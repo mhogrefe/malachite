@@ -2177,7 +2177,7 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
         match (self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => (n.clone(), Natural::ZERO),
-            (n, d) if n as *const Natural == d as *const Natural => (Natural::ONE, Natural::ZERO),
+            (n, d) if std::ptr::eq(n, d) => (Natural::ONE, Natural::ZERO),
             (n, Natural(Small(d))) => {
                 let (q, r) = n.div_mod_limb_ref(*d);
                 (q, Natural(Small(r)))

@@ -4,8 +4,8 @@ use malachite_base::num::conversion::traits::{
     PowerOfTwoDigitIterable, PowerOfTwoDigitIterator, PowerOfTwoDigits,
 };
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::natural::Natural;
+use std::panic::catch_unwind;
 
 #[test]
 pub fn test_power_of_two_digits_primitive() {
@@ -171,49 +171,21 @@ pub fn test_power_of_two_digits_primitive() {
 }
 
 macro_rules! power_of_two_digits_primitive_fail_helper {
-    ($t:ident, $fail_1:ident, $fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            PowerOfTwoDigitIterable::<$t>::power_of_two_digits(&Natural::from(107u32), 0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            PowerOfTwoDigitIterable::<$t>::power_of_two_digits(&Natural::from(107u32), 200);
-        }
+    ($t:ident) => {
+        let x = Natural::from(107u32);
+        assert_panic!(PowerOfTwoDigitIterable::<$t>::power_of_two_digits(&x, 0));
+        let x = Natural::from(107u32);
+        assert_panic!(PowerOfTwoDigitIterable::<$t>::power_of_two_digits(&x, 200));
     };
 }
 
-power_of_two_digits_primitive_fail_helper!(
-    u8,
-    natural_power_of_two_digits_u8_fail_1,
-    natural_power_of_two_digits_u8_fail_2
-);
-power_of_two_digits_primitive_fail_helper!(
-    u16,
-    natural_power_of_two_digits_u16_fail_1,
-    natural_power_of_two_digits_u16_fail_2
-);
-power_of_two_digits_primitive_fail_helper!(
-    u32,
-    natural_power_of_two_digits_u32_fail_1,
-    natural_power_of_two_digits_u32_fail_2
-);
-power_of_two_digits_primitive_fail_helper!(
-    u64,
-    natural_power_of_two_digits_u64_fail_1,
-    natural_power_of_two_digits_u64_fail_2
-);
-power_of_two_digits_primitive_fail_helper!(
-    usize,
-    natural_power_of_two_digits_usize_fail_1,
-    natural_power_of_two_digits_usize_fail_2
-);
+#[test]
+fn power_of_two_digits_fail() {
+    apply_to_unsigneds!(power_of_two_digits_primitive_fail_helper);
+}
 
 #[test]
-pub fn test_power_of_two_digits() {
+pub fn test_power_of_two_digits_natural() {
     let n = Natural::from(107u32);
     assert_eq!(
         PowerOfTwoDigits::<Natural>::to_power_of_two_digits_asc(&n, 2).to_debug_string(),

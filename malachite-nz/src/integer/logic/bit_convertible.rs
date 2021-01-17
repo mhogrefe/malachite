@@ -111,10 +111,8 @@ fn from_bits_helper(mut limbs: Vec<Limb>, sign_bit: bool, last_width: u64) -> In
             *limbs.last_mut().unwrap() |= !Limb::low_mask(last_width);
         }
         assert!(!limbs_twos_complement_in_place(&mut limbs));
-        -Natural::from_owned_limbs_asc(limbs)
-    } else {
-        Integer::from(Natural::from_owned_limbs_asc(limbs))
     }
+    Integer::from_sign_and_abs(!sign_bit, Natural::from_owned_limbs_asc(limbs))
 }
 
 impl BitConvertible for Integer {

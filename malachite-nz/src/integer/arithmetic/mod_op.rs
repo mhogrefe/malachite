@@ -129,16 +129,14 @@ impl<'a> Mod<Integer> for &'a Integer {
     /// assert_eq!((&Integer::from(-23)).mod_op(Integer::from(-10)).to_string(), "-3");
     /// ```
     fn mod_op(self, other: Integer) -> Integer {
-        let r = if self.sign == other.sign {
-            &self.abs % other.abs
-        } else {
-            (&self.abs).neg_mod(other.abs)
-        };
-        if other.sign {
-            Integer::from(r)
-        } else {
-            -r
-        }
+        Integer::from_sign_and_abs(
+            other.sign,
+            if self.sign == other.sign {
+                &self.abs % other.abs
+            } else {
+                (&self.abs).neg_mod(other.abs)
+            },
+        )
     }
 }
 
@@ -179,16 +177,14 @@ impl<'a, 'b> Mod<&'b Integer> for &'a Integer {
     /// assert_eq!((&Integer::from(-23)).mod_op(&Integer::from(-10)).to_string(), "-3");
     /// ```
     fn mod_op(self, other: &'b Integer) -> Integer {
-        let r = if self.sign == other.sign {
-            &self.abs % &other.abs
-        } else {
-            (&self.abs).neg_mod(&other.abs)
-        };
-        if other.sign {
-            Integer::from(r)
-        } else {
-            -r
-        }
+        Integer::from_sign_and_abs(
+            other.sign,
+            if self.sign == other.sign {
+                &self.abs % &other.abs
+            } else {
+                (&self.abs).neg_mod(&other.abs)
+            },
+        )
     }
 }
 
@@ -408,12 +404,7 @@ impl<'a> Rem<Integer> for &'a Integer {
     /// ```
     #[inline]
     fn rem(self, other: Integer) -> Integer {
-        let r = &self.abs % other.abs;
-        if self.sign {
-            Integer::from(r)
-        } else {
-            -r
-        }
+        Integer::from_sign_and_abs(self.sign, &self.abs % other.abs)
     }
 }
 
@@ -451,12 +442,7 @@ impl<'a, 'b> Rem<&'b Integer> for &'a Integer {
     /// ```
     #[inline]
     fn rem(self, other: &'b Integer) -> Integer {
-        let r = &self.abs % &other.abs;
-        if self.sign {
-            Integer::from(r)
-        } else {
-            -r
-        }
+        Integer::from_sign_and_abs(self.sign, &self.abs % &other.abs)
     }
 }
 
@@ -673,16 +659,14 @@ impl<'a> CeilingMod<Integer> for &'a Integer {
     /// assert_eq!((&Integer::from(-23)).ceiling_mod(Integer::from(-10)).to_string(), "7");
     /// ```
     fn ceiling_mod(self, other: Integer) -> Integer {
-        let r = if self.sign == other.sign {
-            (&self.abs).neg_mod(other.abs)
-        } else {
-            &self.abs % other.abs
-        };
-        if other.sign {
-            -r
-        } else {
-            Integer::from(r)
-        }
+        Integer::from_sign_and_abs(
+            !other.sign,
+            if self.sign == other.sign {
+                (&self.abs).neg_mod(other.abs)
+            } else {
+                &self.abs % other.abs
+            },
+        )
     }
 }
 
@@ -723,16 +707,14 @@ impl<'a, 'b> CeilingMod<&'b Integer> for &'a Integer {
     /// assert_eq!((&Integer::from(-23)).ceiling_mod(&Integer::from(-10)).to_string(), "7");
     /// ```
     fn ceiling_mod(self, other: &'b Integer) -> Integer {
-        let r = if self.sign == other.sign {
-            (&self.abs).neg_mod(&other.abs)
-        } else {
-            &self.abs % &other.abs
-        };
-        if other.sign {
-            -r
-        } else {
-            Integer::from(r)
-        }
+        Integer::from_sign_and_abs(
+            !other.sign,
+            if self.sign == other.sign {
+                (&self.abs).neg_mod(&other.abs)
+            } else {
+                &self.abs % &other.abs
+            },
+        )
     }
 }
 

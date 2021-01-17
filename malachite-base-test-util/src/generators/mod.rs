@@ -2,7 +2,7 @@ use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::conversion::traits::{SaturatingFrom, WrappingFrom};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
 use malachite_base::tuples::exhaustive::{exhaustive_pairs_custom_output, ExhaustivePairs};
@@ -50,10 +50,7 @@ pub fn exhaustive_pairs_big_small<
     )
 }
 
-pub(crate) fn digits_valid<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
-    log_base: u64,
-    digits: &[U],
-) -> bool {
+fn digits_valid<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(log_base: u64, digits: &[U]) -> bool {
     let digits = &digits[..digits.len() - slice_trailing_zeros(digits)];
     if digits.is_empty() {
         return true;
@@ -267,6 +264,18 @@ pub fn unsigned_gen_var_3<T: PrimitiveInt>() -> Generator<u64> {
     )
 }
 
+/// All `u64`s where the `u64` is greater than 1 and exactly convertible to the unsigned types `T`
+/// and `U`.
+pub fn unsigned_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<u64>
+where
+    u64: SaturatingFrom<T> + SaturatingFrom<U>,
+{
+    Generator::new_no_special(
+        &exhaustive_unsigned_gen_var_4::<T, U>,
+        &random_unsigned_gen_var_4::<T, U>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
@@ -319,6 +328,19 @@ pub fn unsigned_pair_gen_var_5<T: PrimitiveUnsigned, U: PrimitiveInt>() -> Gener
     Generator::new_no_special(
         &exhaustive_unsigned_pair_gen_var_4::<T, U>,
         &random_unsigned_pair_gen_var_2::<T, U>,
+    )
+}
+
+/// All `(T, u64)`s where `T` is unsigned, and the `u64` is greater than 1 and exactly convertible
+/// to both `T` and an unsigned type `U`.
+pub fn unsigned_pair_gen_var_6<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, u64)>
+where
+    u64: SaturatingFrom<T> + SaturatingFrom<U>,
+{
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_5::<T, U>,
+        &random_primitive_int_unsigned_pair_gen_var_4::<T, U>,
+        &special_random_unsigned_pair_gen_var_4::<T, U>,
     )
 }
 
@@ -521,6 +543,17 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_1<
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_1,
         &random_primitive_int_vec_unsigned_primitive_int_triple_gen_var_1,
         &special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(Vec<T>, usize, usize)` where `T` is unsigned and the length of the `Vec` is at least the
+// product of the `usize`s.
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+) -> Generator<(Vec<T>, usize, usize)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_2,
+        &random_primitive_int_vec_unsigned_unsigned_triple_gen_var_1,
+        &special_random_primitive_int_vec_unsigned_unsigned_triple_gen_var_1,
     )
 }
 

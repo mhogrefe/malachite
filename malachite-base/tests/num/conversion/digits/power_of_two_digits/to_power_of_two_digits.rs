@@ -93,7 +93,7 @@ fn to_power_of_two_digits_asc_helper<
     U: PrimitiveUnsigned,
 >() {
     unsigned_pair_gen_var_4::<T, U>().test_properties(|(u, log_base)| {
-        let digits: Vec<U> = u.to_power_of_two_digits_asc(log_base);
+        let digits = PowerOfTwoDigits::<U>::to_power_of_two_digits_asc(&u, log_base);
         assert_eq!(
             T::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
             u
@@ -142,7 +142,7 @@ fn to_power_of_two_digits_desc_helper<
     U: PrimitiveUnsigned,
 >() {
     unsigned_pair_gen_var_4::<T, U>().test_properties(|(u, log_base)| {
-        let digits: Vec<U> = u.to_power_of_two_digits_desc(log_base);
+        let digits = PowerOfTwoDigits::<U>::to_power_of_two_digits_desc(&u, log_base);
         assert_eq!(
             T::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
             u

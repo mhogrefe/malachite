@@ -1,23 +1,41 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::random::geometric::{
     geometric_random_unsigneds, GeometricRandomNaturalValues,
 };
 use malachite_base::num::random::striped::{
     get_striped_unsigned_vec, striped_random_unsigned_vecs,
-    striped_random_unsigned_vecs_length_range, StripedBitSource, StripedRandomUnsignedVecs,
+    striped_random_unsigned_vecs_length_range, striped_random_unsigned_vecs_min_length,
+    StripedBitSource, StripedRandomUnsignedVecs,
 };
-use malachite_base::num::random::RandomUnsignedRange;
+use malachite_base::num::random::{random_unsigned_inclusive_range, RandomUnsignedRange};
 use malachite_base::options::random::{random_options, RandomOptions};
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::tuples::random::random_pairs;
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{GenConfig, It};
+use malachite_base_test_util::generators::exhaustive::unsigned_pair_gen_var_5_limit;
+use malachite_nz::integer::random::striped_random_integers;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, GET_STR_PRECOMPUTE_THRESHOLD,
 };
 use malachite_nz::natural::random::striped_random_naturals;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+
+// -- Integer --
+
+pub fn special_random_integer_gen(config: &GenConfig) -> It<Integer> {
+    Box::new(striped_random_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
 
 // -- Natural --
 
@@ -28,6 +46,33 @@ pub fn special_random_natural_gen(config: &GenConfig) -> It<Natural> {
         config.get_or("mean_stripe_d", 1),
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+pub fn special_random_unsigned_vec_unsigned_pair_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Vec<T>, u64)>
+where
+    u64: SaturatingFrom<T> + SaturatingFrom<U>,
+{
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigned_vecs_min_length(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                2,
+                config.get_or("mean_length_n", 6),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 2, unsigned_pair_gen_var_5_limit::<T, U>()),
     ))
 }
 

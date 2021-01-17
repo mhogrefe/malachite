@@ -1,18 +1,24 @@
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, SaturatingFrom};
 use malachite_base_test_util::bench::bucketers::{
-    quadruple_3_vec_len_bucketer, triple_3_vec_len_bucketer,
+    pair_1_vec_len_bucketer, quadruple_3_vec_len_bucketer, triple_3_vec_len_bucketer,
 };
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::conversion::digits::general_digits::{
-    _limbs_to_digits_small_base, _limbs_to_digits_small_base_basecase, _to_digits_asc_naive,
+    _limbs_to_digits_basecase, _limbs_to_digits_small_base, _limbs_to_digits_small_base_basecase,
+    _to_digits_asc_naive,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_to_digits_small_base_basecase);
     register_demo!(runner, demo_limbs_to_digits_small_base);
+    register_unsigned_demos!(runner, demo_limbs_to_digits_basecase);
+
     register_bench!(
         runner,
         benchmark_limbs_to_digits_small_base_basecase_algorithms
@@ -22,6 +28,7 @@ pub(crate) fn register(runner: &mut Runner) {
         benchmark_limbs_to_digits_small_base_basecase_algorithms_2
     );
     register_bench!(runner, benchmark_limbs_to_digits_small_base_algorithms);
+    register_unsigned_benches!(runner, benchmark_limbs_to_digits_basecase);
 }
 
 fn demo_limbs_to_digits_small_base_basecase(gm: GenMode, config: GenConfig, limit: usize) {
@@ -50,6 +57,27 @@ fn demo_limbs_to_digits_small_base(gm: GenMode, config: GenConfig, limit: usize)
         println!(
             "out := {:?}; _limbs_to_digits_small_base(&mut out, {}, {:?}) = {}; out = {:?}",
             old_out, base, xs, out_len, out
+        );
+    }
+}
+
+fn demo_limbs_to_digits_basecase<T: ConvertibleFrom<u64> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    u64: SaturatingFrom<T>,
+{
+    for (mut xs, base) in unsigned_vec_unsigned_pair_gen_var_1::<Limb, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let xs_old = xs.clone();
+        println!(
+            "_limbs_to_digits_basecase(&{:?}, {}) = {:?}",
+            xs_old,
+            base,
+            _limbs_to_digits_basecase::<T>(&mut xs, base)
         );
     }
 }
@@ -144,5 +172,27 @@ fn benchmark_limbs_to_digits_small_base_algorithms(
                 ))
             }),
         ],
+    );
+}
+
+fn benchmark_limbs_to_digits_basecase<T: ConvertibleFrom<u64> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    u64: SaturatingFrom<T>,
+{
+    run_benchmark(
+        "_limbs_to_digits_basecase(&mut [Limb], u64)",
+        BenchmarkType::Single,
+        unsigned_vec_unsigned_pair_gen_var_1::<Limb, T>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_bucketer("xs"),
+        &mut [("Malachite", &mut |(mut xs, base)| {
+            no_out!(_limbs_to_digits_basecase::<T>(&mut xs, base))
+        })],
     );
 }

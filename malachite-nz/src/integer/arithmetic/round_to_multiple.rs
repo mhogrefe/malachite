@@ -264,11 +264,10 @@ impl<'a> RoundToMultiple<Integer> for &'a Integer {
     /// );
     /// ```
     fn round_to_multiple(self, other: Integer, rm: RoundingMode) -> Integer {
-        if self.sign {
-            Integer::from((&self.abs).round_to_multiple(other.abs, rm))
-        } else {
-            -(&self.abs).round_to_multiple(other.abs, -rm)
-        }
+        Integer::from_sign_and_abs(
+            self.sign,
+            (&self.abs).round_to_multiple(other.abs, if self.sign { rm } else { -rm }),
+        )
     }
 }
 
@@ -362,11 +361,10 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
     /// );
     /// ```
     fn round_to_multiple(self, other: &'b Integer, rm: RoundingMode) -> Integer {
-        if self.sign {
-            Integer::from((&self.abs).round_to_multiple(&other.abs, rm))
-        } else {
-            -(&self.abs).round_to_multiple(&other.abs, -rm)
-        }
+        Integer::from_sign_and_abs(
+            self.sign,
+            (&self.abs).round_to_multiple(&other.abs, if self.sign { rm } else { -rm }),
+        )
     }
 }
 

@@ -2193,7 +2193,7 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
         match (self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => n.clone(),
-            (n, d) if n as *const Natural == d as *const Natural => Natural::ONE,
+            (n, d) if std::ptr::eq(n, d) => Natural::ONE,
             (n, &Natural(Small(d))) => n.div_limb_ref(d),
             (Natural(Small(_)), _) => Natural::ZERO,
             (&Natural(Large(ref ns)), &Natural(Large(ref ds))) => {

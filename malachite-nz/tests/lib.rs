@@ -142,6 +142,18 @@ pub mod integer {
         pub mod trailing_zeros;
         pub mod xor;
     }
+    pub mod random {
+        pub mod random_integers;
+        pub mod random_natural_integers;
+        pub mod random_negative_integers;
+        pub mod random_nonzero_integers;
+        pub mod random_positive_integers;
+        pub mod striped_random_integers;
+        pub mod striped_random_natural_integers;
+        pub mod striped_random_negative_integers;
+        pub mod striped_random_nonzero_integers;
+        pub mod striped_random_positive_integers;
+    }
 }
 pub mod natural {
     pub mod arithmetic {

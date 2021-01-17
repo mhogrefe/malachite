@@ -1,13 +1,18 @@
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
 use malachite_base::slices::slice_leading_zeros;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_nz::natural::conversion::digits::general_digits::{
-    PowerTableAlgorithm, _limbs_to_digits_small_base, _limbs_to_digits_small_base_basecase,
-    _to_digits_asc_naive,
+    PowerTableAlgorithm, _limbs_to_digits_basecase, _limbs_to_digits_small_base,
+    _limbs_to_digits_small_base_basecase, _to_digits_asc_naive,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::*;
+use std::panic::catch_unwind;
 
 fn verify_limbs_to_digits_small_base_basecase(
     original_out: &[u8],
@@ -387,4 +392,119 @@ fn limbs_to_digits_small_base_properties() {
             assert_eq!(out, result);
         },
     );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_to_digits_basecase() {
+    fn test<T: CheckedFrom<Natural> + ConvertibleFrom<u64> + PrimitiveUnsigned>(
+        xs_before: &[Limb],
+        base: u64,
+        out: &[T],
+    ) {
+        let mut xs = xs_before.to_vec();
+        assert_eq!(_limbs_to_digits_basecase::<T>(&mut xs, base), out);
+        assert_eq!(
+            _to_digits_asc_naive::<T, _>(&Natural::from_limbs_asc(xs_before), base),
+            out
+        );
+    };
+    test::<u64>(&[0, 0], 64, &[]);
+    test::<u64>(&[2, 0], 64, &[2]);
+    test::<u16>(&[123, 0], 8, &[3, 7, 1]);
+    test::<u16>(&[1000000, 0], 256, &[64, 66, 15]);
+    test::<u64>(&[1000000, 0], 256, &[64, 66, 15]);
+    test::<u32>(&[1000, 0], 2, &[0, 0, 0, 1, 0, 1, 1, 1, 1, 1]);
+
+    test::<u32>(&[0, 0], 3, &[]);
+    test::<u32>(&[2, 0], 3, &[2]);
+    test::<u32>(&[123456, 0], 3, &[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]);
+    test::<u32>(&[123456, 0], 10, &[6, 5, 4, 3, 2, 1]);
+    test::<u32>(&[123456, 0], 100, &[56, 34, 12]);
+    test::<u32>(&[123456, 0], 123, &[87, 19, 8]);
+
+    test::<u32>(
+        &[123, 456, 789],
+        2,
+        &[
+            1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1,
+        ],
+    );
+    test::<u32>(
+        &[123, 456, 789],
+        3,
+        &[
+            0, 0, 2, 2, 0, 1, 0, 0, 1, 1, 1, 0, 2, 1, 1, 0, 0, 2, 0, 2, 0, 0, 2, 0, 2, 2, 0, 0, 1,
+            1, 0, 1, 2, 0, 0, 2, 2, 0, 1, 0, 0, 0, 1, 2, 2, 1, 1,
+        ],
+    );
+    test::<u32>(
+        &[123, 456, 789],
+        10,
+        &[
+            3, 2, 1, 2, 1, 3, 1, 4, 3, 5, 1, 1, 6, 7, 0, 1, 8, 4, 4, 5, 5, 4, 1,
+        ],
+    );
+    test::<u32>(
+        &[123, 456, 789],
+        100,
+        &[23, 21, 31, 41, 53, 11, 76, 10, 48, 54, 45, 1],
+    );
+    test::<u32>(
+        &[123, 456, 789],
+        128,
+        &[123, 0, 0, 0, 0, 57, 0, 0, 0, 42, 12],
+    );
+    test::<u64>(
+        &[123, 456, 789],
+        u64::power_of_two(16),
+        &[123, 0, 456, 0, 789],
+    );
+}
+
+fn limbs_to_digits_basecase_fail_helper<T: ConvertibleFrom<u64> + PrimitiveUnsigned>() {
+    assert_panic!(_limbs_to_digits_basecase::<T>(&mut [1], 2));
+    assert_panic!(_limbs_to_digits_basecase::<T>(&mut [123, 456], 0));
+    assert_panic!(_limbs_to_digits_basecase::<T>(&mut [123, 456], 1));
+}
+
+#[test]
+fn limbs_to_digits_basecase_fail() {
+    apply_fn_to_unsigneds!(limbs_to_digits_basecase_fail_helper);
+
+    assert_panic!(_limbs_to_digits_basecase::<u8>(&mut [123, 456], 300));
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        assert_panic!(_limbs_to_digits_basecase::<u64>(&mut [123, 456], u64::MAX));
+    }
+}
+
+fn limbs_to_digits_basecase_properties_helper<
+    T: CheckedFrom<Natural> + ConvertibleFrom<u64> + PrimitiveUnsigned,
+>()
+where
+    u64: SaturatingFrom<T>,
+{
+    let mut config = GenConfig::new();
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    config.insert("mean_stripe_d", 1);
+    config.insert("mean_length_n", 32);
+    config.insert("mean_length_d", 1);
+    unsigned_vec_unsigned_pair_gen_var_1::<Limb, T>().test_properties_with_config(
+        &config,
+        |(mut xs, base)| {
+            let xs_old = xs.clone();
+            assert_eq!(
+                _limbs_to_digits_basecase::<T>(&mut xs, base),
+                _to_digits_asc_naive::<T, _>(&Natural::from_limbs_asc(&xs_old), base)
+            );
+        },
+    );
+}
+
+#[test]
+fn limbs_to_digits_basecase_properties() {
+    apply_fn_to_unsigneds!(limbs_to_digits_basecase_properties_helper);
 }

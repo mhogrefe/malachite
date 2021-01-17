@@ -195,7 +195,7 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 /// This is mpn_add from gmp.h, GMP 6.1.2, where the first input is at least as long as the second,
 /// and the output is returned.
 pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
-    if xs as *const [Limb] == ys as *const [Limb] {
+    if std::ptr::eq(xs, ys) {
         return limbs_shl(xs, 1);
     }
     let xs_len = xs.len();
@@ -499,7 +499,7 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 /// This is mpz_add from mpz/aors.h, GMP 6.1.2, where both inputs are non-negative and the output is
 /// written to the first input.
 pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
-    if xs.as_slice() as *const [Limb] == ys as *const [Limb] {
+    if std::ptr::eq(xs.as_slice(), ys) {
         limbs_vec_shl_in_place(xs, 1);
         return;
     }

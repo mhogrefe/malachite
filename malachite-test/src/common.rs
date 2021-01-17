@@ -284,22 +284,3 @@ pub fn test_properties_custom_limit<
         }
     }
 }
-
-pub fn test_properties_custom_limit_no_special<
-    T,
-    G: Fn(NoSpecialGenerationMode) -> Box<dyn Iterator<Item = T>>,
-    F: FnMut(&T),
->(
-    limit: usize,
-    gen: G,
-    mut test: F,
-) {
-    for &gm in &[
-        NoSpecialGenerationMode::Exhaustive,
-        NoSpecialGenerationMode::Random(32),
-    ] {
-        for x in gen(gm).take(limit) {
-            test(&x);
-        }
-    }
-}

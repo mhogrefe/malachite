@@ -1,11 +1,9 @@
-use std::str::FromStr;
-
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::PowerOfTwoDigits;
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::natural::Natural;
+use std::panic::catch_unwind;
+use std::str::FromStr;
 
 #[test]
 fn test_to_power_of_two_digits_asc() {
@@ -72,52 +70,24 @@ fn test_to_power_of_two_digits_asc() {
     );
 }
 
-macro_rules! to_power_of_two_digits_asc_fail_helper {
-    ($t:ident, $fail_1:ident, $fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            PowerOfTwoDigits::<$t>::to_power_of_two_digits_asc(&Natural::trillion(), 0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            PowerOfTwoDigits::<$t>::to_power_of_two_digits_asc(&Natural::trillion(), $t::WIDTH + 1);
-        }
-    };
+fn to_power_of_two_digits_asc_fail_helper<T: PrimitiveUnsigned>()
+where
+    Natural: PowerOfTwoDigits<T>,
+{
+    assert_panic!(PowerOfTwoDigits::<T>::to_power_of_two_digits_asc(
+        &Natural::trillion(),
+        0
+    ));
+    assert_panic!(PowerOfTwoDigits::<T>::to_power_of_two_digits_asc(
+        &Natural::trillion(),
+        T::WIDTH + 1
+    ));
 }
 
-to_power_of_two_digits_asc_fail_helper!(
-    u8,
-    to_power_of_two_digits_asc_u8_fail_1,
-    to_power_of_two_digits_asc_u8_fail_2
-);
-to_power_of_two_digits_asc_fail_helper!(
-    u16,
-    to_power_of_two_digits_asc_u16_fail_1,
-    to_power_of_two_digits_asc_u16_fail_2
-);
-to_power_of_two_digits_asc_fail_helper!(
-    u32,
-    to_power_of_two_digits_asc_u32_fail_1,
-    to_power_of_two_digits_asc_u32_fail_2
-);
-to_power_of_two_digits_asc_fail_helper!(
-    u64,
-    to_power_of_two_digits_asc_u64_fail_1,
-    to_power_of_two_digits_asc_u64_fail_2
-);
-to_power_of_two_digits_asc_fail_helper!(
-    u128,
-    to_power_of_two_digits_asc_u128_fail_1,
-    to_power_of_two_digits_asc_u128_fail_2
-);
-to_power_of_two_digits_asc_fail_helper!(
-    usize,
-    to_power_of_two_digits_asc_usize_fail_1,
-    to_power_of_two_digits_asc_usize_fail_2
-);
+#[test]
+fn to_power_of_two_digits_asc_fail() {
+    apply_fn_to_unsigneds!(to_power_of_two_digits_asc_fail_helper);
+}
 
 #[test]
 fn test_to_power_of_two_digits_desc() {
@@ -156,55 +126,24 @@ fn test_to_power_of_two_digits_desc() {
     );
 }
 
-macro_rules! to_power_of_two_digits_desc_fail_helper {
-    ($t:ident, $fail_1:ident, $fail_2:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            PowerOfTwoDigits::<$t>::to_power_of_two_digits_desc(&Natural::trillion(), 0);
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            PowerOfTwoDigits::<$t>::to_power_of_two_digits_desc(
-                &Natural::trillion(),
-                $t::WIDTH + 1,
-            );
-        }
-    };
+fn to_power_of_two_digits_desc_fail_helper<T: PrimitiveUnsigned>()
+where
+    Natural: PowerOfTwoDigits<T>,
+{
+    assert_panic!(PowerOfTwoDigits::<T>::to_power_of_two_digits_desc(
+        &Natural::trillion(),
+        0
+    ));
+    assert_panic!(PowerOfTwoDigits::<T>::to_power_of_two_digits_desc(
+        &Natural::trillion(),
+        T::WIDTH + 1
+    ));
 }
 
-to_power_of_two_digits_desc_fail_helper!(
-    u8,
-    to_power_of_two_digits_desc_u8_fail_1,
-    to_power_of_two_digits_desc_u8_fail_2
-);
-to_power_of_two_digits_desc_fail_helper!(
-    u16,
-    to_power_of_two_digits_desc_u16_fail_1,
-    to_power_of_two_digits_desc_u16_fail_2
-);
-to_power_of_two_digits_desc_fail_helper!(
-    u32,
-    to_power_of_two_digits_desc_u32_fail_1,
-    to_power_of_two_digits_desc_u32_fail_2
-);
-to_power_of_two_digits_desc_fail_helper!(
-    u64,
-    to_power_of_two_digits_desc_u64_fail_1,
-    to_power_of_two_digits_desc_u64_fail_2
-);
-to_power_of_two_digits_desc_fail_helper!(
-    u128,
-    to_power_of_two_digits_desc_u128_fail_1,
-    to_power_of_two_digits_desc_u128_fail_2
-);
-to_power_of_two_digits_desc_fail_helper!(
-    usize,
-    to_power_of_two_digits_desc_usize_fail_1,
-    to_power_of_two_digits_desc_usize_fail_2
-);
+#[test]
+fn to_power_of_two_digits_desc_fail() {
+    apply_fn_to_unsigneds!(to_power_of_two_digits_desc_fail_helper);
+}
 
 #[test]
 fn test_to_power_of_two_digits_asc_natural() {

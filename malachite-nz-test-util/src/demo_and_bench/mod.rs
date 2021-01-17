@@ -38,7 +38,9 @@ macro_rules! natural_signed_single_arg_bench_with_trait {
 }
 
 pub(crate) fn register(runner: &mut Runner) {
+    integer::register(runner);
     natural::register(runner);
 }
 
+mod integer;
 mod natural;

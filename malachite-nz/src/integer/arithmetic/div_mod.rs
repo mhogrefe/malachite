@@ -134,14 +134,16 @@ impl<'a> DivMod<Integer> for &'a Integer {
     /// assert_eq!(format!("{:?}", (&Integer::from(-23)).div_mod(Integer::from(-10))), "(2, -3)");
     /// ```
     fn div_mod(self, other: Integer) -> (Integer, Integer) {
-        let (q, r) = if self.sign == other.sign {
-            let (q, r) = (&self.abs).div_mod(other.abs);
-            (Integer::from(q), r)
+        let q_sign = self.sign == other.sign;
+        let (q, r) = if q_sign {
+            (&self.abs).div_mod(other.abs)
         } else {
-            let (q, r) = (&self.abs).ceiling_div_neg_mod(other.abs);
-            (-q, r)
+            (&self.abs).ceiling_div_neg_mod(other.abs)
         };
-        (q, if other.sign { Integer::from(r) } else { -r })
+        (
+            Integer::from_sign_and_abs(q_sign, q),
+            Integer::from_sign_and_abs(other.sign, r),
+        )
     }
 }
 
@@ -184,14 +186,16 @@ impl<'a, 'b> DivMod<&'b Integer> for &'a Integer {
     /// assert_eq!(format!("{:?}", (&Integer::from(-23)).div_mod(&Integer::from(-10))), "(2, -3)");
     /// ```
     fn div_mod(self, other: &'b Integer) -> (Integer, Integer) {
-        let (q, r) = if self.sign == other.sign {
-            let (q, r) = (&self.abs).div_mod(&other.abs);
-            (Integer::from(q), r)
+        let q_sign = self.sign == other.sign;
+        let (q, r) = if q_sign {
+            (&self.abs).div_mod(&other.abs)
         } else {
-            let (q, r) = (&self.abs).ceiling_div_neg_mod(&other.abs);
-            (-q, r)
+            (&self.abs).ceiling_div_neg_mod(&other.abs)
         };
-        (q, if other.sign { Integer::from(r) } else { -r })
+        (
+            Integer::from_sign_and_abs(q_sign, q),
+            Integer::from_sign_and_abs(other.sign, r),
+        )
     }
 }
 
@@ -251,11 +255,7 @@ impl DivAssignMod<Integer> for Integer {
             }
             r
         };
-        if other.sign {
-            Integer::from(r)
-        } else {
-            -r
-        }
+        Integer::from_sign_and_abs(other.sign, r)
     }
 }
 
@@ -315,11 +315,7 @@ impl<'a> DivAssignMod<&'a Integer> for Integer {
             }
             r
         };
-        if other.sign {
-            Integer::from(r)
-        } else {
-            -r
-        }
+        Integer::from_sign_and_abs(other.sign, r)
     }
 }
 
@@ -454,13 +450,10 @@ impl<'a> DivRem<Integer> for &'a Integer {
     #[inline]
     fn div_rem(self, other: Integer) -> (Integer, Integer) {
         let (q, r) = (&self.abs).div_mod(other.abs);
-        let q = if self.sign == other.sign {
-            Integer::from(q)
-        } else {
-            -q
-        };
-        let r = if self.sign { Integer::from(r) } else { -r };
-        (q, r)
+        (
+            Integer::from_sign_and_abs(self.sign == other.sign, q),
+            Integer::from_sign_and_abs(self.sign, r),
+        )
     }
 }
 
@@ -505,13 +498,10 @@ impl<'a, 'b> DivRem<&'b Integer> for &'a Integer {
     #[inline]
     fn div_rem(self, other: &'b Integer) -> (Integer, Integer) {
         let (q, r) = (&self.abs).div_mod(&other.abs);
-        let q = if self.sign == other.sign {
-            Integer::from(q)
-        } else {
-            -q
-        };
-        let r = if self.sign { Integer::from(r) } else { -r };
-        (q, r)
+        (
+            Integer::from_sign_and_abs(self.sign == other.sign, q),
+            Integer::from_sign_and_abs(self.sign, r),
+        )
     }
 }
 
@@ -562,8 +552,7 @@ impl DivAssignRem<Integer> for Integer {
     /// ```
     #[inline]
     fn div_assign_rem(&mut self, other: Integer) -> Integer {
-        let r = self.abs.div_assign_mod(other.abs);
-        let r = if self.sign { Integer::from(r) } else { -r };
+        let r = Integer::from_sign_and_abs(self.sign, self.abs.div_assign_mod(other.abs));
         self.sign = self.sign == other.sign || self.abs == 0;
         r
     }
@@ -616,8 +605,7 @@ impl<'a> DivAssignRem<&'a Integer> for Integer {
     /// ```
     #[inline]
     fn div_assign_rem(&mut self, other: &'a Integer) -> Integer {
-        let r = self.abs.div_assign_mod(&other.abs);
-        let r = if self.sign { Integer::from(r) } else { -r };
+        let r = Integer::from_sign_and_abs(self.sign, self.abs.div_assign_mod(&other.abs));
         self.sign = self.sign == other.sign || self.abs == 0;
         r
     }
@@ -788,14 +776,16 @@ impl<'a> CeilingDivMod<Integer> for &'a Integer {
     /// );
     /// ```
     fn ceiling_div_mod(self, other: Integer) -> (Integer, Integer) {
-        let (q, r) = if self.sign == other.sign {
-            let (q, r) = (&self.abs).ceiling_div_neg_mod(other.abs);
-            (Integer::from(q), r)
+        let q_sign = self.sign == other.sign;
+        let (q, r) = if q_sign {
+            (&self.abs).ceiling_div_neg_mod(other.abs)
         } else {
-            let (q, r) = (&self.abs).div_mod(other.abs);
-            (-q, r)
+            (&self.abs).div_mod(other.abs)
         };
-        (q, if other.sign { -r } else { Integer::from(r) })
+        (
+            Integer::from_sign_and_abs(q_sign, q),
+            Integer::from_sign_and_abs(!other.sign, r),
+        )
     }
 }
 
@@ -850,14 +840,16 @@ impl<'a, 'b> CeilingDivMod<&'b Integer> for &'a Integer {
     /// );
     /// ```
     fn ceiling_div_mod(self, other: &'b Integer) -> (Integer, Integer) {
-        let (q, r) = if self.sign == other.sign {
-            let (q, r) = (&self.abs).ceiling_div_neg_mod(&other.abs);
-            (Integer::from(q), r)
+        let q_sign = self.sign == other.sign;
+        let (q, r) = if q_sign {
+            (&self.abs).ceiling_div_neg_mod(&other.abs)
         } else {
-            let (q, r) = (&self.abs).div_mod(&other.abs);
-            (-q, r)
+            (&self.abs).div_mod(&other.abs)
         };
-        (q, if other.sign { -r } else { Integer::from(r) })
+        (
+            Integer::from_sign_and_abs(q_sign, q),
+            Integer::from_sign_and_abs(!other.sign, r),
+        )
     }
 }
 
@@ -915,11 +907,7 @@ impl CeilingDivAssignMod<Integer> for Integer {
             self.sign = self.abs == 0;
             r
         };
-        if other.sign {
-            -r
-        } else {
-            Integer::from(r)
-        }
+        Integer::from_sign_and_abs(!other.sign, r)
     }
 }
 
@@ -977,10 +965,6 @@ impl<'a> CeilingDivAssignMod<&'a Integer> for Integer {
             self.sign = self.abs == 0;
             r
         };
-        if other.sign {
-            -r
-        } else {
-            Integer::from(r)
-        }
+        Integer::from_sign_and_abs(!other.sign, r)
     }
 }

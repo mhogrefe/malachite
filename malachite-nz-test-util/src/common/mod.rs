@@ -46,12 +46,7 @@ pub fn natural_to_rug_integer(n: &Natural) -> rug::Integer {
 }
 
 pub fn bigint_to_integer(n: &BigInt) -> Integer {
-    let out = biguint_to_natural(n.magnitude());
-    if n.sign() == Sign::Minus {
-        -out
-    } else {
-        Integer::from(out)
-    }
+    Integer::from_sign_and_abs(n.sign() != Sign::Minus, biguint_to_natural(n.magnitude()))
 }
 
 pub fn integer_to_bigint(n: &Integer) -> BigInt {
@@ -64,19 +59,17 @@ pub fn integer_to_bigint(n: &Integer) -> BigInt {
 }
 
 pub fn rug_integer_to_integer(n: &rug::Integer) -> Integer {
-    let out = Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf));
-    if *n >= 0 {
-        Integer::from(out)
-    } else {
-        -out
-    }
+    Integer::from_sign_and_abs(
+        *n >= 0,
+        Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf)),
+    )
 }
 
 pub fn integer_to_rug_integer(n: &Integer) -> rug::Integer {
     let out = natural_to_rug_integer(n.unsigned_abs_ref());
-    if *n < 0 {
-        -out
-    } else {
+    if *n >= 0 {
         out
+    } else {
+        -out
     }
 }

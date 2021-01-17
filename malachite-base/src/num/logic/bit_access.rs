@@ -175,7 +175,7 @@ macro_rules! impl_bit_access_signed {
             ///
             /// If $n < 0$, let
             /// $$
-            /// 2^W = \sum_{i=0}^{W-1} 2^{b_i},
+            /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
             /// $$
             /// where
             /// - $W$ is the type's width
@@ -212,7 +212,6 @@ macro_rules! impl_bit_access_signed {
             /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
             /// \\{b_0, b_1, b_2, \ldots, b_{j-1}, 1, b_ {j+1}, \ldots, b_ {W-1}\\},
             /// $$
-            /// and $i < W$.
             ///
             /// If $n < 0$ or $j = W - 1$, let
             /// $$

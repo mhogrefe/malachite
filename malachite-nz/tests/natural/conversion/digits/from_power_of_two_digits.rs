@@ -1,8 +1,8 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::PowerOfTwoDigits;
 use malachite_base::vecs::vec_from_str;
-
 use malachite_nz::natural::Natural;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_from_power_of_two_digits_asc() {
@@ -46,64 +46,28 @@ fn test_from_power_of_two_digits_asc() {
     );
 }
 
-macro_rules! from_power_of_two_digits_asc_fail_helper {
-    ($t:ident, $fail_1:ident, $fail_2:ident, $fail_3:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            Natural::from_power_of_two_digits_asc(0, [0u32].iter().cloned());
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            Natural::from_power_of_two_digits_asc(33, [2u32].iter().cloned());
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_3() {
-            Natural::from_power_of_two_digits_asc(1, [2u32].iter().cloned());
-        }
-    };
+fn from_power_of_two_digits_asc_fail_helper<T: PrimitiveUnsigned>()
+where
+    Natural: PowerOfTwoDigits<T>,
+{
+    assert_panic!(Natural::from_power_of_two_digits_asc(
+        0,
+        [T::ZERO].iter().cloned()
+    ));
+    assert_panic!(Natural::from_power_of_two_digits_asc(
+        T::WIDTH + 1,
+        [T::TWO].iter().cloned()
+    ));
+    assert_panic!(Natural::from_power_of_two_digits_asc(
+        1,
+        [T::TWO].iter().cloned()
+    ));
 }
 
-from_power_of_two_digits_asc_fail_helper!(
-    u8,
-    from_power_of_two_digits_asc_u8_fail_1,
-    from_power_of_two_digits_asc_u8_fail_2,
-    from_power_of_two_digits_asc_u8_fail_3
-);
-from_power_of_two_digits_asc_fail_helper!(
-    u16,
-    from_power_of_two_digits_asc_u16_fail_1,
-    from_power_of_two_digits_asc_u16_fail_2,
-    from_power_of_two_digits_asc_u16_fail_3
-);
-from_power_of_two_digits_asc_fail_helper!(
-    u32,
-    from_power_of_two_digits_asc_u32_fail_1,
-    from_power_of_two_digits_asc_u32_fail_2,
-    from_power_of_two_digits_asc_u32_fail_3
-);
-from_power_of_two_digits_asc_fail_helper!(
-    u64,
-    from_power_of_two_digits_asc_u64_fail_1,
-    from_power_of_two_digits_asc_u64_fail_2,
-    from_power_of_two_digits_asc_u64_fail_3
-);
-from_power_of_two_digits_asc_fail_helper!(
-    u128,
-    from_power_of_two_digits_asc_u128_fail_1,
-    from_power_of_two_digits_asc_u128_fail_2,
-    from_power_of_two_digits_asc_u128_fail_3
-);
-from_power_of_two_digits_asc_fail_helper!(
-    usize,
-    from_power_of_two_digits_asc_usize_fail_1,
-    from_power_of_two_digits_asc_usize_fail_2,
-    from_power_of_two_digits_asc_usize_fail_3
-);
+#[test]
+fn from_power_of_two_digits_asc_fail() {
+    apply_fn_to_unsigneds!(from_power_of_two_digits_asc_fail_helper);
+}
 
 #[test]
 fn test_from_power_of_two_digits_desc() {
@@ -142,66 +106,28 @@ fn test_from_power_of_two_digits_desc() {
     );
 }
 
-//TODO clean
-
-macro_rules! from_power_of_two_digits_desc_fail_helper {
-    ($t:ident, $fail_1:ident, $fail_2:ident, $fail_3:ident) => {
-        #[test]
-        #[should_panic]
-        fn $fail_1() {
-            Natural::from_power_of_two_digits_desc(0, [0u32].iter().cloned());
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_2() {
-            Natural::from_power_of_two_digits_desc(33, [2u32].iter().cloned());
-        }
-
-        #[test]
-        #[should_panic]
-        fn $fail_3() {
-            Natural::from_power_of_two_digits_desc(1, [2u32].iter().cloned());
-        }
-    };
+fn from_power_of_two_digits_desc_fail_helper<T: PrimitiveUnsigned>()
+where
+    Natural: PowerOfTwoDigits<T>,
+{
+    assert_panic!(Natural::from_power_of_two_digits_desc(
+        0,
+        [T::ZERO].iter().cloned()
+    ));
+    assert_panic!(Natural::from_power_of_two_digits_desc(
+        T::WIDTH + 1,
+        [T::TWO].iter().cloned()
+    ));
+    assert_panic!(Natural::from_power_of_two_digits_desc(
+        1,
+        [T::TWO].iter().cloned()
+    ));
 }
 
-from_power_of_two_digits_desc_fail_helper!(
-    u8,
-    from_power_of_two_digits_desc_u8_fail_1,
-    from_power_of_two_digits_desc_u8_fail_2,
-    from_power_of_two_digits_desc_u8_fail_3
-);
-from_power_of_two_digits_desc_fail_helper!(
-    u16,
-    from_power_of_two_digits_desc_u16_fail_1,
-    from_power_of_two_digits_desc_u16_fail_2,
-    from_power_of_two_digits_desc_u16_fail_3
-);
-from_power_of_two_digits_desc_fail_helper!(
-    u32,
-    from_power_of_two_digits_desc_u32_fail_1,
-    from_power_of_two_digits_desc_u32_fail_2,
-    from_power_of_two_digits_desc_u32_fail_3
-);
-from_power_of_two_digits_desc_fail_helper!(
-    u64,
-    from_power_of_two_digits_desc_u64_fail_1,
-    from_power_of_two_digits_desc_u64_fail_2,
-    from_power_of_two_digits_desc_u64_fail_3
-);
-from_power_of_two_digits_desc_fail_helper!(
-    u128,
-    from_power_of_two_digits_desc_u128_fail_1,
-    from_power_of_two_digits_desc_u128_fail_2,
-    from_power_of_two_digits_desc_u128_fail_3
-);
-from_power_of_two_digits_desc_fail_helper!(
-    usize,
-    from_power_of_two_digits_desc_usize_fail_1,
-    from_power_of_two_digits_desc_usize_fail_2,
-    from_power_of_two_digits_desc_usize_fail_3
-);
+#[test]
+fn from_power_of_two_digits_desc_fail() {
+    apply_fn_to_unsigneds!(from_power_of_two_digits_desc_fail_helper);
+}
 
 #[test]
 fn test_from_power_of_two_digits_asc_natural() {

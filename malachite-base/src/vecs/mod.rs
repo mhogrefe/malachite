@@ -1,9 +1,7 @@
-use itertools::Itertools;
-use std::str::FromStr;
-
 use num::conversion::traits::ExactFrom;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::Seed;
+use std::str::FromStr;
 
 /// Inserts several copies of a value at the left (beginning) of a `Vec`.
 ///
@@ -64,7 +62,7 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 
 /// Converts a `&str` to an `Vec<T>`, where `T` implements `FromStr`.
 ///
-/// If the `&str` does not represent a valid `Option<T>`, `None` is returned.
+/// If the `&str` does not represent a valid `Vec<T>`, `None` is returned.
 ///
 /// If `T` does not implement `FromStr`, try using `vec_from_str_custom` instead.
 ///
@@ -141,27 +139,12 @@ pub fn vec_from_str<T: FromStr>(src: &str) -> Option<Vec<T>> {
 /// assert_eq!(vec_from_str_custom(&option_from_str::<bool>, "[Some(fals), None]"), None);
 /// ```
 pub fn vec_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Option<Vec<T>> {
-    if src.is_empty() {
+    if !src.starts_with('[') || !src.ends_with(']') {
         return None;
     }
-    let mut tokens = src.split(", ").collect_vec();
-    let last_token_index = tokens.len() - 1;
-    if tokens[0].is_empty() {
-        return None;
-    }
-    let mut cleaned_first_token = String::from(tokens[0]);
-    if cleaned_first_token.remove(0) != '[' {
-        return None;
-    }
-    tokens[0] = &cleaned_first_token;
-    let mut cleaned_last_token = String::from(tokens[last_token_index]);
-    if cleaned_last_token.pop() != Some(']') {
-        return None;
-    }
-    tokens[last_token_index] = &cleaned_last_token;
     let mut xs = Vec::new();
     let mut buffer = String::new();
-    for token in &tokens {
+    for token in src[1..src.len() - 1].split(", ") {
         if !buffer.is_empty() {
             buffer.push_str(", ");
         }

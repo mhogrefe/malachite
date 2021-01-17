@@ -1,5 +1,5 @@
 use generators::common::{reshape_1_2_to_3, GenConfig, It};
-use generators::digits_valid;
+use generators::{digits_valid, unsigned_pair_gen_var_5_limit};
 use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::chars::random::{
@@ -10,7 +10,7 @@ use malachite_base::num::arithmetic::traits::{DivRound, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::random::geometric::{
     geometric_random_unsigned_range, geometric_random_unsigneds, GeometricRandomNaturalValues,
 };
@@ -124,6 +124,19 @@ pub fn random_primitive_int_unsigned_pair_gen_var_3<T: PrimitiveInt, U: Primitiv
         EXAMPLE_SEED,
         &random_primitive_ints,
         &|seed| random_unsigned_inclusive_range(seed, 1, U::WIDTH),
+    ))
+}
+
+pub fn random_primitive_int_unsigned_pair_gen_var_4<T: PrimitiveInt, U: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, u64)>
+where
+    u64: SaturatingFrom<T> + SaturatingFrom<U>,
+{
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| random_unsigned_inclusive_range(seed, 2, unsigned_pair_gen_var_5_limit::<T, U>()),
     ))
 }
 
@@ -357,6 +370,19 @@ pub fn random_unsigned_gen_var_2(_config: &GenConfig) -> It<u32> {
 
 pub fn random_unsigned_gen_var_3<T: PrimitiveInt>(_config: &GenConfig) -> It<u64> {
     Box::new(random_unsigned_inclusive_range(EXAMPLE_SEED, 1, T::WIDTH))
+}
+
+pub fn random_unsigned_gen_var_4<T: PrimitiveInt, U: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<u64>
+where
+    u64: SaturatingFrom<T> + SaturatingFrom<U>,
+{
+    Box::new(random_unsigned_inclusive_range(
+        EXAMPLE_SEED,
+        2,
+        unsigned_pair_gen_var_5_limit::<T, U>(),
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -604,6 +630,38 @@ pub fn random_primitive_int_vec_unsigned_primitive_int_triple_gen_var_1<
         },
         &random_primitive_ints,
     ))
+}
+
+// --(Vec<PrimitiveInt>, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+struct PrimitiveIntVecUnsignedUnsignedTripleGeneratorVar1<T: PrimitiveInt> {
+    is: GeometricRandomNaturalValues<usize>,
+    xs: RandomPrimitiveInts<T>,
+}
+
+impl<T: PrimitiveInt> Iterator for PrimitiveIntVecUnsignedUnsignedTripleGeneratorVar1<T> {
+    type Item = (Vec<T>, usize, usize);
+
+    fn next(&mut self) -> Option<(Vec<T>, usize, usize)> {
+        let i = self.is.next().unwrap();
+        let j = self.is.next().unwrap();
+        let excess = self.is.next().unwrap();
+        let xs = (&mut self.xs).take(i * j + excess).collect();
+        Some((xs, i, j))
+    }
+}
+
+pub fn random_primitive_int_vec_unsigned_unsigned_triple_gen_var_1<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, usize, usize)> {
+    Box::new(PrimitiveIntVecUnsignedUnsignedTripleGeneratorVar1 {
+        is: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("is"),
+            config.get_or("small_unsigned_mean_n", 2),
+            config.get_or("small_unsigned_mean_d", 1),
+        ),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
 }
 
 // --(Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --

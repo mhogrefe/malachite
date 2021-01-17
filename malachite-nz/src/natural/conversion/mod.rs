@@ -15,7 +15,7 @@ impl Natural {
         let radix = Natural::from(radix);
         for c in src.chars() {
             *self *= &radix;
-            if c >= '0' && c <= '9' {
+            if ('0'..='9').contains(&c) {
                 *self += Natural::from(c.to_digit(10).unwrap());
             }
         }
@@ -37,7 +37,7 @@ impl Natural {
 
 fn make_string(i: &Natural, radix: u64, to_upper: bool) -> String {
     assert!(!to_upper);
-    assert!(radix >= 2 && radix <= 36, "radix out of range");
+    assert!((2..=36).contains(&radix), "radix out of range");
     if *i == 0 {
         return "0".to_string();
     }

@@ -337,12 +337,10 @@ impl<'a> DivRound<Integer> for &'a Integer {
     /// ```
     fn div_round(self, other: Integer, rm: RoundingMode) -> Integer {
         let q_sign = self.sign == other.sign;
-        let q = (&self.abs).div_round(other.abs, if q_sign { rm } else { -rm });
-        if q_sign {
-            Integer::from(q)
-        } else {
-            -q
-        }
+        Integer::from_sign_and_abs(
+            q_sign,
+            (&self.abs).div_round(other.abs, if q_sign { rm } else { -rm }),
+        )
     }
 }
 
@@ -461,12 +459,10 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
     /// ```
     fn div_round(self, other: &'b Integer, rm: RoundingMode) -> Integer {
         let q_sign = self.sign == other.sign;
-        let q = (&self.abs).div_round(&other.abs, if q_sign { rm } else { -rm });
-        if q_sign {
-            Integer::from(q)
-        } else {
-            -q
-        }
+        Integer::from_sign_and_abs(
+            q_sign,
+            (&self.abs).div_round(&other.abs, if q_sign { rm } else { -rm }),
+        )
     }
 }
 

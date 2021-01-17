@@ -1,5 +1,6 @@
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::exhaustive::{
     exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
 };
@@ -12,7 +13,10 @@ use malachite_base::vecs::exhaustive::{
 };
 use malachite_base_test_util::generators::common::permute_2_1;
 use malachite_base_test_util::generators::common::It;
+use malachite_base_test_util::generators::exhaustive::unsigned_pair_gen_var_5_limit;
 use malachite_base_test_util::generators::exhaustive_pairs_big_tiny;
+use malachite_nz::integer::exhaustive::exhaustive_integers;
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, GET_STR_PRECOMPUTE_THRESHOLD,
 };
@@ -21,10 +25,29 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use std::iter::once;
 
+// -- Integer --
+
+pub fn exhaustive_integer_gen() -> It<Integer> {
+    Box::new(exhaustive_integers())
+}
+
 // -- Natural --
 
 pub fn exhaustive_natural_gen() -> It<Natural> {
     Box::new(exhaustive_naturals())
+}
+
+// -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)
+
+pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(Vec<T>, u64)>
+where
+    u64: SaturatingFrom<T> + SaturatingFrom<U>,
+{
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_vecs_min_length(2, exhaustive_unsigneds()),
+        primitive_int_increasing_inclusive_range(2, unsigned_pair_gen_var_5_limit::<T, U>()),
+    ))
 }
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>)

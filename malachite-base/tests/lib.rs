@@ -268,9 +268,14 @@ pub mod num {
     }
     pub mod conversion {
         pub mod digits {
-            pub mod from_power_of_two_digits;
-            pub mod power_of_two_digit_iterable;
-            pub mod to_power_of_two_digits;
+            pub mod general_digits {
+                pub mod to_digits;
+            }
+            pub mod power_of_two_digits {
+                pub mod from_power_of_two_digits;
+                pub mod power_of_two_digit_iterable;
+                pub mod to_power_of_two_digits;
+            }
         }
         pub mod froms {
             pub mod checked_from_and_exact_from;
@@ -434,7 +439,6 @@ pub mod slices {
     pub mod slice_test_zero;
     pub mod slice_trailing_zeros;
     pub mod split_into_chunks;
-    pub mod split_into_chunks_mut;
 }
 pub mod strings {
     pub mod exhaustive {

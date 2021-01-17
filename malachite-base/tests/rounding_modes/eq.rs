@@ -11,6 +11,7 @@ fn test_eq() {
 }
 
 #[test]
+#[allow(clippy::eq_op)]
 fn eq_properties() {
     rounding_mode_pair_gen().test_properties(|(x, y)| {
         assert_eq!(x == y, y == x);

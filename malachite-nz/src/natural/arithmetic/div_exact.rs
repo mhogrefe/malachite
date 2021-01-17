@@ -2042,7 +2042,7 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => n.clone(),
             (natural_zero!(), _) => Natural::ZERO,
-            (n, d) if n as *const Natural == d as *const Natural => Natural::ONE,
+            (n, d) if std::ptr::eq(n, d) => Natural::ONE,
             (n, Natural(Small(d))) => n.div_exact_limb_ref(*d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
             (Natural(Large(ref ns)), Natural(Large(ref ds))) => {

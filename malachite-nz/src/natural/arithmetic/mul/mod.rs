@@ -128,7 +128,7 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     let len = xs.len();
     assert_eq!(ys.len(), len);
     assert_ne!(len, 0);
-    if xs as *const [Limb] == ys as *const [Limb] {
+    if std::ptr::eq(xs, ys) {
         limbs_square_to_out(out, xs);
     } else if len < MUL_TOOM22_THRESHOLD {
         _limbs_mul_greater_to_out_basecase(out, xs, ys);

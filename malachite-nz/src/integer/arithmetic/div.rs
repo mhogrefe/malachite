@@ -114,12 +114,7 @@ impl<'a> Div<Integer> for &'a Integer {
     /// ```
     #[inline]
     fn div(self, other: Integer) -> Integer {
-        let q = &self.abs / other.abs;
-        if self.sign == other.sign {
-            Integer::from(q)
-        } else {
-            -q
-        }
+        Integer::from_sign_and_abs(self.sign == other.sign, &self.abs / other.abs)
     }
 }
 
@@ -157,12 +152,7 @@ impl<'a, 'b> Div<&'b Integer> for &'a Integer {
     /// ```
     #[inline]
     fn div(self, other: &'b Integer) -> Integer {
-        let q = &self.abs / &other.abs;
-        if self.sign == other.sign {
-            Integer::from(q)
-        } else {
-            -q
-        }
+        Integer::from_sign_and_abs(self.sign == other.sign, &self.abs / &other.abs)
     }
 }
 

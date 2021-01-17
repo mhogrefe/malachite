@@ -552,7 +552,7 @@ pub fn geometric_random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// The probability mass function of this distribution is
 /// $$
 /// P(n) = \\begin{cases}
-///     \frac{(1-p)^{|n|}p}{((1-p)^{2^{W-1}}-1)(p-2)} & 0 < n < 2^W \\\\
+///     \frac{(1-p)^{|n|}p}{((1-p)^{2^{W-1}}-1)(p-2)} & -2^{W-1} \leq n < 2^{W-1} \\\\
 ///     0 & \\text{otherwise}
 /// \\end{cases}
 /// $$
@@ -740,11 +740,12 @@ pub fn geometric_random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
 /// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
-/// mean is what the absolute value of the mean generated value would be if the distribution were
-/// not truncated. If $m_u$ is significantly lower than `-T::MIN`, which is usually the case, then
-/// it is very close to the actual absolute value of the mean. The higher $m_u$ is, the more gently
-/// the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than
-/// one. It may be arbitrarily high, but note that the iteration time increases linearly with
+/// mean is what the mean of the absolute values of the generated values would be if the
+/// distribution were not truncated. If $m_u$ is significantly lower than `-T::MIN`, which is
+/// usually the case, then it is very close to the actual mean of the absolute values. The higher
+/// $m_u$ is, the more gently the probabilities drop; the lower it is, the more quickly they drop.
+/// $m_u$ must be greater than one. It may be arbitrarily high, but note that the iteration time
+/// increases linearly with
 /// `abs_um_numerator` + `abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
@@ -830,12 +831,12 @@ pub fn geometric_random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
 /// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
-/// mean is what the absolute value of the mean generated value would be if the distribution were
-/// not truncated. If $m_u$ is significantly lower than `T::MAX`, which is usually the case, then it
-/// is very close to the actual absolute value of the mean. The higher $m_u$ is, the more gently the
-/// probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than one.
-/// It may be arbitrarily high, but note that the iteration time increases linearly with
-/// `abs_um_numerator` + `abs_um_denominator`.
+/// mean is what the mean of the absolute values of the generated values would be if the
+/// distribution were not truncated. If $m_u$ is significantly lower than `T::MAX`, which is usually
+/// the case, then it is very close to the actual mean of the absolute values. The higher $m_u$ is,
+/// the more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must
+/// be greater than one. It may be arbitrarily high, but note that the iteration time increases
+/// linearly with `abs_um_numerator` + `abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support $S \subset \Z$
 /// equal $[-2^{W-1}, 2^{W-1}) \setminus \\{0\\}$, where $W$ is `T::WIDTH`. Then we have
@@ -1107,12 +1108,13 @@ pub fn geometric_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 /// and $b$.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
-/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
-/// significantly lower than `b`, then it is very close to the actual mean. The higher $m_u$ is, the
-/// more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be
-/// greater than `a`. It may be arbitrarily high, but note that the iteration time increases
-/// linearly with `um_numerator` + `um_denominator`.
+/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// mean is what the mean of the absolute values of the generated values would be if the
+/// distribution were not truncated. If $m_u$ is significantly lower than `b`, then it is very close
+/// to the actual mean of the absolute values. The higher $m_u$ is, the more gently the
+/// probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than `a`.
+/// It may be arbitrarily high, but note that the iteration time increases linearly with
+/// `abs_um_numerator` + `abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support
 /// $S \subset \Z$ equal $[a, b)$. Let $c = \min_{n\in S}|n|$. Geometric distributions are typically
@@ -1230,12 +1232,13 @@ pub fn geometric_random_signed_range<T: PrimitiveSigned>(
 /// that case the distribution is doubled: it is highest at zero and is truncated at $a$ and $b$.
 ///
 /// The probabilities can drop more quickly or more slowly depending on a parameter $m_u$, called
-/// the unadjusted mean. It is equal to `um_numerator` / `um_denominator`. The unadjusted mean is
-/// what the mean generated value would be if the distribution were not truncated. If $m_u$ is
-/// significantly lower than `b`, then it is very close to the actual mean. The higher $m_u$ is, the
-/// more gently the probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be
-/// greater than `a`. It may be arbitrarily high, but note that the iteration time increases
-/// linearly with `um_numerator` + `um_denominator`.
+/// the unadjusted mean. It is equal to `abs_um_numerator` / `abs_um_denominator`. The unadjusted
+/// mean is what the mean of the absolute values of the generated values would be if the
+/// distribution were not truncated. If $m_u$ is significantly lower than `b`, then it is very close
+/// to the actual mean of the absolute values. The higher $m_u$ is, the more gently the
+/// probabilities drop; the lower it is, the more quickly they drop. $m_u$ must be greater than `a`.
+/// It may be arbitrarily high, but note that the iteration time increases linearly with
+/// `abs_um_numerator` + `abs_um_denominator`.
 ///
 /// Here is a more precise characterization of this distribution. Let its support
 /// $S \subset \Z$ equal $[a, b]$. Let $c = \min_{n\in S}|n|$. Geometric distributions are typically

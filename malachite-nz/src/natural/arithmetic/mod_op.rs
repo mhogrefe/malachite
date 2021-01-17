@@ -1874,7 +1874,7 @@ impl<'a, 'b> Rem<&'b Natural> for &'a Natural {
         match (self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (_, natural_one!()) => Natural::ZERO,
-            (n, d) if n as *const Natural == d as *const Natural => Natural::ZERO,
+            (n, d) if std::ptr::eq(n, d) => Natural::ZERO,
             (n, Natural(Small(d))) => Natural(Small(n.rem_limb_ref(*d))),
             (Natural(Small(_)), _) => self.clone(),
             (&Natural(Large(ref ns)), Natural(Large(ref ds))) => {

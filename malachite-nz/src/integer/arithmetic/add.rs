@@ -140,7 +140,7 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
     /// ```
     fn add(self, other: &'a Integer) -> Integer {
         match (self, other) {
-            (x, y) if x as *const Integer == y as *const Integer => x << 1,
+            (x, y) if std::ptr::eq(x, y) => x << 1,
             (&integer_zero!(), y) => y.clone(),
             (x, &integer_zero!()) => x.clone(),
             // e.g. 10 + 5 or -10 + -5; sign of result is sign of self

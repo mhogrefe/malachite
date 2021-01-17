@@ -29,7 +29,7 @@ impl PartialOrd for Integer {
 /// Asserts that `Integer` ordering is a total order.
 impl Ord for Integer {
     fn cmp(&self, other: &Integer) -> Ordering {
-        if self as *const Integer == other as *const Integer {
+        if std::ptr::eq(self, other) {
             Ordering::Equal
         } else {
             match (self.sign, other.sign) {

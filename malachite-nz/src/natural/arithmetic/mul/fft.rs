@@ -517,7 +517,7 @@ pub fn _limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb])
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     assert_ne!(ys_len, 0);
-    if xs as *const [Limb] == ys as *const [Limb] {
+    if std::ptr::eq(xs, ys) {
         let n = _limbs_square_mod_base_pow_n_minus_1_next_size(xs_len << 1);
         let mut scratch = vec![0; _limbs_square_mod_base_pow_n_minus_1_scratch_len(n, xs_len)];
         _limbs_square_mod_base_pow_n_minus_1(out, n, xs, &mut scratch);
@@ -1313,7 +1313,7 @@ pub(crate) fn _limbs_mul_fft(
     ys: &[Limb],
     k: usize,
 ) -> bool {
-    let square = xs as *const [Limb] == ys as *const [Limb];
+    let square = std::ptr::eq(xs, ys);
     assert!(p.divisible_by_power_of_two(u64::exact_from(k)));
     let n = p << Limb::LOG_WIDTH;
     let two_pow_k = 1 << k;

@@ -1,17 +1,19 @@
 use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    CheckedLogTwo, DivAssignMod, DivMod, DivisibleByPowerOfTwo, ModPowerOfTwoAssign, Parity,
-    ShrRound, ShrRoundAssign, XMulYIsZZ,
+    CheckedLogTwo, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOfTwo, ModPowerOfTwoAssign,
+    Parity, ShrRound, ShrRoundAssign, XMulYIsZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{Digits, ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ConvertibleFrom, Digits, ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{LeadingZeros, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::slices::slice_set_zero;
+use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 use natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
-use natural::arithmetic::div_mod::{limbs_div_mod_extra_in_place, limbs_div_mod_to_out};
+use natural::arithmetic::div_mod::{
+    limbs_div_limb_in_place_mod, limbs_div_mod_extra_in_place, limbs_div_mod_to_out,
+};
 use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
 use natural::arithmetic::square::limbs_square_to_out;
@@ -96,7 +98,7 @@ macro_rules! base_10_normalization_step {
         if MP_BASES_NORMALIZATION_STEPS_10 <= $j {
             let (digit, new_frac) = Limb::x_mul_y_is_zz($frac, 10);
             $frac = new_frac;
-            $buffer[$i] = u8::wrapping_from(digit);
+            $buffer[$i] = T::wrapping_from(digit);
             $i += 1;
         }
     };
@@ -112,8 +114,8 @@ macro_rules! base_10_normalization_step {
 /// `len` must be at least as large as the actual number of digits.
 ///
 /// This is mpn_bc_get_str from mpn/generic/get_str.c, GMP 6.2.1.
-pub fn _limbs_to_digits_small_base_basecase(
-    out: &mut [u8],
+pub fn _limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
+    out: &mut [T],
     len: usize,
     xs: &[Limb],
     base: u64,
@@ -132,7 +134,7 @@ pub fn _limbs_to_digits_small_base_basecase(
         GET_STR_PRECOMPUTE_THRESHOLD
     };
     const BUFFER_LEN: usize = (RP_LEN << Limb::LOG_WIDTH) * 7 / 11;
-    let mut buffer = [0u8; BUFFER_LEN];
+    let mut buffer = [T::ZERO; BUFFER_LEN];
     let mut rs = [0; RP_LEN];
     let mut i = BUFFER_LEN;
     if base == 10 {
@@ -164,7 +166,7 @@ pub fn _limbs_to_digits_small_base_basecase(
             for _ in 0..LIMIT {
                 frac *= 10;
                 let digit = frac >> DIGIT_SHIFT;
-                buffer[i] = u8::wrapping_from(digit);
+                buffer[i] = T::wrapping_from(digit);
                 i += 1;
                 frac.mod_power_of_two_assign(DIGIT_SHIFT);
             }
@@ -175,11 +177,11 @@ pub fn _limbs_to_digits_small_base_basecase(
             let (new_r, d) = r.div_mod(10);
             r = new_r;
             i -= 1;
-            buffer[i] = u8::wrapping_from(d);
+            buffer[i] = T::wrapping_from(d);
         }
     } else {
         // not base 10
-        let chars_per_limb = get_chars_per_limb(base);
+        let digits_per_limb = get_chars_per_limb(base);
         let big_base = get_big_base(base);
         let big_base_inverted = get_big_base_inverted(base);
         let normalization_steps = LeadingZeros::leading_zeros(big_base);
@@ -198,11 +200,11 @@ pub fn _limbs_to_digits_small_base_basecase(
             }
             let mut frac = rs[0].wrapping_add(1);
             let old_i = i;
-            i -= chars_per_limb;
+            i -= digits_per_limb;
             for d in buffer[i..old_i].iter_mut() {
                 let (digit, new_frac) = Limb::x_mul_y_is_zz(frac, limb_base);
                 frac = new_frac;
-                *d = u8::wrapping_from(digit);
+                *d = T::wrapping_from(digit);
             }
         }
         let mut r = rs[1];
@@ -210,7 +212,7 @@ pub fn _limbs_to_digits_small_base_basecase(
             let (new_r, digit) = r.div_mod(limb_base);
             r = new_r;
             i -= 1;
-            buffer[i] = u8::wrapping_from(digit);
+            buffer[i] = T::wrapping_from(digit);
         }
     }
     let nonzero_len = BUFFER_LEN - i;
@@ -254,15 +256,15 @@ pub fn _limbs_choose_power_table_algorithm(
     xs_len: usize,
     base: u64,
 ) -> (usize, PowerTableAlgorithm) {
-    let chars_per_limb = get_chars_per_limb(base);
+    let digits_per_limb = get_chars_per_limb(base);
     let mut number_of_powers = 0;
     let mut power: usize = xs_len.shr_round(1, RoundingMode::Ceiling);
     while power != 1 {
-        exptab[number_of_powers] = power * chars_per_limb;
+        exptab[number_of_powers] = power * digits_per_limb;
         number_of_powers += 1;
         power = (power + 1) >> 1;
     }
-    exptab[number_of_powers] = chars_per_limb;
+    exptab[number_of_powers] = digits_per_limb;
     if HAVE_MPN_COMPUTE_POWTAB_MUL && HAVE_MPN_COMPUTE_POWTAB_DIV {
         let power = xs_len - 1;
         let n = xs_len.shr_round(1, RoundingMode::Ceiling);
@@ -317,8 +319,8 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
 ) -> Vec<PowerTableRow<'a>> {
     let mut power_indices = Vec::new();
     let big_base = get_big_base(base);
-    let chars_per_limb = get_chars_per_limb(base);
-    let mut digits_in_base = chars_per_limb;
+    let digits_per_limb = get_chars_per_limb(base);
+    let mut digits_in_base = digits_per_limb;
     let (head, mut remainder) = power_table_memory.split_first_mut().unwrap();
     *head = big_base;
     let (hi, lo) = Limb::x_mul_y_is_zz(big_base, big_base);
@@ -340,14 +342,14 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
         shift,
     });
     let start_index;
-    start_index = if exponents[0] == chars_per_limb << power_len {
+    start_index = if exponents[0] == digits_per_limb << power_len {
         let (power, next_remainder) = remainder[shift..].split_at_mut(len);
         remainder = next_remainder;
         limbs_square_to_out(remainder, power);
         start = 3;
         power_len - 2
     } else {
-        if (digits_in_base + chars_per_limb) << (power_len - 2) <= exponents[0] {
+        if (digits_in_base + digits_per_limb) << (power_len - 2) <= exponents[0] {
             // a = 3, sometimes adjusted to 4.
             let (power, next_remainder) = remainder[shift..].split_at_mut(len);
             remainder = next_remainder;
@@ -357,7 +359,7 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
                 len += 1;
             }
             start = 3;
-            digits_in_base += chars_per_limb;
+            digits_in_base += digits_per_limb;
             if remainder[1] == 0 {
                 start = 4;
                 len -= 1;
@@ -406,13 +408,13 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
             adjust += 1;
         }
         // Adjust new value if it is too small as input to the next squaring.
-        if (digits_in_base + chars_per_limb) << i <= exponents[0] {
+        if (digits_in_base + digits_per_limb) << i <= exponents[0] {
             let carry = limbs_slice_mul_limb_in_place(&mut remainder[..len], big_base);
             remainder[len] = carry;
             if carry != 0 {
                 len += 1;
             }
-            digits_in_base += chars_per_limb;
+            digits_in_base += digits_per_limb;
             if remainder[0] == 0 {
                 len -= 1;
                 shift += 1;
@@ -447,7 +449,7 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
             if carry != 0 {
                 row.len += 1;
             }
-            assert!(row.digits_in_base + chars_per_limb == exponent);
+            assert!(row.digits_in_base + digits_per_limb == exponent);
             row.digits_in_base = exponent;
             if power_table_memory[start] == 0 {
                 row.start += 1;
@@ -481,17 +483,17 @@ pub fn _limbs_compute_power_table_using_div<'a>(
     power_len: usize,
 ) -> Vec<PowerTableRow<'a>> {
     let big_base = get_big_base(base);
-    let chars_per_limb = get_chars_per_limb(base);
+    let digits_per_limb = get_chars_per_limb(base);
     let big_base_trailing_zeros = TrailingZeros::trailing_zeros(big_base);
     power_table_memory[0] = big_base;
     let mut powers = Vec::with_capacity(power_len + 1);
     let (mut power, mut remainder) = power_table_memory.split_at_mut(1);
     powers.push(PowerTableRow {
         power: &*power,
-        digits_in_base: chars_per_limb,
+        digits_in_base: digits_per_limb,
         shift: 0,
     });
-    let mut digits_in_base = chars_per_limb;
+    let mut digits_in_base = digits_per_limb;
     let mut len = 1;
     let mut shift = 0;
     for &exp in exponents[..power_len].iter().rev() {
@@ -507,7 +509,7 @@ pub fn _limbs_compute_power_table_using_div<'a>(
             if remainder[len - 1] == 0 {
                 len -= 1;
             }
-            digits_in_base -= chars_per_limb;
+            digits_in_base -= digits_per_limb;
         }
         shift <<= 1;
         // Strip low zero limbs, but be careful to keep the result divisible by big_base.
@@ -564,15 +566,14 @@ pub fn _limbs_compute_power_table(
 
 const GET_STR_DC_THRESHOLD: usize = 15;
 
-/// Convert {UP,UN} to a string with a base as represented in POWTAB, and put
-/// the string in STR.  Generate LEN characters, possibly padding with zeros to
-/// the left.  If LEN is zero, generate as many characters as required.
-/// Return a pointer immediately after the last digit of the result string.
-/// This uses divide-and-conquer and is intended for large conversions.
+/// Convert `xs` to a string with a base as represented in `powers`, and put the string in `out`.
+/// Generate `len` characters, possibly padding with zeros to the left. If `len` is zero, generate
+/// as many characters as required. Return a pointer immediately after the last digit of the result
+/// string. This uses divide-and-conquer and is intended for large conversions.
 ///
 /// This is mpn_dc_get_str from mpn/generic/get_str.c, GMP 6.2.1.
-pub fn _limbs_to_digits_small_base_divide_and_conquer(
-    out: &mut [u8],
+pub fn _limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
+    out: &mut [T],
     mut len: usize,
     xs: &mut [Limb],
     base: u64,
@@ -657,15 +658,15 @@ pub fn _limbs_to_digits_small_base_divide_and_conquer(
 
 /// This is mpn_get_str from mpn/generic/get_str.c, GMP 6.2.1, where un != 0 and base is not a power
 /// of two.
-pub fn _limbs_to_digits_small_base(
-    out: &mut [u8],
+pub fn _limbs_to_digits_small_base<T: PrimitiveUnsigned>(
+    out: &mut [T],
     base: u64,
     xs: &mut [Limb],
     forced_algorithm: Option<PowerTableAlgorithm>,
 ) -> usize {
     let xs_len = xs.len();
     if xs_len == 0 {
-        out[0] = 0;
+        out[0] = T::ZERO;
         1
     } else if xs_len < GET_STR_PRECOMPUTE_THRESHOLD {
         _limbs_to_digits_small_base_basecase(out, 0, xs, base)
@@ -690,6 +691,33 @@ pub fn _limbs_to_digits_small_base(
             &mut scratch,
         )
     }
+}
+
+// Returns digits in ascending order
+pub fn _limbs_to_digits_basecase<T: ConvertibleFrom<u64> + PrimitiveUnsigned>(
+    xs: &mut [Limb],
+    base: u64,
+) -> Vec<T> {
+    assert!(base >= 2);
+    let limb_base = Limb::exact_from(base);
+    assert!(T::convertible_from(base));
+    let mut digits_per_limb = 0;
+    let mut big_base = 1;
+    while let Some(next) = big_base.checked_mul(limb_base) {
+        big_base = next;
+        digits_per_limb += 1;
+    }
+    let mut digits = Vec::new();
+    while !slice_test_zero(xs) {
+        let mut big_digit = limbs_div_limb_in_place_mod(xs, big_base);
+        for _ in 0..digits_per_limb - 1 {
+            digits.push(T::wrapping_from(big_digit.div_assign_mod(limb_base)));
+        }
+        digits.push(T::wrapping_from(big_digit));
+    }
+    let trailing_zeros = slice_trailing_zeros(&digits);
+    digits.truncate(digits.len() - trailing_zeros);
+    digits
 }
 
 pub fn _to_digits_asc_naive<

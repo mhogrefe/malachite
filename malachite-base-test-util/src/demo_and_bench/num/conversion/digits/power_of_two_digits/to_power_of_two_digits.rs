@@ -73,9 +73,9 @@ fn benchmark_to_power_of_two_digits_asc_evaluation_strategy<
 ) {
     run_benchmark(
         &format!(
-            "{}::to_power_of_two_digits_asc<I: Iterator<Item={}>>(u64, I)",
-            T::NAME,
-            U::NAME
+            "PowerOfTwoDigits::<{}>::to_power_of_two_digits_asc({}, u64)",
+            U::NAME,
+            T::NAME
         ),
         BenchmarkType::EvaluationStrategy,
         unsigned_pair_gen_var_4::<T, U>().get(gm, &config),
@@ -113,9 +113,9 @@ fn benchmark_to_power_of_two_digits_desc_evaluation_strategy<
 ) {
     run_benchmark(
         &format!(
-            "{}::to_power_of_two_digits_desc<I: Iterator<Item={}>>(u64, I)",
-            T::NAME,
-            U::NAME
+            "PowerOfTwoDigits::<{}>::to_power_of_two_digits_desc({}, u64)",
+            U::NAME,
+            T::NAME
         ),
         BenchmarkType::EvaluationStrategy,
         unsigned_pair_gen_var_4::<T, U>().get(gm, &config),

@@ -122,7 +122,6 @@ pub mod integer {
         pub mod mod_op;
         pub mod mod_power_of_two;
         pub mod mul;
-        pub mod neg;
         pub mod parity;
         pub mod pow;
         pub mod power_of_two;

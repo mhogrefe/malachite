@@ -90,7 +90,7 @@ impl PartialOrd for Natural {
 /// Asserts that `Natural` ordering is a total order.
 impl Ord for Natural {
     fn cmp(&self, other: &Natural) -> Ordering {
-        if self as *const Natural == other as *const Natural {
+        if std::ptr::eq(self, other) {
             return Ordering::Equal;
         }
         match (self, other) {

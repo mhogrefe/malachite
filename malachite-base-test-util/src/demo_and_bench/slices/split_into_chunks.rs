@@ -1,12 +1,12 @@
 use itertools::Itertools;
 use malachite_base::strings::ToDebugString;
+use malachite_base_test_util::generators::common::{GenConfig, GenMode};
+use malachite_base_test_util::generators::unsigned_vec_unsigned_unsigned_triple_gen_var_2;
+use malachite_base_test_util::runner::Runner;
 
-use malachite_test::common::{DemoBenchRegistry, NoSpecialGenerationMode};
-use malachite_test::inputs::base::triples_of_unsigned_vec_usize_usize_var_1;
-
-pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_ns_demo!(registry, demo_split_into_chunks);
-    register_ns_demo!(registry, demo_split_into_chunks_mut);
+pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_split_into_chunks);
+    register_demo!(runner, demo_split_into_chunks_mut);
 }
 
 macro_rules! split_into_chunks_helper {
@@ -28,8 +28,11 @@ macro_rules! split_into_chunks_helper {
    }}
 }
 
-fn demo_split_into_chunks(gm: NoSpecialGenerationMode, limit: usize) {
-    for (xs, len, n) in triples_of_unsigned_vec_usize_usize_var_1::<u32>(gm).take(limit) {
+fn demo_split_into_chunks(gm: GenMode, config: GenConfig, limit: usize) {
+    for (xs, len, n) in unsigned_vec_unsigned_unsigned_triple_gen_var_2::<u8>()
+        .get(gm, &config)
+        .take(limit)
+    {
         match n {
             0 => split_into_chunks_helper!(xs, len, 1, [], xs_1),
             1 => split_into_chunks_helper!(xs, len, 2, [xs_1], xs_2),
@@ -69,8 +72,11 @@ macro_rules! split_into_chunks_mut_helper {
    }}
 }
 
-fn demo_split_into_chunks_mut(gm: NoSpecialGenerationMode, limit: usize) {
-    for (mut xs, len, n) in triples_of_unsigned_vec_usize_usize_var_1::<u32>(gm).take(limit) {
+fn demo_split_into_chunks_mut(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut xs, len, n) in unsigned_vec_unsigned_unsigned_triple_gen_var_2::<u8>()
+        .get(gm, &config)
+        .take(limit)
+    {
         match n {
             0 => split_into_chunks_mut_helper!(xs, len, 1, [], xs_1),
             1 => split_into_chunks_mut_helper!(xs, len, 2, [xs_1], xs_2),

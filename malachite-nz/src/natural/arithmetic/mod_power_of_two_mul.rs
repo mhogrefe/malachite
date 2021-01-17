@@ -48,7 +48,7 @@ use platform::{DoubleLimb, Limb};
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
-    if xs.as_slice() as *const [Limb] == ys.as_slice() as *const [Limb] {
+    if std::ptr::eq(xs.as_slice(), ys.as_slice()) {
         return limbs_mod_power_of_two_square(xs, pow);
     }
     let xs_len = xs.len();
@@ -110,7 +110,7 @@ pub fn limbs_mod_power_of_two_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) -> Vec<Limb> {
-    if xs.as_slice() as *const [Limb] == ys as *const [Limb] {
+    if std::ptr::eq(xs.as_slice(), ys) {
         return limbs_mod_power_of_two_square(xs, pow);
     }
     let xs_len = xs.len();
@@ -176,7 +176,7 @@ pub fn limbs_mod_power_of_two_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: 
 /// );
 /// ```
 pub fn limbs_mod_power_of_two_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
-    if xs as *const [Limb] == ys as *const [Limb] {
+    if std::ptr::eq(xs, ys) {
         return limbs_mod_power_of_two_square_ref(xs, pow);
     }
     let xs_len = xs.len();

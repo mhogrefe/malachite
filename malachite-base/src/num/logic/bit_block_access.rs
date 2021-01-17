@@ -45,61 +45,76 @@ macro_rules! impl_bit_block_access_unsigned {
             type Bits = $t;
 
             /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
+            ///
             /// The block of bits has the same type as the input. If `end` is greater than the
             /// type's width, the high bits of the result are all 0.
             ///
-            /// Time: worst case O(1)
+            /// Let
+            /// $$
+            /// n = \sum_{i=0}^\infty 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
+            /// rest are 0. Then
+            /// $$
+            /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `start < end`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitBlockAccess;
             ///
-            /// assert_eq!(0xabcdu16.get_bits(4, 8), 0xc);
-            /// assert_eq!(0xabcdu16.get_bits(12, 100), 0xa);
-            /// assert_eq!(0xabcdu16.get_bits(5, 9), 14);
-            /// assert_eq!(0xabcdu16.get_bits(5, 5), 0);
-            /// assert_eq!(0xabcdu16.get_bits(100, 200), 0);
-            /// ```
+            /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self {
                 _get_bits_unsigned(self, start, end)
             }
 
             /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
-            /// (inclusive) through `end` (exclusive) of `self`. The block of bits has the same type
-            /// as the input. If `bits` has fewer bits than `end - start`, the high bits are
-            /// interpreted as 0. If `end` is greater than the type's width, the high bits of `bits`
-            /// must be 0.
+            /// (inclusive) through `end` (exclusive) of `self`.
             ///
-            /// Time: worst case O(1)
+            /// The block of bits has the same type as the input. If `bits` has fewer bits than
+            /// `end - start`, the high bits are interpreted as 0. If `end` is greater than the
+            /// type's width, the high bits of `bits` must be 0.
             ///
-            /// Additional memory: worst case O(1)
+            /// Let
+            /// $$
+            /// n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`.
+            /// Let
+            /// $$
+            /// m = \sum_{i=0}^k 2^{d_i},
+            /// $$
+            /// where for all $i$, $d_i\in \\{0, 1\\}$.
+            /// Also, let $p, q \in \mathbb{N}$, where $d_i = 0$ for all $i \geq W + p$.
+            ///
+            /// Then
+            /// $$
+            /// f(n, p, q, m) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// $$
+            /// where
+            /// $$
+            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
+            /// \\{b_0, b_1, b_2, \ldots, b_{p-1}, d_0, d_1, \ldots, d_{p-q-1}, b_q, \ldots,
+            /// b_ {W-1}\\}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `start < end`, or if `end > $t::WIDTH` and bits `$t::WIDTH - start`
             /// through `end - start` of `bits` are nonzero.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitBlockAccess;
             ///
-            /// let mut x = 0xab5du16;
-            /// x.assign_bits(4, 8, &0xc);
-            /// assert_eq!(x, 0xabcd);
-            ///
-            /// let mut x = 0xabcdu16;
-            /// x.assign_bits(100, 200, &0);
-            /// assert_eq!(x, 0xabcd);
-            ///
-            /// let mut x = 0xabcdu16;
-            /// x.assign_bits(0, 100, &0x1234);
-            /// assert_eq!(x, 0x1234);
-            /// ```
+            /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
                 _assign_bits_unsigned(self, start, end, bits)
@@ -171,66 +186,113 @@ macro_rules! impl_bit_block_access_signed {
             type Bits = $u;
 
             /// Extracts a block of bits whose first index is `start` and last index is `end - 1`.
+            ///
             /// The type of the block of bits is the unsigned version of the input type. If `end` is
             /// greater than the type's width, the high bits of the result are all 0, or all 1,
             /// depending on the input value's sign; and if the input is negative and `end - start`
             /// is greater than the type's width, the function panics.
             ///
-            /// Time: worst case O(1)
+            /// If $n \geq 0$, let
+            /// $$
+            /// n = \sum_{i=0}^\infty 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$; so finitely many of the bits are 1, and the
+            /// rest are 0. Then
+            /// $$
+            /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// If $n < 0$, let
+            /// $$
+            /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where
+            /// - $W$ is the type's width
+            /// - for all $i$, $b_i\in \\{0, 1\\}$, and $b_i = 1$ for $i \geq W$.
+            /// Then
+            /// $$
+            /// f(n, p, q) = \sum_{i=p}^{q-1} 2^{b_{i-p}}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `start < end` or `self < 0 && end - start > $s::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitBlockAccess;
             ///
-            /// assert_eq!((-0x5433i16).get_bits(4, 8), 0xc);
-            /// assert_eq!((-0x5433i16).get_bits(5, 9), 14);
-            /// assert_eq!((-0x5433i16).get_bits(5, 5), 0);
-            /// assert_eq!((-0x5433i16).get_bits(100, 104), 0xf);
-            /// ```
+            /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self::Bits {
                 _get_bits_signed(self, start, end)
             }
 
             /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
-            /// (inclusive) through `end` (exclusive) of `self`. The type of the block of bits is
-            /// the unsigned version of the input type. If `bits` has fewer bits than `end - start`,
-            /// the high bits are interpreted as 0 or 1, depending on the sign of `self`. If `end`
-            /// is greater than the type's width, the high bits of `bits` must be 0 or 1, depending
-            /// on the sign of `self`.
+            /// (inclusive) through `end` (exclusive) of `self`.
+            ///
+            /// The type of the block of bits is the unsigned version of the input type. If `bits`
+            /// has fewer bits than `end - start`, the high bits are interpreted as 0 or 1,
+            /// depending on the sign of `self`. If `end` is greater than the type's width, the high
+            /// bits of `bits` must be 0 or 1, depending on the sign of `self`.
             ///
             /// The sign of `self` remains unchanged, since only a finite number of bits are changed
             /// and the sign is determined by the implied infinite prefix of bits.
             ///
-            /// Time: worst case O(1)
+            /// If $n \geq 0$ and $j \neq W - 1$, let
+            /// $$
+            /// n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`.
+            /// Let
+            /// $$
+            /// m = \sum_{i=0}^k 2^{d_i},
+            /// $$
+            /// where for all $i$, $d_i\in \\{0, 1\\}$.
+            /// Also, let $p, q \in \mathbb{N}$, where $d_i = 0$ for all $i \geq W + p - 1$. Then
+            /// $$
+            /// f(n, p, q, m) = \sum_{i=0}^{W-1} 2^{c_i},
+            /// $$
+            /// where
+            /// $$
+            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
+            /// \\{b_0, b_1, b_2, \ldots, b_{p-1}, d_0, d_1, \ldots, d_{p-q-1}, b_q, \ldots,
+            /// b_ {W-1}\\}.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// If $n < 0$ or $j = W - 1$, let
+            /// $$
+            /// 2^W + n = \sum_{i=0}^{W-1} 2^{b_i},
+            /// $$
+            /// where for all $i$, $b_i\in \\{0, 1\\}$ and $W$ is `$t::WIDTH`.
+            /// Let
+            /// $$
+            /// m = \sum_{i=0}^k 2^{d_i},
+            /// $$
+            /// where for all $i$, $d_i\in \\{0, 1\\}$.
+            /// Also, let $p, q \in \mathbb{N}$, where $d_i = 1$ for all $i \geq W + p - 1$. Then
+            /// $$
+            /// f(n, p, q, m) = \left ( \sum_{i=0}^{W-1} 2^{c_i} \right ) - 2^W,
+            /// $$
+            /// where
+            /// $$
+            /// \\{c_0, c_1, c_2, \ldots, c_ {W-1}\\} =
+            /// \\{b_0, b_1, b_2, \ldots, b_{p-1}, d_0, d_1, \ldots, d_{p-q-1}, b_q, \ldots,
+            /// b_ {W-1}\\}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `start < end`, or if `end >= $s::WIDTH` and bits `$s::WIDTH - start`
             /// through `end - start` of `bits` are not equal to the original sign bit of `self`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitBlockAccess;
             ///
-            /// let mut x = 0x2b5di16;
-            /// x.assign_bits(4, 8, &0xc);
-            /// assert_eq!(x, 0x2bcd);
-            ///
-            /// let mut x = -0x5413i16;
-            /// x.assign_bits(4, 8, &0xc);
-            /// assert_eq!(x, -0x5433);
-            ///
-            /// let mut x = -0x5433i16;
-            /// x.assign_bits(100, 104, &0xf);
-            /// assert_eq!(x, -0x5433);
-            /// ```
+            /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
                 _assign_bits_signed(self, start, end, bits)

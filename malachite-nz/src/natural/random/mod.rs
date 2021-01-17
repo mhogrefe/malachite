@@ -276,7 +276,10 @@ pub fn random_naturals(
 /// typical).
 ///
 /// $$
-/// P(n) = \frac{1}{m} \left ( \frac{m-1}{2m} \right ) ^ {\lfloor \log_2 n \rfloor}
+/// P(n) = \\begin{cases}
+///     0 & n = 0 \\\\
+///     \frac{1}{m} \left ( \frac{m-1}{2m} \right ) ^ {\lfloor \log_2 n \rfloor} & \\text{otherwise}
+/// \\end{cases}
 /// $$
 ///
 /// This would be a Pareto distribution, if it were not for the floor.

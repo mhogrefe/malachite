@@ -75,7 +75,7 @@ impl Natural {
     pub(crate) fn sub_assign_ref_no_panic(&mut self, other: &Natural) -> bool {
         match (&mut *self, other) {
             (_, natural_zero!()) => false,
-            (x, y) if x as *const Natural == y as *const Natural => {
+            (x, y) if std::ptr::eq(x, y) => {
                 *self = Natural::ZERO;
                 false
             }
@@ -98,7 +98,7 @@ impl Natural {
                 *self = y.clone();
                 false
             }
-            (x, y) if x as *const Natural == y as *const Natural => {
+            (x, y) if std::ptr::eq(x, y) => {
                 *self = Natural::ZERO;
                 false
             }
@@ -281,7 +281,7 @@ impl<'a, 'b> CheckedSub<&'a Natural> for &'b Natural {
     /// ```
     fn checked_sub(self, other: &'a Natural) -> Option<Natural> {
         match (self, other) {
-            (x, y) if x as *const Natural == y as *const Natural => Some(Natural::ZERO),
+            (x, y) if std::ptr::eq(x, y) => Some(Natural::ZERO),
             (x, &natural_zero!()) => Some(x.clone()),
             (x, &Natural(Small(y))) => x.checked_sub_limb_ref(y),
             (&Natural(Small(_)), _) => None,

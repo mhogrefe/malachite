@@ -139,7 +139,7 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
     /// ```
     fn sub(self, other: &'a Integer) -> Integer {
         match (self, other) {
-            (x, y) if x as *const Integer == y as *const Integer => Integer::ZERO,
+            (x, y) if std::ptr::eq(x, y) => Integer::ZERO,
             (integer_zero!(), y) => -y.clone(),
             (x, &integer_zero!()) => x.clone(),
             // e.g. 10 - -5 or -10 - 5; sign of result is sign of self

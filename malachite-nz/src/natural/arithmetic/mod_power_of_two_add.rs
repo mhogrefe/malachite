@@ -522,9 +522,7 @@ impl<'a, 'b> ModPowerOfTwoAdd<&'a Natural> for &'b Natural {
     /// ```
     fn mod_power_of_two_add(self, other: &'a Natural, pow: u64) -> Natural {
         match (self, other) {
-            (x, y) if x as *const Natural == y as *const Natural => {
-                self.mod_power_of_two_shl(1, pow)
-            }
+            (x, y) if std::ptr::eq(x, y) => self.mod_power_of_two_shl(1, pow),
             (x, &Natural(Small(y))) => x.mod_power_of_two_add_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_two_add_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
@@ -606,7 +604,7 @@ impl<'a> ModPowerOfTwoAddAssign<&'a Natural> for Natural {
     /// ```
     fn mod_power_of_two_add_assign(&mut self, other: &'a Natural, pow: u64) {
         match (&mut *self, other) {
-            (x, y) if x as *const Natural == y as *const Natural => {
+            (x, y) if std::ptr::eq(x, y) => {
                 self.mod_power_of_two_shl_assign(pow, 1);
             }
             (x, &Natural(Small(y))) => x.mod_power_of_two_add_assign_limb(y, pow),

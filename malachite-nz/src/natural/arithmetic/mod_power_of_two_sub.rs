@@ -458,7 +458,7 @@ impl<'a, 'b> ModPowerOfTwoSub<&'a Natural> for &'b Natural {
     /// ```
     fn mod_power_of_two_sub(self, other: &'a Natural, pow: u64) -> Natural {
         match (self, other) {
-            (x, y) if x as *const Natural == y as *const Natural => natural_zero!(),
+            (x, y) if std::ptr::eq(x, y) => natural_zero!(),
             (x, &Natural(Small(y))) => x.mod_power_of_two_sub_limb_ref(y, pow),
             (&Natural(Small(x)), y) => y.mod_power_of_two_right_sub_limb_ref(x, pow),
             (&Natural(Large(ref xs)), &Natural(Large(ref ys))) => {
@@ -537,7 +537,7 @@ impl<'a> ModPowerOfTwoSubAssign<&'a Natural> for Natural {
     /// ```
     fn mod_power_of_two_sub_assign(&mut self, other: &'a Natural, pow: u64) {
         match (&mut *self, other) {
-            (x, y) if x as *const Natural == y as *const Natural => *self = natural_zero!(),
+            (x, y) if std::ptr::eq(x, y) => *self = natural_zero!(),
             (x, &Natural(Small(y))) => x.mod_power_of_two_sub_assign_limb(y, pow),
             (&mut Natural(Small(x)), y) => *self = y.mod_power_of_two_right_sub_limb_ref(x, pow),
             (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {

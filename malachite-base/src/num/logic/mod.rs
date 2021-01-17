@@ -129,6 +129,54 @@
 /// assert_eq!(x, -1);
 /// ```
 pub mod bit_access;
+/// This module contains functions for getting and setting adjacent blocks of bits.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # get_bits
+/// ```
+/// use malachite_base::num::logic::traits::BitBlockAccess;
+///
+/// assert_eq!(0xabcdu16.get_bits(4, 8), 0xc);
+/// assert_eq!(0xabcdu16.get_bits(12, 100), 0xa);
+/// assert_eq!(0xabcdu16.get_bits(5, 9), 14);
+/// assert_eq!(0xabcdu16.get_bits(5, 5), 0);
+/// assert_eq!(0xabcdu16.get_bits(100, 200), 0);
+///
+/// assert_eq!((-0x5433i16).get_bits(4, 8), 0xc);
+/// assert_eq!((-0x5433i16).get_bits(5, 9), 14);
+/// assert_eq!((-0x5433i16).get_bits(5, 5), 0);
+/// assert_eq!((-0x5433i16).get_bits(100, 104), 0xf);
+/// ```
+///
+/// # assign_bits
+/// ```
+/// use malachite_base::num::logic::traits::BitBlockAccess;
+///
+/// let mut x = 0xab5du16;
+/// x.assign_bits(4, 8, &0xc);
+/// assert_eq!(x, 0xabcd);
+///
+/// let mut x = 0xabcdu16;
+/// x.assign_bits(100, 200, &0);
+/// assert_eq!(x, 0xabcd);
+///
+/// let mut x = 0xabcdu16;
+/// x.assign_bits(0, 100, &0x1234);
+/// assert_eq!(x, 0x1234);
+///
+/// let mut x = 0x2b5di16;
+/// x.assign_bits(4, 8, &0xc);
+/// assert_eq!(x, 0x2bcd);
+///
+/// let mut x = -0x5413i16;
+/// x.assign_bits(4, 8, &0xc);
+/// assert_eq!(x, -0x5433);
+///
+/// let mut x = -0x5433i16;
+/// x.assign_bits(100, 104, &0xf);
+/// assert_eq!(x, -0x5433);
+/// ```
 pub mod bit_block_access;
 pub mod bit_convertible;
 pub mod bit_iterable;

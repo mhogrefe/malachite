@@ -30,6 +30,22 @@ impl Integer {
     pub fn trillion() -> Integer {
         Integer::from_str("1000000000000").unwrap()
     }
+
+    //TODO doc, test
+    pub fn from_sign_and_abs(sign: bool, abs: Natural) -> Integer {
+        Integer {
+            sign: sign || abs == 0,
+            abs,
+        }
+    }
+
+    //TODO doc, test
+    pub fn from_sign_and_abs_ref(sign: bool, abs: &Natural) -> Integer {
+        Integer {
+            sign: sign || *abs == 0,
+            abs: abs.clone(),
+        }
+    }
 }
 
 macro_rules! integer_zero {
@@ -173,3 +189,4 @@ pub mod logic {
     pub mod trailing_zeros;
     pub mod xor;
 }
+pub mod random;

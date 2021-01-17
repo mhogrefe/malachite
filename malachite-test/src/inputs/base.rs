@@ -1268,19 +1268,6 @@ fn random_pairs_of_primitive_and_small_unsigned_var_1<
     random_pairs_of_primitive_and_small_unsigned_var_1_with_seed::<T, U>(&EXAMPLE_SEED)
 }
 
-fn special_random_pairs_of_unsigned_and_small_unsigned_var_1_with_seed<
-    T: PrimitiveUnsigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    seed: &[u32],
-) -> It<(T, u64)> {
-    Box::new(random_pairs(
-        seed,
-        &special_random_unsigned,
-        &(|seed_2| random_range(seed_2, 1, U::WIDTH)),
-    ))
-}
-
 // All pairs of unsigned `T` and `u64`, where the `u64` is between 1 and `U::WIDTH`, inclusive.
 pub fn pairs_of_unsigned_and_small_u64_var_1<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned>(
     gm: GenerationMode,
@@ -1371,27 +1358,6 @@ pub fn pairs_of_unsigned_and_small_u64_var_4<T: PrimitiveUnsigned + Rand>(
             )
             .filter(|&(x, y)| x == T::ZERO || y < T::WIDTH),
         ),
-    }
-}
-
-pub fn pairs_of_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(usize, T)> {
-    match gm {
-        GenerationMode::Exhaustive => permute_2_1(Box::new(exhaustive_pairs_big_tiny(
-            exhaustive_unsigneds(),
-            exhaustive_unsigneds(),
-        ))),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
-            &random,
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
-            &special_random_unsigned,
-        )),
     }
 }
 
@@ -1718,35 +1684,6 @@ pub fn triples_of_unsigned_small_unsigned_and_small_unsigned_var_1<
         triples_of_unsigned_small_unsigned_and_small_unsigned(gm)
             .filter(|&(_, start, end)| start <= end),
     )
-}
-
-// All triples of unsigned `T`, `u64`, and small `u64`, where the first `u64` is between 1 and
-// `U::WIDTH`, inclusive.
-pub fn triples_of_unsigned_small_u64_and_small_u64_var_1<
-    T: PrimitiveUnsigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    gm: GenerationMode,
-) -> It<(T, u64, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_unsigneds(),
-            primitive_int_increasing_inclusive_range(1, U::WIDTH),
-            exhaustive_unsigneds(),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &random,
-            &(|seed| random_range(seed, 1, U::WIDTH)),
-            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &special_random_unsigned,
-            &(|seed| random_range(seed, 1, U::WIDTH)),
-            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
-        )),
-    }
 }
 
 // All triples of `T`, `U` and `u64`, where `T` and `U` are unsigned and the `u64` is between the
@@ -4804,31 +4741,6 @@ fn exhaustive_pairs_of_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>() 
     ))
 }
 
-pub fn triples_of_unsigned_vec_small_usize_and_unsigned<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, usize, T)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            permute_1_3_2(reshape_2_1_to_3(Box::new(exhaustive_pairs_big_tiny(
-                exhaustive_pairs_of_unsigned_vec_and_unsigned(),
-                exhaustive_unsigneds(),
-            ))))
-        }
-        GenerationMode::Random(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_vecs(seed, scale, &random)),
-            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
-            &random,
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_unsigned_vecs(seed, scale)),
-            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
-            &special_random_unsigned,
-        )),
-    }
-}
-
 // All pairs of `Vec<T>`, where `T` is unsigned, and `usize`, where the `usize` is no larger than
 // the length of the `Vec`.
 pub fn pairs_of_unsigned_vec_and_small_usize_var_1<T: PrimitiveUnsigned + Rand>(
@@ -7492,104 +7404,6 @@ impl<T: Copy + SignificantBits> Iterator for RandomValueSmallU64AndVecOfBool<T> 
         }
         Some((u, log_base, bools))
     }
-}
-
-fn random_triples_of_unsigned_small_u64_and_vec_of_bool_var_1<
-    T: PrimitiveUnsigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    seed: &[u32],
-) -> RandomValueSmallU64AndVecOfBool<T> {
-    RandomValueSmallU64AndVecOfBool {
-        ps: Box::new(
-            random_pairs_of_primitive_and_small_unsigned_var_1_with_seed::<T, U>(&scramble(
-                seed, "pairs",
-            )),
-        ),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-fn special_random_triples_of_unsigned_small_u64_and_vec_of_bool_var_1<
-    T: PrimitiveUnsigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    seed: &[u32],
-) -> RandomValueSmallU64AndVecOfBool<T> {
-    RandomValueSmallU64AndVecOfBool {
-        ps: Box::new(
-            special_random_pairs_of_unsigned_and_small_unsigned_var_1_with_seed::<T, U>(&scramble(
-                seed, "pairs",
-            )),
-        ),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-// All pairs of `T`, `u64` and `Vec<bool>`, where `T` and `U` are unsigned, `log_base` is no greater
-// than `U::WIDTH`, and the length of the `Vec` is equal to the significant base-
-// 2<sup>`log_base`</sup>-digit count of the `T`.
-pub fn triples_of_unsigned_small_u64_and_vec_of_bool_var_1<
-    T: PrimitiveUnsigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    gm: GenerationMode,
-) -> It<(T, u64, Vec<bool>)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            let f = |&(u, log_base): &(T, u64)| {
-                exhaustive_fixed_length_vecs_from_single(
-                    u.significant_bits()
-                        .div_round(log_base, RoundingMode::Ceiling),
-                    exhaustive_bools(),
-                )
-            };
-            reshape_2_1_to_3(Box::new(dependent_pairs(
-                pairs_of_unsigned_and_small_u64_var_1::<T, U>(gm),
-                f,
-            )))
-        }
-        GenerationMode::Random(_) => Box::new(
-            random_triples_of_unsigned_small_u64_and_vec_of_bool_var_1::<T, U>(&EXAMPLE_SEED),
-        ),
-        GenerationMode::SpecialRandom(_) => Box::new(
-            special_random_triples_of_unsigned_small_u64_and_vec_of_bool_var_1::<T, U>(
-                &EXAMPLE_SEED,
-            ),
-        ),
-    }
-}
-
-//TODO replace with something better please
-fn naive_factors(x: usize) -> Vec<(usize, usize)> {
-    let mut factors = Vec::new();
-    for i in 0..=x {
-        for j in 0..=x {
-            if i * j <= x {
-                factors.push((i, j));
-            }
-        }
-    }
-    factors
-}
-
-// All pairs of `Vec<T>`, `usize`, and `usize`, where `T` is unsigned and the length of the `Vec` is
-// at least the product of the `usize`s.
-pub fn triples_of_unsigned_vec_usize_usize_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: NoSpecialGenerationMode,
-) -> It<(Vec<T>, usize, usize)> {
-    let ps: It<(Vec<T>, (usize, usize))> = match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(dependent_pairs(
-            exhaustive_vecs(exhaustive_unsigneds()),
-            |xs| Box::new(naive_factors(xs.len()).into_iter()),
-        )),
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_dependent_pairs(
-            (),
-            Box::new(random_vecs(&scramble(&EXAMPLE_SEED, "xs"), scale, &random)),
-            |_, xs| random_from_vector(&scramble(&EXAMPLE_SEED, "p"), naive_factors(xs.len())),
-        )),
-    };
-    reshape_1_2_to_3(ps)
 }
 
 // All sextuples of `Vec<Limb>`, `usize`, `Vec<Limb>`, `Limb`, `Limb`, and `u64` that are valid
