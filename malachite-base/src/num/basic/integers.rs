@@ -38,7 +38,7 @@ use num::conversion::traits::{
 };
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
-    LeadingZeros, LowMask, NotAssign, Rotate, SignificantBits, TrailingZeros,
+    LeadingZeros, LowMask, NotAssign, SignificantBits, TrailingZeros,
 };
 use num::random::HasRandomPrimitiveInts;
 
@@ -241,7 +241,6 @@ pub trait PrimitiveInt:
     + RemAssign<Self>
     + RemPowerOfTwo<Output = Self>
     + RemPowerOfTwoAssign
-    + Rotate
     + RoundToMultiple<Self, Output = Self>
     + RoundToMultipleAssign<Self>
     + RoundToMultipleOfPowerOfTwo<u64, Output = Self>

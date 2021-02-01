@@ -13,13 +13,14 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_unsigned_benches!(runner, benchmark_to_digits_desc);
 }
 
-fn demo_to_digits_asc<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
+fn demo_to_digits_asc<
+    T: Digits<U> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
-) where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+) {
     for (x, base) in unsigned_pair_gen_var_6::<T, U>()
         .get(gm, &config)
         .take(limit)
@@ -28,18 +29,19 @@ fn demo_to_digits_asc<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigne
             "{}.to_digits_asc({}) = {:?}",
             x,
             base,
-            Digits::<U, u64>::to_digits_asc(&x, base)
+            x.to_digits_asc(&base)
         );
     }
 }
 
-fn demo_to_digits_desc<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
+fn demo_to_digits_desc<
+    T: Digits<U> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
-) where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+) {
     for (x, base) in unsigned_pair_gen_var_6::<T, U>()
         .get(gm, &config)
         .take(limit)
@@ -48,43 +50,46 @@ fn demo_to_digits_desc<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsign
             "{}.to_digits_desc({}) = {:?}",
             x,
             base,
-            Digits::<U, u64>::to_digits_desc(&x, base)
+            x.to_digits_desc(&base)
         );
     }
 }
 
-fn benchmark_to_digits_asc<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
+fn benchmark_to_digits_asc<
+    T: Digits<U> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
-) where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+) {
     run_benchmark(
-        &format!("Digits::<{}>::to_digits_asc({}, u64)", U::NAME, T::NAME),
+        &format!("{}.to_digits_asc({})", T::NAME, U::NAME),
         BenchmarkType::Single,
         unsigned_pair_gen_var_6::<T, U>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &pair_1_bit_bucketer("x"),
-        &mut [("Malachite", &mut |(x, base)| {
-            no_out!(Digits::<U, u64>::to_digits_asc(&x, base))
-        })],
+        &mut [(
+            "Malachite",
+            &mut |(x, base)| no_out!(x.to_digits_asc(&base)),
+        )],
     );
 }
 
-fn benchmark_to_digits_desc<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
+fn benchmark_to_digits_desc<
+    T: Digits<U> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
-) where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+) {
     run_benchmark(
-        &format!("Digits::<{}>::to_digits_asc({}, u64)", U::NAME, T::NAME),
+        &format!("{}.to_digits_desc({})", T::NAME, U::NAME),
         BenchmarkType::Single,
         unsigned_pair_gen_var_6::<T, U>().get(gm, &config),
         gm.name(),
@@ -92,7 +97,7 @@ fn benchmark_to_digits_desc<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveU
         file_name,
         &pair_1_bit_bucketer("x"),
         &mut [("Malachite", &mut |(x, base)| {
-            no_out!(Digits::<U, u64>::to_digits_desc(&x, base))
+            no_out!(x.to_digits_desc(&base))
         })],
     );
 }

@@ -190,6 +190,13 @@ fn unwrap_triple<X, Y, Z>((a, b, c): (Option<X>, Option<Y>, Option<Z>)) -> (X, Y
     (a.unwrap(), b.unwrap(), c.unwrap())
 }
 
+#[allow(clippy::missing_const_for_fn)]
+fn unwrap_quadruple<X, Y, Z, W>(
+    (a, b, c, d): (Option<X>, Option<Y>, Option<Z>, Option<W>),
+) -> (X, Y, Z, W) {
+    (a.unwrap(), b.unwrap(), c.unwrap(), d.unwrap())
+}
+
 lex_custom_tuples!(
     LexTriplesXXY,
     (X, X, Y),
@@ -1361,6 +1368,24 @@ custom_tuples!(
         [1, output_type_ys_1],
         [2, output_type_ys_2]
     ]
+);
+custom_tuples!(
+    ExhaustiveQuadruplesXYYZ,
+    (X, Y, Y, Z),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xyyz,
+    exhaustive_quadruples_xyyz_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0]],
+    [
+        Y,
+        J,
+        ys,
+        ys_done,
+        [1, output_type_ys_1],
+        [2, output_type_ys_2]
+    ],
+    [Z, K, zs, zs_done, [3, output_type_zs_3]]
 );
 
 /// A trait used by dependent-pairs structs.

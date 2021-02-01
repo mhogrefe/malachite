@@ -66,7 +66,7 @@ pub fn limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// assert_eq!(out, &[1, 0, 0]);
 /// ```
 ///
-/// This is mul_1c from gmp-impl.h, GMP 6.1.2.
+/// This is mul_1c from gmp-impl.h, GMP 6.2.1.
 pub fn limbs_mul_limb_with_carry_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -137,7 +137,7 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
 /// assert_eq!(xs, &[1]);
 /// ```
 ///
-/// This is mul_1c from gmp-impl.h, GMP 6.1.2, where the output is the same as the input.
+/// This is mul_1c from gmp-impl.h, GMP 6.2.1, where the output is the same as the input.
 pub fn limbs_slice_mul_limb_with_carry_in_place(xs: &mut [Limb], y: Limb, mut carry: Limb) -> Limb {
     let y = DoubleLimb::from(y);
     for x in xs.iter_mut() {

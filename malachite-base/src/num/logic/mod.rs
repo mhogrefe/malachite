@@ -178,6 +178,76 @@ pub mod bit_access;
 /// assert_eq!(x, -0x5433);
 /// ```
 pub mod bit_block_access;
+/// This module provides traits for extracting all bits from numbers and constructing numbers from
+/// bits.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # to_bits_asc
+/// ```
+/// use malachite_base::num::logic::traits::BitConvertible;
+///
+/// assert_eq!(0u8.to_bits_asc(), &[]);
+/// assert_eq!(2u16.to_bits_asc(), &[false, true]);
+/// assert_eq!(123u32.to_bits_asc(), &[true, true, false, true, true, true, true]);
+///
+/// assert_eq!(0i8.to_bits_asc(), &[]);
+/// assert_eq!(2i16.to_bits_asc(), &[false, true, false]);
+/// assert_eq!((-123i32).to_bits_asc(), &[true, false, true, false, false, false, false, true]);
+/// ```
+///
+/// # to_bits_desc
+/// ```
+/// use malachite_base::num::logic::traits::BitConvertible;
+///
+/// assert_eq!(0u8.to_bits_desc(), &[]);
+/// assert_eq!(2u16.to_bits_desc(), &[true, false]);
+/// assert_eq!(123u32.to_bits_desc(), &[true, true, true, true, false, true, true]);
+///
+/// assert_eq!(0i8.to_bits_desc(), &[]);
+/// assert_eq!(2i16.to_bits_desc(), &[false, true, false]);
+/// assert_eq!((-123i32).to_bits_desc(), &[true, false, false, false, false, true, false, true]);
+/// ```
+///
+/// # from_bits_asc
+/// ```
+/// use malachite_base::num::logic::traits::BitConvertible;
+/// use std::iter::empty;
+///
+/// assert_eq!(u8::from_bits_asc(empty()), 0);
+/// assert_eq!(u16::from_bits_asc([false, true, false].iter().cloned()), 2);
+/// assert_eq!(
+///     u32::from_bits_asc([true, true, false, true, true, true, true].iter().cloned()),
+///     123
+/// );
+///
+/// assert_eq!(i8::from_bits_asc(empty()), 0);
+/// assert_eq!(i16::from_bits_asc([false, true, false].iter().cloned()), 2);
+/// assert_eq!(
+///     i32::from_bits_asc([true, false, true, false, false, false, false, true].iter().cloned()),
+///     -123
+/// );
+/// ```
+///
+/// # from_bits_desc
+/// ```
+/// use malachite_base::num::logic::traits::BitConvertible;
+/// use std::iter::empty;
+///
+/// assert_eq!(u8::from_bits_desc(empty()), 0);
+/// assert_eq!(u16::from_bits_desc([false, true, false].iter().cloned()), 2);
+/// assert_eq!(
+///     u32::from_bits_desc([true, true, true, true, false, true, true].iter().cloned()),
+///     123
+/// );
+///
+/// assert_eq!(i8::from_bits_desc(empty()), 0);
+/// assert_eq!(i16::from_bits_desc([false, true, false].iter().cloned()), 2);
+/// assert_eq!(
+///     i32::from_bits_desc([true, false, false, false, false, true, false, true].iter().cloned()),
+///     -123
+/// );
+/// ```
 pub mod bit_convertible;
 pub mod bit_iterable;
 pub mod bit_scan;
@@ -187,7 +257,6 @@ pub mod hamming_distance;
 pub mod leading_zeros;
 pub mod low_mask;
 pub mod not;
-pub mod rotate;
 pub mod significant_bits;
 pub mod trailing_zeros;
 pub mod traits;

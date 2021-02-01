@@ -1,13 +1,15 @@
 use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogTwo, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOfTwo, ModPowerOfTwoAssign,
-    Parity, ShrRound, ShrRoundAssign, XMulYIsZZ,
+    Parity, ShrRound, ShrRoundAssign, SquareAssign, XMulYIsZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ConvertibleFrom, Digits, ExactFrom, WrappingFrom};
-use malachite_base::num::logic::traits::{LeadingZeros, TrailingZeros};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, WrappingFrom,
+};
+use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
 use natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
@@ -18,6 +20,7 @@ use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb
 use natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
 use natural::arithmetic::square::limbs_square_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
+use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{
     Limb, BASES, MP_BASES_BIG_BASE_10, MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10,
@@ -572,7 +575,7 @@ const GET_STR_DC_THRESHOLD: usize = 15;
 /// string. This uses divide-and-conquer and is intended for large conversions.
 ///
 /// This is mpn_dc_get_str from mpn/generic/get_str.c, GMP 6.2.1.
-pub fn _limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
+fn _limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
     out: &mut [T],
     mut len: usize,
     xs: &mut [Limb],
@@ -666,8 +669,7 @@ pub fn _limbs_to_digits_small_base<T: PrimitiveUnsigned>(
 ) -> usize {
     let xs_len = xs.len();
     if xs_len == 0 {
-        out[0] = T::ZERO;
-        1
+        0
     } else if xs_len < GET_STR_PRECOMPUTE_THRESHOLD {
         _limbs_to_digits_small_base_basecase(out, 0, xs, base)
     } else {
@@ -694,75 +696,602 @@ pub fn _limbs_to_digits_small_base<T: PrimitiveUnsigned>(
 }
 
 // Returns digits in ascending order
-pub fn _limbs_to_digits_basecase<T: ConvertibleFrom<u64> + PrimitiveUnsigned>(
+pub fn _limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    digits: &mut Vec<T>,
     xs: &mut [Limb],
-    base: u64,
-) -> Vec<T> {
+    base: Limb,
+) {
     assert!(base >= 2);
-    let limb_base = Limb::exact_from(base);
+    assert!(xs.len() > 1);
     assert!(T::convertible_from(base));
     let mut digits_per_limb = 0;
     let mut big_base = 1;
-    while let Some(next) = big_base.checked_mul(limb_base) {
+    while let Some(next) = big_base.checked_mul(base) {
         big_base = next;
         digits_per_limb += 1;
     }
-    let mut digits = Vec::new();
     while !slice_test_zero(xs) {
         let mut big_digit = limbs_div_limb_in_place_mod(xs, big_base);
         for _ in 0..digits_per_limb - 1 {
-            digits.push(T::wrapping_from(big_digit.div_assign_mod(limb_base)));
+            digits.push(T::wrapping_from(big_digit.div_assign_mod(base)));
         }
         digits.push(T::wrapping_from(big_digit));
     }
-    let trailing_zeros = slice_trailing_zeros(&digits);
+    let trailing_zeros = slice_trailing_zeros(digits);
     digits.truncate(digits.len() - trailing_zeros);
-    digits
 }
 
-pub fn _to_digits_asc_naive<
-    D: ExactFrom<Natural> + PrimitiveUnsigned,
-    B: CheckedLogTwo + Copy + One + Ord,
->(
+pub fn _to_digits_asc_naive_primitive<T: ExactFrom<Natural> + PrimitiveUnsigned>(
+    digits: &mut Vec<T>,
     x: &Natural,
-    base: B,
-) -> Vec<D>
-where
-    Natural: From<B>,
+    base: T,
+) where
+    Natural: From<T>,
 {
-    assert!(base > B::ONE);
-    let mut digits = Vec::new();
+    assert!(base > T::ONE);
     let mut remainder = x.clone();
     let nat_base = Natural::from(base);
     while remainder != 0 {
-        digits.push(D::exact_from(remainder.div_assign_mod(&nat_base)));
+        digits.push(T::exact_from(remainder.div_assign_mod(&nat_base)));
     }
-    digits
+}
+
+pub fn _to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natural) {
+    assert!(*base > 1);
+    let mut remainder = x.clone();
+    while remainder != 0 {
+        digits.push(remainder.div_assign_mod(base));
+    }
+}
+
+const TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 50;
+
+const SQRT_MAX_LIMB: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
+
+fn compute_powers(powers: &mut Vec<Natural>, base: &Natural, bits: u64) {
+    let limit = (bits + 3).shr_round(1, RoundingMode::Ceiling);
+    let mut power = base.clone();
+    loop {
+        powers.push(power.clone());
+        power.square_assign();
+        if power.significant_bits() >= limit {
+            break;
+        }
+    }
+    powers.push(power);
+}
+
+fn _to_digits_asc_divide_and_conquer_limb<
+    T: ConvertibleFrom<Limb> + ExactFrom<Natural> + PrimitiveUnsigned,
+>(
+    digits: &mut Vec<T>,
+    mut x: Natural,
+    base: Limb,
+    powers: &mut Vec<Natural>,
+    mut power_index: usize,
+) where
+    Limb: Digits<T>,
+    Natural: From<T>,
+{
+    let bits = x.significant_bits();
+    if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
+        if base <= SQRT_MAX_LIMB {
+            match x {
+                Natural(Small(x)) => {
+                    digits.extend_from_slice(&x.to_digits_asc(&T::wrapping_from(base)))
+                }
+                Natural(Large(ref mut xs)) => _limbs_to_digits_basecase(digits, xs, base),
+            }
+        } else {
+            _to_digits_asc_naive_primitive(digits, &x, T::exact_from(base))
+        }
+    } else {
+        if powers.is_empty() {
+            compute_powers(powers, &From::<Limb>::from(base), bits);
+            power_index = powers.len() - 1;
+        }
+        let (q, r) = x.div_mod(&powers[power_index]);
+        let start_len = digits.len();
+        _to_digits_asc_divide_and_conquer_limb(digits, r, base, powers, power_index - 1);
+        if q != 0 {
+            for _ in digits.len() - start_len..1 << power_index {
+                digits.push(T::ZERO);
+            }
+            _to_digits_asc_divide_and_conquer_limb(digits, q, base, powers, power_index - 1);
+        }
+    }
+}
+
+fn _to_digits_asc_divide_and_conquer(
+    digits: &mut Vec<Natural>,
+    x: &Natural,
+    base: &Natural,
+    powers: &mut Vec<Natural>,
+    mut power_index: usize,
+) {
+    let bits = x.significant_bits();
+    if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
+        _to_digits_asc_naive(digits, x, base)
+    } else {
+        if powers.is_empty() {
+            compute_powers(powers, base, bits);
+            power_index = powers.len() - 1;
+        }
+        let (q, r) = x.div_mod(&powers[power_index]);
+        let start_len = digits.len();
+        _to_digits_asc_divide_and_conquer(digits, &r, base, powers, power_index - 1);
+        if q != 0 {
+            for _ in digits.len() - start_len..1 << power_index {
+                digits.push(Natural::ZERO);
+            }
+            _to_digits_asc_divide_and_conquer(digits, &q, base, powers, power_index - 1);
+        }
+    }
+}
+
+pub fn _to_digits_asc_limb<T: ConvertibleFrom<Limb> + ExactFrom<Natural> + PrimitiveUnsigned>(
+    x: &Natural,
+    base: Limb,
+) -> Vec<T>
+where
+    Limb: Digits<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    assert!(base >= 2);
+    if let Some(log_base) = base.checked_log_two() {
+        x.to_power_of_two_digits_asc(log_base)
+    } else {
+        let t_base = T::exact_from(base);
+        match x {
+            Natural(Small(x)) => x.to_digits_asc(&t_base),
+            Natural(Large(xs)) => {
+                if base < 256 {
+                    let mut digits =
+                        vec![
+                            T::ZERO;
+                            usize::exact_from(limbs_digit_count(xs, u64::wrapping_from(base)))
+                        ];
+                    let mut xs = xs.clone();
+                    let len = _limbs_to_digits_small_base(
+                        &mut digits,
+                        u64::wrapping_from(base),
+                        &mut xs,
+                        None,
+                    );
+                    digits.truncate(len);
+                    digits.reverse();
+                    digits
+                } else {
+                    let mut powers = Vec::new();
+                    let mut digits = Vec::new();
+                    _to_digits_asc_divide_and_conquer_limb(
+                        &mut digits,
+                        x.clone(),
+                        base,
+                        &mut powers,
+                        0,
+                    );
+                    digits
+                }
+            }
+        }
+    }
+}
+
+pub fn _to_digits_desc_limb<T: ConvertibleFrom<Limb> + ExactFrom<Natural> + PrimitiveUnsigned>(
+    x: &Natural,
+    base: Limb,
+) -> Vec<T>
+where
+    Limb: Digits<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    assert!(base >= 2);
+    if let Some(log_base) = base.checked_log_two() {
+        x.to_power_of_two_digits_desc(log_base)
+    } else {
+        let t_base = T::exact_from(base);
+        match x {
+            Natural(Small(x)) => x.to_digits_desc(&t_base),
+            Natural(Large(xs)) => {
+                if base < 256 {
+                    let mut digits =
+                        vec![
+                            T::ZERO;
+                            usize::exact_from(limbs_digit_count(xs, u64::wrapping_from(base)))
+                        ];
+                    let mut xs = xs.clone();
+                    let len = _limbs_to_digits_small_base(
+                        &mut digits,
+                        u64::wrapping_from(base),
+                        &mut xs,
+                        None,
+                    );
+                    digits.truncate(len);
+                    digits
+                } else {
+                    let mut powers = Vec::new();
+                    let mut digits = Vec::new();
+                    _to_digits_asc_divide_and_conquer_limb(
+                        &mut digits,
+                        x.clone(),
+                        base,
+                        &mut powers,
+                        0,
+                    );
+                    digits.reverse();
+                    digits
+                }
+            }
+        }
+    }
+}
+
+// base must be large
+pub fn _to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
+    if *x == 0 {
+        Vec::new()
+    } else if x < base {
+        vec![x.clone()]
+    } else if let Some(log_base) = base.checked_log_two() {
+        x.to_power_of_two_digits_asc(log_base)
+    } else {
+        match x {
+            Natural(Large(_)) => {
+                let mut powers = Vec::new();
+                let mut digits = Vec::new();
+                _to_digits_asc_divide_and_conquer(&mut digits, x, base, &mut powers, 0);
+                digits
+            }
+            _ => panic!("x must be large"),
+        }
+    }
+}
+
+// base must be large
+pub fn _to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
+    if *x == 0 {
+        Vec::new()
+    } else if x < base {
+        vec![x.clone()]
+    } else if let Some(log_base) = base.checked_log_two() {
+        x.to_power_of_two_digits_desc(log_base)
+    } else {
+        match x {
+            Natural(Large(_)) => {
+                let mut powers = Vec::new();
+                let mut digits = Vec::new();
+                _to_digits_asc_divide_and_conquer(&mut digits, x, base, &mut powers, 0);
+                digits.reverse();
+                digits
+            }
+            _ => panic!("x must be large"),
+        }
+    }
+}
+
+impl Digits<u8> for Natural {
+    /// Returns a `Vec` containing the digits of `self` in ascending order (least- to most-
+    /// significant).
+    ///
+    /// The type of each digit is `u8`. If `self` is 0, the `Vec` is empty; otherwise, it ends with
+    /// a nonzero digit.
+    ///
+    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
+    /// $d_{k-1} \neq 0$, and
+    ///
+    /// $$
+    /// \sum_{i=0}^{k-1}b^i d_i = x.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2.
+    ///
+    /// # Examples
+    /// See the documentation of the `num::conversion::digits::general_digits` module.
+    #[inline]
+    fn to_digits_asc(&self, base: &u8) -> Vec<u8> {
+        match self {
+            Natural(Small(x)) => x.to_digits_asc(base),
+            Natural(Large(xs)) => {
+                if let Some(log_base) = base.checked_log_two() {
+                    self.to_power_of_two_digits_asc(log_base)
+                } else {
+                    let mut digits =
+                        vec![0; usize::exact_from(limbs_digit_count(xs, u64::from(*base)))];
+                    let mut xs = xs.clone();
+                    let len =
+                        _limbs_to_digits_small_base(&mut digits, u64::from(*base), &mut xs, None);
+                    digits.truncate(len);
+                    digits.reverse();
+                    digits
+                }
+            }
+        }
+    }
+
+    /// Returns a `Vec` containing the digits of `self` in descending order (most- to least-
+    /// significant).
+    ///
+    /// The type of each digit is `u8`. If `self` is 0, the `Vec` is empty; otherwise, it begins
+    /// with a nonzero digit.
+    ///
+    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
+    /// $d_{k-1} \neq 0$, and
+    ///
+    /// $$
+    /// \sum_{i=0}^{k-1}b^i d_{k-i-1} = x.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2.
+    ///
+    /// # Examples
+    /// See the documentation of the `num::conversion::digits::general_digits` module.
+    #[inline]
+    fn to_digits_desc(&self, base: &u8) -> Vec<u8> {
+        match self {
+            Natural(Small(x)) => x.to_digits_desc(base),
+            Natural(Large(xs)) => {
+                if let Some(log_base) = base.checked_log_two() {
+                    self.to_power_of_two_digits_desc(log_base)
+                } else {
+                    let mut digits =
+                        vec![0; usize::exact_from(limbs_digit_count(xs, u64::from(*base)))];
+                    let mut xs = xs.clone();
+                    let len =
+                        _limbs_to_digits_small_base(&mut digits, u64::from(*base), &mut xs, None);
+                    digits.truncate(len);
+                    digits
+                }
+            }
+        }
+    }
+
+    #[inline]
+    fn from_digits_asc<I: Iterator<Item = u8>>(_base: &u8, _digits: I) -> Natural {
+        unimplemented!()
+    }
+
+    #[inline]
+    fn from_digits_desc<I: Iterator<Item = u8>>(_base: &u8, _digits: I) -> Natural {
+        unimplemented!()
+    }
+}
+
+fn _to_digits_asc_unsigned<
+    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned + WrappingFrom<Natural>,
+>(
+    x: &Natural,
+    base: &T,
+) -> Vec<T>
+where
+    Limb: CheckedFrom<T> + Digits<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    if let Some(base) = Limb::checked_from(*base) {
+        _to_digits_asc_limb(x, base)
+    } else {
+        _to_digits_asc_large(x, &Natural::from(*base))
+            .into_iter()
+            .map(T::wrapping_from)
+            .collect()
+    }
+}
+
+fn _to_digits_desc_unsigned<
+    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned + WrappingFrom<Natural>,
+>(
+    x: &Natural,
+    base: &T,
+) -> Vec<T>
+where
+    Limb: CheckedFrom<T> + Digits<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    if let Some(base) = Limb::checked_from(*base) {
+        _to_digits_desc_limb(x, base)
+    } else {
+        _to_digits_desc_large(x, &Natural::from(*base))
+            .into_iter()
+            .map(T::wrapping_from)
+            .collect()
+    }
 }
 
 macro_rules! digits_unsigned {
     ($d: ident) => {
-        impl Digits<$d, u64> for Natural {
+        impl Digits<$d> for Natural {
+            /// Returns a `Vec` containing the digits of `self` in ascending order (least- to most-
+            /// significant).
+            ///
+            /// The type of each digit is `$d`. If `self` is 0, the `Vec` is empty; otherwise, it
+            /// ends with a nonzero digit.
+            ///
+            /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
+            /// $d_{k-1} \neq 0$, and
+            ///
+            /// $$
+            /// \sum_{i=0}^{k-1}b^i d_i = x.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// TODO
+            ///
+            /// # Panics
+            /// Panics if `base` is less than 2.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::conversion::digits::general_digits` module.
             #[inline]
-            fn to_digits_asc(&self, base: u64) -> Vec<$d> {
-                _to_digits_asc_naive(self, base)
+            fn to_digits_asc(&self, base: &$d) -> Vec<$d> {
+                _to_digits_asc_unsigned(self, base)
+            }
+
+            /// Returns a `Vec` containing the digits of `self` in descending order (most- to least-
+            /// significant).
+            ///
+            /// The type of each digit is `$d`. If `self` is 0, the `Vec` is empty; otherwise, it
+            /// begins with a nonzero digit.
+            ///
+            /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
+            /// $d_{k-1} \neq 0$, and
+            ///
+            /// $$
+            /// \sum_{i=0}^{k-1}b^i d_{k-i-1} = x.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// TODO
+            ///
+            /// # Panics
+            /// Panics if `base` is less than 2.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::conversion::digits::general_digits` module.
+            #[inline]
+            fn to_digits_desc(&self, base: &$d) -> Vec<$d> {
+                _to_digits_desc_unsigned(self, base)
             }
 
             #[inline]
-            fn to_digits_desc(&self, _base: u64) -> Vec<$d> {
+            fn from_digits_asc<I: Iterator<Item = $d>>(_base: &$d, _digits: I) -> Natural {
                 unimplemented!()
             }
 
             #[inline]
-            fn from_digits_asc<I: Iterator<Item = $d>>(_base: u64, _digits: I) -> Natural {
-                unimplemented!()
-            }
-
-            #[inline]
-            fn from_digits_desc<I: Iterator<Item = $d>>(_base: u64, _digits: I) -> Natural {
+            fn from_digits_desc<I: Iterator<Item = $d>>(_base: &$d, _digits: I) -> Natural {
                 unimplemented!()
             }
         }
     };
 }
-apply_to_unsigneds!(digits_unsigned);
+digits_unsigned!(u16);
+digits_unsigned!(u32);
+digits_unsigned!(u64);
+digits_unsigned!(u128);
+digits_unsigned!(usize);
+
+impl Digits<Natural> for Natural {
+    /// Returns a `Vec` containing the digits of `self` in ascending order (least- to most-
+    /// significant).
+    ///
+    /// The type of each digit is `Natural`. If `self` is 0, the `Vec` is empty; otherwise, it
+    /// ends with a nonzero digit.
+    ///
+    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
+    /// $d_{k-1} \neq 0$, and
+    ///
+    /// $$
+    /// \sum_{i=0}^{k-1}b^i d_i = x.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate itertools;
+    /// extern crate malachite_base;
+    ///
+    /// use itertools::Itertools;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
+    /// use malachite_base::num::conversion::traits::Digits;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert!(Natural::ZERO.to_digits_asc(&Natural::from(6u32)).is_empty());
+    ///
+    /// let digits = Natural::TWO.to_digits_asc(&Natural::from(6u32))
+    ///     .iter().map(Natural::to_string).collect_vec();
+    /// assert_eq!(digits.iter().map(String::as_str).collect_vec(), &["2"]);
+    ///
+    /// let digits = Natural::from(123456u32).to_digits_asc(&Natural::from(3u32))
+    ///     .iter().map(Natural::to_string).collect_vec();
+    /// assert_eq!(
+    ///     digits.iter().map(String::as_str).collect_vec(),
+    ///     &["0", "1", "1", "0", "0", "1", "1", "2", "0", "0", "2"]
+    /// );
+    /// ```
+    fn to_digits_asc(&self, base: &Natural) -> Vec<Natural> {
+        match base {
+            Natural(Small(b)) => self
+                .to_digits_asc(b)
+                .into_iter()
+                .map(Natural::from)
+                .collect(),
+            _ => _to_digits_asc_large(self, base),
+        }
+    }
+
+    /// Returns a `Vec` containing the digits of `self` in descending order (most- to least-
+    /// significant).
+    ///
+    /// The type of each digit is `$d`. If `self` is 0, the `Vec` is empty; otherwise, it begins
+    /// with a nonzero digit.
+    ///
+    /// $f(x, b) = (d_i)_ {i=0}^{k-1}$, where $0 \leq d_i < b$ for all $i$, $k=0$ or
+    /// $d_{k-1} \neq 0$, and
+    ///
+    /// $$
+    /// \sum_{i=0}^{k-1}b^i d_{k-i-1} = x.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate itertools;
+    /// extern crate malachite_base;
+    ///
+    /// use itertools::Itertools;
+    /// use malachite_base::num::basic::traits::{Two, Zero};
+    /// use malachite_base::num::conversion::traits::Digits;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert!(Natural::ZERO.to_digits_desc(&Natural::from(6u32)).is_empty());
+    ///
+    /// let digits = Natural::TWO.to_digits_desc(&Natural::from(6u32))
+    ///     .iter().map(Natural::to_string).collect_vec();
+    /// assert_eq!(digits.iter().map(String::as_str).collect_vec(), &["2"]);
+    ///
+    /// let digits = Natural::from(123456u32).to_digits_desc(&Natural::from(3u32))
+    ///     .iter().map(Natural::to_string).collect_vec();
+    /// assert_eq!(
+    ///     digits.iter().map(String::as_str).collect_vec(),
+    ///     &["2", "0", "0", "2", "1", "1", "0", "0", "1", "1", "0"]
+    /// );
+    /// ```
+    fn to_digits_desc(&self, base: &Natural) -> Vec<Natural> {
+        match base {
+            Natural(Small(b)) => self
+                .to_digits_desc(b)
+                .into_iter()
+                .map(Natural::from)
+                .collect(),
+            _ => _to_digits_desc_large(self, base),
+        }
+    }
+
+    #[inline]
+    fn from_digits_asc<I: Iterator<Item = Natural>>(_base: &Natural, _digits: I) -> Natural {
+        unimplemented!()
+    }
+
+    #[inline]
+    fn from_digits_desc<I: Iterator<Item = Natural>>(_base: &Natural, _digits: I) -> Natural {
+        unimplemented!()
+    }
+}

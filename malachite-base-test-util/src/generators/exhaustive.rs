@@ -1,29 +1,36 @@
 use generators::common::{permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3, It};
-use generators::{digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
+use generators::{
+    digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, signed_assign_bits_valid,
+    unsigned_assign_bits_valid,
+};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
 use malachite_base::comparison::traits::{Max, Min};
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::DivRound;
+use malachite_base::num::arithmetic::traits::{DivRound, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::exhaustive::{
     exhaustive_natural_signeds, exhaustive_negative_signeds, exhaustive_positive_primitive_ints,
-    exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
-    primitive_int_increasing_range, PrimitiveIntIncreasingRange,
+    exhaustive_signed_inclusive_range, exhaustive_signeds, exhaustive_unsigneds,
+    primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
+    PrimitiveIntIncreasingRange,
 };
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
+use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use malachite_base::tuples::exhaustive::{
-    exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_triples,
-    exhaustive_triples_custom_output, exhaustive_triples_from_single, lex_pairs,
-    lex_pairs_from_single, lex_triples_from_single, ExhaustiveDependentPairsYsGenerator,
+    exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
+    exhaustive_quadruples_xyyz_custom_output, exhaustive_triples, exhaustive_triples_custom_output,
+    exhaustive_triples_from_single, exhaustive_triples_xxy_custom_output,
+    exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
+    lex_triples_from_single, ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_fixed_length_vecs_from_single, exhaustive_vecs,
@@ -79,6 +86,10 @@ pub fn exhaustive_char_pair_gen() -> It<(char, char)> {
 
 pub fn exhaustive_primitive_int_gen_var_1<T: PrimitiveInt>() -> It<T> {
     Box::new(exhaustive_positive_primitive_ints())
+}
+
+pub fn exhaustive_primitive_int_gen_var_2<T: PrimitiveInt>() -> It<T> {
+    Box::new(primitive_int_increasing_inclusive_range(T::TWO, T::MAX))
 }
 
 // -- PrimitiveSigned --
@@ -185,6 +196,75 @@ pub fn exhaustive_signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>() ->
     )
 }
 
+// -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_signed_unsigned_unsigned_triple_gen_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+    V: PrimitiveUnsigned,
+>() -> It<(T, U, V)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_signeds(),
+        exhaustive_unsigneds(),
+        exhaustive_unsigneds(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+pub fn exhaustive_signed_unsigned_unsigned_triple_gen_var_2<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(T, U, U)> {
+    Box::new(
+        exhaustive_triples_xyy_custom_output(
+            exhaustive_positive_primitive_ints(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        )
+        .interleave(exhaustive_triples_custom_output(
+            exhaustive_signed_inclusive_range(T::MIN, T::ZERO),
+            exhaustive_unsigneds(),
+            primitive_int_increasing_inclusive_range(U::ZERO, U::exact_from(T::WIDTH)),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        ))
+        .filter_map(|(x, y, z)| y.checked_add(z).map(|new_z| (x, y, new_z))),
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveSigned + UnsignedAbs<Output = U>,
+    U: BitBlockAccess<Bits = U> + PrimitiveUnsigned,
+>() -> It<(T, u64, u64, U)> {
+    Box::new(
+        exhaustive_quadruples_xyyz_custom_output(
+            exhaustive_signeds(),
+            exhaustive_unsigneds(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::normal(1),
+        )
+        .filter_map(|(x, y, z, w): (T, u64, u64, U)| {
+            y.checked_add(z).and_then(|new_z| {
+                if signed_assign_bits_valid(x, y, new_z, w) {
+                    Some((x, y, new_z, w))
+                } else {
+                    None
+                }
+            })
+        }),
+    )
+}
+
 // -- PrimitiveUnsigned --
 
 pub fn exhaustive_unsigned_gen<T: PrimitiveUnsigned>() -> It<T> {
@@ -199,13 +279,13 @@ pub fn exhaustive_unsigned_gen_var_2<T: PrimitiveInt>() -> It<u64> {
     Box::new(primitive_int_increasing_inclusive_range(1, T::WIDTH))
 }
 
-pub fn exhaustive_unsigned_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> It<u64>
-where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+pub fn exhaustive_unsigned_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>() -> It<U> {
     Box::new(primitive_int_increasing_inclusive_range(
-        2,
-        unsigned_pair_gen_var_5_limit::<T, U>(),
+        U::TWO,
+        U::saturating_from(T::MAX),
     ))
 }
 
@@ -259,22 +339,19 @@ pub fn exhaustive_unsigned_pair_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveInt>
     ))
 }
 
-pub fn unsigned_pair_gen_var_5_limit<T: PrimitiveInt, U: PrimitiveInt>() -> u64
-where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
-    min(u64::saturating_from(T::MAX), u64::saturating_from(U::MAX))
-}
-
-pub fn exhaustive_unsigned_pair_gen_var_5<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
-) -> It<(T, u64)>
-where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+pub fn exhaustive_unsigned_pair_gen_var_5<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>() -> It<(T, U)> {
     Box::new(exhaustive_pairs_big_small(
         exhaustive_unsigneds(),
-        primitive_int_increasing_inclusive_range(2, unsigned_pair_gen_var_5_limit::<T, U>()),
+        primitive_int_increasing_inclusive_range(U::TWO, U::saturating_from(T::MAX)),
     ))
+}
+
+//TODO make better
+pub fn exhaustive_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x <= y))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
@@ -311,6 +388,57 @@ pub fn exhaustive_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>() -> It<(T, T,
     Box::new(
         exhaustive_triples_from_single(exhaustive_unsigneds())
             .filter(|&(x, y, z)| sub_mul_inputs_valid(x, y, z)),
+    )
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(T, T, U)> {
+    Box::new(exhaustive_triples_xxy_custom_output(
+        exhaustive_unsigneds(),
+        exhaustive_unsigneds(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(T, U, U)> {
+    Box::new(
+        exhaustive_triples_xyy_custom_output(
+            exhaustive_unsigneds(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        )
+        .filter_map(|(x, y, z): (T, U, U)| y.checked_add(z).map(|new_z| (x, y, new_z))),
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(T, u64, u64, U)> {
+    Box::new(
+        exhaustive_quadruples_xyyz_custom_output(
+            exhaustive_unsigneds(),
+            exhaustive_unsigneds(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::normal(1),
+        )
+        .filter_map(|(x, y, z, w): (T, u64, u64, U)| {
+            y.checked_add(z).and_then(|new_z| {
+                if unsigned_assign_bits_valid(y, new_z, w) {
+                    Some((x, y, new_z, w))
+                } else {
+                    None
+                }
+            })
+        }),
     )
 }
 

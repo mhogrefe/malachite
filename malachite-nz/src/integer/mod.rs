@@ -171,6 +171,7 @@ pub mod comparison {
     pub mod partial_ord_primitive_int;
 }
 pub mod conversion;
+/// This module contains iterators that generate `Integer`s without repetition.
 pub mod exhaustive;
 pub mod logic {
     pub mod and;
@@ -189,4 +190,5 @@ pub mod logic {
     pub mod trailing_zeros;
     pub mod xor;
 }
+/// This module contains iterators that generate `Integer`s randomly.
 pub mod random;

@@ -36,7 +36,7 @@ use platform::Limb;
 /// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 100), None);
 /// ```
 ///
-/// This is mpz_scan0 from mpz/scan0.c, GMP 6.1.2.
+/// This is mpz_scan0 from mpz/scan0.c, GMP 6.2.1.
 pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -> Option<u64> {
     let n = xs.len();
     let i = slice_leading_zeros(xs);
@@ -96,7 +96,7 @@ pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -
 /// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 100), 100);
 /// ```
 ///
-/// This is mpz_scan1 from mpz/scan1.c, GMP 6.1.2.
+/// This is mpz_scan1 from mpz/scan1.c, GMP 6.2.1.
 pub fn limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) -> u64 {
     let n = xs.len();
     let i = slice_leading_zeros(xs);

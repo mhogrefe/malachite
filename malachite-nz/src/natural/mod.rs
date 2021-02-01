@@ -203,6 +203,7 @@ pub mod comparison {
     pub mod partial_ord_abs_primitive_int;
     pub mod partial_ord_primitive_int;
 }
+/// This module contains iterators that generate `Natural`s without repetition.
 pub mod exhaustive;
 pub mod logic {
     pub mod and;
@@ -220,4 +221,5 @@ pub mod logic {
     pub mod trailing_zeros;
     pub mod xor;
 }
+/// This module contains iterators that generate `Natural`s randomly.
 pub mod random;

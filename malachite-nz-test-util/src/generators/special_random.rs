@@ -1,4 +1,5 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Two;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::random::geometric::{
@@ -15,15 +16,15 @@ use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::tuples::random::random_pairs;
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{GenConfig, It};
-use malachite_base_test_util::generators::exhaustive::unsigned_pair_gen_var_5_limit;
 use malachite_nz::integer::random::striped_random_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, GET_STR_PRECOMPUTE_THRESHOLD,
 };
-use malachite_nz::natural::random::striped_random_naturals;
+use malachite_nz::natural::random::{random_natural_range_to_infinity, striped_random_naturals};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use std::marker::PhantomData;
 
 // -- Integer --
 
@@ -49,17 +50,80 @@ pub fn special_random_natural_gen(config: &GenConfig) -> It<Natural> {
     ))
 }
 
+// -- (Natural, Natural) --
+
+pub fn special_random_natural_pair_gen_var_1(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_natural_range_to_infinity(
+                seed,
+                Natural::TWO,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Natural, PrimitiveUnsigned) --
+
+pub fn special_random_natural_unsigned_pair_gen_var_1<
+    T: PrimitiveUnsigned + SaturatingFrom<U>,
+    U: PrimitiveInt,
+>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::saturating_from(U::MAX)),
+    ))
+}
+
+pub fn special_random_natural_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::MAX),
+    ))
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 pub fn special_random_unsigned_vec_unsigned_pair_gen_var_1<
-    T: PrimitiveUnsigned,
+    T: PrimitiveUnsigned + SaturatingFrom<U>,
     U: PrimitiveUnsigned,
 >(
     config: &GenConfig,
-) -> It<(Vec<T>, u64)>
-where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+) -> It<(Vec<T>, T)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
         &|seed| {
@@ -72,36 +136,37 @@ where
                 config.get_or("mean_length_d", 1),
             )
         },
-        &|seed| random_unsigned_inclusive_range(seed, 2, unsigned_pair_gen_var_5_limit::<T, U>()),
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::saturating_from(U::MAX)),
     ))
 }
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
 
-struct DigitsSpecialRandomGenerator {
+struct DigitsSpecialRandomGenerator<T: PrimitiveUnsigned> {
     bases: RandomValuesFromVec<u64>,
     xss: StripedRandomUnsignedVecs<Limb, GeometricRandomNaturalValues<u64>>,
     bit_source: StripedBitSource,
+    phantom: PhantomData<T>,
 }
 
-impl Iterator for DigitsSpecialRandomGenerator {
-    type Item = (Vec<u8>, u64, Vec<Limb>);
+impl<T: PrimitiveUnsigned> Iterator for DigitsSpecialRandomGenerator<T> {
+    type Item = (Vec<T>, u64, Vec<Limb>);
 
-    fn next(&mut self) -> Option<(Vec<u8>, u64, Vec<Limb>)> {
+    fn next(&mut self) -> Option<(Vec<T>, u64, Vec<Limb>)> {
         let base = self.bases.next().unwrap();
         let xs = self.xss.next().unwrap();
         let out_len = usize::exact_from(limbs_digit_count(&xs, base));
         let out = get_striped_unsigned_vec(
             &mut self.bit_source,
-            u64::exact_from(out_len) << u8::LOG_WIDTH,
+            u64::exact_from(out_len) << T::LOG_WIDTH,
         );
         Some((out, base, xs))
     }
 }
 
-pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1(
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
-) -> It<(Vec<u8>, u64, Vec<Limb>)> {
+) -> It<(Vec<T>, u64, Vec<Limb>)> {
     Box::new(DigitsSpecialRandomGenerator {
         bases: random_values_from_vec(
             EXAMPLE_SEED.fork("bases"),
@@ -119,23 +184,25 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1(
             config.get_or("mean_stripe_n", 32),
             config.get_or("mean_stripe_d", 1),
         ),
+        phantom: PhantomData,
     })
 }
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
-struct BasecaseDigitsSpecialRandomGenerator {
+struct BasecaseDigitsSpecialRandomGenerator<T: PrimitiveUnsigned> {
     bases: RandomValuesFromVec<u64>,
     xss: StripedRandomUnsignedVecs<Limb, RandomUnsignedRange<u64>>,
     excess_lens: RandomOptions<GeometricRandomNaturalValues<usize>>,
     excess_out_lens: GeometricRandomNaturalValues<usize>,
     bit_source: StripedBitSource,
+    phantom: PhantomData<T>,
 }
 
-impl Iterator for BasecaseDigitsSpecialRandomGenerator {
-    type Item = (Vec<u8>, usize, Vec<Limb>, u64);
+impl<T: PrimitiveUnsigned> Iterator for BasecaseDigitsSpecialRandomGenerator<T> {
+    type Item = (Vec<T>, usize, Vec<Limb>, u64);
 
-    fn next(&mut self) -> Option<(Vec<u8>, usize, Vec<Limb>, u64)> {
+    fn next(&mut self) -> Option<(Vec<T>, usize, Vec<Limb>, u64)> {
         let base = self.bases.next().unwrap();
         let xs = self.xss.next().unwrap();
         let min_out_len = usize::exact_from(limbs_digit_count(&xs, base));
@@ -147,15 +214,17 @@ impl Iterator for BasecaseDigitsSpecialRandomGenerator {
         };
         let out = get_striped_unsigned_vec(
             &mut self.bit_source,
-            u64::exact_from(out_len) << u8::LOG_WIDTH,
+            u64::exact_from(out_len) << T::LOG_WIDTH,
         );
         Some((out, len, xs, base))
     }
 }
 
-pub fn special_random_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1(
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
     config: &GenConfig,
-) -> It<(Vec<u8>, usize, Vec<Limb>, u64)> {
+) -> It<(Vec<T>, usize, Vec<Limb>, u64)> {
     Box::new(BasecaseDigitsSpecialRandomGenerator {
         bases: random_values_from_vec(
             EXAMPLE_SEED.fork("bases"),
@@ -190,5 +259,6 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_
             config.get_or("mean_stripe_n", 32),
             config.get_or("mean_stripe_d", 1),
         ),
+        phantom: PhantomData,
     })
 }

@@ -1,6 +1,4 @@
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
-use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::digits::general_digits::_unsigned_to_digits_asc_naive;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, SaturatingFrom, WrappingFrom};
@@ -11,12 +9,8 @@ use std::panic::catch_unwind;
 
 #[test]
 pub fn test_to_digits_asc() {
-    fn test<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
-        x: T,
-        base: u64,
-        out: &[U],
-    ) {
-        assert_eq!(Digits::<U, u64>::to_digits_asc(&x, base), out);
+    fn test<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(x: T, base: U, out: &[U]) {
+        assert_eq!(x.to_digits_asc(&base), out);
     };
 
     test::<u8, u64>(0, 64, &[]);
@@ -34,20 +28,11 @@ pub fn test_to_digits_asc() {
     test::<u64, u32>(123456, 123, &[87, 19, 8]);
 }
 
-fn to_digits_asc_fail_helper<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigned>() {
-    assert_panic!(Digits::<U, u64>::to_digits_asc(&T::exact_from(100), 0));
-    assert_panic!(Digits::<U, u64>::to_digits_asc(&T::exact_from(100), 1));
-    if T::WIDTH < u64::WIDTH {
-        assert_panic!(Digits::<U, u64>::to_digits_asc(
-            &T::exact_from(100),
-            u64::power_of_two(T::WIDTH)
-        ));
-    }
-    if U::WIDTH < u64::WIDTH {
-        assert_panic!(Digits::<U, u64>::to_digits_asc(
-            &T::exact_from(100),
-            u64::power_of_two(U::WIDTH)
-        ));
+fn to_digits_asc_fail_helper<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>() {
+    assert_panic!(T::exact_from(100).to_digits_asc(&U::ZERO));
+    assert_panic!(T::exact_from(100).to_digits_asc(&U::ONE));
+    if T::WIDTH < U::WIDTH {
+        assert_panic!(T::exact_from(100).to_digits_asc(&U::power_of_two(T::WIDTH)));
     }
 }
 
@@ -58,12 +43,8 @@ fn to_digits_asc_fail() {
 
 #[test]
 pub fn test_to_digits_desc() {
-    fn test<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigned>(
-        x: T,
-        base: u64,
-        out: &[U],
-    ) {
-        assert_eq!(Digits::<U, u64>::to_digits_desc(&x, base), out);
+    fn test<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(x: T, base: U, out: &[U]) {
+        assert_eq!(x.to_digits_desc(&base), out);
     };
 
     test::<u8, u64>(0, 64, &[]);
@@ -81,20 +62,11 @@ pub fn test_to_digits_desc() {
     test::<u64, u32>(123456, 123, &[8, 19, 87]);
 }
 
-fn to_digits_desc_fail_helper<T: Digits<U, u64> + PrimitiveUnsigned, U: PrimitiveUnsigned>() {
-    assert_panic!(Digits::<U, u64>::to_digits_desc(&T::exact_from(100), 0));
-    assert_panic!(Digits::<U, u64>::to_digits_desc(&T::exact_from(100), 1));
-    if T::WIDTH < u64::WIDTH {
-        assert_panic!(Digits::<U, u64>::to_digits_desc(
-            &T::exact_from(100),
-            u64::power_of_two(T::WIDTH)
-        ));
-    }
-    if U::WIDTH < u64::WIDTH {
-        assert_panic!(Digits::<U, u64>::to_digits_desc(
-            &T::exact_from(100),
-            u64::power_of_two(U::WIDTH)
-        ));
+fn to_digits_desc_fail_helper<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>() {
+    assert_panic!(T::exact_from(100).to_digits_desc(&U::ZERO));
+    assert_panic!(T::exact_from(100).to_digits_desc(&U::ONE));
+    if T::WIDTH < U::WIDTH {
+        assert_panic!(T::exact_from(100).to_digits_desc(&U::power_of_two(T::WIDTH)));
     }
 }
 
@@ -104,38 +76,35 @@ fn to_digits_desc_fail() {
 }
 
 fn to_digits_asc_helper<
-    T: Digits<U, u64> + PrimitiveUnsigned,
-    U: ExactFrom<u64> + PrimitiveUnsigned + WrappingFrom<T>,
->()
-where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+    T: Digits<U> + ExactFrom<U> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
+>() {
     unsigned_pair_gen_var_6::<T, U>().test_properties(|(u, base)| {
-        let digits = Digits::<U, u64>::to_digits_asc(&u, base);
-        assert_eq!(_unsigned_to_digits_asc_naive::<T, U>(&u, base), digits);
+        let digits = u.to_digits_asc(&base);
+        assert_eq!(_unsigned_to_digits_asc_naive(&u, base), digits);
         //TODO from_digits
         if u != T::ZERO {
             assert_ne!(*digits.last().unwrap(), U::ZERO);
         }
         assert_eq!(
             digits.iter().cloned().rev().collect_vec(),
-            u.to_digits_desc(base)
+            u.to_digits_desc(&base)
         );
-        assert!(digits.iter().all(|&digit| digit <= U::exact_from(base)));
+        assert!(digits.iter().all(|&digit| digit <= base));
     });
 
     unsigned_gen::<T>().test_properties(|u| {
         assert_eq!(
-            u.to_digits_asc(2)
+            u.to_digits_asc(&U::TWO)
                 .into_iter()
-                .map(|digit: U| digit == U::ONE)
+                .map(|digit| digit == U::ONE)
                 .collect_vec(),
             u.to_bits_asc()
         );
     });
 
     unsigned_gen_var_4::<T, U>().test_properties(|base| {
-        assert!(Digits::<U, u64>::to_digits_asc(&T::ZERO, base).is_empty());
+        assert!(T::ZERO.to_digits_asc(&base).is_empty());
     });
 }
 
@@ -145,37 +114,34 @@ fn to_digits_asc_properties() {
 }
 
 fn to_digits_desc_helper<
-    T: Digits<U, u64> + PrimitiveUnsigned,
-    U: ExactFrom<u64> + PrimitiveUnsigned + WrappingFrom<T>,
->()
-where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+    T: Digits<U> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>() {
     unsigned_pair_gen_var_6::<T, U>().test_properties(|(u, base)| {
-        let digits = Digits::<U, u64>::to_digits_desc(&u, base);
+        let digits = u.to_digits_desc(&base);
         //TODO from_digits
         if u != T::ZERO {
             assert_ne!(digits[0], U::ZERO);
         }
         assert_eq!(
             digits.iter().cloned().rev().collect_vec(),
-            u.to_digits_asc(base)
+            u.to_digits_asc(&base)
         );
-        assert!(digits.iter().all(|&digit| digit <= U::exact_from(base)));
+        assert!(digits.iter().all(|&digit| digit <= base));
     });
 
     unsigned_gen::<T>().test_properties(|u| {
         assert_eq!(
-            u.to_digits_desc(2)
+            u.to_digits_desc(&U::TWO)
                 .into_iter()
-                .map(|digit: U| digit == U::ONE)
+                .map(|digit| digit == U::ONE)
                 .collect_vec(),
             u.to_bits_desc()
         );
     });
 
     unsigned_gen_var_4::<T, U>().test_properties(|base| {
-        assert!(Digits::<U, u64>::to_digits_desc(&T::ZERO, base).is_empty());
+        assert!(T::ZERO.to_digits_desc(&base).is_empty());
     });
 }
 

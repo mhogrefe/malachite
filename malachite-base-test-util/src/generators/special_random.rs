@@ -1,36 +1,40 @@
 use generators::common::{reshape_1_2_to_3, GenConfig, It};
 use generators::{
     digits_valid, reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned,
-    reduce_to_fit_sub_mul_signed, reduce_to_fit_sub_mul_unsigned, unsigned_pair_gen_var_5_limit,
+    reduce_to_fit_sub_mul_signed, reduce_to_fit_sub_mul_unsigned, signed_assign_bits_valid,
+    unsigned_assign_bits_valid,
 };
 use malachite_base::chars::random::{
     graphic_weighted_random_ascii_chars, graphic_weighted_random_char_inclusive_range,
     graphic_weighted_random_char_range, graphic_weighted_random_chars,
 };
 use malachite_base::comparison::traits::{Max, Min};
-use malachite_base::num::arithmetic::traits::DivRound;
+use malachite_base::num::arithmetic::traits::{DivRound, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
+use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base::num::random::geometric::{
     geometric_random_unsigned_range, geometric_random_unsigneds, GeometricRandomNaturalValues,
 };
 use malachite_base::num::random::striped::{
     get_striped_bool_vec, get_striped_unsigned_vec, striped_random_fixed_length_bool_vecs,
     striped_random_natural_signeds, striped_random_negative_signeds,
-    striped_random_positive_unsigneds, striped_random_signeds, striped_random_unsigned_vecs,
-    striped_random_unsigneds, StripedBitSource, StripedRandomUnsignedBitChunks,
+    striped_random_positive_signeds, striped_random_positive_unsigneds, striped_random_signeds,
+    striped_random_unsigned_vecs, striped_random_unsigneds, StripedBitSource,
+    StripedRandomUnsignedBitChunks,
 };
 use malachite_base::num::random::{
-    random_unsigned_inclusive_range, random_unsigned_range, random_unsigneds_less_than,
-    RandomUnsignedInclusiveRange,
+    random_signed_range, random_unsigned_inclusive_range, random_unsigned_range,
+    random_unsigneds_less_than, RandomUnsignedInclusiveRange,
 };
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::random::random_strings_using_chars;
 use malachite_base::tuples::random::{
-    random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
+    random_pairs, random_pairs_from_single, random_quadruples_xyyz, random_triples,
+    random_triples_from_single, random_triples_xxy, random_triples_xyy,
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
@@ -332,6 +336,134 @@ pub fn random_signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>(
     )
 }
 
+// -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn special_random_signed_unsigned_unsigned_triple_gen_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+    V: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, V)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_large_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_large_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_large_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_large_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_unsigned_n", 32),
+                config.get_or("mean_small_unsigned_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_signed_unsigned_unsigned_triple_gen_var_2<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, U)> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_triples_xyy(
+                    seed,
+                    &|seed_2| {
+                        striped_random_positive_signeds(
+                            seed_2,
+                            config.get_or("mean_large_stripe_n", T::WIDTH >> 1),
+                            config.get_or("mean_large_stripe_d", 1),
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_unsigneds(
+                            seed_2,
+                            config.get_or("small_unsigned_mean_n", 32),
+                            config.get_or("small_unsigned_mean_d", 1),
+                        )
+                    },
+                )
+                .map(|(x, y, z)| if y <= z { (x, y, z) } else { (x, z, y) })
+            },
+            &|seed| {
+                random_triples(
+                    seed,
+                    &|seed_2| random_signed_range(seed_2, T::MIN, T::ZERO),
+                    &|seed_2| {
+                        geometric_random_unsigneds(
+                            seed_2,
+                            config.get_or("small_unsigned_mean_n", 32),
+                            config.get_or("small_unsigned_mean_d", 1),
+                        )
+                    },
+                    &|seed_2| random_unsigned_range(seed_2, U::ZERO, U::exact_from(T::WIDTH)),
+                )
+                .filter_map(|(x, y, z): (T, U, U)| y.checked_add(z).map(|new_z| (x, y, new_z)))
+            },
+        )
+        .map(Union2::unwrap),
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn special_random_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
+    T: PrimitiveSigned + UnsignedAbs<Output = U>,
+    U: BitBlockAccess<Bits = U> + PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, u64, u64, U)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed_2| {
+                striped_random_signeds(
+                    seed_2,
+                    config.get_or("mean_large_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_large_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 32),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &|seed_2| {
+                striped_random_unsigneds(
+                    seed_2,
+                    config.get_or("mean_large_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_large_stripe_d", 1),
+                )
+            },
+        )
+        .filter_map(|(x, y, z, w)| {
+            let (y, z) = if y <= z { (y, z) } else { (z, y) };
+            if signed_assign_bits_valid(x, y, z, w) {
+                Some((x, y, z, w))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
 // -- PrimitiveUnsigned --
 
 pub fn special_random_unsigned_gen<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
@@ -414,12 +546,12 @@ pub fn special_random_unsigned_pair_gen_var_3<T: PrimitiveUnsigned, U: Primitive
     ))
 }
 
-pub fn special_random_unsigned_pair_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+pub fn special_random_unsigned_pair_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>(
     config: &GenConfig,
-) -> It<(T, u64)>
-where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+) -> It<(T, U)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
         &|seed| {
@@ -429,8 +561,22 @@ where
                 config.get_or("mean_stripe_d", 1),
             )
         },
-        &|seed| random_unsigned_inclusive_range(seed, 2, unsigned_pair_gen_var_5_limit::<T, U>()),
+        &|seed| random_unsigned_inclusive_range(seed, U::TWO, U::saturating_from(T::MAX)),
     ))
+}
+
+//TODO make better
+pub fn special_random_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T)> {
+    Box::new(
+        random_pairs_from_single(striped_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .map(|(x, y)| if x <= y { (x, y) } else { (y, x) }),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
@@ -528,6 +674,94 @@ pub fn special_random_unsigned_triple_gen_var_3<
             )
         },
     ))
+}
+
+pub fn special_random_unsigned_triple_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, U)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_large_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_large_unsigned_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_unsigned_n", 32),
+                config.get_or("mean_small_unsigned_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_unsigned_triple_gen_var_5<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U, U)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigneds(
+                    seed,
+                    config.get_or("mean_large_unsigned_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_large_unsigned_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_unsigned_n", 32),
+                    config.get_or("mean_small_unsigned_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, z)| if y <= z { (x, y, z) } else { (x, z, y) }),
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn special_random_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, u64, u64, U)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigneds(
+                    seed,
+                    config.get_or("mean_large_unsigned_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_large_unsigned_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 32),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigneds(
+                    seed,
+                    config.get_or("mean_large_unsigned_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_large_unsigned_stripe_d", 1),
+                )
+            },
+        )
+        .filter_map(|(x, y, z, w)| {
+            let (y, z) = if y <= z { (y, z) } else { (z, y) };
+            if unsigned_assign_bits_valid(y, z, w) {
+                Some((x, y, z, w))
+            } else {
+                None
+            }
+        }),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --

@@ -60,6 +60,8 @@ pub mod error;
 pub mod platform_32;
 #[cfg(not(feature = "32_bit_limbs"))]
 pub mod platform_64;
+/// This module defines `Natural`s (arbitrarily large non-negative integers).
 #[macro_use]
 pub mod natural;
+/// This module defines `Integer`s (which are arbitrarily large).
 pub mod integer;

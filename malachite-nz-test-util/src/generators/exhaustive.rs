@@ -1,4 +1,7 @@
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
+use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Two;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::exhaustive::{
@@ -6,24 +9,26 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::tuples::exhaustive::{
-    exhaustive_dependent_pairs, ExhaustiveDependentPairsYsGenerator,
+    exhaustive_dependent_pairs, exhaustive_pairs, ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_vecs, exhaustive_vecs_length_range, exhaustive_vecs_min_length,
 };
 use malachite_base_test_util::generators::common::permute_2_1;
 use malachite_base_test_util::generators::common::It;
-use malachite_base_test_util::generators::exhaustive::unsigned_pair_gen_var_5_limit;
 use malachite_base_test_util::generators::exhaustive_pairs_big_tiny;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, GET_STR_PRECOMPUTE_THRESHOLD,
 };
-use malachite_nz::natural::exhaustive::exhaustive_naturals;
+use malachite_nz::natural::exhaustive::{
+    exhaustive_natural_range_to_infinity, exhaustive_naturals,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use std::iter::once;
+use std::marker::PhantomData;
 
 // -- Integer --
 
@@ -37,28 +42,68 @@ pub fn exhaustive_natural_gen() -> It<Natural> {
     Box::new(exhaustive_naturals())
 }
 
+pub fn exhaustive_natural_gen_var_1() -> It<Natural> {
+    Box::new(exhaustive_natural_range_to_infinity(Natural::TWO))
+}
+
+// -- (Natural, Natural) --
+
+pub fn exhaustive_natural_pair_gen_var_1() -> It<(Natural, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_natural_range_to_infinity(Natural::power_of_two(Limb::WIDTH)),
+        exhaustive_natural_range_to_infinity(Natural::TWO),
+    ))
+}
+
+pub fn exhaustive_natural_pair_gen_var_2() -> It<(Natural, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_naturals(),
+        exhaustive_natural_range_to_infinity(Natural::TWO),
+    ))
+}
+
+// -- (Natural, PrimitiveInt) --
+
+pub fn natural_primitive_int_pair_gen_var_1<
+    T: PrimitiveInt + SaturatingFrom<U>,
+    U: PrimitiveInt,
+>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        primitive_int_increasing_inclusive_range(T::TWO, T::saturating_from(U::MAX)),
+    ))
+}
+
+pub fn natural_primitive_int_pair_gen_var_2<T: PrimitiveInt>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        primitive_int_increasing_inclusive_range(T::TWO, T::MAX),
+    ))
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)
 
-pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
-) -> It<(Vec<T>, u64)>
-where
-    u64: SaturatingFrom<T> + SaturatingFrom<U>,
-{
+pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_1<
+    T: PrimitiveUnsigned + SaturatingFrom<U>,
+    U: PrimitiveInt,
+>() -> It<(Vec<T>, T)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_vecs_min_length(2, exhaustive_unsigneds()),
-        primitive_int_increasing_inclusive_range(2, unsigned_pair_gen_var_5_limit::<T, U>()),
+        primitive_int_increasing_inclusive_range(T::TWO, T::saturating_from(U::MAX)),
     ))
 }
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>)
 
-struct ValidLengthsGenerator;
+struct ValidLengthsGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<T>,
+}
 
-impl ExhaustiveDependentPairsYsGenerator<(Vec<Limb>, u64), Vec<u8>, It<Vec<u8>>>
-    for ValidLengthsGenerator
+impl<T: PrimitiveUnsigned> ExhaustiveDependentPairsYsGenerator<(Vec<Limb>, u64), Vec<T>, It<Vec<T>>>
+    for ValidLengthsGenerator<T>
 {
     #[inline]
-    fn get_ys(&self, p: &(Vec<Limb>, u64)) -> It<Vec<u8>> {
+    fn get_ys(&self, p: &(Vec<Limb>, u64)) -> It<Vec<T>> {
         Box::new(exhaustive_vecs_min_length(
             limbs_digit_count(&p.0, p.1),
             exhaustive_unsigneds(),
@@ -66,8 +111,8 @@ impl ExhaustiveDependentPairsYsGenerator<(Vec<Limb>, u64), Vec<u8>, It<Vec<u8>>>
     }
 }
 
-pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1(
-) -> It<(Vec<u8>, u64, Vec<Limb>)> {
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, u64, Vec<Limb>)> {
     Box::new(
         exhaustive_dependent_pairs(
             bit_distributor_sequence(
@@ -79,7 +124,9 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1(
                 primitive_int_increasing_inclusive_range::<u64>(3, 256)
                     .filter(|&b| !b.is_power_of_two()),
             ),
-            ValidLengthsGenerator,
+            ValidLengthsGenerator {
+                phantom: PhantomData,
+            },
         )
         .map(|((xs, base), out)| (out, base, xs)),
     )
@@ -87,15 +134,16 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1(
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
-struct ValidLengthsBasecaseGenerator {
+struct ValidLengthsBasecaseGenerator<T: PrimitiveUnsigned> {
     min_out_len: usize,
+    phantom: PhantomData<T>,
 }
 
-impl ExhaustiveDependentPairsYsGenerator<usize, Vec<u8>, It<Vec<u8>>>
-    for ValidLengthsBasecaseGenerator
+impl<T: PrimitiveUnsigned> ExhaustiveDependentPairsYsGenerator<usize, Vec<T>, It<Vec<T>>>
+    for ValidLengthsBasecaseGenerator<T>
 {
     #[inline]
-    fn get_ys(&self, &len: &usize) -> It<Vec<u8>> {
+    fn get_ys(&self, &len: &usize) -> It<Vec<T>> {
         Box::new(exhaustive_vecs_min_length(
             u64::exact_from(if len == 0 { self.min_out_len } else { len }),
             exhaustive_unsigneds(),
@@ -103,13 +151,16 @@ impl ExhaustiveDependentPairsYsGenerator<usize, Vec<u8>, It<Vec<u8>>>
     }
 }
 
-struct BasecaseDigitsInputGenerator;
+struct BasecaseDigitsInputGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<T>,
+}
 
-impl ExhaustiveDependentPairsYsGenerator<(Vec<Limb>, u64), (Vec<u8>, usize), It<(Vec<u8>, usize)>>
-    for BasecaseDigitsInputGenerator
+impl<T: PrimitiveUnsigned>
+    ExhaustiveDependentPairsYsGenerator<(Vec<Limb>, u64), (Vec<T>, usize), It<(Vec<T>, usize)>>
+    for BasecaseDigitsInputGenerator<T>
 {
     #[inline]
-    fn get_ys(&self, p: &(Vec<Limb>, u64)) -> It<(Vec<u8>, usize)> {
+    fn get_ys(&self, p: &(Vec<Limb>, u64)) -> It<(Vec<T>, usize)> {
         let min_out_len = usize::exact_from(limbs_digit_count(&p.0, p.1));
         permute_2_1(Box::new(exhaustive_dependent_pairs(
             ruler_sequence(),
@@ -117,13 +168,17 @@ impl ExhaustiveDependentPairsYsGenerator<(Vec<Limb>, u64), (Vec<u8>, usize), It<
                 min_out_len,
                 usize::MAX,
             )),
-            ValidLengthsBasecaseGenerator { min_out_len },
+            ValidLengthsBasecaseGenerator {
+                min_out_len,
+                phantom: PhantomData,
+            },
         )))
     }
 }
 
-pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1(
-) -> It<(Vec<u8>, usize, Vec<Limb>, u64)> {
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>() -> It<(Vec<T>, usize, Vec<Limb>, u64)> {
     Box::new(
         exhaustive_dependent_pairs(
             bit_distributor_sequence(
@@ -139,7 +194,9 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_
                 primitive_int_increasing_inclusive_range::<u64>(3, 256)
                     .filter(|&b| !b.is_power_of_two()),
             ),
-            BasecaseDigitsInputGenerator,
+            BasecaseDigitsInputGenerator {
+                phantom: PhantomData,
+            },
         )
         .map(|((xs, base), (out, len))| (out, len, xs, base)),
     )

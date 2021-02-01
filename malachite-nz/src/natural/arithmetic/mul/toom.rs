@@ -116,7 +116,7 @@ pub(crate) fn _limbs_toom_couple_handling(
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom22_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom22_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_mul_greater_to_out_toom_22_scratch_len(xs_len: usize) -> usize {
     (xs_len + Limb::WIDTH as usize) << 1
 }
@@ -346,7 +346,7 @@ pub fn _limbs_mul_greater_to_out_toom_22(
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom32_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom32_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_mul_greater_to_out_toom_32_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = if xs_len << 1 >= 3 * ys_len {
         (xs_len - 1) / 3
@@ -634,7 +634,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom33_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom33_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub fn _limbs_mul_greater_to_out_toom_33_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
@@ -908,7 +908,7 @@ pub fn _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len: usize, ys_len
 /// This function can be used to determine the length of the input `scratch` slice in
 /// `_limbs_mul_greater_to_out_toom_42`.
 ///
-/// This is mpn_toom42_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom42_mul_itch from gmp-impl.h, GMP 6.2.1.
 ///
 /// Time: worst case O(1)
 ///
@@ -1117,7 +1117,7 @@ pub fn _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom43_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom43_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_mul_greater_to_out_toom_43_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if 3 * xs_len >= ys_len << 2 {
         (xs_len - 1) >> 2
@@ -1302,7 +1302,7 @@ pub fn _limbs_mul_greater_to_out_toom_44_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom44_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom44_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub fn _limbs_mul_greater_to_out_toom_44_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
@@ -1508,7 +1508,7 @@ pub fn _limbs_mul_greater_to_out_toom_52_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom52_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom52_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_mul_greater_to_out_toom_52_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if xs_len << 1 >= 5 * ys_len {
         (xs_len - 1) / 5
@@ -1710,7 +1710,7 @@ pub fn _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len: usize, ys_len
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom53_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom53_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_mul_greater_to_out_toom_53_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if 3 * xs_len >= 5 * ys_len {
         (xs_len - 1) / 5
@@ -2011,7 +2011,7 @@ pub const fn _limbs_mul_greater_to_out_toom_54_input_sizes_valid(
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom54_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom54_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_mul_greater_to_out_toom_54_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1
         + (if xs_len << 2 >= 5 * ys_len {
@@ -2174,7 +2174,7 @@ pub const fn _limbs_mul_greater_to_out_toom_62_input_sizes_valid(
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom62_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom62_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_mul_greater_to_out_toom_62_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if xs_len >= 3 * ys_len {
         (xs_len - 1) / 6
@@ -2491,7 +2491,7 @@ pub const fn _limbs_mul_greater_to_out_toom_63_input_sizes_valid(
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom63_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom63_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_mul_greater_to_out_toom_63_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let n = 1 + if xs_len >= ys_len << 1 {
         (xs_len - 1) / 6
@@ -2790,7 +2790,7 @@ fn _limbs_mul_to_out_toom_6h_recursive(out: &mut [Limb], xs: &[Limb], ys: &[Limb
 }
 
 /// TODO make this a constant once possible
-/// This is MUL_TOOM6H_MIN from gmp-impl.h, GMP 6.1.2.
+/// This is MUL_TOOM6H_MIN from gmp-impl.h, GMP 6.2.1.
 fn _limbs_mul_toom_6h_min_threshold() -> usize {
     max(MUL_TOOM6H_THRESHOLD, MUL_TOOM44_THRESHOLD)
 }
@@ -2799,7 +2799,7 @@ fn _limbs_mul_toom_6h_min_threshold() -> usize {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom6_mul_n_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom6_mul_n_itch from gmp-impl.h, GMP 6.2.1.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usize {
     let t = _limbs_mul_toom_6h_min_threshold() << 1;
     (n << 1)
@@ -2817,7 +2817,7 @@ pub(crate) fn _limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usi
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom6h_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom6h_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub fn _limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let estimated_n = (xs_len + ys_len) / 10 + 1;
     _limbs_mul_same_length_to_out_toom_6h_scratch_len(6 * estimated_n)
@@ -3172,12 +3172,12 @@ fn _limbs_mul_to_out_toom_8h_recursive(out: &mut [Limb], xs: &[Limb], ys: &[Limb
 }
 
 /// TODO make this a constant once possible
-/// This is MUL_TOOM8H_MIN from gmp-impl.h, GMP 6.1.2.
+/// This is MUL_TOOM8H_MIN from gmp-impl.h, GMP 6.2.1.
 fn _limbs_mul_toom_8h_min_threshold() -> usize {
     max(MUL_TOOM8H_THRESHOLD, _limbs_mul_toom_6h_min_threshold())
 }
 
-// This is mpn_toom8_mul_n_itch from gmp-impl.h, GMP 6.1.2.
+// This is mpn_toom8_mul_n_itch from gmp-impl.h, GMP 6.2.1.
 pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_len(n: usize) -> usize {
     let t = (_limbs_mul_toom_8h_min_threshold() * 15) >> 3;
     ((n * 15) >> 3)
@@ -3195,7 +3195,7 @@ pub(crate) fn _limbs_mul_same_length_to_out_toom_8h_scratch_len(n: usize) -> usi
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_toom8h_mul_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom8h_mul_itch from gmp-impl.h, GMP 6.2.1.
 pub fn _limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let estimated_n = (xs_len + ys_len) / 14 + 1;
     _limbs_mul_same_length_to_out_toom_8h_scratch_len(estimated_n << 3)

@@ -206,7 +206,7 @@ pub const fn limbs_neg_or_neg_limb(xs: &[Limb], y: Limb) -> Limb {
 /// assert_eq!(limbs_or_pos_neg(&[1, 2], &[100, 200, 300]), &[99, 200, 300]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res is returned, the first input is positive,
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res is returned, the first input is positive,
 /// and the second is negative.
 pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
@@ -283,7 +283,7 @@ pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(out, &[99, 200, 300, 10]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where the first input is positive and the second is
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where the first input is positive and the second is
 /// negative.
 pub fn limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
@@ -361,7 +361,7 @@ pub fn limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// assert_eq!(xs, &[99, 200]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res == op1, the first input is positive and the
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1, the first input is positive and the
 /// second is negative, and the length of op1 is not changed; instead, a carry is returned.
 pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
@@ -435,7 +435,7 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> boo
 /// assert_eq!(xs, &[99, 200, 300]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res == op1 and the first input is positive and
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1 and the first input is positive and
 /// the second is negative.
 pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
@@ -512,7 +512,7 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// assert_eq!(ys, &[1, 2, 5]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res == op2 and the first input is positive and
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op2 and the first input is positive and
 /// the second is negative.
 pub fn limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
     let xs_len = xs.len();
@@ -576,7 +576,7 @@ pub fn limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
 /// assert_eq!(limbs_or_neg_neg(&[1, 2, 5], &[100, 200]), &[1, 0]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res is returned and both inputs are negative.
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res is returned and both inputs are negative.
 pub fn limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -641,7 +641,7 @@ pub fn limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(out, &[1, 0, 10, 10]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where both inputs are negative.
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where both inputs are negative.
 pub fn limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -705,7 +705,7 @@ pub fn limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// assert_eq!(xs, &[1, 0, 0]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res == op1, both inputs are negative, and the
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1, both inputs are negative, and the
 /// length of op1 is not changed.
 pub fn limbs_slice_or_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let xs_len = xs.len();
@@ -767,7 +767,7 @@ pub fn limbs_slice_or_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// assert_eq!(xs, &[1, 0]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where res == op1 and both inputs are negative.
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1 and both inputs are negative.
 pub fn limbs_vec_or_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -834,7 +834,7 @@ pub fn limbs_vec_or_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// assert_eq!(ys, &[1, 2, 5]);
 /// ```
 ///
-/// This is mpz_ior from mpz/ior.c, GMP 6.1.2, where both inputs are negative and the result is
+/// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where both inputs are negative and the result is
 /// written to the shorter input slice.
 pub fn limbs_or_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();

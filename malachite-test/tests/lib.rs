@@ -95,13 +95,11 @@ pub mod base {
         }
 
         pub mod logic {
-            pub mod bit_block_access;
             pub mod bit_convertible;
             pub mod bit_iterable;
             pub mod hamming_distance;
             pub mod low_mask;
             pub mod not_assign;
-            pub mod rotate;
         }
     }
 }

@@ -64,7 +64,7 @@ pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_and_n from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_and_n from gmp-impl.h, GMP 6.2.1.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
@@ -140,7 +140,7 @@ pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_and_n from gmp-impl.h, GMP 6.1.2, where rp == up.
+/// This is mpn_and_n from gmp-impl.h, GMP 6.2.1, where rp == up.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.

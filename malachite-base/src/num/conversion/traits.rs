@@ -272,23 +272,23 @@ pub trait PowerOfTwoDigitIterable<T> {
 /// This trait defines functions that express a value as a `Vec` of digits and read a value from an
 /// iterator of digits.
 ///
-/// The trait is parameterized by the digit type and the base type.
-pub trait Digits<D, B> {
+/// The trait is parameterized by `T`, which is both the digit type and the base type.
+pub trait Digits<T> {
     /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
     /// significant.
-    fn to_digits_asc(&self, base: B) -> Vec<D>;
+    fn to_digits_asc(&self, base: &T) -> Vec<T>;
 
     /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
     /// significant.
-    fn to_digits_desc(&self, base: B) -> Vec<D>;
+    fn to_digits_desc(&self, base: &T) -> Vec<T>;
 
     /// Converts an iterator of digits into a value.
     ///
     /// The input digits are in ascending order: least- to most-significant.
-    fn from_digits_asc<I: Iterator<Item = D>>(base: B, digits: I) -> Self;
+    fn from_digits_asc<I: Iterator<Item = T>>(base: &T, digits: I) -> Self;
 
     /// Converts an iterator of digits into a value.
     ///
     /// The input digits are in descending order: most- to least-significant.
-    fn from_digits_desc<I: Iterator<Item = D>>(base: B, digits: I) -> Self;
+    fn from_digits_desc<I: Iterator<Item = T>>(base: &T, digits: I) -> Self;
 }

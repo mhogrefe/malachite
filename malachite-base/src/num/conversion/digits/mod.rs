@@ -7,24 +7,18 @@
 /// ```
 /// use malachite_base::num::conversion::traits::Digits;
 ///
-/// assert_eq!(Digits::<u64, u64>::to_digits_asc(&0u8, 6), &[]);
-/// assert_eq!(Digits::<u64, u64>::to_digits_asc(&2u16, 6), &[2]);
-/// assert_eq!(
-///     Digits::<u16, u64>::to_digits_asc(&123456u32, 3),
-///     &[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]
-/// );
+/// assert_eq!(0u8.to_digits_asc(&6u64), &[]);
+/// assert_eq!(2u16.to_digits_asc(&6u32), &[2]);
+/// assert_eq!(123456u32.to_digits_asc(&3u16), &[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2]);
 /// ```
 ///
 /// # to_digits_desc
 /// ```
 /// use malachite_base::num::conversion::traits::Digits;
 ///
-/// assert_eq!(Digits::<u64, u64>::to_digits_desc(&0u8, 6), &[]);
-/// assert_eq!(Digits::<u64, u64>::to_digits_desc(&2u16, 6), &[2]);
-/// assert_eq!(
-///     Digits::<u16, u64>::to_digits_desc(&123456u32, 3),
-///     &[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]
-/// );
+/// assert_eq!(0u8.to_digits_asc(&6u64), &[]);
+/// assert_eq!(2u16.to_digits_asc(&6u32), &[2]);
+/// assert_eq!(123456u32.to_digits_desc(&3u16), &[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]);
 /// ```
 pub mod general_digits;
 /// This module provides a double-ended iterator for iterating over a number's digits, if the base

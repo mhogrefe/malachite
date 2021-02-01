@@ -76,86 +76,94 @@ macro_rules! impl_bit_convertible_unsigned {
     ($t:ident) => {
         impl BitConvertible for $t {
             /// Returns a `Vec` containing the bits of `self` in ascending order: least- to most-
-            /// significant. If `self` is 0, the `Vec` is empty; otherwise, it ends with `true`.
+            /// significant.
             ///
-            /// Time: worst case O(n)
+            /// If `self` is 0, the `Vec` is empty; otherwise, it ends with `true`.
             ///
-            /// Additional memory: worst case O(n)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = `self.significant_bits()`
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `self.significant_bits()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            ///
-            /// assert_eq!(0u8.to_bits_asc(), &[]);
-            /// assert_eq!(2u16.to_bits_asc(), &[false, true]);
-            /// assert_eq!(123u32.to_bits_asc(), &[true, true, false, true, true, true, true]);
-            /// ```
+            /// See the documentation of the `num::logic` module.
             #[inline]
             fn to_bits_asc(&self) -> Vec<bool> {
                 _to_bits_asc_unsigned(self)
             }
 
             /// Returns a `Vec` containing the bits of `self` in descending order: most- to least-
-            /// significant. If `self` is 0, the `Vec` is empty; otherwise, it begins with `true`.
+            /// significant.
             ///
-            /// Time: worst case O(n)
+            /// If `self` is 0, the `Vec` is empty; otherwise, it begins with `true`.
             ///
-            /// Additional memory: worst case O(n)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = `self.significant_bits()`
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `self.significant_bits()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            ///
-            /// assert_eq!(0u8.to_bits_desc(), &[]);
-            /// assert_eq!(2u16.to_bits_desc(), &[true, false]);
-            /// assert_eq!(123u32.to_bits_desc(), &[true, true, true, true, false, true, true]);
-            /// ```
+            /// See the documentation of the `num::logic` module.
             #[inline]
             fn to_bits_desc(&self) -> Vec<bool> {
                 _to_bits_desc_unsigned(self)
             }
 
-            /// TODO doc
+            /// Converts an iterator of bits into a value. The bits should be in ascending order
+            /// (least- to most-significant).
+            ///
+            /// The function panics if the input represents a number that can't fit in `$t`.
+            ///
+            /// $$
+            /// f((b_i)_ {i=0}^{k-1}) = \sum_{i=0}^{k-1}2^i \[b_i\],
+            /// $$
+            /// where braces denote the Iverson bracket, converting a bit to 0 or 1.
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits.count()`.
+            ///
+            /// # Panics
+            /// Panics if the bits represent a value that isn't representable by `$t`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            /// use std::iter::empty;
-            ///
-            /// assert_eq!(u8::from_bits_asc(empty()), 0);
-            /// assert_eq!(u16::from_bits_asc([false, true, false].iter().cloned()), 2);
-            /// assert_eq!(
-            ///     u32::from_bits_asc(
-            ///         [true, true, false, true, true, true, true].iter().cloned()
-            ///     ),
-            ///     123
-            /// );
-            /// ```
+            /// See the documentation of the `num::logic` module.
             #[inline]
             fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> $t {
                 _from_bits_asc_unsigned(bits)
             }
 
-            /// TODO doc
+            /// Converts an iterator of bits into a value. The bits should be in descending order
+            /// (most- to least-significant).
+            ///
+            /// The function panics if the input represents a number that can't fit in `$t`.
+            ///
+            /// $$
+            /// f((b_i)_ {i=0}^{k-1}) = \sum_{i=0}^{k-1}2^{k-i-1} \[b_i\],
+            /// $$
+            /// where braces denote the Iverson bracket, converting a bit to 0 or 1.
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits.count()`.
+            ///
+            /// # Panics
+            /// Panics if the bits represent a value that isn't representable by `$t`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            /// use std::iter::empty;
-            ///
-            /// assert_eq!(u8::from_bits_desc(empty()), 0);
-            /// assert_eq!(u16::from_bits_desc([false, true, false].iter().cloned()), 2);
-            /// assert_eq!(
-            ///     u32::from_bits_desc(
-            ///         [true, true, true, true, false, true, true].iter().cloned()
-            ///     ),
-            ///     123
-            /// );
-            /// ```
+            /// See the documentation of the `num::logic` module.
             #[inline]
             fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> $t {
                 _from_bits_desc_unsigned(bits)
@@ -296,94 +304,106 @@ macro_rules! impl_bit_convertible_signed {
     ($u:ident, $s:ident) => {
         impl BitConvertible for $s {
             /// Returns a `Vec` containing the bits of `self` in ascending order: least- to most-
-            /// significant. If `self` is 0, the `Vec` is empty; otherwise, the last bit is the sign
-            /// bit: `false` if `self` is non-negative and `true` if `self` is negative.
+            /// significant.
             ///
-            /// Time: worst case O(n)
+            /// If `self` is 0, the `Vec` is empty; otherwise, the last bit is the sign bit: `false`
+            /// if `self` is non-negative and `true` if `self` is negative.
             ///
-            /// Additional memory: worst case O(n)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = `self.significant_bits()`
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `self.significant_bits()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            ///
-            /// assert_eq!(0i8.to_bits_asc(), &[]);
-            /// assert_eq!(2i16.to_bits_asc(), &[false, true, false]);
-            /// assert_eq!(
-            ///     (-123i32).to_bits_asc(),
-            ///     &[true, false, true, false, false, false, false, true]
-            /// );
-            /// ```
+            /// See the documentation of the `num::logic` module.
             #[inline]
             fn to_bits_asc(&self) -> Vec<bool> {
                 _to_bits_asc_signed(self)
             }
 
             /// Returns a `Vec` containing the bits of `self` in ascending order: most- to least-
-            /// significant. If `self` is 0, the `Vec` is empty; otherwise, the first bit is the
-            /// sign bit: `false` if `self` is non-negative and `true` if `self` is negative.
+            /// significant.
             ///
-            /// Time: worst case O(n)
+            /// If `self` is 0, the `Vec` is empty; otherwise, the first bit is the sign bit:
+            /// `false` if `self` is non-negative and `true` if `self` is negative.
             ///
-            /// Additional memory: worst case O(n)
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
             ///
-            /// where n = `self.significant_bits()`
+            /// $M(n) = O(n)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `self.significant_bits()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            ///
-            /// assert_eq!(0i8.to_bits_desc(), &[]);
-            /// assert_eq!(2i16.to_bits_desc(), &[false, true, false]);
-            /// assert_eq!(
-            ///     (-123i32).to_bits_desc(),
-            ///     &[true, false, false, false, false, true, false, true]
-            /// );
-            /// ```
+            /// See the documentation of the `num::logic` module.
             #[inline]
             fn to_bits_desc(&self) -> Vec<bool> {
                 _to_bits_desc_signed(self)
             }
 
-            /// TODO doc
+            /// Converts an iterator of bits into a value. The bits should be in ascending order
+            /// (least- to most-significant).
+            ///
+            /// The bits are interpreted as in twos-complement, and the last bit is the sign bit; if
+            /// it is `false`, the number is non-negative, and if it is `true`, the number is
+            /// negative.
+            ///
+            /// The function panics if the input represents a number that can't fit in `$t`.
+            ///
+            /// Let $k$ be `bits.count()`. If $k = 0$ or $b_{k-1}$ is `false`,
+            /// $$
+            /// f((b_i)_ {i=0}^{k-1}) = \sum_{i=0}^{k-1}2^i \[b_i\].
+            /// $$
+            /// where braces denote the Iverson bracket, converting a bit to 0 or 1.
+            ///
+            /// If $b_{k-1}$ is `true`,
+            /// $$
+            /// f((b_i)_ {i=0}^{k-1}) = \left ( \sum_{i=0}^{k-1}2^i \[b_i\] \right ) - 2^k.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `bits.count()`.
+            ///
+            /// # Panics
+            /// Panics if the bits represent a value that isn't representable by `$t`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            /// use std::iter::empty;
-            ///
-            /// assert_eq!(i8::from_bits_asc(empty()), 0);
-            /// assert_eq!(i16::from_bits_asc([false, true, false].iter().cloned()), 2);
-            /// assert_eq!(
-            ///     i32::from_bits_asc(
-            ///         [true, false, true, false, false, false, false, true].iter().cloned()
-            ///     ),
-            ///     -123
-            /// );
-            /// ```
+            /// See the documentation of the `num::logic` module.
             #[inline]
             fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> $s {
                 _from_bits_asc_signed::<$u, $s, _>(bits)
             }
 
-            /// TODO doc
+            /// Converts an iterator of bits into a value. The bits should be in descending order
+            /// (most- to least-significant).
+            ///
+            /// The bits are interpreted as in twos-complement, and the first bit is the sign bit;
+            /// if it is `false`, the number is non-negative, and if it is `true`, the number is
+            /// negative.
+            ///
+            /// The function panics if the input represents a number that can't fit in `$t`.
+            ///
+            /// If `bits` is empty or $b_0$ is `false`,
+            /// $$
+            /// f((b_i)_ {i=0}^{k-1}) = \sum_{i=0}^{k-1}2^{k-i-1} \[b_i\].
+            /// $$
+            /// where braces denote the Iverson bracket, converting a bit to 0 or 1.
+            ///
+            /// If $b_0$ is `true`,
+            /// $$
+            /// f((b_i)_ {i=0}^{k-1}) = \left ( \sum_{i=0}^{k-1}2^{k-i-1} \[b_i\] \right ) - 2^k.
+            /// $$
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitConvertible;
-            /// use std::iter::empty;
-            ///
-            /// assert_eq!(i8::from_bits_desc(empty()), 0);
-            /// assert_eq!(i16::from_bits_desc([false, true, false].iter().cloned()), 2);
-            /// assert_eq!(
-            ///     i32::from_bits_desc(
-            ///         [true, false, false, false, false, true, false, true].iter().cloned()
-            ///     ),
-            ///     -123
-            /// );
-            /// ```
+            /// See the documentation of the `num::logic` module.
             #[inline]
             fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> $s {
                 _from_bits_desc_signed::<$u, $s, _>(bits)

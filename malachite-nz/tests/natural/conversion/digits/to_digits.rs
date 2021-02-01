@@ -1,32 +1,43 @@
+use itertools::Itertools;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, SaturatingFrom,
+};
+use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::slices::slice_leading_zeros;
 use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{unsigned_gen_var_6, unsigned_pair_gen_var_6};
 use malachite_nz::natural::conversion::digits::general_digits::{
     PowerTableAlgorithm, _limbs_to_digits_basecase, _limbs_to_digits_small_base,
-    _limbs_to_digits_small_base_basecase, _to_digits_asc_naive,
+    _limbs_to_digits_small_base_basecase, _to_digits_asc_large, _to_digits_asc_limb,
+    _to_digits_asc_naive, _to_digits_asc_naive_primitive, _to_digits_desc_large,
+    _to_digits_desc_limb,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::*;
 use std::panic::catch_unwind;
+use std::str::FromStr;
 
-fn verify_limbs_to_digits_small_base_basecase(
-    original_out: &[u8],
+fn verify_limbs_to_digits_small_base_basecase<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
+    original_out: &[T],
     len: usize,
     xs: &[Limb],
     base: u64,
     out_len: usize,
-    out: &[u8],
+    out: &[T],
 ) {
     if len != 0 {
         assert_eq!(len, out_len);
     }
-    let digits = _to_digits_asc_naive::<u8, _>(&Natural::from_limbs_asc(xs), base);
-    let mut expected_digits = vec![0; out_len];
+    let mut digits = Vec::new();
+    _to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(xs), base);
+    let digits = digits.into_iter().map(T::exact_from).collect_vec();
+    let mut expected_digits = vec![T::ZERO; out_len];
     expected_digits[..digits.len()].copy_from_slice(&digits);
     expected_digits.reverse();
     assert_eq!(&out[..out_len], expected_digits);
@@ -44,15 +55,17 @@ fn verify_limbs_to_digits_small_base_basecase(
     );
 }
 
-fn verify_limbs_to_digits_small_base(
-    original_out: &[u8],
+fn verify_limbs_to_digits_small_base<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
+    original_out: &[T],
     original_xs: &[Limb],
     base: u64,
     out_len: usize,
-    out: &[u8],
+    out: &[T],
 ) {
-    let digits = _to_digits_asc_naive::<u8, _>(&Natural::from_limbs_asc(original_xs), base);
-    let mut expected_digits = vec![0; out_len];
+    let mut digits = Vec::new();
+    _to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(original_xs), base);
+    let digits = digits.into_iter().map(T::exact_from).collect_vec();
+    let mut expected_digits = vec![T::ZERO; out_len];
     expected_digits[..digits.len()].copy_from_slice(&digits);
     expected_digits.reverse();
     assert_eq!(&out[..out_len], expected_digits);
@@ -130,19 +143,23 @@ fn test_limbs_to_digits_small_base_basecase() {
     test(&[0; 20], 8, &[123456], 10, &[0, 0, 1, 2, 3, 4, 5, 6]);
 }
 
-#[test]
-fn limbs_to_digits_small_base_basecase_properties() {
+fn limbs_to_digits_small_base_basecase_properties_helper<
+    T: CheckedFrom<Natural> + PrimitiveUnsigned,
+>() {
     let mut config = GenConfig::new();
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     config.insert("mean_stripe_d", 1);
-    unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1().test_properties_with_config(
-        &config,
-        |(mut out, len, xs, base)| {
+    unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1::<T>()
+        .test_properties_with_config(&config, |(mut out, len, xs, base)| {
             let old_out = out.clone();
             let out_len = _limbs_to_digits_small_base_basecase(&mut out, len, &xs, base);
             verify_limbs_to_digits_small_base_basecase(&old_out, len, &xs, base, out_len, &out);
-        },
-    );
+        });
+}
+
+#[test]
+fn limbs_to_digits_small_base_basecase_properties() {
+    apply_fn_to_unsigneds!(limbs_to_digits_small_base_basecase_properties_helper);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -156,7 +173,7 @@ fn test_limbs_to_digits_small_base() {
         verify_limbs_to_digits_small_base(out_before, xs, base, out_len, &out);
     };
     // xs_len == 0
-    test(&[0; 20], &[], 9, &[0]);
+    test(&[0; 20], &[], 9, &[]);
     // 0 < xs_len < GET_STR_PRECOMPUTE_THRESHOLD
     test(&[0; 20], &[1], 9, &[1]);
     test(&[0; 20], &[123456], 3, &[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]);
@@ -351,14 +368,13 @@ fn test_limbs_to_digits_small_base() {
     );
 }
 
-#[test]
-fn limbs_to_digits_small_base_properties() {
+fn limbs_to_digits_small_base_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>() {
     let mut config = GenConfig::new();
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     config.insert("mean_stripe_d", 1);
     config.insert("mean_length_n", 32);
     config.insert("mean_length_d", 1);
-    unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1().test_properties_with_config(
+    unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1::<T>().test_properties_with_config(
         &config,
         |(mut out, base, mut xs)| {
             let old_out = out.clone();
@@ -394,20 +410,26 @@ fn limbs_to_digits_small_base_properties() {
     );
 }
 
+#[test]
+fn limbs_to_digits_small_base_properties() {
+    apply_fn_to_unsigneds!(limbs_to_digits_small_base_properties_helper);
+}
+
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_to_digits_basecase() {
-    fn test<T: CheckedFrom<Natural> + ConvertibleFrom<u64> + PrimitiveUnsigned>(
+    fn test<T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         xs_before: &[Limb],
-        base: u64,
+        base: Limb,
         out: &[T],
     ) {
         let mut xs = xs_before.to_vec();
-        assert_eq!(_limbs_to_digits_basecase::<T>(&mut xs, base), out);
-        assert_eq!(
-            _to_digits_asc_naive::<T, _>(&Natural::from_limbs_asc(xs_before), base),
-            out
-        );
+        let mut digits = Vec::new();
+        _limbs_to_digits_basecase::<T>(&mut digits, &mut xs, base);
+        assert_eq!(digits, out);
+        let mut digits = Vec::new();
+        _to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(xs_before), base);
+        assert_eq!(digits.into_iter().map(T::exact_from).collect_vec(), out);
     };
     test::<u64>(&[0, 0], 64, &[]);
     test::<u64>(&[2, 0], 64, &[2]);
@@ -459,33 +481,41 @@ fn test_limbs_to_digits_basecase() {
     );
     test::<u64>(
         &[123, 456, 789],
-        u64::power_of_two(16),
+        Limb::power_of_two(16),
         &[123, 0, 456, 0, 789],
     );
 }
 
-fn limbs_to_digits_basecase_fail_helper<T: ConvertibleFrom<u64> + PrimitiveUnsigned>() {
-    assert_panic!(_limbs_to_digits_basecase::<T>(&mut [1], 2));
-    assert_panic!(_limbs_to_digits_basecase::<T>(&mut [123, 456], 0));
-    assert_panic!(_limbs_to_digits_basecase::<T>(&mut [123, 456], 1));
+fn limbs_to_digits_basecase_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>() {
+    assert_panic!(_limbs_to_digits_basecase::<T>(&mut Vec::new(), &mut [1], 2));
+    assert_panic!(_limbs_to_digits_basecase::<T>(
+        &mut Vec::new(),
+        &mut [123, 456],
+        0
+    ));
+    assert_panic!(_limbs_to_digits_basecase::<T>(
+        &mut Vec::new(),
+        &mut [123, 456],
+        1
+    ));
 }
 
 #[test]
 fn limbs_to_digits_basecase_fail() {
     apply_fn_to_unsigneds!(limbs_to_digits_basecase_fail_helper);
 
-    assert_panic!(_limbs_to_digits_basecase::<u8>(&mut [123, 456], 300));
-    #[cfg(feature = "32_bit_limbs")]
-    {
-        assert_panic!(_limbs_to_digits_basecase::<u64>(&mut [123, 456], u64::MAX));
-    }
+    assert_panic!(_limbs_to_digits_basecase::<u8>(
+        &mut Vec::new(),
+        &mut [123, 456],
+        300
+    ));
 }
 
 fn limbs_to_digits_basecase_properties_helper<
-    T: CheckedFrom<Natural> + ConvertibleFrom<u64> + PrimitiveUnsigned,
+    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >()
 where
-    u64: SaturatingFrom<T>,
+    Limb: SaturatingFrom<T>,
 {
     let mut config = GenConfig::new();
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
@@ -496,10 +526,16 @@ where
         &config,
         |(mut xs, base)| {
             let xs_old = xs.clone();
-            assert_eq!(
-                _limbs_to_digits_basecase::<T>(&mut xs, base),
-                _to_digits_asc_naive::<T, _>(&Natural::from_limbs_asc(&xs_old), base)
+            let mut digits = Vec::new();
+            _limbs_to_digits_basecase::<T>(&mut digits, &mut xs, base);
+            let mut digits_alt = Vec::new();
+            _to_digits_asc_naive_primitive(
+                &mut digits_alt,
+                &Natural::from_limbs_asc(&xs_old),
+                base,
             );
+            let digits_alt = digits_alt.into_iter().map(T::exact_from).collect_vec();
+            assert_eq!(digits, digits_alt);
         },
     );
 }
@@ -507,4 +543,1074 @@ where
 #[test]
 fn limbs_to_digits_basecase_properties() {
     apply_fn_to_unsigneds!(limbs_to_digits_basecase_properties_helper);
+}
+
+#[test]
+fn test_to_digits_asc_limb() {
+    fn test<T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+        x: &str,
+        base: Limb,
+        out: &[T],
+    ) where
+        Limb: Digits<T>,
+        Natural: From<T> + PowerOfTwoDigits<T>,
+    {
+        let x = Natural::from_str(x).unwrap();
+        assert_eq!(_to_digits_asc_limb::<T>(&x, base), out);
+        let mut digits_alt = Vec::new();
+        _to_digits_asc_naive_primitive(&mut digits_alt, &x, T::exact_from(base));
+        assert_eq!(digits_alt, out);
+    }
+    test::<u8>("0", 10, &[]);
+    test::<u8>("0", 16, &[]);
+    // base is not a power of two
+    // x is small
+    test::<u8>("123", 10, &[3, 2, 1]);
+    // base is a power of two
+    test::<u8>("123", 8, &[3, 7, 1]);
+    // x is large
+    // x is large and base < 256
+    test::<u8>(
+        "1473250819553359898729024041508",
+        77,
+        &[
+            44, 55, 51, 10, 43, 13, 36, 15, 70, 15, 19, 57, 50, 10, 22, 74,
+        ],
+    );
+    // x is large and base >= 256
+    // _to_digits_asc_divide_and_conquer_limb: many digits
+    // _to_digits_asc_divide_and_conquer_limb: few digits
+    // base <= SQRT_MAX_LIMB
+    // _to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x small
+    // _to_digits_asc_divide_and_conquer_limb: q != 0
+    // _to_digits_asc_divide_and_conquer_limb: zero padding
+    // _to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x large
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        1000,
+        &[
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        1001,
+        &[
+            1, 981, 189, 862, 839, 516, 706, 596, 767, 333, 404, 392, 677, 683, 644, 550, 825, 866,
+            188, 981,
+        ],
+    );
+    // _to_digits_asc_divide_and_conquer_limb: base > SQRT_MAX_LIMB
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        123456,
+        &[
+            115456, 7508, 27948, 11540, 30637, 92024, 26412, 41276, 18791, 86861, 49669, 9848,
+        ],
+    );
+    // _to_digits_asc_divide_and_conquer_limb: q == 0
+    test::<u32>(
+        "958147186852538842877959980138243879940342867265688956449364129",
+        9238,
+        &[
+            1297, 1928, 2066, 7131, 5213, 6502, 1707, 1758, 138, 6317, 2051, 6308, 402, 1611, 277,
+            3146,
+        ],
+    );
+}
+
+fn to_digits_asc_limb_fail_helper<
+    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+>()
+where
+    Limb: Digits<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    assert_panic!(_to_digits_asc_limb::<T>(&Natural::exact_from(10), 0));
+    assert_panic!(_to_digits_asc_limb::<T>(&Natural::exact_from(10), 1));
+}
+
+#[test]
+fn to_digits_asc_limb_fail() {
+    apply_fn_to_unsigneds!(to_digits_asc_limb_fail_helper);
+
+    assert_panic!(_to_digits_asc_limb::<u8>(&Natural::from(10u32), 1000));
+}
+
+fn to_digits_asc_limb_properties_helper<
+    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+>()
+where
+    Limb: Digits<T> + SaturatingFrom<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 256);
+    config.insert("mean_stripe_n", 128);
+    natural_unsigned_pair_gen_var_1::<Limb, T>().test_properties_with_config(
+        &config,
+        |(x, base)| {
+            let digits = _to_digits_asc_limb::<T>(&x, base);
+            let mut digits_alt = Vec::new();
+            _to_digits_asc_naive_primitive(&mut digits_alt, &x, T::exact_from(base));
+            assert_eq!(digits, digits_alt);
+            assert_eq!(
+                _to_digits_desc_limb::<T>(&x, base)
+                    .into_iter()
+                    .rev()
+                    .collect_vec(),
+                digits
+            );
+            if !digits.is_empty() {
+                assert_ne!(*digits.last().unwrap(), T::ZERO);
+            }
+        },
+    );
+}
+
+#[test]
+fn to_digits_asc_limb_properties() {
+    apply_fn_to_unsigneds!(to_digits_asc_limb_properties_helper);
+}
+
+#[test]
+fn test_to_digits_desc_limb() {
+    fn test<T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+        x: &str,
+        base: Limb,
+        out: &[T],
+    ) where
+        Limb: Digits<T>,
+        Natural: From<T> + PowerOfTwoDigits<T>,
+    {
+        let x = Natural::from_str(x).unwrap();
+        assert_eq!(_to_digits_desc_limb::<T>(&x, base), out);
+    }
+    test::<u8>("0", 10, &[]);
+    test::<u8>("0", 16, &[]);
+    test::<u8>("123", 10, &[1, 2, 3]);
+    test::<u8>("123", 8, &[1, 7, 3]);
+    test::<u8>(
+        "1473250819553359898729024041508",
+        77,
+        &[
+            74, 22, 10, 50, 57, 19, 15, 70, 15, 36, 13, 43, 10, 51, 55, 44,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        1000,
+        &[
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        1001,
+        &[
+            981, 188, 866, 825, 550, 644, 683, 677, 392, 404, 333, 767, 596, 706, 516, 839, 862,
+            189, 981, 1,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        123456,
+        &[
+            9848, 49669, 86861, 18791, 41276, 26412, 92024, 30637, 11540, 27948, 7508, 115456,
+        ],
+    );
+    test::<u32>(
+        "958147186852538842877959980138243879940342867265688956449364129",
+        9238,
+        &[
+            3146, 277, 1611, 402, 6308, 2051, 6317, 138, 1758, 1707, 6502, 5213, 7131, 2066, 1928,
+            1297,
+        ],
+    );
+}
+
+fn to_digits_desc_limb_fail_helper<
+    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+>()
+where
+    Limb: Digits<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    assert_panic!(_to_digits_desc_limb::<T>(&Natural::exact_from(10), 0));
+    assert_panic!(_to_digits_desc_limb::<T>(&Natural::exact_from(10), 1));
+}
+
+#[test]
+fn to_digits_desc_limb_fail() {
+    apply_fn_to_unsigneds!(to_digits_desc_limb_fail_helper);
+
+    assert_panic!(_to_digits_desc_limb::<u8>(&Natural::from(10u32), 1000));
+}
+
+fn to_digits_desc_limb_properties_helper<
+    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+>()
+where
+    Limb: Digits<T> + SaturatingFrom<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 256);
+    config.insert("mean_stripe_n", 128);
+    natural_unsigned_pair_gen_var_1::<Limb, T>().test_properties_with_config(
+        &config,
+        |(x, base)| {
+            let digits = _to_digits_desc_limb::<T>(&x, base);
+            assert_eq!(
+                _to_digits_asc_limb::<T>(&x, base)
+                    .into_iter()
+                    .rev()
+                    .collect_vec(),
+                digits
+            );
+            if !digits.is_empty() {
+                assert_ne!(digits[0], T::ZERO);
+            }
+        },
+    );
+}
+
+#[test]
+fn to_digits_desc_limb_properties() {
+    apply_fn_to_unsigneds!(to_digits_desc_limb_properties_helper);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_to_digits_asc_large() {
+    fn test(x: &str, base: &str, out: &[&str]) {
+        let x = Natural::from_str(x).unwrap();
+        let base = Natural::from_str(base).unwrap();
+        let out = out
+            .iter()
+            .map(|s| Natural::from_str(s).unwrap())
+            .collect_vec();
+        assert_eq!(_to_digits_asc_large(&x, &base), out);
+        let mut digits_alt = Vec::new();
+        _to_digits_asc_naive(&mut digits_alt, &x, &base);
+        assert_eq!(digits_alt, out);
+    }
+    // x >= base
+    // base is not a power of two
+    // bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
+    test(
+        "1000000000000",
+        "10",
+        &[
+            "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "1",
+        ],
+    );
+    // base is a power of two
+    test(
+        "1000000000000",
+        "16",
+        &["0", "0", "0", "1", "5", "10", "4", "13", "8", "14"],
+    );
+    // x < base
+    test("1000000000000", "1000000000000000", &["1000000000000"]);
+    // bits / base.significant_bits() >= TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
+    // q != 0
+    test(
+        "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
+        7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
+        "6",
+        &[
+            "4", "1", "3", "2", "3", "2", "1", "4", "2", "5", "3", "0", "5", "1", "5", "3", "5",
+            "2", "4", "5", "1", "3", "1", "5", "5", "1", "5", "4", "2", "1", "2", "2", "2", "1",
+            "2", "4", "3", "2", "3", "2", "5", "0", "4", "5", "5", "3", "4", "1", "1", "3", "3",
+            "4", "5", "0", "4", "5", "0", "4", "4", "2", "2", "5", "5", "2", "1", "5", "4", "0",
+            "3", "4", "1", "3", "5", "0", "1", "3", "0", "1", "1", "4", "4", "5", "1", "2", "0",
+            "5", "3", "0", "1", "1", "4", "5", "0", "3", "2", "5", "3", "5", "0", "5", "2", "0",
+            "0", "4", "1", "5", "3", "1", "4", "1", "5", "5", "1", "0", "2", "5", "3", "2", "1",
+            "2", "3", "2", "2", "3", "0", "2", "4", "4", "0", "1", "2", "0", "3", "3", "2", "2",
+            "5", "4", "5", "1", "2", "2", "5", "1", "5", "3", "0", "0", "2", "5", "3", "5", "2",
+            "0", "1", "0", "3", "4", "0", "1", "5", "4", "1", "1", "0", "1", "1", "3", "5", "3",
+            "2", "3", "0", "1", "3", "0", "5", "2", "3", "5", "3", "2", "5", "2", "5", "0", "2",
+            "3", "3", "1", "3", "3", "0", "0", "2", "3", "0", "3", "0", "5", "3", "0", "0", "4",
+            "1", "5", "1", "4", "4", "1", "5", "4", "0", "0", "4", "1", "2", "1", "3", "5", "1",
+            "5", "5", "0", "1"
+        ]
+    );
+    // pad with zeros
+    test(
+        "14974892748479131847778931724116484851265511358392776602889616274416063303",
+        "3",
+        &[
+            "0", "2", "1", "1", "1", "2", "0", "2", "1", "2", "1", "1", "2", "0", "2", "2", "2",
+            "0", "0", "1", "0", "1", "1", "2", "1", "1", "0", "0", "2", "1", "0", "0", "0", "0",
+            "1", "2", "1", "0", "1", "0", "2", "1", "1", "1", "1", "1", "0", "0", "0", "0", "2",
+            "1", "1", "0", "2", "1", "1", "0", "2", "0", "0", "1", "2", "0", "2", "0", "0", "0",
+            "1", "2", "2", "0", "0", "2", "2", "2", "2", "1", "0", "2", "0", "0", "1", "1", "1",
+            "0", "1", "2", "2", "0", "2", "2", "2", "0", "2", "1", "1", "1", "1", "0", "1", "2",
+            "1", "1", "0", "2", "0", "1", "0", "1", "0", "1", "1", "2", "0", "2", "1", "2", "2",
+            "0", "1", "1", "1", "2", "0", "2", "0", "0", "2", "0", "0", "1", "1", "2", "2", "0",
+            "2", "1", "1", "2", "1", "1", "1", "1", "0", "1", "2", "0", "1", "1", "1", "1", "1",
+            "1",
+        ],
+    );
+    // q == 0
+    test(
+        "643945257796761196320314690988316858252541574945689186182369731847117890385280572047834937\
+        1883212246436232738680605124294949600205450044993253033167972343988333612737978764297848348\
+        2665822115523011210267845467229157815194234251375826930137780574470438350033031660616757791\
+        61",
+        "7",
+        &[
+            "4", "5", "1", "4", "5", "6", "0", "2", "4", "6", "2", "0", "1", "0", "3", "6", "4",
+            "3", "1", "4", "2", "6", "4", "4", "0", "2", "1", "0", "3", "3", "2", "0", "3", "5",
+            "4", "1", "3", "4", "4", "3", "5", "6", "4", "1", "6", "0", "2", "2", "5", "0", "5",
+            "0", "5", "4", "0", "5", "3", "5", "0", "0", "3", "6", "1", "5", "4", "4", "1", "2",
+            "1", "4", "2", "0", "0", "1", "4", "3", "2", "0", "3", "5", "2", "6", "5", "5", "0",
+            "2", "1", "6", "5", "2", "5", "0", "6", "6", "4", "3", "1", "6", "0", "6", "1", "3",
+            "1", "5", "4", "3", "0", "5", "2", "6", "5", "2", "0", "3", "3", "1", "3", "5", "3",
+            "1", "1", "3", "2", "0", "1", "5", "6", "0", "1", "6", "4", "4", "5", "4", "4", "2",
+            "0", "2", "5", "6", "4", "5", "2", "2", "4", "4", "0", "6", "5", "4", "2", "1", "6",
+            "0", "2", "0", "4", "2", "5", "6", "2", "5", "1", "5", "3", "3", "5", "1", "0", "2",
+            "5", "4", "1", "2", "6", "6", "2", "0", "6", "1", "1", "1", "4", "0", "1", "5", "4",
+            "0", "6", "6", "4", "6", "1", "3", "0", "3", "3", "4", "6", "2", "3", "5", "1", "4",
+            "4", "6", "3", "2", "4", "3", "0", "3", "2", "6", "2", "4", "3", "6", "6", "6", "6",
+            "4", "4", "3", "6", "6", "3", "3", "5", "5", "1", "0", "1", "0", "3", "6", "5", "3",
+            "2", "1", "3", "1", "3", "2", "4", "6", "1", "5", "6", "2", "6", "2", "5", "0", "6",
+            "0", "0", "3", "4", "0", "6", "3", "5", "2", "5", "5", "4", "1", "3", "4", "4", "2",
+            "2", "3", "1", "6", "2", "1", "4", "1", "5", "5", "6", "3", "6", "3", "6", "4", "4",
+            "5", "2", "3", "1", "6", "2", "1", "0", "0", "5", "0", "2", "5", "5", "4", "0", "5",
+            "6", "5", "2", "2", "0", "3", "6", "5", "2", "4", "6", "4", "3", "6", "4", "4", "6",
+            "6"
+        ]
+    );
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_to_digits_desc_large() {
+    fn test(x: &str, base: &str, out: &[&str]) {
+        let x = Natural::from_str(x).unwrap();
+        let base = Natural::from_str(base).unwrap();
+        let out = out
+            .iter()
+            .map(|s| Natural::from_str(s).unwrap())
+            .collect_vec();
+        assert_eq!(_to_digits_desc_large(&x, &base), out);
+    }
+    test(
+        "1000000000000",
+        "10",
+        &[
+            "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
+        ],
+    );
+    test(
+        "1000000000000",
+        "16",
+        &["14", "8", "13", "4", "10", "5", "1", "0", "0", "0"],
+    );
+    test("1000000000000", "1000000000000000", &["1000000000000"]);
+    test(
+        "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
+        7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
+        "6",
+        &[
+            "1", "0", "5", "5", "1", "5", "3", "1", "2", "1", "4", "0", "0", "4", "5", "1", "4",
+            "4", "1", "5", "1", "4", "0", "0", "3", "5", "0", "3", "0", "3", "2", "0", "0", "3",
+            "3", "1", "3", "3", "2", "0", "5", "2", "5", "2", "3", "5", "3", "2", "5", "0", "3",
+            "1", "0", "3", "2", "3", "5", "3", "1", "1", "0", "1", "1", "4", "5", "1", "0", "4",
+            "3", "0", "1", "0", "2", "5", "3", "5", "2", "0", "0", "3", "5", "1", "5", "2", "2",
+            "1", "5", "4", "5", "2", "2", "3", "3", "0", "2", "1", "0", "4", "4", "2", "0", "3",
+            "2", "2", "3", "2", "1", "2", "3", "5", "2", "0", "1", "5", "5", "1", "4", "1", "3",
+            "5", "1", "4", "0", "0", "2", "5", "0", "5", "3", "5", "2", "3", "0", "5", "4", "1",
+            "1", "0", "3", "5", "0", "2", "1", "5", "4", "4", "1", "1", "0", "3", "1", "0", "5",
+            "3", "1", "4", "3", "0", "4", "5", "1", "2", "5", "5", "2", "2", "4", "4", "0", "5",
+            "4", "0", "5", "4", "3", "3", "1", "1", "4", "3", "5", "5", "4", "0", "5", "2", "3",
+            "2", "3", "4", "2", "1", "2", "2", "2", "1", "2", "4", "5", "1", "5", "5", "1", "3",
+            "1", "5", "4", "2", "5", "3", "5", "1", "5", "0", "3", "5", "2", "4", "1", "2", "3",
+            "2", "3", "1", "4"
+        ]
+    );
+    test(
+        "14974892748479131847778931724116484851265511358392776602889616274416063303",
+        "3",
+        &[
+            "1", "1", "1", "1", "1", "1", "0", "2", "1", "0", "1", "1", "1", "1", "2", "1", "1",
+            "2", "0", "2", "2", "1", "1", "0", "0", "2", "0", "0", "2", "0", "2", "1", "1", "1",
+            "0", "2", "2", "1", "2", "0", "2", "1", "1", "0", "1", "0", "1", "0", "2", "0", "1",
+            "1", "2", "1", "0", "1", "1", "1", "1", "2", "0", "2", "2", "2", "0", "2", "2", "1",
+            "0", "1", "1", "1", "0", "0", "2", "0", "1", "2", "2", "2", "2", "0", "0", "2", "2",
+            "1", "0", "0", "0", "2", "0", "2", "1", "0", "0", "2", "0", "1", "1", "2", "0", "1",
+            "1", "2", "0", "0", "0", "0", "1", "1", "1", "1", "1", "2", "0", "1", "0", "1", "2",
+            "1", "0", "0", "0", "0", "1", "2", "0", "0", "1", "1", "2", "1", "1", "0", "1", "0",
+            "0", "2", "2", "2", "0", "2", "1", "1", "2", "1", "2", "0", "2", "1", "1", "1", "2",
+            "0",
+        ],
+    );
+    test(
+        "643945257796761196320314690988316858252541574945689186182369731847117890385280572047834937\
+        1883212246436232738680605124294949600205450044993253033167972343988333612737978764297848348\
+        2665822115523011210267845467229157815194234251375826930137780574470438350033031660616757791\
+        61",
+        "7",
+        &[
+            "6", "6", "4", "4", "6", "3", "4", "6", "4", "2", "5", "6", "3", "0", "2", "2", "5",
+            "6", "5", "0", "4", "5", "5", "2", "0", "5", "0", "0", "1", "2", "6", "1", "3", "2",
+            "5", "4", "4", "6", "3", "6", "3", "6", "5", "5", "1", "4", "1", "2", "6", "1", "3",
+            "2", "2", "4", "4", "3", "1", "4", "5", "5", "2", "5", "3", "6", "0", "4", "3", "0",
+            "0", "6", "0", "5", "2", "6", "2", "6", "5", "1", "6", "4", "2", "3", "1", "3", "1",
+            "2", "3", "5", "6", "3", "0", "1", "0", "1", "5", "5", "3", "3", "6", "6", "3", "4",
+            "4", "6", "6", "6", "6", "3", "4", "2", "6", "2", "3", "0", "3", "4", "2", "3", "6",
+            "4", "4", "1", "5", "3", "2", "6", "4", "3", "3", "0", "3", "1", "6", "4", "6", "6",
+            "0", "4", "5", "1", "0", "4", "1", "1", "1", "6", "0", "2", "6", "6", "2", "1", "4",
+            "5", "2", "0", "1", "5", "3", "3", "5", "1", "5", "2", "6", "5", "2", "4", "0", "2",
+            "0", "6", "1", "2", "4", "5", "6", "0", "4", "4", "2", "2", "5", "4", "6", "5", "2",
+            "0", "2", "4", "4", "5", "4", "4", "6", "1", "0", "6", "5", "1", "0", "2", "3", "1",
+            "1", "3", "5", "3", "1", "3", "3", "0", "2", "5", "6", "2", "5", "0", "3", "4", "5",
+            "1", "3", "1", "6", "0", "6", "1", "3", "4", "6", "6", "0", "5", "2", "5", "6", "1",
+            "2", "0", "5", "5", "6", "2", "5", "3", "0", "2", "3", "4", "1", "0", "0", "2", "4",
+            "1", "2", "1", "4", "4", "5", "1", "6", "3", "0", "0", "5", "3", "5", "0", "4", "5",
+            "0", "5", "0", "5", "2", "2", "0", "6", "1", "4", "6", "5", "3", "4", "4", "3", "1",
+            "4", "5", "3", "0", "2", "3", "3", "0", "1", "2", "0", "4", "4", "6", "2", "4", "1",
+            "3", "4", "6", "3", "0", "1", "0", "2", "6", "4", "2", "0", "6", "5", "4", "1", "5",
+            "4"
+        ]
+    );
+}
+
+#[test]
+fn to_digits_asc_large_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 256);
+    natural_pair_gen_var_1().test_properties_with_config(&config, |(x, base)| {
+        let digits = _to_digits_asc_large(&x, &base);
+        let mut digits_alt = Vec::new();
+        _to_digits_asc_naive(&mut digits_alt, &x, &base);
+        assert_eq!(digits, digits_alt);
+        assert_eq!(
+            _to_digits_desc_large(&x, &base)
+                .into_iter()
+                .rev()
+                .collect_vec(),
+            digits
+        );
+        if !digits.is_empty() {
+            assert_ne!(*digits.last().unwrap(), 0);
+        }
+    });
+}
+
+#[test]
+fn to_digits_desc_large_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 256);
+    natural_pair_gen_var_1().test_properties_with_config(&config, |(x, base)| {
+        let digits = _to_digits_desc_large(&x, &base);
+        assert_eq!(
+            _to_digits_asc_large(&x, &base)
+                .into_iter()
+                .rev()
+                .collect_vec(),
+            digits
+        );
+        if !digits.is_empty() {
+            assert_ne!(digits[0], 0);
+        }
+    });
+}
+
+#[test]
+fn test_to_digits_asc_unsigned() {
+    fn test<T: CheckedFrom<Natural> + PrimitiveUnsigned>(x: &str, base: T, out: &[T])
+    where
+        Natural: Digits<T> + From<T>,
+    {
+        let x = Natural::from_str(x).unwrap();
+        assert_eq!(x.to_digits_asc(&base), out);
+        let mut digits_alt = Vec::new();
+        _to_digits_asc_naive_primitive(&mut digits_alt, &x, base);
+        assert_eq!(digits_alt, out);
+    }
+    test::<u8>("0", 10, &[]);
+    test::<u8>("0", 16, &[]);
+    test::<u8>("123", 10, &[3, 2, 1]);
+    test::<u8>("123", 8, &[3, 7, 1]);
+    test::<u8>(
+        "1473250819553359898729024041508",
+        77,
+        &[
+            44, 55, 51, 10, 43, 13, 36, 15, 70, 15, 19, 57, 50, 10, 22, 74,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        1000,
+        &[
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        1001,
+        &[
+            1, 981, 189, 862, 839, 516, 706, 596, 767, 333, 404, 392, 677, 683, 644, 550, 825, 866,
+            188, 981,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        123456,
+        &[
+            115456, 7508, 27948, 11540, 30637, 92024, 26412, 41276, 18791, 86861, 49669, 9848,
+        ],
+    );
+    test::<u32>(
+        "958147186852538842877959980138243879940342867265688956449364129",
+        9238,
+        &[
+            1297, 1928, 2066, 7131, 5213, 6502, 1707, 1758, 138, 6317, 2051, 6308, 402, 1611, 277,
+            3146,
+        ],
+    );
+}
+
+fn to_digits_asc_unsigned_fail_helper<T: PrimitiveUnsigned>()
+where
+    Natural: Digits<T>,
+{
+    assert_panic!(Natural::from(10u32).to_digits_asc(&T::ZERO));
+    assert_panic!(Natural::from(10u32).to_digits_asc(&T::ONE));
+}
+
+#[test]
+fn to_digits_asc_unsigned_fail() {
+    apply_fn_to_unsigneds!(to_digits_asc_unsigned_fail_helper);
+}
+
+fn to_digits_asc_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>()
+where
+    Limb: Digits<T>,
+    Natural: Digits<T> + From<T>,
+{
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 256);
+    config.insert("mean_stripe_n", 128);
+    natural_unsigned_pair_gen_var_2::<T>().test_properties_with_config(&config, |(x, base)| {
+        let digits = x.to_digits_asc(&base);
+        let mut digits_alt = Vec::new();
+        _to_digits_asc_naive_primitive(&mut digits_alt, &x, base);
+        assert_eq!(digits_alt, digits, "{} {}", x, base);
+        //TODO from digits
+        if x != 0 {
+            assert_ne!(*digits.last().unwrap(), T::ZERO);
+        }
+        assert_eq!(
+            digits.iter().cloned().rev().collect_vec(),
+            x.to_digits_desc(&base)
+        );
+        assert!(digits.iter().all(|&digit| digit < base));
+
+        let digits_alt = Digits::<Natural>::to_digits_asc(&x, &Natural::from(base));
+        assert_eq!(
+            digits_alt.into_iter().map(T::exact_from).collect_vec(),
+            digits
+        );
+    });
+
+    natural_gen().test_properties_with_config(&config, |x| {
+        assert_eq!(
+            x.to_digits_asc(&T::TWO)
+                .into_iter()
+                .map(|digit| digit == T::ONE)
+                .collect_vec(),
+            x.to_bits_asc()
+        );
+    });
+
+    unsigned_gen_var_6().test_properties_with_config(&config, |base| {
+        assert!(Natural::ZERO.to_digits_asc(&base).is_empty());
+    });
+
+    unsigned_pair_gen_var_6::<Limb, T>().test_properties(|(u, base)| {
+        let x: Natural = From::from(u);
+        assert_eq!(u.to_digits_asc(&base), x.to_digits_asc(&base));
+    });
+}
+
+#[test]
+fn to_digits_asc_properties() {
+    apply_fn_to_unsigneds!(to_digits_asc_properties_helper);
+}
+
+#[test]
+fn test_to_digits_desc_unsigned() {
+    fn test<T: PrimitiveUnsigned>(x: &str, base: T, out: &[T])
+    where
+        Natural: Digits<T>,
+    {
+        let x = Natural::from_str(x).unwrap();
+        assert_eq!(x.to_digits_desc(&base), out);
+    }
+    test::<u8>("0", 10, &[]);
+    test::<u8>("0", 16, &[]);
+    test::<u8>("123", 10, &[1, 2, 3]);
+    test::<u8>("123", 8, &[1, 7, 3]);
+    test::<u8>(
+        "1473250819553359898729024041508",
+        77,
+        &[
+            74, 22, 10, 50, 57, 19, 15, 70, 15, 36, 13, 43, 10, 51, 55, 44,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        1000,
+        &[
+            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        1001,
+        &[
+            981, 188, 866, 825, 550, 644, 683, 677, 392, 404, 333, 767, 596, 706, 516, 839, 862,
+            189, 981, 1,
+        ],
+    );
+    test::<u32>(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        123456,
+        &[
+            9848, 49669, 86861, 18791, 41276, 26412, 92024, 30637, 11540, 27948, 7508, 115456,
+        ],
+    );
+    test::<u32>(
+        "958147186852538842877959980138243879940342867265688956449364129",
+        9238,
+        &[
+            3146, 277, 1611, 402, 6308, 2051, 6317, 138, 1758, 1707, 6502, 5213, 7131, 2066, 1928,
+            1297,
+        ],
+    );
+}
+
+fn to_digits_desc_unsigned_fail_helper<T: PrimitiveUnsigned>()
+where
+    Natural: Digits<T>,
+{
+    assert_panic!(Natural::from(10u32).to_digits_desc(&T::ZERO));
+    assert_panic!(Natural::from(10u32).to_digits_desc(&T::ONE));
+}
+
+#[test]
+fn to_digits_desc_unsigned_fail() {
+    apply_fn_to_unsigneds!(to_digits_desc_unsigned_fail_helper);
+}
+
+fn to_digits_desc_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>()
+where
+    Limb: Digits<T>,
+    Natural: Digits<T> + From<T>,
+{
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 256);
+    config.insert("mean_stripe_n", 128);
+    natural_unsigned_pair_gen_var_2::<T>().test_properties_with_config(&config, |(x, base)| {
+        let digits = x.to_digits_desc(&base);
+        //TODO from digits
+        if x != 0 {
+            assert_ne!(digits[0], T::ZERO);
+        }
+        assert_eq!(
+            digits.iter().cloned().rev().collect_vec(),
+            x.to_digits_asc(&base)
+        );
+        assert!(digits.iter().all(|&digit| digit < base));
+
+        let digits_alt = Digits::<Natural>::to_digits_desc(&x, &Natural::from(base));
+        assert_eq!(
+            digits_alt.into_iter().map(T::exact_from).collect_vec(),
+            digits
+        );
+    });
+
+    natural_gen().test_properties_with_config(&config, |x| {
+        assert_eq!(
+            x.to_digits_desc(&T::TWO)
+                .into_iter()
+                .map(|digit| digit == T::ONE)
+                .collect_vec(),
+            x.to_bits_desc()
+        );
+    });
+
+    unsigned_gen_var_6().test_properties_with_config(&config, |base| {
+        assert!(Natural::ZERO.to_digits_desc(&base).is_empty());
+    });
+
+    unsigned_pair_gen_var_6::<Limb, T>().test_properties(|(u, base)| {
+        let x: Natural = From::from(u);
+        assert_eq!(u.to_digits_desc(&base), x.to_digits_desc(&base));
+    });
+}
+
+#[test]
+fn to_digits_desc_properties() {
+    apply_fn_to_unsigneds!(to_digits_desc_properties_helper);
+}
+
+#[test]
+fn test_to_digits_asc_natural() {
+    fn test(x: &str, base: &str, out: &[&str]) {
+        let x = Natural::from_str(x).unwrap();
+        let base = Natural::from_str(base).unwrap();
+        let out = out
+            .iter()
+            .map(|s| Natural::from_str(s).unwrap())
+            .collect_vec();
+        assert_eq!(x.to_digits_asc(&base), out);
+        let mut digits_alt = Vec::new();
+        _to_digits_asc_naive(&mut digits_alt, &x, &base);
+        assert_eq!(digits_alt, out);
+    }
+    test("0", "10", &[]);
+    test("0", "16", &[]);
+    test("123", "10", &["3", "2", "1"]);
+    test("123", "8", &["3", "7", "1"]);
+    test(
+        "1473250819553359898729024041508",
+        "77",
+        &[
+            "44", "55", "51", "10", "43", "13", "36", "15", "70", "15", "19", "57", "50", "10",
+            "22", "74",
+        ],
+    );
+    test(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        "1000",
+        &[
+            "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
+            "0", "0", "0", "1",
+        ],
+    );
+    test(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        "1001",
+        &[
+            "1", "981", "189", "862", "839", "516", "706", "596", "767", "333", "404", "392",
+            "677", "683", "644", "550", "825", "866", "188", "981",
+        ],
+    );
+    test(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        "123456",
+        &[
+            "115456", "7508", "27948", "11540", "30637", "92024", "26412", "41276", "18791",
+            "86861", "49669", "9848",
+        ],
+    );
+    test(
+        "958147186852538842877959980138243879940342867265688956449364129",
+        "9238",
+        &[
+            "1297", "1928", "2066", "7131", "5213", "6502", "1707", "1758", "138", "6317", "2051",
+            "6308", "402", "1611", "277", "3146",
+        ],
+    );
+    test(
+        "1000000000000",
+        "10",
+        &[
+            "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "1",
+        ],
+    );
+    test(
+        "1000000000000",
+        "16",
+        &["0", "0", "0", "1", "5", "10", "4", "13", "8", "14"],
+    );
+    test("1000000000000", "1000000000000000", &["1000000000000"]);
+    test(
+        "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
+        7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
+        "6",
+        &[
+            "4", "1", "3", "2", "3", "2", "1", "4", "2", "5", "3", "0", "5", "1", "5", "3", "5",
+            "2", "4", "5", "1", "3", "1", "5", "5", "1", "5", "4", "2", "1", "2", "2", "2", "1",
+            "2", "4", "3", "2", "3", "2", "5", "0", "4", "5", "5", "3", "4", "1", "1", "3", "3",
+            "4", "5", "0", "4", "5", "0", "4", "4", "2", "2", "5", "5", "2", "1", "5", "4", "0",
+            "3", "4", "1", "3", "5", "0", "1", "3", "0", "1", "1", "4", "4", "5", "1", "2", "0",
+            "5", "3", "0", "1", "1", "4", "5", "0", "3", "2", "5", "3", "5", "0", "5", "2", "0",
+            "0", "4", "1", "5", "3", "1", "4", "1", "5", "5", "1", "0", "2", "5", "3", "2", "1",
+            "2", "3", "2", "2", "3", "0", "2", "4", "4", "0", "1", "2", "0", "3", "3", "2", "2",
+            "5", "4", "5", "1", "2", "2", "5", "1", "5", "3", "0", "0", "2", "5", "3", "5", "2",
+            "0", "1", "0", "3", "4", "0", "1", "5", "4", "1", "1", "0", "1", "1", "3", "5", "3",
+            "2", "3", "0", "1", "3", "0", "5", "2", "3", "5", "3", "2", "5", "2", "5", "0", "2",
+            "3", "3", "1", "3", "3", "0", "0", "2", "3", "0", "3", "0", "5", "3", "0", "0", "4",
+            "1", "5", "1", "4", "4", "1", "5", "4", "0", "0", "4", "1", "2", "1", "3", "5", "1",
+            "5", "5", "0", "1"
+        ]
+    );
+    test(
+        "14974892748479131847778931724116484851265511358392776602889616274416063303",
+        "3",
+        &[
+            "0", "2", "1", "1", "1", "2", "0", "2", "1", "2", "1", "1", "2", "0", "2", "2", "2",
+            "0", "0", "1", "0", "1", "1", "2", "1", "1", "0", "0", "2", "1", "0", "0", "0", "0",
+            "1", "2", "1", "0", "1", "0", "2", "1", "1", "1", "1", "1", "0", "0", "0", "0", "2",
+            "1", "1", "0", "2", "1", "1", "0", "2", "0", "0", "1", "2", "0", "2", "0", "0", "0",
+            "1", "2", "2", "0", "0", "2", "2", "2", "2", "1", "0", "2", "0", "0", "1", "1", "1",
+            "0", "1", "2", "2", "0", "2", "2", "2", "0", "2", "1", "1", "1", "1", "0", "1", "2",
+            "1", "1", "0", "2", "0", "1", "0", "1", "0", "1", "1", "2", "0", "2", "1", "2", "2",
+            "0", "1", "1", "1", "2", "0", "2", "0", "0", "2", "0", "0", "1", "1", "2", "2", "0",
+            "2", "1", "1", "2", "1", "1", "1", "1", "0", "1", "2", "0", "1", "1", "1", "1", "1",
+            "1",
+        ],
+    );
+    test(
+        "643945257796761196320314690988316858252541574945689186182369731847117890385280572047834937\
+        1883212246436232738680605124294949600205450044993253033167972343988333612737978764297848348\
+        2665822115523011210267845467229157815194234251375826930137780574470438350033031660616757791\
+        61",
+        "7",
+        &[
+            "4", "5", "1", "4", "5", "6", "0", "2", "4", "6", "2", "0", "1", "0", "3", "6", "4",
+            "3", "1", "4", "2", "6", "4", "4", "0", "2", "1", "0", "3", "3", "2", "0", "3", "5",
+            "4", "1", "3", "4", "4", "3", "5", "6", "4", "1", "6", "0", "2", "2", "5", "0", "5",
+            "0", "5", "4", "0", "5", "3", "5", "0", "0", "3", "6", "1", "5", "4", "4", "1", "2",
+            "1", "4", "2", "0", "0", "1", "4", "3", "2", "0", "3", "5", "2", "6", "5", "5", "0",
+            "2", "1", "6", "5", "2", "5", "0", "6", "6", "4", "3", "1", "6", "0", "6", "1", "3",
+            "1", "5", "4", "3", "0", "5", "2", "6", "5", "2", "0", "3", "3", "1", "3", "5", "3",
+            "1", "1", "3", "2", "0", "1", "5", "6", "0", "1", "6", "4", "4", "5", "4", "4", "2",
+            "0", "2", "5", "6", "4", "5", "2", "2", "4", "4", "0", "6", "5", "4", "2", "1", "6",
+            "0", "2", "0", "4", "2", "5", "6", "2", "5", "1", "5", "3", "3", "5", "1", "0", "2",
+            "5", "4", "1", "2", "6", "6", "2", "0", "6", "1", "1", "1", "4", "0", "1", "5", "4",
+            "0", "6", "6", "4", "6", "1", "3", "0", "3", "3", "4", "6", "2", "3", "5", "1", "4",
+            "4", "6", "3", "2", "4", "3", "0", "3", "2", "6", "2", "4", "3", "6", "6", "6", "6",
+            "4", "4", "3", "6", "6", "3", "3", "5", "5", "1", "0", "1", "0", "3", "6", "5", "3",
+            "2", "1", "3", "1", "3", "2", "4", "6", "1", "5", "6", "2", "6", "2", "5", "0", "6",
+            "0", "0", "3", "4", "0", "6", "3", "5", "2", "5", "5", "4", "1", "3", "4", "4", "2",
+            "2", "3", "1", "6", "2", "1", "4", "1", "5", "5", "6", "3", "6", "3", "6", "4", "4",
+            "5", "2", "3", "1", "6", "2", "1", "0", "0", "5", "0", "2", "5", "5", "4", "0", "5",
+            "6", "5", "2", "2", "0", "3", "6", "5", "2", "4", "6", "4", "3", "6", "4", "4", "6",
+            "6"
+        ]
+    );
+}
+
+#[test]
+fn to_digits_asc_natural_fail() {
+    assert_panic!(Natural::from(10u32).to_digits_asc(&Natural::ZERO));
+    assert_panic!(Natural::from(10u32).to_digits_asc(&Natural::ONE));
+}
+
+#[test]
+fn to_digits_asc_natural_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 256);
+    config.insert("mean_stripe_n", 128);
+    natural_pair_gen_var_2().test_properties_with_config(&config, |(x, base)| {
+        let digits = x.to_digits_asc(&base);
+        let mut digits_alt = Vec::new();
+        _to_digits_asc_naive(&mut digits_alt, &x, &base);
+        assert_eq!(digits_alt, digits);
+        //TODO from digits
+        if x != 0 {
+            assert_ne!(*digits.last().unwrap(), 0);
+        }
+        assert_eq!(
+            digits.iter().cloned().rev().collect_vec(),
+            x.to_digits_desc(&base)
+        );
+        assert!(digits.into_iter().all(|digit| digit < base));
+    });
+
+    natural_gen().test_properties_with_config(&config, |x| {
+        assert_eq!(
+            x.to_digits_asc(&Natural::TWO)
+                .into_iter()
+                .map(|digit| digit == 1)
+                .collect_vec(),
+            x.to_bits_asc()
+        );
+    });
+
+    natural_gen_var_1().test_properties_with_config(&config, |base| {
+        assert!(Natural::ZERO.to_digits_asc(&base).is_empty());
+    });
+}
+
+#[test]
+fn test_to_digits_desc_natural() {
+    fn test(x: &str, base: &str, out: &[&str]) {
+        let x = Natural::from_str(x).unwrap();
+        let base = Natural::from_str(base).unwrap();
+        let out = out
+            .iter()
+            .map(|s| Natural::from_str(s).unwrap())
+            .collect_vec();
+        assert_eq!(x.to_digits_desc(&base), out);
+    }
+    test("0", "10", &[]);
+    test("0", "16", &[]);
+    test("123", "10", &["1", "2", "3"]);
+    test("123", "8", &["1", "7", "3"]);
+    test(
+        "1473250819553359898729024041508",
+        "77",
+        &[
+            "74", "22", "10", "50", "57", "19", "15", "70", "15", "36", "13", "43", "10", "51",
+            "55", "44",
+        ],
+    );
+    test(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        "1000",
+        &[
+            "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
+            "0", "0", "0", "0",
+        ],
+    );
+    test(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        "1001",
+        &[
+            "981", "188", "866", "825", "550", "644", "683", "677", "392", "404", "333", "767",
+            "596", "706", "516", "839", "862", "189", "981", "1",
+        ],
+    );
+    test(
+        "1000000000000000000000000000000000000000000000000000000000000",
+        "123456",
+        &[
+            "9848", "49669", "86861", "18791", "41276", "26412", "92024", "30637", "11540",
+            "27948", "7508", "115456",
+        ],
+    );
+    test(
+        "958147186852538842877959980138243879940342867265688956449364129",
+        "9238",
+        &[
+            "3146", "277", "1611", "402", "6308", "2051", "6317", "138", "1758", "1707", "6502",
+            "5213", "7131", "2066", "1928", "1297",
+        ],
+    );
+    test(
+        "1000000000000",
+        "10",
+        &[
+            "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
+        ],
+    );
+    test(
+        "1000000000000",
+        "16",
+        &["14", "8", "13", "4", "10", "5", "1", "0", "0", "0"],
+    );
+    test("1000000000000", "1000000000000000", &["1000000000000"]);
+    test(
+        "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
+        7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
+        "6",
+        &[
+            "1", "0", "5", "5", "1", "5", "3", "1", "2", "1", "4", "0", "0", "4", "5", "1", "4",
+            "4", "1", "5", "1", "4", "0", "0", "3", "5", "0", "3", "0", "3", "2", "0", "0", "3",
+            "3", "1", "3", "3", "2", "0", "5", "2", "5", "2", "3", "5", "3", "2", "5", "0", "3",
+            "1", "0", "3", "2", "3", "5", "3", "1", "1", "0", "1", "1", "4", "5", "1", "0", "4",
+            "3", "0", "1", "0", "2", "5", "3", "5", "2", "0", "0", "3", "5", "1", "5", "2", "2",
+            "1", "5", "4", "5", "2", "2", "3", "3", "0", "2", "1", "0", "4", "4", "2", "0", "3",
+            "2", "2", "3", "2", "1", "2", "3", "5", "2", "0", "1", "5", "5", "1", "4", "1", "3",
+            "5", "1", "4", "0", "0", "2", "5", "0", "5", "3", "5", "2", "3", "0", "5", "4", "1",
+            "1", "0", "3", "5", "0", "2", "1", "5", "4", "4", "1", "1", "0", "3", "1", "0", "5",
+            "3", "1", "4", "3", "0", "4", "5", "1", "2", "5", "5", "2", "2", "4", "4", "0", "5",
+            "4", "0", "5", "4", "3", "3", "1", "1", "4", "3", "5", "5", "4", "0", "5", "2", "3",
+            "2", "3", "4", "2", "1", "2", "2", "2", "1", "2", "4", "5", "1", "5", "5", "1", "3",
+            "1", "5", "4", "2", "5", "3", "5", "1", "5", "0", "3", "5", "2", "4", "1", "2", "3",
+            "2", "3", "1", "4"
+        ]
+    );
+    test(
+        "14974892748479131847778931724116484851265511358392776602889616274416063303",
+        "3",
+        &[
+            "1", "1", "1", "1", "1", "1", "0", "2", "1", "0", "1", "1", "1", "1", "2", "1", "1",
+            "2", "0", "2", "2", "1", "1", "0", "0", "2", "0", "0", "2", "0", "2", "1", "1", "1",
+            "0", "2", "2", "1", "2", "0", "2", "1", "1", "0", "1", "0", "1", "0", "2", "0", "1",
+            "1", "2", "1", "0", "1", "1", "1", "1", "2", "0", "2", "2", "2", "0", "2", "2", "1",
+            "0", "1", "1", "1", "0", "0", "2", "0", "1", "2", "2", "2", "2", "0", "0", "2", "2",
+            "1", "0", "0", "0", "2", "0", "2", "1", "0", "0", "2", "0", "1", "1", "2", "0", "1",
+            "1", "2", "0", "0", "0", "0", "1", "1", "1", "1", "1", "2", "0", "1", "0", "1", "2",
+            "1", "0", "0", "0", "0", "1", "2", "0", "0", "1", "1", "2", "1", "1", "0", "1", "0",
+            "0", "2", "2", "2", "0", "2", "1", "1", "2", "1", "2", "0", "2", "1", "1", "1", "2",
+            "0",
+        ],
+    );
+    test(
+        "643945257796761196320314690988316858252541574945689186182369731847117890385280572047834937\
+        1883212246436232738680605124294949600205450044993253033167972343988333612737978764297848348\
+        2665822115523011210267845467229157815194234251375826930137780574470438350033031660616757791\
+        61",
+        "7",
+        &[
+            "6", "6", "4", "4", "6", "3", "4", "6", "4", "2", "5", "6", "3", "0", "2", "2", "5",
+            "6", "5", "0", "4", "5", "5", "2", "0", "5", "0", "0", "1", "2", "6", "1", "3", "2",
+            "5", "4", "4", "6", "3", "6", "3", "6", "5", "5", "1", "4", "1", "2", "6", "1", "3",
+            "2", "2", "4", "4", "3", "1", "4", "5", "5", "2", "5", "3", "6", "0", "4", "3", "0",
+            "0", "6", "0", "5", "2", "6", "2", "6", "5", "1", "6", "4", "2", "3", "1", "3", "1",
+            "2", "3", "5", "6", "3", "0", "1", "0", "1", "5", "5", "3", "3", "6", "6", "3", "4",
+            "4", "6", "6", "6", "6", "3", "4", "2", "6", "2", "3", "0", "3", "4", "2", "3", "6",
+            "4", "4", "1", "5", "3", "2", "6", "4", "3", "3", "0", "3", "1", "6", "4", "6", "6",
+            "0", "4", "5", "1", "0", "4", "1", "1", "1", "6", "0", "2", "6", "6", "2", "1", "4",
+            "5", "2", "0", "1", "5", "3", "3", "5", "1", "5", "2", "6", "5", "2", "4", "0", "2",
+            "0", "6", "1", "2", "4", "5", "6", "0", "4", "4", "2", "2", "5", "4", "6", "5", "2",
+            "0", "2", "4", "4", "5", "4", "4", "6", "1", "0", "6", "5", "1", "0", "2", "3", "1",
+            "1", "3", "5", "3", "1", "3", "3", "0", "2", "5", "6", "2", "5", "0", "3", "4", "5",
+            "1", "3", "1", "6", "0", "6", "1", "3", "4", "6", "6", "0", "5", "2", "5", "6", "1",
+            "2", "0", "5", "5", "6", "2", "5", "3", "0", "2", "3", "4", "1", "0", "0", "2", "4",
+            "1", "2", "1", "4", "4", "5", "1", "6", "3", "0", "0", "5", "3", "5", "0", "4", "5",
+            "0", "5", "0", "5", "2", "2", "0", "6", "1", "4", "6", "5", "3", "4", "4", "3", "1",
+            "4", "5", "3", "0", "2", "3", "3", "0", "1", "2", "0", "4", "4", "6", "2", "4", "1",
+            "3", "4", "6", "3", "0", "1", "0", "2", "6", "4", "2", "0", "6", "5", "4", "1", "5",
+            "4"
+        ]
+    );
+}
+
+#[test]
+fn to_digits_desc_natural_fail() {
+    assert_panic!(Natural::from(10u32).to_digits_desc(&Natural::ZERO));
+    assert_panic!(Natural::from(10u32).to_digits_desc(&Natural::ONE));
+}
+
+#[test]
+fn to_digits_desc_natural_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 256);
+    config.insert("mean_stripe_n", 128);
+    natural_pair_gen_var_2().test_properties_with_config(&config, |(x, base)| {
+        let digits = x.to_digits_desc(&base);
+        //TODO from digits
+        if x != 0 {
+            assert_ne!(digits[0], 0);
+        }
+        assert_eq!(
+            digits.iter().cloned().rev().collect_vec(),
+            x.to_digits_asc(&base)
+        );
+        assert!(digits.into_iter().all(|digit| digit < base));
+    });
+
+    natural_gen().test_properties_with_config(&config, |x| {
+        assert_eq!(
+            x.to_digits_desc(&Natural::TWO)
+                .into_iter()
+                .map(|digit| digit == 1)
+                .collect_vec(),
+            x.to_bits_desc()
+        );
+    });
+
+    natural_gen_var_1().test_properties_with_config(&config, |base| {
+        assert!(Natural::ZERO.to_digits_desc(&base).is_empty());
+    });
 }

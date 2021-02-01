@@ -116,7 +116,7 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
 /// assert_eq!(limbs_hamming_distance_neg(&[1, 1, 1], &[1, 2, 3]), 3);
 /// ```
 ///
-/// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are negative and have
+/// This is mpz_hamdist from mpz/hamdist.c, GMP 6.2.1, where both arguments are negative and have
 /// the same length.
 pub fn limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_i = slice_leading_zeros(xs);

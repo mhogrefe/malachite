@@ -325,7 +325,10 @@ pub mod num {
             pub mod get_bit;
             pub mod set_bit;
         }
-        pub mod bit_block_access;
+        pub mod bit_block_access {
+            pub mod assign_bits;
+            pub mod get_bits;
+        }
         pub mod bit_convertible {
             pub mod from_bits;
             pub mod to_bits;
@@ -339,7 +342,6 @@ pub mod num {
         pub mod hamming_distance;
         pub mod low_mask;
         pub mod not;
-        pub mod rotate;
         pub mod significant_bits;
     }
     pub mod random {

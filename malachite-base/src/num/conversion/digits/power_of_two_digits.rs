@@ -184,9 +184,9 @@ macro_rules! impl_power_of_two_digits {
                     /// two.
                     ///
                     /// The base-2 logarithm of the base is specified. The input digits are in
-                    /// ascending order (least- to most-significant_. The type of each digit is
+                    /// ascending order (least- to most-significant). The type of each digit is
                     /// `$u`, and `log_base` must be no larger than the width of `$u`. The function
-                    /// panics if the input represents a number that can't fit in $t.
+                    /// panics if the input represents a number that can't fit in `$t`.
                     ///
                     /// $$
                     /// f((d_i)_ {i=0}^{k-1}, \ell) = \sum_{i=0}^{k-1}2^{\ell i}d_i.
@@ -221,7 +221,7 @@ macro_rules! impl_power_of_two_digits {
                     /// The base-2 logarithm of the base is specified. The input digits are in
                     /// descending order (most- to least-significant). The type of each digit is
                     /// `$u`, and `log_base` must be no larger than the width of `$u`. The function
-                    /// panics if the input represents a number that can't fit in $t.
+                    /// panics if the input represents a number that can't fit in `$t`.
                     ///
                     /// $$
                     /// f((d_i)_ {i=0}^{k-1}, \ell) = \sum_{i=0}^{k-1}2^{\ell (k-i-1)}d_i.

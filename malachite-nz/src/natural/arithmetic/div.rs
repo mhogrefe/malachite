@@ -109,7 +109,7 @@ pub fn limbs_div_divisor_of_limb_max_with_carry_in_place(
 ///
 /// Additional memory: O(1)
 ///
-/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.1.2, but not computing the remainder.
+/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1, but not computing the remainder.
 pub fn _div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
     let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))

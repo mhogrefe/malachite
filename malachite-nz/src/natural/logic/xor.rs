@@ -88,7 +88,7 @@ pub fn limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_xor_n from gmp-impl.h, GMP 6.1.2, where rp is returned.
+/// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1, where rp is returned.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
@@ -152,7 +152,7 @@ pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
-/// This is mpn_xor_n from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1.
 ///
 /// # Examples
 /// ```
@@ -225,7 +225,7 @@ pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()` = `ys.len()`
 ///
-/// This is mpn_xor_n from gmp-impl.h, GMP 6.1.2, where rp == up.
+/// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1, where rp == up.
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.

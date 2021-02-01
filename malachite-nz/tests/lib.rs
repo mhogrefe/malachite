@@ -273,9 +273,15 @@ pub mod natural {
         pub mod get_random_natural_with_up_to_bits;
         pub mod get_striped_random_natural_with_bits;
         pub mod get_striped_random_natural_with_up_to_bits;
+        pub mod random_natural_inclusive_range;
+        pub mod random_natural_range;
+        pub mod random_natural_range_to_infinity;
         pub mod random_naturals;
+        pub mod random_naturals_less_than;
         pub mod random_positive_naturals;
         pub mod striped_random_naturals;
         pub mod striped_random_positive_naturals;
+        pub mod uniform_random_natural_inclusive_range;
+        pub mod uniform_random_natural_range;
     }
 }

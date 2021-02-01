@@ -74,7 +74,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
 ///
 /// Result is O(`n`)
 ///
-/// This is mpn_mulmod_bnm1_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_mulmod_bnm1_itch from gmp-impl.h, GMP 6.2.1.
 pub(crate) const fn _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
     n: usize,
     xs_len: usize,

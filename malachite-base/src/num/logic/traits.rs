@@ -20,21 +20,6 @@ pub trait TrailingZeros {
     fn trailing_zeros(self) -> u64;
 }
 
-/// Rotate a value's bits left or right.
-pub trait Rotate {
-    /// Shifts the bits to the left by a specified amount, `n`, wrapping the truncated bits to the
-    /// end of the resulting value.
-    ///
-    /// Please note this isn't the same operation as `<<`!
-    fn rotate_left(self, n: u64) -> Self;
-
-    /// Shifts the bits to the right by a specified amount, `n`, wrapping the truncated bits to the
-    /// end of the resulting value.
-    ///
-    /// Please note this isn't the same operation as `>>`!
-    fn rotate_right(self, n: u64) -> Self;
-}
-
 /// Replaces a number with its bitwise negation.
 pub trait NotAssign {
     fn not_assign(&mut self);
@@ -145,13 +130,11 @@ pub trait BitBlockAccess: Sized {
     /// Extracts a block of bits whose first index is `start` and last index is `end - 1`, taking
     /// ownership of `self`.
     ///
-    /// Time: worst case O(f(n)), where f(n) is the worst-case time complexity of `Self::get_bits`.
-    ///
-    /// Additional memory: worst case O(f(n)), where f(n) is the worst-case additional-memory
-    /// complexity of `Self::get_bits`.
+    /// # Worst-case complexity
+    /// For the default implementation, same as `Self::get_bits`.
     ///
     /// # Panics
-    /// See panics for `get_bits`.
+    /// See panics for `Self::get_bits`.
     ///
     /// # Examples
     /// ```

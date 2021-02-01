@@ -6,17 +6,22 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use num::BigUint;
 use rug;
 
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen;
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_fft_fft, _limbs_mul_fft_internal, _limbs_mul_fft_inverse,
     _limbs_mul_fft_normalize_mod_f,
 };
+use malachite_nz::natural::arithmetic::mul::limb::{
+    limbs_mul_limb, limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
+};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::limb::{
-    limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
-    limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
-    limbs_vec_mul_limb_in_place,
+    limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
+    limbs_slice_mul_limb_with_carry_in_place,
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::mul_low::{
@@ -77,6 +82,38 @@ fn test_limbs_mul_limb_and_limbs_vec_mul_limb_in_place() {
     test(&[u32::MAX], 2, &[u32::MAX - 1, 1]);
     test(&[u32::MAX], u32::MAX, &[1, u32::MAX - 1]);
 }
+
+#[test]
+fn limbs_mul_limb_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen().test_properties_with_config(&config, |(xs, y)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_mul_limb(&xs, y)),
+            Natural::from_limbs_asc(&xs) * Natural::from(y)
+        );
+    });
+}
+
+#[test]
+fn limbs_vec_mul_limb_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen().test_properties_with_config(&config, |(mut xs, y)| {
+        let old_xs = xs.clone();
+        limbs_vec_mul_limb_in_place(&mut xs, y);
+        let n = Natural::from_limbs_asc(&old_xs) * Natural::from(y);
+        assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+    });
+}
+
+//TODO limbs_mul_limb_with_carry_to_out
+
+//TODO demo_limbs_mul_limb_to_out
+
+//TODO demo_limbs_slice_mul_limb_with_carry_in_place
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -198,6 +235,25 @@ fn test_limbs_slice_mul_limb_in_place() {
     test(&[u32::MAX, 5], 2, 0, &[u32::MAX - 1, 11]);
     test(&[u32::MAX], 2, 1, &[u32::MAX - 1]);
     test(&[u32::MAX], u32::MAX, u32::MAX - 1, &[1]);
+}
+
+#[test]
+fn limbs_slice_mul_limb_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen().test_properties_with_config(&config, |(mut xs, y)| {
+        let old_xs = xs.clone();
+        let carry = limbs_slice_mul_limb_in_place(&mut xs, y);
+        let n = Natural::from_limbs_asc(&old_xs) * Natural::from(y);
+        let mut expected_limbs = n.into_limbs_asc();
+        assert_eq!(carry != 0, expected_limbs.len() == xs.len() + 1);
+        if carry != 0 {
+            assert_eq!(*expected_limbs.last().unwrap(), carry);
+        }
+        expected_limbs.resize(xs.len(), 0);
+        assert_eq!(xs, expected_limbs);
+    });
 }
 
 #[cfg(feature = "32_bit_limbs")]

@@ -40,9 +40,9 @@ fn benchmark_natural_neg_library_comparison(
         file_name,
         &triple_3_natural_bit_bucketer("x"),
         &mut [
-            ("Malachite", &mut (|(_, _, x)| no_out!(-x))),
-            ("num", &mut (|(x, _, _)| no_out!(neg_num(x)))),
-            ("rug", &mut (|(_, x, _)| no_out!(-x))),
+            ("Malachite", &mut |(_, _, x)| no_out!(-x)),
+            ("num", &mut |(x, _, _)| no_out!(neg_num(x))),
+            ("rug", &mut |(_, x, _)| no_out!(-x)),
         ],
     );
 }

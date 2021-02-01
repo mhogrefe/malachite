@@ -99,7 +99,7 @@ pub fn test_invert_limb_table() {
 /// assert_eq!(limbs_modular_invert_limb(1000000001), 2211001857);
 /// ```
 ///
-/// This is binvert_limb from gmp-impl.h, GMP 6.1.2.
+/// This is binvert_limb from gmp-impl.h, GMP 6.2.1.
 pub fn limbs_modular_invert_limb(x: Limb) -> Limb {
     assert!(x.odd());
     let index = (x >> 1).mod_power_of_two(INVERT_LIMB_TABLE_LOG_SIZE);

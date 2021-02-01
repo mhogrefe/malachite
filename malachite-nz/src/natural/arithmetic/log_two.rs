@@ -1,5 +1,8 @@
-use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
+use malachite_base::num::arithmetic::traits::{CeilingLogTwo, CheckedLogTwo, FloorLogTwo};
 
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::slices::slice_test_zero;
 use natural::arithmetic::is_power_of_two::limbs_is_power_of_two;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
@@ -59,6 +62,18 @@ pub fn limbs_ceiling_log_two(xs: &[Limb]) -> u64 {
     }
 }
 
+//TODO test
+pub fn limbs_checked_log_two(xs: &[Limb]) -> Option<u64> {
+    let (xs_last, xs_init) = xs.split_last().unwrap();
+    if slice_test_zero(xs_init) {
+        xs_last
+            .checked_log_two()
+            .map(|log| log + (u64::exact_from(xs_init.len()) << Limb::LOG_WIDTH))
+    } else {
+        None
+    }
+}
+
 impl<'a> FloorLogTwo for &'a Natural {
     /// Returns the floor of the base-2 logarithm of a positive `Natural`.
     ///
@@ -115,6 +130,16 @@ impl<'a> CeilingLogTwo for &'a Natural {
         match *self {
             Natural(Small(small)) => small.ceiling_log_two(),
             Natural(Large(ref limbs)) => limbs_ceiling_log_two(limbs),
+        }
+    }
+}
+
+//TODO test
+impl<'a> CheckedLogTwo for &'a Natural {
+    fn checked_log_two(self) -> Option<u64> {
+        match *self {
+            Natural(Small(small)) => small.checked_log_two(),
+            Natural(Large(ref limbs)) => limbs_checked_log_two(limbs),
         }
     }
 }

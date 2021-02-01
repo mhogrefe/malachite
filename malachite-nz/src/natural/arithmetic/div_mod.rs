@@ -64,7 +64,7 @@ use platform::{
 /// assert_eq!(limbs_invert_limb(u32::MAX - 1), 2);
 /// ```
 ///
-/// This is mpn_invert_limb, or invert_limb, from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_invert_limb, or invert_limb, from gmp-impl.h, GMP 6.2.1.
 #[inline]
 pub fn limbs_invert_limb(d: Limb) -> Limb {
     (DoubleLimb::join_halves(!d, Limb::MAX) / DoubleLimb::from(d)).lower_half()
@@ -74,7 +74,7 @@ pub fn limbs_invert_limb(d: Limb) -> Limb {
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.1.2.
+/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1.
 pub fn _div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> (Limb, Limb) {
     let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
@@ -511,7 +511,7 @@ pub fn limbs_div_mod_extra_in_place(
 /// assert_eq!(limbs_two_limb_inverse_helper(2325651385, 3907343530), 3636893938);
 /// ```
 ///
-/// This is invert_pi1 from gmp-impl.h, GMP 6.1.2, where the result is returned instead of being
+/// This is invert_pi1 from gmp-impl.h, GMP 6.2.1, where the result is returned instead of being
 /// written to dinv.
 pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
     let mut d_inv = limbs_invert_limb(hi);
@@ -567,7 +567,7 @@ pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
 /// );
 /// ```
 ///
-/// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.1.2.
+/// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.2.1.
 pub fn limbs_div_mod_three_limb_by_two_limb(
     n_2: Limb,
     n_1: Limb,
@@ -1450,7 +1450,7 @@ fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) ->
 ///
 /// Additional memory: Worst case O(1)
 ///
-/// This is mpn_invertappr_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_invertappr_itch from gmp-impl.h, GMP 6.2.1.
 pub(crate) const fn _limbs_invert_approx_scratch_len(is_len: usize) -> usize {
     is_len << 1
 }

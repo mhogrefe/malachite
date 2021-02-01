@@ -509,7 +509,7 @@ pub(crate) fn _limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_mul from gmp-impl.h, GMP 6.1.2, and mpn_nussbaumer_mul from
+/// This is mpn_fft_mul from gmp-impl.h, GMP 6.2.1, and mpn_nussbaumer_mul from
 /// mpn/generic/mpn_nussbaumer_mul.c, GMP 6.1.2.
 #[inline]
 pub fn _limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {

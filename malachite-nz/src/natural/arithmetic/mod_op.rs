@@ -49,7 +49,7 @@ use platform::{
 ///
 /// Additional memory: O(1)
 ///
-/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.1.2, but not computing the quotient.
+/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1, but not computing the quotient.
 pub fn _mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
     let (q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
@@ -129,7 +129,7 @@ pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
 /// );
 /// ```
 ///
-/// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.1.2, returning only the remainder.
+/// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.2.1, returning only the remainder.
 pub fn limbs_mod_three_limb_by_two_limb(
     n_2: Limb,
     n_1: Limb,
@@ -1043,7 +1043,7 @@ pub fn _limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
 ///
 /// Additional memory: O(1)
 ///
-/// This is udiv_rnnd_preinv from gmp-impl.h, GMP 6.1.2.
+/// This is udiv_rnnd_preinv from gmp-impl.h, GMP 6.2.1.
 fn mod_by_preinversion_special(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
     let (q_high, q_low) = ((DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low)))

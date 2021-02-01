@@ -108,7 +108,7 @@ pub fn _limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
     }
 }
 
-/// This is mpn_toom2_sqr_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom2_sqr_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
     (xs_len + Limb::WIDTH as usize) << 1
 }
@@ -223,7 +223,7 @@ pub const fn _limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool
     xs_len == 3 || xs_len > 4
 }
 
-/// This is mpn_toom3_sqr_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom3_sqr_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
@@ -386,7 +386,7 @@ pub const fn _limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool
     xs_len == 4 || xs_len == 7 || xs_len == 8 || xs_len > 9
 }
 
-/// This is mpn_toom4_sqr_itch from gmp-impl.h, GMP 6.1.2.
+/// This is mpn_toom4_sqr_itch from gmp-impl.h, GMP 6.2.1.
 pub const fn _limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
@@ -519,7 +519,7 @@ pub const fn _limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool
     xs_len == 18 || xs_len > 21 && xs_len != 25 && xs_len != 26 && xs_len != 31
 }
 
-// This is mpn_toom6_sqr_itch from gmp-impl.h, GMP 6.1.2.
+// This is mpn_toom6_sqr_itch from gmp-impl.h, GMP 6.2.1.
 pub fn _limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
     (n << 1)
         + max(
@@ -671,7 +671,7 @@ pub const fn _limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool
     xs_len == 40 || xs_len > 43 && xs_len != 49 && xs_len != 50 && xs_len != 57
 }
 
-// This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.1.2.
+// This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.2.1.
 pub fn _limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
     ((n * 15) >> 3)
         + max(

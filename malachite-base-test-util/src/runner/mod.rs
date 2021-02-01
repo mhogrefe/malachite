@@ -85,6 +85,18 @@ macro_rules! register_generic_demos_2 {
 }
 
 #[macro_export]
+macro_rules! register_generic_demos_2_only_first_in_key {
+    ($runner: ident, $f: ident $(,[$t:ty, $u:ty])*) => {
+        $(
+            $runner.register_demo(
+                concat!(stringify!($f), "_", stringify!($t)),
+                &$f::<$t, $u>
+            );
+        )*
+    };
+}
+
+#[macro_export]
 macro_rules! register_unsigned_demos {
     ($runner: ident, $f: ident) => {
         register_generic_demos!($runner, $f, u8, u16, u32, u64, u128, usize);
@@ -95,6 +107,22 @@ macro_rules! register_unsigned_demos {
 macro_rules! register_signed_demos {
     ($runner: ident, $f: ident) => {
         register_generic_demos!($runner, $f, i8, i16, i32, i64, i128, isize);
+    };
+}
+
+#[macro_export]
+macro_rules! register_signed_unsigned_match_demos {
+    ($runner: ident, $f: ident) => {
+        register_generic_demos_2_only_first_in_key!(
+            $runner,
+            $f,
+            [i8, u8],
+            [i16, u16],
+            [i32, u32],
+            [i64, u64],
+            [i128, u128],
+            [isize, usize]
+        );
     };
 }
 
@@ -335,6 +363,18 @@ macro_rules! register_generic_benches_2 {
 }
 
 #[macro_export]
+macro_rules! register_generic_benches_2_only_first_in_key {
+    ($runner: ident, $f: ident $(,[$t:ty, $u:ty])*) => {
+        $(
+            $runner.register_bench(
+                concat!(stringify!($f), "_", stringify!($t)),
+                &$f::<$t, $u>
+            );
+        )*
+    };
+}
+
+#[macro_export]
 macro_rules! register_unsigned_benches {
     ($runner: ident, $f: ident) => {
         register_generic_benches!($runner, $f, u8, u16, u32, u64, u128, usize);
@@ -345,6 +385,22 @@ macro_rules! register_unsigned_benches {
 macro_rules! register_signed_benches {
     ($runner: ident, $f: ident) => {
         register_generic_benches!($runner, $f, i8, i16, i32, i64, i128, isize);
+    };
+}
+
+#[macro_export]
+macro_rules! register_signed_unsigned_match_benches {
+    ($runner: ident, $f: ident) => {
+        register_generic_benches_2_only_first_in_key!(
+            $runner,
+            $f,
+            [i8, u8],
+            [i16, u16],
+            [i32, u32],
+            [i64, u64],
+            [i128, u128],
+            [isize, usize]
+        );
     };
 }
 
