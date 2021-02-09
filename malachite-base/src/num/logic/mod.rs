@@ -249,7 +249,100 @@ pub mod bit_block_access;
 /// );
 /// ```
 pub mod bit_convertible;
+/// This module provides a double-ended iterator for iterating over a number's bits.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # bits
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::logic::traits::BitIterable;
+///
+/// assert!(0u8.bits().next().is_none());
+/// // 105 = 1101001b
+/// assert_eq!(105u32.bits().collect_vec(), &[true, false, false, true, false, true, true]);
+///
+/// assert!(0u8.bits().next_back().is_none());
+/// // 105 = 1101001b
+/// assert_eq!(105u32.bits().rev().collect_vec(), &[true, true, false, true, false, false, true]);
+///
+/// assert_eq!(0i8.bits().next(), None);
+/// // 105 = 01101001b, with a leading false bit to indicate sign
+/// assert_eq!(105i32.bits().collect_vec(), &[true, false, false, true, false, true, true, false]);
+/// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+/// assert_eq!(
+///     (-105i32).bits().collect_vec(),
+///     &[true, true, true, false, true, false, false, true]
+/// );
+///
+/// assert_eq!(0i8.bits().next_back(), None);
+/// // 105 = 01101001b, with a leading false bit to indicate sign
+/// assert_eq!(
+///     105i32.bits().rev().collect_vec(),
+///     &[false, true, true, false, true, false, false, true]
+/// );
+/// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
+/// assert_eq!(
+///     (-105i32).bits().rev().collect_vec(),
+///     &[true, false, false, true, false, true, true, true]
+/// );
+/// ```
 pub mod bit_iterable;
+/// This module contains functions for finding the next `true` or `false` bit after a provided
+/// index.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # index_of_next_false_bit
+/// ```
+/// use malachite_base::num::logic::traits::BitScan;
+///
+/// assert_eq!(0xb00000000u64.index_of_next_false_bit(0), Some(0));
+/// assert_eq!(0xb00000000u64.index_of_next_false_bit(20), Some(20));
+/// assert_eq!(0xb00000000u64.index_of_next_false_bit(31), Some(31));
+/// assert_eq!(0xb00000000u64.index_of_next_false_bit(32), Some(34));
+/// assert_eq!(0xb00000000u64.index_of_next_false_bit(33), Some(34));
+/// assert_eq!(0xb00000000u64.index_of_next_false_bit(34), Some(34));
+/// assert_eq!(0xb00000000u64.index_of_next_false_bit(35), Some(36));
+/// assert_eq!(0xb00000000u64.index_of_next_false_bit(100), Some(100));
+///
+/// assert_eq!((-0x500000000i64).index_of_next_false_bit(0), Some(0));
+/// assert_eq!((-0x500000000i64).index_of_next_false_bit(20), Some(20));
+/// assert_eq!((-0x500000000i64).index_of_next_false_bit(31), Some(31));
+/// assert_eq!((-0x500000000i64).index_of_next_false_bit(32), Some(34));
+/// assert_eq!((-0x500000000i64).index_of_next_false_bit(33), Some(34));
+/// assert_eq!((-0x500000000i64).index_of_next_false_bit(34), Some(34));
+/// assert_eq!((-0x500000000i64).index_of_next_false_bit(35), None);
+/// assert_eq!((-0x500000000i64).index_of_next_false_bit(100), None);
+/// ```
+///
+/// # index_of_next_true_bit
+/// ```
+/// use malachite_base::num::logic::traits::BitScan;
+///
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(0), Some(32));
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(20), Some(32));
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(31), Some(32));
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(32), Some(32));
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(33), Some(33));
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(34), Some(35));
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(35), Some(35));
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(36), None);
+/// assert_eq!(0xb00000000u64.index_of_next_true_bit(100), None);
+///
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(0), Some(32));
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(20), Some(32));
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(31), Some(32));
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(32), Some(32));
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(33), Some(33));
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(34), Some(35));
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(35), Some(35));
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(36), Some(36));
+/// assert_eq!((-0x500000000i64).index_of_next_true_bit(100), Some(100));
+/// ```
 pub mod bit_scan;
 pub mod count_ones;
 pub mod count_zeros;

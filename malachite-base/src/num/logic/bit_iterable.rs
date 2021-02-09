@@ -8,6 +8,9 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::BitIterable;
 
+/// A double-ended iterator over the bits of a primitive unsigned integer.
+///
+/// This `struct` is created by the `BitIterable::bits` function. See its documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveUnsignedBitIterator<T: PrimitiveUnsigned> {
     pub(crate) value: T,
@@ -26,9 +29,9 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     /// A function to iterate through the bits of a primitive unsigned integer in ascending order
     /// (least-significant first).
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -61,12 +64,14 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     }
 
     /// A function that returns the length of the bits iterator; that is, the value's significant
-    /// bit count. The format is (lower bound, Option<upper bound>), but in this case it's trivial
-    /// to always have an exact bound.
+    /// bit count.
     ///
-    /// Time: worst case O(1)
+    /// The format is (lower bound, Option<upper bound>), but in this case it's trivial to always
+    /// have an exact bound.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    ///
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -85,9 +90,9 @@ impl<T: PrimitiveUnsigned> DoubleEndedIterator for PrimitiveUnsignedBitIterator<
     /// A function to iterate through the bits of a primitive unsigned integer in descending order
     /// (most-significant first).
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -120,20 +125,22 @@ impl<T: PrimitiveUnsigned> DoubleEndedIterator for PrimitiveUnsignedBitIterator<
     }
 }
 
-/// This allows for some optimizations, e.g. when collecting into a `Vec`.
+/// This allows for some optimizations, _e.g._ when collecting into a `Vec`.
 impl<T: PrimitiveUnsigned> ExactSizeIterator for PrimitiveUnsignedBitIterator<T> {}
 
 impl<T: PrimitiveUnsigned> Index<u64> for PrimitiveUnsignedBitIterator<T> {
     type Output = bool;
 
-    /// A function to retrieve bits by index. The index is the power of 2 of which the bit is a
-    /// coefficient. Indexing at or above the significant bit count returns false bits.
+    /// A function to retrieve bits by index.
+    ///
+    /// The index is the power of 2 of which the bit is a coefficient. Indexing at or above the
+    /// significant bit count returns false bits.
     ///
     /// This is equivalent to the `get_bit` function.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -177,35 +184,20 @@ macro_rules! impl_bit_iterable_unsigned {
         impl BitIterable for $t {
             type BitIterator = PrimitiveUnsignedBitIterator<$t>;
 
-            /// Returns a double-ended iterator over the bits of a primitive unsigned integer. The
-            /// forward order is ascending, so that less significant bits appear first. There are no
-            /// trailing false bits going forward, or leading falses going backward.
+            /// Returns a double-ended iterator over the bits of a primitive unsigned integer.
+            ///
+            /// The forward order is ascending, so that less significant bits appear first. There
+            /// are no trailing false bits going forward, or leading falses going backward.
             ///
             /// If it's necessary to get a `Vec` of all the bits, consider using `to_bits_asc` or
             /// `to_bits_desc` instead.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate itertools;
-            ///
-            /// use itertools::Itertools;
-            ///
-            /// use malachite_base::num::logic::traits::BitIterable;
-            ///
-            /// assert!(0u8.bits().next().is_none());
-            /// // 105 = 1101001b
-            /// assert_eq!(105u32.bits().collect_vec(),
-            ///     vec![true, false, false, true, false, true, true]);
-            ///
-            /// assert!(0u8.bits().next_back().is_none());
-            /// // 105 = 1101001b
-            /// assert_eq!(105u32.bits().rev().collect_vec(),
-            ///     vec![true, true, false, true, false, false, true]);
-            /// ```
+            /// See the documentation of the `num::logic::bit_iterable` module.
             #[inline]
             fn bits(self) -> PrimitiveUnsignedBitIterator<$t> {
                 _bits_unsigned(self)
@@ -215,6 +207,9 @@ macro_rules! impl_bit_iterable_unsigned {
 }
 apply_to_unsigneds!(impl_bit_iterable_unsigned);
 
+/// A double-ended iterator over the bits of a primitive signed integer.
+///
+/// This `struct` is created by the `BitIterable::bits` function. See its documentation for more.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveSignedBitIterator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
     phantom: PhantomData<*const S>,
@@ -227,9 +222,9 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Iterator for PrimitiveSignedBitIt
     /// A function to iterate through the bits of a primitive signed integer in ascending order
     /// (least-significant first).
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -260,9 +255,9 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> DoubleEndedIterator
     /// A function to iterate through the bits of a primitive signed integer in descending order
     /// (most-significant first).
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -291,14 +286,16 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Index<u64> for PrimitiveSignedBit
     type Output = bool;
 
     /// A function to retrieve bits by index. The index is the power of 2 of which the bit is a
-    /// coefficient. Indexing at or above the significant bit count returns false or true bits,
-    /// depending on the value's sign.
+    /// coefficient.
+    ///
+    /// Indexing at or above the significant bit count returns false or true bits, depending on the
+    /// value's sign.
     ///
     /// This is equivalent to the `get_bit` function.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
     ///
-    /// Additional memory: worst case O(1)
+    /// Constant time and additional memory.
     ///
     /// # Examples
     /// ```
@@ -352,41 +349,20 @@ macro_rules! impl_bit_iterable_signed {
         impl BitIterable for $s {
             type BitIterator = PrimitiveSignedBitIterator<$u, $s>;
 
-            /// Returns a double-ended iterator over the bits of a primitive signed integer. The
-            /// forward order is ascending, so that less significant bits appear first. There are no
-            /// trailing sign bits going forward, or leading sign bits going backward.
+            /// Returns a double-ended iterator over the bits of a primitive signed integer.
+            ///
+            /// The forward order is ascending, so that less significant bits appear first. There
+            /// are no trailing sign bits going forward, or leading sign bits going backward.
             ///
             /// If it's necessary to get a `Vec` of all the bits, consider using `to_bits_asc` or
             /// `to_bits_desc` instead.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate itertools;
-            ///
-            /// use itertools::Itertools;
-            ///
-            /// use malachite_base::num::logic::traits::BitIterable;
-            ///
-            /// assert_eq!(0i8.bits().next(), None);
-            /// // 105 = 01101001b, with a leading false bit to indicate sign
-            /// assert_eq!(105i32.bits().collect_vec(),
-            ///     vec![true, false, false, true, false, true, true, false]);
-            /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-            /// assert_eq!((-105i32).bits().collect_vec(),
-            ///     vec![true, true, true, false, true, false, false, true]);
-            ///
-            /// assert_eq!(0i8.bits().next_back(), None);
-            /// // 105 = 01101001b, with a leading false bit to indicate sign
-            /// assert_eq!(105i32.bits().rev().collect_vec(),
-            ///     vec![false, true, true, false, true, false, false, true]);
-            /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
-            /// assert_eq!((-105i32).bits().rev().collect_vec(),
-            ///     vec![true, false, false, true, false, true, true, true]);
-            /// ```
+            /// See the documentation of the `num::logic::bit_iterable` module.
             #[inline]
             fn bits(self) -> PrimitiveSignedBitIterator<$u, $s> {
                 _bits_signed::<$u, $s>(self)

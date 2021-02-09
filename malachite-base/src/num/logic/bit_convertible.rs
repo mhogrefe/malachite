@@ -89,7 +89,7 @@ macro_rules! impl_bit_convertible_unsigned {
             /// `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic` module.
+            /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn to_bits_asc(&self) -> Vec<bool> {
                 _to_bits_asc_unsigned(self)
@@ -109,7 +109,7 @@ macro_rules! impl_bit_convertible_unsigned {
             /// `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic` module.
+            /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn to_bits_desc(&self) -> Vec<bool> {
                 _to_bits_desc_unsigned(self)
@@ -136,7 +136,7 @@ macro_rules! impl_bit_convertible_unsigned {
             /// Panics if the bits represent a value that isn't representable by `$t`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic` module.
+            /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> $t {
                 _from_bits_asc_unsigned(bits)
@@ -163,7 +163,7 @@ macro_rules! impl_bit_convertible_unsigned {
             /// Panics if the bits represent a value that isn't representable by `$t`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic` module.
+            /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> $t {
                 _from_bits_desc_unsigned(bits)
@@ -318,7 +318,7 @@ macro_rules! impl_bit_convertible_signed {
             /// `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic` module.
+            /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn to_bits_asc(&self) -> Vec<bool> {
                 _to_bits_asc_signed(self)
@@ -339,7 +339,7 @@ macro_rules! impl_bit_convertible_signed {
             /// `self.significant_bits()`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic` module.
+            /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn to_bits_desc(&self) -> Vec<bool> {
                 _to_bits_desc_signed(self)
@@ -376,7 +376,7 @@ macro_rules! impl_bit_convertible_signed {
             /// Panics if the bits represent a value that isn't representable by `$t`.
             ///
             /// # Examples
-            /// See the documentation of the `num::logic` module.
+            /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> $s {
                 _from_bits_asc_signed::<$u, $s, _>(bits)
@@ -403,7 +403,7 @@ macro_rules! impl_bit_convertible_signed {
             /// $$
             ///
             /// # Examples
-            /// See the documentation of the `num::logic` module.
+            /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> $s {
                 _from_bits_desc_signed::<$u, $s, _>(bits)

@@ -6,37 +6,40 @@ use malachite_nz::integer::Integer;
 
 #[test]
 fn test_add() {
-    let test = |u, v, out| {
-        let mut n = Integer::from_str(u).unwrap();
-        n += Integer::from_str(v).unwrap();
+    let test = |s, t, out| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        let mut n = u.clone();
+        n += v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Integer::from_str(u).unwrap();
-        n += &Integer::from_str(v).unwrap();
+        let mut n = u.clone();
+        n += &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap() + Integer::from_str(v).unwrap();
+        let n = u.clone() + v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Integer::from_str(u).unwrap() + Integer::from_str(v).unwrap();
+        let n = &u + v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap() + &Integer::from_str(v).unwrap();
+        let n = u.clone() + &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Integer::from_str(u).unwrap() + &Integer::from_str(v).unwrap();
+        let n = &u + &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = BigInt::from_str(u).unwrap() + BigInt::from_str(v).unwrap();
+        let n = BigInt::from_str(s).unwrap() + BigInt::from_str(t).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = rug::Integer::from_str(u).unwrap() + rug::Integer::from_str(v).unwrap();
+        let n = rug::Integer::from_str(s).unwrap() + rug::Integer::from_str(t).unwrap();
         assert_eq!(n.to_string(), out);
     };
     test("0", "0", "0");

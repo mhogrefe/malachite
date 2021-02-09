@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use std::collections::HashSet;
-use std::fmt::{Binary, Debug};
+use std::fmt::{Binary, Debug, LowerHex, Octal, UpperHex};
 
 use named::Named;
 
@@ -132,6 +132,84 @@ impl<T: Binary> ToBinaryString for T {
     #[inline]
     fn to_binary_string(&self) -> String {
         format!("{:b}", self)
+    }
+}
+
+/// A trait that provides an ergonomic way to create the string specified by an `Octal`
+/// implementation.
+pub trait ToOctalString: Octal {
+    fn to_octal_string(&self) -> String;
+}
+
+impl<T: Octal> ToOctalString for T {
+    /// Returns the `String` produced by `T`s `Octal` implementation.
+    ///
+    /// Time: depends on `Octal` implementation
+    ///
+    /// Additional memory: depends on `Octal` implementation
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::ToOctalString;
+    ///
+    /// assert_eq!(50u64.to_octal_string(), "62");
+    /// assert_eq!((-100i16).to_octal_string(), "177634");
+    /// ```
+    #[inline]
+    fn to_octal_string(&self) -> String {
+        format!("{:o}", self)
+    }
+}
+
+/// A trait that provides an ergonomic way to create the string specified by a `LowerHex`
+/// implementation.
+pub trait ToLowerHexString: LowerHex {
+    fn to_lower_hex_string(&self) -> String;
+}
+
+impl<T: LowerHex> ToLowerHexString for T {
+    /// Returns the `String` produced by `T`s `LowerHex` implementation.
+    ///
+    /// Time: depends on `LowerHex` implementation
+    ///
+    /// Additional memory: depends on `LowerHex` implementation
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::ToLowerHexString;
+    ///
+    /// assert_eq!(50u64.to_lower_hex_string(), "32");
+    /// assert_eq!((-100i16).to_lower_hex_string(), "ff9c");
+    /// ```
+    #[inline]
+    fn to_lower_hex_string(&self) -> String {
+        format!("{:x}", self)
+    }
+}
+
+/// A trait that provides an ergonomic way to create the string specified by an `UpperHex`
+/// implementation.
+pub trait ToUpperHexString: UpperHex {
+    fn to_upper_hex_string(&self) -> String;
+}
+
+impl<T: UpperHex> ToUpperHexString for T {
+    /// Returns the `String` produced by `T`s `UpperHex` implementation.
+    ///
+    /// Time: depends on `UpperHex` implementation
+    ///
+    /// Additional memory: depends on `UpperHex` implementation
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::strings::ToUpperHexString;
+    ///
+    /// assert_eq!(50u64.to_upper_hex_string(), "32");
+    /// assert_eq!((-100i16).to_upper_hex_string(), "FF9C");
+    /// ```
+    #[inline]
+    fn to_upper_hex_string(&self) -> String {
+        format!("{:X}", self)
     }
 }
 

@@ -51,6 +51,11 @@ pub mod num {
         pub mod mod_mul;
         pub mod mod_pow;
     }
+    pub mod conversion {
+        pub mod string {
+            pub mod to_string;
+        }
+    }
     pub mod float {
         pub mod nice_float;
     }

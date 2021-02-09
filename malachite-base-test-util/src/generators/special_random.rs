@@ -1,35 +1,39 @@
-use generators::common::{reshape_1_2_to_3, GenConfig, It};
+use generators::common::{reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, GenConfig, It};
 use generators::{
     digits_valid, reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned,
     reduce_to_fit_sub_mul_signed, reduce_to_fit_sub_mul_unsigned, signed_assign_bits_valid,
     unsigned_assign_bits_valid,
 };
+use itertools::repeat_n;
 use malachite_base::chars::random::{
     graphic_weighted_random_ascii_chars, graphic_weighted_random_char_inclusive_range,
     graphic_weighted_random_char_range, graphic_weighted_random_chars,
 };
 use malachite_base::comparison::traits::{Max, Min};
-use malachite_base::num::arithmetic::traits::{DivRound, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base::num::random::geometric::{
+    geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
     geometric_random_unsigned_range, geometric_random_unsigneds, GeometricRandomNaturalValues,
 };
 use malachite_base::num::random::striped::{
-    get_striped_bool_vec, get_striped_unsigned_vec, striped_random_fixed_length_bool_vecs,
+    get_striped_bool_vec, get_striped_unsigned_vec,
+    striped_random_bool_vecs_length_inclusive_range, striped_random_fixed_length_bool_vecs,
     striped_random_natural_signeds, striped_random_negative_signeds,
     striped_random_positive_signeds, striped_random_positive_unsigneds, striped_random_signeds,
-    striped_random_unsigned_vecs, striped_random_unsigneds, StripedBitSource,
+    striped_random_unsigned_vecs, striped_random_unsigned_vecs_min_length,
+    striped_random_unsigneds, StripedBitSource, StripedRandomSigneds,
     StripedRandomUnsignedBitChunks,
 };
 use malachite_base::num::random::{
     random_signed_range, random_unsigned_inclusive_range, random_unsigned_range,
     random_unsigneds_less_than, RandomUnsignedInclusiveRange,
 };
-use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::random::random_strings_using_chars;
 use malachite_base::tuples::random::{
@@ -289,6 +293,25 @@ pub fn special_random_signed_unsigned_pair_gen_var_4<T: PrimitiveSigned>(
     )
 }
 
+pub fn special_random_signed_unsigned_pair_gen_var_5<
+    T: PrimitiveSigned,
+    U: ExactFrom<u8> + PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, U::TWO, U::exact_from(36u8)),
+    ))
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
 
 pub fn random_signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>(
@@ -464,6 +487,43 @@ pub fn special_random_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
     )
 }
 
+// -- (PrimitiveSigned, Vec<bool>) --
+
+struct SignedBoolVecPairGeneratorVar1<T: PrimitiveSigned> {
+    xs: StripedRandomSigneds<T>,
+    striped_bit_source: StripedBitSource,
+}
+
+impl<T: PrimitiveSigned> Iterator for SignedBoolVecPairGeneratorVar1<T> {
+    type Item = (T, Vec<bool>);
+
+    fn next(&mut self) -> Option<(T, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let bs = get_striped_bool_vec(
+            &mut self.striped_bit_source,
+            u64::exact_from(x.to_bits_asc().len()),
+        );
+        Some((x, bs))
+    }
+}
+
+pub fn special_random_signed_bool_vec_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, Vec<bool>)> {
+    Box::new(SignedBoolVecPairGeneratorVar1 {
+        xs: striped_random_signeds(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
 // -- PrimitiveUnsigned --
 
 pub fn special_random_unsigned_gen<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
@@ -577,6 +637,25 @@ pub fn special_random_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
         ))
         .map(|(x, y)| if x <= y { (x, y) } else { (y, x) }),
     )
+}
+
+pub fn special_random_unsigned_pair_gen_var_6<
+    T: PrimitiveUnsigned,
+    U: ExactFrom<u8> + PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, U::TWO, U::exact_from(36u8)),
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
@@ -808,6 +887,40 @@ pub fn special_random_unsigned_unsigned_bool_vec_triple_gen_var_1<
     })
 }
 
+// -- (PrimitiveUnsigned, Vec<bool>) --
+
+struct UnsignedBoolVecPairGeneratorVar1<T: PrimitiveUnsigned> {
+    xs: StripedRandomUnsignedBitChunks<T>,
+    striped_bit_source: StripedBitSource,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for UnsignedBoolVecPairGeneratorVar1<T> {
+    type Item = (T, Vec<bool>);
+
+    fn next(&mut self) -> Option<(T, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let bs = get_striped_bool_vec(&mut self.striped_bit_source, x.significant_bits());
+        Some((x, bs))
+    }
+}
+
+pub fn special_random_unsigned_bool_vec_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, Vec<bool>)> {
+    Box::new(UnsignedBoolVecPairGeneratorVar1 {
+        xs: striped_random_unsigneds(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
 // -- String --
 
 pub fn special_random_string_gen(config: &GenConfig) -> It<String> {
@@ -870,6 +983,176 @@ pub fn special_random_string_pair_gen_var_1(config: &GenConfig) -> It<(String, S
         config.get_or("mean_length_n", 32),
         config.get_or("mean_length_d", 1),
     )))
+}
+
+// -- Vec<bool> --
+
+pub fn special_random_bool_vec_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<Vec<bool>> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_bool_vecs_length_inclusive_range(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    0,
+                    T::WIDTH,
+                )
+            },
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        striped_random_fixed_length_bool_vecs(
+                            seed_2,
+                            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                            T::WIDTH,
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_positive_unsigneds(
+                            seed_2,
+                            config.get_or("mean_excess_length_n", 32),
+                            config.get_or("mean_excess_length_d", 1),
+                        )
+                    },
+                )
+                .map(|(bs, n)| bs.into_iter().chain(repeat_n(false, n)).collect())
+            },
+        )
+        .map(Union2::unwrap),
+    )
+}
+
+pub fn special_random_bool_vec_gen_var_2<T: PrimitiveSigned>(config: &GenConfig) -> It<Vec<bool>> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_bool_vecs_length_inclusive_range(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    0,
+                    T::WIDTH,
+                )
+            },
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        striped_random_fixed_length_bool_vecs(
+                            seed_2,
+                            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                            T::WIDTH - 1,
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_nonzero_signeds::<isize>(
+                            seed_2,
+                            config.get_or("mean_excess_length_n", 32),
+                            config.get_or("mean_excess_length_d", 1),
+                        )
+                    },
+                )
+                .map(|(bs, n)| {
+                    bs.into_iter()
+                        .chain(repeat_n(n < 0, n.unsigned_abs()))
+                        .collect()
+                })
+            },
+        )
+        .map(Union2::unwrap),
+    )
+}
+
+pub fn special_random_bool_vec_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<Vec<bool>> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_bool_vecs_length_inclusive_range(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    0,
+                    T::WIDTH,
+                )
+            },
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        striped_random_fixed_length_bool_vecs(
+                            seed_2,
+                            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                            T::WIDTH,
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_positive_unsigneds(
+                            seed_2,
+                            config.get_or("mean_excess_length_n", 32),
+                            config.get_or("mean_excess_length_d", 1),
+                        )
+                    },
+                )
+                .map(|(bs, n)| repeat_n(false, n).chain(bs.into_iter()).collect())
+            },
+        )
+        .map(Union2::unwrap),
+    )
+}
+
+pub fn special_random_bool_vec_gen_var_4<T: PrimitiveSigned>(config: &GenConfig) -> It<Vec<bool>> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_bool_vecs_length_inclusive_range(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                    0,
+                    T::WIDTH - 1,
+                )
+            },
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        striped_random_fixed_length_bool_vecs(
+                            seed_2,
+                            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                            T::WIDTH - 1,
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_nonzero_signeds::<isize>(
+                            seed_2,
+                            config.get_or("mean_excess_length_n", 32),
+                            config.get_or("mean_excess_length_d", 1),
+                        )
+                    },
+                )
+                .map(|(bs, n)| {
+                    repeat_n(n < 0, n.unsigned_abs())
+                        .chain(bs.into_iter())
+                        .collect()
+                })
+            },
+        )
+        .map(Union2::unwrap),
+    )
 }
 
 // -- Vec<PrimitiveUnsigned> --
@@ -1063,6 +1346,30 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_1<
 
 // --(Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, T, T)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigned_vecs(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
 struct UnsignedVecUnsignedUnsignedTripleGeneratorVar1<T: PrimitiveUnsigned> {
     phantom: PhantomData<*const T>,
     is: GeometricRandomNaturalValues<usize>,
@@ -1100,4 +1407,170 @@ pub fn special_random_primitive_int_vec_unsigned_unsigned_triple_gen_var_1<T: Pr
             config.get_or("mean_stripe_d", 1),
         ),
     })
+}
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
+
+struct UnsignedVecPairLenGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> {
+    phantom: PhantomData<*const T>,
+    lengths: I,
+    striped_bit_source: StripedBitSource,
+}
+
+impl<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> Iterator
+    for UnsignedVecPairLenGenerator<T, I>
+{
+    type Item = (Vec<T>, Vec<T>);
+
+    fn next(&mut self) -> Option<(Vec<T>, Vec<T>)> {
+        let (i, j) = self.lengths.next().unwrap();
+        Some((
+            get_striped_unsigned_vec(&mut self.striped_bit_source, i << T::LOG_WIDTH),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, j << T::LOG_WIDTH),
+        ))
+    }
+}
+
+fn special_random_unsigned_vec_pair_gen_var_1_helper<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+    seed: Seed,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(UnsignedVecPairLenGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_unsigneds(
+            seed.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .map(|(x, y)| if x >= y { (x, y) } else { (y, x) }),
+        striped_bit_source: StripedBitSource::new(
+            seed.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
+//TODO will be used
+pub fn special_random_unsigned_vec_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    special_random_unsigned_vec_pair_gen_var_1_helper(config, EXAMPLE_SEED)
+}
+
+pub fn special_random_unsigned_vec_pair_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(UnsignedVecPairLenGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_positive_unsigneds(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .map(|(x, y)| if x >= y { (x, y) } else { (y, x) }),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
+pub fn special_random_unsigned_vec_pair_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(random_pairs_from_single(
+        striped_random_unsigned_vecs_min_length(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH << 1),
+            config.get_or("mean_stripe_d", 1),
+            1,
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+    ))
+}
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, T)> {
+    reshape_2_1_to_3(Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| special_random_unsigned_vec_pair_gen_var_1_helper(config, seed),
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    )))
+}
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
+
+struct UnsignedVecTripleXYYLenGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> {
+    phantom: PhantomData<*const T>,
+    lengths: I,
+    striped_bit_source: StripedBitSource,
+}
+
+impl<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> Iterator
+    for UnsignedVecTripleXYYLenGenerator<T, I>
+{
+    type Item = (Vec<T>, Vec<T>, Vec<T>);
+
+    fn next(&mut self) -> Option<(Vec<T>, Vec<T>, Vec<T>)> {
+        let (i, j) = self.lengths.next().unwrap();
+        let shifted_j = j << T::LOG_WIDTH;
+        Some((
+            get_striped_unsigned_vec(&mut self.striped_bit_source, i << T::LOG_WIDTH),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, shifted_j),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, shifted_j),
+        ))
+    }
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(UnsignedVecTripleXYYLenGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(|(x, y)| {
+            let y = y.checked_add(1)?;
+            let x = x.checked_add(y.arithmetic_checked_shl(1)?)?;
+            Some((x, y))
+        }),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
+// -- large types --
+
+pub fn special_random_large_type_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, T, T)> {
+    reshape_2_2_to_4(Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| special_random_unsigned_vec_pair_gen_var_1_helper(config, seed),
+        &|seed| {
+            random_pairs_from_single(striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ))
+        },
+    )))
 }

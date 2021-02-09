@@ -1,15 +1,23 @@
 use integer::Integer;
-use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::arithmetic::traits::{PowerOfTwo, UnsignedAbs};
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
     geometric_random_natural_signeds, geometric_random_negative_signeds,
-    geometric_random_nonzero_signeds, geometric_random_positive_signeds, geometric_random_signeds,
+    geometric_random_nonzero_signeds, geometric_random_positive_signeds,
+    geometric_random_signed_inclusive_range, geometric_random_signeds,
     GeometricRandomNaturalValues, GeometricRandomNegativeSigneds, GeometricRandomNonzeroSigneds,
-    GeometricRandomSigneds,
+    GeometricRandomSignedRange, GeometricRandomSigneds,
 };
 use malachite_base::num::random::striped::StripedBitSource;
 use malachite_base::num::random::{random_primitive_ints, RandomPrimitiveInts};
 use malachite_base::random::Seed;
-use natural::random::{get_random_natural_with_bits, get_striped_random_natural_with_bits};
+use natural::random::{
+    get_random_natural_with_bits, get_striped_random_natural_with_bits, random_naturals_less_than,
+    RandomNaturalsLessThan,
+};
+use natural::Natural;
 
 /// Generates random `Integer`s, given an iterator of random signed bit lengths.
 ///
@@ -708,5 +716,534 @@ pub fn striped_random_integers(
             mean_stripe_numerator,
             mean_stripe_denominator,
         ),
+    }
+}
+
+/// Uniformly generates random `Integer`s in an interval.
+#[derive(Clone, Debug)]
+pub struct UniformRandomIntegerRange {
+    xs: RandomNaturalsLessThan,
+    a: Integer,
+}
+
+impl Iterator for UniformRandomIntegerRange {
+    type Item = Integer;
+
+    fn next(&mut self) -> Option<Integer> {
+        self.xs.next().map(|x| &self.a + Integer::from(x))
+    }
+}
+
+/// Uniformly generates random `Integer`s in the half-open interval $[a, b)$.
+///
+/// `a` must be less than `b`.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     \frac{1}{b-a} & a \leq x < b \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ = `b.significant_bits()`.
+///
+/// # Panics
+///
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::uniform_random_integer_range;
+///
+/// assert_eq!(
+///     uniform_random_integer_range(
+///         EXAMPLE_SEED,
+///         Integer::from(-10),
+///         Integer::from(100)
+///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     &["77", "83", "-3", "95", "94", "97", "74", "17", "36", "83"]
+/// )
+/// ```
+pub fn uniform_random_integer_range(
+    seed: Seed,
+    a: Integer,
+    b: Integer,
+) -> UniformRandomIntegerRange {
+    assert!(a < b);
+    UniformRandomIntegerRange {
+        xs: random_naturals_less_than(seed, Natural::exact_from(b - &a)),
+        a,
+    }
+}
+
+/// Uniformly generates random `Integer`s in the closed interval $[a, b]$.
+///
+/// `a` must be less than or equal to `b`.
+///
+/// $$
+/// P(x) = \\begin{cases}
+///     \frac{1}{b-a+1} & a \leq x \leq b \\\\
+///     0 & \\text{otherwise}
+/// \\end{cases}
+/// $$
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ = `b.significant_bits()`.
+///
+/// # Panics
+///
+/// Panics if $a > b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::uniform_random_integer_inclusive_range;
+///
+/// assert_eq!(
+///     uniform_random_integer_inclusive_range(
+///         EXAMPLE_SEED,
+///         Integer::from(-10),
+///         Integer::from(100)
+///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     &["77", "83", "-3", "95", "94", "97", "74", "17", "36", "83"]
+/// )
+/// ```
+#[inline]
+pub fn uniform_random_integer_inclusive_range(
+    seed: Seed,
+    a: Integer,
+    b: Integer,
+) -> UniformRandomIntegerRange {
+    assert!(a <= b);
+    uniform_random_integer_range(seed, a, b + Integer::ONE)
+}
+
+fn signed_significant_bits(a: &Integer) -> (u64, i64) {
+    let unsigned_bits = a.significant_bits();
+    let bits = if *a >= 0 {
+        i64::exact_from(unsigned_bits)
+    } else {
+        -i64::exact_from(unsigned_bits)
+    };
+    (unsigned_bits, bits)
+}
+
+fn signed_min_bit_range(
+    seed: &Seed,
+    a: Integer,
+    unsigned_min_bits: u64,
+) -> UniformRandomIntegerRange {
+    if a >= 0 {
+        uniform_random_integer_range(
+            seed.fork("min_bit_xs"),
+            a,
+            Integer::power_of_two(unsigned_min_bits),
+        )
+    } else {
+        uniform_random_integer_inclusive_range(
+            seed.fork("min_bit_xs"),
+            a,
+            -Integer::power_of_two(unsigned_min_bits - 1),
+        )
+    }
+}
+
+fn signed_max_bit_range(
+    seed: &Seed,
+    a: Integer,
+    unsigned_max_bits: u64,
+) -> UniformRandomIntegerRange {
+    if a > 0 {
+        uniform_random_integer_inclusive_range(
+            seed.fork("max_bit_xs"),
+            Integer::power_of_two(unsigned_max_bits - 1),
+            a,
+        )
+    } else {
+        // also handles a == 0
+        uniform_random_integer_inclusive_range(
+            seed.fork("max_bit_xs"),
+            -Integer::power_of_two(unsigned_max_bits) + Integer::ONE,
+            a,
+        )
+    }
+}
+
+/// Generates random `Integer`s greater than or equal to a lower bound, or less than or equal to an
+/// upper bound.
+#[derive(Clone, Debug)]
+pub struct RandomIntegerRangeToInfinity {
+    boundary_bits: i64,
+    bits: GeometricRandomSignedRange<i64>,
+    limbs: RandomPrimitiveInts<u64>,
+    boundary_bit_xs: UniformRandomIntegerRange,
+}
+
+impl Iterator for RandomIntegerRangeToInfinity {
+    type Item = Integer;
+
+    fn next(&mut self) -> Option<Integer> {
+        let bits = self.bits.next().unwrap();
+        if bits == self.boundary_bits {
+            self.boundary_bit_xs.next()
+        } else {
+            Some(Integer::from_sign_and_abs(
+                bits >= 0,
+                get_random_natural_with_bits(&mut self.limbs, bits.unsigned_abs()),
+            ))
+        }
+    }
+}
+
+/// Generates random `Integer`s greater than or equal to a lower bound $a$.
+///
+/// A parameter $m$ is specified. As $\log (b/a)$ approaches infinity, $m$ approaches the mean bit
+/// length of the absolute values of the generated values; but the actual mean will always be lower
+/// than $m$. If $a > 0$, $m$ must be greater than the bit length of $a$; otherwise, $m$ must be
+/// positive. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
+/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a > 0$ and their ratio
+/// is less than or equal to the bit length of `a`, or if they are too large and manipulating them
+/// leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::random_integer_range_to_infinity;
+///
+/// assert_eq!(
+///     random_integer_range_to_infinity(EXAMPLE_SEED, Integer::from(-1000), 10, 1)
+///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     &["15542", "2", "1714", "27863518", "-162", "956", "8", "14648399", "-419", "-98"]
+/// )
+/// ```
+pub fn random_integer_range_to_infinity(
+    seed: Seed,
+    a: Integer,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerRangeToInfinity {
+    let (unsigned_min_bits, min_bits) = signed_significant_bits(&a);
+    RandomIntegerRangeToInfinity {
+        boundary_bits: min_bits,
+        bits: geometric_random_signed_inclusive_range(
+            seed.fork("bits"),
+            min_bits,
+            i64::MAX,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+        limbs: random_primitive_ints(seed.fork("limbs")),
+        boundary_bit_xs: signed_min_bit_range(&seed, a, unsigned_min_bits),
+    }
+}
+
+/// Generates random `Integer`s less than or equal to an upper bound $a$.
+///
+/// A parameter $m$ is specified. As $\log (b/a)$ approaches infinity, $m$ approaches the mean bit
+/// length of the absolute values of the generated values; but the actual mean will always be lower
+/// than $m$. If $a < 0$, $m$ must be greater than the bit length of $a$; otherwise, $m$ must be
+/// positive. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
+/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if $a < 0$ and their ratio
+/// is less than or equal to the bit length of `a`, or if they are too large and manipulating them
+/// leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::random_integer_range_to_negative_infinity;
+///
+/// assert_eq!(
+///     random_integer_range_to_negative_infinity(EXAMPLE_SEED, Integer::from(1000), 10, 1)
+///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     &[
+///         "6", "2", "-1714", "-235958584061012446", "-455842", "514", "-12", "-14936760", "335",
+///         "99"
+///     ]
+/// )
+/// ```
+pub fn random_integer_range_to_negative_infinity(
+    seed: Seed,
+    a: Integer,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerRangeToInfinity {
+    let (unsigned_max_bits, max_bits) = signed_significant_bits(&a);
+    RandomIntegerRangeToInfinity {
+        boundary_bits: max_bits,
+        bits: geometric_random_signed_inclusive_range(
+            seed.fork("bits"),
+            i64::MIN,
+            max_bits,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+        limbs: random_primitive_ints(seed.fork("limbs")),
+        boundary_bit_xs: signed_max_bit_range(&seed, a, unsigned_max_bits),
+    }
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub struct RandomIntegerRangeMultipleOrders {
+    min_bits: i64,
+    max_bits: i64,
+    bits: GeometricRandomSignedRange<i64>,
+    limbs: RandomPrimitiveInts<u64>,
+    min_bit_xs: UniformRandomIntegerRange,
+    max_bit_xs: UniformRandomIntegerRange,
+}
+
+impl Iterator for RandomIntegerRangeMultipleOrders {
+    type Item = Integer;
+
+    fn next(&mut self) -> Option<Integer> {
+        let bits = self.bits.next().unwrap();
+        if bits == self.min_bits {
+            self.min_bit_xs.next()
+        } else if bits == self.max_bits {
+            self.max_bit_xs.next()
+        } else {
+            Some(Integer::from_sign_and_abs(
+                bits >= 0,
+                get_random_natural_with_bits(&mut self.limbs, bits.unsigned_abs()),
+            ))
+        }
+    }
+}
+
+/// Generates random `Integer`s in an interval.
+#[derive(Clone, Debug)]
+#[allow(clippy::large_enum_variant)]
+pub enum RandomIntegerRange {
+    SingleOrder(UniformRandomIntegerRange),
+    MultipleOrders(RandomIntegerRangeMultipleOrders),
+}
+
+impl Iterator for RandomIntegerRange {
+    type Item = Integer;
+
+    fn next(&mut self) -> Option<Integer> {
+        match self {
+            RandomIntegerRange::SingleOrder(xs) => xs.next(),
+            RandomIntegerRange::MultipleOrders(xs) => xs.next(),
+        }
+    }
+}
+
+/// Generates random `Integer`s in the half-open interval $[a, b)$.
+///
+/// In general, the `Integer`s are not generated uniformly; for that, use
+/// `uniform_random_integer_range`. Instead, `Natural`s with smaller bit lengths are generated more
+/// frequently.
+///
+/// The distribution of generated values is parametrized by a number $m$, given by
+/// `mean_bits_numerator` / `mean_bits_denominator`. It is not actually the mean bit length, though
+/// it approaches the mean bit length of the values minus $a$ as $\log (b/a)$ approaches infinity.
+/// $m$ cannot be 0, and must be greater than the bit length of the smallest integer in the range,
+/// but it may be arbitrarily large. The smaller it is, the more quickly the probabilities decrease
+/// as bit length increases. The larger it is, the more closely the distribution approaches a
+/// uniform distribution over the bit lengths.
+///
+/// Once a bit length is selected, the `Integer` is chosen uniformly from all `Integer`s with that
+/// bit length that are in $[a, b)$.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
+/// `mean_bits_denominator`, and $m$ = `b.significant_bits()`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
+/// ratio is less than or equal to the bit length of the smallest integer in the range, or if they
+/// are too large and manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::random_integer_range;
+///
+/// assert_eq!(
+///     random_integer_range(
+///         EXAMPLE_SEED,
+///         Integer::from(-1000),
+///         Integer::from(1000000000),
+///         20,
+///         1
+///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     &["1", "1728664", "434", "-30", "5282", "515436476", "2353848", "-15", "19", "418"]
+/// )
+/// ```
+#[inline]
+pub fn random_integer_range(
+    seed: Seed,
+    a: Integer,
+    b: Integer,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerRange {
+    assert!(a < b);
+    random_integer_inclusive_range(
+        seed,
+        a,
+        b - Integer::ONE,
+        mean_bits_numerator,
+        mean_bits_denominator,
+    )
+}
+
+/// Generates random `Integer`s in the closed interval $[a, b]$.
+///
+/// In general, the `Integer`s are not generated uniformly; for that, use
+/// `uniform_random_integer_range`. Instead, `Natural`s with smaller bit lengths are generated more
+/// frequently.
+///
+/// The distribution of generated values is parametrized by a number $m$, given by
+/// `mean_bits_numerator` / `mean_bits_denominator`. It is not actually the mean bit length, though
+/// it approaches the mean bit length of the values minus $a$ as $\log (b/a)$ approaches infinity.
+/// $m$ cannot be 0, and must be greater than the bit length of the smallest integer in the range,
+/// but it may be arbitrarily large. The smaller it is, the more quickly the probabilities decrease
+/// as bit length increases. The larger it is, the more closely the distribution approaches a
+/// uniform distribution over the bit lengths.
+///
+/// Once a bit length is selected, the `Integer` is chosen uniformly from all `Integer`s with that
+/// bit length that are in $[a, b]$.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
+/// `mean_bits_denominator`, and $m$ = `b.significant_bits()`.
+///
+/// # Panics
+/// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
+/// ratio is less than or equal to the bit length of the smallest integer in the range, or if they
+/// are too large and manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::random_integer_inclusive_range;
+///
+/// assert_eq!(
+///     random_integer_inclusive_range(
+///         EXAMPLE_SEED,
+///         Integer::from(-1000),
+///         Integer::from(999999999),
+///         20,
+///         1
+///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     &["1", "1728664", "434", "-30", "5282", "515436476", "2353848", "-15", "19", "418"]
+/// )
+/// ```
+pub fn random_integer_inclusive_range(
+    seed: Seed,
+    a: Integer,
+    b: Integer,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> RandomIntegerRange {
+    assert!(a <= b);
+    let (unsigned_min_bits, min_bits) = signed_significant_bits(&a);
+    let (unsigned_max_bits, max_bits) = signed_significant_bits(&b);
+    if min_bits == max_bits {
+        RandomIntegerRange::SingleOrder(uniform_random_integer_inclusive_range(seed, a, b))
+    } else {
+        RandomIntegerRange::MultipleOrders(RandomIntegerRangeMultipleOrders {
+            min_bits,
+            max_bits,
+            bits: geometric_random_signed_inclusive_range(
+                seed.fork("bits"),
+                min_bits,
+                max_bits,
+                mean_bits_numerator,
+                mean_bits_denominator,
+            ),
+            limbs: random_primitive_ints(seed.fork("limbs")),
+            min_bit_xs: signed_min_bit_range(&seed, a, unsigned_min_bits),
+            max_bit_xs: signed_max_bit_range(&seed, b, unsigned_max_bits),
+        })
     }
 }

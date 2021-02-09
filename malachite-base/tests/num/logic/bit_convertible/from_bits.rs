@@ -1,9 +1,13 @@
+use itertools::repeat_n;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    bool_vec_gen_var_1, bool_vec_gen_var_2, bool_vec_gen_var_3, bool_vec_gen_var_4,
+    unsigned_gen_var_5,
+};
 use malachite_base_test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_asc_signed_naive, from_bits_asc_unsigned_naive, from_bits_desc_alt,
 };
-
-use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use std::iter::{once, repeat};
 use std::panic::catch_unwind;
 
@@ -171,4 +175,92 @@ fn from_bits_desc_fail_helper_signed<T: PrimitiveSigned>() {
 fn from_bits_desc_fail() {
     apply_fn_to_unsigneds!(from_bits_desc_fail_helper_unsigned);
     apply_fn_to_signeds!(from_bits_desc_fail_helper_signed);
+}
+
+fn from_bits_asc_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    bool_vec_gen_var_1::<T>().test_properties(|bs| {
+        let n = T::from_bits_asc(bs.iter().cloned());
+        assert_eq!(from_bits_asc_unsigned_naive::<T, _>(bs.iter().cloned()), n);
+        assert_eq!(from_bits_asc_alt::<T, _>(bs.iter().cloned()), n);
+        let trailing_falses = bs.iter().rev().take_while(|&&bit| !bit).count();
+        let trimmed_bits = bs[..bs.len() - trailing_falses].to_vec();
+        assert_eq!(n.to_bits_asc(), trimmed_bits);
+    });
+
+    unsigned_gen_var_5().test_properties(|u| {
+        assert_eq!(T::from_bits_desc(repeat_n(false, u)), T::ZERO);
+    });
+}
+
+fn from_bits_asc_properties_helper_signed<T: PrimitiveSigned>() {
+    bool_vec_gen_var_2::<T>().test_properties(|bs| {
+        let n = T::from_bits_asc(bs.iter().cloned());
+        assert_eq!(from_bits_asc_signed_naive::<T, _>(bs.iter().cloned()), n);
+        assert_eq!(from_bits_asc_alt::<T, _>(bs.iter().cloned()), n);
+        let trimmed_bits = if bs.iter().all(|&bit| !bit) {
+            Vec::new()
+        } else {
+            let sign_bits = if *bs.last().unwrap() {
+                bs.iter().rev().take_while(|&&bit| bit).count()
+            } else {
+                bs.iter().rev().take_while(|&&bit| !bit).count()
+            };
+            bs[..bs.len() - sign_bits + 1].to_vec()
+        };
+        assert_eq!(n.to_bits_asc(), trimmed_bits);
+    });
+
+    unsigned_gen_var_5().test_properties(|u| {
+        assert_eq!(T::from_bits_asc(repeat_n(false, u)), T::ZERO);
+        assert_eq!(T::from_bits_asc(repeat_n(true, u + 1)), T::NEGATIVE_ONE);
+    });
+}
+
+#[test]
+fn from_bits_asc_properties() {
+    apply_fn_to_unsigneds!(from_bits_asc_properties_helper_unsigned);
+    apply_fn_to_signeds!(from_bits_asc_properties_helper_signed);
+}
+
+fn from_bits_desc_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    bool_vec_gen_var_3::<T>().test_properties(|bs| {
+        let n = T::from_bits_desc(bs.iter().cloned());
+        assert_eq!(from_bits_desc_alt::<T, _>(bs.iter().cloned()), n);
+        let leading_falses = bs.iter().take_while(|&&bit| !bit).count();
+        let trimmed_bits = bs[leading_falses..].to_vec();
+        assert_eq!(n.to_bits_desc(), trimmed_bits);
+    });
+
+    unsigned_gen_var_5().test_properties(|u| {
+        assert_eq!(T::from_bits_desc(repeat_n(false, u)), T::ZERO);
+    });
+}
+
+fn from_bits_desc_properties_helper_signed<T: PrimitiveSigned>() {
+    bool_vec_gen_var_4::<T>().test_properties(|bs| {
+        let n = T::from_bits_desc(bs.iter().cloned());
+        assert_eq!(from_bits_desc_alt::<T, _>(bs.iter().cloned()), n);
+        let trimmed_bits = if bs.iter().all(|&bit| !bit) {
+            Vec::new()
+        } else {
+            let sign_bits = if bs[0] {
+                bs.iter().take_while(|&&bit| bit).count()
+            } else {
+                bs.iter().take_while(|&&bit| !bit).count()
+            };
+            bs[sign_bits - 1..].to_vec()
+        };
+        assert_eq!(n.to_bits_desc(), trimmed_bits);
+    });
+
+    unsigned_gen_var_5().test_properties(|u| {
+        assert_eq!(T::from_bits_desc(repeat_n(false, u)), T::ZERO);
+        assert_eq!(T::from_bits_desc(repeat_n(true, u + 1)), T::NEGATIVE_ONE);
+    });
+}
+
+#[test]
+fn from_bits_desc_properties() {
+    apply_fn_to_unsigneds!(from_bits_desc_properties_helper_unsigned);
+    apply_fn_to_signeds!(from_bits_desc_properties_helper_signed);
 }

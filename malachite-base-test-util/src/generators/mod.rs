@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{SaturatingFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
@@ -258,6 +258,17 @@ pub fn signed_unsigned_pair_gen_var_4<T: PrimitiveSigned>() -> Generator<(T, u64
     )
 }
 
+// All `(T, U)`s where `T` is signed, `U` is unsigned, and the `U` is greater than 1 and no greater
+// than 36.
+pub fn signed_unsigned_pair_gen_var_5<T: PrimitiveSigned, U: ExactFrom<u8> + PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen_var_6,
+        &random_primitive_int_unsigned_pair_gen_var_5,
+        &special_random_signed_unsigned_pair_gen_var_5,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
 
 // All (`T`, `u64`, and `bool`) where `T` is signed and either the `u64` is smaller than `T::WIDTH`
@@ -309,6 +320,19 @@ pub fn signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
         &exhaustive_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1,
         &random_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1,
         &special_random_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// -- (PrimitiveSigned, Vec<bool>) --
+
+// All `(T, Vec<bool>)` where `T` is signed and the `Vec` has as many elements as
+// `u64::exact_from(n.to_bits_asc().len())` (which is not necessarily the same as the number of
+// significant bits).
+pub fn signed_bool_vec_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(T, Vec<bool>)> {
+    Generator::new(
+        &exhaustive_signed_bool_vec_pair_gen_var_1,
+        &random_signed_bool_vec_pair_gen_var_1,
+        &special_random_signed_bool_vec_pair_gen_var_1,
     )
 }
 
@@ -369,6 +393,22 @@ pub fn unsigned_gen_var_6<T: PrimitiveUnsigned>() -> Generator<T> {
     )
 }
 
+// All unsigned `T`s less than 36.
+pub fn unsigned_gen_var_7<T: PrimitiveUnsigned>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_gen_var_3,
+        &random_unsigned_gen_var_7,
+    )
+}
+
+// All unsigned `T`s greater than or equal to 2 and less than or equal to 36.
+pub fn unsigned_gen_var_8<T: PrimitiveUnsigned>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_gen_var_4,
+        &random_unsigned_gen_var_8,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
@@ -424,7 +464,8 @@ pub fn unsigned_pair_gen_var_5<T: PrimitiveUnsigned, U: PrimitiveInt>() -> Gener
     )
 }
 
-// All `(T, U)`s where `T` is unsigned and the `U` is greater than 1 and no greater than `T::MAX`.
+// All `(T, U)`s where `T` and `U` are unsigned and the `U` is greater than 1 and no greater than
+// `T::MAX`.
 pub fn unsigned_pair_gen_var_6<T: PrimitiveUnsigned, U: PrimitiveUnsigned + SaturatingFrom<T>>(
 ) -> Generator<(T, U)> {
     Generator::new(
@@ -440,6 +481,17 @@ pub fn unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
         &exhaustive_unsigned_pair_gen_var_6,
         &random_primitive_int_pair_gen_var_1,
         &special_random_unsigned_pair_gen_var_5,
+    )
+}
+
+// All `(T, U)`s where `T` and `U` are unsigned and the `U` is greater than 1 and no greater than
+// 36.
+pub fn unsigned_pair_gen_var_8<T: PrimitiveUnsigned, U: ExactFrom<u8> + PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_7,
+        &random_primitive_int_unsigned_pair_gen_var_5,
+        &special_random_unsigned_pair_gen_var_6,
     )
 }
 
@@ -543,6 +595,18 @@ pub fn unsigned_unsigned_bool_vec_triple_gen_var_1<T: PrimitiveUnsigned, U: Prim
     )
 }
 
+// -- (PrimitiveUnsigned, Vec<bool>) --
+
+// All `(T, Vec<bool>)` where `T` is unsigned and the `Vec` has as many elements as the `T` has
+// significant bits.
+pub fn unsigned_bool_vec_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, Vec<bool>)> {
+    Generator::new(
+        &exhaustive_unsigned_bool_vec_pair_gen_var_1,
+        &random_unsigned_bool_vec_pair_gen_var_1,
+        &special_random_unsigned_bool_vec_pair_gen_var_1,
+    )
+}
+
 // -- RoundingMode --
 
 pub fn rounding_mode_gen() -> Generator<RoundingMode> {
@@ -611,6 +675,48 @@ pub fn string_pair_gen_var_1() -> Generator<(String, String)> {
     )
 }
 
+// -- Vec<bool> --
+
+// All `Vec<bool>`s that could be the bits, in ascending order, of an unsigned value of type `T`.
+// The `Vec`s may be arbitrarily long.
+pub fn bool_vec_gen_var_1<T: PrimitiveUnsigned>() -> Generator<Vec<bool>> {
+    Generator::new(
+        &exhaustive_bool_vec_gen_var_1::<T>,
+        &random_bool_vec_gen_var_1::<T>,
+        &special_random_bool_vec_gen_var_1::<T>,
+    )
+}
+
+// All `Vec<bool>`s that could be the bits, in ascending order, of a signed value of type `T`. The
+// `Vec`s may be arbitrarily long.
+pub fn bool_vec_gen_var_2<T: PrimitiveSigned>() -> Generator<Vec<bool>> {
+    Generator::new(
+        &exhaustive_bool_vec_gen_var_2::<T>,
+        &random_bool_vec_gen_var_2::<T>,
+        &special_random_bool_vec_gen_var_2::<T>,
+    )
+}
+
+// All `Vec<bool>`s that could be the bits, in descending order, of an unsigned value of type `T`.
+// The `Vec`s may be arbitrarily long.
+pub fn bool_vec_gen_var_3<T: PrimitiveUnsigned>() -> Generator<Vec<bool>> {
+    Generator::new(
+        &exhaustive_bool_vec_gen_var_3::<T>,
+        &random_bool_vec_gen_var_3::<T>,
+        &special_random_bool_vec_gen_var_3::<T>,
+    )
+}
+
+// All `Vec<bool>`s that could be the bits, in descending order, of a signed value of type `T`. The
+// `Vec`s may be arbitrarily long.
+pub fn bool_vec_gen_var_4<T: PrimitiveSigned>() -> Generator<Vec<bool>> {
+    Generator::new(
+        &exhaustive_bool_vec_gen_var_4::<T>,
+        &random_bool_vec_gen_var_4::<T>,
+        &special_random_bool_vec_gen_var_4::<T>,
+    )
+}
+
 // -- Vec<PrimitiveUnsigned> --
 
 pub fn unsigned_vec_gen<T: PrimitiveUnsigned>() -> Generator<Vec<T>> {
@@ -666,6 +772,16 @@ pub fn unsigned_vec_unsigned_pair_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUn
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
+type T1<T> = Generator<(Vec<T>, T, T)>;
+
+pub fn unsigned_vec_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -> T1<T> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen,
+        &random_primitive_int_vec_primitive_int_primitive_int_triple_gen,
+        &special_random_unsigned_vec_unsigned_unsigned_triple_gen,
+    )
+}
+
 // All `(Vec<T>, U, V)` where `T`, `U`, and `V` are unsigned and the `U` is small.
 pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_1<
     T: PrimitiveUnsigned,
@@ -687,6 +803,63 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_2,
         &random_primitive_int_vec_unsigned_unsigned_triple_gen_var_1,
         &special_random_primitive_int_vec_unsigned_unsigned_triple_gen_var_1,
+    )
+}
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
+
+// All `(Vec<T>, Vec<T>)` where `T` is unsigned, both `Vec`s are nonempty, and the first `Vec` is at
+// least as large as the second,
+pub fn unsigned_vec_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_pair_gen_var_2,
+        &random_primitive_int_vec_pair_gen_var_2,
+        &special_random_unsigned_vec_pair_gen_var_2,
+    )
+}
+
+// All `(Vec<T>, Vec<T>)` where `T` is unsigned and both `Vec`s are nonempty.
+pub fn unsigned_vec_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_pair_gen_var_3,
+        &random_primitive_int_vec_pair_gen_var_3,
+        &special_random_unsigned_vec_pair_gen_var_3,
+    )
+}
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+// All `(Vec<T>, Vec<T>, T)` where `T` is unsigned and the first `Vec` is at least as long as the
+// second.
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(Vec<T>, Vec<T>, T)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+        &random_primitive_int_vec_primitive_int_vec_primitive_int_triple_gen_var_1,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+    )
+}
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` where `T` is unsigned, no `Vec` is empty, the second and third
+// `Vec`s have equal length, and the first is at least twice as long as the second.
+pub fn unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_1,
+        &random_primitive_int_vec_triple_gen_var_1,
+        &special_random_unsigned_vec_triple_gen_var_1,
+    )
+}
+
+// -- large types --
+
+pub fn large_type_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, T, T)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_1,
+        &random_large_type_gen_var_1,
+        &special_random_large_type_gen_var_1,
     )
 }
 

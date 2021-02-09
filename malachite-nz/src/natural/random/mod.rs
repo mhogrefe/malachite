@@ -677,7 +677,7 @@ pub fn uniform_random_natural_inclusive_range(
     uniform_random_natural_range(seed, a, b + Natural::ONE)
 }
 
-/// Generates random positive `Natural`s greater than or equal to a lower bound.
+/// Generates random `Natural`s greater than or equal to a lower bound.
 #[derive(Clone, Debug)]
 pub struct RandomNaturalRangeToInfinity {
     min_bits: u64,
@@ -733,7 +733,7 @@ impl Iterator for RandomNaturalRangeToInfinity {
 ///
 /// # Panics
 /// Panics if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their ratio is less than
-/// or equal to `a`, or, if they are too large and manipulating them leads to arithmetic overflow.
+/// or equal to `a`, or if they are too large and manipulating them leads to arithmetic overflow.
 ///
 /// # Examples
 /// ```
@@ -855,7 +855,7 @@ impl Iterator for RandomNaturalRange {
 ///
 /// # Panics
 /// Panics if $a \geq b$, if `mean_bits_numerator` or `mean_bits_denominator` are zero, if their
-/// ratio is less than or equal to `a`, or, if they are too large and manipulating them leads to
+/// ratio is less than or equal to `a`, or if they are too large and manipulating them leads to
 /// arithmetic overflow.
 ///
 /// # Examples

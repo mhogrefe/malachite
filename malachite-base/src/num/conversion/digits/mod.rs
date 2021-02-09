@@ -40,14 +40,14 @@ pub mod general_digits;
 ///
 /// // 107 = 1101011b
 /// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
-/// assert_eq!(digits.collect_vec(), vec![3, 2, 2, 1]);
+/// assert_eq!(digits.collect_vec(), &[3, 2, 2, 1]);
 ///
 /// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(0u8, 2);
 /// assert!(digits.next_back().is_none());
 ///
 /// // 107 = 1101011b
 /// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
-/// assert_eq!(digits.rev().collect_vec(), vec![1, 2, 2, 3]);
+/// assert_eq!(digits.rev().collect_vec(), &[1, 2, 2, 3]);
 /// ```
 pub mod power_of_two_digit_iterable;
 /// This module provides traits for extracting digits from numbers and constructing numbers from

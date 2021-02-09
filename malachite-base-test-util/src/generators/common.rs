@@ -148,3 +148,10 @@ pub fn reshape_2_1_to_3<A: 'static, B: 'static, C: 'static>(
 ) -> Box<dyn Iterator<Item = (A, B, C)>> {
     Box::new(it.map(|((a, b), c)| (a, b, c)))
 }
+
+#[allow(clippy::type_complexity)]
+pub fn reshape_2_2_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
+    it: Box<dyn Iterator<Item = ((A, B), (C, D))>>,
+) -> Box<dyn Iterator<Item = (A, B, C, D)>> {
+    Box::new(it.map(|((a, b), (c, d))| (a, b, c, d)))
+}

@@ -26,28 +26,19 @@ macro_rules! impl_bit_scan_unsigned {
     ($t:ident) => {
         impl BitScan for $t {
             /// Finds the smallest index of a `false` bit that is greater than or equal to
-            /// `starting_index`. Since `$t` is unsigned and therefore has an implicit prefix of
-            /// infinitely-many zeros, this function always returns a value.
+            /// `starting_index`.
+            ///
+            /// Since `$t` is unsigned and therefore has an implicit prefix of infinitely-many
+            /// zeros, this function always returns a value.
             ///
             /// Starting beyond the type's width is allowed; the result will be the starting index.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitScan;
-            ///
-            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(0), Some(0));
-            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(20), Some(20));
-            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(31), Some(31));
-            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(32), Some(34));
-            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(33), Some(34));
-            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(34), Some(34));
-            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(35), Some(36));
-            /// assert_eq!(0xb00000000u64.index_of_next_false_bit(100), Some(100));
-            /// ```
+            /// See the documentation of the `num::logic::bit_scan` module.
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
                 _index_of_next_false_bit_unsigned(self, start)
@@ -59,24 +50,12 @@ macro_rules! impl_bit_scan_unsigned {
             /// If the starting index is greater than or equal to the type's width, the result will
             /// be `None` since there are no `true` bits past that point.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitScan;
-            ///
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(0), Some(32));
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(20), Some(32));
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(31), Some(32));
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(32), Some(32));
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(33), Some(33));
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(34), Some(35));
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(35), Some(35));
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(36), None);
-            /// assert_eq!(0xb00000000u64.index_of_next_true_bit(100), None);
-            /// ```
+            /// See the documentation of the `num::logic::bit_scan` module.
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
                 _index_of_next_true_bit_unsigned(self, start)
@@ -130,23 +109,12 @@ macro_rules! impl_bit_scan_signed {
             /// width, the result will be `None` since there are no `false` bits past that point. If
             /// the input is non-negative, the result will be the starting index.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitScan;
-            ///
-            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(0), Some(0));
-            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(20), Some(20));
-            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(31), Some(31));
-            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(32), Some(34));
-            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(33), Some(34));
-            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(34), Some(34));
-            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(35), None);
-            /// assert_eq!((-0x500000000i64).index_of_next_false_bit(100), None);
-            /// ```
+            /// See the documentation of the `num::logic::bit_scan` module.
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
                 _index_of_next_false_bit_signed(self, start)
@@ -159,24 +127,12 @@ macro_rules! impl_bit_scan_signed {
             /// type's width, the result will be `None` since there are no `true` bits past that
             /// point. If the input is negative, the result will be the starting index.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::BitScan;
-            ///
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(0), Some(32));
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(20), Some(32));
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(31), Some(32));
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(32), Some(32));
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(33), Some(33));
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(34), Some(35));
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(35), Some(35));
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(36), Some(36));
-            /// assert_eq!((-0x500000000i64).index_of_next_true_bit(100), Some(100));
-            /// ```
+            /// See the documentation of the `num::logic::bit_scan` module.
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
                 _index_of_next_true_bit_signed(self, start)

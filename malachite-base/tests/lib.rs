@@ -296,6 +296,9 @@ pub mod num {
             pub mod vec_from_other_type;
             pub mod vec_from_other_type_slice;
         }
+        pub mod string {
+            pub mod to_string;
+        }
     }
     pub mod exhaustive {
         pub mod exhaustive_natural_signeds;
@@ -465,6 +468,9 @@ pub mod strings {
     pub mod strings_from_char_vecs;
     pub mod to_binary_string;
     pub mod to_debug_string;
+    pub mod to_lower_hex_string;
+    pub mod to_octal_string;
+    pub mod to_upper_hex_string;
 }
 pub mod tuples {
     pub mod exhaustive {

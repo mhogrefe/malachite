@@ -143,6 +143,10 @@ pub mod integer {
         pub mod xor;
     }
     pub mod random {
+        pub mod random_integer_inclusive_range;
+        pub mod random_integer_range;
+        pub mod random_integer_range_to_infinity;
+        pub mod random_integer_range_to_negative_infinity;
         pub mod random_integers;
         pub mod random_natural_integers;
         pub mod random_negative_integers;
@@ -153,6 +157,8 @@ pub mod integer {
         pub mod striped_random_negative_integers;
         pub mod striped_random_nonzero_integers;
         pub mod striped_random_positive_integers;
+        pub mod uniform_random_integer_inclusive_range;
+        pub mod uniform_random_integer_range;
     }
 }
 pub mod natural {

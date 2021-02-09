@@ -1,6 +1,6 @@
-/// This module provides traits for working with the digits of numbers.
+/// This module provides trait implementations for working with the digits of numbers.
 pub mod digits;
-/// This module provides traits for converting between different number types.
+/// This module provides trait implementations for converting between different number types.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -148,14 +148,14 @@ pub mod half;
 /// ```
 /// use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
 ///
-/// assert_eq!(u32::vec_from_other_type_slice(&[123u32, 456]), vec![123, 456]);
+/// assert_eq!(u32::vec_from_other_type_slice(&[123u32, 456]), &[123, 456]);
 /// assert_eq!(
 ///     u8::vec_from_other_type_slice(&[0xcdabu16, 0x01ef, 0x4523, 0x8967]),
-///     vec![0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89]
+///     &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89]
 /// );
 /// assert_eq!(
 ///     u16::vec_from_other_type_slice(&[0xabu8, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67]),
-///     vec![0xcdab, 0x01ef, 0x4523, 0x67]
+///     &[0xcdab, 0x01ef, 0x4523, 0x67]
 /// );
 /// ```
 ///
@@ -163,10 +163,12 @@ pub mod half;
 /// ```
 /// use malachite_base::num::conversion::traits::VecFromOtherType;
 ///
-/// assert_eq!(u32::vec_from_other_type(123u32), vec![123]);
-/// assert_eq!(u8::vec_from_other_type(0xcdabu16), vec![0xab, 0xcd]);
-/// assert_eq!(u16::vec_from_other_type(0xabu8), vec![0xab]);
+/// assert_eq!(u32::vec_from_other_type(123u32), &[123]);
+/// assert_eq!(u8::vec_from_other_type(0xcdabu16), &[0xab, 0xcd]);
+/// assert_eq!(u16::vec_from_other_type(0xabu8), &[0xab]);
 /// ```
 pub mod slice;
+/// This module provides trait implementations for converting numbers to and from `String`s.
+pub mod string;
 /// This module defines various traits for converting numbers.
 pub mod traits;

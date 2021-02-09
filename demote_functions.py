@@ -3,27 +3,27 @@ import subprocess
 
 def try_building(include_rust_wheels):
     try:
-        subprocess.check_call(['cargo', 'check', '--all'], cwd = 'malachite-base-test-util')
+        subprocess.check_call(['cargo', 'check', '--all-targets'], cwd = 'malachite-base-test-util')
     except subprocess.CalledProcessError:
         return False
     try:
-        subprocess.check_call(['cargo', 'check', '--all'], cwd = 'malachite-nz-test-util')
+        subprocess.check_call(['cargo', 'check', '--all-targets'], cwd = 'malachite-nz-test-util')
     except subprocess.CalledProcessError:
         return False
     try:
-        subprocess.check_call(['cargo', 'check', '--all', '--features', '32_bit_limbs'], cwd = 'malachite-nz-test-util')
+        subprocess.check_call(['cargo', 'check', '--all-targets', '--features', '32_bit_limbs'], cwd = 'malachite-nz-test-util')
     except subprocess.CalledProcessError:
         return False
     try:
-        subprocess.check_call(['cargo', 'check', '--all'], cwd = 'malachite-base')
+        subprocess.check_call(['cargo', 'check', '--all-targets'], cwd = 'malachite-base')
     except subprocess.CalledProcessError:
         return False
     try:
-        subprocess.check_call(['cargo', 'check', '--all'], cwd = 'malachite-nz')
+        subprocess.check_call(['cargo', 'check', '--all-targets', '--features', 'serde'], cwd = 'malachite-nz')
     except subprocess.CalledProcessError:
         return False
     try:
-        subprocess.check_call(['cargo', 'check', '--all', '--features', '32_bit_limbs'], cwd = 'malachite-nz')
+        subprocess.check_call(['cargo', 'check', '--all-targets', '--features', '32_bit_limbs', '--features', 'serde'], cwd = 'malachite-nz')
     except subprocess.CalledProcessError:
         return False
     try:

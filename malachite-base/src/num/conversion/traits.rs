@@ -1,6 +1,5 @@
-use std::num::ParseIntError;
-
 use rounding_modes::RoundingMode;
+use std::num::ParseIntError;
 
 /// This trait defines a conversion from another type. If the conversion fails, `None` is returned.
 ///
@@ -155,6 +154,13 @@ impl<T, U: RoundingFrom<T>> RoundingInto<U> for T {
 /// `CheckedFrom` for `T` as well.
 pub trait ConvertibleFrom<T> {
     fn convertible_from(value: T) -> bool;
+}
+
+//TODO
+pub trait ToStringBase {
+    fn to_string_base(&self, base: u64) -> String;
+
+    fn to_string_base_upper(&self, base: u64) -> String;
 }
 
 //TODO

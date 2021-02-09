@@ -34,7 +34,7 @@ use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use num::conversion::traits::{
     CheckedFrom, CheckedInto, ExactFrom, ExactInto, OverflowingFrom, OverflowingInto,
-    SaturatingFrom, SaturatingInto, WrappingFrom, WrappingInto,
+    SaturatingFrom, SaturatingInto, ToStringBase, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
@@ -168,6 +168,7 @@ pub trait PrimitiveInt:
     + ExactInto<isize>
     + FromStr
     + Hash
+    + HasRandomPrimitiveInts
     + Iverson
     + LeadingZeros
     + LowerHex
@@ -375,7 +376,7 @@ pub trait PrimitiveInt:
     + SubMul<Self, Self, Output = Self>
     + SubMulAssign<Self, Self>
     + Sum<Self>
-    + HasRandomPrimitiveInts
+    + ToStringBase
     + TrailingZeros
     + Two
     + UpperHex

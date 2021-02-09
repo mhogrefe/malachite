@@ -8,17 +8,17 @@ use malachite_base_test_util::generators::unsigned_pair_gen;
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_x_mul_y_is_zz);
-    register_unsigned_benches!(runner, benchmark_unsigned_x_mul_y_is_zz_algorithms);
+    register_unsigned_demos!(runner, demo_x_mul_y_is_zz);
+    register_unsigned_benches!(runner, benchmark_x_mul_y_is_zz_algorithms);
 }
 
-fn demo_unsigned_x_mul_y_is_zz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_x_mul_y_is_zz<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in unsigned_pair_gen::<T>().get(gm, &config).take(limit) {
         println!("{} * {} = {:?}", x, y, T::x_mul_y_is_zz(x, y));
     }
 }
 
-fn benchmark_unsigned_x_mul_y_is_zz_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_x_mul_y_is_zz_algorithms<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

@@ -152,15 +152,15 @@ where
 
 pub fn pair_1_bit_bucketer<T: Copy + SignificantBits, U>(x_name: &str) -> Bucketer<(T, U)> {
     Bucketer {
-        bucketing_function: &(|&(x, _)| usize::exact_from(x.significant_bits())),
-        bucketing_label: format!("{}.significant_bits", x_name),
+        bucketing_function: &|&(x, _)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", x_name),
     }
 }
 
 pub fn triple_1_bit_bucketer<T: Copy + SignificantBits, U, V>(x_name: &str) -> Bucketer<(T, U, V)> {
     Bucketer {
         bucketing_function: &|&(x, _, _)| usize::exact_from(x.significant_bits()),
-        bucketing_label: format!("{}.significant_bits", x_name),
+        bucketing_label: format!("{}.significant_bits()", x_name),
     }
 }
 
@@ -185,10 +185,34 @@ pub fn triple_3_vec_len_bucketer<T, U, V>(xs_name: &str) -> Bucketer<(T, U, Vec<
     }
 }
 
+pub fn triple_2_vec_len_bucketer<T, U, V>(xs_name: &str) -> Bucketer<(T, Vec<U>, V)> {
+    Bucketer {
+        bucketing_function: &|&(_, ref xs, _)| xs.len(),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
+pub fn quadruple_2_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, Vec<U>, V, W)> {
+    Bucketer {
+        bucketing_function: &|&(_, ref xs, _, _)| xs.len(),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
 pub fn quadruple_3_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, U, Vec<V>, W)> {
     Bucketer {
         bucketing_function: &|&(_, _, ref xs, _)| xs.len(),
         bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
+pub fn pair_sum_vec_len_bucketer<'a, T, U>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (Vec<T>, Vec<U>)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys)| xs.len() + ys.len(),
+        bucketing_label: format!("{}.len() + {}.len()", xs_name, ys_name),
     }
 }
 

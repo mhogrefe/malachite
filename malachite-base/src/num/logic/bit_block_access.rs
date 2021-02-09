@@ -68,7 +68,7 @@ macro_rules! impl_bit_block_access_unsigned {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self {
                 _get_bits_unsigned(self, start, end)
@@ -114,7 +114,7 @@ macro_rules! impl_bit_block_access_unsigned {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
                 _assign_bits_unsigned(self, start, end, bits)
@@ -223,7 +223,7 @@ macro_rules! impl_bit_block_access_signed {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self::Bits {
                 _get_bits_signed(self, start, end)
@@ -292,7 +292,7 @@ macro_rules! impl_bit_block_access_signed {
             ///
             /// # Examples
             ///
-            /// See the documentation of the `num::logic::bit_access` module.
+            /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
                 _assign_bits_signed(self, start, end, bits)

@@ -8,7 +8,11 @@ use rug;
 
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen;
+use malachite_base_test_util::generators::{
+    large_type_gen_var_1, unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_2,
+    unsigned_vec_triple_gen_var_1, unsigned_vec_unsigned_pair_gen,
+    unsigned_vec_unsigned_unsigned_triple_gen, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+};
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::fft::{
@@ -16,13 +20,12 @@ use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_fft_normalize_mod_f,
 };
 use malachite_nz::natural::arithmetic::mul::limb::{
-    limbs_mul_limb, limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
+    limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
+    limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
+    limbs_vec_mul_limb_in_place,
 };
 #[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::mul::limb::{
-    limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
-    limbs_slice_mul_limb_with_carry_in_place,
-};
+use malachite_nz::natural::arithmetic::mul::limbs_mul_to_out;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::mul_low::{
     _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
@@ -50,11 +53,8 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out,
-};
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::mul::{
-    limbs_mul, limbs_mul_greater, limbs_mul_same_length_to_out, limbs_mul_to_out,
+    _limbs_mul_greater_to_out_basecase, limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out,
+    limbs_mul_same_length_to_out,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -109,12 +109,6 @@ fn limbs_vec_mul_limb_in_place_properties() {
     });
 }
 
-//TODO limbs_mul_limb_with_carry_to_out
-
-//TODO demo_limbs_mul_limb_to_out
-
-//TODO demo_limbs_slice_mul_limb_with_carry_in_place
-
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_limb_with_carry_to_out() {
@@ -147,6 +141,27 @@ fn test_limbs_mul_limb_with_carry_to_out() {
 #[should_panic]
 fn limbs_mul_limb_with_carry_to_out_fail() {
     limbs_mul_limb_with_carry_to_out(&mut [10], &[10, 10], 10, 2);
+}
+
+#[test]
+fn limbs_mul_limb_with_carry_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    large_type_gen_var_1().test_properties_with_config(&config, |(mut out, xs, y, carry)| {
+        let old_out = out.clone();
+        let carry_out = limbs_mul_limb_with_carry_to_out(&mut out, &xs, y, carry);
+        let len = xs.len();
+        let n = Natural::from_owned_limbs_asc(xs) * Natural::from(y) + Natural::from(carry);
+        let mut xs_out = n.into_limbs_asc();
+        assert_eq!(carry_out != 0, xs_out.len() == len + 1);
+        if carry_out != 0 {
+            assert_eq!(*xs_out.last().unwrap(), carry_out);
+        }
+        xs_out.resize(len, 0);
+        assert_eq!(xs_out, &out[..len]);
+        assert_eq!(&out[len..], &old_out[len..]);
+    });
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -204,6 +219,30 @@ fn limbs_mul_limb_to_out_fail() {
     limbs_mul_limb_to_out(&mut [10], &[10, 10], 10);
 }
 
+#[test]
+fn limbs_mul_limb_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1().test_properties_with_config(
+        &config,
+        |(mut out, xs, y)| {
+            let old_out = out.clone();
+            let carry = limbs_mul_limb_to_out(&mut out, &xs, y);
+            let len = xs.len();
+            let n = Natural::from_owned_limbs_asc(xs) * Natural::from(y);
+            let mut limbs = n.into_limbs_asc();
+            assert_eq!(carry != 0, limbs.len() == len + 1);
+            if carry != 0 {
+                assert_eq!(*limbs.last().unwrap(), carry);
+            }
+            limbs.resize(len, 0);
+            assert_eq!(limbs, &out[..len]);
+            assert_eq!(&out[len..], &old_out[len..]);
+        },
+    );
+}
+
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul_limb_with_carry_in_place() {
@@ -217,6 +256,27 @@ fn test_limbs_mul_limb_with_carry_in_place() {
     };
     test(&[123, 456], 789, 10, 0, &[97057, 359784]);
     test(&[u32::MAX], 2, 3, 2, &[1]);
+}
+
+#[test]
+fn limbs_slice_mul_limb_with_carry_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_unsigned_triple_gen().test_properties_with_config(
+        &config,
+        |(mut xs, y, carry)| {
+            let n = Natural::from_limbs_asc(&xs) * Natural::from(y) + Natural::from(carry);
+            let carry_out = limbs_slice_mul_limb_with_carry_in_place(&mut xs, y, carry);
+            let mut expected_limbs = n.into_limbs_asc();
+            assert_eq!(carry_out != 0, expected_limbs.len() == xs.len() + 1);
+            if carry_out != 0 {
+                assert_eq!(*expected_limbs.last().unwrap(), carry_out);
+            }
+            expected_limbs.resize(xs.len(), 0);
+            assert_eq!(xs, expected_limbs);
+        },
+    );
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -293,6 +353,25 @@ fn test_limbs_mul_greater_fail_2() {
     limbs_mul_greater(&[6, 7], &[]);
 }
 
+fn limbs_mul_helper(f: &dyn Fn(&[Limb], &[Limb]) -> Vec<Limb>, xs: Vec<Limb>, ys: Vec<Limb>) {
+    let result = f(&xs, &ys);
+    assert_eq!(result.len(), xs.len() + ys.len());
+    assert_eq!(
+        Natural::from_owned_limbs_asc(result),
+        Natural::from_owned_limbs_asc(xs) * Natural::from_owned_limbs_asc(ys)
+    );
+}
+
+#[test]
+fn limbs_mul_greater_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_1().test_properties_with_config(&config, |(xs, ys)| {
+        limbs_mul_helper(&limbs_mul_greater, xs, ys);
+    });
+}
+
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mul() {
@@ -322,6 +401,16 @@ fn test_limbs_mul() {
 #[should_panic]
 fn test_limbs_mul_fail() {
     limbs_mul(&[6, 7], &[]);
+}
+
+#[test]
+fn limbs_mul_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_2().test_properties_with_config(&config, |(xs, ys)| {
+        limbs_mul_helper(&limbs_mul, xs, ys);
+    });
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -382,6 +471,23 @@ fn limbs_mul_same_length_to_out_fail_2() {
 fn limbs_mul_same_length_to_out_fail_3() {
     let mut out = vec![10];
     limbs_mul_same_length_to_out(&mut out, &[], &[]);
+}
+
+#[test]
+fn limbs_mul_same_length_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_1().test_properties_with_config(&config, |(mut out, xs, ys)| {
+        let old_out = out.clone();
+        limbs_mul_same_length_to_out(&mut out, &xs, &ys);
+        let len = xs.len() << 1;
+        let n = Natural::from_owned_limbs_asc(xs) * Natural::from_owned_limbs_asc(ys);
+        let mut expected_out = n.into_limbs_asc();
+        expected_out.resize(len, 0);
+        assert_eq!(expected_out, &out[..len]);
+        assert_eq!(&out[len..], &old_out[len..]);
+    });
 }
 
 #[cfg(feature = "32_bit_limbs")]

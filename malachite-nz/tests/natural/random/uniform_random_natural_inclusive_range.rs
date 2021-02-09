@@ -190,6 +190,6 @@ fn test_uniform_random_natural_inclusive_range() {
 
 #[test]
 #[should_panic]
-fn uniform_random_natural_inclusive_range_fail_1() {
+fn uniform_random_natural_inclusive_range_fail() {
     uniform_random_natural_inclusive_range(EXAMPLE_SEED, Natural::from(10u32), Natural::from(9u32));
 }

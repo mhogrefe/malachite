@@ -5,9 +5,11 @@ pub(crate) fn register(runner: &mut Runner) {
     from::register(runner);
     half::register(runner);
     slice::register(runner);
+    string::register(runner);
 }
 
 mod digits;
 mod from;
 mod half;
 mod slice;
+mod string;

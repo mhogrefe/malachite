@@ -6,10 +6,6 @@ use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::mul::fft::{
     _limbs_mul_greater_to_out_fft, _limbs_mul_greater_to_out_fft_input_sizes_threshold,
 };
-use malachite_nz::natural::arithmetic::mul::limb::{
-    limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
-    limbs_slice_mul_limb_with_carry_in_place,
-};
 use malachite_nz::natural::arithmetic::mul::mul_low::{
     _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
     _limbs_mul_low_same_length_divide_and_conquer,
@@ -46,8 +42,8 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out,
-    limbs_mul_same_length_to_out, limbs_mul_to_out,
+    _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out, limbs_mul_same_length_to_out,
+    limbs_mul_to_out,
 };
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
@@ -56,10 +52,7 @@ use malachite_test::common::{
     DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode, ScaleType,
 };
 use malachite_test::inputs::base::{
-    pairs_of_small_unsigneds_single, pairs_of_unsigned_vec_var_4, pairs_of_unsigned_vec_var_5,
-    quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1,
-    triples_of_unsigned_vec_unsigned_and_unsigned,
-    triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1, triples_of_unsigned_vec_var_10,
+    pairs_of_small_unsigneds_single, triples_of_unsigned_vec_var_10,
     triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13,
     triples_of_unsigned_vec_var_14, triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16,
     triples_of_unsigned_vec_var_17, triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19,
@@ -75,12 +68,6 @@ use malachite_test::inputs::natural::{
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_demo!(registry, demo_limbs_mul_limb_with_carry_to_out);
-    register_demo!(registry, demo_limbs_mul_limb_to_out);
-    register_demo!(registry, demo_limbs_slice_mul_limb_with_carry_in_place);
-    register_demo!(registry, demo_limbs_mul_greater);
-    register_demo!(registry, demo_limbs_mul);
-    register_demo!(registry, demo_limbs_mul_same_length_to_out);
     register_demo!(registry, demo_limbs_mul_greater_to_out);
     register_demo!(registry, demo_limbs_mul_to_out);
     register_ns_demo!(
@@ -152,16 +139,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_natural_mul_val_ref);
     register_demo!(registry, demo_natural_mul_ref_val);
     register_demo!(registry, demo_natural_mul_ref_ref);
-    register_bench!(registry, Small, benchmark_limbs_mul_limb_with_carry_to_out);
-    register_bench!(registry, Small, benchmark_limbs_mul_limb_to_out);
-    register_bench!(
-        registry,
-        Small,
-        benchmark_limbs_slice_mul_limb_with_carry_in_place
-    );
-    register_bench!(registry, Small, benchmark_limbs_mul_greater);
-    register_bench!(registry, Small, benchmark_limbs_mul);
-    register_bench!(registry, Small, benchmark_limbs_mul_same_length_to_out);
     register_bench!(
         registry,
         Large,
@@ -320,78 +297,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
     register_bench!(registry, Large, benchmark_natural_mul_library_comparison);
     register_bench!(registry, Large, benchmark_natural_mul_evaluation_strategy);
-}
-
-fn demo_limbs_mul_limb_with_carry_to_out(gm: GenerationMode, limit: usize) {
-    for (out, in_limbs, limb, carry) in
-        quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1(gm).take(limit)
-    {
-        let mut out = out.to_vec();
-        let out_old = out.clone();
-        let carry_out = limbs_mul_limb_with_carry_to_out(&mut out, &in_limbs, limb, carry);
-        println!(
-            "out := {:?}; limbs_mul_limb_with_carry_to_out(&mut out, {:?}, {}, {}) = {}; \
-             out = {:?}",
-            out_old, in_limbs, limb, carry, carry_out, out
-        );
-    }
-}
-
-fn demo_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize) {
-    for (out, in_limbs, limb) in
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm).take(limit)
-    {
-        let mut out = out.to_vec();
-        let out_old = out.clone();
-        let carry = limbs_mul_limb_to_out(&mut out, &in_limbs, limb);
-        println!(
-            "out := {:?}; limbs_mul_limb_to_out(&mut out, {:?}, {}) = {}; out = {:?}",
-            out_old, in_limbs, limb, carry, out
-        );
-    }
-}
-
-fn demo_limbs_slice_mul_limb_with_carry_in_place(gm: GenerationMode, limit: usize) {
-    for (limbs, limb, carry) in triples_of_unsigned_vec_unsigned_and_unsigned(gm).take(limit) {
-        let mut limbs = limbs.to_vec();
-        let limbs_old = limbs.clone();
-        let carry_out = limbs_slice_mul_limb_with_carry_in_place(&mut limbs, limb, carry);
-        println!(
-            "limbs := {:?}; limbs_slice_mul_limb_with_carry_in_place(&mut limbs, {}, {}) = {}; \
-             limbs = {:?}",
-            limbs_old, limb, carry, carry_out, limbs
-        );
-    }
-}
-
-fn demo_limbs_mul_greater(gm: GenerationMode, limit: usize) {
-    for (xs, ys) in pairs_of_unsigned_vec_var_4(gm).take(limit) {
-        println!(
-            "limbs_mul_greater({:?}, {:?}) = {:?}",
-            xs,
-            ys,
-            limbs_mul_greater(&xs, &ys)
-        );
-    }
-}
-
-fn demo_limbs_mul(gm: GenerationMode, limit: usize) {
-    for (xs, ys) in pairs_of_unsigned_vec_var_5(gm).take(limit) {
-        println!("limbs_mul({:?}, {:?}) = {:?}", xs, ys, limbs_mul(&xs, &ys));
-    }
-}
-
-fn demo_limbs_mul_same_length_to_out(gm: GenerationMode, limit: usize) {
-    for (xs, ys, zs) in triples_of_unsigned_vec_var_25(gm).take(limit) {
-        let mut xs = xs.to_vec();
-        let xs_old = xs.clone();
-        limbs_mul_same_length_to_out(&mut xs, &ys, &zs);
-        println!(
-            "out := {:?}; limbs_mul_same_length_to_out(&mut out, {:?}, {:?}); \
-             out = {:?}",
-            xs_old, ys, zs, xs
-        );
-    }
 }
 
 fn demo_limbs_mul_greater_to_out(gm: GenerationMode, limit: usize) {
@@ -711,119 +616,6 @@ fn demo_natural_mul_ref_ref(gm: GenerationMode, limit: usize) {
     for (x, y) in pairs_of_naturals(gm).take(limit) {
         println!("&{} * &{} = {}", x, y, &x * &y);
     }
-}
-
-fn benchmark_limbs_mul_limb_with_carry_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark_old(
-        "limbs_mul_limb_with_carry_to_out(&mut [Limb], &[Limb], Limb, Limb)",
-        BenchmarkType::Single,
-        quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref in_limbs, _, _)| in_limbs.len()),
-        "in_limbs.len()",
-        &mut [(
-            "Malachite",
-            &mut (|(mut out, in_limbs, limb, carry)| {
-                no_out!(limbs_mul_limb_with_carry_to_out(
-                    &mut out, &in_limbs, limb, carry
-                ))
-            }),
-        )],
-    );
-}
-
-fn benchmark_limbs_mul_limb_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark_old(
-        "limbs_mul_limb_to_out(&mut [Limb], &[Limb], Limb)",
-        BenchmarkType::Single,
-        triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_1(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref in_limbs, _)| in_limbs.len()),
-        "in_limbs.len()",
-        &mut [(
-            "Malachite",
-            &mut (|(mut out, in_limbs, limb)| {
-                no_out!(limbs_mul_limb_to_out(&mut out, &in_limbs, limb))
-            }),
-        )],
-    );
-}
-
-fn benchmark_limbs_slice_mul_limb_with_carry_in_place(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "limbs_slice_mul_limb_with_carry_in_place(&mut [Limb], Limb, Limb)",
-        BenchmarkType::Single,
-        triples_of_unsigned_vec_unsigned_and_unsigned(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref limbs, _, _)| limbs.len()),
-        "limbs.len()",
-        &mut [(
-            "Malachite",
-            &mut (|(mut limbs, limb, carry)| {
-                no_out!(limbs_slice_mul_limb_with_carry_in_place(
-                    &mut limbs, limb, carry
-                ))
-            }),
-        )],
-    );
-}
-
-fn benchmark_limbs_mul_greater(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark_old(
-        "limbs_mul_greater(&[Limb], &[Limb])",
-        BenchmarkType::Single,
-        pairs_of_unsigned_vec_var_4(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [(
-            "Malachite",
-            &mut (|(xs, ys)| no_out!(limbs_mul_greater(&xs, &ys))),
-        )],
-    );
-}
-
-fn benchmark_limbs_mul(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark_old(
-        "limbs_mul(&[Limb], &[Limb])",
-        BenchmarkType::Single,
-        pairs_of_unsigned_vec_var_5(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [("Malachite", &mut (|(xs, ys)| no_out!(limbs_mul(&xs, &ys))))],
-    );
-}
-
-fn benchmark_limbs_mul_same_length_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
-    run_benchmark_old(
-        "limbs_mul_same_length_to_out(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Single,
-        triples_of_unsigned_vec_var_25(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, _)| xs.len()),
-        "xs.len() = ys.len()",
-        &mut [(
-            "Malachite",
-            &mut (|(mut xs, ys, zs)| limbs_mul_same_length_to_out(&mut xs, &ys, &zs)),
-        )],
-    );
 }
 
 fn benchmark_limbs_mul_greater_to_out_algorithms(
