@@ -3,10 +3,6 @@ use std::cmp::Ordering;
 use num::arithmetic::traits::UnsignedAbs;
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
 
-fn _partial_cmp_abs<T: OrdAbs>(x: &T, y: &T) -> Option<Ordering> {
-    Some(x.cmp_abs(y))
-}
-
 /// This macro defines trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_partial_ord_abs {
     ($t:ident) => {
@@ -25,7 +21,7 @@ macro_rules! impl_partial_ord_abs {
             /// See the documentation of the `num::comparison::ord_abs` module.
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
-                _partial_cmp_abs(self, other)
+                Some(self.cmp_abs(other))
             }
         }
     };

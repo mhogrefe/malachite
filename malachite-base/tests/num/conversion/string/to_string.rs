@@ -1,4 +1,5 @@
-use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use itertools::repeat_n;
+use malachite_base::num::arithmetic::traits::{SaturatingSubAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -11,14 +12,41 @@ use malachite_base::strings::{
     string_is_subset, ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString,
 };
 use malachite_base_test_util::generators::{
-    signed_gen, signed_gen_var_2, signed_unsigned_pair_gen_var_5, unsigned_gen, unsigned_gen_var_7,
-    unsigned_gen_var_8, unsigned_pair_gen_var_8,
+    signed_gen, signed_gen_var_2, signed_unsigned_pair_gen_var_5, signed_unsigned_pair_gen_var_6,
+    signed_unsigned_unsigned_triple_gen_var_3, unsigned_gen, unsigned_gen_var_7,
+    unsigned_gen_var_8, unsigned_pair_gen_var_2, unsigned_pair_gen_var_8, unsigned_pair_gen_var_9,
+    unsigned_triple_gen_var_6,
 };
 use malachite_base_test_util::num::conversion::string::to_string::{
     _to_string_base_signed_naive, _to_string_base_unsigned_naive,
 };
+use std::cmp::max;
 use std::fmt::{Debug, Display};
 use std::panic::catch_unwind;
+
+fn test_padding_unsigned(s: &str, s_padded: &str, width: usize) {
+    assert!(s_padded.ends_with(&s));
+    assert!(s_padded.len() >= width);
+    assert_eq!(s.len() >= width, s == s_padded);
+    if s.len() < width {
+        let diff = s_padded.len() - s.len();
+        assert!(s_padded[..diff].chars().all(|c| c == '0'));
+        assert_eq!(&s_padded[diff..], s);
+    }
+}
+
+fn test_padding_signed(mut s: &str, mut s_padded: &str, mut width: usize) {
+    assert!(s_padded.len() >= width);
+    assert_eq!(s.len() >= width, s == s_padded);
+    let negative = s.starts_with('-');
+    assert_eq!(s_padded.starts_with('-'), negative);
+    if negative {
+        s = &s[1..];
+        s_padded = &s_padded[1..];
+        width.saturating_sub_assign(1);
+    }
+    test_padding_unsigned(s, s_padded, width);
+}
 
 #[test]
 fn test_digit_to_display_byte_lower() {
@@ -62,6 +90,10 @@ fn digit_to_display_byte_lower_properties() {
         assert!((b'0'..=b'9').contains(&display_byte) || (b'a'..=b'z').contains(&display_byte));
         let display_byte_upper = digit_to_display_byte_upper(b);
         assert_eq!(display_byte == display_byte_upper, (0..=9).contains(&b));
+        assert_eq!(
+            char::from(display_byte).to_ascii_uppercase(),
+            char::from(display_byte_upper)
+        );
     });
 }
 
@@ -107,6 +139,10 @@ fn digit_to_display_byte_upper_properties() {
         assert!((b'0'..=b'9').contains(&display_byte) || (b'A'..=b'Z').contains(&display_byte));
         let display_byte_lower = digit_to_display_byte_lower(b);
         assert_eq!(display_byte == display_byte_lower, (0..=9).contains(&b));
+        assert_eq!(
+            char::from(display_byte).to_ascii_lowercase(),
+            char::from(display_byte_lower)
+        );
     });
 }
 
@@ -121,6 +157,8 @@ pub fn test_to_string_base() {
         assert_eq!(_to_string_base_unsigned_naive(x, base), out);
         assert_eq!(format!("{}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), out);
+        assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), out);
+        assert_eq!(format!("{:00?}", BaseFmtWrapper::new(x, base)), out);
     };
     test_u::<u8>(0, 2, "0");
     test_u::<u8>(0, 3, "0");
@@ -142,6 +180,34 @@ pub fn test_to_string_base() {
     test_u::<u64>(1000, 20, "2a0");
     test_u::<u64>(1000, 36, "rs");
 
+    fn test_u_width<T: PrimitiveUnsigned>(x: T, base: u64, width: usize, out: &str)
+    where
+        BaseFmtWrapper<T>: Debug + Display,
+        u8: WrappingFrom<T>,
+    {
+        let s = x.to_string_base(base);
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, base), width = width),
+            out
+        );
+        assert_eq!(
+            format!("{:0width$?}", BaseFmtWrapper::new(x, base), width = width),
+            out
+        );
+        test_padding_unsigned(&s, out, width);
+    };
+    test_u_width::<u8>(0, 2, 0, "0");
+    test_u_width::<u8>(0, 2, 1, "0");
+    test_u_width::<u8>(0, 2, 2, "00");
+    test_u_width::<u8>(0, 2, 5, "00000");
+    test_u_width::<u32>(1000000, 36, 0, "lfls");
+    test_u_width::<u32>(1000000, 36, 1, "lfls");
+    test_u_width::<u32>(1000000, 36, 2, "lfls");
+    test_u_width::<u32>(1000000, 36, 3, "lfls");
+    test_u_width::<u32>(1000000, 36, 4, "lfls");
+    test_u_width::<u32>(1000000, 36, 5, "0lfls");
+    test_u_width::<u32>(1000000, 36, 6, "00lfls");
+
     fn test_i<T: PrimitiveSigned>(x: T, base: u64, out: &str)
     where
         BaseFmtWrapper<T>: Debug + Display,
@@ -152,6 +218,8 @@ pub fn test_to_string_base() {
         assert_eq!(_to_string_base_signed_naive(x, base), out);
         assert_eq!(format!("{}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), out);
+        assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), out);
+        assert_eq!(format!("{:00?}", BaseFmtWrapper::new(x, base)), out);
     };
     test_i::<i8>(0, 2, "0");
     test_i::<i8>(0, 3, "0");
@@ -187,6 +255,41 @@ pub fn test_to_string_base() {
     test_i::<i64>(-1000, 10, "-1000");
     test_i::<i64>(-1000, 20, "-2a0");
     test_i::<i64>(-1000, 36, "-rs");
+
+    fn test_i_width<T: PrimitiveSigned>(x: T, base: u64, width: usize, out: &str)
+    where
+        BaseFmtWrapper<T>: Debug + Display,
+        u8: WrappingFrom<T>,
+    {
+        let s = x.to_string_base(base);
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, base), width = width),
+            out
+        );
+        assert_eq!(
+            format!("{:0width$?}", BaseFmtWrapper::new(x, base), width = width),
+            out
+        );
+        test_padding_signed(&s, out, width);
+    };
+    test_i_width::<i8>(0, 2, 0, "0");
+    test_i_width::<i8>(0, 2, 1, "0");
+    test_i_width::<i8>(0, 2, 2, "00");
+    test_i_width::<i8>(0, 2, 5, "00000");
+    test_i_width::<i32>(1000000, 36, 0, "lfls");
+    test_i_width::<i32>(1000000, 36, 1, "lfls");
+    test_i_width::<i32>(1000000, 36, 2, "lfls");
+    test_i_width::<i32>(1000000, 36, 3, "lfls");
+    test_i_width::<i32>(1000000, 36, 4, "lfls");
+    test_i_width::<i32>(1000000, 36, 5, "0lfls");
+    test_i_width::<i32>(1000000, 36, 6, "00lfls");
+    test_i_width::<i32>(-1000000, 36, 0, "-lfls");
+    test_i_width::<i32>(-1000000, 36, 1, "-lfls");
+    test_i_width::<i32>(-1000000, 36, 2, "-lfls");
+    test_i_width::<i32>(-1000000, 36, 3, "-lfls");
+    test_i_width::<i32>(-1000000, 36, 4, "-lfls");
+    test_i_width::<i32>(-1000000, 36, 5, "-lfls");
+    test_i_width::<i32>(-1000000, 36, 6, "-0lfls");
 }
 
 fn to_string_base_fail_helper<T: PrimitiveInt>() {
@@ -211,6 +314,9 @@ where
         assert_eq!(_to_string_base_unsigned_naive(x, base), s);
         assert_eq!(format!("{}", BaseFmtWrapper::new(x, base)), s);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(format!("{:00?}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(x.to_string_base_upper(base), s.to_uppercase());
         //TODO from_string_base
         assert!(string_is_subset(&s, "0123456789abcdefghijklmnopqrstuvwxyz"));
         if x != T::ZERO {
@@ -230,6 +336,47 @@ where
         assert_eq!(T::ONE.to_string_base(base), "1");
         assert_eq!(T::exact_from(base).to_string_base(base), "10");
     });
+
+    unsigned_triple_gen_var_6::<T, u64, usize>().test_properties(|(x, base, width)| {
+        let fx = BaseFmtWrapper::new(x, base);
+        let s = x.to_string_base(base);
+        let s_padded = format!("{:0width$}", fx, width = width);
+        assert_eq!(format!("{:0width$?}", fx, width = width), s_padded);
+        //TODO from_string_base
+        assert!(string_is_subset(
+            &s_padded,
+            "0123456789abcdefghijklmnopqrstuvwxyz"
+        ));
+        test_padding_unsigned(&s, &s_padded, width);
+    });
+
+    unsigned_pair_gen_var_2::<T, usize>().test_properties(|(x, width)| {
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, 10), width = width),
+            format!("{:0width$}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, 2), width = width),
+            format!("{:0width$b}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, 8), width = width),
+            format!("{:0width$o}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, 16), width = width),
+            format!("{:0width$x}", x, width = width)
+        );
+    });
+
+    unsigned_pair_gen_var_9::<usize, u64>().test_properties(|(width, base)| {
+        let s = format!(
+            "{:0width$}",
+            BaseFmtWrapper::new(T::ZERO, base),
+            width = width
+        );
+        assert_eq!(repeat_n('0', max(1, width)).collect::<String>(), s);
+    });
 }
 
 fn to_string_base_helper_signed<T: PrimitiveSigned>()
@@ -243,6 +390,9 @@ where
         assert_eq!(_to_string_base_signed_naive(x, base), s);
         assert_eq!(format!("{}", BaseFmtWrapper::new(x, base)), s);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(format!("{:00?}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(x.to_string_base_upper(base), s.to_uppercase());
         //TODO from_string_base
         assert!(string_is_subset(
             &s,
@@ -270,6 +420,51 @@ where
         assert_eq!(T::ONE.to_string_base(base), "1");
         assert_eq!(T::NEGATIVE_ONE.to_string_base(base), "-1");
         assert_eq!(T::exact_from(base).to_string_base(base), "10");
+    });
+
+    signed_unsigned_unsigned_triple_gen_var_3::<T, u64, usize>().test_properties(
+        |(x, base, width)| {
+            let fx = BaseFmtWrapper::new(x, base);
+            let s = x.to_string_base(base);
+            let s_padded = format!("{:0width$}", fx, width = width);
+            assert!(s_padded.len() >= width);
+            assert_eq!(s.len() >= width, s == s_padded);
+            assert_eq!(format!("{:0width$?}", fx, width = width), s_padded);
+            //TODO from_string_base
+            assert!(string_is_subset(
+                &s_padded,
+                "-0123456789abcdefghijklmnopqrstuvwxyz"
+            ));
+            test_padding_signed(&s, &s_padded, width);
+        },
+    );
+
+    signed_unsigned_pair_gen_var_6::<T, usize>().test_properties(|(x, width)| {
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, 10), width = width),
+            format!("{:0width$}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, 2), width = width),
+            format!("{:0width$b}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, 8), width = width),
+            format!("{:0width$o}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:0width$}", BaseFmtWrapper::new(x, 16), width = width),
+            format!("{:0width$x}", x, width = width)
+        );
+    });
+
+    unsigned_pair_gen_var_9::<usize, u64>().test_properties(|(width, base)| {
+        let s = format!(
+            "{:0width$}",
+            BaseFmtWrapper::new(T::ZERO, base),
+            width = width
+        );
+        assert_eq!(repeat_n('0', max(1, width)).collect::<String>(), s);
     });
 }
 
@@ -308,6 +503,34 @@ pub fn test_to_string_base_upper() {
     test_u::<u64>(1000, 10, "1000");
     test_u::<u64>(1000, 20, "2A0");
     test_u::<u64>(1000, 36, "RS");
+
+    fn test_u_width<T: PrimitiveUnsigned>(x: T, base: u64, width: usize, out: &str)
+    where
+        BaseFmtWrapper<T>: Debug + Display,
+        u8: WrappingFrom<T>,
+    {
+        let s = x.to_string_base_upper(base);
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, base), width = width),
+            out
+        );
+        assert_eq!(
+            format!("{:#0width$?}", BaseFmtWrapper::new(x, base), width = width),
+            out
+        );
+        test_padding_unsigned(&s, out, width);
+    };
+    test_u_width::<u8>(0, 2, 0, "0");
+    test_u_width::<u8>(0, 2, 1, "0");
+    test_u_width::<u8>(0, 2, 2, "00");
+    test_u_width::<u8>(0, 2, 5, "00000");
+    test_u_width::<u32>(1000000, 36, 0, "LFLS");
+    test_u_width::<u32>(1000000, 36, 1, "LFLS");
+    test_u_width::<u32>(1000000, 36, 2, "LFLS");
+    test_u_width::<u32>(1000000, 36, 3, "LFLS");
+    test_u_width::<u32>(1000000, 36, 4, "LFLS");
+    test_u_width::<u32>(1000000, 36, 5, "0LFLS");
+    test_u_width::<u32>(1000000, 36, 6, "00LFLS");
 
     fn test_i<T: PrimitiveSigned>(x: T, base: u64, out: &str)
     where
@@ -351,6 +574,41 @@ pub fn test_to_string_base_upper() {
     test_i::<i64>(-1000, 10, "-1000");
     test_i::<i64>(-1000, 20, "-2A0");
     test_i::<i64>(-1000, 36, "-RS");
+
+    fn test_i_width<T: PrimitiveSigned>(x: T, base: u64, width: usize, out: &str)
+    where
+        BaseFmtWrapper<T>: Debug + Display,
+        u8: WrappingFrom<T>,
+    {
+        let s = x.to_string_base_upper(base);
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, base), width = width),
+            out
+        );
+        assert_eq!(
+            format!("{:#0width$?}", BaseFmtWrapper::new(x, base), width = width),
+            out
+        );
+        test_padding_signed(&s, out, width);
+    };
+    test_i_width::<i8>(0, 2, 0, "0");
+    test_i_width::<i8>(0, 2, 1, "0");
+    test_i_width::<i8>(0, 2, 2, "00");
+    test_i_width::<i8>(0, 2, 5, "00000");
+    test_i_width::<i32>(1000000, 36, 0, "LFLS");
+    test_i_width::<i32>(1000000, 36, 1, "LFLS");
+    test_i_width::<i32>(1000000, 36, 2, "LFLS");
+    test_i_width::<i32>(1000000, 36, 3, "LFLS");
+    test_i_width::<i32>(1000000, 36, 4, "LFLS");
+    test_i_width::<i32>(1000000, 36, 5, "0LFLS");
+    test_i_width::<i32>(1000000, 36, 6, "00LFLS");
+    test_i_width::<i32>(-1000000, 36, 0, "-LFLS");
+    test_i_width::<i32>(-1000000, 36, 1, "-LFLS");
+    test_i_width::<i32>(-1000000, 36, 2, "-LFLS");
+    test_i_width::<i32>(-1000000, 36, 3, "-LFLS");
+    test_i_width::<i32>(-1000000, 36, 4, "-LFLS");
+    test_i_width::<i32>(-1000000, 36, 5, "-LFLS");
+    test_i_width::<i32>(-1000000, 36, 6, "-0LFLS");
 }
 
 fn to_string_base_upper_fail_helper<T: PrimitiveInt>() {
@@ -373,6 +631,8 @@ where
         let s = x.to_string_base_upper(base);
         assert_eq!(format!("{:#}", BaseFmtWrapper::new(x, base)), s);
         assert_eq!(format!("{:#?}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(format!("{:#00}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(x.to_string_base(base), s.to_lowercase());
         //TODO from_string_base
         assert!(string_is_subset(&s, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
         if x != T::ZERO {
@@ -392,6 +652,47 @@ where
         assert_eq!(T::ONE.to_string_base_upper(base), "1");
         assert_eq!(T::exact_from(base).to_string_base_upper(base), "10");
     });
+
+    unsigned_triple_gen_var_6::<T, u64, usize>().test_properties(|(x, base, width)| {
+        let fx = BaseFmtWrapper::new(x, base);
+        let s = x.to_string_base_upper(base);
+        let s_padded = format!("{:#0width$}", fx, width = width);
+        assert_eq!(format!("{:#0width$?}", fx, width = width), s_padded);
+        //TODO from_string_base
+        assert!(string_is_subset(
+            &s_padded,
+            "01234567890123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        ));
+        test_padding_unsigned(&s, &s_padded, width);
+    });
+
+    unsigned_pair_gen_var_2::<T, usize>().test_properties(|(x, width)| {
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, 10), width = width),
+            format!("{:0width$}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, 2), width = width),
+            format!("{:0width$b}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, 8), width = width),
+            format!("{:0width$o}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, 16), width = width),
+            format!("{:0width$X}", x, width = width)
+        );
+    });
+
+    unsigned_pair_gen_var_9::<usize, u64>().test_properties(|(width, base)| {
+        let s = format!(
+            "{:#0width$}",
+            BaseFmtWrapper::new(T::ZERO, base),
+            width = width
+        );
+        assert_eq!(repeat_n('0', max(1, width)).collect::<String>(), s);
+    });
 }
 
 fn to_string_base_upper_helper_signed<T: PrimitiveSigned>()
@@ -402,6 +703,7 @@ where
         let s = x.to_string_base_upper(base);
         assert_eq!(format!("{:#}", BaseFmtWrapper::new(x, base)), s);
         assert_eq!(format!("{:#?}", BaseFmtWrapper::new(x, base)), s);
+        assert_eq!(x.to_string_base(base), s.to_lowercase());
         //TODO from_string_base
         assert!(string_is_subset(
             &s,
@@ -429,6 +731,51 @@ where
         assert_eq!(T::ONE.to_string_base_upper(base), "1");
         assert_eq!(T::NEGATIVE_ONE.to_string_base_upper(base), "-1");
         assert_eq!(T::exact_from(base).to_string_base_upper(base), "10");
+    });
+
+    signed_unsigned_unsigned_triple_gen_var_3::<T, u64, usize>().test_properties(
+        |(x, base, width)| {
+            let fx = BaseFmtWrapper::new(x, base);
+            let s = x.to_string_base_upper(base);
+            let s_padded = format!("{:#0width$}", fx, width = width);
+            assert!(s_padded.len() >= width);
+            assert_eq!(s.len() >= width, s == s_padded);
+            assert_eq!(format!("{:#0width$?}", fx, width = width), s_padded);
+            //TODO from_string_base
+            assert!(string_is_subset(
+                &s_padded,
+                "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            ));
+            test_padding_signed(&s, &s_padded, width);
+        },
+    );
+
+    signed_unsigned_pair_gen_var_6::<T, usize>().test_properties(|(x, width)| {
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, 10), width = width),
+            format!("{:0width$}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, 2), width = width),
+            format!("{:0width$b}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, 8), width = width),
+            format!("{:0width$o}", x, width = width)
+        );
+        assert_eq!(
+            format!("{:#0width$}", BaseFmtWrapper::new(x, 16), width = width),
+            format!("{:0width$X}", x, width = width)
+        );
+    });
+
+    unsigned_pair_gen_var_9::<usize, u64>().test_properties(|(width, base)| {
+        let s = format!(
+            "{:#0width$}",
+            BaseFmtWrapper::new(T::ZERO, base),
+            width = width
+        );
+        assert_eq!(repeat_n('0', max(1, width)).collect::<String>(), s);
     });
 }
 

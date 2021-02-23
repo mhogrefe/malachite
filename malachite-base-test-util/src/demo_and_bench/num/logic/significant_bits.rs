@@ -8,14 +8,14 @@ use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_significant_bits);
-    register_signed_demos!(runner, demo_signed_significant_bits);
-    register_unsigned_benches!(runner, benchmark_unsigned_significant_bits);
-    register_signed_benches!(runner, benchmark_signed_significant_bits);
+    register_unsigned_demos!(runner, demo_significant_bits_unsigned);
+    register_signed_demos!(runner, demo_significant_bits_signed);
+    register_unsigned_benches!(runner, benchmark_significant_bits_unsigned);
+    register_signed_benches!(runner, benchmark_significant_bits_signed);
 }
 
-unsigned_single_arg_demo!(demo_unsigned_significant_bits, significant_bits);
-signed_single_arg_demo!(demo_signed_significant_bits, significant_bits);
+unsigned_single_arg_demo!(demo_significant_bits_unsigned, significant_bits);
+signed_single_arg_demo!(demo_significant_bits_signed, significant_bits);
 
-unsigned_single_arg_bench!(benchmark_unsigned_significant_bits, significant_bits);
-signed_single_arg_bench!(benchmark_signed_significant_bits, significant_bits);
+unsigned_single_arg_bench!(benchmark_significant_bits_unsigned, significant_bits);
+signed_single_arg_bench!(benchmark_significant_bits_signed, significant_bits);

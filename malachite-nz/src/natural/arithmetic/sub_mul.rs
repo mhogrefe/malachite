@@ -34,7 +34,7 @@ use platform::{DoubleLimb, Limb};
 /// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[0, 123], u32::MAX), None);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, and w is returned instead of overwriting the first input.
 pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], z: Limb) -> Option<Vec<Limb>> {
     let ys_len = ys.len();
@@ -172,7 +172,7 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
 /// assert_eq!(ys, &[123, 579]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive and have the
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
 /// same lengths, sub is negative, and the lowest limbs of the result are written to the second
 /// input rather than the first.
 pub fn limbs_sub_mul_limb_same_length_in_place_right(
@@ -231,7 +231,7 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
 /// assert_eq!(ys, &[123, 579]);
 /// ```
 ///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.1.2, where w and x are positive, sub is
+/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, and the result is written to the second input rather than the first.
 pub fn limbs_sub_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) -> Limb {
     let ys_len = ys.len();
@@ -276,7 +276,7 @@ pub fn limbs_sub_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 ///         Some(vec![4294927936, 4294634040, 4294452078, 0]));
 /// ```
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.1.2, where w, x, and y are positive, sub is
+/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// negative, negative results are converted to `None`, and w is returned instead of overwriting the
 /// first input.
 pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>> {
@@ -318,7 +318,7 @@ pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>>
 /// assert_eq!(xs, &[4294927936, 4294634040, 4294452078, 0]);
 /// ```
 ///
-/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.1.2, where w, x, and y are positive, sub is
+/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// negative and negative results are discarded.
 pub fn limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
     assert!(ys.len() > 1);

@@ -9,20 +9,23 @@ fn _significant_bits_unsigned<T: PrimitiveInt>(x: T) -> u64 {
 macro_rules! impl_significant_bits_unsigned {
     ($t:ident) => {
         impl SignificantBits for $t {
-            /// Returns the number of significant bits of a primitive unsigned integer; this is the
-            /// integer's width minus the number of leading zeros.
+            /// Returns the number of significant bits of a primitive unsigned integer.
             ///
-            /// Time: worst case O(1)
+            /// This is the integer's width minus the number of leading zeros.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(n) = \\begin{cases}
+            ///     0 & n = 0 \\\\
+            ///     \lfloor \log_2 n \rfloor + 1 & n > 0
+            /// \\end{cases}
+            /// $$
+            ///
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::SignificantBits;
-            ///
-            /// assert_eq!(0u8.significant_bits(), 0);
-            /// assert_eq!(100u64.significant_bits(), 7);
-            /// ```
+            /// See the documentation of the `num::logic::significant_bits` module.
             #[inline]
             fn significant_bits(self) -> u64 {
                 _significant_bits_unsigned(self)
@@ -38,20 +41,23 @@ fn _significant_bits_signed<U: SignificantBits, S: UnsignedAbs<Output = U>>(x: S
 
 macro_rules! impl_significant_bits_signed {
     ($u:ident, $s:ident) => {
-        /// Returns the number of significant bits of a primitive signed integer; this is the
-        /// integer's width minus the number of leading zeros of its absolute value.
+        /// Returns the number of significant bits of a primitive signed integer.
         ///
-        /// Time: worst case O(1)
+        /// This is the integer's width minus the number of leading zeros of its absolute value.
         ///
-        /// Additional memory: worst case O(1)
+        /// $$
+        /// f(n) = \\begin{cases}
+        ///     0 & n = 0 \\\\
+        ///     \lfloor \log_2 |n| \rfloor + 1 & n \neq 0
+        /// \\end{cases}
+        /// $$
+        ///
+        /// # Worst-case complexity
+        ///
+        /// Constant time and additional memory.
         ///
         /// # Examples
-        /// ```
-        /// use malachite_base::num::logic::traits::SignificantBits;
-        ///
-        /// assert_eq!(0i8.significant_bits(), 0);
-        /// assert_eq!((-100i64).significant_bits(), 7);
-        /// ```
+        /// See the documentation of the `num::logic::significant_bits` module.
         impl SignificantBits for $s {
             #[inline]
             fn significant_bits(self) -> u64 {

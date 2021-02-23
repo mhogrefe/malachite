@@ -344,12 +344,81 @@ pub mod bit_iterable;
 /// assert_eq!((-0x500000000i64).index_of_next_true_bit(100), Some(100));
 /// ```
 pub mod bit_scan;
+/// This module wraps the `count_ones` function into an implementation of `CountOnes`.
 pub mod count_ones;
+/// This module wraps the `count_zeros` function into an implementation of `CountZeros`.
 pub mod count_zeros;
+/// This module contains functions for computing the Hamming distance between two numbers.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # hamming_distance
+/// ```
+/// use malachite_base::num::logic::traits::HammingDistance;
+///
+/// assert_eq!(123u32.hamming_distance(456), 6);
+/// assert_eq!(0u8.hamming_distance(255), 8);
+/// ```
+///
+/// # checked_hamming_distance
+/// ```
+/// use malachite_base::num::logic::traits::CheckedHammingDistance;
+///
+/// assert_eq!(123i32.checked_hamming_distance(456), Some(6));
+/// assert_eq!(0i8.checked_hamming_distance(127), Some(7));
+/// assert_eq!(0i8.checked_hamming_distance(-1), None);
+/// ```
 pub mod hamming_distance;
+/// This module wraps the `leading_zeros` function into an implementation of `LeadingZeros`.
 pub mod leading_zeros;
+/// This module contains functions for generating bit masks.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # low_mask
+/// ```
+/// use malachite_base::num::logic::traits::LowMask;
+///
+/// assert_eq!(u16::low_mask(0), 0);
+/// assert_eq!(u8::low_mask(3), 0x7);
+/// assert_eq!(u8::low_mask(8), 0xff);
+/// assert_eq!(u64::low_mask(40), 0xffffffffff);
+///
+/// assert_eq!(i16::low_mask(0), 0);
+/// assert_eq!(i8::low_mask(3), 0x7);
+/// assert_eq!(i8::low_mask(8), -1);
+/// assert_eq!(i64::low_mask(40), 0xffffffffff);
+/// ```
 pub mod low_mask;
+/// This module contains implementations of `NotAssign`.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # not_assign
+/// ```
+/// use malachite_base::num::logic::traits::NotAssign;
+///
+/// let mut x = 123u16;
+/// x.not_assign();
+/// assert_eq!(x, 65412);
+/// ```
 pub mod not;
+/// This module contains functions to get the number of significant bits of a primitive integer.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # significant_bits
+/// ```
+/// use malachite_base::num::logic::traits::SignificantBits;
+///
+/// assert_eq!(0u8.significant_bits(), 0);
+/// assert_eq!(100u64.significant_bits(), 7);
+///
+/// assert_eq!(0i8.significant_bits(), 0);
+/// assert_eq!((-100i64).significant_bits(), 7);
+/// ```
 pub mod significant_bits;
+/// This module wraps the `trailing_zeros` function into an implementation of `TrailingZeros`.
 pub mod trailing_zeros;
+/// This module defines various traits for functions related to bit manipulation.
 pub mod traits;

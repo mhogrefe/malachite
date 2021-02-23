@@ -6,46 +6,45 @@ use num::BigInt;
 
 use malachite_nz::integer::Integer;
 
-//TODO clean from_str
 #[test]
 fn test_div() {
-    let test = |u, v, quotient| {
-        let mut x = Integer::from_str(u).unwrap();
-        x /= Integer::from_str(v).unwrap();
+    let test = |s, t, quotient| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x /= v.clone();
         assert!(x.is_valid());
         assert_eq!(x.to_string(), quotient);
 
-        let mut x = Integer::from_str(u).unwrap();
-        x /= &Integer::from_str(v).unwrap();
+        let mut x = u.clone();
+        x /= &v;
         assert!(x.is_valid());
         assert_eq!(x.to_string(), quotient);
 
-        let q = Integer::from_str(u).unwrap() / Integer::from_str(v).unwrap();
+        let q = u.clone() / v.clone();
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = Integer::from_str(u).unwrap() / &Integer::from_str(v).unwrap();
+        let q = u.clone() / &v;
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = &Integer::from_str(u).unwrap() / Integer::from_str(v).unwrap();
+        let q = &u / v.clone();
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = &Integer::from_str(u).unwrap() / &Integer::from_str(v).unwrap();
+        let q = &u / &v;
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = BigInt::from_str(u).unwrap() / &BigInt::from_str(v).unwrap();
+        let q = BigInt::from_str(s).unwrap() / &BigInt::from_str(t).unwrap();
         assert_eq!(q.to_string(), quotient);
 
-        let q = rug::Integer::from_str(u).unwrap() / rug::Integer::from_str(v).unwrap();
+        let q = rug::Integer::from_str(s).unwrap() / rug::Integer::from_str(t).unwrap();
         assert_eq!(q.to_string(), quotient);
 
-        let q = Integer::from_str(u)
-            .unwrap()
-            .div_rem(Integer::from_str(v).unwrap())
-            .0;
+        let q = u.div_rem(v).0;
         assert_eq!(q.to_string(), quotient);
     };
     test("0", "1", "0");

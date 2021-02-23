@@ -1,4 +1,4 @@
-use std::fmt::{self, Display, Formatter};
+use std::fmt::{Debug, Display, Formatter, Result};
 
 use rounding_modes::RoundingMode;
 
@@ -21,7 +21,7 @@ impl Display for RoundingMode {
     /// assert_eq!(RoundingMode::Exact.to_string(), "Exact");
     /// ```
     #[inline]
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.write_fmt(format_args!("{:?}", self))
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Debug::fmt(self, f)
     }
 }

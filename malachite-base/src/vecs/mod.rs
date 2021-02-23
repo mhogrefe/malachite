@@ -1,6 +1,7 @@
 use num::conversion::traits::ExactFrom;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
 use random::Seed;
+use slices::advance_indices;
 use std::str::FromStr;
 
 /// Inserts several copies of a value at the left (beginning) of a `Vec`.
@@ -213,6 +214,72 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
     }
     let indices = random_unsigneds_less_than(seed, u64::exact_from(xs.len()));
     RandomValuesFromVec { xs, indices }
+}
+
+/// Generates every permutation of a `Vec`.
+pub struct ExhaustiveVecPermutations<T: Clone> {
+    xs: Vec<T>,
+    indices: Vec<usize>,
+    done: bool,
+}
+
+impl<T: Clone> Iterator for ExhaustiveVecPermutations<T> {
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        if self.done {
+            None
+        } else {
+            let out = Some(self.indices.iter().map(|&i| self.xs[i].clone()).collect());
+            self.done = advance_indices(&mut self.indices);
+            out
+        }
+    }
+}
+
+/// Generates every permutation of a `Vec`.
+///
+/// The permutations are `Vec`s of cloned items. It may be more convenient for the iterator to
+/// return references to a slice, in which case you may use `exhaustive_slice_permutations` instead.
+///
+/// The permutations are generated in lexicographic order with respect to the ordering in the `Vec`.
+///
+/// The output length is $n!$, where $n$ is `xs.len()`.
+///
+/// # Expected complexity per iteration
+///
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive_vec_permutations;
+///
+/// let css: Vec<String> = exhaustive_vec_permutations(vec!['a', 'b', 'c', 'd'])
+///     .map(|ds| ds.into_iter().collect()).collect();
+/// assert_eq!(
+///     css.iter().map(String::as_str).collect_vec().as_slice(),
+///     [
+///         "abcd", "abdc", "acbd", "acdb", "adbc", "adcb", "bacd", "badc", "bcad", "bcda", "bdac",
+///         "bdca", "cabd", "cadb", "cbad", "cbda", "cdab", "cdba", "dabc", "dacb", "dbac", "dbca",
+///         "dcab", "dcba"
+///     ]
+/// );
+/// ```
+pub fn exhaustive_vec_permutations<T: Clone>(xs: Vec<T>) -> ExhaustiveVecPermutations<T> {
+    let len = xs.len();
+    ExhaustiveVecPermutations {
+        xs,
+        indices: (0..len).collect(),
+        done: false,
+    }
 }
 
 /// This module contains iterators that generate `Vec`s without repetition.

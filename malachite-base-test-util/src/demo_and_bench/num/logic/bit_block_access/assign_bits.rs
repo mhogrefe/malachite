@@ -12,13 +12,13 @@ use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_assign_bits);
-    register_signed_unsigned_match_demos!(runner, demo_signed_assign_bits);
-    register_unsigned_benches!(runner, benchmark_unsigned_assign_bits_algorithms);
-    register_signed_unsigned_match_benches!(runner, benchmark_signed_assign_bits_algorithms);
+    register_unsigned_demos!(runner, demo_assign_bits_unsigned);
+    register_signed_unsigned_match_demos!(runner, demo_assign_bits_signed);
+    register_unsigned_benches!(runner, benchmark_assign_bits_algorithms_unsigned);
+    register_signed_unsigned_match_benches!(runner, benchmark_assign_bits_algorithms_signed);
 }
 
-fn demo_unsigned_assign_bits<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_assign_bits_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
 where
     T::Bits: PrimitiveUnsigned,
 {
@@ -35,7 +35,7 @@ where
     }
 }
 
-fn demo_signed_assign_bits<
+fn demo_assign_bits_signed<
     T: BitBlockAccess<Bits = U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     U: BitBlockAccess<Bits = U> + PrimitiveUnsigned,
 >(
@@ -56,7 +56,7 @@ fn demo_signed_assign_bits<
     }
 }
 
-fn benchmark_unsigned_assign_bits_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_assign_bits_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -83,7 +83,7 @@ fn benchmark_unsigned_assign_bits_algorithms<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_assign_bits_algorithms<
+fn benchmark_assign_bits_algorithms_signed<
     T: BitBlockAccess<Bits = U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     U: BitBlockAccess<Bits = U> + PrimitiveUnsigned,
 >(

@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::{DivMod, Square};
 use malachite_base::num::basic::traits::{One, Zero};
+use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use malachite_nz::natural::arithmetic::mul::mul_low::{
     _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
@@ -21,15 +22,11 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_6h, _limbs_mul_greater_to_out_toom_6h_scratch_len,
     _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
-use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out, limbs_mul_to_out,
-};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
 use malachite_nz_test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
 
 use malachite_test::common::{test_properties, test_properties_custom_scale};
 use malachite_test::inputs::base::{
@@ -38,8 +35,8 @@ use malachite_test::inputs::base::{
     triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16, triples_of_unsigned_vec_var_17,
     triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19, triples_of_unsigned_vec_var_20,
     triples_of_unsigned_vec_var_21, triples_of_unsigned_vec_var_22, triples_of_unsigned_vec_var_23,
-    triples_of_unsigned_vec_var_24, triples_of_unsigned_vec_var_25, triples_of_unsigned_vec_var_26,
-    triples_of_unsigned_vec_var_46, triples_of_unsigned_vec_var_48,
+    triples_of_unsigned_vec_var_24, triples_of_unsigned_vec_var_25, triples_of_unsigned_vec_var_46,
+    triples_of_unsigned_vec_var_48,
 };
 use malachite_test::inputs::natural::{naturals, pairs_of_naturals, triples_of_naturals};
 
@@ -71,43 +68,6 @@ fn limbs_mul_basecase_helper(out: &Vec<Limb>, xs: &Vec<Limb>, ys: &Vec<Limb>) ->
     assert_eq!(limbs, &out[..len]);
     assert_eq!(&out[len..], &old_out[len..]);
     out
-}
-
-#[test]
-fn limbs_mul_greater_to_out_properties() {
-    test_properties_custom_scale(
-        2_048,
-        triples_of_unsigned_vec_var_10,
-        |&(ref out_before, ref xs, ref ys)| {
-            let expected_out = limbs_mul_basecase_helper(out_before, xs, ys);
-            let mut out = out_before.to_vec();
-            let highest_result_limb = limbs_mul_greater_to_out(&mut out, xs, ys);
-            assert_eq!(highest_result_limb, out[xs.len() + ys.len() - 1]);
-            assert_eq!(out, expected_out);
-            let mut out = out_before.to_vec();
-            _limbs_mul_greater_to_out_basecase_mem_opt(&mut out, xs, ys);
-            assert_eq!(out, expected_out);
-        },
-    );
-}
-
-#[test]
-fn limbs_mul_to_out_properties() {
-    test_properties(
-        triples_of_unsigned_vec_var_26,
-        |&(ref out_before, ref xs, ref ys)| {
-            let mut out = out_before.to_vec();
-            let old_out = out_before.clone();
-            let highest_result_limb = limbs_mul_to_out(&mut out, xs, ys);
-            assert_eq!(highest_result_limb, out[xs.len() + ys.len() - 1]);
-            let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
-            let len = xs.len() + ys.len();
-            let mut limbs = n.into_limbs_asc();
-            limbs.resize(len, 0);
-            assert_eq!(limbs, &out[..len]);
-            assert_eq!(&out[len..], &old_out[len..]);
-        },
-    );
 }
 
 #[test]

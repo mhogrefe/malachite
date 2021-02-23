@@ -79,6 +79,7 @@ impl Debug for MomentStats {
 }
 
 // From https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
+#[allow(clippy::suspicious_operation_groupings)]
 pub fn moment_stats<I: Iterator>(xs: I) -> MomentStats
 where
     I::Item: CheckedToF64,
@@ -668,6 +669,7 @@ fn pop_double_truncated_geometric_dist_mean(b: f64, a: f64, unadjusted_mean: f64
         / (p * (-2.0 + qpa + q.powf(1.0 + b) + p - qpa * p))
 }
 
+#[allow(clippy::suspicious_operation_groupings)]
 fn pop_double_truncated_geometric_dist_2_mean(b: f64, a: f64, unadjusted_mean: f64) -> f64 {
     let p = 1.0 / (unadjusted_mean + 1.0);
     let q = 1.0 - p;

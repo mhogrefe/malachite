@@ -13,46 +13,46 @@ use malachite_base_test_util::num::logic::bit_convertible::{
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_to_bits_asc);
-    register_signed_demos!(runner, demo_signed_to_bits_asc);
-    register_unsigned_demos!(runner, demo_unsigned_to_bits_desc);
-    register_signed_demos!(runner, demo_signed_to_bits_desc);
+    register_unsigned_demos!(runner, demo_to_bits_asc_unsigned);
+    register_signed_demos!(runner, demo_to_bits_asc_signed);
+    register_unsigned_demos!(runner, demo_to_bits_desc_unsigned);
+    register_signed_demos!(runner, demo_to_bits_desc_signed);
 
-    register_unsigned_benches!(runner, benchmark_unsigned_to_bits_asc_algorithms);
-    register_signed_benches!(runner, benchmark_signed_to_bits_asc_algorithms);
-    register_unsigned_benches!(runner, benchmark_unsigned_to_bits_asc_evaluation_strategy);
-    register_signed_benches!(runner, benchmark_signed_to_bits_asc_evaluation_strategy);
-    register_unsigned_benches!(runner, benchmark_unsigned_to_bits_desc_algorithms);
-    register_signed_benches!(runner, benchmark_signed_to_bits_desc_algorithms);
-    register_unsigned_benches!(runner, benchmark_unsigned_to_bits_desc_evaluation_strategy);
-    register_signed_benches!(runner, benchmark_signed_to_bits_desc_evaluation_strategy);
+    register_unsigned_benches!(runner, benchmark_to_bits_asc_algorithms_unsigned);
+    register_signed_benches!(runner, benchmark_to_bits_asc_algorithms_signed);
+    register_unsigned_benches!(runner, benchmark_to_bits_asc_evaluation_strategy_unsigned);
+    register_signed_benches!(runner, benchmark_to_bits_asc_evaluation_strategy_signed);
+    register_unsigned_benches!(runner, benchmark_to_bits_desc_algorithms_unsigned);
+    register_signed_benches!(runner, benchmark_to_bits_desc_algorithms_signed);
+    register_unsigned_benches!(runner, benchmark_to_bits_desc_evaluation_strategy_unsigned);
+    register_signed_benches!(runner, benchmark_to_bits_desc_evaluation_strategy_signed);
 }
 
-fn demo_unsigned_to_bits_asc<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_to_bits_asc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
         println!("{}.to_bits_asc() = {:?}", u, u.to_bits_asc());
     }
 }
 
-fn demo_signed_to_bits_asc<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_to_bits_asc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for i in signed_gen::<T>().get(gm, &config).take(limit) {
         println!("{}.to_bits_asc() = {:?}", i, i.to_bits_asc());
     }
 }
 
-fn demo_unsigned_to_bits_desc<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_to_bits_desc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
         println!("{}.to_bits_desc() = {:?}", u, u.to_bits_desc());
     }
 }
 
-fn demo_signed_to_bits_desc<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_to_bits_desc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for i in signed_gen::<T>().get(gm, &config).take(limit) {
         println!("{}.to_bits_desc() = {:?}", i, i.to_bits_desc());
     }
 }
 
-fn benchmark_unsigned_to_bits_asc_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_to_bits_asc_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -74,7 +74,7 @@ fn benchmark_unsigned_to_bits_asc_algorithms<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_to_bits_asc_algorithms<T: PrimitiveSigned>(
+fn benchmark_to_bits_asc_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -97,7 +97,7 @@ fn benchmark_signed_to_bits_asc_algorithms<T: PrimitiveSigned>(
 }
 
 #[allow(unused_must_use)]
-fn benchmark_unsigned_to_bits_asc_evaluation_strategy<T: PrimitiveUnsigned>(
+fn benchmark_to_bits_asc_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -123,7 +123,7 @@ fn benchmark_unsigned_to_bits_asc_evaluation_strategy<T: PrimitiveUnsigned>(
 }
 
 #[allow(unused_must_use)]
-fn benchmark_signed_to_bits_asc_evaluation_strategy<T: PrimitiveSigned>(
+fn benchmark_to_bits_asc_evaluation_strategy_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -148,7 +148,7 @@ fn benchmark_signed_to_bits_asc_evaluation_strategy<T: PrimitiveSigned>(
     );
 }
 
-fn benchmark_unsigned_to_bits_desc_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_to_bits_desc_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -170,7 +170,7 @@ fn benchmark_unsigned_to_bits_desc_algorithms<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_to_bits_desc_algorithms<T: PrimitiveSigned>(
+fn benchmark_to_bits_desc_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -193,7 +193,7 @@ fn benchmark_signed_to_bits_desc_algorithms<T: PrimitiveSigned>(
 }
 
 #[allow(unused_must_use)]
-fn benchmark_unsigned_to_bits_desc_evaluation_strategy<T: PrimitiveUnsigned>(
+fn benchmark_to_bits_desc_evaluation_strategy_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -220,7 +220,7 @@ fn benchmark_unsigned_to_bits_desc_evaluation_strategy<T: PrimitiveUnsigned>(
 }
 
 #[allow(unused_must_use)]
-fn benchmark_signed_to_bits_desc_evaluation_strategy<T: PrimitiveSigned>(
+fn benchmark_to_bits_desc_evaluation_strategy_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

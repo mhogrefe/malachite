@@ -1,4 +1,6 @@
-use generators::common::{permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, It};
+use generators::common::{
+    permute_1_3_2, permute_2_1, reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, It,
+};
 use generators::{
     digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, signed_assign_bits_valid,
     unsigned_assign_bits_valid,
@@ -31,7 +33,7 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples_from_single, exhaustive_triples_xxy_custom_output, exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
     lex_triples_from_single, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs,
-    ExhaustiveTriplesXYY,
+    ExhaustiveTriples, ExhaustiveTriplesXYY,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_fixed_length_vecs_from_single, exhaustive_vecs,
@@ -122,10 +124,21 @@ pub fn exhaustive_signed_gen_var_3<T: PrimitiveSigned>() -> It<T> {
     Box::new(exhaustive_signeds().filter(|&x| x != T::ZERO && x != T::NEGATIVE_ONE))
 }
 
+pub fn exhaustive_signed_gen_var_4<T: PrimitiveSigned>() -> It<T> {
+    Box::new(exhaustive_negative_signeds())
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned) --
 
 pub fn exhaustive_signed_pair_gen<T: PrimitiveSigned>() -> It<(T, T)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_signeds()))
+}
+
+pub fn exhaustive_signed_pair_gen_var_1<T: PrimitiveSigned>() -> It<(T, T)> {
+    Box::new(
+        exhaustive_pairs_from_single(exhaustive_natural_signeds())
+            .interleave(exhaustive_pairs_from_single(exhaustive_negative_signeds())),
+    )
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
@@ -145,6 +158,13 @@ pub fn exhaustive_signed_triple_gen_var_2<T: PrimitiveSigned>() -> It<(T, T, T)>
     Box::new(
         exhaustive_triples_from_single(exhaustive_signeds())
             .filter(|&(x, y, z)| sub_mul_inputs_valid(x, y, z)),
+    )
+}
+
+pub fn exhaustive_signed_triple_gen_var_3<T: PrimitiveSigned>() -> It<(T, T, T)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_natural_signeds())
+            .interleave(exhaustive_triples_from_single(exhaustive_negative_signeds())),
     )
 }
 
@@ -197,6 +217,24 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_6<
 >() -> It<(T, U)> {
     Box::new(lex_pairs(
         exhaustive_signeds(),
+        primitive_int_increasing_inclusive_range(U::TWO, U::exact_from(36u8)),
+    ))
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_7<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_signeds(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_8<
+    T: PrimitiveSigned,
+    U: ExactFrom<u8> + PrimitiveUnsigned,
+>() -> It<(T, U)> {
+    Box::new(lex_pairs(
+        exhaustive_natural_signeds(),
         primitive_int_increasing_inclusive_range(U::TWO, U::exact_from(36u8)),
     ))
 }
@@ -257,6 +295,17 @@ pub fn exhaustive_signed_unsigned_unsigned_triple_gen_var_2<
         ))
         .filter_map(|(x, y, z)| y.checked_add(z).map(|new_z| (x, y, new_z))),
     )
+}
+
+pub fn exhaustive_signed_unsigned_unsigned_triple_gen_var_3<
+    T: PrimitiveSigned,
+    U: ExactFrom<u8> + PrimitiveUnsigned,
+    V: PrimitiveUnsigned,
+>() -> It<(T, U, V)> {
+    permute_1_3_2(reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs_big_tiny(exhaustive_signeds(), exhaustive_unsigneds()),
+        primitive_int_increasing_inclusive_range(U::TWO, U::exact_from(36u8)),
+    ))))
 }
 
 // -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -344,6 +393,10 @@ pub fn exhaustive_unsigned_gen_var_4<
         U::TWO,
         U::saturating_from(T::MAX),
     ))
+}
+
+pub fn exhaustive_unsigned_gen_var_5<T: PrimitiveInt>() -> It<u64> {
+    Box::new(primitive_int_increasing_inclusive_range(0, T::WIDTH))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
@@ -481,6 +534,17 @@ pub fn exhaustive_unsigned_triple_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUn
         )
         .filter_map(|(x, y, z): (T, U, U)| y.checked_add(z).map(|new_z| (x, y, new_z))),
     )
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_5<
+    T: PrimitiveUnsigned,
+    U: ExactFrom<u8> + PrimitiveUnsigned,
+    V: PrimitiveUnsigned,
+>() -> It<(T, U, V)> {
+    permute_1_3_2(reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs_big_tiny(exhaustive_unsigneds(), exhaustive_unsigneds()),
+        primitive_int_increasing_inclusive_range(U::TWO, U::exact_from(36u8)),
+    ))))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -886,7 +950,6 @@ impl<T: PrimitiveUnsigned>
     }
 }
 
-//TODO will be used
 pub fn exhaustive_unsigned_vec_pair_gen_var_1<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
     Box::new(
         exhaustive_dependent_pairs(
@@ -1000,6 +1063,89 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
                 Some((x, y))
             }),
             UnsignedVecTripleXYYLenGenerator {
+                phantom: PhantomData,
+            },
+        )
+        .map(|p| p.1),
+    )
+}
+
+struct UnsignedVecTripleLenGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned>
+    ExhaustiveDependentPairsYsGenerator<
+        (u64, u64, u64),
+        (Vec<T>, Vec<T>, Vec<T>),
+        ExhaustiveTriples<
+            Vec<T>,
+            ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
+            Vec<T>,
+            ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
+            Vec<T>,
+            ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
+        >,
+    > for UnsignedVecTripleLenGenerator<T>
+{
+    #[allow(clippy::type_complexity)]
+    #[inline]
+    fn get_ys(
+        &self,
+        &(i, j, k): &(u64, u64, u64),
+    ) -> ExhaustiveTriples<
+        Vec<T>,
+        ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
+        Vec<T>,
+        ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
+        Vec<T>,
+        ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
+    > {
+        exhaustive_triples(
+            exhaustive_fixed_length_vecs_from_single(i, exhaustive_unsigneds()),
+            exhaustive_fixed_length_vecs_from_single(j, exhaustive_unsigneds()),
+            exhaustive_fixed_length_vecs_from_single(k, exhaustive_unsigneds()),
+        )
+    }
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_2<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
+                let y = y.checked_add(1)?;
+                let x = x.checked_add(y)?;
+                let o = x.checked_add(y)?.checked_add(o)?;
+                Some((o, x, y))
+            }),
+            UnsignedVecTripleLenGenerator {
+                phantom: PhantomData,
+            },
+        )
+        .map(|p| p.1),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_3<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
+                let y = y.checked_add(1)?;
+                let x = x.checked_add(1)?;
+                let o = x.checked_add(y)?.checked_add(o)?;
+                Some((o, x, y))
+            }),
+            UnsignedVecTripleLenGenerator {
                 phantom: PhantomData,
             },
         )

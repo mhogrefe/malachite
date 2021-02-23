@@ -216,6 +216,16 @@ pub fn pair_sum_vec_len_bucketer<'a, T, U>(
     }
 }
 
+pub fn triple_2_3_sum_vec_len_bucketer<'a, T, U, V>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (T, Vec<U>, Vec<V>)> {
+    Bucketer {
+        bucketing_function: &|(_, xs, ys)| xs.len() + ys.len(),
+        bucketing_label: format!("{}.len() + {}.len()", xs_name, ys_name),
+    }
+}
+
 pub fn get_bits_bucketer<T>() -> Bucketer<'static, (T, u64, u64)> {
     Bucketer {
         bucketing_function: &|&(_, start, end)| usize::exact_from(end - start),

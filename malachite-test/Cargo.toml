@@ -27,8 +27,6 @@ num = "0.3.1"
 rand = "0.4.6"
 serde = "^1.0.0"
 serde_json = "^1.0.32"
-streaming-stats = "0.2.2"
-time = "0.1.40"
 
 [dependencies.rug]
 version = "1.11.0"

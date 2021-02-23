@@ -8,15 +8,12 @@ use malachite_base_test_util::generators::unsigned_gen;
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_generic_demos!(runner, demo_unsigned_upper_half, u16, u32, u64, u128);
-    register_generic_benches!(runner, benchmark_unsigned_upper_half, u16, u32, u64, u128);
+    register_generic_demos!(runner, demo_upper_half, u16, u32, u64, u128);
+    register_generic_benches!(runner, benchmark_upper_half, u16, u32, u64, u128);
 }
 
-fn demo_unsigned_upper_half<T: PrimitiveUnsigned + SplitInHalf>(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-) where
+fn demo_upper_half<T: PrimitiveUnsigned + SplitInHalf>(gm: GenMode, config: GenConfig, limit: usize)
+where
     T::Half: PrimitiveUnsigned,
 {
     for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
@@ -24,7 +21,7 @@ fn demo_unsigned_upper_half<T: PrimitiveUnsigned + SplitInHalf>(
     }
 }
 
-fn benchmark_unsigned_upper_half<T: PrimitiveUnsigned + SplitInHalf>(
+fn benchmark_upper_half<T: PrimitiveUnsigned + SplitInHalf>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

@@ -1097,7 +1097,7 @@ where
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]
-pub struct LexVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
+struct LexVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
     ys: J,
 }
 
@@ -1435,7 +1435,7 @@ where
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]
-pub struct ExhaustiveVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
+struct ExhaustiveVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
     ys: J,
 }
 

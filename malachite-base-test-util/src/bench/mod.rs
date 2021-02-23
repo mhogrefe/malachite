@@ -26,7 +26,7 @@ pub struct BenchmarkSeriesOptions<'a, T: 'a> {
     pub color: &'a str,
 }
 
-pub struct BenchmarkOptions<'a, I: Iterator>
+struct BenchmarkOptions<'a, I: Iterator>
 where
     I::Item: 'a,
 {

@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-def try_building(include_rust_wheels):
+def try_building():
     try:
         subprocess.check_call(['cargo', 'check', '--all-targets'], cwd = 'malachite-base-test-util')
     except subprocess.CalledProcessError:
@@ -27,26 +27,25 @@ def try_building(include_rust_wheels):
     except subprocess.CalledProcessError:
         return False
     try:
-        subprocess.check_call(['cargo', 'check', '--tests'], cwd = 'malachite-test')
+        subprocess.check_call(['cargo', 'check', '--all-targets'], cwd = 'malachite-test')
     except subprocess.CalledProcessError:
         return False
     try:
-        subprocess.check_call(['cargo', 'check', '--tests', '--features', '32_bit_limbs'], cwd = 'malachite-test')
+        subprocess.check_call(['cargo', 'check', '--all-targets', '--features', '32_bit_limbs'], cwd = 'malachite-test')
     except subprocess.CalledProcessError:
         return False
-    if include_rust_wheels:
-        try:
-            subprocess.check_call(['cargo', 'check', '--tests'], cwd = '../rust-wheels')
-        except subprocess.CalledProcessError:
-            return False
-        try:
-            subprocess.check_call(['cargo', 'check', '--tests', '--features', '32_bit_limbs'], cwd = '../rust-wheels')
-        except subprocess.CalledProcessError:
-            return False
+    try:
+        subprocess.check_call(['cargo', 'check', '--all-targets'], cwd = '../rust-wheels')
+    except subprocess.CalledProcessError:
+        return False
+    try:
+        subprocess.check_call(['cargo', 'check', '--all-targets', '--features', '32_bit_limbs'], cwd = '../rust-wheels')
+    except subprocess.CalledProcessError:
+        return False
     return True
 
 
-def replace_and_build(filename, line_number, substring, replacement, include_rust_wheels):
+def replace_and_build(filename, line_number, substring, replacement):
     with open(filename, 'r') as in_f:
         with open('temp.rs', 'w') as out_f:
             n = 1
@@ -59,7 +58,7 @@ def replace_and_build(filename, line_number, substring, replacement, include_rus
                 n += 1
     assert subprocess.call('cp ' + filename + ' backup.rs', shell = True) == 0
     assert subprocess.call('mv temp.rs ' + filename, shell = True) == 0
-    if try_building(include_rust_wheels):
+    if try_building():
         assert subprocess.call('rm backup.rs', shell = True) == 0
         return True
     else:
@@ -67,7 +66,7 @@ def replace_and_build(filename, line_number, substring, replacement, include_rus
         return False
 
 
-def try_replacing(filename, substring, replacement, exceptions, include_rust_wheels):
+def try_replacing(filename, substring, replacement, exceptions):
     start_line_number = 1
     while True:
         found_instance = False
@@ -80,13 +79,13 @@ def try_replacing(filename, substring, replacement, exceptions, include_rust_whe
                     break
                 n += 1
         if found_instance:
-            replace_and_build(filename, n, substring, replacement, include_rust_wheels)
+            replace_and_build(filename, n, substring, replacement)
             start_line_number = n + 1
         else:
             return
 
 
-assert try_building(True)
+assert try_building()
 filename_list = []
 for root, directories, filenames in os.walk('.'):
     for filename in filenames: 
@@ -101,8 +100,8 @@ for root, directories, filenames in os.walk('../rust-wheels'):
 filename_list.sort()
 
 for filename in filename_list:
-    if '/malachite-test/' in filename:
-        try_replacing(filename, 'pub fn', 'pub(crate) fn', ['pub fn main()'], False)
-        try_replacing(filename, 'pub(crate) fn', 'fn', [], False)
-    else:
-        try_replacing(filename, 'pub(crate) fn', 'fn', [], True)
+    if '/malachite-test/' in filename or '/rust-wheels/' in filename:
+        try_replacing(filename, 'pub fn', 'pub(crate) fn', ['pub fn main()'])
+    try_replacing(filename, 'pub(crate) fn', 'fn', [])
+    try_replacing(filename, 'pub struct', 'pub(crate) struct', [])
+    try_replacing(filename, 'pub(crate) struct', 'struct', [])

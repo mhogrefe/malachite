@@ -14,4 +14,5 @@ impl CheckedToF64 for NaturalCheckedToF64Wrapper {
 
 pub mod arithmetic;
 pub mod comparison;
+pub mod conversion;
 pub mod logic;

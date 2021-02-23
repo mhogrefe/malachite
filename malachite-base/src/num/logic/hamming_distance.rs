@@ -13,17 +13,12 @@ macro_rules! impl_hamming_distance_unsigned {
             /// Returns the Hamming distance between `self` and `other`, or the number of bit flips
             /// needed to turn `self` into `other`.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::HammingDistance;
-            ///
-            /// assert_eq!(123u32.hamming_distance(456), 6);
-            /// assert_eq!(0u8.hamming_distance(255), 8);
-            /// ```
+            /// See the documentation of the `num::logic::hamming_distance` module.
             #[inline]
             fn hamming_distance(self, other: $t) -> u64 {
                 _hamming_distance_unsigned(self, other)
@@ -48,21 +43,17 @@ macro_rules! impl_checked_hamming_distance_signed {
     ($t:ident) => {
         impl CheckedHammingDistance<$t> for $t {
             /// Returns the Hamming distance between `self` and `other`, or the number of bit flips
-            /// needed to turn `self` into `other`. If `self` and `other` have opposite signs, then
-            /// the number of flips would be infinite, so the result is `None`.
+            /// needed to turn `self` into `other`.
             ///
-            /// Time: worst case O(1)
+            /// If `self` and `other` have opposite signs, then the number of flips would be
+            /// infinite, so the result is `None`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::CheckedHammingDistance;
-            ///
-            /// assert_eq!(123i32.checked_hamming_distance(456), Some(6));
-            /// assert_eq!(0i8.checked_hamming_distance(127), Some(7));
-            /// assert_eq!(0i8.checked_hamming_distance(-1), None);
-            /// ```
+            /// See the documentation of the `num::logic::hamming_distance` module.
             #[inline]
             fn checked_hamming_distance(self, other: $t) -> Option<u64> {
                 _checked_hamming_distance_signed(self, other)

@@ -18,9 +18,25 @@ pub fn pair_1_natural_bit_bucketer<T>(var_name: &str) -> Bucketer<(Natural, T)> 
     }
 }
 
+pub fn triple_1_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(Natural, T, U)> {
+    Bucketer {
+        bucketing_function: &|(x, _, _)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
 pub fn triple_3_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, U, Natural)> {
     Bucketer {
         bucketing_function: &|(_, _, x)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
+pub fn triple_3_pair_1_natural_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<(T, U, (Natural, V))> {
+    Bucketer {
+        bucketing_function: &|(_, _, (x, _))| usize::exact_from(x.significant_bits()),
         bucketing_label: format!("{}.significant_bits()", var_name),
     }
 }
@@ -32,9 +48,32 @@ pub fn integer_bit_bucketer(var_name: &str) -> Bucketer<Integer> {
     }
 }
 
+pub fn pair_1_integer_bit_bucketer<T>(var_name: &str) -> Bucketer<(Integer, T)> {
+    Bucketer {
+        bucketing_function: &|(x, _)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
+pub fn triple_1_integer_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(Integer, T, U)> {
+    Bucketer {
+        bucketing_function: &|(x, _, _)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
 pub fn triple_3_integer_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, U, Integer)> {
     Bucketer {
         bucketing_function: &|(_, _, x)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
+pub fn triple_3_pair_1_integer_bit_bucketer<T, U, V>(
+    var_name: &str,
+) -> Bucketer<(T, U, (Integer, V))> {
+    Bucketer {
+        bucketing_function: &|(_, _, (x, _))| usize::exact_from(x.significant_bits()),
         bucketing_label: format!("{}.significant_bits()", var_name),
     }
 }

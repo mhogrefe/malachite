@@ -7,41 +7,41 @@ use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen};
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_eq_abs);
-    register_unsigned_demos!(runner, demo_unsigned_ne_abs);
-    register_signed_demos!(runner, demo_signed_eq_abs);
-    register_signed_demos!(runner, demo_signed_ne_abs);
-    register_unsigned_benches!(runner, benchmark_unsigned_eq_abs);
-    register_unsigned_benches!(runner, benchmark_unsigned_ne_abs);
-    register_signed_benches!(runner, benchmark_signed_eq_abs);
-    register_signed_benches!(runner, benchmark_signed_ne_abs);
+    register_unsigned_demos!(runner, demo_eq_abs_unsigned);
+    register_unsigned_demos!(runner, demo_ne_abs_unsigned);
+    register_signed_demos!(runner, demo_eq_abs_signed);
+    register_signed_demos!(runner, demo_ne_abs_signed);
+    register_unsigned_benches!(runner, benchmark_eq_abs_unsigned);
+    register_unsigned_benches!(runner, benchmark_ne_abs_unsigned);
+    register_signed_benches!(runner, benchmark_eq_abs_signed);
+    register_signed_benches!(runner, benchmark_ne_abs_signed);
 }
 
-fn demo_unsigned_eq_abs<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_eq_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in unsigned_pair_gen::<T>().get(gm, &config).take(limit) {
         println!("{}.eq_abs(&{}) = {:?}", x, y, x.eq_abs(&y));
     }
 }
 
-fn demo_unsigned_ne_abs<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_ne_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in unsigned_pair_gen::<T>().get(gm, &config).take(limit) {
         println!("{}.ne_abs(&{}) = {:?}", x, y, x.ne_abs(&y));
     }
 }
 
-fn demo_signed_eq_abs<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_eq_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
         println!("({}).eq_abs(&{}) = {:?}", x, y, x.eq_abs(&y));
     }
 }
 
-fn demo_signed_ne_abs<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_ne_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
         println!("({}).ne_abs(&{}) = {:?}", x, y, x.ne_abs(&y));
     }
 }
 
-fn benchmark_unsigned_eq_abs<T: PrimitiveUnsigned>(
+fn benchmark_eq_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -59,7 +59,7 @@ fn benchmark_unsigned_eq_abs<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_unsigned_ne_abs<T: PrimitiveUnsigned>(
+fn benchmark_ne_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -77,7 +77,7 @@ fn benchmark_unsigned_ne_abs<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_eq_abs<T: PrimitiveSigned>(
+fn benchmark_eq_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -95,7 +95,7 @@ fn benchmark_signed_eq_abs<T: PrimitiveSigned>(
     );
 }
 
-fn benchmark_signed_ne_abs<T: PrimitiveSigned>(
+fn benchmark_ne_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

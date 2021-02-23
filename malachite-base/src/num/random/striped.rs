@@ -250,7 +250,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNegativeSigneds<T> {
 /// This `struct` is created by the `striped_random_unsigneds_less_than` function. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
-pub struct StripedRandomUnsignedsLessThan<T: PrimitiveUnsigned> {
+struct StripedRandomUnsignedsLessThan<T: PrimitiveUnsigned> {
     pub(crate) xs: StripedRandomUnsignedBitChunks<T>,
     pub(crate) limit: T,
 }

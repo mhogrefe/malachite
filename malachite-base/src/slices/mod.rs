@@ -239,9 +239,10 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
     }
 }
 
-/// Uniformly generates a random reference to a value from a nonempty slice. The iterator cannot
-/// outlive the slice. It may be more convenient for the iterator to own the data, in which case you
-/// may use `random_values_from_vec` instead.
+/// Uniformly generates a random reference to a value from a nonempty slice.
+///
+/// The iterator cannot outlive the slice. It may be more convenient for the iterator to own the
+/// data, in which case you may use `random_values_from_vec` instead.
 ///
 /// The output length is infinite.
 ///
@@ -275,5 +276,101 @@ pub fn random_values_from_slice<T>(seed: Seed, xs: &[T]) -> RandomValuesFromSlic
     RandomValuesFromSlice {
         xs,
         indices: random_unsigneds_less_than(seed, u64::exact_from(xs.len())),
+    }
+}
+
+pub(crate) fn advance_indices(indices: &mut [usize]) -> bool {
+    let n = indices.len();
+    if n == 0 {
+        return true;
+    }
+    // Find the index of the value right before the longest descending suffix.
+    let mut pivot_index = n;
+    let mut i = 0;
+    let mut reached_end = true;
+    while pivot_index > 0 {
+        pivot_index -= 1;
+        let next_i = indices[pivot_index];
+        if next_i < i {
+            reached_end = false;
+            break;
+        }
+        i = next_i;
+    }
+    if reached_end {
+        return true;
+    }
+    let pivot = indices[pivot_index];
+    let mut swap_index = n - 1;
+    while indices[swap_index] < pivot {
+        swap_index -= 1;
+    }
+    indices.swap(pivot_index, swap_index);
+    indices[pivot_index + 1..].reverse();
+    false
+}
+
+/// Generates every permutation of a slice.
+pub struct ExhaustiveSlicePermutations<'a, T> {
+    xs: &'a [T],
+    indices: Vec<usize>,
+    done: bool,
+}
+
+impl<'a, T> Iterator for ExhaustiveSlicePermutations<'a, T> {
+    type Item = Vec<&'a T>;
+
+    fn next(&mut self) -> Option<Vec<&'a T>> {
+        if self.done {
+            None
+        } else {
+            let out = Some(self.indices.iter().map(|&i| &self.xs[i]).collect());
+            self.done = advance_indices(&mut self.indices);
+            out
+        }
+    }
+}
+
+/// Generates every permutation of a slice.
+///
+/// The permutations are `Vec`s of references to the slice. It may be more convenient for the
+/// iterator to own the data, in which case you may use `exhaustive_vec_permutations` instead.
+///
+/// The permutations are generated in lexicographic order with respect to the ordering in the slice.
+///
+/// The output length is $n!$, where $n$ is `xs.len()`.
+///
+/// # Expected complexity per iteration
+///
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::slices::exhaustive_slice_permutations;
+///
+/// let css: Vec<String> = exhaustive_slice_permutations(&['a', 'b', 'c', 'd'])
+///     .map(|ds| ds.into_iter().copied().collect()).collect();
+/// assert_eq!(
+///     css.iter().map(String::as_str).collect_vec().as_slice(),
+///     [
+///         "abcd", "abdc", "acbd", "acdb", "adbc", "adcb", "bacd", "badc", "bcad", "bcda", "bdac",
+///         "bdca", "cabd", "cadb", "cbad", "cbda", "cdab", "cdba", "dabc", "dacb", "dbac", "dbca",
+///         "dcab", "dcba"
+///     ]
+/// );
+/// ```
+pub fn exhaustive_slice_permutations<T>(xs: &[T]) -> ExhaustiveSlicePermutations<T> {
+    ExhaustiveSlicePermutations {
+        xs,
+        indices: (0..xs.len()).collect(),
+        done: false,
     }
 }

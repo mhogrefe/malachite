@@ -19,11 +19,8 @@ impl<T> BaseFmtWrapper<T> {
     /// use malachite_base::num::conversion::string::BaseFmtWrapper;
     ///
     /// let x = BaseFmtWrapper::new(1000000000u32, 36);
-    /// assert_eq!(format!("Base-36 example: {}", x), "Base-36 example: gjdgxs");
-    /// assert_eq!(
-    ///     format!("Base-36 example, uppercase: {:#}", x),
-    ///     "Base-36 example, uppercase: GJDGXS"
-    /// );
+    /// assert_eq!(format!("{}", x), "gjdgxs");
+    /// assert_eq!(format!("{:#}", x), "GJDGXS");
     /// ```
     pub fn new(x: T, base: u64) -> Self {
         assert!((2..=36).contains(&base), "base out of range");
@@ -57,18 +54,16 @@ impl<T> BaseFmtWrapper<T> {
 /// use malachite_base::num::conversion::string::BaseFmtWrapper;
 ///
 /// let x = BaseFmtWrapper::new(1000000000u32, 36);
-/// assert_eq!(format!("Base-36 example: {}", x), "Base-36 example: gjdgxs");
-/// assert_eq!(
-///     format!("Base-36 example, uppercase: {:#}", x),
-///     "Base-36 example, uppercase: GJDGXS"
-/// );
+/// assert_eq!(format!("{}", x), "gjdgxs");
+/// assert_eq!(format!("{:#}", x), "GJDGXS");
+/// assert_eq!(format!("{:010}", x), "0000gjdgxs");
+/// assert_eq!(format!("{:#010}", x), "0000GJDGXS");
 ///
 /// let x = BaseFmtWrapper::new(-1000000000i32, 36);
-/// assert_eq!(format!("Base-36 example: {}", x), "Base-36 example: -gjdgxs");
-/// assert_eq!(
-///     format!("Base-36 example, uppercase: {:#}", x),
-///     "Base-36 example, uppercase: -GJDGXS"
-/// );
+/// assert_eq!(format!("{}", x), "-gjdgxs");
+/// assert_eq!(format!("{:#}", x), "-GJDGXS");
+/// assert_eq!(format!("{:010}", x), "-000gjdgxs");
+/// assert_eq!(format!("{:#010}", x), "-000GJDGXS");
 /// ```
 ///
 /// # Debug::fmt for BaseFmtWrapper
@@ -76,18 +71,16 @@ impl<T> BaseFmtWrapper<T> {
 /// use malachite_base::num::conversion::string::BaseFmtWrapper;
 ///
 /// let x = BaseFmtWrapper::new(1000000000u32, 36);
-/// assert_eq!(format!("Base-36 example: {:?}", x), "Base-36 example: gjdgxs");
-/// assert_eq!(
-///     format!("Base-36 example, uppercase: {:#?}", x),
-///     "Base-36 example, uppercase: GJDGXS"
-/// );
+/// assert_eq!(format!("{:?}", x), "gjdgxs");
+/// assert_eq!(format!("{:#?}", x), "GJDGXS");
+/// assert_eq!(format!("{:010?}", x), "0000gjdgxs");
+/// assert_eq!(format!("{:#010?}", x), "0000GJDGXS");
 ///
 /// let x = BaseFmtWrapper::new(-1000000000i32, 36);
-/// assert_eq!(format!("Base-36 example: {:?}", x), "Base-36 example: -gjdgxs");
-/// assert_eq!(
-///     format!("Base-36 example, uppercase: {:#?}", x),
-///     "Base-36 example, uppercase: -GJDGXS"
-/// );
+/// assert_eq!(format!("{:?}", x), "-gjdgxs");
+/// assert_eq!(format!("{:#?}", x), "-GJDGXS");
+/// assert_eq!(format!("{:010?}", x), "-000gjdgxs");
+/// assert_eq!(format!("{:#010?}", x), "-000GJDGXS");
 /// ```
 ///
 /// # to_string_base

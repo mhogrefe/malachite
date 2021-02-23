@@ -93,12 +93,6 @@ pub mod base {
             pub mod xxx_sub_yyy_is_zzz;
             pub mod xxxx_add_yyyy_is_zzzz;
         }
-
-        pub mod logic {
-            pub mod hamming_distance;
-            pub mod low_mask;
-            pub mod not_assign;
-        }
     }
 }
 

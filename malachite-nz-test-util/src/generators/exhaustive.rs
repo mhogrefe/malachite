@@ -9,13 +9,14 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::tuples::exhaustive::{
-    exhaustive_dependent_pairs, exhaustive_pairs, ExhaustiveDependentPairsYsGenerator,
+    exhaustive_dependent_pairs, exhaustive_pairs, lex_pairs, ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_vecs, exhaustive_vecs_length_range, exhaustive_vecs_min_length,
 };
-use malachite_base_test_util::generators::common::permute_2_1;
-use malachite_base_test_util::generators::common::It;
+use malachite_base_test_util::generators::common::{
+    permute_1_3_2, permute_2_1, reshape_2_1_to_3, It,
+};
 use malachite_base_test_util::generators::exhaustive_pairs_big_tiny;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::integer::Integer;
@@ -34,6 +35,35 @@ use std::marker::PhantomData;
 
 pub fn exhaustive_integer_gen() -> It<Integer> {
     Box::new(exhaustive_integers())
+}
+
+// -- (Integer, PrimitiveUnsigned) --
+
+pub fn exhaustive_integer_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
+) -> It<(Integer, T)> {
+    Box::new(lex_pairs(
+        exhaustive_integers(),
+        primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
+    ))
+}
+
+pub fn exhaustive_integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integers(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+// -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_integer_unsigned_unsigned_triple_gen_var_1<
+    T: ExactFrom<u8> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Integer, T, U)> {
+    permute_1_3_2(reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs_big_tiny(exhaustive_integers(), exhaustive_unsigneds()),
+        primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
+    ))))
 }
 
 // -- Natural --
@@ -64,7 +94,7 @@ pub fn exhaustive_natural_pair_gen_var_2() -> It<(Natural, Natural)> {
 
 // -- (Natural, PrimitiveInt) --
 
-pub fn natural_primitive_int_pair_gen_var_1<
+pub fn exhaustive_natural_primitive_int_pair_gen_var_1<
     T: PrimitiveInt + SaturatingFrom<U>,
     U: PrimitiveInt,
 >() -> It<(Natural, T)> {
@@ -74,11 +104,40 @@ pub fn natural_primitive_int_pair_gen_var_1<
     ))
 }
 
-pub fn natural_primitive_int_pair_gen_var_2<T: PrimitiveInt>() -> It<(Natural, T)> {
+pub fn exhaustive_natural_primitive_int_pair_gen_var_2<T: PrimitiveInt>() -> It<(Natural, T)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_naturals(),
         primitive_int_increasing_inclusive_range(T::TWO, T::MAX),
     ))
+}
+
+// -- (Natural, PrimitiveUnsigned) --
+
+pub fn exhaustive_natural_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
+) -> It<(Natural, T)> {
+    Box::new(lex_pairs(
+        exhaustive_naturals(),
+        primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
+    ))
+}
+
+pub fn exhaustive_natural_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+// -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_1<
+    T: ExactFrom<u8> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Natural, T, U)> {
+    permute_1_3_2(reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs_big_tiny(exhaustive_naturals(), exhaustive_unsigneds()),
+        primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
+    ))))
 }
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)

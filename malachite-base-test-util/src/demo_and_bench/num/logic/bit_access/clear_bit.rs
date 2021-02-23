@@ -10,13 +10,13 @@ use malachite_base_test_util::generators::{
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_clear_bit);
-    register_signed_demos!(runner, demo_signed_clear_bit);
-    register_unsigned_benches!(runner, benchmark_unsigned_clear_bit);
-    register_signed_benches!(runner, benchmark_signed_clear_bit);
+    register_unsigned_demos!(runner, demo_clear_bit_unsigned);
+    register_signed_demos!(runner, demo_clear_bit_signed);
+    register_unsigned_benches!(runner, benchmark_clear_bit_unsigned);
+    register_signed_benches!(runner, benchmark_clear_bit_signed);
 }
 
-fn demo_unsigned_clear_bit<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_clear_bit_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut n, index) in unsigned_pair_gen_var_2::<T, u64>()
         .get(gm, &config)
         .take(limit)
@@ -27,7 +27,7 @@ fn demo_unsigned_clear_bit<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig,
     }
 }
 
-fn demo_signed_clear_bit<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_clear_bit_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut n, index) in signed_unsigned_pair_gen_var_4::<T>()
         .get(gm, &config)
         .take(limit)
@@ -38,7 +38,7 @@ fn demo_signed_clear_bit<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, lim
     }
 }
 
-fn benchmark_unsigned_clear_bit<T: PrimitiveUnsigned>(
+fn benchmark_clear_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -56,7 +56,7 @@ fn benchmark_unsigned_clear_bit<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_clear_bit<T: PrimitiveSigned>(
+fn benchmark_clear_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

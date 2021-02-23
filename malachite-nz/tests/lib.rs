@@ -101,6 +101,9 @@ pub mod integer {
         pub mod natural_from_integer;
         pub mod primitive_int_from_integer;
         pub mod serde;
+        pub mod string {
+            pub mod to_string;
+        }
         pub mod to_twos_complement_limbs;
     }
     pub mod exhaustive {
@@ -241,6 +244,9 @@ pub mod natural {
         pub mod from_primitive_int;
         pub mod primitive_int_from_natural;
         pub mod serde;
+        pub mod string {
+            pub mod to_string;
+        }
         pub mod to_limbs;
     }
     pub mod exhaustive {

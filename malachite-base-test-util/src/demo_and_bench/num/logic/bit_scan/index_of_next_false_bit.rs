@@ -10,13 +10,13 @@ use malachite_base_test_util::generators::{
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_index_of_next_false_bit);
-    register_signed_demos!(runner, demo_signed_index_of_next_false_bit);
-    register_unsigned_benches!(runner, benchmark_unsigned_index_of_next_false_bit);
-    register_signed_benches!(runner, benchmark_signed_index_of_next_false_bit);
+    register_unsigned_demos!(runner, demo_index_of_next_false_bit_unsigned);
+    register_signed_demos!(runner, demo_index_of_next_false_bit_signed);
+    register_unsigned_benches!(runner, benchmark_index_of_next_false_bit_unsigned);
+    register_signed_benches!(runner, benchmark_index_of_next_false_bit_signed);
 }
 
-fn demo_unsigned_index_of_next_false_bit<T: PrimitiveUnsigned>(
+fn demo_index_of_next_false_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -34,7 +34,7 @@ fn demo_unsigned_index_of_next_false_bit<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_signed_index_of_next_false_bit<T: PrimitiveSigned>(
+fn demo_index_of_next_false_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -52,7 +52,7 @@ fn demo_signed_index_of_next_false_bit<T: PrimitiveSigned>(
     }
 }
 
-fn benchmark_unsigned_index_of_next_false_bit<T: PrimitiveUnsigned>(
+fn benchmark_index_of_next_false_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -72,7 +72,7 @@ fn benchmark_unsigned_index_of_next_false_bit<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_index_of_next_false_bit<T: PrimitiveSigned>(
+fn benchmark_index_of_next_false_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

@@ -405,6 +405,14 @@ macro_rules! register_signed_unsigned_match_benches {
 }
 
 #[macro_export]
+macro_rules! register_primitive_int_benches {
+    ($runner: ident, $f: ident) => {
+        register_unsigned_benches!($runner, $f);
+        register_signed_benches!($runner, $f);
+    };
+}
+
+#[macro_export]
 macro_rules! register_unsigned_unsigned_benches {
     ($runner: ident, $f: ident) => {
         register_generic_benches_2!(

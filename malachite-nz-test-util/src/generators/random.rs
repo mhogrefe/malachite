@@ -12,7 +12,7 @@ use malachite_base::num::random::{
 };
 use malachite_base::options::random::{random_options, RandomOptions};
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::tuples::random::random_pairs;
+use malachite_base::tuples::random::{random_pairs, random_triples};
 use malachite_base::vecs::random::{
     random_vecs, random_vecs_length_range, random_vecs_min_length, RandomVecs,
 };
@@ -34,6 +34,74 @@ pub fn random_integer_gen(config: &GenConfig) -> It<Integer> {
         EXAMPLE_SEED,
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
+    ))
+}
+
+// -- (Integer, PrimitiveUnsigned) --
+
+pub fn random_integer_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::exact_from(36u8)),
+    ))
+}
+
+pub fn random_integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn random_integer_unsigned_unsigned_triple_gen_var_1<
+    T: ExactFrom<u8> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Integer, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::exact_from(36u8)),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 4),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
     ))
 }
 
@@ -135,6 +203,72 @@ pub fn random_natural_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
             )
         },
         &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::MAX),
+    ))
+}
+
+pub fn random_natural_unsigned_pair_gen_var_3<T: ExactFrom<u8> + PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::exact_from(36u8)),
+    ))
+}
+
+pub fn random_natural_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn random_natural_unsigned_unsigned_triple_gen_var_1<
+    T: ExactFrom<u8> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Natural, T, U)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::exact_from(36u8)),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 4),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
     ))
 }
 

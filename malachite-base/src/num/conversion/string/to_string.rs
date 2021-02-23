@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{CheckedLogTwo, UnsignedAbs};
+use num::arithmetic::traits::UnsignedAbs;
 use num::basic::traits::Zero;
 use num::conversion::string::BaseFmtWrapper;
-use num::conversion::traits::{Digits, PowerOfTwoDigitIterable, ToStringBase, WrappingFrom};
-use std::fmt::{self, Debug, Display, Formatter, Write};
+use num::conversion::traits::{Digits, ToStringBase, WrappingFrom};
+use std::fmt::{Debug, Display, Formatter, Result, Write};
 use vecs::vec_pad_left;
 
 /// Converts a digit to a byte corresponding to a numeric or lowercase alphabetic `char` that
@@ -65,37 +65,24 @@ pub fn digit_to_display_byte_upper(b: u8) -> u8 {
     }
 }
 
-fn _fmt_unsigned<T: Copy + Digits<u8> + Eq + PowerOfTwoDigitIterable<u8> + Zero>(
+fn _fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
     w: &BaseFmtWrapper<T>,
     f: &mut Formatter,
-) -> fmt::Result {
-    let upper = f.alternate();
-    if w.x == T::ZERO {
-        f.write_char('0')
-    } else if let Some(log_base) = w.base.checked_log_two() {
-        if upper {
-            for digit in PowerOfTwoDigitIterable::<u8>::power_of_two_digits(w.x, log_base).rev() {
-                f.write_char(char::from(digit_to_display_byte_upper(digit)))?;
-            }
-        } else {
-            for digit in PowerOfTwoDigitIterable::<u8>::power_of_two_digits(w.x, log_base).rev() {
-                f.write_char(char::from(digit_to_display_byte_lower(digit)))?;
-            }
+) -> Result {
+    let mut digits = w.x.to_digits_desc(&u8::wrapping_from(w.base));
+    if f.alternate() {
+        for digit in &mut digits {
+            *digit = digit_to_display_byte_upper(*digit);
         }
-        Ok(())
     } else {
-        let mut digits = w.x.to_digits_desc(&u8::wrapping_from(w.base));
-        if upper {
-            for digit in &mut digits {
-                *digit = digit_to_display_byte_upper(*digit);
-            }
-        } else {
-            for digit in &mut digits {
-                *digit = digit_to_display_byte_lower(*digit);
-            }
+        for digit in &mut digits {
+            *digit = digit_to_display_byte_lower(*digit);
         }
-        write!(f, "{}", std::str::from_utf8(&digits).unwrap())
     }
+    if w.x == T::ZERO {
+        digits.push(b'0');
+    }
+    f.pad_integral(true, "", std::str::from_utf8(&digits).unwrap())
 }
 
 fn _to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) -> String {
@@ -130,7 +117,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// Writes a wrapped unsigned number to a string using a specified base.
             ///
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
-            /// Using the `#` flag switches to uppercase letters.
+            /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
             /// # Worst-case complexity
             ///
@@ -143,7 +130,7 @@ macro_rules! impl_to_string_base_unsigned {
             ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
-            fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+            fn fmt(&self, f: &mut Formatter) -> Result {
                 _fmt_unsigned(self, f)
             }
         }
@@ -152,7 +139,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// Writes a wrapped unsigned number to a string using a specified base.
             ///
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
-            /// Using the `#` flag switches to uppercase letters.
+            /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
             /// This is the same as the `Display::fmt` implementation.
             ///
@@ -167,7 +154,7 @@ macro_rules! impl_to_string_base_unsigned {
             ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
-            fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+            fn fmt(&self, f: &mut Formatter) -> Result {
                 Display::fmt(self, f)
             }
         }
@@ -220,12 +207,29 @@ apply_to_unsigneds!(impl_to_string_base_unsigned);
 fn _fmt_signed<T: Copy + Ord + UnsignedAbs + Zero>(
     w: &BaseFmtWrapper<T>,
     f: &mut Formatter,
-) -> fmt::Result
+) -> Result
 where
     BaseFmtWrapper<<T as UnsignedAbs>::Output>: Display,
 {
     if w.x < T::ZERO {
         f.write_char('-')?;
+        if let Some(width) = f.width() {
+            return if f.alternate() {
+                write!(
+                    f,
+                    "{:#0width$}",
+                    &BaseFmtWrapper::new(w.x.unsigned_abs(), w.base),
+                    width = width.saturating_sub(1)
+                )
+            } else {
+                write!(
+                    f,
+                    "{:0width$}",
+                    &BaseFmtWrapper::new(w.x.unsigned_abs(), w.base),
+                    width = width.saturating_sub(1)
+                )
+            };
+        }
     }
     Display::fmt(&BaseFmtWrapper::new(w.x.unsigned_abs(), w.base), f)
 }
@@ -277,7 +281,7 @@ macro_rules! impl_to_string_base_signed {
             /// Writes a wrapped signed number to a string using a specified base.
             ///
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
-            /// Using the `#` flag switches to uppercase letters.
+            /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
             /// Unlike with the default implementations of `Binary`, `Octal`, `LowerHex`, and
             /// `UpperHex`, negative numbers are represented using a negative sign, not two's
@@ -294,7 +298,7 @@ macro_rules! impl_to_string_base_signed {
             ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
-            fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+            fn fmt(&self, f: &mut Formatter) -> Result {
                 _fmt_signed(self, f)
             }
         }
@@ -303,7 +307,7 @@ macro_rules! impl_to_string_base_signed {
             /// Writes a wrapped signed number to a string using a specified base.
             ///
             /// If the base is greater than 10, lowercase alphabetic letters are used by default.
-            /// Using the `#` flag switches to uppercase letters.
+            /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
             /// Unlike with the default implementations of `Binary`, `Octal`, `LowerHex`, and
             /// `UpperHex`, negative numbers are represented using a negative sign, not two's
@@ -322,7 +326,7 @@ macro_rules! impl_to_string_base_signed {
             ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
-            fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+            fn fmt(&self, f: &mut Formatter) -> Result {
                 Display::fmt(self, f)
             }
         }

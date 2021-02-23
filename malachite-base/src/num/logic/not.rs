@@ -3,20 +3,14 @@ use num::logic::traits::NotAssign;
 macro_rules! impl_not {
     ($t:ident) => {
         impl NotAssign for $t {
-            /// Replace a number with its bitwise negation.
+            /// Replaces a number with its bitwise negation.
             ///
-            /// Time: worst case O(1)
+            /// # Worst-case complexity
             ///
-            /// Additional memory: worst case O(1)
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::NotAssign;
-            ///
-            /// let mut x = 123u16;
-            /// x.not_assign();
-            /// assert_eq!(x, 65412);
-            /// ```
+            /// See the documentation of the `num::logic::not` module.
             #[inline]
             fn not_assign(&mut self) {
                 *self = !*self;

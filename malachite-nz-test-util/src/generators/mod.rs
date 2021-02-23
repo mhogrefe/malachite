@@ -1,4 +1,4 @@
-use crate::generators::common::{integer_nrm, natural_nrm};
+use crate::generators::common::{integer_nrm, integer_pair_1_nrm, natural_nrm, natural_pair_1_nrm};
 use crate::generators::exhaustive::*;
 use crate::generators::random::*;
 use crate::generators::special_random::*;
@@ -26,6 +26,49 @@ pub fn integer_gen_nrm() -> Generator<(BigInt, rug::Integer, Integer)> {
         &|| integer_nrm(exhaustive_integer_gen()),
         &|config| integer_nrm(random_integer_gen(config)),
         &|config| integer_nrm(special_random_integer_gen(config)),
+    )
+}
+
+// -- (Integer, PrimitiveUnsigned) --
+
+// All `(Integer, T)` where `T` is unsigned and between 2 and 36, inclusive.
+pub fn integer_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_pair_gen_var_1,
+        &random_integer_unsigned_pair_gen_var_1,
+        &special_random_integer_unsigned_pair_gen_var_3,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_unsigned_pair_gen_var_1_nrm<T: PrimitiveUnsigned>(
+) -> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
+    Generator::new(
+        &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen_var_1()),
+        &|config| integer_pair_1_nrm(random_integer_unsigned_pair_gen_var_1(config)),
+        &|config| integer_pair_1_nrm(special_random_integer_unsigned_pair_gen_var_3(config)),
+    )
+}
+
+// All `(Integer, T)` where `T` is unsigned and small.
+pub fn integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_pair_gen_var_2,
+        &random_integer_unsigned_pair_gen_var_2,
+        &special_random_integer_unsigned_pair_gen_var_2,
+    )
+}
+
+// -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// All `(Integer, T, U)` where `T` and `U` are unsigned, the `T` is between 2 and 36, inclusive, and
+// the `U` is small.
+pub fn integer_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, U)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_unsigned_triple_gen_var_1,
+        &random_integer_unsigned_unsigned_triple_gen_var_1,
+        &special_random_integer_unsigned_unsigned_triple_gen_var_1,
     )
 }
 
@@ -80,7 +123,7 @@ pub fn natural_unsigned_pair_gen_var_1<
     U: PrimitiveInt,
 >() -> Generator<(Natural, T)> {
     Generator::new(
-        &natural_primitive_int_pair_gen_var_1::<T, U>,
+        &exhaustive_natural_primitive_int_pair_gen_var_1::<T, U>,
         &random_natural_unsigned_pair_gen_var_1::<T, U>,
         &special_random_natural_unsigned_pair_gen_var_1::<T, U>,
     )
@@ -89,9 +132,50 @@ pub fn natural_unsigned_pair_gen_var_1<
 // All `(Natural, T)` where `T` is unsigned and the `T` is at least 2.
 pub fn natural_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
     Generator::new(
-        &natural_primitive_int_pair_gen_var_2,
+        &exhaustive_natural_primitive_int_pair_gen_var_2,
         &random_natural_unsigned_pair_gen_var_2,
         &special_random_natural_unsigned_pair_gen_var_2,
+    )
+}
+
+// All `(Natural, T)` where `T` is unsigned and between 2 and 36, inclusive.
+pub fn natural_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_pair_gen_var_1,
+        &random_natural_unsigned_pair_gen_var_3,
+        &special_random_natural_unsigned_pair_gen_var_3,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn natural_unsigned_pair_gen_var_3_nrm<T: PrimitiveUnsigned>(
+) -> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
+    Generator::new(
+        &|| natural_pair_1_nrm(exhaustive_natural_unsigned_pair_gen_var_1()),
+        &|config| natural_pair_1_nrm(random_natural_unsigned_pair_gen_var_3(config)),
+        &|config| natural_pair_1_nrm(special_random_natural_unsigned_pair_gen_var_3(config)),
+    )
+}
+
+// All `(Natural, T)` where `T` is unsigned and small.
+pub fn natural_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_pair_gen_var_2,
+        &random_natural_unsigned_pair_gen_var_4,
+        &special_random_natural_unsigned_pair_gen_var_4,
+    )
+}
+
+// -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// All `(Natural, T, U)` where `T` and `U` are unsigned, the `T` is between 2 and 36, inclusive, and
+// the `U` is small.
+pub fn natural_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(Natural, T, U)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_unsigned_triple_gen_var_1,
+        &random_natural_unsigned_unsigned_triple_gen_var_1,
+        &special_random_natural_unsigned_unsigned_triple_gen_var_1,
     )
 }
 

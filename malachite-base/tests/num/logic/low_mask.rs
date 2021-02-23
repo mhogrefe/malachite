@@ -1,6 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::unsigned_gen_var_9;
 use std::panic::catch_unwind;
 
 fn low_mask_primitive_helper<T: PrimitiveInt>() {
@@ -43,4 +44,29 @@ fn low_mask_fail_helper<T: PrimitiveInt>() {
 #[test]
 fn low_mask_fail() {
     apply_fn_to_primitive_ints!(low_mask_fail_helper);
+}
+
+fn low_mask_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen_var_9::<T>().test_properties(|bits| {
+        let n = T::low_mask(bits);
+        assert_eq!(n.count_ones(), bits);
+        assert_eq!(n.index_of_next_false_bit(0), Some(bits));
+    });
+}
+
+fn low_mask_properties_helper_signed<T: PrimitiveSigned>() {
+    unsigned_gen_var_9::<T>().test_properties(|bits| {
+        let n = T::low_mask(bits);
+        assert_eq!(n.count_ones(), bits);
+        assert_eq!(
+            n.index_of_next_false_bit(0),
+            if bits == T::WIDTH { None } else { Some(bits) }
+        );
+    });
+}
+
+#[test]
+fn low_mask_properties() {
+    apply_fn_to_unsigneds!(low_mask_properties_helper_unsigned);
+    apply_fn_to_signeds!(low_mask_properties_helper_signed);
 }

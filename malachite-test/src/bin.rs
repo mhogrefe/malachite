@@ -14,7 +14,6 @@ extern crate num;
 extern crate rand;
 extern crate rug;
 extern crate rust_wheels;
-extern crate time;
 
 use itertools::Itertools;
 use malachite_test::common::{get_gm, get_no_special_gm, DemoBenchRegistry, ScaleType};

@@ -1,5 +1,5 @@
 use std::error::Error;
-use std::fmt::{self, Debug, Display, Formatter};
+use std::fmt::{Debug, Display, Formatter, Result};
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 /// An error which can be returned when parsing an `Integer`.
@@ -26,7 +26,7 @@ impl Error for ParseIntegerError {
 
 //TODO test
 impl Display for ParseIntegerError {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter) -> Result {
         Debug::fmt(self, f)
     }
 }

@@ -344,7 +344,7 @@ pub mod num {
         pub mod get_highest_bit;
         pub mod hamming_distance;
         pub mod low_mask;
-        pub mod not;
+        pub mod not_assign;
         pub mod significant_bits;
     }
     pub mod random {
@@ -438,6 +438,7 @@ pub mod rounding_modes {
     pub mod size;
 }
 pub mod slices {
+    pub mod exhaustive_slice_permutations;
     pub mod slice_leading_zeros;
     pub mod slice_move_left;
     pub mod slice_set_zero;
@@ -475,11 +476,13 @@ pub mod strings {
 pub mod tuples {
     pub mod exhaustive {
         pub mod exhaustive_custom_tuples;
+        pub mod exhaustive_dependent_pairs;
         pub mod exhaustive_tuples_1_input;
         pub mod exhaustive_tuples_custom_output;
         pub mod exhaustive_tuples_from_single;
         pub mod exhaustive_units;
         pub mod lex_custom_tuples;
+        pub mod lex_dependent_pairs;
         pub mod lex_tuples;
         pub mod lex_tuples_from_single;
     }
@@ -509,7 +512,6 @@ pub mod unions {
 }
 pub mod vecs {
     pub mod exhaustive {
-        pub mod exhaustive_dependent_pairs;
         pub mod exhaustive_fixed_length_vecs_from_single;
         pub mod exhaustive_fixed_length_vecs_m_inputs;
         pub mod exhaustive_length_n_vecs;
@@ -518,7 +520,6 @@ pub mod vecs {
         pub mod exhaustive_vecs_length_inclusive_range;
         pub mod exhaustive_vecs_length_range;
         pub mod exhaustive_vecs_min_length;
-        pub mod lex_dependent_pairs;
         pub mod lex_fixed_length_vecs_from_single;
         pub mod lex_fixed_length_vecs_m_inputs;
         pub mod lex_length_n_vecs;
@@ -528,6 +529,7 @@ pub mod vecs {
         pub mod shortlex_vecs_length_range;
         pub mod shortlex_vecs_min_length;
     }
+    pub mod exhaustive_vec_permutations;
     pub mod random {
         pub mod random_fixed_length_vecs;
         pub mod random_fixed_length_vecs_from_single;

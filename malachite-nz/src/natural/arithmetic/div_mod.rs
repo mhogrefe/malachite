@@ -115,7 +115,7 @@ pub fn _div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb)
 ///     (vec![0x55555555, 0x55555555], 0));
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0, un > 1, and both
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0, un > 1, and both
 /// results are returned. Experiments show that DIVREM_1_NORM_THRESHOLD and
 /// DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be 0).
 pub fn limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
@@ -151,7 +151,7 @@ pub fn limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
 /// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0 and un > 1.
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0 and un > 1.
 /// Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary
 /// (they would always be 0).
 pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
@@ -236,7 +236,7 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb
 /// assert_eq!(ns, &[0x55555555, 0x55555555]);
 /// ```
 ///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qp == up, qxn is 0, and
+/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qp == up, qxn is 0, and
 /// un > 1. Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are
 /// unnecessary (they would always be 0).
 pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
@@ -325,7 +325,7 @@ pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
 /// assert_eq!(out, &[613566756, 613566774, 65, 10]);
 /// ```
 ///
-/// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.1.2, where qp != ap.
+/// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp != ap.
 pub fn limbs_div_mod_extra(
     out: &mut [Limb],
     fraction_len: usize,
@@ -429,7 +429,7 @@ pub fn limbs_div_mod_extra(
 /// assert_eq!(ns, &[613566756, 613566774, 65]);
 /// ```
 ///
-/// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.1.2, where qp == ap.
+/// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp == ap.
 pub fn limbs_div_mod_extra_in_place(
     ns: &mut [Limb],
     fraction_len: usize,
@@ -1965,7 +1965,8 @@ impl Natural {
         }
     }
 
-    pub(crate) fn div_assign_mod_limb(&mut self, other: Limb) -> Limb {
+    #[doc(hidden)]
+    pub fn div_assign_mod_limb(&mut self, other: Limb) -> Limb {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => 0,

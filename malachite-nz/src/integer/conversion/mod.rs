@@ -1,10 +1,7 @@
-use std::fmt::{self, Binary, Debug, Display, Formatter, Write};
-use std::str::FromStr;
-
-use malachite_base::num::basic::traits::Zero;
-
 use error::ParseIntegerError;
 use integer::Integer;
+use malachite_base::num::basic::traits::Zero;
+use std::str::FromStr;
 
 impl Integer {
     //TODO test
@@ -34,36 +31,6 @@ impl Integer {
 }
 
 //TODO test
-impl Display for Integer {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if !self.sign {
-            f.write_char('-').unwrap();
-        }
-        Display::fmt(&self.abs, f)
-    }
-}
-
-//TODO test
-impl Debug for Integer {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if !self.sign {
-            f.write_char('-').unwrap();
-        }
-        Debug::fmt(&self.abs, f)
-    }
-}
-
-//TODO test
-impl Binary for Integer {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        if !self.sign {
-            f.write_char('-').unwrap();
-        }
-        Binary::fmt(&self.abs, f)
-    }
-}
-
-//TODO test
 impl FromStr for Integer {
     type Err = ParseIntegerError;
 
@@ -81,4 +48,5 @@ pub mod from_primitive_int;
 pub mod from_twos_complement_limbs;
 pub mod natural_from_integer;
 pub mod primitive_int_from_integer;
+pub mod string;
 pub mod to_twos_complement_limbs;

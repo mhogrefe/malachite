@@ -97,10 +97,6 @@ macro_rules! identity_conversion {
     };
 }
 
-fn _checked_from_lossless<A, B: From<A>>(value: A) -> Option<B> {
-    Some(B::from(value))
-}
-
 /// This macro defines conversions from type $a to type $b, where every value of type $a is
 /// representable by a value of type $b.
 macro_rules! lossless_conversion {
@@ -118,7 +114,7 @@ macro_rules! lossless_conversion {
         impl CheckedFrom<$a> for $b {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
-                _checked_from_lossless(value)
+                Some($b::from(value))
             }
         }
 

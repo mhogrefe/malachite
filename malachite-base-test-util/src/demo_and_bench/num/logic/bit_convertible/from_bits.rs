@@ -12,18 +12,18 @@ use malachite_base_test_util::num::logic::bit_convertible::{
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_from_bits_asc);
-    register_signed_demos!(runner, demo_signed_from_bits_asc);
-    register_unsigned_demos!(runner, demo_unsigned_from_bits_desc);
-    register_signed_demos!(runner, demo_signed_from_bits_desc);
+    register_unsigned_demos!(runner, demo_from_bits_asc_unsigned);
+    register_signed_demos!(runner, demo_from_bits_asc_signed);
+    register_unsigned_demos!(runner, demo_from_bits_desc_unsigned);
+    register_signed_demos!(runner, demo_from_bits_desc_signed);
 
-    register_unsigned_benches!(runner, benchmark_unsigned_from_bits_asc_algorithms);
-    register_signed_benches!(runner, benchmark_signed_from_bits_asc_algorithms);
-    register_unsigned_benches!(runner, benchmark_unsigned_from_bits_desc_algorithms);
-    register_signed_benches!(runner, benchmark_signed_from_bits_desc_algorithms);
+    register_unsigned_benches!(runner, benchmark_from_bits_asc_algorithms_unsigned);
+    register_signed_benches!(runner, benchmark_from_bits_asc_algorithms_signed);
+    register_unsigned_benches!(runner, benchmark_from_bits_desc_algorithms_unsigned);
+    register_signed_benches!(runner, benchmark_from_bits_desc_algorithms_signed);
 }
 
-fn demo_unsigned_from_bits_asc<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_from_bits_asc_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for bs in bool_vec_gen_var_1::<T>().get(gm, &config).take(limit) {
         println!(
             "{}::from_bits_asc({:?}) = {}",
@@ -34,7 +34,7 @@ fn demo_unsigned_from_bits_asc<T: PrimitiveUnsigned>(gm: GenMode, config: GenCon
     }
 }
 
-fn demo_signed_from_bits_asc<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_from_bits_asc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for bs in bool_vec_gen_var_2::<T>().get(gm, &config).take(limit) {
         println!(
             "{}::from_bits_asc({:?}) = {}",
@@ -45,7 +45,7 @@ fn demo_signed_from_bits_asc<T: PrimitiveSigned>(gm: GenMode, config: GenConfig,
     }
 }
 
-fn demo_unsigned_from_bits_desc<T: PrimitiveUnsigned>(
+fn demo_from_bits_desc_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -60,7 +60,7 @@ fn demo_unsigned_from_bits_desc<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_signed_from_bits_desc<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_from_bits_desc_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for bs in bool_vec_gen_var_4::<T>().get(gm, &config).take(limit) {
         println!(
             "{}::from_bits_desc({:?}) = {}",
@@ -71,7 +71,7 @@ fn demo_signed_from_bits_desc<T: PrimitiveSigned>(gm: GenMode, config: GenConfig
     }
 }
 
-fn benchmark_unsigned_from_bits_asc_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_from_bits_asc_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -99,7 +99,7 @@ fn benchmark_unsigned_from_bits_asc_algorithms<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_from_bits_asc_algorithms<T: PrimitiveSigned>(
+fn benchmark_from_bits_asc_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -127,7 +127,7 @@ fn benchmark_signed_from_bits_asc_algorithms<T: PrimitiveSigned>(
     );
 }
 
-fn benchmark_unsigned_from_bits_desc_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_from_bits_desc_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -152,7 +152,7 @@ fn benchmark_unsigned_from_bits_desc_algorithms<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_from_bits_desc_algorithms<T: PrimitiveSigned>(
+fn benchmark_from_bits_desc_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

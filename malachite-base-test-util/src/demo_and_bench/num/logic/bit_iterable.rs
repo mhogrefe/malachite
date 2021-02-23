@@ -12,43 +12,43 @@ use malachite_base_test_util::runner::Runner;
 use std::ops::Index;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_bits);
-    register_signed_demos!(runner, demo_signed_bits);
-    register_unsigned_demos!(runner, demo_unsigned_bits_rev);
-    register_signed_demos!(runner, demo_signed_bits_rev);
-    register_unsigned_demos!(runner, demo_unsigned_bits_size_hint);
-    register_signed_demos!(runner, demo_signed_bits_index);
+    register_unsigned_demos!(runner, demo_bits_unsigned);
+    register_signed_demos!(runner, demo_bits_signed);
+    register_unsigned_demos!(runner, demo_bits_rev_unsigned);
+    register_signed_demos!(runner, demo_bits_rev_signed);
+    register_unsigned_demos!(runner, demo_bits_size_hint_unsigned);
+    register_signed_demos!(runner, demo_bits_index_signed);
 
-    register_unsigned_benches!(runner, benchmark_unsigned_bits_size_hint);
-    register_unsigned_benches!(runner, benchmark_unsigned_bits_get_algorithms);
-    register_signed_benches!(runner, benchmark_signed_bits_get_algorithms);
+    register_unsigned_benches!(runner, benchmark_bits_size_hint_unsigned);
+    register_unsigned_benches!(runner, benchmark_bits_get_algorithms_unsigned);
+    register_signed_benches!(runner, benchmark_bits_get_algorithms_signed);
 }
 
-fn demo_unsigned_bits<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_bits_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
         println!("bits({}) = {:?}", u, u.bits().collect_vec());
     }
 }
 
-fn demo_signed_bits<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_bits_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for i in signed_gen::<T>().get(gm, &config).take(limit) {
         println!("bits({}) = {:?}", i, i.bits().collect_vec());
     }
 }
 
-fn demo_unsigned_bits_rev<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_bits_rev_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for u in unsigned_gen::<T>().get(gm, &config).take(limit) {
         println!("bits({}).rev() = {:?}", u, u.bits().rev().collect_vec());
     }
 }
 
-fn demo_signed_bits_rev<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_bits_rev_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for i in signed_gen::<T>().get(gm, &config).take(limit) {
         println!("bits({}).rev() = {:?}", i, i.bits().rev().collect_vec());
     }
 }
 
-fn demo_unsigned_bits_size_hint<T: PrimitiveUnsigned>(
+fn demo_bits_size_hint_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -58,7 +58,7 @@ fn demo_unsigned_bits_size_hint<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_signed_bits_index<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_bits_index_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
 where
     T::BitIterator: Index<u64, Output = bool>,
 {
@@ -70,7 +70,7 @@ where
     }
 }
 
-fn benchmark_unsigned_bits_size_hint<T: PrimitiveUnsigned>(
+fn benchmark_bits_size_hint_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -91,7 +91,7 @@ fn benchmark_unsigned_bits_size_hint<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::unnecessary_operation)]
-fn benchmark_unsigned_bits_get_algorithms<T: PrimitiveUnsigned>(
+fn benchmark_bits_get_algorithms_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -125,7 +125,7 @@ fn benchmark_unsigned_bits_get_algorithms<T: PrimitiveUnsigned>(
 }
 
 #[allow(clippy::unnecessary_operation)]
-fn benchmark_signed_bits_get_algorithms<T: PrimitiveSigned>(
+fn benchmark_bits_get_algorithms_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

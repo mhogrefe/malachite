@@ -119,9 +119,9 @@ dependencies = [
 
 [[package]]
 name = "gmp-mpfr-sys"
-version = "1.4.2"
+version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a57fdb339d49833021b1fded600ed240ae907e33909d5511a61dff884df7f16e"
+checksum = "c6e8813402282ac06d031b2b036998940ddcffa3100c722663cd8a1ac98b0bd8"
 dependencies = [
  "libc",
  "winapi",
@@ -236,8 +236,6 @@ dependencies = [
  "rust-wheels",
  "serde",
  "serde_json",
- "streaming-stats",
- "time",
 ]
 
 [[package]]
@@ -339,9 +337,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.8"
+version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "991431c3519a3f36861882da93630ce66b52918dcf1b8e2fd66b397fc96f28df"
+checksum = "c3d0b9745dc2debf507c8422de05d7226cc1f0644216dfdfead988f9b1ab32a7"
 dependencies = [
  "proc-macro2",
 ]
@@ -439,14 +437,11 @@ dependencies = [
 name = "rust-wheels"
 version = "0.1.0"
 dependencies = [
- "gnuplot",
  "itertools",
  "malachite-base",
  "malachite-nz",
  "rand 0.4.6",
  "sha3",
- "streaming-stats",
- "time",
 ]
 
 [[package]]

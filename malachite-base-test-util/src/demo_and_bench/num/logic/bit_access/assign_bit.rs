@@ -10,13 +10,13 @@ use malachite_base_test_util::generators::{
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_assign_bit);
-    register_signed_demos!(runner, demo_signed_assign_bit);
-    register_unsigned_benches!(runner, benchmark_unsigned_assign_bit);
-    register_signed_benches!(runner, benchmark_signed_assign_bit);
+    register_unsigned_demos!(runner, demo_assign_bit_unsigned);
+    register_signed_demos!(runner, demo_assign_bit_signed);
+    register_unsigned_benches!(runner, benchmark_assign_bit_unsigned);
+    register_signed_benches!(runner, benchmark_assign_bit_signed);
 }
 
-fn demo_unsigned_assign_bit<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_assign_bit_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut n, index, bit) in unsigned_unsigned_bool_triple_gen_var_1::<T>()
         .get(gm, &config)
         .take(limit)
@@ -30,7 +30,7 @@ fn demo_unsigned_assign_bit<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig
     }
 }
 
-fn demo_signed_assign_bit<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_assign_bit_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut n, index, bit) in signed_unsigned_bool_triple_gen_var_1::<T>()
         .get(gm, &config)
         .take(limit)
@@ -44,7 +44,7 @@ fn demo_signed_assign_bit<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, li
     }
 }
 
-fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned>(
+fn benchmark_assign_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -64,7 +64,7 @@ fn benchmark_unsigned_assign_bit<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_assign_bit<T: PrimitiveSigned>(
+fn benchmark_assign_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

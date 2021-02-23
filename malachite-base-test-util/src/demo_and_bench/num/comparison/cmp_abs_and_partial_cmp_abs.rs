@@ -8,23 +8,23 @@ use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen};
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_cmp_abs);
-    register_unsigned_demos!(runner, demo_unsigned_partial_cmp_abs);
-    register_signed_demos!(runner, demo_signed_cmp_abs);
-    register_signed_demos!(runner, demo_signed_partial_cmp_abs);
-    register_unsigned_benches!(runner, benchmark_unsigned_cmp_abs);
-    register_unsigned_benches!(runner, benchmark_unsigned_partial_cmp_abs);
-    register_signed_benches!(runner, benchmark_signed_cmp_abs);
-    register_signed_benches!(runner, benchmark_signed_partial_cmp_abs);
+    register_unsigned_demos!(runner, demo_cmp_abs_unsigned);
+    register_unsigned_demos!(runner, demo_partial_cmp_abs_unsigned);
+    register_signed_demos!(runner, demo_cmp_abs_signed);
+    register_signed_demos!(runner, demo_partial_cmp_abs_signed);
+    register_unsigned_benches!(runner, benchmark_cmp_abs_unsigned);
+    register_unsigned_benches!(runner, benchmark_partial_cmp_abs_unsigned);
+    register_signed_benches!(runner, benchmark_cmp_abs_signed);
+    register_signed_benches!(runner, benchmark_partial_cmp_abs_signed);
 }
 
-fn demo_unsigned_cmp_abs<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_cmp_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in unsigned_pair_gen::<T>().get(gm, &config).take(limit) {
         println!("{}.cmp_abs(&{}) = {:?}", x, y, x.cmp_abs(&y));
     }
 }
 
-fn demo_unsigned_partial_cmp_abs<T: PrimitiveUnsigned>(
+fn demo_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -39,13 +39,13 @@ fn demo_unsigned_partial_cmp_abs<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_signed_cmp_abs<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_cmp_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
         println!("({}).cmp_abs(&{}) = {:?}", x, y, x.cmp_abs(&y));
     }
 }
 
-fn demo_signed_partial_cmp_abs<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_partial_cmp_abs_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in signed_pair_gen::<T>().get(gm, &config).take(limit) {
         println!(
             "({}).partial_cmp_abs(&{}) = {:?}",
@@ -56,7 +56,7 @@ fn demo_signed_partial_cmp_abs<T: PrimitiveSigned>(gm: GenMode, config: GenConfi
     }
 }
 
-fn benchmark_unsigned_cmp_abs<T: PrimitiveUnsigned>(
+fn benchmark_cmp_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -74,7 +74,7 @@ fn benchmark_unsigned_cmp_abs<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_unsigned_partial_cmp_abs<T: PrimitiveUnsigned>(
+fn benchmark_partial_cmp_abs_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -92,7 +92,7 @@ fn benchmark_unsigned_partial_cmp_abs<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_cmp_abs<T: PrimitiveSigned>(
+fn benchmark_cmp_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -110,7 +110,7 @@ fn benchmark_signed_cmp_abs<T: PrimitiveSigned>(
     );
 }
 
-fn benchmark_signed_partial_cmp_abs<T: PrimitiveSigned>(
+fn benchmark_partial_cmp_abs_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

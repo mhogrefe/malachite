@@ -9,15 +9,12 @@ use malachite_base_test_util::generators::unsigned_pair_gen;
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_generic_demos!(runner, demo_unsigned_join_halves, u16, u32, u64, u128);
-    register_generic_benches!(runner, benchmark_unsigned_join_halves, u16, u32, u64, u128);
+    register_generic_demos!(runner, demo_join_halves, u16, u32, u64, u128);
+    register_generic_benches!(runner, benchmark_join_halves, u16, u32, u64, u128);
 }
 
-fn demo_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-) where
+fn demo_join_halves<T: JoinHalves + PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+where
     T::Half: PrimitiveUnsigned,
 {
     for (x, y) in unsigned_pair_gen::<T::Half>().get(gm, &config).take(limit) {
@@ -31,7 +28,7 @@ fn demo_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(
     }
 }
 
-fn benchmark_unsigned_join_halves<T: JoinHalves + PrimitiveUnsigned>(
+fn benchmark_join_halves<T: JoinHalves + PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

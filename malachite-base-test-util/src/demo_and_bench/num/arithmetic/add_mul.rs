@@ -8,18 +8,18 @@ use malachite_base_test_util::generators::{signed_triple_gen_var_1, unsigned_tri
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_add_mul);
-    register_signed_demos!(runner, demo_signed_add_mul);
-    register_unsigned_demos!(runner, demo_unsigned_add_mul_assign);
-    register_signed_demos!(runner, demo_signed_add_mul_assign);
+    register_unsigned_demos!(runner, demo_add_mul_unsigned);
+    register_signed_demos!(runner, demo_add_mul_signed);
+    register_unsigned_demos!(runner, demo_add_mul_assign_unsigned);
+    register_signed_demos!(runner, demo_add_mul_assign_signed);
 
-    register_unsigned_benches!(runner, benchmark_unsigned_add_mul);
-    register_signed_benches!(runner, benchmark_signed_add_mul);
-    register_unsigned_benches!(runner, benchmark_unsigned_add_mul_assign);
-    register_signed_benches!(runner, benchmark_signed_add_mul_assign);
+    register_unsigned_benches!(runner, benchmark_add_mul_unsigned);
+    register_signed_benches!(runner, benchmark_add_mul_signed);
+    register_unsigned_benches!(runner, benchmark_add_mul_assign_unsigned);
+    register_signed_benches!(runner, benchmark_add_mul_assign_signed);
 }
 
-fn demo_unsigned_add_mul<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_add_mul_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y, z) in unsigned_triple_gen_var_1::<T>()
         .get(gm, &config)
         .take(limit)
@@ -28,13 +28,13 @@ fn demo_unsigned_add_mul<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, l
     }
 }
 
-fn demo_signed_add_mul<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_add_mul_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y, z) in signed_triple_gen_var_1::<T>().get(gm, &config).take(limit) {
         println!("({}).add_mul({}, {}) = {}", x, y, z, x.add_mul(y, z));
     }
 }
 
-fn demo_unsigned_add_mul_assign<T: PrimitiveUnsigned>(
+fn demo_add_mul_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -49,7 +49,7 @@ fn demo_unsigned_add_mul_assign<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_signed_add_mul_assign<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_add_mul_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut x, y, z) in signed_triple_gen_var_1::<T>().get(gm, &config).take(limit) {
         let old_x = x;
         x.add_mul_assign(y, z);
@@ -57,7 +57,7 @@ fn demo_signed_add_mul_assign<T: PrimitiveSigned>(gm: GenMode, config: GenConfig
     }
 }
 
-fn benchmark_unsigned_add_mul<T: PrimitiveUnsigned>(
+fn benchmark_add_mul_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -75,7 +75,7 @@ fn benchmark_unsigned_add_mul<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_add_mul<T: PrimitiveSigned>(
+fn benchmark_add_mul_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -93,7 +93,7 @@ fn benchmark_signed_add_mul<T: PrimitiveSigned>(
     );
 }
 
-fn benchmark_unsigned_add_mul_assign<T: PrimitiveUnsigned>(
+fn benchmark_add_mul_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -111,7 +111,7 @@ fn benchmark_unsigned_add_mul_assign<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_add_mul_assign<T: PrimitiveSigned>(
+fn benchmark_add_mul_assign_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

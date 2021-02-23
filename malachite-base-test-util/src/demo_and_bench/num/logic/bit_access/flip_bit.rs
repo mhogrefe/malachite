@@ -10,13 +10,13 @@ use malachite_base_test_util::generators::{
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_demos!(runner, demo_unsigned_flip_bit);
-    register_signed_demos!(runner, demo_signed_flip_bit);
-    register_unsigned_benches!(runner, benchmark_unsigned_flip_bit);
-    register_signed_benches!(runner, benchmark_signed_flip_bit);
+    register_unsigned_demos!(runner, demo_flip_bit_unsigned);
+    register_signed_demos!(runner, demo_flip_bit_signed);
+    register_unsigned_benches!(runner, benchmark_flip_bit_unsigned);
+    register_signed_benches!(runner, benchmark_flip_bit_signed);
 }
 
-fn demo_unsigned_flip_bit<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_flip_bit_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut n, index) in unsigned_pair_gen_var_3::<T>().get(gm, &config).take(limit) {
         let n_old = n;
         n.flip_bit(index);
@@ -24,7 +24,7 @@ fn demo_unsigned_flip_bit<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, 
     }
 }
 
-fn demo_signed_flip_bit<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_flip_bit_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut n, index) in signed_unsigned_pair_gen_var_2::<T>()
         .get(gm, &config)
         .take(limit)
@@ -35,7 +35,7 @@ fn demo_signed_flip_bit<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limi
     }
 }
 
-fn benchmark_unsigned_flip_bit<T: PrimitiveUnsigned>(
+fn benchmark_flip_bit_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -53,7 +53,7 @@ fn benchmark_unsigned_flip_bit<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_signed_flip_bit<T: PrimitiveSigned>(
+fn benchmark_flip_bit_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

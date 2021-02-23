@@ -17,22 +17,17 @@ macro_rules! impl_low_mask_unsigned {
             /// Returns a value with the least significant `bits` bits on and the remaining bits
             /// off.
             ///
-            /// Time: worst case O(1)
+            /// $f(b) = 2^b - 1$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `pow` is greater than the width of `$t`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::LowMask;
-            ///
-            /// assert_eq!(u16::low_mask(0), 0);
-            /// assert_eq!(u8::low_mask(3), 0x7);
-            /// assert_eq!(u8::low_mask(8), 0xff);
-            /// assert_eq!(u64::low_mask(40), 0xffffffffff);
-            /// ```
+            /// See the documentation of the `num::logic::low_mask` module.
             #[inline]
             fn low_mask(bits: u64) -> $t {
                 _low_mask_unsigned(bits)
@@ -59,22 +54,23 @@ macro_rules! impl_low_mask_signed {
             /// Returns a value with the least significant `bits` bits on and the remaining bits
             /// off.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(b) = \\begin{cases}
+            ///     2^b - 1 & 0 \leq n < W \\\\
+            ///     -1 & n = W,
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            ///
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `pow` is greater than the width of `$t`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::logic::traits::LowMask;
-            ///
-            /// assert_eq!(u16::low_mask(0), 0);
-            /// assert_eq!(u8::low_mask(3), 0x7);
-            /// assert_eq!(u8::low_mask(8), 0xff);
-            /// assert_eq!(u64::low_mask(40), 0xffffffffff);
-            /// ```
+            /// See the documentation of the `num::logic::low_mask` module.
             #[inline]
             fn low_mask(bits: u64) -> $t {
                 _low_mask_signed(bits)

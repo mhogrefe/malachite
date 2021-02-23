@@ -126,7 +126,7 @@ pub fn limbs_modular_invert_limb(x: Limb) -> Limb {
 /// # Panics
 /// Panics if `ns` is empty or if `d` is zero.
 ///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2, where the result is returned.
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
 pub fn _limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_limb_to_out(&mut q, ns, d);
@@ -142,7 +142,7 @@ pub fn _limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 ///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2.
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
 pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -199,7 +199,7 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], 
 /// # Panics
 /// Panics if `ns` is empty or if `d` is zero.
 ///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2, where dst == src.
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dst == src.
 pub fn _limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -270,7 +270,7 @@ pub const MAX_OVER_3: Limb = Limb::MAX / 3;
 /// assert_eq!(limbs_div_exact_3(&[u32::MAX, u32::MAX]), &[0x55555555, 0x55555555]);
 /// ```
 ///
-/// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 0
+/// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0
 /// and no carry-in, where the result is returned.
 pub fn limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
@@ -305,7 +305,7 @@ pub fn limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
 /// ```
 ///
-/// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 0,
+/// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
 /// no carry-in, and no return value.
 pub fn limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
     let (out_last, out_init) = out[..ns.len()].split_last_mut().unwrap();
@@ -341,7 +341,7 @@ pub fn limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
 /// limbs_div_exact_3_in_place(&mut ns);
 /// assert_eq!(ns, &[0x55555555, 0x55555555]);
 /// ```
-/// This is mpn_divexact_by3c from mpn/generic diveby3.c, GMP 6.1.2, with DIVEXACT_BY3_METHOD == 0,
+/// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
 /// no carry-in, and no return value, where rp == up.
 pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
     let (ns_last, ns_init) = ns.split_last_mut().unwrap();
@@ -378,7 +378,7 @@ pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 /// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
 /// ```
 ///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2.
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
 pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_to_out(out, ns)
@@ -409,7 +409,7 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 /// assert_eq!(limbs_div_exact_limb(&[u32::MAX, u32::MAX], 3), &[0x55555555, 0x55555555]);
 /// ```
 ///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2, where the result is returned.
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
 pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
     if d == 3 {
         limbs_div_exact_3(ns)
@@ -445,7 +445,7 @@ pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 /// assert_eq!(ns, &[0x55555555, 0x55555555]);
 /// ```
 ///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.1.2, where dest == src.
+/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dest == src.
 pub fn limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_in_place(ns)
@@ -460,7 +460,7 @@ pub fn limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
 ///
 /// Result is O(`n`)
 ///
-/// This is mpn_binvert_itch from mpn/generic/binvert.c, GMP 6.1.2.
+/// This is mpn_binvert_itch from mpn/generic/binvert.c, GMP 6.2.1.
 pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_local = _limbs_mul_mod_base_pow_n_minus_1_next_size(n);
     let itch_out = _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
@@ -509,7 +509,7 @@ pub fn _limbs_modular_invert_small(
 /// assert_eq!(is, &[1, u32::MAX - 1, 0, 0]);
 /// ```
 ///
-/// This is mpn_binvert from mpn/generic/binvert.c, GMP 6.1.2.
+/// This is mpn_binvert from mpn/generic/binvert.c, GMP 6.2.1.
 pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     // Compute the computation precisions from highest to lowest, leaving the basecase size in
