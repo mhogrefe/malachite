@@ -38,35 +38,35 @@ fn test_random_fixed_length_strings_using_chars() {
     random_fixed_length_strings_using_chars_helper(
         0,
         repeat('a'),
-        &repeat("").take(20).collect_vec(),
+        &[""; 20],
         &[("", 1000000)],
         ("", None),
     );
     random_fixed_length_strings_using_chars_helper(
         1,
         repeat('a'),
-        &repeat("a").take(20).collect_vec(),
+        &["a"; 20],
         &[("a", 1000000)],
         ("a", None),
     );
     random_fixed_length_strings_using_chars_helper(
         2,
         repeat('a'),
-        &repeat("aa").take(20).collect_vec(),
+        &["aa"; 20],
         &[("aa", 1000000)],
         ("aa", None),
     );
     random_fixed_length_strings_using_chars_helper(
         3,
         repeat('a'),
-        &repeat("aaa").take(20).collect_vec(),
+        &["aaa"; 20],
         &[("aaa", 1000000)],
         ("aaa", None),
     );
     random_fixed_length_strings_using_chars_helper(
         10,
         repeat('a'),
-        &repeat("aaaaaaaaaa").take(20).collect_vec(),
+        &["aaaaaaaaaa"; 20],
         &[("aaaaaaaaaa", 1000000)],
         ("aaaaaaaaaa", None),
     );

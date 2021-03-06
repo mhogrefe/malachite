@@ -25,7 +25,6 @@ impl<'a> Display for BaseFmtWrapper<&'a Natural> {
     /// `#` flag switches to uppercase letters. Padding with zeros works as usual.
     ///
     /// # Worst-case complexity
-    ///
     /// TODO
     ///
     /// # Panics
@@ -72,7 +71,6 @@ impl<'a> Debug for BaseFmtWrapper<&'a Natural> {
     /// This is the same as the `Display::fmt` implementation.
     ///
     /// # Worst-case complexity
-    ///
     /// TODO
     ///
     /// # Panics
@@ -103,7 +101,6 @@ impl ToStringBase for Natural {
     /// `char`s 'a' to 'z'.
     ///
     /// # Worst-case complexity
-    ///
     /// TODO
     ///
     /// # Panics
@@ -139,14 +136,12 @@ impl ToStringBase for Natural {
     /// `char`s 'A' to 'Z'.
     ///
     /// # Worst-case complexity
-    ///
     /// TODO
     ///
     /// # Panics
     /// Panics if `base` is less than 2 or greater than 36.
     ///
     /// # Examples
-    ///
     /// ```
     /// extern crate malachite_base;
     ///
@@ -175,7 +170,6 @@ impl Display for Natural {
     /// Converts a `Natural` to a `String`.
     ///
     /// # Worst-case complexity
-    ///
     /// TODO
     ///
     /// # Examples
@@ -214,7 +208,6 @@ impl Debug for Natural {
     /// This is the same as the `Display::fmt` implementation.
     ///
     /// # Worst-case complexity
-    ///
     /// TODO
     ///
     /// # Examples
@@ -308,7 +301,6 @@ impl Binary for Natural {
     /// Using the `#` format flag prepends `"0b"` to the string.
     ///
     /// # Worst-case complexity
-    ///
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
@@ -491,7 +483,6 @@ impl Octal for Natural {
     /// Using the `#` format flag prepends `"0o"` to the string.
     ///
     /// # Worst-case complexity
-    ///
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
@@ -642,7 +633,6 @@ impl LowerHex for Natural {
     /// Using the `#` format flag prepends `"0x"` to the string.
     ///
     /// # Worst-case complexity
-    ///
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
@@ -703,7 +693,6 @@ impl UpperHex for Natural {
     /// Using the `#` format flag prepends `"0x"` to the string.
     ///
     /// # Worst-case complexity
-    ///
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$

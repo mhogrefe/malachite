@@ -46,7 +46,6 @@ where
 /// `xs.count()`.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

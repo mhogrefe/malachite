@@ -7,7 +7,6 @@ pub(crate) const ORDERINGS: [Ordering; 3] = [Ordering::Equal, Ordering::Less, Or
 /// If the `&str` does not represent a valid `Ordering`, `None` is returned.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

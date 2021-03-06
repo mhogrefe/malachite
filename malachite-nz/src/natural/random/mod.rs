@@ -523,7 +523,6 @@ impl Iterator for RandomNaturalsLessThan {
 /// where $T$ is time, $M$ is additional memory, and $n$ = `limit.significant_bits()`.
 ///
 /// # Panics
-///
 /// Panics if `limit` is 0.
 ///
 /// # Examples
@@ -588,7 +587,6 @@ impl Iterator for UniformRandomNaturalRange {
 /// where $T$ is time, $M$ is additional memory, and $n$ = `b.significant_bits()`.
 ///
 /// # Panics
-///
 /// Panics if $a \geq b$.
 ///
 /// # Examples
@@ -644,7 +642,6 @@ pub fn uniform_random_natural_range(
 /// where $T$ is time, $M$ is additional memory, and $n$ = `b.significant_bits()`.
 ///
 /// # Panics
-///
 /// Panics if $a > b$.
 ///
 /// # Examples

@@ -66,7 +66,6 @@ pub trait BitAccess {
     /// Sets the bit at `index` to whichever value `bit` is.
     ///
     /// # Worst-case complexity
-    ///
     /// $T(n) = O(\max(T_S(n), T_C(n)))$,
     ///
     /// $M(n) = O(\max(M_S(n), M_C(n)))$
@@ -88,7 +87,6 @@ pub trait BitAccess {
     /// Sets the bit at `index` to the opposite of its original value.
     ///
     /// # Worst-case complexity
-    ///
     /// $T(n) = O(T_G(n) + \max(T_S(n), T_C(n)))$,
     ///
     /// $M(n) = O(M_G(n) + \max(M_S(n), M_C(n)))$

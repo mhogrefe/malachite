@@ -1,15 +1,13 @@
-use std::cmp::{max, Ordering};
-use std::iter::repeat;
-use std::ops::{BitOr, BitOrAssign};
-
+use integer::Integer;
+use itertools::repeat_n;
 use malachite_base::num::arithmetic::traits::WrappingNegAssign;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-
-use integer::Integer;
 use natural::logic::not::{limbs_not_in_place, limbs_not_to_out};
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::{max, Ordering};
+use std::ops::{BitOr, BitOrAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
 /// `Integer`, returns the limbs of the bitwise or of the `Integer` and a `Limb`. `xs` cannot be
@@ -219,7 +217,7 @@ pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         let mut out = vec![0; x_i];
         out.push(xs[x_i].wrapping_neg());
         out.extend(xs[x_i + 1..].iter().map(|x| !x));
-        out.extend(repeat(Limb::MAX).take(y_i - xs_len));
+        out.extend(repeat_n(Limb::MAX, y_i - xs_len));
         out.push(ys[y_i] - 1);
         out.extend_from_slice(&ys[y_i + 1..]);
         out
@@ -447,7 +445,7 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if y_i >= xs_len {
         xs[x_i].wrapping_neg_assign();
         limbs_not_in_place(&mut xs[x_i + 1..]);
-        xs.extend(repeat(Limb::MAX).take(y_i - xs_len));
+        xs.extend(repeat_n(Limb::MAX, y_i - xs_len));
         xs.push(ys[y_i] - 1);
         xs.extend_from_slice(&ys[y_i + 1..]);
     } else if x_i >= ys_len {

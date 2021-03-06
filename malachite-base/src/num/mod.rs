@@ -2,6 +2,7 @@
 #[macro_use]
 pub mod macros;
 
+/// This module defines the traits for primitive integer arithmetic.
 pub mod arithmetic;
 /// This module defines the traits for primitive integers and some of their basic functionality.
 pub mod basic;

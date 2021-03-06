@@ -11,7 +11,6 @@ use comparison::traits::{Max, Min};
 /// The output length is 128.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -36,7 +35,6 @@ pub const fn ascii_chars_increasing() -> RangeInclusive<char> {
 /// The output length is 1,112,064.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -173,7 +171,6 @@ impl Iterator for ExhaustiveChars {
 /// The output length is 128.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -213,7 +210,6 @@ pub const fn exhaustive_ascii_chars() -> ExhaustiveChars {
 /// The output length is 1,112,064.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

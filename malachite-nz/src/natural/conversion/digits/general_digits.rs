@@ -7,11 +7,12 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, WrappingFrom, WrappingInto,
 };
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
+use natural::arithmetic::add::limbs_slice_add_limb_in_place;
 use natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
 use natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod, limbs_div_mod_extra_in_place, limbs_div_mod_to_out,
@@ -41,6 +42,10 @@ const fn get_log_base_of_2(base: u64) -> Limb {
     BASES[base as usize].1
 }
 
+const fn get_log_2_of_base(base: u64) -> Limb {
+    BASES[base as usize].2
+}
+
 const fn get_big_base(base: u64) -> Limb {
     BASES[base as usize].3
 }
@@ -49,23 +54,23 @@ const fn get_big_base_inverted(base: u64) -> Limb {
     BASES[base as usize].4
 }
 
-/// Compute the number of base-b digits corresponding to nlimbs limbs, rounding down.
+/// Compute the number of base-`base` digits corresponding to `limb_count` limbs, rounding down.
 ///
 /// This is DIGITS_IN_BASE_PER_LIMB from gmp-impl.h, where res is returned.
-fn digits_in_base_per_limb(nlimbs: usize, b: u64) -> u64 {
+fn digits_in_base_per_limb(limb_count: usize, base: u64) -> u64 {
     u64::exact_from(
         Limb::x_mul_y_is_zz(
-            get_log_base_of_2(b),
-            Limb::exact_from(nlimbs) << Limb::LOG_WIDTH,
+            get_log_base_of_2(base),
+            Limb::exact_from(limb_count) << Limb::LOG_WIDTH,
         )
         .0,
     )
 }
 
-/// This is DIGITS_IN_BASEGT2_FROM_BITS from gmp-impl.h, GMP 6.2.1, where res is returned and base
+/// This is DIGITS_IN_BASEGT2_FROM_BITS from gmp-impl.h, GMP 6.2.1, where res is returned and `base`
 /// is not a power of two.
-fn limbs_digit_count_helper(nbits: u64, base: u64) -> u64 {
-    u64::exact_from(Limb::x_mul_y_is_zz(get_log_base_of_2(base) + 1, Limb::exact_from(nbits)).0)
+fn limbs_digit_count_helper(bit_count: u64, base: u64) -> u64 {
+    u64::exact_from(Limb::x_mul_y_is_zz(get_log_base_of_2(base) + 1, Limb::exact_from(bit_count)).0)
         .checked_add(1)
         .unwrap()
 }
@@ -235,6 +240,7 @@ struct PowerTableIndicesRow {
     digits_in_base: usize, // number of corresponding digits
 }
 
+#[derive(Clone, Debug)]
 pub struct PowerTableRow<'a> {
     power: &'a [Limb],
     shift: usize,          // weight of lowest limb, in limb base B
@@ -968,6 +974,115 @@ pub fn _to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
             _ => panic!("x must be large"),
         }
     }
+}
+
+pub fn _from_digits_desc_naive_primitive<T: PrimitiveUnsigned>(xs: &[T], base: T) -> Natural
+where
+    Natural: From<T>,
+{
+    assert!(base > T::ONE);
+    let mut n = Natural::ZERO;
+    let base = Natural::from(base);
+    for &x in xs {
+        n *= &base;
+        n += Natural::from(x);
+    }
+    n
+}
+
+/// Compute the number of limbs corresponding to `digit_count` base-`base` digits, rounding up.
+///
+/// This is LIMBS_PER_DIGIT_IN_BASE from gmp-impl.h, where res is returned and base is not a power
+/// of 2.
+pub fn limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
+    (u64::exact_from(Limb::x_mul_y_is_zz(get_log_2_of_base(base), Limb::exact_from(digit_count)).0)
+        >> (Limb::LOG_WIDTH - 3))
+        + 2
+}
+
+/// The input digits are in descending order.
+///
+/// This is mpn_bc_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+pub fn _limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
+    out: &mut [Limb],
+    xs: &[T],
+    base: u64,
+) -> usize
+where
+    Limb: WrappingFrom<T>,
+{
+    let xs_len = xs.len();
+    assert!(base > 2);
+    assert!(base < 256);
+    assert_ne!(xs_len, 0);
+    let big_base = get_big_base(base);
+    let digits_per_limb = get_chars_per_limb(base);
+    let base: Limb = base.wrapping_into();
+    let mut size = 0;
+    let mut i = 0;
+    for chunk in xs[..xs_len - 1].chunks_exact(digits_per_limb) {
+        let (&chunk_head, chunk_tail) = chunk.split_first().unwrap();
+        let mut y = Limb::wrapping_from(chunk_head);
+        if base == 10 {
+            // This is a common case. Help the compiler avoid multiplication.
+            for &x in chunk_tail {
+                y = y * 10 + Limb::wrapping_from(x);
+            }
+        } else {
+            for &x in chunk_tail {
+                y = y * base + Limb::wrapping_from(x);
+            }
+        }
+        if size == 0 {
+            if y != 0 {
+                out[0] = y;
+                size = 1;
+            }
+        } else {
+            let (out_last, out_init) = out[..size + 1].split_last_mut().unwrap();
+            let mut carry = limbs_slice_mul_limb_in_place(out_init, big_base);
+            if limbs_slice_add_limb_in_place(out_init, y) {
+                carry += 1;
+            }
+            if carry != 0 {
+                *out_last = carry;
+                size += 1;
+            }
+        }
+        i += digits_per_limb;
+    }
+    let mut big_base = base;
+    let (&remainder_head, remainder_tail) = xs[i..].split_first().unwrap();
+    let mut y = Limb::wrapping_from(remainder_head);
+    if base == 10 {
+        // This is a common case. Help the compiler avoid multiplication.
+        for &x in remainder_tail {
+            y = y * 10 + Limb::wrapping_from(x);
+            big_base *= 10;
+        }
+    } else {
+        for &x in remainder_tail {
+            y = y * base + Limb::wrapping_from(x);
+            big_base *= base;
+        }
+    }
+    if size == 0 {
+        if y != 0 {
+            out[0] = y;
+            size = 1;
+        }
+    } else {
+        let (out_last, out_init) = out[..size + 1].split_last_mut().unwrap();
+        let mut carry = limbs_slice_mul_limb_in_place(out_init, big_base);
+        if limbs_slice_add_limb_in_place(out_init, y) {
+            carry += 1;
+        }
+        if carry != 0 {
+            *out_last = carry;
+            size += 1;
+        }
+    }
+    size
 }
 
 impl Digits<u8> for Natural {

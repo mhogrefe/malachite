@@ -3,9 +3,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
-use malachite_nz::natural::arithmetic::mul::fft::{
-    _limbs_mul_greater_to_out_fft, _limbs_mul_greater_to_out_fft_input_sizes_threshold,
-};
+use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 use malachite_nz::natural::arithmetic::mul::mul_low::{
     _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
     _limbs_mul_low_same_length_divide_and_conquer,
@@ -14,115 +12,33 @@ use malachite_nz::natural::arithmetic::mul::mul_low::{
     limbs_mul_low_same_length,
 };
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_22_scratch_len, _limbs_mul_greater_to_out_toom_32,
-    _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_32_scratch_len, _limbs_mul_greater_to_out_toom_33,
-    _limbs_mul_greater_to_out_toom_33_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_33_scratch_len, _limbs_mul_greater_to_out_toom_42,
-    _limbs_mul_greater_to_out_toom_42_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_42_scratch_len, _limbs_mul_greater_to_out_toom_43,
-    _limbs_mul_greater_to_out_toom_43_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_43_scratch_len, _limbs_mul_greater_to_out_toom_44,
-    _limbs_mul_greater_to_out_toom_44_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_44_scratch_len, _limbs_mul_greater_to_out_toom_52,
-    _limbs_mul_greater_to_out_toom_52_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_52_scratch_len, _limbs_mul_greater_to_out_toom_53,
-    _limbs_mul_greater_to_out_toom_53_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_53_scratch_len, _limbs_mul_greater_to_out_toom_54,
-    _limbs_mul_greater_to_out_toom_54_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_54_scratch_len, _limbs_mul_greater_to_out_toom_62,
-    _limbs_mul_greater_to_out_toom_62_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_62_scratch_len, _limbs_mul_greater_to_out_toom_63,
-    _limbs_mul_greater_to_out_toom_63_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_63_scratch_len, _limbs_mul_greater_to_out_toom_6h,
-    _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_6h_scratch_len, _limbs_mul_greater_to_out_toom_8h,
-    _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_8h_scratch_len,
+    _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_32_scratch_len,
+    _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_len,
+    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_len,
+    _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_43_scratch_len,
+    _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_len,
+    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_len,
+    _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_63_scratch_len,
+    _limbs_mul_greater_to_out_toom_6h, _limbs_mul_greater_to_out_toom_6h_scratch_len,
+    _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
     _limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
 };
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
-
-use malachite_test::common::{
-    DemoBenchRegistry, GenerationMode, NoSpecialGenerationMode, ScaleType,
-};
+use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
-    pairs_of_small_unsigneds_single, triples_of_unsigned_vec_var_10,
-    triples_of_unsigned_vec_var_11, triples_of_unsigned_vec_var_12, triples_of_unsigned_vec_var_13,
-    triples_of_unsigned_vec_var_14, triples_of_unsigned_vec_var_15, triples_of_unsigned_vec_var_16,
-    triples_of_unsigned_vec_var_17, triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_19,
-    triples_of_unsigned_vec_var_20, triples_of_unsigned_vec_var_21, triples_of_unsigned_vec_var_22,
-    triples_of_unsigned_vec_var_23, triples_of_unsigned_vec_var_25, triples_of_unsigned_vec_var_30,
-    triples_of_unsigned_vec_var_31, triples_of_unsigned_vec_var_32, triples_of_unsigned_vec_var_33,
-    triples_of_unsigned_vec_var_34, triples_of_unsigned_vec_var_35, triples_of_unsigned_vec_var_36,
-    triples_of_unsigned_vec_var_46, triples_of_unsigned_vec_var_47, triples_of_unsigned_vec_var_48,
-    triples_of_unsigned_vec_var_49, triples_of_unsigned_vec_var_52,
+    triples_of_unsigned_vec_var_10, triples_of_unsigned_vec_var_18, triples_of_unsigned_vec_var_21,
+    triples_of_unsigned_vec_var_25, triples_of_unsigned_vec_var_31, triples_of_unsigned_vec_var_32,
+    triples_of_unsigned_vec_var_33, triples_of_unsigned_vec_var_34, triples_of_unsigned_vec_var_35,
+    triples_of_unsigned_vec_var_36, triples_of_unsigned_vec_var_46, triples_of_unsigned_vec_var_47,
+    triples_of_unsigned_vec_var_48, triples_of_unsigned_vec_var_49, triples_of_unsigned_vec_var_52,
 };
 use malachite_test::inputs::natural::{
     nrm_pairs_of_naturals, pairs_of_naturals, rm_pairs_of_naturals,
 };
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_22_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_32_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_33_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_42_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_43_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_44_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_52_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_53_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_54_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_62_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_63_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_6h_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_toom_8h_input_sizes_valid
-    );
-    register_ns_demo!(
-        registry,
-        demo_limbs_mul_greater_to_out_fft_input_sizes_threshold
-    );
     register_demo!(registry, demo_limbs_mul_low_same_length_basecase);
     register_demo!(
         registry,
@@ -139,57 +55,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_limbs_mul_greater_to_out_basecase_mem_opt_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_22_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_32_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_33_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_33_same_length_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_42_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_43_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_limbs_mul_greater_to_out_toom_32_to_43_algorithms
     );
     register_bench!(
         registry,
         Large,
-        benchmark_limbs_mul_greater_to_out_toom_44_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_limbs_mul_greater_to_out_toom_44_same_length_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_52_algorithms
     );
     register_bench!(
         registry,
@@ -204,32 +75,12 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(
         registry,
         Large,
-        benchmark_limbs_mul_greater_to_out_toom_54_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_62_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_limbs_mul_greater_to_out_toom_63_algorithms
     );
     register_bench!(
         registry,
         Large,
-        benchmark_limbs_mul_greater_to_out_toom_6h_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
         benchmark_limbs_mul_greater_to_out_toom_6h_same_length_algorithms
-    );
-    register_bench!(
-        registry,
-        Large,
-        benchmark_limbs_mul_greater_to_out_toom_8h_algorithms
     );
     register_bench!(
         registry,
@@ -288,202 +139,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     );
     register_bench!(registry, Large, benchmark_natural_mul_library_comparison);
     register_bench!(registry, Large, benchmark_natural_mul_evaluation_strategy);
-}
-
-fn demo_limbs_mul_greater_to_out_toom_22_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_22_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_22_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_32_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_32_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_32_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_33_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_33_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_33_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_42_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_42_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_42_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_43_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_43_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_43_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_44_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_44_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_44_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_52_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_52_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_52_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_53_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_53_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_53_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_54_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_54_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_54_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_62_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_62_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_62_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_63_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_63_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_63_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_6h_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_6h_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_toom_8h_input_sizes_valid(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_toom_8h_input_sizes_valid({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(x, y)
-        );
-    }
-}
-
-fn demo_limbs_mul_greater_to_out_fft_input_sizes_threshold(
-    gm: NoSpecialGenerationMode,
-    limit: usize,
-) {
-    for (x, y) in pairs_of_small_unsigneds_single(gm).take(limit) {
-        println!(
-            "_limbs_mul_greater_to_out_fft_input_sizes_threshold({}, {}) = {}",
-            x,
-            y,
-            _limbs_mul_greater_to_out_fft_input_sizes_threshold(x, y)
-        );
-    }
 }
 
 fn demo_limbs_mul_low_same_length_basecase(gm: GenerationMode, limit: usize) {
@@ -584,229 +239,6 @@ fn demo_natural_mul_ref_ref(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn benchmark_limbs_mul_greater_to_out_basecase_mem_opt_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "limbs_mul_greater_to_out_basecase_mem_opt(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_10(gm.with_scale(512)),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "limbs_mul_greater_to_out_basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "limbs_mul_greater_to_out_basecase_mem_opt",
-                &mut (|(mut out, xs, ys)| {
-                    _limbs_mul_greater_to_out_basecase_mem_opt(&mut out, &xs, &ys)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_22_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_22(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_11(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom22",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
-                    _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_32_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_32(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_12(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom32",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(xs.len(), ys.len())];
-                    _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_33_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_33(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_13(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom33",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
-                    _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_33_same_length_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_33(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_30(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, _)| xs.len()),
-        "xs.len() = ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom22",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
-                    _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-            (
-                "Toom33",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
-                    _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_42_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_42(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_14(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom42",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
-                    _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_43_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_43(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_15(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom43",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
-                    _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
 fn benchmark_limbs_mul_greater_to_out_toom_32_to_43_algorithms(
     gm: GenerationMode,
     limit: usize,
@@ -836,37 +268,6 @@ fn benchmark_limbs_mul_greater_to_out_toom_32_to_43_algorithms(
                     let mut scratch =
                         vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_44_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_44(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_16(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom44",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
-                    _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
         ],
@@ -906,37 +307,6 @@ fn benchmark_limbs_mul_greater_to_out_toom_44_same_length_algorithms(
                     let mut scratch =
                         vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
                     _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_52_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_52(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_17(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom52",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
-                    _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
         ],
@@ -1025,68 +395,6 @@ fn benchmark_limbs_mul_greater_to_out_toom_42_to_53_algorithms(
     );
 }
 
-fn benchmark_limbs_mul_greater_to_out_toom_54_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_54(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_19(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom54",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(xs.len(), ys.len())];
-                    _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_62_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_62(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_20(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom62",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(xs.len(), ys.len())];
-                    _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
 fn benchmark_limbs_mul_greater_to_out_toom_63_algorithms(
     gm: GenerationMode,
     limit: usize,
@@ -1126,37 +434,6 @@ fn benchmark_limbs_mul_greater_to_out_toom_63_algorithms(
     );
 }
 
-fn benchmark_limbs_mul_greater_to_out_toom_6h_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_6h(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_22(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom6h",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
-                    _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
 fn benchmark_limbs_mul_greater_to_out_toom_6h_same_length_algorithms(
     gm: GenerationMode,
     limit: usize,
@@ -1190,37 +467,6 @@ fn benchmark_limbs_mul_greater_to_out_toom_6h_same_length_algorithms(
                     let mut scratch =
                         vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
                     _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch)
-                }),
-            ),
-        ],
-    );
-}
-
-fn benchmark_limbs_mul_greater_to_out_toom_8h_algorithms(
-    gm: GenerationMode,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark_old(
-        "_limbs_mul_greater_to_out_toom_8h(&mut [Limb], &[Limb], &[Limb])",
-        BenchmarkType::Algorithms,
-        triples_of_unsigned_vec_var_23(gm),
-        gm.name(),
-        limit,
-        file_name,
-        &(|&(_, ref xs, ref ys)| xs.len() + ys.len()),
-        "xs.len() + ys.len()",
-        &mut [
-            (
-                "basecase",
-                &mut (|(mut out, xs, ys)| _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)),
-            ),
-            (
-                "Toom8h",
-                &mut (|(mut out, xs, ys)| {
-                    let mut scratch =
-                        vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
-                    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch)
                 }),
             ),
         ],

@@ -5,7 +5,7 @@ use std::ops::{Shl, Shr};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedNeg, DivRound, EqMod, ModPowerOfTwo, Parity,
+    ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedNeg, EqMod, ModPowerOfTwo, Parity,
     PowerOfTwo, RoundToMultiple, UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -23,9 +23,7 @@ use malachite_base::num::exhaustive::{
     exhaustive_signed_range, primitive_int_increasing_inclusive_range,
     primitive_int_increasing_range,
 };
-use malachite_base::num::logic::traits::{
-    BitAccess, BitConvertible, BitIterable, LeadingZeros, SignificantBits,
-};
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible, BitIterable, LeadingZeros};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
@@ -36,8 +34,7 @@ use malachite_base::tuples::exhaustive::{
     lex_pairs,
 };
 use malachite_base::vecs::exhaustive::{
-    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, exhaustive_vecs_min_length,
-    shortlex_vecs,
+    exhaustive_vecs, exhaustive_vecs_min_length, shortlex_vecs,
 };
 use malachite_base_test_util::generators::common::{reshape_1_2_to_3, It};
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
@@ -527,7 +524,7 @@ fn add_mul_inputs_valid<T: PrimitiveInt>(x: T, y: T, z: T) -> bool {
     x.checked_add_mul(y, z).is_some()
 }
 
-pub(crate) struct ValidAddMulInputs<T> {
+struct ValidAddMulInputs<T> {
     ts: It<(T, T, T)>,
     range: Range<u64>,
     pub(crate) rng: Box<IsaacRng>,
@@ -590,7 +587,7 @@ fn sub_mul_inputs_valid<T: PrimitiveInt>(x: T, y: T, z: T) -> bool {
     x.checked_sub_mul(y, z).is_some()
 }
 
-pub(crate) struct ValidSubMulInputs<T> {
+struct ValidSubMulInputs<T> {
     ts: It<(T, T, T)>,
     range: Range<u64>,
     pub(crate) rng: Box<IsaacRng>,
@@ -678,15 +675,6 @@ where
     }
 }
 
-// All pairs of signeds with the same sign.
-pub fn pairs_of_signeds_var_1<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(pairs_of_signeds(gm).filter(|&(x, y)| (x >= T::ZERO) == (y >= T::ZERO)))
-}
-
 // All pairs of signeds where the second is nonzero, and (T::MIN, T::NEGATIVE_ONE) is excluded.
 pub fn pairs_of_signeds_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
 where
@@ -743,19 +731,6 @@ where
             special_random_signed(&EXAMPLE_SEED),
         )),
     }
-}
-
-// All triples of signeds with the same sign.
-pub fn triples_of_signeds_var_1<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T, T)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(
-        triples_of_signeds(gm).filter(|&(x, y, z)| {
-            (x >= T::ZERO) == (y >= T::ZERO) && (y >= T::ZERO) == (z >= T::ZERO)
-        }),
-    )
 }
 
 // All triples (x, y, z) of signed `T`, where x + y * z doesn't overflow.
@@ -2194,13 +2169,6 @@ pub fn pairs_of_unsigned_vec_var_4<T: PrimitiveUnsigned + Rand>(
     )
 }
 
-// All pairs of `Vec<T>`, where `T` is unsigned and neither `Vec` is empty.
-pub fn pairs_of_unsigned_vec_var_5<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>)> {
-    Box::new(pairs_of_unsigned_vec(gm).filter(|&(ref xs, ref ys)| !xs.is_empty() && !ys.is_empty()))
-}
-
 // All pairs of `Vec<T>` where `T` is unsigned and both elements are nonempty and don't only contain
 // zeros.
 pub fn pairs_of_unsigned_vec_var_6<T: PrimitiveUnsigned + Rand>(
@@ -2983,17 +2951,6 @@ pub fn triples_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
     reshape_1_2_to_3(Box::new(xs.filter(|&(ref out, (ref xs, _))| {
         !xs.is_empty() && out.len() >= xs.len() << 1
     })))
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` are nonempty, and `out.len()` is at
-// least `xs.len() + ys.len()`.
-pub fn triples_of_unsigned_vec_var_26<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(
-        triples_of_unsigned_vec_min_sizes(gm, 2, 1, 1)
-            .filter(|&(ref out, ref xs, ref ys)| out.len() >= xs.len() + ys.len()),
-    )
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` are nonempty, `zs` has at least two
@@ -4209,40 +4166,6 @@ pub fn quadruples_of_unsigneds_var_4<T: PrimitiveUnsigned + Rand, U: PrimitiveUn
     Box::new(quadruples_of_four_unsigneds(gm).filter(|&(x, _, _, m)| x < m))
 }
 
-fn quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, T, T)> {
-    reshape_2_2_to_4(match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_pairs_from_single(exhaustive_vecs(exhaustive_unsigneds())),
-            exhaustive_pairs_from_single(exhaustive_unsigneds()),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_pairs_from_single(random_vecs(seed, scale, &random))),
-            &(|seed| random_pairs_from_single(random(seed))),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_pairs_from_single(special_random_unsigned_vecs(seed, scale))),
-            &(|seed| random_pairs_from_single(special_random_unsigned(seed))),
-        )),
-    })
-}
-
-// All quadruples of `Vec<T>`, `Vec<T>`, `T`, and `T`, where `T` is unsigned and the first `Vec` is
-// at least as long as the second.
-pub fn quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned_var_1<
-    T: PrimitiveUnsigned + Rand,
->(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, T, T)> {
-    Box::new(
-        quadruples_of_unsigned_vec_unsigned_vec_unsigned_and_unsigned(gm)
-            .filter(|&(ref xs, ref ys, _, _)| xs.len() >= ys.len()),
-    )
-}
-
 // All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Limb` where the first limb is a divisor
 // of `Limb::MAX`.
 fn quadruples_of_limb_vec_limb_vec_limb_and_limb_var_2(
@@ -5036,60 +4959,6 @@ pub fn vecs_of_bool_var_1(gm: GenerationMode) -> It<Vec<bool>> {
     Box::new(vecs_of_bool(gm).filter(|bits| bits.iter().any(|&bit| bit)))
 }
 
-// All `Vec<bool>` that could be the bits, in ascending order, of a value of type `T`, which is
-// unsigned.
-pub fn vecs_of_bool_var_2<T: PrimitiveUnsigned>(gm: GenerationMode) -> It<Vec<bool>> {
-    Box::new(vecs_of_bool(gm).filter(|bits| {
-        let width = usize::exact_from(T::WIDTH);
-        bits.len() <= width || bits[width..].iter().all(|&bit| !bit)
-    }))
-}
-
-// All `Vec<bool>` that could be the bits, in ascending order, of a value of type `T`, which is
-// signed.
-pub fn vecs_of_bool_var_3<T: PrimitiveSigned>(gm: GenerationMode) -> It<Vec<bool>> {
-    Box::new(vecs_of_bool(gm).filter(|bits| {
-        if bits.is_empty() {
-            return true;
-        }
-        let width = usize::exact_from(T::WIDTH);
-        if !*bits.last().unwrap() {
-            bits.len() < width || bits[width - 1..].iter().all(|&bit| !bit)
-        } else {
-            let trailing_trues = bits.iter().rev().take_while(|&&bit| bit).count();
-            let significant_bits = bits.len() - trailing_trues;
-            significant_bits < width
-        }
-    }))
-}
-
-// All `Vec<bool>` that could be the bits, in descending order, of a value of type `T`, which is
-// unsigned.
-pub fn vecs_of_bool_var_4<T: PrimitiveUnsigned>(gm: GenerationMode) -> It<Vec<bool>> {
-    Box::new(vecs_of_bool(gm).filter(|bits| {
-        let width = usize::exact_from(T::WIDTH);
-        bits.len() <= width || bits[..bits.len() - width].iter().all(|&bit| !bit)
-    }))
-}
-
-// All `Vec<bool>` that could be the bits, in descending order, of a value of type `T`, which is
-// signed.
-pub fn vecs_of_bool_var_5<T: PrimitiveSigned>(gm: GenerationMode) -> It<Vec<bool>> {
-    Box::new(vecs_of_bool(gm).filter(|bits| {
-        if bits.is_empty() {
-            return true;
-        }
-        let width = usize::exact_from(T::WIDTH);
-        if !*bits.last().unwrap() {
-            bits.len() < width || bits[..bits.len() - width + 1].iter().all(|&bit| !bit)
-        } else {
-            let trailing_trues = bits.iter().take_while(|&&bit| bit).count();
-            let significant_bits = bits.len() - trailing_trues;
-            significant_bits < width
-        }
-    }))
-}
-
 fn triples_of_unsigned_vec_unsigned_vec_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, Vec<T>, T)> {
@@ -5534,7 +5403,7 @@ fn triples_of_unsigned_vec_unsigned_vec_and_small_unsigned<
     }
 }
 
-pub fn triples_of_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
+fn triples_of_unsigned_vec_unsigned_and_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Vec<T>, T, T)> {
     match gm {
@@ -7111,107 +6980,6 @@ impl<T: BitConvertible> Iterator for RandomValueAndVecOfBool<T> {
             bools.push(self.rng.gen::<bool>());
         }
         Some((n, bools))
-    }
-}
-
-fn random_pairs_of_primitive_and_vec_of_bool_var_1<T: PrimitiveInt + Rand>(
-    seed: &[u32],
-) -> RandomValueAndVecOfBool<T> {
-    RandomValueAndVecOfBool {
-        xs: Box::new(random(&scramble(seed, "naturals"))),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-fn special_random_pairs_of_unsigned_and_vec_of_bool_var_1<T: PrimitiveUnsigned + Rand>(
-    seed: &[u32],
-) -> RandomValueAndVecOfBool<T> {
-    RandomValueAndVecOfBool {
-        xs: Box::new(special_random_unsigned(&scramble(seed, "naturals"))),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-// All pairs of `T` and `Vec<bool>`, where `T` is unsigned and the length of the `Vec` is equal to
-// the significant bit count of the `T`.
-pub fn pairs_of_unsigned_and_vec_of_bool_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, Vec<bool>)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            let f = |n: &T| {
-                exhaustive_fixed_length_vecs_from_single(n.significant_bits(), exhaustive_bools())
-            };
-            Box::new(dependent_pairs(exhaustive_unsigneds(), f))
-        }
-        GenerationMode::Random(_) => Box::new(random_pairs_of_primitive_and_vec_of_bool_var_1(
-            &EXAMPLE_SEED,
-        )),
-        GenerationMode::SpecialRandom(_) => Box::new(
-            special_random_pairs_of_unsigned_and_vec_of_bool_var_1(&EXAMPLE_SEED),
-        ),
-    }
-}
-
-fn special_random_pairs_of_signed_and_vec_of_bool_var_1<T: PrimitiveSigned + Rand>(
-    seed: &[u32],
-) -> RandomValueAndVecOfBool<T>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    RandomValueAndVecOfBool {
-        xs: Box::new(special_random_signed(&scramble(seed, "naturals"))),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-// All pairs of `T` and `Vec<bool>`, where `T` is signed and the length of the `Vec` is equal to the
-// significant bit count of the `T`.
-pub fn pairs_of_signed_and_vec_of_bool_var_1<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, Vec<bool>)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    match gm {
-        GenerationMode::Exhaustive => {
-            let f = |n: &T| {
-                exhaustive_fixed_length_vecs_from_single(
-                    u64::exact_from(n.to_bits_asc().len()),
-                    exhaustive_bools(),
-                )
-            };
-            Box::new(dependent_pairs(exhaustive_signeds(), f))
-        }
-        GenerationMode::Random(_) => Box::new(random_pairs_of_primitive_and_vec_of_bool_var_1(
-            &EXAMPLE_SEED,
-        )),
-        GenerationMode::SpecialRandom(_) => Box::new(
-            special_random_pairs_of_signed_and_vec_of_bool_var_1(&EXAMPLE_SEED),
-        ),
-    }
-}
-
-pub(crate) struct RandomValueSmallU64AndVecOfBool<T> {
-    pub(crate) ps: It<(T, u64)>,
-    pub(crate) rng: Box<IsaacRng>,
-}
-
-impl<T: Copy + SignificantBits> Iterator for RandomValueSmallU64AndVecOfBool<T> {
-    type Item = (T, u64, Vec<bool>);
-
-    fn next(&mut self) -> Option<(T, u64, Vec<bool>)> {
-        let (u, log_base) = self.ps.next().unwrap();
-        let mut bools = Vec::new();
-        for _ in 0..u
-            .significant_bits()
-            .div_round(log_base, RoundingMode::Ceiling)
-        {
-            bools.push(self.rng.gen::<bool>());
-        }
-        Some((u, log_base, bools))
     }
 }
 

@@ -55,7 +55,6 @@ impl Iterator for WeightedGraphicRandomCharRange {
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -85,7 +84,6 @@ pub fn random_chars(seed: Seed) -> RandomCharRange {
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -120,11 +118,9 @@ pub fn random_ascii_chars(seed: Seed) -> RandomCharRange {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
-///
 /// Panics if $a \geq b$.
 ///
 /// # Examples
@@ -163,11 +159,9 @@ pub fn random_char_range(seed: Seed, a: char, mut b: char) -> RandomCharRange {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
-///
 /// Panics if $a > b$.
 ///
 /// # Examples
@@ -215,7 +209,6 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -270,7 +263,6 @@ pub fn graphic_weighted_random_chars(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -331,7 +323,6 @@ pub fn graphic_weighted_random_ascii_chars(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -392,7 +383,6 @@ pub fn graphic_weighted_random_char_range(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics

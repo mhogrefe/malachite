@@ -8,7 +8,7 @@ use malachite_base_test_util::generators::{
 use malachite_base_test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_asc_signed_naive, from_bits_asc_unsigned_naive, from_bits_desc_alt,
 };
-use std::iter::{once, repeat};
+use std::iter::once;
 use std::panic::catch_unwind;
 
 #[test]
@@ -82,14 +82,14 @@ pub fn test_from_bits_asc() {
 }
 
 fn from_bits_asc_fail_helper_unsigned<T: PrimitiveUnsigned>() {
-    assert_panic!(T::from_bits_asc(repeat(true).take(200)));
+    assert_panic!(T::from_bits_asc(repeat_n(true, 200)));
 }
 
 fn from_bits_asc_fail_helper_signed<T: PrimitiveSigned>() {
     assert_panic!(T::from_bits_asc(
-        repeat(false).take(200).chain([true, false].iter().cloned())
+        repeat_n(false, 200).chain([true, false].iter().cloned())
     ));
-    assert_panic!(T::from_bits_asc(repeat(false).take(200).chain(once(true))));
+    assert_panic!(T::from_bits_asc(repeat_n(false, 200).chain(once(true))));
 }
 
 #[test]
@@ -161,14 +161,14 @@ pub fn test_from_bits_desc() {
 }
 
 fn from_bits_desc_fail_helper_unsigned<T: PrimitiveUnsigned>() {
-    assert_panic!(T::from_bits_desc(repeat(true).take(200)));
+    assert_panic!(T::from_bits_desc(repeat_n(true, 200)));
 }
 
 fn from_bits_desc_fail_helper_signed<T: PrimitiveSigned>() {
     assert_panic!(T::from_bits_desc(
-        [false, true].iter().cloned().chain(repeat(false).take(200))
+        [false, true].iter().cloned().chain(repeat_n(false, 200))
     ));
-    assert_panic!(T::from_bits_desc(once(true).chain(repeat(false).take(200))));
+    assert_panic!(T::from_bits_desc(once(true).chain(repeat_n(false, 200))));
 }
 
 #[test]

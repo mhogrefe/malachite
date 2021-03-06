@@ -14,7 +14,6 @@ macro_rules! impl_hamming_distance_unsigned {
             /// needed to turn `self` into `other`.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
@@ -49,7 +48,6 @@ macro_rules! impl_checked_hamming_distance_signed {
             /// infinite, so the result is `None`.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples

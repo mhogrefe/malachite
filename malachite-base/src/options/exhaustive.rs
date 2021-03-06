@@ -23,7 +23,6 @@ impl<I: Iterator> Iterator for ExhaustiveSomes<I> {
 /// The output length is `xs.count()`.
 ///
 /// # Complexity per iteration
-///
 /// Same as the time and additional memory complexity of iterating `xs`.
 ///
 /// # Examples
@@ -51,7 +50,6 @@ pub fn exhaustive_somes<I: Iterator>(xs: I) -> ExhaustiveSomes<I> {
 /// The output length is `xs.count()`.
 ///
 /// # Complexity per iteration
-///
 /// Same as the time and additional memory complexity of iterating `xs`.
 ///
 /// # Examples

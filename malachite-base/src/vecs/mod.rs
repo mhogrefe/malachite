@@ -1,5 +1,7 @@
 use num::conversion::traits::ExactFrom;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use rand::prelude::SliceRandom;
+use rand_chacha::ChaCha20Rng;
 use random::Seed;
 use slices::advance_indices;
 use std::str::FromStr;
@@ -73,7 +75,6 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 /// `vec!["a", "b"]`.
 ///
 /// # Worst-case complexity
-///
 /// $T(n) = O(n + T^\prime(n))$
 ///
 /// $M(n) = O(n + M^\prime(n))$
@@ -108,7 +109,6 @@ pub fn vec_from_str<T: FromStr>(src: &str) -> Option<Vec<T>> {
 /// `vec!["a", "b"]`.
 ///
 /// # Worst-case complexity
-///
 /// $T(n) = O(n + \max\sum_{p \in P}T^\prime(p))$, where the maximum is taken over all multisets $P$
 /// that sum to $n$.
 ///
@@ -185,8 +185,9 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
 ///
 /// The output length is infinite.
 ///
-/// # Expected complexity per iteration
+/// $P(x) = 1/n$, where $n$ is `xs.len()`.
 ///
+/// # Expected complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -217,6 +218,7 @@ pub fn random_values_from_vec<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomValuesF
 }
 
 /// Generates every permutation of a `Vec`.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveVecPermutations<T: Clone> {
     xs: Vec<T>,
     indices: Vec<usize>,
@@ -247,7 +249,6 @@ impl<T: Clone> Iterator for ExhaustiveVecPermutations<T> {
 /// The output length is $n!$, where $n$ is `xs.len()`.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -279,6 +280,67 @@ pub fn exhaustive_vec_permutations<T: Clone>(xs: Vec<T>) -> ExhaustiveVecPermuta
         xs,
         indices: (0..len).collect(),
         done: false,
+    }
+}
+
+/// Uniformly generates a random `Vec` of values cloned from an original `Vec`.
+#[derive(Clone, Debug)]
+pub struct RandomVecPermutations<T: Clone> {
+    xs: Vec<T>,
+    indices: Vec<usize>,
+    rng: ChaCha20Rng,
+}
+
+impl<T: Clone> Iterator for RandomVecPermutations<T> {
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Vec<T>> {
+        self.indices.shuffle(&mut self.rng);
+        Some(self.indices.iter().map(|&i| self.xs[i].clone()).collect())
+    }
+}
+
+/// Uniformly generates a random `Vec` of values cloned from an original `Vec`.
+///
+/// The permutations are `Vec`s of cloned items. It may be more convenient for the iterator to
+/// return references to a slice, in which case you may use `random_slice_permutations` instead.
+///
+/// The output length is infinite.
+///
+/// $P(p) = 1/n!$, where $n$ is `xs.len()`.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::vecs::random_vec_permutations;
+///
+/// let css: Vec<String> = random_vec_permutations(EXAMPLE_SEED, vec!['a', 'b', 'c', 'd']).take(20)
+///     .map(|ds| ds.into_iter().collect()).collect();
+/// assert_eq!(
+///     css.iter().map(String::as_str).collect_vec().as_slice(),
+///     [
+///         "cadb", "cbad", "cadb", "badc", "acdb", "cbad", "dabc", "dbca", "cdba", "cdab", "bacd",
+///         "cabd", "adbc", "cdab", "dcab", "abcd", "abcd", "dacb", "bcad", "adcb"
+///     ]
+/// );
+/// ```
+pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPermutations<T> {
+    let len = xs.len();
+    RandomVecPermutations {
+        xs,
+        indices: (0..len).collect(),
+        rng: seed.get_rng(),
     }
 }
 

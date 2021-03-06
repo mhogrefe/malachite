@@ -8,7 +8,6 @@ use rounding_modes::{RoundingMode, ROUNDING_MODES};
 /// The output length is 6.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

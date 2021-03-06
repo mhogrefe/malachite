@@ -238,7 +238,6 @@ fn select_fns(
 /// TODO complexity
 ///
 /// # Panics
-///
 /// Panics if `xs`, `es`, or `ms` are empty, if `xs` is longer than `ms`, if the first element of
 /// `ms` is even, or if $E$ less than 2.
 ///

@@ -7,7 +7,6 @@ use std::str::FromStr;
 /// If `T` does not implement `FromStr`, try using `option_from_str_custom` instead.
 ///
 /// # Worst-case complexity
-///
 /// Same time and additional memory complexity as `T::from_str`.
 ///
 /// # Examples
@@ -32,7 +31,6 @@ pub fn option_from_str<T: FromStr>(src: &str) -> Option<Option<T>> {
 /// If `f` just uses `T::from_str`, you can use `option_from_str` instead.
 ///
 /// # Worst-case complexity
-///
 /// Same time and additional memory complexity as `f`.
 ///
 /// # Examples

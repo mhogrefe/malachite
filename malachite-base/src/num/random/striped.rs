@@ -38,7 +38,6 @@ impl Iterator for StripedBitSource {
     /// or `false`, call `end_block`.
     ///
     /// # Expected worst-case complexity
-    ///
     /// Constant time and additional memory.
     #[inline]
     fn next(&mut self) -> Option<bool> {
@@ -57,7 +56,6 @@ impl StripedBitSource {
     /// `m_numerator` / `m_denominator`.
     ///
     /// # Expected worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Panics
@@ -95,7 +93,6 @@ impl StripedBitSource {
     /// `true` or `false` will be equal.
     ///
     /// # Expected worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -140,7 +137,7 @@ impl StripedBitSource {
 /// Generates random unsigned integers from a random striped distribution.
 #[derive(Clone, Debug)]
 pub struct StripedRandomUnsignedBitChunks<T: PrimitiveUnsigned> {
-    phantom_data: PhantomData<*const T>,
+    phantom: PhantomData<*const T>,
     bits: StripedBitSource,
     chunk_size: usize,
 }
@@ -167,7 +164,7 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedBitChunks<T> {
 /// more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomSigneds<T: PrimitiveSigned> {
-    phantom_data: PhantomData<*const T>,
+    phantom: PhantomData<*const T>,
     bits: StripedBitSource,
     bs: RandomBools,
 }
@@ -197,7 +194,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomSigneds<T> {
 /// for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNaturalSigneds<T: PrimitiveSigned> {
-    phantom_data: PhantomData<*const T>,
+    phantom: PhantomData<*const T>,
     bits: StripedBitSource,
 }
 
@@ -223,7 +220,7 @@ impl<T: PrimitiveSigned> Iterator for StripedRandomNaturalSigneds<T> {
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub struct StripedRandomNegativeSigneds<T: PrimitiveSigned> {
-    phantom_data: PhantomData<*const T>,
+    phantom: PhantomData<*const T>,
     bits: StripedBitSource,
 }
 
@@ -385,7 +382,7 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
     m_denominator: u64,
 ) -> StripedRandomSigneds<T> {
     StripedRandomSigneds {
-        phantom_data: PhantomData,
+        phantom: PhantomData,
         bits: StripedBitSource::new(seed.fork("bits"), m_numerator, m_denominator),
         bs: random_bools(seed.fork("bs")),
     }
@@ -427,7 +424,7 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
     m_denominator: u64,
 ) -> StripedRandomNaturalSigneds<T> {
     StripedRandomNaturalSigneds {
-        phantom_data: PhantomData,
+        phantom: PhantomData,
         bits: StripedBitSource::new(seed, m_numerator, m_denominator),
     }
 }
@@ -512,7 +509,7 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
     m_denominator: u64,
 ) -> StripedRandomNegativeSigneds<T> {
     StripedRandomNegativeSigneds {
-        phantom_data: PhantomData,
+        phantom: PhantomData,
         bits: StripedBitSource::new(seed, m_numerator, m_denominator),
     }
 }
@@ -596,7 +593,7 @@ pub fn striped_random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 ) -> StripedRandomUnsignedBitChunks<T> {
     assert!(chunk_size <= T::WIDTH);
     StripedRandomUnsignedBitChunks {
-        phantom_data: PhantomData,
+        phantom: PhantomData,
         bits: StripedBitSource::new(seed, m_numerator, m_denominator),
         chunk_size: usize::exact_from(chunk_size),
     }
@@ -710,7 +707,6 @@ pub fn striped_random_bool_vecs_from_length_iterator<I: Iterator<Item = u64>>(
 /// If `len` is 0, the output consists of the empty list, repeated.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -763,7 +759,6 @@ pub fn striped_random_fixed_length_bool_vecs(
 /// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -827,7 +822,6 @@ pub fn striped_random_bool_vecs(
 /// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -905,7 +899,6 @@ pub fn striped_random_bool_vecs_min_length(
 /// $$
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(a + b)$
 ///
 /// $M(n) = O(a + b)$
@@ -971,7 +964,6 @@ pub fn striped_random_bool_vecs_length_range(
 /// $$
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(a + b)$
 ///
 /// $M(n) = O(a + b)$
@@ -1071,7 +1063,7 @@ pub fn get_striped_unsigned_vec<T: PrimitiveUnsigned>(
 /// Generates random striped `Vec`s of unsigneds.
 #[derive(Clone, Debug)]
 pub struct StripedRandomUnsignedVecs<T: PrimitiveUnsigned, I: Iterator<Item = u64>> {
-    phantom_data: PhantomData<*const T>,
+    phantom: PhantomData<*const T>,
     lengths: I,
     bit_source: StripedBitSource,
 }
@@ -1140,7 +1132,7 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
     mean_stripe_denominator: u64,
 ) -> StripedRandomUnsignedVecs<T, I> {
     StripedRandomUnsignedVecs {
-        phantom_data: PhantomData,
+        phantom: PhantomData,
         lengths: lengths_gen(seed.fork("lengths")),
         bit_source: StripedBitSource::new(
             seed.fork("bit_source"),
@@ -1158,7 +1150,6 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
 /// If `len` is 0, the output consists of the empty list, repeated.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -1221,7 +1212,6 @@ pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
 /// $$
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -1303,7 +1293,6 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
 /// where $a$ is `min_length`.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -1387,7 +1376,6 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
 /// $$
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(a + b)$
 ///
 /// $M(n) = O(a + b)$
@@ -1459,7 +1447,6 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
 /// $$
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(a + b)$
 ///
 /// $M(n) = O(a + b)$

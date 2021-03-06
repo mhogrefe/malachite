@@ -47,7 +47,7 @@ impl Default for GenConfig {
 }
 
 pub struct Generator<T: 'static> {
-    phantom_data: PhantomData<*const T>,
+    phantom: PhantomData<*const T>,
     exhaustive: &'static dyn Fn() -> It<T>,
     random: &'static dyn Fn(&GenConfig) -> It<T>,
     special_random: Option<&'static dyn Fn(&GenConfig) -> It<T>>,
@@ -60,7 +60,7 @@ impl<T> Generator<T> {
         special_random: &'static dyn Fn(&GenConfig) -> It<T>,
     ) -> Generator<T> {
         Generator {
-            phantom_data: PhantomData,
+            phantom: PhantomData,
             exhaustive,
             random,
             special_random: Some(special_random),
@@ -72,7 +72,7 @@ impl<T> Generator<T> {
         random: &'static dyn Fn(&GenConfig) -> It<T>,
     ) -> Generator<T> {
         Generator {
-            phantom_data: PhantomData,
+            phantom: PhantomData,
             exhaustive,
             random,
             special_random: None,

@@ -34,11 +34,9 @@ macro_rules! impl_half_traits {
             /// $f(x, y) = 2^{W/2} x + y$.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::half` module.
             #[inline]
             fn join_halves(upper: Self::Half, lower: Self::Half) -> Self {
@@ -49,7 +47,6 @@ macro_rules! impl_half_traits {
         /// Implements `SplitInHalf` for unsigned primitive integers.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::comparison::half` module.
         impl SplitInHalf for $t {
             /// Extracts the lower, or least significant half, of and unsigned integer.
@@ -59,11 +56,9 @@ macro_rules! impl_half_traits {
             /// $f(n) = m$, where $m < 2^{W/2}$ and $n + 2^{W/2} k = m$ for some $k \in Z$.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::half` module.
             #[inline]
             fn lower_half(&self) -> Self::Half {
@@ -75,11 +70,9 @@ macro_rules! impl_half_traits {
             /// $f(n) = \lfloor \frac{n}{2^{W/2}} \rfloor$.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::half` module.
             #[inline]
             fn upper_half(&self) -> Self::Half {

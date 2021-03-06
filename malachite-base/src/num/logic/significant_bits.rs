@@ -21,7 +21,6 @@ macro_rules! impl_significant_bits_unsigned {
             /// $$
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
@@ -53,7 +52,6 @@ macro_rules! impl_significant_bits_signed {
         /// $$
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples

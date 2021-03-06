@@ -12,7 +12,6 @@ use vecs::vec_pad_left;
 /// become bytes representing the lowercase `char`s 'a' to 'z'.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -42,7 +41,6 @@ pub fn digit_to_display_byte_lower(b: u8) -> u8 {
 /// become bytes representing the lowercase `char`s 'A' to 'Z'.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -120,14 +118,12 @@ macro_rules! impl_to_string_base_unsigned {
             /// Using the `#` flag switches to uppercase letters. Padding with zeros works as usual.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
@@ -144,14 +140,12 @@ macro_rules! impl_to_string_base_unsigned {
             /// This is the same as the `Display::fmt` implementation.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
@@ -166,14 +160,12 @@ macro_rules! impl_to_string_base_unsigned {
             /// lowercase `char`s 'a' to 'z'.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn to_string_base(&self, base: u64) -> String {
@@ -186,14 +178,12 @@ macro_rules! impl_to_string_base_unsigned {
             /// uppercase `char`s 'A' to 'Z'.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn to_string_base_upper(&self, base: u64) -> String {
@@ -288,14 +278,12 @@ macro_rules! impl_to_string_base_signed {
             /// complement.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
@@ -316,14 +304,12 @@ macro_rules! impl_to_string_base_signed {
             /// This is the same as the `Display::fmt` implementation.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
@@ -342,14 +328,12 @@ macro_rules! impl_to_string_base_signed {
             /// complement.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn to_string_base(&self, base: u64) -> String {
@@ -366,14 +350,12 @@ macro_rules! impl_to_string_base_signed {
             /// complement.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `base` is less than 2 or greater than 36.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn to_string_base_upper(&self, base: u64) -> String {

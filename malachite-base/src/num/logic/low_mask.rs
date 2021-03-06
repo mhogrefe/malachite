@@ -20,7 +20,6 @@ macro_rules! impl_low_mask_unsigned {
             /// $f(b) = 2^b - 1$.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
@@ -63,7 +62,6 @@ macro_rules! impl_low_mask_signed {
             /// where $W$ is `$t::WIDTH`.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics

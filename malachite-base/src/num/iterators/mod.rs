@@ -14,7 +14,7 @@ pub struct SameWidthIteratorToBitChunks<
     U: PrimitiveUnsigned,
 > {
     xs: I,
-    phantom: PhantomData<U>,
+    phantom: PhantomData<*const U>,
 }
 
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -50,7 +50,7 @@ pub struct EvenFractionIteratorToBitChunks<
     multiple: u64,
     y_width: u64,
     counter: u64,
-    phantom: PhantomData<U>,
+    phantom: PhantomData<*const U>,
 }
 
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -104,7 +104,7 @@ pub struct EvenMultipleIteratorToBitChunks<
     x_width: u64,
     y_width: u64,
     done: bool,
-    phantom: PhantomData<U>,
+    phantom: PhantomData<*const U>,
 }
 
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -165,7 +165,7 @@ pub struct IrregularIteratorToBitChunks<
     y_width: u64,
     remaining_x_bits: u64,
     in_inner_loop: bool,
-    phantom: PhantomData<U>,
+    phantom: PhantomData<*const U>,
 }
 
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
@@ -292,7 +292,6 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 /// is `out_chunk_size`.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -375,7 +374,7 @@ pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pr
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct RulerSequence<T: ExactFrom<u32>> {
     i: u64,
-    phantom: PhantomData<T>,
+    phantom: PhantomData<*const T>,
 }
 
 impl<T: ExactFrom<u32>> Iterator for RulerSequence<T> {
@@ -401,7 +400,6 @@ impl<T: ExactFrom<u32>> Iterator for RulerSequence<T> {
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -464,11 +462,9 @@ impl Iterator for BitDistributorSequence {
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
-///
 /// Panics if both output types are tiny.
 ///
 /// # Examples

@@ -27,11 +27,9 @@ macro_rules! union {
             /// type.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `unions` module.
             #[allow(clippy::missing_const_for_fn)] // Can't be const because of destructor
             pub fn unwrap(self) -> T {
@@ -47,12 +45,10 @@ macro_rules! union {
             /// Converts a union to a `String`.
             ///
             /// # Worst-case complexity
-            ///
             /// The time and additional memory complexities are the maxima of the time and memory
             /// complexities of the `Display::fmt` implementations of the variant types.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `unions` module.
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> fmt::Result {
@@ -72,13 +68,11 @@ macro_rules! union {
             /// If the `&str` does not represent a valid union, an error value is returned.
             ///
             /// # Worst-case complexity
-            ///
             /// The time and additional memory complexities are the maxima of the time and memory
             /// complexities of the `FromStr::from_str` implementations of the variant types, or
             /// $O(n)$, whichever is greater.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `unions` module.
             #[inline]
             fn from_str(src: &str) -> Result<$name<$($t),*>, Self::Err> {

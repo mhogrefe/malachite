@@ -60,14 +60,12 @@ macro_rules! impl_bit_block_access_unsigned {
             /// $$
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `start < end`.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self {
@@ -105,7 +103,6 @@ macro_rules! impl_bit_block_access_unsigned {
             /// $$
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
@@ -113,7 +110,6 @@ macro_rules! impl_bit_block_access_unsigned {
             /// through `end - start` of `bits` are nonzero.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
@@ -215,14 +211,12 @@ macro_rules! impl_bit_block_access_signed {
             /// $$
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `start < end` or `self < 0 && end - start > $s::WIDTH`.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self::Bits {
@@ -283,7 +277,6 @@ macro_rules! impl_bit_block_access_signed {
             /// $$
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
@@ -291,7 +284,6 @@ macro_rules! impl_bit_block_access_signed {
             /// through `end - start` of `bits` are not equal to the original sign bit of `self`.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {

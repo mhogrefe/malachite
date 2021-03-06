@@ -15,11 +15,9 @@ macro_rules! identity_conversion {
             /// leaves the value unchanged, `None` is never returned.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn checked_from(value: $t) -> Option<$t> {
@@ -32,11 +30,9 @@ macro_rules! identity_conversion {
             /// the value unchanged.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn wrapping_from(value: $t) -> $t {
@@ -49,11 +45,9 @@ macro_rules! identity_conversion {
             /// the value unchanged.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn saturating_from(value: $t) -> $t {
@@ -67,11 +61,9 @@ macro_rules! identity_conversion {
             /// overflow).
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn overflowing_from(value: $t) -> ($t, bool) {
@@ -83,11 +75,9 @@ macro_rules! identity_conversion {
             /// Checks whether a value is convertible to its own type. The result is always `true`.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::conversion::from` module.
             #[inline]
             fn convertible_from(_: $t) -> bool {
@@ -105,11 +95,9 @@ macro_rules! lossless_conversion {
         /// the value unchanged, `None` is never returned.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl CheckedFrom<$a> for $b {
             #[inline]
@@ -122,11 +110,9 @@ macro_rules! lossless_conversion {
         /// value unchanged.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl WrappingFrom<$a> for $b {
             #[inline]
@@ -139,11 +125,9 @@ macro_rules! lossless_conversion {
         /// value unchanged.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl SaturatingFrom<$a> for $b {
             #[inline]
@@ -157,11 +141,9 @@ macro_rules! lossless_conversion {
         /// overflow).
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl OverflowingFrom<$a> for $b {
             #[inline]
@@ -173,11 +155,9 @@ macro_rules! lossless_conversion {
         /// Checks whether a value is convertible to a different type. The result is always `true`.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl ConvertibleFrom<$a> for $b {
             #[inline]
@@ -265,11 +245,9 @@ macro_rules! lossy_conversion {
         /// $$
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl CheckedFrom<$a> for $b {
             #[inline]
@@ -291,11 +269,9 @@ macro_rules! lossy_conversion {
         /// $k \in \Z$.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         #[allow(clippy::cast_lossless)]
         impl WrappingFrom<$a> for $b {
@@ -329,11 +305,9 @@ macro_rules! lossy_conversion {
         /// $$
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl SaturatingFrom<$a> for $b {
             #[inline]
@@ -355,11 +329,9 @@ macro_rules! lossy_conversion {
         /// $k \in \Z$.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl OverflowingFrom<$a> for $b {
             #[inline]
@@ -383,11 +355,9 @@ macro_rules! lossy_conversion {
         /// $$
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `num::conversion::from` module.
         impl ConvertibleFrom<$a> for $b {
             #[inline]

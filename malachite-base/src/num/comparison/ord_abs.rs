@@ -13,11 +13,9 @@ macro_rules! impl_partial_ord_abs {
             /// primitive integers these never occur.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::comparison::ord_abs` module.
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
@@ -36,11 +34,9 @@ macro_rules! impl_ord_abs_unsigned {
             /// For unsigned values, this is the same as ordinary comparison.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::comparison::ord_abs` module.
             #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {
@@ -61,11 +57,9 @@ macro_rules! impl_ord_abs_signed {
             /// Compares the absolute values of `self` and `other`, taking both by reference.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::comparison::ord_abs` module.
             #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {

@@ -22,7 +22,6 @@ impl FromStr for Never {
     /// Since a `Never` can never be instantiated, `from_str` never succeeds.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -43,7 +42,6 @@ impl FromStr for Never {
 /// The output length is 0.
 ///
 /// # Worst-case complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

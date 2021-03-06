@@ -14,7 +14,6 @@ use num::logic::traits::SignificantBits;
 /// The output length is 1.
 ///
 /// # Worst-case complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -145,7 +144,6 @@ macro_rules! lex_custom_tuples {
         /// If any of the input iterators is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If `xs` is finite:
         ///
         /// $T(i, n) = O(n)$
@@ -170,7 +168,6 @@ macro_rules! lex_custom_tuples {
         /// where $T$ is time, $M$ is additional memory and $n$ is the number of input iterators.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         pub fn $exhaustive_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             $($xs: $it,)*
@@ -316,7 +313,6 @@ macro_rules! lex_tuples {
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If `xs` is finite:
         ///
         /// $T(i, n) = O(n)$
@@ -338,7 +334,6 @@ macro_rules! lex_tuples {
         /// `xs`, and $P$ is the product of the lengths of `ys`, `zs`, ... (excluding `xs`).
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         pub fn $exhaustive_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             $($xs: $it,)*
@@ -414,7 +409,6 @@ macro_rules! lex_tuples {
         /// If `xs` is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// $$
         /// T(i, n) = O(n + T^\prime (i))
         /// $$
@@ -428,7 +422,6 @@ macro_rules! lex_tuples {
         /// `xs`.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         pub fn $exhaustive_fn_from_single<T: Clone, I: Iterator<Item = T>>(
             xs: I
@@ -624,7 +617,6 @@ macro_rules! exhaustive_tuples_1_input {
         /// If `xs` is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If all of `xs` is finite:
         ///
         /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
@@ -652,7 +644,6 @@ macro_rules! exhaustive_tuples_1_input {
         /// $T^\prime$ and $M^\prime$ are the time and additional memory functions of `xs`.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         pub fn $exhaustive_fn<I: Iterator>(
             xs: I,
@@ -679,7 +670,6 @@ macro_rules! exhaustive_tuples_1_input {
         /// If `xs` is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If `xs` is finite:
         ///
         /// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt\[n\]{i}))$
@@ -696,7 +686,6 @@ macro_rules! exhaustive_tuples_1_input {
         /// $T^\prime$ and $M^\prime$ are the time and additional memory functions of `xs`.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         #[inline]
         pub fn $exhaustive_fn_from_single<I: Iterator>(xs: I) -> $exhaustive_struct<I>
@@ -911,7 +900,6 @@ macro_rules! exhaustive_tuples {
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
         /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
@@ -957,7 +945,6 @@ macro_rules! exhaustive_tuples {
         /// where $T$ is time, $M$ is additional memory, and $n$ is the width of the tuples.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         pub fn $exhaustive_fn_custom_output<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             $($xs: $it,)*
@@ -982,7 +969,6 @@ macro_rules! exhaustive_tuples {
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
         /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
@@ -1004,7 +990,6 @@ macro_rules! exhaustive_tuples {
         /// memory functions of the infinite input iterators.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         #[inline]
         pub fn $exhaustive_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
@@ -1229,7 +1214,6 @@ macro_rules! custom_tuples {
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
         /// $T(i, n) = O(P \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
@@ -1250,7 +1234,6 @@ macro_rules! custom_tuples {
         /// and $P = \product{j=0}^{m-1}\frac{\ell_j}{2}$.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         pub fn $exhaustive_custom_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             $($xs: $it,)*
@@ -1283,7 +1266,6 @@ macro_rules! custom_tuples {
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
         /// $T(i, n) = O(P \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
@@ -1304,7 +1286,6 @@ macro_rules! custom_tuples {
         /// and $P = \product{j=0}^{m-1}\frac{\ell_j}{2}$.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::exhaustive` module.
         #[inline]
         pub fn $exhaustive_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
@@ -1693,8 +1674,6 @@ impl<
         if self.done {
             None
         } else {
-            let x_out;
-            let y_out;
             let original_i = self.index_generator.next().unwrap();
             loop {
                 let mut i = original_i;
@@ -1715,14 +1694,12 @@ impl<
                         i %= xs_yss_len;
                     }
                 }
-                let p = &mut self.xs_yss[i];
-                if let Some(y) = p.1.next() {
-                    x_out = p.0.clone();
-                    y_out = y;
-                    // p has been used
-                    p.2 = false;
-                    break;
-                } else if self.stop_after_empty_ys && p.2 {
+                let t = &mut self.xs_yss[i];
+                if let Some(y) = t.1.next() {
+                    // t has been used
+                    t.2 = false;
+                    return Some((t.0.clone(), y));
+                } else if self.stop_after_empty_ys && t.2 {
                     self.done = true;
                     return None;
                 } else {
@@ -1733,7 +1710,6 @@ impl<
                     }
                 }
             }
-            Some((x_out, y_out))
         }
     }
 }

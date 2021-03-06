@@ -6,7 +6,6 @@ impl NotAssign for bool {
     /// $b_\mathrm{after}=\lnot b_\mathrm{before}$
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples

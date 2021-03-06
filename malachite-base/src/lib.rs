@@ -90,7 +90,6 @@ pub mod random;
 /// - `Exact` panics if the value is not already rounded.
 ///
 /// # Examples
-///
 /// Here are some examples of how floating-point values would be rounded to integer values using the
 /// different `RoundingMode`s.
 ///

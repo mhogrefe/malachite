@@ -9,11 +9,9 @@ macro_rules! impl_eq_abs_unsigned {
             /// For unsigned values, this is the same as ordinary equality.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::comparison::eq_abs` module.
             #[inline]
             fn eq_abs(&self, other: &Self) -> bool {
@@ -34,11 +32,9 @@ macro_rules! impl_eq_abs_signed {
             /// Compares the absolute values of `self` and `other`, taking both by reference.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::comparison::eq_abs` module.
             #[inline]
             fn eq_abs(&self, other: &Self) -> bool {

@@ -20,7 +20,7 @@ fn escape_label_string(s: &str) -> String {
     escaped
 }
 
-pub struct BenchmarkSeriesOptions<'a, T: 'a> {
+struct BenchmarkSeriesOptions<'a, T: 'a> {
     pub name: &'a str,
     pub function: &'a mut dyn FnMut(T),
     pub color: &'a str,

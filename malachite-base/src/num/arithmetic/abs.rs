@@ -17,28 +17,15 @@ macro_rules! impl_abs {
         }
 
         impl AbsAssign for $s {
-            /// Replace `self` with its absolute value.
+            /// Replaces `self` with its absolute value.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets |x|$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::AbsAssign;
-            ///
-            /// let mut x = 0i8;
-            /// x.abs_assign();
-            /// assert_eq!(x, 0i8);
-            ///
-            /// let mut x = 100i64;
-            /// x.abs_assign();
-            /// assert_eq!(x, 100i64);
-            ///
-            /// let mut x = -100i64;
-            /// x.abs_assign();
-            /// assert_eq!(x, 100i64);
-            /// ```
+            /// See the documentation of the `num::arithmetic::abs` module.
             #[inline]
             fn abs_assign(&mut self) {
                 *self = self.abs();
@@ -49,22 +36,18 @@ macro_rules! impl_abs {
             type Output = $u;
 
             /// Computes the absolute value of `self` and converts it to the unsigned type of the
-            /// same width. Unlike regular `abs`, this function lets you take the absolute value of
-            /// the smallest representable value of a signed type.
+            /// same width.
             ///
-            /// Time: worst case O(1)
+            /// Unlike regular `abs`, this function lets you take the absolute value of the smallest
+            /// representable value of a signed type.
             ///
-            /// Additional memory: worst case O(1)
+            /// $f(x) = |x|$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::UnsignedAbs;
-            ///
-            /// assert_eq!(0i8.unsigned_abs(), 0u8);
-            /// assert_eq!(100i64.unsigned_abs(), 100u64);
-            /// assert_eq!((-100i64).unsigned_abs(), 100u64);
-            /// assert_eq!((-128i8).unsigned_abs(), 128u8);
-            /// ```
+            /// See the documentation of the `num::arithmetic::abs` module.
             #[inline]
             fn unsigned_abs(self) -> $u {
                 _unsigned_abs::<$u, $s>(self)

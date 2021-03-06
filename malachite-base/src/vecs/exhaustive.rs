@@ -1,8 +1,8 @@
 use std::cmp::max;
-use std::iter::{once, repeat, Once};
+use std::iter::{once, Once};
 use std::marker::PhantomData;
 
-use itertools::Itertools;
+use itertools::{repeat_n, Itertools};
 
 use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use iterators::iterator_cache::IteratorCache;
@@ -146,7 +146,6 @@ macro_rules! lex_fixed_length_vecs {
         /// If any of the input iterators is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If `xs` is finite:
         ///
         /// $T(i, n) = O(n)$
@@ -171,7 +170,6 @@ macro_rules! lex_fixed_length_vecs {
         /// where $T$ is time, $M$ is additional memory and $n$ is the number of input iterators.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `vecs::exhaustive` module.
         pub fn $exhaustive_custom_fn<T: Clone, $($it: Iterator<Item = T>,)*>(
             $($xs: $it,)*
@@ -219,7 +217,6 @@ macro_rules! lex_fixed_length_vecs {
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If `xs` is finite:
         ///
         /// $T(i, n) = O(n)$
@@ -241,7 +238,6 @@ macro_rules! lex_fixed_length_vecs {
         /// $P$ is the product of the lengths of `ys`, `zs`, ... (excluding `xs`).
         ///
         /// # Examples
-        ///
         /// See the documentation of the `vecs::exhaustive` module.
         #[inline]
         pub fn $exhaustive_1_to_1_fn<T: Clone, $($it: Iterator<Item = T>,)*>(
@@ -367,7 +363,7 @@ where
         } else if self.first {
             self.first = false;
             if let Some(x) = self.xs.get(0) {
-                Some(repeat(x).cloned().take(self.counters.len()).collect())
+                Some(repeat_n(x, self.counters.len()).cloned().collect())
             } else {
                 self.done = true;
                 None
@@ -449,7 +445,6 @@ where
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
 /// # Complexity per iteration
-///
 /// $$
 /// T(i, n) = O(n + T^\prime (i))
 /// $$
@@ -637,7 +632,6 @@ macro_rules! exhaustive_fixed_length_vecs {
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
         /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
@@ -683,13 +677,11 @@ macro_rules! exhaustive_fixed_length_vecs {
         /// where $T$ is time, $M$ is additional memory and $n$ is `len`.
         ///
         /// # Panics
-        ///
         /// Panics if the `usize`s in `output_types` do not include all indices from 0 to $m-1$,
         /// inclusive, possibly with repetitions. In particular, the length of `output_types` must
         /// be at least $m$.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `vecs::exhaustive` module.
         pub fn $exhaustive_custom_fn<T: Clone, $($it: Iterator<Item=T>,)*> (
             $($xs: $it,)*
@@ -726,7 +718,6 @@ macro_rules! exhaustive_fixed_length_vecs {
         /// If any of `xs`, `ys`, `zs`, ... is empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// If all of `xs`, `ys`, `zs`, ... are finite:
         ///
         /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{n-1}T_j(\sqrt\[n\]{i}))$
@@ -748,7 +739,6 @@ macro_rules! exhaustive_fixed_length_vecs {
         /// memory functions of the infinite input iterators.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `vecs::exhaustive` module.
         #[inline]
         pub fn $exhaustive_1_to_1_fn<T: Clone, $($it: Iterator<Item=T>,)*> (
@@ -962,7 +952,6 @@ where
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
 /// # Complexity per iteration
-///
 /// If all of `xs` is finite:
 ///
 /// $T(i, n) = O((\ell/2)^n \sum_{j=0}^{k-1}T_j(\sqrt\[n\]{i}))$
@@ -1048,7 +1037,6 @@ where
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
 /// # Complexity per iteration
-///
 /// If `xs` is finite:
 ///
 /// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt\[n\]{i}))$
@@ -1214,7 +1202,6 @@ pub fn shortlex_vecs_from_length_iterator<
 /// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -1268,7 +1255,6 @@ where
 /// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -1330,7 +1316,6 @@ where
 /// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -1391,7 +1376,6 @@ where
 /// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -1566,7 +1550,6 @@ pub fn exhaustive_vecs_from_length_iterator<
 /// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -1609,7 +1592,6 @@ where
 /// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -1664,7 +1646,6 @@ where
 /// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -1719,7 +1700,6 @@ where
 /// The lengths of the output `Vec`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$

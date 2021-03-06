@@ -1,13 +1,11 @@
-use std::panic::catch_unwind;
-
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::random::random_unsigneds_less_than;
+use malachite_base::random::EXAMPLE_SEED;
 use malachite_base_test_util::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
     uniform_primitive_int_assertions, CheckedToF64, MomentStats,
 };
-
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::random::random_unsigneds_less_than;
-use malachite_base::random::EXAMPLE_SEED;
+use std::panic::catch_unwind;
 
 fn random_unsigneds_less_than_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     limit: T,

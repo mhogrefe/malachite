@@ -42,11 +42,9 @@ macro_rules! impl_bit_access_unsigned {
             /// rest are 0. Then $f(n, j) = (b_j = 1)$.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
@@ -73,14 +71,12 @@ macro_rules! impl_bit_access_unsigned {
             /// $$
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if $i \geq W$, where $i$ is `index` and $W$ is `$t::WIDTH`.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn set_bit(&mut self, index: u64) {
@@ -109,11 +105,9 @@ macro_rules! impl_bit_access_unsigned {
             /// $$
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn clear_bit(&mut self, index: u64) {
@@ -184,11 +178,9 @@ macro_rules! impl_bit_access_signed {
             /// Then $f(n, j) = (b_j = 1)$.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
@@ -228,7 +220,6 @@ macro_rules! impl_bit_access_signed {
             /// $$
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
@@ -236,7 +227,6 @@ macro_rules! impl_bit_access_signed {
             /// `$t::WIDTH`.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn set_bit(&mut self, index: u64) {
@@ -277,7 +267,6 @@ macro_rules! impl_bit_access_signed {
             /// and $i < W$.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Panics
@@ -285,7 +274,6 @@ macro_rules! impl_bit_access_signed {
             /// `$t::WIDTH`.
             ///
             /// # Examples
-            ///
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn clear_bit(&mut self, index: u64) {

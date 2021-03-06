@@ -9,7 +9,6 @@ use random::Seed;
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -69,7 +68,6 @@ macro_rules! random_tuples {
         /// `xs`, `ys`, `zs`, ... must be infinite.
         ///
         /// # Expected complexity per iteration
-        ///
         /// $$
         /// T(n) = O(\sum_{j=0}^{n-1}T_j)
         /// $$
@@ -83,7 +81,6 @@ macro_rules! random_tuples {
         /// memory of the input iterators.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::random` module.
         pub fn $random_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             seed: Seed,
@@ -122,7 +119,6 @@ macro_rules! random_tuples {
         /// `xs` must be infinite.
         ///
         /// # Expected complexity per iteration
-        ///
         /// $T(n) = O(nT^\prime)$
         ///
         /// $M(n) = O(nM^\prime)$
@@ -131,7 +127,6 @@ macro_rules! random_tuples {
         /// and $M^\prime$ are the time and additional memory of `xs`.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::random` module.
         #[inline]
         pub fn $random_fn_from_single<I: Iterator>(xs: I) -> $random_struct_from_single<I> {
@@ -289,7 +284,6 @@ macro_rules! random_custom_tuples {
         /// `xs`, `ys`, `zs`, ... must be infinite.
         ///
         /// # Expected complexity per iteration
-        ///
         /// Let $j$ be the largest index of any output associated with `xs`, $X$ the set of outputs
         /// with indices higher than $j$, $P$ the product of the lengths of all the iterators
         /// associated with the outputs in $X$, including multiplicities, and $T^\prime$ and
@@ -310,7 +304,6 @@ macro_rules! random_custom_tuples {
         /// $j$th output.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `tuples::random` module.
         pub fn $random_fn<$($t: Clone, $it: Iterator<Item = $t>,)*>(
             seed: Seed,

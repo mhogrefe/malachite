@@ -1,4 +1,5 @@
 /// A struct that allows for formatting a numeric type and rendering its digits in a specified base.
+#[derive(Clone, Eq, Hash, PartialEq)]
 pub struct BaseFmtWrapper<T> {
     pub(crate) x: T,
     pub(crate) base: u64,
@@ -8,7 +9,6 @@ impl<T> BaseFmtWrapper<T> {
     /// Creates a new `BaseFmtWrapper`.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Panics
@@ -38,7 +38,6 @@ impl<T> BaseFmtWrapper<T> {
     /// Recovers the value from a `BaseFmtWrapper`.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples

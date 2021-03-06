@@ -1,4 +1,4 @@
-use itertools::Itertools;
+use itertools::{repeat_n, Itertools};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -9,7 +9,6 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use rand::distributions::range::SampleRange;
 use rand::Rand;
-use std::iter::repeat;
 
 use malachite_test::common::{test_properties, test_properties_no_special};
 use malachite_test::inputs::base::{
@@ -50,7 +49,7 @@ where
         pairs_of_u64_and_small_unsigned_var_1::<T, usize>,
         |&(log_base, u)| {
             assert_eq!(
-                Natural::from_power_of_two_digits_asc(log_base, repeat(T::ZERO).take(u)),
+                Natural::from_power_of_two_digits_asc(log_base, repeat_n(T::ZERO, u)),
                 0
             );
         },
@@ -110,7 +109,7 @@ where
         pairs_of_u64_and_small_unsigned_var_1::<T, usize>,
         |&(log_base, u)| {
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, repeat(T::ZERO).take(u)),
+                Natural::from_power_of_two_digits_desc(log_base, repeat_n(T::ZERO, u)),
                 0
             );
         },
@@ -174,7 +173,7 @@ fn from_power_of_two_digits_asc_natural_properties() {
         pairs_of_small_u64_and_small_usize_var_2,
         |&(log_base, u)| {
             assert_eq!(
-                Natural::from_power_of_two_digits_asc(log_base, repeat(Natural::ZERO).take(u)),
+                Natural::from_power_of_two_digits_asc(log_base, repeat_n(Natural::ZERO, u)),
                 0
             );
         },
@@ -216,7 +215,7 @@ fn from_power_of_two_digits_desc_natural_properties() {
         pairs_of_small_u64_and_small_usize_var_2,
         |&(log_base, u)| {
             assert_eq!(
-                Natural::from_power_of_two_digits_desc(log_base, repeat(Natural::ZERO).take(u)),
+                Natural::from_power_of_two_digits_desc(log_base, repeat_n(Natural::ZERO, u)),
                 0
             );
         },

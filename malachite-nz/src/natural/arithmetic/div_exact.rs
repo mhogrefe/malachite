@@ -562,7 +562,8 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_sbpi1_bdiv_qr from mpn/generic/sbpi1_bdiv_qr.c, GMP 6.1.2.
+/// This is mpn_sbpi1_bdiv_qr from mpn/generic/sbpi1_bdiv_qr.c, GMP 6.2.1. Note: need to investigate
+/// changes from 6.1.2.
 pub fn _limbs_modular_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -627,7 +628,7 @@ pub fn _limbs_modular_div_mod_schoolbook(
 ///
 /// where n = `ds.len()`
 ///
-/// This is mpn_dcpi1_bdiv_qr_n from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.1.2.
+/// This is mpn_dcpi1_bdiv_qr_n from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
 fn _limbs_modular_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -775,13 +776,13 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_dcpi1_bdiv_qr_n_itch from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.1.2.
+/// This is mpn_dcpi1_bdiv_qr_n_itch from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
 #[inline]
 pub const fn _limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }
 
-/// This is mpn_mu_bdiv_qr_itch from mpn/generic/mu_bdiv_qr.c, GMP 6.1.2.
+/// This is mpn_mu_bdiv_qr_itch from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
 pub fn _limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let q_len = n_len - d_len;
@@ -1010,7 +1011,7 @@ fn _limbs_modular_div_mod_barrett_balanced(
 /// length less than `ns.len()` - `ds.len()`, `rs` is shorter than `ds`, `scratch` is to short, or
 /// the last limb of `ds` is even.
 ///
-/// This is mpn_mu_bdiv_qr from mpn/generic/mu_bdiv_qr.c, GMP 6.1.2.
+/// This is mpn_mu_bdiv_qr from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
 pub fn _limbs_modular_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1050,7 +1051,8 @@ pub fn _limbs_modular_div_mod_barrett(
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_sbpi1_bdiv_q from mpn/generic/sbpi1_bdiv_q.c, GMP 6.1.2.
+/// This is mpn_sbpi1_bdiv_q from mpn/generic/sbpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
+/// changes from 6.1.2.
 pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1083,7 +1085,7 @@ pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c, GMP 6.1.2.
+/// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1.
 #[inline]
 pub const fn _limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
@@ -1095,7 +1097,8 @@ pub const fn _limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) 
 ///
 /// where n = `ds.len()`
 ///
-/// This is mpn_dcpi1_bdiv_q_n from mpn/generic/dcpi1_bdiv_q.c, GMP 6.1.2.
+/// This is mpn_dcpi1_bdiv_q_n from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
+/// changes from 6.1.2.
 fn _limbs_modular_div_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],

@@ -233,6 +233,7 @@ pub mod natural {
     pub mod conversion {
         pub mod clone;
         pub mod digits {
+            pub mod from_digits;
             pub mod from_power_of_two_digits;
             pub mod power_of_two_digits;
             pub mod to_digits;

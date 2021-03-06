@@ -16,7 +16,6 @@ impl<I: Iterator> IteratorCache<I> {
     /// This function does not allocate any memory or advance the iterator.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -76,7 +75,6 @@ impl<I: Iterator> IteratorCache<I> {
     /// If the iterator has not been completely consumed yet, returns `None`.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples

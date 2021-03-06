@@ -39,7 +39,6 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 /// `xs` must be infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(nT^\prime(n))$
 ///
 /// $M(n) = O(nM^\prime(n))$
@@ -135,7 +134,6 @@ macro_rules! random_fixed_length_vecs {
         /// `xs` must be infinite.
         ///
         /// # Expected complexity per iteration
-        ///
         /// Let $j$ be the largest index of any output associated with `xs`, $X$ the set of outputs
         /// with indices higher than $j$, $P$ the product of the lengths of all the iterators
         /// associated with the outputs in $X$, including multiplicities, and $T^\prime$ and
@@ -156,7 +154,6 @@ macro_rules! random_fixed_length_vecs {
         /// to the $j$th output.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `vecs::random` module.
         pub fn $exhaustive_fn<T, $($it: Iterator<Item = T>),*>(
             seed: Seed,
@@ -183,7 +180,6 @@ macro_rules! random_fixed_length_vecs {
         /// `xs`, `ys`, `zs`, ... must be infinite.
         ///
         /// # Expected complexity per iteration
-        ///
         /// $$
         /// T(n) = O(\sum_{j=0}^{n-1}T_j)
         /// $$
@@ -197,7 +193,6 @@ macro_rules! random_fixed_length_vecs {
         /// memory of the input iterators.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `vecs::random` module.
         #[inline]
         pub fn $exhaustive_1_to_1_fn<T, $($it: Iterator<Item = T>),*>(
@@ -360,7 +355,6 @@ pub fn random_vecs_from_length_iterator<T, I: Iterator<Item = u64>, J: Iterator<
 /// The iterators produced by `xs_gen` must be infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(mT^\prime(n))$
 ///
 /// $M(n) = O(mM^\prime(n))$
@@ -430,7 +424,6 @@ pub fn random_vecs<I: Iterator>(
 /// The iterators produced by `xs_gen` must be infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(mT^\prime(n))$
 ///
 /// $M(n) = O(mM^\prime(n))$
@@ -510,7 +503,6 @@ pub fn random_vecs_min_length<I: Iterator>(
 /// The iterators produced by `xs_gen` must be infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O((a+b)T^\prime(n))$
 ///
 /// $M(n) = O((a+b)M^\prime(n))$
@@ -569,7 +561,6 @@ pub fn random_vecs_length_range<I: Iterator>(
 /// The iterators produced by `xs_gen` must be infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O((a+b)T^\prime(n))$
 ///
 /// $M(n) = O((a+b)M^\prime(n))$

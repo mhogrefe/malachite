@@ -16,7 +16,6 @@ use vecs::random::{
 /// `cs` must be infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(nT^\prime)$
 ///
 /// $M(n) = O(nM^\prime)$
@@ -61,7 +60,6 @@ pub fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 /// If `len` is 0, the output consists of the empty `String`, repeated.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -107,7 +105,6 @@ pub fn random_fixed_length_strings(
 /// The iterators produced by `cs_gen` must be infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(mT^\prime(n))$
 ///
 /// $M(n) = O(mM^\prime(n))$
@@ -163,7 +160,6 @@ pub fn random_strings_using_chars<I: Iterator<Item = char>>(
 /// $$
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(m)$
 ///
 /// $M(n) = O(m)$

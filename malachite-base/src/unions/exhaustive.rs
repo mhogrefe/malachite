@@ -58,7 +58,6 @@ macro_rules! exhaustive_unions {
         /// If all of the input iterators are empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// $$
         /// T(i, n) = O(\max(T_1(i, n), T_2(i, n), \ldots, T_{n-1}(i, n)))
         /// $$
@@ -72,7 +71,6 @@ macro_rules! exhaustive_unions {
         /// iterator.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `unions::exhaustive` module.
         #[inline]
         pub fn $lex_fn<$($t, $it: Iterator<Item=$t>),*>($($xs: $it),*) ->
@@ -145,7 +143,6 @@ macro_rules! exhaustive_unions {
         /// If all of the input iterators are empty, the output is also empty.
         ///
         /// # Complexity per iteration
-        ///
         /// $$
         /// T(i, n) = O(n + \max(T_1(i, n), T_2(i, n), \ldots, T_{n-1}(i, n)))
         /// $$
@@ -159,7 +156,6 @@ macro_rules! exhaustive_unions {
         /// iterator.
         ///
         /// # Examples
-        ///
         /// See the documentation of the `unions::exhaustive` module.
         #[inline]
         pub fn $exhaustive_fn<$($t, $it: Iterator<Item=$t>),*>($($xs: $it),*) ->

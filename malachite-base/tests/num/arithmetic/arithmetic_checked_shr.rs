@@ -1,5 +1,12 @@
-use malachite_base::num::arithmetic::traits::ArithmeticCheckedShr;
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, ArithmeticCheckedShr};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::generators::{
+    signed_gen, signed_gen_var_5, signed_pair_gen_var_2, unsigned_gen,
+    unsigned_signed_pair_gen_var_1,
+};
 
 #[test]
 fn test_arithmetic_checked_shr() {
@@ -24,4 +31,63 @@ fn test_arithmetic_checked_shr() {
     test::<i32, i32>(-100, 3, Some(-13));
     test::<i64, i64>(100, 100, Some(0));
     test::<i64, i128>(-100, 100, Some(-1));
+}
+
+fn arithmetic_checked_shr_properties_helper_unsigned_signed<
+    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T>,
+    U: PrimitiveSigned,
+>()
+where
+    u64: ExactFrom<U>,
+    T: PrimitiveUnsigned,
+{
+    unsigned_signed_pair_gen_var_1::<T, U>().test_properties(|(n, i)| {
+        let shifted = n.arithmetic_checked_shr(i);
+        if shifted.is_none() {
+            assert_ne!(n, T::ZERO);
+        }
+        if i != U::MIN {
+            assert_eq!(n.arithmetic_checked_shl(-i), shifted);
+        }
+    });
+
+    unsigned_gen::<T>().test_properties(|n| {
+        assert_eq!(n.arithmetic_checked_shr(U::ZERO), Some(n));
+    });
+
+    signed_gen_var_5::<U>().test_properties(|i| {
+        assert_eq!(T::ZERO.arithmetic_checked_shr(i), Some(T::ZERO));
+    });
+}
+
+fn arithmetic_checked_shr_properties_helper_signed_signed<
+    T: ArithmeticCheckedShl<U, Output = T> + ArithmeticCheckedShr<U, Output = T> + PrimitiveSigned,
+    U: PrimitiveSigned,
+>()
+where
+    u64: ExactFrom<U>,
+{
+    signed_pair_gen_var_2::<T, U>().test_properties(|(n, i)| {
+        let shifted = n.arithmetic_checked_shr(i);
+        if shifted.is_none() {
+            assert_ne!(n, T::ZERO);
+        }
+        if i != U::MIN {
+            assert_eq!(n.arithmetic_checked_shl(-i), shifted);
+        }
+    });
+
+    signed_gen::<T>().test_properties(|n| {
+        assert_eq!(n.arithmetic_checked_shr(U::ZERO), Some(n));
+    });
+
+    signed_gen_var_5::<U>().test_properties(|i| {
+        assert_eq!(T::ZERO.arithmetic_checked_shr(i), Some(T::ZERO));
+    });
+}
+
+#[test]
+fn arithmetic_checked_shr_properties() {
+    apply_fn_to_unsigneds_and_signeds!(arithmetic_checked_shr_properties_helper_unsigned_signed);
+    apply_fn_to_signeds_and_signeds!(arithmetic_checked_shr_properties_helper_signed_signed);
 }

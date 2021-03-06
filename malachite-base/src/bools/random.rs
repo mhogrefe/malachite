@@ -39,7 +39,6 @@ impl Iterator for RandomBools {
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -102,7 +101,6 @@ impl Iterator for WeightedRandomBools {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

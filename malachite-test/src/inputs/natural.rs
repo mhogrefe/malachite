@@ -2038,7 +2038,7 @@ pub fn pairs_of_u64_and_natural_vec_var_1(gm: GenerationMode) -> It<(u64, Vec<Na
     }
 }
 
-pub(crate) struct RandomNaturalSmallU64AndVecOfBool {
+struct RandomNaturalSmallU64AndVecOfBool {
     pub(crate) ps: It<(Natural, u64)>,
     pub(crate) rng: Box<IsaacRng>,
 }

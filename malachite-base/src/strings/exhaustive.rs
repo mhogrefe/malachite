@@ -21,7 +21,6 @@ use vecs::exhaustive::{
 /// If `cs` is empty, the output is also empty, unless `len` is 0.
 ///
 /// # Complexity per iteration
-///
 /// $$
 /// T(i, n) = O(n + T^\prime (i))
 /// $$
@@ -66,7 +65,6 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 /// If `len` is 0, the output consists of one empty `String`.
 ///
 /// # Complexity per iteration
-///
 /// $T(i, n) = O(n)$
 ///
 /// $M(i, n) = O(n)$
@@ -107,7 +105,6 @@ pub fn lex_fixed_length_strings(
 /// If `cs` is empty, the output is also empty, unless `len` is 0.
 ///
 /// # Complexity per iteration
-///
 /// If `cs` is finite:
 ///
 /// $T(i, n) = O((\ell/2)^n T^\prime(\sqrt\[n\]{i}))$
@@ -153,7 +150,6 @@ pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
 /// If `len` is 0, the output consists of one empty `String`.
 ///
 /// # Complexity per iteration
-///
 /// If `cs` is finite:
 ///
 /// $T(i, n) = O(556032^n \sqrt\[n\]{i})$
@@ -199,7 +195,6 @@ pub fn exhaustive_fixed_length_strings(
 /// The lengths of the output `String`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -242,7 +237,6 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
 /// The lengths of the output `String`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -279,7 +273,6 @@ pub fn shortlex_strings(
 /// The lengths of the output `String`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$
@@ -315,7 +308,6 @@ pub fn exhaustive_strings_using_chars<I: Clone + Iterator<Item = char>>(
 /// The lengths of the output `String`s grow logarithmically.
 ///
 /// # Complexity per iteration
-///
 /// $T(i) = O(\log i)$
 ///
 /// $M(i) = O(\log i)$

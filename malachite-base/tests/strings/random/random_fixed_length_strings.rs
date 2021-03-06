@@ -1,11 +1,8 @@
-use std::iter::repeat;
-
 use itertools::Itertools;
-use malachite_base_test_util::stats::common_values_map::common_values_map;
-use malachite_base_test_util::stats::median;
-
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::random::random_fixed_length_strings;
+use malachite_base_test_util::stats::common_values_map::common_values_map;
+use malachite_base_test_util::stats::median;
 
 fn random_fixed_length_strings_helper(
     len: u64,
@@ -33,12 +30,7 @@ fn random_fixed_length_strings_helper(
 
 #[test]
 fn test_random_fixed_length_strings() {
-    random_fixed_length_strings_helper(
-        0,
-        &repeat("").take(20).collect_vec(),
-        &[("", 1000000)],
-        ("", None),
-    );
+    random_fixed_length_strings_helper(0, &[""; 20], &[("", 1000000)], ("", None));
     random_fixed_length_strings_helper(
         1,
         &[

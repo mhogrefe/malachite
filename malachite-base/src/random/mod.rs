@@ -18,7 +18,6 @@ impl Seed {
     /// Creates a `Seed` from a slice of 32 bytes.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -35,7 +34,6 @@ impl Seed {
     /// Creates an RNG from a slice of 32 bytes.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -52,7 +50,6 @@ impl Seed {
     /// Uniformly generates a random `Seed`.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -81,7 +78,6 @@ impl Seed {
     /// will be (cryptographically) difficult, even if the key is known.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples

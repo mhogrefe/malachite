@@ -15,8 +15,6 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod arithmetic_checked_shl;
-            pub mod arithmetic_checked_shr;
             pub mod checked_add_mul;
             pub mod checked_sub_mul;
             pub mod div_exact;

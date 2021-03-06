@@ -9,7 +9,6 @@ use rounding_modes::RoundingMode;
 /// unchanged.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

@@ -219,6 +219,167 @@ pub fn unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1<T: Primit
     )
 }
 
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned --
+
+// var 1 is in malachite-base
+
+// All `(Vec<U>, Vec<T>, u64)` that are valid inputs to `_limbs_from_digits_small_base_basecase`.
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(Vec<U>, Vec<T>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+        &random_primitive_int_vec_unsigned_vec_unsigned_triple_gen_var_1,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+    )
+}
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned> --
+
+// vars 1 thru 3 are in malachite-base
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_22`.
+pub fn unsigned_vec_triple_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_4,
+        &random_primitive_int_vec_triple_gen_var_4,
+        &special_random_unsigned_vec_triple_gen_var_4,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_32`.
+pub fn unsigned_vec_triple_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_5,
+        &random_primitive_int_vec_triple_gen_var_5,
+        &special_random_unsigned_vec_triple_gen_var_5,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_33`.
+pub fn unsigned_vec_triple_gen_var_6<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_6,
+        &random_primitive_int_vec_triple_gen_var_6,
+        &special_random_unsigned_vec_triple_gen_var_6,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_42`.
+pub fn unsigned_vec_triple_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_7,
+        &random_primitive_int_vec_triple_gen_var_7,
+        &special_random_unsigned_vec_triple_gen_var_7,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_43`.
+pub fn unsigned_vec_triple_gen_var_8<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_8,
+        &random_primitive_int_vec_triple_gen_var_8,
+        &special_random_unsigned_vec_triple_gen_var_8,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_44`.
+pub fn unsigned_vec_triple_gen_var_9<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_9,
+        &random_primitive_int_vec_triple_gen_var_9,
+        &special_random_unsigned_vec_triple_gen_var_9,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_52`.
+pub fn unsigned_vec_triple_gen_var_10<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_10,
+        &random_primitive_int_vec_triple_gen_var_10,
+        &special_random_unsigned_vec_triple_gen_var_10,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_53`.
+pub fn unsigned_vec_triple_gen_var_11<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_11,
+        &random_primitive_int_vec_triple_gen_var_11,
+        &special_random_unsigned_vec_triple_gen_var_11,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_54`.
+pub fn unsigned_vec_triple_gen_var_12<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_12,
+        &random_primitive_int_vec_triple_gen_var_12,
+        &special_random_unsigned_vec_triple_gen_var_12,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_62`.
+pub fn unsigned_vec_triple_gen_var_13<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_13,
+        &random_primitive_int_vec_triple_gen_var_13,
+        &special_random_unsigned_vec_triple_gen_var_13,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_63`.
+pub fn unsigned_vec_triple_gen_var_14<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_14,
+        &random_primitive_int_vec_triple_gen_var_14,
+        &special_random_unsigned_vec_triple_gen_var_14,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_6h`.
+pub fn unsigned_vec_triple_gen_var_15<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_15,
+        &random_primitive_int_vec_triple_gen_var_15,
+        &special_random_unsigned_vec_triple_gen_var_15,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_8h`.
+pub fn unsigned_vec_triple_gen_var_16<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_16,
+        &random_primitive_int_vec_triple_gen_var_16,
+        &special_random_unsigned_vec_triple_gen_var_16,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that would trigger the actual FFT code of
+// `_limbs_mul_greater_to_out_fft`.
+pub fn unsigned_vec_triple_gen_var_17<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_17,
+        &random_primitive_int_vec_triple_gen_var_17,
+        &special_random_unsigned_vec_triple_gen_var_17,
+    )
+}
+
 pub mod common;
 pub mod exhaustive;
 pub mod random;

@@ -34,7 +34,6 @@ macro_rules! impl_bit_scan_unsigned {
             /// Starting beyond the type's width is allowed; the result will be the starting index.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
@@ -51,7 +50,6 @@ macro_rules! impl_bit_scan_unsigned {
             /// be `None` since there are no `true` bits past that point.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
@@ -110,7 +108,6 @@ macro_rules! impl_bit_scan_signed {
             /// the input is non-negative, the result will be the starting index.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
@@ -128,7 +125,6 @@ macro_rules! impl_bit_scan_signed {
             /// point. If the input is negative, the result will be the starting index.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples

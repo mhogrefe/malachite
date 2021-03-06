@@ -8,40 +8,23 @@ use malachite_nz::integer::Integer;
 
 #[test]
 fn test_divisible_by() {
-    let test = |u, v, divisible| {
-        assert_eq!(
-            Integer::from_str(u)
-                .unwrap()
-                .divisible_by(Integer::from_str(v).unwrap()),
-            divisible
-        );
-        assert_eq!(
-            Integer::from_str(u)
-                .unwrap()
-                .divisible_by(&Integer::from_str(v).unwrap()),
-            divisible
-        );
-        assert_eq!(
-            (&Integer::from_str(u).unwrap()).divisible_by(Integer::from_str(v).unwrap()),
-            divisible
-        );
-        assert_eq!(
-            (&Integer::from_str(u).unwrap()).divisible_by(&Integer::from_str(v).unwrap()),
-            divisible
-        );
+    let test = |s, t, divisible| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
 
-        let x = Integer::from_str(u).unwrap();
-        let y = Integer::from_str(v).unwrap();
-        assert_eq!(x == 0 || y != 0 && x % y == 0, divisible);
-
+        assert_eq!(u.clone().divisible_by(v.clone()), divisible);
+        assert_eq!(u.clone().divisible_by(&v), divisible);
+        assert_eq!((&u).divisible_by(v.clone()), divisible);
+        assert_eq!((&u).divisible_by(&v), divisible);
+        assert_eq!(u == 0 || v != 0 && u % v == 0, divisible);
         assert_eq!(
-            num_divisible_by(&BigInt::from_str(u).unwrap(), &BigInt::from_str(v).unwrap()),
+            num_divisible_by(&BigInt::from_str(s).unwrap(), &BigInt::from_str(t).unwrap()),
             divisible
         );
         assert_eq!(
-            rug::Integer::from_str(u)
+            rug::Integer::from_str(s)
                 .unwrap()
-                .is_divisible(&rug::Integer::from_str(v).unwrap()),
+                .is_divisible(&rug::Integer::from_str(t).unwrap()),
             divisible
         );
     };

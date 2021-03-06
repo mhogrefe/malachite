@@ -755,7 +755,6 @@ impl Iterator for UniformRandomIntegerRange {
 /// where $T$ is time, $M$ is additional memory, and $n$ = `b.significant_bits()`.
 ///
 /// # Panics
-///
 /// Panics if $a \geq b$.
 ///
 /// # Examples
@@ -811,7 +810,6 @@ pub fn uniform_random_integer_range(
 /// where $T$ is time, $M$ is additional memory, and $n$ = `b.significant_bits()`.
 ///
 /// # Panics
-///
 /// Panics if $a > b$.
 ///
 /// # Examples

@@ -26,7 +26,6 @@ fn debug_starts_with_slash(c: char) -> bool {
 /// The ASCII space ' ' is the only graphic whitespace `char`.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

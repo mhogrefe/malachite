@@ -1,3 +1,4 @@
+use itertools::repeat_n;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::PowerOfTwoDigits;
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
@@ -5,7 +6,6 @@ use malachite_base_test_util::generators::{
     unsigned_pair_gen_var_5, unsigned_vec_unsigned_pair_gen_var_2,
     unsigned_vec_unsigned_pair_gen_var_3,
 };
-use std::iter::repeat;
 use std::panic::catch_unwind;
 
 #[test]
@@ -115,16 +115,15 @@ fn from_power_of_two_digits_asc_helper<
             n
         );
         let trailing_zeros = slice_trailing_zeros(&digits);
-        let trimmed_digits = digits[..digits.len() - trailing_zeros].to_vec();
         assert_eq!(
             PowerOfTwoDigits::<U>::to_power_of_two_digits_asc(&n, log_base),
-            trimmed_digits
+            &digits[..digits.len() - trailing_zeros]
         );
     });
 
     unsigned_pair_gen_var_5::<usize, U>().test_properties(|(u, log_base)| {
         assert_eq!(
-            T::from_power_of_two_digits_asc(log_base, repeat(U::ZERO).take(u)),
+            T::from_power_of_two_digits_asc(log_base, repeat_n(U::ZERO, u)),
             T::ZERO
         );
     });
@@ -146,16 +145,15 @@ fn from_power_of_two_digits_desc_helper<
             n
         );
         let leading_zeros = slice_leading_zeros(&digits);
-        let trimmed_digits = digits[leading_zeros..].to_vec();
         assert_eq!(
             PowerOfTwoDigits::<U>::to_power_of_two_digits_desc(&n, log_base),
-            trimmed_digits
+            &digits[leading_zeros..]
         );
     });
 
     unsigned_pair_gen_var_5::<usize, U>().test_properties(|(u, log_base)| {
         assert_eq!(
-            T::from_power_of_two_digits_desc(log_base, repeat(U::ZERO).take(u)),
+            T::from_power_of_two_digits_desc(log_base, repeat_n(U::ZERO, u)),
             T::ZERO
         );
     });

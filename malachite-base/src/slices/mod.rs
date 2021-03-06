@@ -1,6 +1,8 @@
 use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
+use rand::prelude::SliceRandom;
+use rand_chacha::ChaCha20Rng;
 use random::Seed;
 
 /// Sets all values in a slice to 0.
@@ -246,8 +248,9 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 ///
 /// The output length is infinite.
 ///
-/// # Expected complexity per iteration
+/// $P(x) = 1/n$, where $n$ is `xs.len()`.
 ///
+/// # Expected complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -311,6 +314,7 @@ pub(crate) fn advance_indices(indices: &mut [usize]) -> bool {
 }
 
 /// Generates every permutation of a slice.
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct ExhaustiveSlicePermutations<'a, T> {
     xs: &'a [T],
     indices: Vec<usize>,
@@ -341,7 +345,6 @@ impl<'a, T> Iterator for ExhaustiveSlicePermutations<'a, T> {
 /// The output length is $n!$, where $n$ is `xs.len()`.
 ///
 /// # Expected complexity per iteration
-///
 /// $T(n) = O(n)$
 ///
 /// $M(n) = O(n)$
@@ -372,5 +375,65 @@ pub fn exhaustive_slice_permutations<T>(xs: &[T]) -> ExhaustiveSlicePermutations
         xs,
         indices: (0..xs.len()).collect(),
         done: false,
+    }
+}
+
+/// Uniformly generates a random permutation of references to a slice.
+#[derive(Clone, Debug)]
+pub struct RandomSlicePermutations<'a, T> {
+    xs: &'a [T],
+    indices: Vec<usize>,
+    rng: ChaCha20Rng,
+}
+
+impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
+    type Item = Vec<&'a T>;
+
+    fn next(&mut self) -> Option<Vec<&'a T>> {
+        self.indices.shuffle(&mut self.rng);
+        Some(self.indices.iter().map(|&i| &self.xs[i]).collect())
+    }
+}
+
+/// Uniformly generates a random permutation of references to a slice.
+///
+/// The iterator cannot outlive the slice. It may be more convenient for the iterator to own the
+/// data, in which case you may use `random_vec_permutations` instead.
+///
+/// The output length is infinite.
+///
+/// $P(p) = 1/n!$, where $n$ is `xs.len()`.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::slices::random_slice_permutations;
+///
+/// let css: Vec<String> = random_slice_permutations(EXAMPLE_SEED, &['a', 'b', 'c', 'd']).take(20)
+///     .map(|ds| ds.into_iter().copied().collect()).collect();
+/// assert_eq!(
+///     css.iter().map(String::as_str).collect_vec().as_slice(),
+///     [
+///         "cadb", "cbad", "cadb", "badc", "acdb", "cbad", "dabc", "dbca", "cdba", "cdab", "bacd",
+///         "cabd", "adbc", "cdab", "dcab", "abcd", "abcd", "dacb", "bcad", "adcb"
+///     ]
+/// );
+/// ```
+pub fn random_slice_permutations<T>(seed: Seed, xs: &[T]) -> RandomSlicePermutations<T> {
+    RandomSlicePermutations {
+        xs,
+        indices: (0..xs.len()).collect(),
+        rng: seed.get_rng(),
     }
 }

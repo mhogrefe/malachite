@@ -1,12 +1,7 @@
 #[cfg(not(feature = "32_bit_limbs"))]
 use itertools::Itertools;
-use std::str::FromStr;
-
-use malachite_base::num::conversion::traits::ExactFrom;
-use num::BigUint;
-use rug;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
     large_type_gen_var_1, unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_2,
@@ -33,20 +28,17 @@ use malachite_nz::natural::arithmetic::mul::mul_low::{
 };
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::mul_mod::_limbs_mul_mod_base_pow_n_minus_1;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_len,
     _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_32_scratch_len,
     _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_len,
     _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_len,
-    _limbs_mul_greater_to_out_toom_54, _limbs_mul_greater_to_out_toom_54_scratch_len,
-    _limbs_mul_greater_to_out_toom_62, _limbs_mul_greater_to_out_toom_62_scratch_len,
-};
-use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_43_scratch_len,
     _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_len,
     _limbs_mul_greater_to_out_toom_52, _limbs_mul_greater_to_out_toom_52_scratch_len,
     _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_len,
+    _limbs_mul_greater_to_out_toom_54, _limbs_mul_greater_to_out_toom_54_scratch_len,
+    _limbs_mul_greater_to_out_toom_62, _limbs_mul_greater_to_out_toom_62_scratch_len,
     _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_63_scratch_len,
     _limbs_mul_greater_to_out_toom_6h, _limbs_mul_greater_to_out_toom_6h_scratch_len,
     _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_len,
@@ -57,7 +49,17 @@ use malachite_nz::natural::arithmetic::mul::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12,
+    unsigned_vec_triple_gen_var_13, unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15,
+    unsigned_vec_triple_gen_var_16, unsigned_vec_triple_gen_var_17, unsigned_vec_triple_gen_var_4,
+    unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7,
+    unsigned_vec_triple_gen_var_8, unsigned_vec_triple_gen_var_9,
+};
 use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
+use num::BigUint;
+use rug;
+use std::str::FromStr;
 
 fn series(start: Limb, len: usize) -> Vec<Limb> {
     (start..start + Limb::exact_from(len)).collect()
@@ -1844,6 +1846,118 @@ fn limbs_mul_greater_to_out_toom_22_fail_7() {
     let ys = series(1, 4);
     _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
 }
+
+macro_rules! mul_properties_helper_1 {
+    ($properties: ident, $mul: ident, $scratch: ident, $gen: ident) => {
+        #[test]
+        fn $properties() {
+            let mut config = GenConfig::new();
+            config.insert("mean_length_n", 2048);
+            config.insert("mean_stripe_n", 4 << Limb::LOG_WIDTH);
+            $gen().test_properties_with_config(&config, |(mut out, xs, ys)| {
+                let expected_out = limbs_mul_basecase_helper(&out, &xs, &ys);
+                let mut scratch = vec![0; $scratch(xs.len())];
+                $mul(&mut out, &xs, &ys, &mut scratch);
+                assert_eq!(out, expected_out);
+            });
+        }
+    };
+}
+
+macro_rules! mul_properties_helper_2 {
+    ($properties: ident, $mul: ident, $scratch: ident, $gen: ident) => {
+        #[test]
+        fn $properties() {
+            let mut config = GenConfig::new();
+            config.insert("mean_length_n", 2048);
+            config.insert("mean_stripe_n", 4 << Limb::LOG_WIDTH);
+            $gen().test_properties_with_config(&config, |(mut out, xs, ys)| {
+                let expected_out = limbs_mul_basecase_helper(&out, &xs, &ys);
+                let mut scratch = vec![0; $scratch(xs.len(), ys.len())];
+                $mul(&mut out, &xs, &ys, &mut scratch);
+                assert_eq!(out, expected_out);
+            });
+        }
+    };
+}
+mul_properties_helper_1!(
+    limbs_mul_greater_to_out_toom_22_properties,
+    _limbs_mul_greater_to_out_toom_22,
+    _limbs_mul_greater_to_out_toom_22_scratch_len,
+    unsigned_vec_triple_gen_var_4
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_32_properties,
+    _limbs_mul_greater_to_out_toom_32,
+    _limbs_mul_greater_to_out_toom_32_scratch_len,
+    unsigned_vec_triple_gen_var_5
+);
+mul_properties_helper_1!(
+    limbs_mul_greater_to_out_toom_33_properties,
+    _limbs_mul_greater_to_out_toom_33,
+    _limbs_mul_greater_to_out_toom_33_scratch_len,
+    unsigned_vec_triple_gen_var_6
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_42_properties,
+    _limbs_mul_greater_to_out_toom_42,
+    _limbs_mul_greater_to_out_toom_42_scratch_len,
+    unsigned_vec_triple_gen_var_7
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_43_properties,
+    _limbs_mul_greater_to_out_toom_43,
+    _limbs_mul_greater_to_out_toom_43_scratch_len,
+    unsigned_vec_triple_gen_var_8
+);
+mul_properties_helper_1!(
+    limbs_mul_greater_to_out_toom_44_properties,
+    _limbs_mul_greater_to_out_toom_44,
+    _limbs_mul_greater_to_out_toom_44_scratch_len,
+    unsigned_vec_triple_gen_var_9
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_52_properties,
+    _limbs_mul_greater_to_out_toom_52,
+    _limbs_mul_greater_to_out_toom_52_scratch_len,
+    unsigned_vec_triple_gen_var_10
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_53_properties,
+    _limbs_mul_greater_to_out_toom_53,
+    _limbs_mul_greater_to_out_toom_53_scratch_len,
+    unsigned_vec_triple_gen_var_11
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_54_properties,
+    _limbs_mul_greater_to_out_toom_54,
+    _limbs_mul_greater_to_out_toom_54_scratch_len,
+    unsigned_vec_triple_gen_var_12
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_62_properties,
+    _limbs_mul_greater_to_out_toom_62,
+    _limbs_mul_greater_to_out_toom_62_scratch_len,
+    unsigned_vec_triple_gen_var_13
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_63_properties,
+    _limbs_mul_greater_to_out_toom_63,
+    _limbs_mul_greater_to_out_toom_63_scratch_len,
+    unsigned_vec_triple_gen_var_14
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_6h_properties,
+    _limbs_mul_greater_to_out_toom_6h,
+    _limbs_mul_greater_to_out_toom_6h_scratch_len,
+    unsigned_vec_triple_gen_var_15
+);
+mul_properties_helper_2!(
+    limbs_mul_greater_to_out_toom_8h_properties,
+    _limbs_mul_greater_to_out_toom_8h,
+    _limbs_mul_greater_to_out_toom_8h_scratch_len,
+    unsigned_vec_triple_gen_var_16
+);
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -11986,6 +12100,26 @@ fn test_limbs_mul_greater_to_out_fft() {
     ];
     let out_len = xs.len() + ys.len();
     test(xs, ys, vec![10; out_len]);
+}
+
+#[test]
+fn limbs_mul_greater_to_out_fft_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 2048);
+    config.insert("mean_stripe_n", 4 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_2().test_properties_with_config(&config, |(mut out, xs, ys)| {
+        let expected_out = limbs_mul_basecase_helper(&out, &xs, &ys);
+        _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
+        assert_eq!(out, expected_out);
+    });
+
+    config.insert("mean_length_n", 64);
+    config.insert("mean_stripe_n", 32 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_17().test_properties_with_config(&config, |(mut out, xs, ys)| {
+        let expected_out = limbs_mul_basecase_helper(&out, &xs, &ys);
+        _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
+        assert_eq!(out, expected_out);
+    });
 }
 
 #[cfg(not(feature = "32_bit_limbs"))]

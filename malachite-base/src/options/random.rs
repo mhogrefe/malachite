@@ -30,7 +30,6 @@ impl<I: Iterator> Iterator for RandomSomes<I> {
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Same as the time and additional memory complexity of iterating `xs`.
 ///
 /// # Examples

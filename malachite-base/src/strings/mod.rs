@@ -238,7 +238,6 @@ impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
 /// The output length is `css.count()`.
 ///
 /// # Complexity per iteration
-///
 /// Same as the time and additional memory complexity of iterating `css`.
 ///
 /// # Examples

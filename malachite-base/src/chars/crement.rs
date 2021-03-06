@@ -13,7 +13,6 @@ use comparison::traits::Min;
 /// The inverse of this function is `contiguous_range_to_char`.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -39,7 +38,6 @@ pub const fn char_to_contiguous_range(c: char) -> u32 {
 /// return `None`.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -89,7 +87,6 @@ pub fn increment_char(c: &mut char) {
 /// Decrements this `char`, skipping over the surrogate range.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Panics

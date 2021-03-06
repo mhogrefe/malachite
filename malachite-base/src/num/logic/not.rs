@@ -6,7 +6,6 @@ macro_rules! impl_not {
             /// Replaces a number with its bitwise negation.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples

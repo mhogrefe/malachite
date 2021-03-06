@@ -18,11 +18,9 @@ impl BitDistributorOutputType {
     /// Creates a normal output with a specified weight.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Panics
-    ///
     /// Panics if `weight` is zero.
     ///
     /// The corresponding element grows as a power of $i$. See the `BitDistributor` documentation
@@ -38,7 +36,6 @@ impl BitDistributorOutputType {
     /// Creates a tiny output.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// The corresponding element grows logarithmically. See the `BitDistributor` documentation for
@@ -113,7 +110,6 @@ impl BitDistributor {
     /// Creates a new `BitDistributor`.
     ///
     /// # Worst-case complexity
-    ///
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(n)$
@@ -142,7 +138,6 @@ impl BitDistributor {
     /// $1, 3, 5, \ldots$.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -229,7 +224,6 @@ impl BitDistributor {
     /// the bit map.
     ///
     /// # Worst-case complexity
-    ///
     /// $T(n) = O(n)$
     ///
     /// $M(n) = O(1)$
@@ -237,7 +231,6 @@ impl BitDistributor {
     /// where $T$ is time, $M$ is additional memory, and $n$ is `output_type_indices.len()`.
     ///
     /// # Panics
-    ///
     /// Panics if `max_bits` is 0 or if any index is greater than or equal to
     /// `self.output_types.len()`.
     ///
@@ -278,7 +271,6 @@ impl BitDistributor {
     /// If the counter is incremented $2^{64}$ times, it rolls back to 0.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -308,11 +300,9 @@ impl BitDistributor {
     /// Gets the output at a specified index.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Panics
-    ///
     /// Panics if `index` is greater than or equal to `self.output_types.len()`.
     ///
     /// # Examples

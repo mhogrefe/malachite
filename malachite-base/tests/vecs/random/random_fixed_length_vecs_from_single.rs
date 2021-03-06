@@ -1,15 +1,12 @@
 use core::hash::Hash;
-use std::fmt::Debug;
-use std::iter::repeat;
-
-use itertools::Itertools;
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-
+use itertools::{repeat_n, Itertools};
 use malachite_base::bools::random::random_bools;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::vecs::random::random_fixed_length_vecs_from_single;
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
+use std::fmt::Debug;
 
 fn random_fixed_length_vecs_from_single_helper<I: Clone + Iterator>(
     len: u64,
@@ -36,7 +33,7 @@ fn test_random_fixed_length_vecs_from_single() {
     random_fixed_length_vecs_from_single_helper(
         0,
         random_primitive_ints::<u8>(EXAMPLE_SEED),
-        &repeat(vec![]).take(20).collect_vec(),
+        &repeat_n(vec![], 20).collect_vec(),
         &[(vec![], 1000000)],
         (vec![], None),
     );

@@ -8,7 +8,6 @@ pub trait EqAbs<Rhs: ?Sized = Self> {
     /// Determines whether $|x| \neq |y|$.
     ///
     /// # Worst-case complexity
-    ///
     /// Same as the time and additional memory complexity of `eq_abs`.
     ///
     #[inline]
@@ -28,7 +27,6 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// Determines whether $|x| < |y|$.
     ///
     /// # Worst-case complexity
-    ///
     /// Same as the time and additional memory complexity of `partial_cmp_abs`.
     ///
     #[inline]
@@ -39,7 +37,6 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// Determines whether $|x| \leq |y|$.
     ///
     /// # Worst-case complexity
-    ///
     /// Same as the time and additional memory complexity of `partial_cmp_abs`.
     #[inline]
     fn le_abs(&self, other: &Rhs) -> bool {
@@ -52,7 +49,6 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// Determines whether $|x| > |y|$.
     ///
     /// # Worst-case complexity
-    ///
     /// Same as the time and additional memory complexity of `partial_cmp_abs`.
     #[inline]
     fn gt_abs(&self, other: &Rhs) -> bool {
@@ -62,7 +58,6 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     /// Determines whether $|x| \geq |y|$.
     ///
     /// # Worst-case complexity
-    ///
     /// Same as the time and additional memory complexity of `partial_cmp_abs`.
     #[inline]
     fn ge_abs(&self, other: &Rhs) -> bool {

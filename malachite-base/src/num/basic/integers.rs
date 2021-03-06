@@ -453,7 +453,6 @@ pub trait PrimitiveInt:
     /// If `Self` is unsigned, $f(n) = (n \geq 2^{W-1})$. If `Self` is unsigned, $f(n) = (n < 0)$.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -475,7 +474,6 @@ pub trait PrimitiveInt:
 macro_rules! impl_basic_traits {
     ($t:ident, $width:expr) => {
         /// # Examples
-        ///
         /// See the documentation of the `num::integers` module.
         impl PrimitiveInt for $t {
             const WIDTH: u64 = $width;
@@ -486,7 +484,6 @@ macro_rules! impl_basic_traits {
         /// The constant 0.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         impl Zero for $t {
             const ZERO: $t = 0;
@@ -495,7 +492,6 @@ macro_rules! impl_basic_traits {
         /// The constant 1.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         impl One for $t {
             const ONE: $t = 1;
@@ -504,7 +500,6 @@ macro_rules! impl_basic_traits {
         /// The constant 2.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         impl Two for $t {
             const TWO: $t = 2;
@@ -517,7 +512,6 @@ macro_rules! impl_basic_traits {
         /// If `Self` is unsigned, `MIN` is 0. If `Self` is signed, `MIN` is $-2^{W-1}$.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         impl Min for $t {
             const MIN: $t = std::$t::MIN;
@@ -530,7 +524,6 @@ macro_rules! impl_basic_traits {
         /// If `Self` is unsigned, `MAX` is $2^W-1$. If `Self` is signed, `MAX` is $2^{W-1}-1$.
         ///
         /// # Worst-case complexity
-        ///
         /// Constant time and additional memory.
         impl Max for $t {
             const MAX: $t = std::$t::MAX;

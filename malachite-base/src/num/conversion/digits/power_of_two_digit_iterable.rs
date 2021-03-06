@@ -23,7 +23,7 @@ pub struct PrimitivePowerOfTwoDigitIterator<T: PrimitiveUnsigned, U: PrimitiveUn
     // If `n` is nonzero, this mask initially points to the least-significant bit of the most-
     // significant nonzero digit, and is right-shifted by `next_back`.
     pub(crate) j: u64,
-    boo: PhantomData<U>,
+    phantom: PhantomData<*const U>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAccess>::Bits>>
@@ -37,7 +37,6 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     /// The base is $2^\ell$ and the output type is `U`.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -76,7 +75,6 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     /// exact bound.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -109,7 +107,6 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     /// The base is $2^\ell$ and the output type is `U`.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -164,7 +161,6 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     /// $$
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -212,7 +208,7 @@ fn _power_of_two_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
         some_remaining: significant_digits != 0,
         i: 0,
         j: significant_digits.saturating_sub(1) * log_base,
-        boo: PhantomData,
+        phantom: PhantomData,
     }
 }
 
@@ -234,11 +230,9 @@ macro_rules! impl_power_of_two_digit_iterable {
                     /// `to_power_of_to_digits_asc` or `to_power_of_two_digits_desc` instead.
                     ///
                     /// # Worst-case complexity
-                    ///
                     /// Constant time and additional memory.
                     ///
                     /// # Panics
-                    ///
                     /// Panics if `log_base` is larger than the width of `$u`.
                     ///
                     /// # Examples

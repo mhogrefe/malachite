@@ -18,7 +18,8 @@ use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base::num::random::geometric::{
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
-    geometric_random_unsigned_range, geometric_random_unsigneds, GeometricRandomNaturalValues,
+    geometric_random_signeds, geometric_random_unsigned_range, geometric_random_unsigneds,
+    GeometricRandomNaturalValues,
 };
 use malachite_base::num::random::striped::{
     get_striped_bool_vec, get_striped_unsigned_vec,
@@ -31,7 +32,8 @@ use malachite_base::num::random::striped::{
 };
 use malachite_base::num::random::{
     random_signed_range, random_unsigned_inclusive_range, random_unsigned_range,
-    random_unsigneds_less_than, RandomUnsignedInclusiveRange,
+    random_unsigneds_less_than, variable_range_generator, RandomUnsignedInclusiveRange,
+    VariableRangeGenerator,
 };
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::RoundingMode;
@@ -42,8 +44,6 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
-use malachite_base::vecs::random::random_vecs_length_inclusive_range;
-use std::collections::HashMap;
 use std::marker::PhantomData;
 
 // -- char --
@@ -160,6 +160,28 @@ pub fn special_random_signed_pair_gen_var_1<T: PrimitiveSigned>(config: &GenConf
         )
         .map(Union2::unwrap),
     )
+}
+
+pub fn special_random_signed_pair_gen_var_2<T: PrimitiveSigned, U: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_signeds(
+                seed,
+                config.get_or("mean_large_signed_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_large_signed_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
@@ -663,6 +685,30 @@ pub fn special_random_unsigned_gen_var_1<T: PrimitiveUnsigned>(config: &GenConfi
         EXAMPLE_SEED,
         config.get_or("mean_stripe_n", T::WIDTH >> 1),
         config.get_or("mean_stripe_d", 1),
+    ))
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned) --
+
+pub fn special_random_unsigned_signed_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_large_unsigned_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_large_unsigned_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
+            )
+        },
     ))
 }
 
@@ -1345,11 +1391,11 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen<T: PrimitiveUnsigned, U: Pr
 }
 
 struct UnsignedVecUnsignedPairGeneratorVar1<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
-    phantom: PhantomData<*const T>,
     log_bases: GeometricRandomNaturalValues<u64>,
-    log_base_to_xs: HashMap<u64, It<Vec<U>>>,
-    mean_stripe_n: u64,
-    mean_stripe_d: u64,
+    ranges: VariableRangeGenerator,
+    striped_bit_source: StripedBitSource,
+    phantom_t: PhantomData<*const T>,
+    phantom_u: PhantomData<*const U>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
@@ -1359,28 +1405,19 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
 
     fn next(&mut self) -> Option<(Vec<U>, u64)> {
         let log_base = self.log_bases.next().unwrap();
-        let mean_stripe_n = self.mean_stripe_n;
-        let mean_stripe_d = self.mean_stripe_d;
-        let xs = self.log_base_to_xs.entry(log_base).or_insert_with(move || {
-            Box::new(
-                random_vecs_length_inclusive_range(
-                    EXAMPLE_SEED.fork(&log_base.to_string()),
-                    0,
-                    T::WIDTH.div_round(log_base, RoundingMode::Ceiling),
-                    &|seed| {
-                        striped_random_fixed_length_bool_vecs(
-                            seed,
-                            mean_stripe_n,
-                            mean_stripe_d,
-                            log_base,
-                        )
-                        .map(|bs| U::from_bits_asc(bs.into_iter()))
-                    },
-                )
-                .filter(move |xs| digits_valid::<T, U>(log_base, xs)),
-            )
-        });
-        Some((xs.next().unwrap(), log_base))
+        let max_count = usize::exact_from(T::WIDTH.div_round(log_base, RoundingMode::Ceiling));
+        loop {
+            let digit_count = self.ranges.next_in_inclusive_range(0, max_count);
+            let mut digits = Vec::with_capacity(digit_count);
+            for _ in 0..digit_count {
+                digits.push(U::from_bits_asc(
+                    get_striped_bool_vec(&mut self.striped_bit_source, log_base).into_iter(),
+                ))
+            }
+            if digits_valid::<T, U>(log_base, &digits) {
+                return Some((digits, log_base));
+            }
+        }
     }
 }
 
@@ -1391,7 +1428,6 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_1<
     config: &GenConfig,
 ) -> It<(Vec<U>, u64)> {
     Box::new(UnsignedVecUnsignedPairGeneratorVar1::<T, U> {
-        phantom: PhantomData,
         log_bases: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("log_bases"),
             1,
@@ -1399,9 +1435,14 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_1<
             config.get_or("mean_log_base_n", 4),
             config.get_or("mean_log_base_d", 1),
         ),
-        log_base_to_xs: HashMap::new(),
-        mean_stripe_n: config.get_or("mean_stripe_n", T::WIDTH >> 1),
-        mean_stripe_d: config.get_or("mean_stripe_d", 1),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        phantom_t: PhantomData,
+        phantom_u: PhantomData,
     })
 }
 
@@ -1660,6 +1701,8 @@ pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: Pri
     )))
 }
 
+// var 2 is in malachite-nz
+
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
 struct UnsignedVecTripleXYYLenGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> {
@@ -1707,10 +1750,11 @@ pub fn special_random_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
     })
 }
 
-struct UnsignedVecTripleLenGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64, u64)>> {
-    phantom: PhantomData<*const T>,
-    lengths: I,
-    striped_bit_source: StripedBitSource,
+pub struct UnsignedVecTripleLenGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64, u64)>>
+{
+    pub phantom: PhantomData<*const T>,
+    pub lengths: I,
+    pub striped_bit_source: StripedBitSource,
 }
 
 impl<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64, u64)>> Iterator
@@ -1775,6 +1819,8 @@ pub fn special_random_unsigned_vec_triple_gen_var_3<T: PrimitiveUnsigned>(
         ),
     })
 }
+
+// vars 4 through 17 are in malachite-nz
 
 // -- large types --
 

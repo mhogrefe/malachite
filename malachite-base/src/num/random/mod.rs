@@ -1,9 +1,3 @@
-use std::convert::identity;
-use std::fmt::Debug;
-
-use rand::Rng;
-use rand_chacha::ChaCha20Rng;
-
 use iterators::{nonzero_values, NonzeroValues};
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -11,7 +5,11 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 use num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
 use num::logic::traits::BitAccess;
+use rand::Rng;
+use rand_chacha::ChaCha20Rng;
 use random::Seed;
+use std::convert::identity;
+use std::fmt::Debug;
 
 /// Uniformly generates random primitive integers.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -58,7 +56,7 @@ impl_trivial_random_primitive_ints!(isize);
 fn _get_random<T: PrimitiveInt>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
     if state.bits_left == 0 {
         state.x = rng.gen();
-        state.bits_left = 32 - T::WIDTH;
+        state.bits_left = u32::WIDTH - T::WIDTH;
     } else {
         state.x >>= T::WIDTH;
         state.bits_left -= T::WIDTH;
@@ -343,7 +341,6 @@ where
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -381,7 +378,6 @@ pub fn random_primitive_ints<T: PrimitiveInt>(seed: Seed) -> RandomPrimitiveInts
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -418,7 +414,6 @@ pub fn random_positive_unsigneds<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -455,7 +450,6 @@ pub fn random_positive_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -495,7 +489,6 @@ pub fn random_negative_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -530,7 +523,6 @@ pub fn random_natural_signeds<T: PrimitiveSigned>(seed: Seed) -> RandomSignedBit
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -567,11 +559,9 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
-///
 /// Panics if `limit` is 0.
 ///
 /// # Examples
@@ -619,11 +609,9 @@ pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
-///
 /// Panics if $a \geq b$.
 ///
 /// # Examples
@@ -668,11 +656,9 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
-///
 /// Panics if $a > b$.
 ///
 /// # Examples
@@ -719,11 +705,9 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
-///
 /// Panics if $a \geq b$.
 ///
 /// # Examples
@@ -764,11 +748,9 @@ pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> Random
 /// The output length is infinite.
 ///
 /// # Expected complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
-///
 /// Panics if $a > b$.
 ///
 /// # Examples
@@ -812,7 +794,6 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -857,7 +838,6 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -900,7 +880,6 @@ pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
 /// The output length is infinite.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -924,6 +903,221 @@ pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
     RandomHighestBitSetValues {
         xs: random_unsigned_bit_chunks(seed, T::WIDTH - 1),
         mask: T::power_of_two(T::WIDTH - 1),
+    }
+}
+
+/// Generates ranges of unsigneds. A single generator can generate many different ranges.
+#[derive(Clone, Debug)]
+pub struct VariableRangeGenerator {
+    xs: RandomPrimitiveInts<u32>,
+    x: u32,
+    in_inner_loop: bool,
+    remaining_x_bits: u64,
+}
+
+impl VariableRangeGenerator {
+    /// Uniformly generates an unsigned integer of up to `chunk_size` bits.
+    ///
+    /// $$
+    /// P(x) = \\begin{cases}
+    ///     2^{-c} & 0 \\leq x < 2^c \\\\
+    ///     0 & \\text{otherwise}
+    /// \\end{cases}
+    /// $$
+    /// where $c$ is `chunk_size`.
+    ///
+    /// The output length is infinite.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `chunk_size` is zero or greater than `T::WIDTH`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::random::EXAMPLE_SEED;
+    /// use malachite_base::num::random::variable_range_generator;
+    ///
+    /// let mut xs = Vec::with_capacity(10);
+    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// for _ in 0..10 {
+    ///     xs.push(generator.next_bit_chunk::<u8>(3));
+    /// }
+    /// assert_eq!(xs, &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]);
+    /// ```
+    pub fn next_bit_chunk<T: PrimitiveUnsigned>(&mut self, chunk_size: u64) -> T {
+        assert_ne!(chunk_size, 0);
+        assert!(chunk_size <= T::WIDTH);
+        let mut y = T::ZERO;
+        let mut remaining_y_bits = chunk_size;
+        loop {
+            if !self.in_inner_loop {
+                self.x = self.xs.next().unwrap();
+                self.remaining_x_bits = u32::WIDTH;
+                self.in_inner_loop = true;
+            }
+            while self.remaining_x_bits != 0 {
+                let y_index = chunk_size - remaining_y_bits;
+                if self.remaining_x_bits <= remaining_y_bits {
+                    y |= T::wrapping_from(self.x) << y_index;
+                    remaining_y_bits -= self.remaining_x_bits;
+                    self.remaining_x_bits = 0;
+                } else {
+                    y |= T::wrapping_from(self.x).mod_power_of_two(remaining_y_bits) << y_index;
+                    self.x >>= remaining_y_bits;
+                    self.remaining_x_bits -= remaining_y_bits;
+                    remaining_y_bits = 0;
+                }
+                if remaining_y_bits == 0 {
+                    return y;
+                }
+            }
+            self.in_inner_loop = false;
+        }
+    }
+
+    /// Uniformly generates a random unsigned integers less than a positive `limit`.
+    ///
+    /// $$
+    /// P(x) = \\begin{cases}
+    ///     \frac{1}{\\ell} & x < \\ell \\\\
+    ///     0 & \\text{otherwise}
+    /// \\end{cases}
+    /// $$
+    /// where $\ell$ is `limit`.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `limit` is 0.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::random::EXAMPLE_SEED;
+    /// use malachite_base::num::random::variable_range_generator;
+    ///
+    /// let mut xs = Vec::with_capacity(10);
+    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// for _ in 0..10 {
+    ///     xs.push(generator.next_less_than(10u8));
+    /// }
+    /// assert_eq!(xs, &[1, 7, 5, 4, 6, 4, 2, 8, 1, 7]);
+    /// ```
+    pub fn next_less_than<T: PrimitiveUnsigned>(&mut self, limit: T) -> T {
+        assert_ne!(limit, T::ZERO);
+        if limit == T::ONE {
+            T::ZERO
+        } else {
+            let chunk_size = limit.ceiling_log_two();
+            loop {
+                let x = self.next_bit_chunk(chunk_size);
+                if x < limit {
+                    return x;
+                }
+            }
+        }
+    }
+
+    /// Uniformly generates a random unsigned integer in the half-open interval $[a, b)$.
+    ///
+    /// `a` must be less than `b`. This function cannot create a range that includes `T::MAX`; for
+    /// that, use `next_in_inclusive_range`.
+    ///
+    /// $$
+    /// P(x) = \\begin{cases}
+    ///     \frac{1}{b-a} & a \leq x < b \\\\
+    ///     0 & \\text{otherwise}
+    /// \\end{cases}
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if $a \geq b$.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::random::EXAMPLE_SEED;
+    /// use malachite_base::num::random::variable_range_generator;
+    ///
+    /// let mut xs = Vec::with_capacity(10);
+    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// for _ in 0..10 {
+    ///     xs.push(generator.next_in_range(10u8, 20));
+    /// }
+    /// assert_eq!(xs, &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17]);
+    /// ```
+    pub fn next_in_range<T: PrimitiveUnsigned>(&mut self, a: T, b: T) -> T {
+        self.next_less_than(b - a) + a
+    }
+
+    /// Uniformly generates a random unsigned integer in the closed interval $[a, b]$.
+    ///
+    /// `a` must be less than or equal to `b`.
+    ///
+    /// $$
+    /// P(x) = \\begin{cases}
+    ///     \frac{1}{b-a+1} & a \leq x \leq b \\\\
+    ///     0 & \\text{otherwise}
+    /// \\end{cases}
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if $a > b$.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::random::EXAMPLE_SEED;
+    /// use malachite_base::num::random::variable_range_generator;
+    ///
+    /// let mut xs = Vec::with_capacity(10);
+    /// let mut generator = variable_range_generator(EXAMPLE_SEED);
+    /// for _ in 0..10 {
+    ///     xs.push(generator.next_in_inclusive_range(10u8, 19));
+    /// }
+    /// assert_eq!(xs, &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17]);
+    /// ```
+    pub fn next_in_inclusive_range<T: PrimitiveUnsigned>(&mut self, a: T, b: T) -> T {
+        if a == T::ZERO && b == T::MAX {
+            self.next_bit_chunk(T::WIDTH)
+        } else {
+            self.next_less_than(b - a + T::ONE) + a
+        }
+    }
+}
+
+/// Generates ranges of unsigneds. A single generator can generate many different ranges.
+///
+/// If you only need to generate values from a single range, it is slightly more efficient to use
+/// `random_unsigned_bit_chunks`, `unsigneds_less_than`, `random_unsigned_range`, or
+/// `random_unsigned_inclusive_range`.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::random::variable_range_generator;
+///
+/// let mut generator = variable_range_generator(EXAMPLE_SEED);
+/// assert_eq!(generator.next_bit_chunk::<u16>(10), 881);
+/// assert_eq!(generator.next_less_than::<u8>(100), 34);
+/// assert_eq!(generator.next_in_range::<u32>(10, 20), 16);
+/// assert_eq!(generator.next_in_inclusive_range::<u64>(10, 20), 14);
+/// ```
+pub fn variable_range_generator(seed: Seed) -> VariableRangeGenerator {
+    VariableRangeGenerator {
+        xs: random_primitive_ints(seed),
+        x: 0,
+        in_inner_loop: false,
+        remaining_x_bits: 0,
     }
 }
 

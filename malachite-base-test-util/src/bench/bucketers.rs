@@ -1,6 +1,7 @@
 use std::cmp::max;
 
 use malachite_base::chars::crement::char_to_contiguous_range;
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -140,6 +141,16 @@ where
     }
 }
 
+pub fn pair_2_unsigned_abs_bucketer<T, U: Copy + UnsignedAbs>(y_name: &str) -> Bucketer<(T, U)>
+where
+    usize: ExactFrom<<U as UnsignedAbs>::Output>,
+{
+    Bucketer {
+        bucketing_function: &|&(_, y)| usize::exact_from(y.unsigned_abs()),
+        bucketing_label: y_name.to_string(),
+    }
+}
+
 pub fn triple_2_bucketer<T, U: Copy, V>(y_name: &str) -> Bucketer<(T, U, V)>
 where
     usize: ExactFrom<U>,
@@ -167,6 +178,13 @@ pub fn triple_1_bit_bucketer<T: Copy + SignificantBits, U, V>(x_name: &str) -> B
 pub fn pair_1_vec_len_bucketer<T, U>(xs_name: &str) -> Bucketer<(Vec<T>, U)> {
     Bucketer {
         bucketing_function: &|&(ref xs, _)| xs.len(),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
+pub fn pair_2_vec_len_bucketer<T, U>(xs_name: &str) -> Bucketer<(T, Vec<U>)> {
+    Bucketer {
+        bucketing_function: &|&(_, ref xs)| xs.len(),
         bucketing_label: format!("{}.len()", xs_name),
     }
 }

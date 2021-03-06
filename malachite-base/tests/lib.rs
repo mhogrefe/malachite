@@ -269,6 +269,7 @@ pub mod num {
     pub mod conversion {
         pub mod digits {
             pub mod general_digits {
+                pub mod from_digits;
                 pub mod to_digits;
             }
             pub mod power_of_two_digits {
@@ -401,6 +402,12 @@ pub mod num {
             pub mod striped_random_unsigned_vecs_min_length;
             pub mod striped_random_unsigneds;
         }
+        pub mod variable_range_generator {
+            pub mod next_bit_chunk;
+            pub mod next_in_inclusive_range;
+            pub mod next_in_range;
+            pub mod next_less_than;
+        }
     }
 }
 pub mod options {
@@ -439,6 +446,7 @@ pub mod rounding_modes {
 }
 pub mod slices {
     pub mod exhaustive_slice_permutations;
+    pub mod random_slice_permutations;
     pub mod slice_leading_zeros;
     pub mod slice_move_left;
     pub mod slice_set_zero;
@@ -541,6 +549,7 @@ pub mod vecs {
         pub mod random_vecs_min_length;
     }
     pub mod random_values_from_vec;
+    pub mod random_vec_permutations;
     pub mod vec_delete_left;
     pub mod vec_from_str;
     pub mod vec_pad_left;

@@ -42,11 +42,9 @@ impl<T: One + Sized + Zero> Iverson for T {
     /// $$
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
-    ///
     /// See the documentation of the `num::basic::traits` module.
     #[inline]
     fn iverson(b: bool) -> T {

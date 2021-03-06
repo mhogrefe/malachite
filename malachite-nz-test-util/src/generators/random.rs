@@ -4,28 +4,47 @@ use malachite_base::num::basic::traits::Two;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
 use malachite_base::num::random::geometric::{
-    geometric_random_unsigneds, GeometricRandomNaturalValues,
+    geometric_random_positive_unsigneds, geometric_random_unsigneds, GeometricRandomNaturalValues,
 };
 use malachite_base::num::random::{
-    random_primitive_ints, random_unsigned_inclusive_range, RandomPrimitiveInts,
-    RandomUnsignedRange,
+    random_primitive_ints, random_unsigned_inclusive_range, random_unsigneds_less_than,
+    RandomPrimitiveInts, RandomUnsignedRange, RandomUnsignedsLessThan,
 };
 use malachite_base::options::random::{random_options, RandomOptions};
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::tuples::random::{random_pairs, random_triples};
+use malachite_base::tuples::random::{random_pairs, random_triples, random_triples_from_single};
 use malachite_base::vecs::random::{
     random_vecs, random_vecs_length_range, random_vecs_min_length, RandomVecs,
 };
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{GenConfig, It};
+use malachite_base_test_util::generators::random::PrimitiveIntVecTripleLenGenerator;
 use malachite_nz::integer::random::random_integers;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::arithmetic::mul::fft::*;
+use malachite_nz::natural::arithmetic::mul::toom::{
+    _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_44_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_52_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_54_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_62_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+};
 use malachite_nz::natural::conversion::digits::general_digits::{
-    limbs_digit_count, GET_STR_PRECOMPUTE_THRESHOLD,
+    limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
 use malachite_nz::natural::random::{random_natural_range_to_infinity, random_naturals};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use std::collections::HashMap;
+use std::marker::PhantomData;
 
 // -- Integer --
 
@@ -371,7 +390,61 @@ pub fn random_primitive_int_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var
             config.get_or("mean_excess_len_n", 4),
             config.get_or("mean_excess_len_d", 1),
         ),
-        outs: random_primitive_ints(EXAMPLE_SEED.fork("bytes")),
+        outs: random_primitive_ints(EXAMPLE_SEED.fork("outs")),
+    })
+}
+
+// -- (Vec<PrimitiveInt>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+struct BasecaseDigitsRandomGenerator2<T: PrimitiveUnsigned, U: PrimitiveInt> {
+    bases: RandomValuesFromVec<u64>,
+    digit_counts: GeometricRandomNaturalValues<usize>,
+    base_to_digits: HashMap<u64, RandomUnsignedsLessThan<T>>,
+    excess_limb_counts: GeometricRandomNaturalValues<usize>,
+    outs: RandomPrimitiveInts<U>,
+}
+
+impl<T: PrimitiveUnsigned, U: PrimitiveInt> Iterator for BasecaseDigitsRandomGenerator2<T, U> {
+    type Item = (Vec<U>, Vec<T>, u64);
+
+    fn next(&mut self) -> Option<(Vec<U>, Vec<T>, u64)> {
+        let base = self.bases.next().unwrap();
+        let digit_count = self.digit_counts.next().unwrap();
+        let ds = self.base_to_digits.entry(base).or_insert_with(move || {
+            random_unsigneds_less_than(EXAMPLE_SEED.fork(&base.to_string()), T::wrapping_from(base))
+        });
+        let digits = ds.take(digit_count).collect();
+        let min_limb_count = limbs_per_digit_in_base(digit_count, base);
+        let out = (&mut self.outs)
+            .take(usize::exact_from(min_limb_count) + self.excess_limb_counts.next().unwrap())
+            .collect();
+        Some((out, digits, base))
+    }
+}
+
+pub fn random_primitive_int_vec_unsigned_vec_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveInt,
+>(
+    config: &GenConfig,
+) -> It<(Vec<U>, Vec<T>, u64)> {
+    Box::new(BasecaseDigitsRandomGenerator2 {
+        bases: random_values_from_vec(
+            EXAMPLE_SEED.fork("bases"),
+            (3u64..256).filter(|&b| !b.is_power_of_two()).collect(),
+        ),
+        digit_counts: geometric_random_positive_unsigneds(
+            EXAMPLE_SEED.fork("digit_counts"),
+            config.get_or("mean_digit_count_n", 4),
+            config.get_or("mean_digit_count_d", 1),
+        ),
+        excess_limb_counts: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("excess_limb_count"),
+            config.get_or("excess_limb_count_n", 4),
+            config.get_or("excess_limb_count_d", 1),
+        ),
+        outs: random_primitive_ints(EXAMPLE_SEED.fork("outs")),
+        base_to_digits: HashMap::new(),
     })
 }
 
@@ -396,4 +469,189 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_1<
         },
         &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::saturating_from(U::MAX)),
     ))
+}
+
+// -- (Vec<PrimitiveInt>, Vec<PrimitiveInt>, Vec<PrimitiveInt>) --
+
+// vars 1 through 3 are in malachite-base
+
+fn random_mul_helper<T: PrimitiveInt, F: Fn(usize, usize) -> bool>(
+    config: &GenConfig,
+    valid: &'static F,
+    min_x: usize,
+    min_y: usize,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(PrimitiveIntVecTripleLenGenerator {
+        phantom: PhantomData,
+        lengths: random_triples_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(move |(o, x, y)| {
+            let x = x.checked_add(min_x)?;
+            let y = y.checked_add(min_y)?;
+            if valid(usize::exact_from(x), usize::exact_from(y)) {
+                let o = x.checked_add(y)?.checked_add(o)?;
+                Some((o, x, y))
+            } else {
+                None
+            }
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_4<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+        2,
+        2,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_5<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+        6,
+        4,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_6<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+        3,
+        3,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_7<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+        4,
+        2,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_8<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+        11,
+        8,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_9<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_44_input_sizes_valid,
+        4,
+        4,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_10<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_52_input_sizes_valid,
+        14,
+        5,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_11<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+        5,
+        3,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_12<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_54_input_sizes_valid,
+        14,
+        11,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_13<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_62_input_sizes_valid,
+        6,
+        2,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_14<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+        17,
+        9,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_15<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+        42,
+        42,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_16<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+        86,
+        86,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_17<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &_limbs_mul_greater_to_out_fft_input_sizes_threshold,
+        15,
+        15,
+    )
 }

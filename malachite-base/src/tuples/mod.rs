@@ -22,7 +22,6 @@ impl<I: Iterator> Iterator for Singletons<I> {
 /// The output length is `xs.count()`.
 ///
 /// # Complexity per iteration
-///
 /// Same as the time and additional memory complexity of iterating `xs`.
 ///
 /// # Examples

@@ -6,7 +6,6 @@ use std::slice::Iter;
 /// The output length is 2.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

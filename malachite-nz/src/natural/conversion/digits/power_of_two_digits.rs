@@ -273,14 +273,15 @@ macro_rules! power_of_two_digits_unsigned {
             /// use malachite_base::num::conversion::traits::PowerOfTwoDigits;
             /// use malachite_nz::natural::Natural;
             ///
-            /// let digits: &[u64] = &[0, 0, 0];
-            /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits.iter().cloned()), 0);
-            ///
-            /// let digits: &[u64] = &[2, 0];
-            /// assert_eq!(Natural::from_power_of_two_digits_asc(6, digits.iter().cloned()), 2);
-            ///
-            /// let digits: &[u16] = &[3, 7, 1];
-            /// assert_eq!(Natural::from_power_of_two_digits_asc(3, digits.iter().cloned()), 123);
+            /// assert_eq!(
+            ///     Natural::from_power_of_two_digits_asc(6, [0u64, 0, 0].iter().cloned()),
+            ///     0
+            /// );
+            /// assert_eq!(Natural::from_power_of_two_digits_asc(6, [2u64, 0].iter().cloned()), 2);
+            /// assert_eq!(
+            ///     Natural::from_power_of_two_digits_asc(3, [3u16, 7, 1].iter().cloned()),
+            ///     123
+            /// );
             /// ```
             #[inline]
             fn from_power_of_two_digits_asc<I: Iterator<Item = $t>>(
@@ -313,14 +314,15 @@ macro_rules! power_of_two_digits_unsigned {
             /// use malachite_base::num::conversion::traits::PowerOfTwoDigits;
             /// use malachite_nz::natural::Natural;
             ///
-            /// let digits: &[u64] = &[0, 0, 0];
-            /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits.iter().cloned()), 0);
-            ///
-            /// let digits: &[u64] = &[0, 2];
-            /// assert_eq!(Natural::from_power_of_two_digits_desc(6, digits.iter().cloned()), 2);
-            ///
-            /// let digits: &[u16] = &[1, 7, 3];
-            /// assert_eq!(Natural::from_power_of_two_digits_desc(3, digits.iter().cloned()), 123);
+            /// assert_eq!(
+            ///     Natural::from_power_of_two_digits_desc(6, [0u64, 0, 0].iter().cloned()),
+            ///     0
+            /// );
+            /// assert_eq!(Natural::from_power_of_two_digits_desc(6, [0u64, 2].iter().cloned()), 2);
+            /// assert_eq!(
+            ///     Natural::from_power_of_two_digits_desc(3, [1u16, 7, 3].iter().cloned()),
+            ///     123
+            /// );
             /// ```
             #[inline]
             fn from_power_of_two_digits_desc<I: Iterator<Item = $t>>(

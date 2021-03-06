@@ -30,7 +30,6 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     /// (least-significant first).
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -70,7 +69,6 @@ impl<T: PrimitiveUnsigned> Iterator for PrimitiveUnsignedBitIterator<T> {
     /// have an exact bound.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -91,7 +89,6 @@ impl<T: PrimitiveUnsigned> DoubleEndedIterator for PrimitiveUnsignedBitIterator<
     /// (most-significant first).
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -139,7 +136,6 @@ impl<T: PrimitiveUnsigned> Index<u64> for PrimitiveUnsignedBitIterator<T> {
     /// This is equivalent to the `get_bit` function.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -193,7 +189,6 @@ macro_rules! impl_bit_iterable_unsigned {
             /// `to_bits_desc` instead.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples
@@ -223,7 +218,6 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Iterator for PrimitiveSignedBitIt
     /// (least-significant first).
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -256,7 +250,6 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> DoubleEndedIterator
     /// (most-significant first).
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -294,7 +287,6 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Index<u64> for PrimitiveSignedBit
     /// This is equivalent to the `get_bit` function.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples
@@ -358,7 +350,6 @@ macro_rules! impl_bit_iterable_signed {
             /// `to_bits_desc` instead.
             ///
             /// # Worst-case complexity
-            ///
             /// Constant time and additional memory.
             ///
             /// # Examples

@@ -77,7 +77,6 @@ pub type PrimitiveIntUpDown<T> =
 /// The output length is $2^W$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -107,7 +106,6 @@ pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntIncreasingRan
 /// The output length is $L$.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -139,7 +137,6 @@ pub fn exhaustive_positive_primitive_ints<T: PrimitiveInt>() -> PrimitiveIntIncr
 /// The output length is $2^W$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -167,7 +164,6 @@ pub fn exhaustive_signeds<T: PrimitiveSigned>() -> Chain<Once<T>, PrimitiveIntUp
 /// The output length is $2^{W-1}$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -195,7 +191,6 @@ pub fn exhaustive_natural_signeds<T: PrimitiveSigned>() -> PrimitiveIntIncreasin
 /// The output length is $2^{W-1}$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -227,7 +222,6 @@ pub fn exhaustive_negative_signeds<T: PrimitiveSigned>() -> Rev<PrimitiveIntIncr
 /// The output length is $2^W-1$, where $W$ is `T::WIDTH`.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -259,7 +253,6 @@ pub fn exhaustive_nonzero_signeds<T: PrimitiveSigned>() -> PrimitiveIntUpDown<T>
 /// The output length is $b - a$.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -302,7 +295,6 @@ pub fn primitive_int_increasing_range<T: PrimitiveInt>(
 /// The output length is $b - a + 1$.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -349,7 +341,6 @@ pub fn primitive_int_increasing_inclusive_range<T: PrimitiveInt>(
 /// The output length is $b - a$.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics
@@ -399,7 +390,6 @@ pub fn exhaustive_signed_range<T: PrimitiveSigned>(a: T, b: T) -> ExhaustiveSign
 /// The output length is $b - a + 1$.
 ///
 /// # Complexity per iteration
-///
 /// Constant time and additional memory.
 ///
 /// # Panics

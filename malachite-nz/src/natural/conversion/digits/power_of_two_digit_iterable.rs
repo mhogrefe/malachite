@@ -38,7 +38,7 @@ struct FILIterator<'a, T> {
     // next_back().
     j: u64,
     mask: Limb,
-    boo: PhantomData<T>,
+    phantom: PhantomData<*const T>,
 }
 
 impl<'a, T: PrimitiveUnsigned> Iterator for FILIterator<'a, T> {
@@ -115,7 +115,7 @@ struct SOLIterator<'a, T> {
     // This index initially points to the most-significant nonzero digit, and is decremented by
     // next_back().
     j: usize,
-    boo: PhantomData<T>,
+    phantom: PhantomData<*const T>,
 }
 
 impl<'a, T: PrimitiveUnsigned> Iterator for SOLIterator<'a, T> {
@@ -177,7 +177,7 @@ struct MOLIterator<'a, T> {
     log_ratio: u64,
     limbs: &'a [Limb],
     chunks: Chunks<'a, Limb>,
-    boo: PhantomData<T>,
+    phantom: PhantomData<*const T>,
 }
 
 impl<'a, T: PrimitiveUnsigned> Iterator for MOLIterator<'a, T> {
@@ -230,7 +230,7 @@ struct IIterator<'a, T> {
     // This index initially points to the most-significant nonzero digit, and is decremented by
     // next_back().
     j: u64,
-    boo: PhantomData<T>,
+    phantom: PhantomData<*const T>,
 }
 
 impl<'a, T: PrimitiveUnsigned> Iterator for IIterator<'a, T> {
@@ -512,7 +512,7 @@ fn fits_in_limb_iterator<T: PrimitiveUnsigned>(
         j: (significant_digits - 1).mod_power_of_two(Limb::LOG_WIDTH - log_log_base)
             << log_log_base,
         mask: Limb::low_mask(log_base),
-        boo: PhantomData,
+        phantom: PhantomData,
     })
 }
 
@@ -522,7 +522,7 @@ fn size_of_limb_iterator<T: PrimitiveUnsigned>(xs: &[Limb]) -> SizeOfLimbIterato
         some_remaining: true,
         i: 0,
         j: xs.len() - 1,
-        boo: PhantomData,
+        phantom: PhantomData,
     })
 }
 
@@ -538,7 +538,7 @@ fn multiple_of_limb_iterator<T: PrimitiveUnsigned>(
         log_ratio,
         limbs: xs,
         chunks: xs.chunks(usize::power_of_two(log_ratio)),
-        boo: PhantomData,
+        phantom: PhantomData,
     })
 }
 
@@ -554,7 +554,7 @@ fn irregular_iterator<T: PrimitiveUnsigned>(
         some_remaining: true,
         i: 0,
         j: significant_digits - 1,
-        boo: PhantomData,
+        phantom: PhantomData,
     })
 }
 

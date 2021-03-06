@@ -82,7 +82,7 @@ fn to_digits_asc_helper<
     unsigned_pair_gen_var_6::<T, U>().test_properties(|(u, base)| {
         let digits = u.to_digits_asc(&base);
         assert_eq!(_unsigned_to_digits_asc_naive(&u, base), digits);
-        //TODO from_digits
+        assert_eq!(T::from_digits_asc(&base, digits.iter().copied()), u);
         if u != T::ZERO {
             assert_ne!(*digits.last().unwrap(), U::ZERO);
         }
@@ -119,7 +119,7 @@ fn to_digits_desc_helper<
 >() {
     unsigned_pair_gen_var_6::<T, U>().test_properties(|(u, base)| {
         let digits = u.to_digits_desc(&base);
-        //TODO from_digits
+        assert_eq!(T::from_digits_desc(&base, digits.iter().copied()), u);
         if u != T::ZERO {
             assert_ne!(digits[0], U::ZERO);
         }

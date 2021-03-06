@@ -6,7 +6,6 @@ impl Display for RoundingMode {
     /// Converts a `RoundingMode` to a `String`.
     ///
     /// # Worst-case complexity
-    ///
     /// Constant time and additional memory.
     ///
     /// # Examples

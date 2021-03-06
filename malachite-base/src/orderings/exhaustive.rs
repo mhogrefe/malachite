@@ -9,7 +9,6 @@ use orderings::ORDERINGS;
 /// The output length is 3.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Examples
@@ -38,7 +37,6 @@ pub fn orderings_increasing() -> Cloned<Iter<'static, Ordering>> {
 /// The output length is 3.
 ///
 /// # Worst-case complexity
-///
 /// Constant time and additional memory.
 ///
 /// # Examples

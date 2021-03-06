@@ -20,6 +20,30 @@
 /// assert_eq!(2u16.to_digits_asc(&6u32), &[2]);
 /// assert_eq!(123456u32.to_digits_desc(&3u16), &[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0]);
 /// ```
+///
+/// # from_digits_asc
+/// ```
+/// use malachite_base::num::conversion::traits::Digits;
+///
+/// assert_eq!(u8::from_digits_asc(&64, [0u64, 0, 0].iter().cloned()), 0);
+/// assert_eq!(
+///     u32::from_digits_asc(&3, [0u64, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2].iter().cloned()),
+///     123456
+/// );
+/// assert_eq!(u32::from_digits_asc(&8, [3u16, 7, 1].iter().cloned()), 123);
+/// ```
+///
+/// # from_digits_desc
+/// ```
+/// use malachite_base::num::conversion::traits::Digits;
+///
+/// assert_eq!(u8::from_digits_desc(&64, [0u64, 0, 0].iter().cloned()), 0);
+/// assert_eq!(
+///     u32::from_digits_desc(&3, [2u64, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0].iter().cloned()),
+///     123456
+/// );
+/// assert_eq!(u32::from_digits_desc(&8, [1u16, 7, 3].iter().cloned()), 123);
+/// ```
 pub mod general_digits;
 /// This module provides a double-ended iterator for iterating over a number's digits, if the base
 /// is a power of two.
@@ -79,27 +103,17 @@ pub mod power_of_two_digit_iterable;
 /// ```
 /// use malachite_base::num::conversion::traits::PowerOfTwoDigits;
 ///
-/// let digits: &[u64] = &[0, 0, 0];
-/// assert_eq!(u8::from_power_of_two_digits_asc(6, digits.iter().cloned()), 0);
-///
-/// let digits: &[u64] = &[2, 0];
-/// assert_eq!(u16::from_power_of_two_digits_asc(6, digits.iter().cloned()), 2);
-///
-/// let digits: &[u16] = &[3, 7, 1];
-/// assert_eq!(u32::from_power_of_two_digits_asc(3, digits.iter().cloned()), 123);
+/// assert_eq!(u8::from_power_of_two_digits_asc(6, [0u64, 0, 0].iter().cloned()), 0);
+/// assert_eq!(u16::from_power_of_two_digits_asc(6, [2u64, 0].iter().cloned()), 2);
+/// assert_eq!(u32::from_power_of_two_digits_asc(3, [3u16, 7, 1].iter().cloned()), 123);
 /// ```
 ///
 /// # from_power_of_two_digits_desc
 /// ```
 /// use malachite_base::num::conversion::traits::PowerOfTwoDigits;
 ///
-/// let digits: &[u64] = &[0, 0, 0];
-/// assert_eq!(u8::from_power_of_two_digits_desc(6, digits.iter().cloned()), 0);
-///
-/// let digits: &[u64] = &[0, 2];
-/// assert_eq!(u16::from_power_of_two_digits_desc(6, digits.iter().cloned()), 2);
-///
-/// let digits: &[u16] = &[1, 7, 3];
-/// assert_eq!(u32::from_power_of_two_digits_desc(3, digits.iter().cloned()), 123);
+/// assert_eq!(u8::from_power_of_two_digits_desc(6, [0u64, 0, 0].iter().cloned()), 0);
+/// assert_eq!(u16::from_power_of_two_digits_desc(6, [0u64, 2].iter().cloned()), 2);
+/// assert_eq!(u32::from_power_of_two_digits_desc(3, [1u16, 7, 3].iter().cloned()), 123);
 /// ```
 pub mod power_of_two_digits;
