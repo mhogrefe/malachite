@@ -1,6 +1,6 @@
 use std::panic::catch_unwind;
 
-use malachite_base_test_util::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::common_values_map::common_values_map;
 use malachite_base_test_util::stats::median;
 use malachite_base_test_util::stats::moments::{moment_stats, CheckedToF64, MomentStats};

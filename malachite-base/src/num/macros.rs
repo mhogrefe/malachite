@@ -292,3 +292,21 @@ macro_rules! apply_fn_to_primitive_ints_and_primitive_ints {
         apply_fn_to_primitive_ints_and_signeds!($f);
     };
 }
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! apply_to_primitive_floats {
+    ($m: tt) => {
+        $m!(f32);
+        $m!(f64);
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! apply_fn_to_primitive_floats {
+    ($f: ident) => {
+        $f::<f32>();
+        $f::<f64>();
+    };
+}

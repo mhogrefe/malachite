@@ -17,17 +17,11 @@ macro_rules! impl_checked_sub_mul_unsigned {
 
             /// Computes `self - y * z`, returning `None` if there is no valid result.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Subitional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
-            ///
-            /// assert_eq!(60u8.checked_sub_mul(5, 10), Some(10));
-            /// assert_eq!(2u8.checked_sub_mul(10, 5), None);
-            /// ```
+            /// See the documentation of the `num::arithmetic::checked_sub_mul` module.
             #[inline]
             fn checked_sub_mul(self, y: $t, z: $t) -> Option<$t> {
                 _checked_sub_mul_unsigned(self, y, z)
@@ -84,17 +78,11 @@ macro_rules! impl_checked_sub_mul_signed {
 
             /// Computes `self - y * z`, returning `None` if there is no valid result.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Subitional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CheckedSubMul;
-            ///
-            /// assert_eq!(127i8.checked_sub_mul(2, 100), Some(-73));
-            /// assert_eq!((-127i8).checked_sub_mul(2, 100), None);
-            /// ```
+            /// See the documentation of the `num::arithmetic::checked_sub_mul` module.
             #[inline]
             fn checked_sub_mul(self, y: $t, z: $t) -> Option<$t> {
                 _checked_sub_mul_signed(self, y, z)

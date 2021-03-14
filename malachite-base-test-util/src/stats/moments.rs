@@ -1,20 +1,18 @@
 use itertools::Itertools;
-use std::fmt::{self, Debug, Formatter};
-
 use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
-
-use num::float::nice_float::NiceFloat;
+use malachite_base::num::float::nice_float::NiceFloat;
 use stats::common_values_map::common_values_map;
 use stats::median;
 use stats::median::{
     deleted_uniform_primitive_int_median, double_geometric_median, double_nonzero_geometric_median,
     truncated_geometric_median, uniform_bool_median, uniform_primitive_int_median,
 };
+use std::fmt::{self, Debug, Formatter};
 
 // Panics if the input exceeds the finite range of f64.
 pub trait CheckedToF64 {

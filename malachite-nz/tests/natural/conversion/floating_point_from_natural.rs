@@ -4,7 +4,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
-use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 
 use malachite_nz::natural::Natural;
@@ -26,7 +26,7 @@ fn test_f32() {
     test(f32::NEGATIVE_ONE, 0xbf800000);
     test(f32::TWO, 0x40000000);
     test(f32::MAX_FINITE, 0x7f7fffff);
-    test(f32::MIN_FINITE, 0xff7fffff);
+    test(-f32::MAX_FINITE, 0xff7fffff);
     test(f32::POSITIVE_INFINITY, 0x7f800000);
     test(f32::NEGATIVE_INFINITY, 0xff800000);
 
@@ -50,7 +50,7 @@ fn test_f64() {
     test(f64::NEGATIVE_ONE, 0xbff0000000000000);
     test(f64::TWO, 0x4000000000000000);
     test(f64::MAX_FINITE, 0x7fefffffffffffff);
-    test(f64::MIN_FINITE, 0xffefffffffffffff);
+    test(-f64::MAX_FINITE, 0xffefffffffffffff);
     test(f64::POSITIVE_INFINITY, 0x7ff0000000000000);
     test(f64::NEGATIVE_INFINITY, 0xfff0000000000000);
 

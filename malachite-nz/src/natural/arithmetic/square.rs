@@ -357,10 +357,9 @@ pub fn _limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut 
             limbs_slice_add_mul_limb_same_length_in_place_left(v_1_init, as1_init, 2)
                 .wrapping_add(1)
         } else if *as1_last != 0 {
-            let carry: Limb = as1_last.arithmetic_checked_shl(1).unwrap();
-            carry.wrapping_add(limbs_slice_add_mul_limb_same_length_in_place_left(
-                v_1_init, as1_init, 4,
-            ))
+            as1_last.arithmetic_checked_shl(1u64).unwrap().wrapping_add(
+                limbs_slice_add_mul_limb_same_length_in_place_left(v_1_init, as1_init, 4),
+            )
         } else {
             0
         };
@@ -477,21 +476,21 @@ pub fn _limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut 
     _limbs_square_to_out_toom_4_recursive(scratch_lo, amx, tp);
     // Compute apx = 8 xs_0 + 4 xs_1 + 2 xs_2 + xs_3 = (((2 xs_0 + xs_1) * 2 + xs_2) * 2 + xs_3
     let (apx_last, apx_init) = apx.split_last_mut().unwrap();
-    let mut cy = limbs_shl_to_out(apx_init, xs_0, 1);
+    let mut carry = limbs_shl_to_out(apx_init, xs_0, 1);
     if limbs_slice_add_same_length_in_place_left(apx_init, xs_1) {
-        cy.wrapping_add_assign(1);
+        carry.wrapping_add_assign(1);
     }
-    cy = cy.arithmetic_checked_shl(1).unwrap();
-    cy.wrapping_add_assign(limbs_slice_shl_in_place(apx_init, 1));
+    carry = carry.arithmetic_checked_shl(1).unwrap();
+    carry.wrapping_add_assign(limbs_slice_shl_in_place(apx_init, 1));
     if limbs_slice_add_same_length_in_place_left(apx_init, xs_2) {
-        cy.wrapping_add_assign(1);
+        carry.wrapping_add_assign(1);
     }
-    cy = cy.arithmetic_checked_shl(1).unwrap();
-    cy.wrapping_add_assign(limbs_slice_shl_in_place(apx_init, 1));
+    carry = carry.arithmetic_checked_shl(1).unwrap();
+    carry.wrapping_add_assign(limbs_slice_shl_in_place(apx_init, 1));
     if limbs_slice_add_greater_in_place_left(apx_init, xs_3) {
-        cy.wrapping_add_assign(1);
+        carry.wrapping_add_assign(1);
     }
-    *apx_last = cy;
+    *apx_last = carry;
     assert!(*apx_last < 15);
     let scratch_lo = &mut scratch_lo[k..];
     _limbs_square_to_out_toom_4_recursive(scratch_lo, apx, tp);

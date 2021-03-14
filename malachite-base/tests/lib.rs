@@ -310,10 +310,30 @@ pub mod num {
         pub mod exhaustive_signed_range;
         pub mod exhaustive_signeds;
         pub mod exhaustive_unsigneds;
+        pub mod finite_primitive_floats_increasing;
+        pub mod negative_finite_primitive_floats_increasing;
+        pub mod negative_primitive_floats_increasing;
+        pub mod nonzero_finite_primitive_floats_increasing;
+        pub mod nonzero_primitive_floats_increasing;
+        pub mod positive_finite_primitive_floats_increasing;
+        pub mod positive_primitive_floats_increasing;
+        pub mod primitive_float_increasing_inclusive_range;
+        pub mod primitive_float_increasing_range;
+        pub mod primitive_floats_increasing;
         pub mod primitive_int_increasing_inclusive_range;
         pub mod primitive_int_increasing_range;
     }
     pub mod float {
+        pub mod basic {
+            pub mod abs_negative_zeros;
+            pub mod constants;
+            pub mod exponent;
+            pub mod from_ordered_representation;
+            pub mod mantissa_and_exponent;
+            pub mod next_higher;
+            pub mod next_lower;
+            pub mod to_ordered_representation;
+        }
         pub mod nice_float;
     }
     pub mod iterators {

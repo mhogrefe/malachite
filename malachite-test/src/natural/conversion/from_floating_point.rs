@@ -1,10 +1,9 @@
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
-use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::Natural;
-
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
     f32s, f32s_var_1, f64s, f64s_var_1, pairs_of_finite_f32_and_rounding_mode_var_1,
@@ -122,8 +121,8 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&(f, _)| usize::exact_from(f.adjusted_exponent())),
-                "f.adjusted_exponent()",
+                &(|&(f, _)| usize::exact_from(f.raw_exponent())),
+                "f.raw_exponent()",
                 &mut [(
                     "Malachite",
                     &mut (|(f, rm)| no_out!(Natural::rounding_from(f, rm))),
@@ -139,8 +138,8 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| usize::exact_from(f.adjusted_exponent())),
-                "f.adjusted_exponent()",
+                &(|&f| usize::exact_from(f.raw_exponent())),
+                "f.raw_exponent()",
                 &mut [("Malachite", &mut (|f| no_out!(Natural::from(f))))],
             );
         }
@@ -157,8 +156,8 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| usize::exact_from(f.adjusted_exponent())),
-                "f.adjusted_exponent()",
+                &(|&f| usize::exact_from(f.raw_exponent())),
+                "f.raw_exponent()",
                 &mut [("Malachite", &mut (|f| no_out!(Natural::checked_from(f))))],
             );
         }
@@ -171,8 +170,8 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| usize::exact_from(f.adjusted_exponent())),
-                "f.adjusted_exponent()",
+                &(|&f| usize::exact_from(f.raw_exponent())),
+                "f.raw_exponent()",
                 &mut [("Malachite", &mut (|f| no_out!(Natural::exact_from(f))))],
             );
         }
@@ -189,8 +188,8 @@ macro_rules! float_demos_and_benches {
                 gm.name(),
                 limit,
                 file_name,
-                &(|&f| usize::exact_from(f.adjusted_exponent())),
-                "f.adjusted_exponent()",
+                &(|&f| usize::exact_from(f.raw_exponent())),
+                "f.raw_exponent()",
                 &mut [
                     ("standard", &mut (|f| no_out!(Natural::convertible_from(f)))),
                     (

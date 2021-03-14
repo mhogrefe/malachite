@@ -12,12 +12,15 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero, slice_trailing_zeros};
-use natural::arithmetic::add::limbs_slice_add_limb_in_place;
+use natural::arithmetic::add::{
+    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
+};
 use natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
 use natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod, limbs_div_mod_extra_in_place, limbs_div_mod_to_out,
 };
 use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
+use natural::arithmetic::mul::limbs_mul_to_out;
 use natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
 use natural::arithmetic::square::limbs_square_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
@@ -356,7 +359,7 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
         remainder = next_remainder;
         limbs_square_to_out(remainder, power);
         start = 3;
-        power_len - 2
+        isize::exact_from(power_len) - 2
     } else {
         if (digits_in_base + digits_per_limb) << (power_len - 2) <= exponents[0] {
             // a = 3, sometimes adjusted to 4.
@@ -399,71 +402,73 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
             limbs_square_to_out(remainder, &power[..len]);
             start = 6;
         }
-        power_len - 3
+        isize::exact_from(power_len) - 3
     };
-    for i in (0..=start_index).rev() {
-        let increment = (len + 1) << 1;
-        digits_in_base <<= 1;
-        len <<= 1;
-        if remainder[len - 1] == 0 {
-            len -= 1;
-        }
-        shift <<= 1;
-        let mut adjust = 0;
-        if remainder[0] == 0 {
-            len -= 1;
-            shift += 1;
-            remainder = &mut remainder[1..];
-            adjust += 1;
-        }
-        // Adjust new value if it is too small as input to the next squaring.
-        if (digits_in_base + digits_per_limb) << i <= exponents[0] {
-            let carry = limbs_slice_mul_limb_in_place(&mut remainder[..len], big_base);
-            remainder[len] = carry;
-            if carry != 0 {
-                len += 1;
+    if start_index >= 0 {
+        for i in (0..=start_index).rev() {
+            let increment = (len + 1) << 1;
+            digits_in_base <<= 1;
+            len <<= 1;
+            if remainder[len - 1] == 0 {
+                len -= 1;
             }
-            digits_in_base += digits_per_limb;
+            shift <<= 1;
+            let mut adjust = 0;
             if remainder[0] == 0 {
                 len -= 1;
                 shift += 1;
-                adjust += 1;
                 remainder = &mut remainder[1..];
+                adjust += 1;
+            }
+            // Adjust new value if it is too small as input to the next squaring.
+            if (digits_in_base + digits_per_limb) << i <= exponents[0] {
+                let carry = limbs_slice_mul_limb_in_place(&mut remainder[..len], big_base);
+                remainder[len] = carry;
+                if carry != 0 {
+                    len += 1;
+                }
+                digits_in_base += digits_per_limb;
+                if remainder[0] == 0 {
+                    len -= 1;
+                    shift += 1;
+                    adjust += 1;
+                    remainder = &mut remainder[1..];
+                }
+            }
+            power_indices.push(PowerTableIndicesRow {
+                start: start + adjust,
+                len,
+                digits_in_base,
+                shift,
+            });
+            start += increment;
+            let (power, next_remainder) = remainder.split_at_mut(increment - adjust);
+            remainder = next_remainder;
+            if i != 0 {
+                limbs_square_to_out(remainder, &power[..len]);
             }
         }
-        power_indices.push(PowerTableIndicesRow {
-            start: start + adjust,
-            len,
-            digits_in_base,
-            shift,
-        });
-        start += increment;
-        let (power, next_remainder) = remainder.split_at_mut(increment - adjust);
-        remainder = next_remainder;
-        if i != 0 {
-            limbs_square_to_out(remainder, &power[..len]);
-        }
-    }
-    for (&exponent, row) in exponents[1..start_index + 2]
-        .iter()
-        .rev()
-        .zip(power_indices[power_len - start_index - 1..].iter_mut())
-    {
-        if row.digits_in_base < exponent {
-            let start = row.start;
-            let end = start + row.len;
-            let carry =
-                limbs_slice_mul_limb_in_place(&mut power_table_memory[start..end], big_base);
-            power_table_memory[end] = carry;
-            if carry != 0 {
-                row.len += 1;
-            }
-            assert!(row.digits_in_base + digits_per_limb == exponent);
-            row.digits_in_base = exponent;
-            if power_table_memory[start] == 0 {
-                row.start += 1;
-                row.len -= 1;
-                row.shift += 1;
+        for (&exponent, row) in exponents[1..usize::exact_from(start_index + 2)]
+            .iter()
+            .rev()
+            .zip(power_indices[power_len - usize::exact_from(start_index + 1)..].iter_mut())
+        {
+            if row.digits_in_base < exponent {
+                let start = row.start;
+                let end = start + row.len;
+                let carry =
+                    limbs_slice_mul_limb_in_place(&mut power_table_memory[start..end], big_base);
+                power_table_memory[end] = carry;
+                if carry != 0 {
+                    row.len += 1;
+                }
+                assert!(row.digits_in_base + digits_per_limb == exponent);
+                row.digits_in_base = exponent;
+                if power_table_memory[start] == 0 {
+                    row.start += 1;
+                    row.len -= 1;
+                    row.shift += 1;
+                }
             }
         }
     }
@@ -1083,6 +1088,129 @@ where
         }
     }
     size
+}
+
+// must be greater than get_chars_per_limb(3), which is 40 for 64-bit build
+const SET_STR_DC_THRESHOLD: usize = 7;
+
+/// The input digits are in descending order.
+///
+/// This is mpn_dc_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+pub fn _limbs_from_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
+    out: &mut [Limb],
+    xs: &[T],
+    base: u64,
+    powers: &[PowerTableRow],
+    i: usize,
+    scratch: &mut [Limb],
+) -> usize
+where
+    Limb: WrappingFrom<T>,
+{
+    if i == 0 {
+        return _limbs_from_digits_small_base_basecase(out, xs, base);
+    }
+    let xs_len = xs.len();
+    let power = &powers[i];
+    let len_lo = power.digits_in_base;
+    if xs_len <= len_lo {
+        return if xs_len < SET_STR_DC_THRESHOLD {
+            fail_on_untested_path(
+                "_limbs_from_digits_small_base_divide_and_conquer, xs_len < SET_STR_DC_THRESHOLD",
+            );
+            _limbs_from_digits_small_base_basecase(out, xs, base)
+        } else {
+            _limbs_from_digits_small_base_divide_and_conquer(out, xs, base, powers, i - 1, scratch)
+        };
+    }
+    let len_hi = xs_len - len_lo;
+    let (xs_lo, xs_hi) = xs.split_at(len_hi);
+    assert!(len_lo >= len_hi);
+    let out_len_hi = if len_hi < SET_STR_DC_THRESHOLD {
+        _limbs_from_digits_small_base_basecase(scratch, xs_lo, base)
+    } else {
+        _limbs_from_digits_small_base_divide_and_conquer(scratch, xs_lo, base, powers, i - 1, out)
+    };
+    let shift = power.shift;
+    let adjusted_power_len = power.power.len() + shift;
+    if out_len_hi == 0 {
+        fail_on_untested_path("_limbs_from_digits_small_base_divide_and_conquer, out_len_hi == 0");
+        // Zero +1 limb here, to avoid reading an allocated but uninitialized limb in
+        // limbs_slice_add_limb_in_place below.
+        slice_set_zero(&mut out[..adjusted_power_len + 1]);
+    } else {
+        let (out_lo, out_hi) = out.split_at_mut(shift);
+        limbs_mul_to_out(out_hi, power.power, &scratch[..out_len_hi]);
+        slice_set_zero(out_lo);
+    }
+    let out_len_lo = if len_lo < SET_STR_DC_THRESHOLD {
+        _limbs_from_digits_small_base_basecase(scratch, xs_hi, base)
+    } else {
+        let (scratch_lo, scratch_hi) = scratch.split_at_mut(adjusted_power_len + 1);
+        _limbs_from_digits_small_base_divide_and_conquer(
+            scratch_lo,
+            xs_hi,
+            base,
+            powers,
+            i - 1,
+            scratch_hi,
+        )
+    };
+    if out_len_lo != 0 {
+        let (out_lo, out_hi) = out.split_at_mut(out_len_lo);
+        if limbs_slice_add_same_length_in_place_left(out_lo, &scratch[..out_len_lo]) {
+            assert!(!limbs_slice_add_limb_in_place(out_hi, 1));
+        }
+    } else {
+        fail_on_untested_path("_limbs_from_digits_small_base_divide_and_conquer, out_len_lo == 0");
+    }
+    let mut n = out_len_hi + adjusted_power_len;
+    if out[n - 1] == 0 {
+        n -= 1;
+    }
+    n
+}
+
+/// This is mpn_dc_set_str_itch from gmp-impl.h, GMP 6.2.1.
+const fn _limbs_from_digits_small_base_divide_and_conquer_scratch_len(xs_len: usize) -> usize {
+    xs_len + (Limb::WIDTH as usize)
+}
+
+// must be greater than get_chars_per_limb(3), which is 40 for 64-bit build
+const SET_STR_PRECOMPUTE_THRESHOLD: usize = 7100;
+
+/// The input digits are in descending order.
+///
+/// This is mpn_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+pub fn _limbs_from_digits_small_base<T: PrimitiveUnsigned>(
+    out: &mut [Limb],
+    xs: &[T],
+    base: u64,
+) -> usize
+where
+    Limb: WrappingFrom<T>,
+{
+    let xs_len = xs.len();
+    if xs_len < SET_STR_PRECOMPUTE_THRESHOLD {
+        _limbs_from_digits_small_base_basecase(out, xs, base)
+    } else {
+        let chars_per_limb = get_chars_per_limb(base);
+        let len = xs_len / chars_per_limb + 1;
+        // Allocate one large block for the powers of big_base.
+        let mut power_table_memory = vec![0; _limbs_digits_power_table_scratch_len(len)];
+        let (power_len, powers) =
+            _limbs_compute_power_table(&mut power_table_memory, len, base, None);
+        let mut scratch =
+            vec![0; _limbs_from_digits_small_base_divide_and_conquer_scratch_len(len)];
+        _limbs_from_digits_small_base_divide_and_conquer(
+            out,
+            xs,
+            base,
+            &powers,
+            power_len,
+            &mut scratch,
+        )
+    }
 }
 
 impl Digits<u8> for Natural {

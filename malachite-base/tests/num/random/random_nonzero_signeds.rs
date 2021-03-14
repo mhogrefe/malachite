@@ -1,4 +1,4 @@
-use malachite_base_test_util::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
     deleted_uniform_primitive_int_assertions, CheckedToF64, MomentStats,
 };

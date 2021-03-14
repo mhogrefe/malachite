@@ -12,7 +12,7 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{exhaustive_signeds, exhaustive_unsigneds};
-use malachite_base::num::floats::{increment_float, PrimitiveFloat};
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
@@ -1110,8 +1110,7 @@ macro_rules! float_gen {
                     return None;
                 }
                 let n_below = on_below.unwrap();
-                let mut f_above = f_below;
-                increment_float(&mut f_above);
+                let f_above = f_below.next_higher();
                 let on_above = Integer::checked_from(f_above);
                 if on_above.is_none() {
                     return None;

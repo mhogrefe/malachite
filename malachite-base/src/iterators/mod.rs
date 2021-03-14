@@ -11,11 +11,11 @@ use num::basic::traits::Zero;
 #[derive(Clone, Debug)]
 pub struct NonzeroValues<I: Iterator>(I)
 where
-    I::Item: Eq + Zero;
+    I::Item: PartialEq<I::Item> + Zero;
 
 impl<I: Iterator> Iterator for NonzeroValues<I>
 where
-    I::Item: Eq + Zero,
+    I::Item: PartialEq<I::Item> + Zero,
 {
     type Item = I::Item;
 
@@ -23,6 +23,21 @@ where
     fn next(&mut self) -> Option<I::Item> {
         loop {
             let x = self.0.next();
+            if x != Some(I::Item::ZERO) {
+                return x;
+            }
+        }
+    }
+}
+
+impl<I: DoubleEndedIterator> DoubleEndedIterator for NonzeroValues<I>
+where
+    I::Item: PartialEq<I::Item> + Zero,
+{
+    #[inline]
+    fn next_back(&mut self) -> Option<I::Item> {
+        loop {
+            let x = self.0.next_back();
             if x != Some(I::Item::ZERO) {
                 return x;
             }
@@ -55,7 +70,7 @@ where
 #[inline]
 pub fn nonzero_values<I: Iterator>(xs: I) -> NonzeroValues<I>
 where
-    I::Item: Eq + Zero,
+    I::Item: PartialEq<I::Item> + Zero,
 {
     NonzeroValues(xs)
 }

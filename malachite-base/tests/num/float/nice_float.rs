@@ -1,11 +1,10 @@
+use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::common::{test_cmp_helper, test_eq_helper};
-use malachite_base_test_util::num::float::nice_float::{FmtRyuString, NiceFloat};
-
-use malachite_base::num::floats::PrimitiveFloat;
 
 #[test]
 pub fn test_to_string() {
-    fn test<T: PrimitiveFloat + FmtRyuString>(x: T, out: &str) {
+    fn test<T: PrimitiveFloat>(x: T, out: &str) {
         assert_eq!(NiceFloat(x).to_string(), out);
     };
     test::<f32>(f32::NAN, "NaN");

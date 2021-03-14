@@ -1,8 +1,5 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod checked_add_mul;
-pub mod checked_square;
-pub mod checked_sub_mul;
 pub mod div_exact;
 pub mod div_mod;
 pub mod div_round;
@@ -79,9 +76,6 @@ pub mod xxx_sub_yyy_is_zzz;
 pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    checked_add_mul::register(registry);
-    checked_square::register(registry);
-    checked_sub_mul::register(registry);
     div_exact::register(registry);
     div_mod::register(registry);
     div_round::register(registry);

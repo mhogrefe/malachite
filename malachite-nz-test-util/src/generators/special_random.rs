@@ -1,3 +1,4 @@
+use malachite_base::num::arithmetic::traits::ArithmeticCheckedShl;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Two;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -16,10 +17,14 @@ use malachite_base::num::random::{
 };
 use malachite_base::options::random::{random_options, RandomOptions};
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::tuples::random::{random_pairs, random_triples, random_triples_from_single};
+use malachite_base::tuples::random::{
+    random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
+};
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{GenConfig, It};
-use malachite_base_test_util::generators::special_random::UnsignedVecTripleLenGenerator;
+use malachite_base_test_util::generators::special_random::{
+    UnsignedVecTripleLenGenerator, UnsignedVecTripleXYYLenGenerator,
+};
 use malachite_nz::integer::random::striped_random_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::fft::*;
@@ -682,5 +687,106 @@ pub fn special_random_unsigned_vec_triple_gen_var_17<T: PrimitiveUnsigned>(
         &_limbs_mul_greater_to_out_fft_input_sizes_threshold,
         15,
         15,
+    )
+}
+
+fn special_random_mul_same_length_helper<T: PrimitiveUnsigned, F: Fn(usize, usize) -> bool>(
+    config: &GenConfig,
+    valid: &'static F,
+    min_x: u64,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(UnsignedVecTripleXYYLenGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_unsigneds::<u64>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(move |(o, x)| {
+            let x = x.checked_add(min_x)?;
+            let ux = usize::exact_from(x);
+            if valid(ux, ux) {
+                let o = x.arithmetic_checked_shl(1u64)?.checked_add(o)?;
+                Some((o, x))
+            } else {
+                None
+            }
+        }),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_18<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    special_random_mul_same_length_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+        5,
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_19<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    special_random_mul_same_length_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+        42,
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_20<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    special_random_mul_same_length_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+        86,
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_21<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    special_random_mul_same_length_helper(
+        config,
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len, ys_len)
+        },
+        86,
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_22<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    special_random_mul_helper(
+        config,
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len, ys_len)
+        },
+        11,
+        8,
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    special_random_mul_helper(
+        config,
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len, ys_len)
+        },
+        5,
+        3,
     )
 }

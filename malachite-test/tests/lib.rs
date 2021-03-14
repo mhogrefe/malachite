@@ -15,8 +15,6 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod checked_add_mul;
-            pub mod checked_sub_mul;
             pub mod div_exact;
             pub mod div_mod;
             pub mod div_round;
@@ -279,14 +277,5 @@ pub mod natural {
         pub mod to_bits;
         pub mod trailing_zeros;
         pub mod xor;
-    }
-
-    pub mod random {
-        pub mod random_natural_below;
-        pub mod random_natural_up_to_bits;
-        pub mod random_natural_with_bits;
-        pub mod special_random_natural_below;
-        pub mod special_random_natural_up_to_bits;
-        pub mod special_random_natural_with_bits;
     }
 }

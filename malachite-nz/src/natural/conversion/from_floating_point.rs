@@ -3,10 +3,9 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
-use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
-
 use natural::Natural;
 
 macro_rules! float_impls {
@@ -67,7 +66,7 @@ macro_rules! float_impls {
                 } else if value == 0.0 {
                     Natural::ZERO
                 } else {
-                    let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
+                    let (mut mantissa, exponent) = value.raw_mantissa_and_exponent();
                     let value_negative = value < 0.0;
                     mantissa.set_bit($f::MANTISSA_WIDTH);
                     let n = Natural::from(mantissa).shl_round(
@@ -136,7 +135,7 @@ macro_rules! float_impls {
             /// extern crate malachite_nz;
             ///
             /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_base::num::floats::PrimitiveFloat;
+            /// use malachite_base::num::float::PrimitiveFloat;
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(format!("{:?}", Natural::checked_from(f64::NAN)), "None");
@@ -169,7 +168,7 @@ macro_rules! float_impls {
                 } else if value == 0.0 {
                     Some(Natural::ZERO)
                 } else {
-                    let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
+                    let (mut mantissa, exponent) = value.raw_mantissa_and_exponent();
                     mantissa.set_bit($f::MANTISSA_WIDTH);
                     let exponent = i64::exact_from(exponent) + $f::MIN_EXPONENT - 1;
                     if exponent >= 0
@@ -196,7 +195,7 @@ macro_rules! float_impls {
             /// extern crate malachite_nz;
             ///
             /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_base::num::floats::PrimitiveFloat;
+            /// use malachite_base::num::float::PrimitiveFloat;
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(Natural::convertible_from(f64::NAN), false);
@@ -223,7 +222,7 @@ macro_rules! float_impls {
                 } else if value == 0.0 {
                     true
                 } else {
-                    let (mut mantissa, exponent) = value.to_adjusted_mantissa_and_exponent();
+                    let (mut mantissa, exponent) = value.raw_mantissa_and_exponent();
                     mantissa.set_bit($f::MANTISSA_WIDTH);
                     let exponent = i64::exact_from(exponent) + $f::MIN_EXPONENT - 1;
                     exponent >= 0

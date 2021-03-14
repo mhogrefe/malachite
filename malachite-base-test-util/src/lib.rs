@@ -39,7 +39,6 @@ extern crate gnuplot;
 extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
-extern crate ryu;
 extern crate time;
 
 pub mod bench;
@@ -55,9 +54,6 @@ pub mod num {
         pub mod string {
             pub mod to_string;
         }
-    }
-    pub mod float {
-        pub mod nice_float;
     }
     pub mod logic {
         pub mod bit_block_access;

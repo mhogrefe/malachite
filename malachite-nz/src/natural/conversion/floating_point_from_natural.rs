@@ -7,10 +7,9 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
 };
-use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
-
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
@@ -104,7 +103,7 @@ macro_rules! float_impls {
                 }
                 mantissa.clear_bit($f::MANTISSA_WIDTH);
                 let exponent = exponent + $f::MAX_EXPONENT;
-                $f::from_adjusted_mantissa_and_exponent(mantissa, exponent)
+                $f::from_raw_mantissa_and_exponent(mantissa, exponent)
             }
         }
 
@@ -169,7 +168,7 @@ macro_rules! float_impls {
                 }
                 mantissa.clear_bit($f::MANTISSA_WIDTH);
                 let exponent = exponent + $f::MAX_EXPONENT;
-                $f::from_adjusted_mantissa_and_exponent(mantissa, exponent)
+                $f::from_raw_mantissa_and_exponent(mantissa, exponent)
             }
         }
 
@@ -272,7 +271,7 @@ macro_rules! float_impls {
                 let mut mantissa =
                     <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(value);
                 mantissa.clear_bit($f::MANTISSA_WIDTH);
-                Some($f::from_adjusted_mantissa_and_exponent(
+                Some($f::from_raw_mantissa_and_exponent(
                     mantissa,
                     exponent + $f::MAX_EXPONENT,
                 ))
@@ -320,7 +319,7 @@ macro_rules! float_impls {
                     <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(value >> shift);
                 mantissa.clear_bit($f::MANTISSA_WIDTH);
                 let exponent = exponent + $f::MAX_EXPONENT;
-                Some($f::from_adjusted_mantissa_and_exponent(mantissa, exponent))
+                Some($f::from_raw_mantissa_and_exponent(mantissa, exponent))
             }
         }
 
@@ -389,6 +388,5 @@ macro_rules! float_impls {
         }
     };
 }
-
 float_impls!(f32, gt_max_finite_f32);
 float_impls!(f64, gt_max_finite_f64);

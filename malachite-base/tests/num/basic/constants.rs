@@ -83,6 +83,4 @@ pub fn test_named() {
     test::<i64>("i64");
     test::<i128>("i128");
     test::<isize>("isize");
-    test::<f32>("f32");
-    test::<f64>("f64");
 }

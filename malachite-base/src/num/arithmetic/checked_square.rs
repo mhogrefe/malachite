@@ -7,18 +7,19 @@ macro_rules! impl_checked_square {
 
             /// Squares `self`, returning `None` if there is no valid result.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x) = \\begin{cases}
+            ///     \operatorname{Some}(x^2) & x^2 < 2^W \\\\
+            ///     \operatorname{None} & x^2 \geq 2^W,
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CheckedSquare;
-            ///
-            /// assert_eq!(3u8.checked_square(), Some(9));
-            /// assert_eq!((-1000i32).checked_square(), Some(1000000));
-            /// assert_eq!((1000u16).checked_square(), None);
-            /// ```
+            /// See the documentation of the `num::arithmetic::checked_square` module.
             #[inline]
             fn checked_square(self) -> Option<$t> {
                 self.checked_mul(self)

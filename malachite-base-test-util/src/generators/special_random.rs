@@ -1705,10 +1705,10 @@ pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: Pri
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
-struct UnsignedVecTripleXYYLenGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> {
-    phantom: PhantomData<*const T>,
-    lengths: I,
-    striped_bit_source: StripedBitSource,
+pub struct UnsignedVecTripleXYYLenGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> {
+    pub phantom: PhantomData<*const T>,
+    pub lengths: I,
+    pub striped_bit_source: StripedBitSource,
 }
 
 impl<T: PrimitiveUnsigned, I: Iterator<Item = (u64, u64)>> Iterator

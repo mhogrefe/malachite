@@ -2,10 +2,9 @@ use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
-use malachite_base::num::floats::increment_float;
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
-
 use malachite_test::common::test_properties;
 use malachite_test::inputs::integer::{
     integers, integers_exactly_equal_to_f32, integers_exactly_equal_to_f64,
@@ -53,8 +52,7 @@ macro_rules! float_properties {
             test_properties($integers_not_exactly_equal_to_float, |n| {
                 let f_below = $f::rounding_from(n, RoundingMode::Floor);
                 assert_eq!($f::rounding_from(n.clone(), RoundingMode::Floor), f_below);
-                let mut f_above = f_below;
-                increment_float(&mut f_above);
+                let f_above = f_below.next_higher();
                 assert_eq!(f_above, $f::rounding_from(n, RoundingMode::Ceiling));
                 assert_eq!(f_above, $f::rounding_from(n.clone(), RoundingMode::Ceiling));
                 if *n >= 0 {
@@ -78,8 +76,7 @@ macro_rules! float_properties {
             });
             test_properties($integers_var_1, |n| {
                 let floor = $f::rounding_from(n, RoundingMode::Floor);
-                let mut ceiling = floor;
-                increment_float(&mut ceiling);
+                let ceiling = floor.next_higher();
                 let nearest = $f::rounding_from(n, RoundingMode::Nearest);
                 assert_eq!(
                     nearest,
@@ -110,8 +107,7 @@ macro_rules! float_properties {
             test_properties($integers_not_exactly_equal_to_float, |n| {
                 let f_below = $f::rounding_from(n, RoundingMode::Floor);
                 assert_eq!($f::rounding_from(n.clone(), RoundingMode::Floor), f_below);
-                let mut f_above = f_below;
-                increment_float(&mut f_above);
+                let f_above = f_below.next_higher();
                 let f_nearest = $f::from(n);
                 assert_eq!($f::from(n.clone()), f_nearest);
                 assert!(f_nearest == f_below || f_nearest == f_above);
@@ -120,8 +116,7 @@ macro_rules! float_properties {
 
             test_properties($integers_var_1, |n| {
                 let floor = $f::rounding_from(n, RoundingMode::Floor);
-                let mut ceiling = floor;
-                increment_float(&mut ceiling);
+                let ceiling = floor.next_higher();
                 let nearest = $f::from(n);
                 assert_eq!(
                     nearest,

@@ -17,17 +17,19 @@ macro_rules! impl_checked_add_mul_unsigned {
 
             /// Computes `self + y * z`, returning `None` if there is no valid result.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x, y, z) = \\begin{cases}
+            ///     \operatorname{Some}(xy + z) & xy + z < 2^W \\\\
+            ///     \operatorname{None} & xy + z \geq 2^W,
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CheckedAddMul;
-            ///
-            /// assert_eq!(2u8.checked_add_mul(3, 7), Some(23));
-            /// assert_eq!(2u8.checked_add_mul(20, 20), None);
-            /// ```
+            /// See the documentation of the `num::arithmetic::checked_add_mul` module.
             #[inline]
             fn checked_add_mul(self, y: $t, z: $t) -> Option<$t> {
                 _checked_add_mul_unsigned(self, y, z)
@@ -80,17 +82,20 @@ macro_rules! impl_checked_add_mul_signed {
 
             /// Computes `self + y * z`, returning `None` if there is no valid result.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x, y, z) = \\begin{cases}
+            ///     \operatorname{Some}(xy + z) & -2^{W-1} \leq xy + z < 2^{W-1} \\\\
+            ///     \operatorname{None} &
+            ///         xy + z < -2^{W-1} \\ \mathrm{or} \\ xy + z \geq 2^{W-1}, \\\\
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CheckedAddMul;
-            ///
-            /// assert_eq!(127i8.checked_add_mul(-2, 100), Some(-73));
-            /// assert_eq!((-127i8).checked_add_mul(-2, 100), None);
-            /// ```
+            /// See the documentation of the `num::arithmetic::checked_add_mul` module.
             #[inline]
             fn checked_add_mul(self, y: $t, z: $t) -> Option<$t> {
                 _checked_add_mul_signed(self, y, z)

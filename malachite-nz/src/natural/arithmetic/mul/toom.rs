@@ -768,11 +768,11 @@ pub fn _limbs_mul_greater_to_out_toom_33(
         as2_init[s..].copy_from_slice(&as1_init[s..]);
         false
     };
-    let mut carry: Limb = Limb::iverson(carry)
+    let mut carry = Limb::iverson(carry)
         .wrapping_add(*as1_last)
-        .arithmetic_checked_shl(1)
-        .unwrap();
-    carry = carry.wrapping_add(limbs_slice_shl_in_place(as2_init, 1));
+        .arithmetic_checked_shl(1u64)
+        .unwrap()
+        .wrapping_add(limbs_slice_shl_in_place(as2_init, 1));
     if limbs_sub_same_length_in_place_left(as2_init, xs_0) {
         carry.wrapping_sub_assign(1);
     }
@@ -805,11 +805,11 @@ pub fn _limbs_mul_greater_to_out_toom_33(
         bs2_init[t..].copy_from_slice(&bs1_init[t..]);
         false
     };
-    let mut carry: Limb = Limb::iverson(carry)
+    let mut carry = Limb::iverson(carry)
         .wrapping_add(*bs1_last)
-        .arithmetic_checked_shl(1)
-        .unwrap();
-    carry.wrapping_add_assign(limbs_slice_shl_in_place(bs2_init, 1));
+        .arithmetic_checked_shl(1u64)
+        .unwrap()
+        .wrapping_add(limbs_slice_shl_in_place(bs2_init, 1));
     if limbs_sub_same_length_in_place_left(bs2_init, ys_0) {
         carry.wrapping_sub_assign(1);
     }
@@ -2380,13 +2380,9 @@ pub fn _limbs_mul_greater_to_out_toom_62(
             }
             carry
         }
-        2 => {
-            let mut carry: Limb = bs1_last.arithmetic_checked_shl(1).unwrap();
-            carry.wrapping_add_assign(limbs_slice_add_mul_limb_same_length_in_place_left(
-                v_1_hi, bs1_init, 2,
-            ));
-            carry
-        }
+        2 => bs1_last.arithmetic_checked_shl(1u64).unwrap().wrapping_add(
+            limbs_slice_add_mul_limb_same_length_in_place_left(v_1_hi, bs1_init, 2),
+        ),
         0 => 0,
         _ => as1_last.wrapping_mul(*bs1_last).wrapping_add(
             limbs_slice_add_mul_limb_same_length_in_place_left(v_1_hi, bs1_init, *as1_last),

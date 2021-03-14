@@ -1,7 +1,7 @@
 use std::panic::catch_unwind;
 
 use itertools::{assert_equal, repeat_n, Itertools};
-use malachite_base_test_util::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
     uniform_primitive_int_assertions, CheckedToF64, MomentStats,
 };

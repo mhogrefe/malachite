@@ -16,7 +16,6 @@ clap = "2.33.1"
 gnuplot = "0.0.26"
 itertools = "0.9.0"
 malachite-base = { path = "../malachite-base" }
-ryu = "1.0"
 time = "0.1.40"
 
 [profile.release]

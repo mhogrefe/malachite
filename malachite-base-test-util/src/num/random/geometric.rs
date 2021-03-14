@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::floats::PrimitiveFloat;
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
 
 pub fn unadjusted_mean_to_adjusted_mean(unadjusted_mean: f64, limit: f64) -> f64 {

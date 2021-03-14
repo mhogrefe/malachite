@@ -13,7 +13,8 @@ pub mod comparison;
 pub mod conversion;
 /// This module contains iterators that generate primitive integers without repetition.
 pub mod exhaustive;
-pub mod floats;
+/// Thus module contains functions specific to primitive floating-point numbers.
+pub mod float;
 /// This module contains iterators related to numbers.
 pub mod iterators;
 /// This module contains functions related to logic and bit manipulation.

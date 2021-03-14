@@ -125,16 +125,68 @@ pub mod arithmetic_checked_shl;
 /// assert_eq!(0i8.arithmetic_checked_shr(-100), Some(0i8));
 /// ```
 pub mod arithmetic_checked_shr;
+/// This module wraps the `checked_abs` function into an implementation of `CheckedAbs`.
 pub mod checked_abs;
+/// This module wraps the `checked_add` function into an implementation of `CheckedAdd`.
 pub mod checked_add;
+/// This module contains functions for adding a number and the product of two other numbers, and
+/// checking whether the result is representable.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # checked_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedAddMul;
+///
+/// assert_eq!(2u8.checked_add_mul(3, 7), Some(23));
+/// assert_eq!(2u8.checked_add_mul(20, 20), None);
+///
+/// assert_eq!(127i8.checked_add_mul(-2, 100), Some(-73));
+/// assert_eq!((-127i8).checked_add_mul(-2, 100), None);
+/// ```
 pub mod checked_add_mul;
+/// This module wraps the `checked_div` function into an implementation of `CheckedDiv`.
 pub mod checked_div;
+/// This module wraps the `checked_mul` function into an implementation of `CheckedMul`.
 pub mod checked_mul;
+/// This module wraps the `checked_neg` function into an implementation of `CheckedNeg`.
 pub mod checked_neg;
+/// This module wraps the `checked_next_power_of_two` function into an implementation of
+/// `CheckedNextPowerOfTwo`.
 pub mod checked_next_power_of_two;
+/// This module wraps the `checked_pow` function into an implementation of `CheckedPow`.
 pub mod checked_pow;
+/// This module contains functions for squaring a number and checking whether the result is
+/// representable.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # checked_square
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedSquare;
+///
+/// assert_eq!(3u8.checked_square(), Some(9));
+/// assert_eq!((-1000i32).checked_square(), Some(1000000));
+/// assert_eq!((1000u16).checked_square(), None);
+/// ```
 pub mod checked_square;
+/// This module wraps the `checked_sub` function into an implementation of `CheckedSub`.
 pub mod checked_sub;
+/// This module contains functions for subtracting the product of two numbers from another number,
+/// and checking whether the result is representable.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # checked_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedSubMul;
+///
+/// assert_eq!(60u8.checked_sub_mul(5, 10), Some(10));
+/// assert_eq!(2u8.checked_sub_mul(10, 5), None);
+///
+/// assert_eq!(127i8.checked_sub_mul(2, 100), Some(-73));
+/// assert_eq!((-127i8).checked_sub_mul(2, 100), None);
+/// ```
 pub mod checked_sub_mul;
 pub mod div_exact;
 pub mod div_mod;

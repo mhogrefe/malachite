@@ -1,5 +1,5 @@
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Two;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -10,8 +10,8 @@ use malachite_base::num::exhaustive::{
 };
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::tuples::exhaustive::{
-    exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_triples_from_single, lex_pairs,
-    ExhaustiveDependentPairsYsGenerator,
+    exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
+    exhaustive_triples_from_single, lex_pairs, ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, exhaustive_vecs_length_range,
@@ -20,7 +20,9 @@ use malachite_base::vecs::exhaustive::{
 use malachite_base_test_util::generators::common::{
     permute_1_3_2, permute_2_1, reshape_2_1_to_3, It,
 };
-use malachite_base_test_util::generators::exhaustive::UnsignedVecTripleLenGenerator;
+use malachite_base_test_util::generators::exhaustive::{
+    UnsignedVecTripleLenGenerator, UnsignedVecTripleXYYLenGenerator,
+};
 use malachite_base_test_util::generators::exhaustive_pairs_big_tiny;
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 use malachite_nz::integer::Integer;
@@ -416,4 +418,80 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_16<T: PrimitiveUnsigned>(
 pub fn exhaustive_unsigned_vec_triple_gen_var_17<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     exhaustive_mul_helper(&_limbs_mul_greater_to_out_fft_input_sizes_threshold, 15, 15)
+}
+
+fn exhaustive_mul_same_length_helper<T: PrimitiveUnsigned, F: Fn(usize, usize) -> bool>(
+    valid: &'static F,
+    min_x: u64,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(move |(o, x)| {
+                let x = x.checked_add(min_x)?;
+                let ux = usize::exact_from(x);
+                if valid(ux, ux) {
+                    let o = x.arithmetic_checked_shl(1u64)?.checked_add(o)?;
+                    Some((o, x))
+                } else {
+                    None
+                }
+            }),
+            UnsignedVecTripleXYYLenGenerator,
+        )
+        .map(|p| p.1),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_18<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    exhaustive_mul_same_length_helper(&_limbs_mul_greater_to_out_toom_33_input_sizes_valid, 5)
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_19<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    exhaustive_mul_same_length_helper(&_limbs_mul_greater_to_out_toom_6h_input_sizes_valid, 42)
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_20<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    exhaustive_mul_same_length_helper(&_limbs_mul_greater_to_out_toom_8h_input_sizes_valid, 86)
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_21<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    exhaustive_mul_same_length_helper(
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len, ys_len)
+        },
+        86,
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_22<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    exhaustive_mul_helper(
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len, ys_len)
+        },
+        11,
+        8,
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    exhaustive_mul_helper(
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len, ys_len)
+        },
+        5,
+        3,
+    )
 }

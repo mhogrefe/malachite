@@ -1368,10 +1368,11 @@ pub fn random_primitive_int_vec_primitive_int_vec_primitive_int_triple_gen_var_1
 
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveInt>, Vec<PrimitiveInt>) --
 
-struct PrimitiveIntVecTripleXYYLenGenerator<T: PrimitiveInt, I: Iterator<Item = (usize, usize)>> {
-    phantom: PhantomData<*const T>,
-    lengths: I,
-    xs: RandomPrimitiveInts<T>,
+pub struct PrimitiveIntVecTripleXYYLenGenerator<T: PrimitiveInt, I: Iterator<Item = (usize, usize)>>
+{
+    pub phantom: PhantomData<*const T>,
+    pub lengths: I,
+    pub xs: RandomPrimitiveInts<T>,
 }
 
 impl<T: PrimitiveInt, I: Iterator<Item = (usize, usize)>> Iterator

@@ -1,6 +1,6 @@
 use std::panic::catch_unwind;
 
-use malachite_base_test_util::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base_test_util::stats::moments::{
     double_truncated_geometric_dist_assertions, negative_truncated_geometric_dist_assertions,
     truncated_geometric_dist_assertions, CheckedToF64, MomentStats,

@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Two;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -12,13 +12,17 @@ use malachite_base::num::random::{
 };
 use malachite_base::options::random::{random_options, RandomOptions};
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base::tuples::random::{random_pairs, random_triples, random_triples_from_single};
+use malachite_base::tuples::random::{
+    random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
+};
 use malachite_base::vecs::random::{
     random_vecs, random_vecs_length_range, random_vecs_min_length, RandomVecs,
 };
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{GenConfig, It};
-use malachite_base_test_util::generators::random::PrimitiveIntVecTripleLenGenerator;
+use malachite_base_test_util::generators::random::{
+    PrimitiveIntVecTripleLenGenerator, PrimitiveIntVecTripleXYYLenGenerator,
+};
 use malachite_nz::integer::random::random_integers;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::fft::*;
@@ -653,5 +657,102 @@ pub fn random_primitive_int_vec_triple_gen_var_17<T: PrimitiveInt>(
         &_limbs_mul_greater_to_out_fft_input_sizes_threshold,
         15,
         15,
+    )
+}
+
+fn random_mul_same_length_helper<T: PrimitiveInt, F: Fn(usize, usize) -> bool>(
+    config: &GenConfig,
+    valid: &'static F,
+    min_x: usize,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(PrimitiveIntVecTripleXYYLenGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(move |(o, x)| {
+            let x = x.checked_add(min_x)?;
+            let ux = usize::exact_from(x);
+            if valid(ux, ux) {
+                let o = x.arithmetic_checked_shl(1u64)?.checked_add(o)?;
+                Some((o, x))
+            } else {
+                None
+            }
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_18<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_same_length_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+        5,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_19<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_same_length_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+        42,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_20<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_same_length_helper(
+        config,
+        &_limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+        86,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_21<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_same_length_helper(
+        config,
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len, ys_len)
+        },
+        86,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_22<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len, ys_len)
+        },
+        11,
+        8,
+    )
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_23<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &|xs_len, ys_len| {
+            _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len, ys_len)
+                && _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len, ys_len)
+        },
+        5,
+        3,
     )
 }
