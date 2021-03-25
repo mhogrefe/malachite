@@ -1,6 +1,5 @@
-use rand_chacha::rand_core::RngCore;
-
 use malachite_base::random::EXAMPLE_SEED;
+use rand_chacha::rand_core::RngCore;
 
 #[test]
 fn test_get_rng() {

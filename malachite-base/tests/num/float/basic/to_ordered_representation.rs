@@ -6,8 +6,7 @@ use std::panic::catch_unwind;
 pub fn test_to_ordered_representation() {
     fn test<T: PrimitiveFloat>(x: T, out: T::UnsignedOfEqualWidth) {
         assert_eq!(x.to_ordered_representation(), out);
-    };
-
+    }
     test::<f32>(f32::NEGATIVE_INFINITY, 0);
     test::<f32>(-f32::MAX_FINITE, 1);
     test::<f32>(-458.42188, 1000000000);

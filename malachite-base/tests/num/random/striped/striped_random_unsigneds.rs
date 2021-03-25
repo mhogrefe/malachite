@@ -1,15 +1,13 @@
-use std::panic::catch_unwind;
-
-use malachite_base::num::float::nice_float::NiceFloat;
-use malachite_base_test_util::stats::common_values_map::common_values_map;
-use malachite_base_test_util::stats::median;
-use malachite_base_test_util::stats::moments::{moment_stats, CheckedToF64, MomentStats};
-
 use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::random::striped::striped_random_unsigneds;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToBinaryString;
+use malachite_base_test_util::stats::common_values_map::common_values_map;
+use malachite_base_test_util::stats::median;
+use malachite_base_test_util::stats::moments::{moment_stats, CheckedToF64, MomentStats};
+use std::panic::catch_unwind;
 
 fn striped_random_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     m_numerator: u64,

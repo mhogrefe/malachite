@@ -8,8 +8,7 @@ pub fn test_raw_mantissa_and_exponent() {
         let (actual_mantissa, actual_exponent) = x.raw_mantissa_and_exponent();
         assert_eq!(actual_mantissa, mantissa);
         assert_eq!(actual_exponent, exponent);
-    };
-
+    }
     test::<f32>(0.0, 0, 0);
     test::<f32>(-0.0, 0, 0);
     test::<f32>(f32::NAN, 0x400000, 255);
@@ -40,13 +39,12 @@ pub fn test_raw_mantissa_and_exponent() {
 }
 
 #[test]
-pub fn test_mantissa_and_exponent() {
+pub fn test_adjusted_mantissa_and_exponent() {
     fn test<T: PrimitiveFloat>(x: T, mantissa: T::UnsignedOfEqualWidth, exponent: i64) {
-        let (actual_mantissa, actual_exponent) = x.mantissa_and_exponent();
+        let (actual_mantissa, actual_exponent) = x.adjusted_mantissa_and_exponent();
         assert_eq!(actual_mantissa, mantissa);
         assert_eq!(actual_exponent, exponent);
-    };
-
+    }
     test::<f32>(1.0, 1, 0);
     test::<f32>(core::f32::consts::PI, 13176795, -22);
     test::<f32>(0.1, 13421773, -27);
@@ -66,15 +64,15 @@ pub fn test_mantissa_and_exponent() {
     test::<f64>(f64::MAX_FINITE, 0x1fffffffffffff, 971);
 }
 
-fn mantissa_and_exponent_fail_helper<T: PrimitiveFloat>() {
-    assert_panic!(T::NAN.mantissa_and_exponent());
-    assert_panic!(T::POSITIVE_INFINITY.mantissa_and_exponent());
-    assert_panic!(T::NEGATIVE_INFINITY.mantissa_and_exponent());
-    assert_panic!(T::ZERO.mantissa_and_exponent());
-    assert_panic!(T::NEGATIVE_ZERO.mantissa_and_exponent());
+fn adjusted_mantissa_and_exponent_fail_helper<T: PrimitiveFloat>() {
+    assert_panic!(T::NAN.adjusted_mantissa_and_exponent());
+    assert_panic!(T::POSITIVE_INFINITY.adjusted_mantissa_and_exponent());
+    assert_panic!(T::NEGATIVE_INFINITY.adjusted_mantissa_and_exponent());
+    assert_panic!(T::ZERO.adjusted_mantissa_and_exponent());
+    assert_panic!(T::NEGATIVE_ZERO.adjusted_mantissa_and_exponent());
 }
 
 #[test]
-pub fn mantissa_and_exponent_fail() {
-    apply_fn_to_primitive_floats!(mantissa_and_exponent_fail_helper);
+pub fn adjusted_mantissa_and_exponent_fail() {
+    apply_fn_to_primitive_floats!(adjusted_mantissa_and_exponent_fail_helper);
 }

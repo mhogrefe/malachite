@@ -1,5 +1,4 @@
-use std::cmp::{max, Ordering};
-
+use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, EqModPowerOfTwo, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
@@ -9,8 +8,6 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
-
-use fail_on_untested_path;
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left, _limbs_add_to_out_aliased,
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
@@ -50,6 +47,7 @@ use platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
     MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
+use std::cmp::{max, Ordering};
 
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 

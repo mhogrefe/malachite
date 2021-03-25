@@ -1,6 +1,5 @@
-use std::cmp::Ordering;
-
 use malachite_base::orderings::ordering_from_str;
+use std::cmp::Ordering;
 
 #[test]
 fn test_from_str() {

@@ -1,7 +1,6 @@
+use malachite_nz::integer::Integer;
 use num::BigInt;
 use rug;
-
-use malachite_nz::integer::Integer;
 
 #[test]
 fn test_from_u32() {

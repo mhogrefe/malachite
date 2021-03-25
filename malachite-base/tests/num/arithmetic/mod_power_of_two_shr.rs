@@ -18,7 +18,7 @@ fn test_mod_power_of_two_shr() {
         let mut t = t;
         t.mod_power_of_two_shr_assign(u, pow);
         assert_eq!(t, out);
-    };
+    }
     test::<u64, i8>(0, 0, 0, 0);
     test::<u64, i8>(0, 0, 5, 0);
     test::<u32, i16>(12, -2, 5, 16);

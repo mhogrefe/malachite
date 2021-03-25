@@ -1,7 +1,6 @@
-use std::cmp::Ordering;
-
 use num::arithmetic::traits::UnsignedAbs;
 use num::comparison::traits::{OrdAbs, PartialOrdAbs};
+use std::cmp::Ordering;
 
 /// This macro defines trait implementations that are the same for unsigned and signed types.
 macro_rules! impl_partial_ord_abs {

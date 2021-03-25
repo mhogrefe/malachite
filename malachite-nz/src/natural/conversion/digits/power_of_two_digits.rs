@@ -1,5 +1,3 @@
-use std::cmp::{min, Ordering};
-
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{CheckedLogTwo, DivRound, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -12,10 +10,10 @@ use malachite_base::num::iterators::iterator_to_bit_chunks;
 use malachite_base::num::logic::traits::{BitBlockAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::{min, Ordering};
 
 macro_rules! check_digits_size {
     ($ds: expr, $log_base: expr) => {

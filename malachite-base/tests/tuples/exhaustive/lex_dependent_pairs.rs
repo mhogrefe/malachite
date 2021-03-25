@@ -1,15 +1,13 @@
 use core::hash::Hash;
-use std::collections::HashMap;
-use std::fmt::Debug;
-use std::iter::{once, repeat, Cloned};
-use std::slice::Iter;
-
 use itertools::{chain, Itertools};
-
 use malachite_base::tuples::exhaustive::{
     lex_dependent_pairs, lex_dependent_pairs_stop_after_empty_ys,
     ExhaustiveDependentPairsYsGenerator,
 };
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::iter::{once, repeat, Cloned};
+use std::slice::Iter;
 
 #[derive(Clone, Debug)]
 struct DPGeneratorFromMap<X: Clone + Eq + Hash, Y: 'static + Clone> {

@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
-use rug;
-
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_integer_partial_eq_natural() {

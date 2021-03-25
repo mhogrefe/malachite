@@ -1,8 +1,7 @@
+use itertools::Itertools;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
-
-use itertools::Itertools;
 use malachite_nz::integer::exhaustive::exhaustive_integer_inclusive_range;
 use malachite_nz::integer::Integer;
 

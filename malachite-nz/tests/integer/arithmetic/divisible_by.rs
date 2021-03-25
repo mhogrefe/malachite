@@ -1,10 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_nz::integer::Integer;
 use malachite_nz_test_util::integer::arithmetic::divisible_by::num_divisible_by;
 use num::BigInt;
-
-use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_divisible_by() {

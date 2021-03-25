@@ -1,11 +1,6 @@
-use std::cmp::max;
-use std::iter::{once, Once};
-use std::marker::PhantomData;
-
-use itertools::{repeat_n, Itertools};
-
 use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use iterators::iterator_cache::IteratorCache;
+use itertools::{repeat_n, Itertools};
 use num::arithmetic::traits::CheckedPow;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::exhaustive::{
@@ -14,6 +9,9 @@ use num::exhaustive::{
 };
 use num::iterators::{ruler_sequence, RulerSequence};
 use num::logic::traits::SignificantBits;
+use std::cmp::max;
+use std::iter::{once, Once};
+use std::marker::PhantomData;
 use tuples::exhaustive::{
     exhaustive_dependent_pairs_stop_after_empty_ys, lex_dependent_pairs_stop_after_empty_ys,
     ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,

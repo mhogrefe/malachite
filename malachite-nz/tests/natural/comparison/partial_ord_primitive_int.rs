@@ -1,11 +1,9 @@
-use std::cmp::Ordering;
-use std::str::FromStr;
-
+use malachite_nz::natural::Natural;
 use malachite_nz_test_util::natural::comparison::partial_ord_primitive_int::*;
 use num::BigUint;
 use rug;
-
-use malachite_nz::natural::Natural;
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[test]
 fn test_partial_cmp_u32() {

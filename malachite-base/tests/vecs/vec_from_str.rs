@@ -1,11 +1,10 @@
-use std::cmp::Ordering;
-use std::fmt::Debug;
-use std::str::FromStr;
-
 use malachite_base::nevers::Never;
 use malachite_base::options::option_from_str;
 use malachite_base::orderings::ordering_from_str;
 use malachite_base::vecs::{vec_from_str, vec_from_str_custom};
+use std::cmp::Ordering;
+use std::fmt::Debug;
+use std::str::FromStr;
 
 #[allow(clippy::needless_pass_by_value)]
 fn vec_from_str_helper<T: Debug + Eq + FromStr>(s: &str, out: Option<Vec<T>>) {

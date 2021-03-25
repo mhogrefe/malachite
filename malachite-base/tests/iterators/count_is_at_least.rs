@@ -1,6 +1,5 @@
-use std::iter::repeat;
-
 use malachite_base::iterators::count_is_at_least;
+use std::iter::repeat;
 
 fn count_is_at_least_helper(xs: &[u8], n: usize, result: bool) {
     assert_eq!(count_is_at_least(xs.iter(), n), result);

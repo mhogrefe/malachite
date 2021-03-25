@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::arithmetic::traits::{PowerOfTwo, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;

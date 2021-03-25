@@ -1,11 +1,9 @@
-use std::ops::{Shr, ShrAssign};
-
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
-
 use natural::Natural;
+use std::ops::{Shr, ShrAssign};
 
 fn _mod_power_of_two_shr_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,

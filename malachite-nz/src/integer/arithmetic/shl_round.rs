@@ -1,12 +1,10 @@
-use std::ops::{Shl, ShlAssign};
-
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::{
     ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-
-use integer::Integer;
+use std::ops::{Shl, ShlAssign};
 
 fn _shl_round_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Integer,

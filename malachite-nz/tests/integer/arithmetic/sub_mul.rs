@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::integer::arithmetic::sub_mul::{

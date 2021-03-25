@@ -1,8 +1,7 @@
 use malachite_base_test_util::common::test_eq_helper;
+use malachite_nz::natural::Natural;
 use num::BigUint;
 use rug;
-
-use malachite_nz::natural::Natural;
 
 #[test]
 fn test_eq() {

@@ -1,6 +1,5 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use std::panic::catch_unwind;
 
 fn mod_is_reduced_helper<T: PrimitiveUnsigned>() {
     let test = |n: T, m, out| {

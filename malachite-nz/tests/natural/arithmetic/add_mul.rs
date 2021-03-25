@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::add_mul::{

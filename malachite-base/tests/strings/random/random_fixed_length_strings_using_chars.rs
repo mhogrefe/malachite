@@ -1,12 +1,10 @@
-use std::iter::repeat;
-
 use itertools::Itertools;
-use malachite_base_test_util::stats::common_values_map::common_values_map;
-use malachite_base_test_util::stats::median;
-
 use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::random::random_fixed_length_strings_using_chars;
+use malachite_base_test_util::stats::common_values_map::common_values_map;
+use malachite_base_test_util::stats::median;
+use std::iter::repeat;
 
 fn random_fixed_length_strings_using_chars_helper<I: Clone + Iterator<Item = char>>(
     len: u64,

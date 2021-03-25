@@ -1,7 +1,6 @@
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_pair_gen};
-
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
+use malachite_base_test_util::generators::{unsigned_gen, unsigned_pair_gen};
 
 fn join_halves_helper<T: JoinHalves + PrimitiveUnsigned>(upper: T::Half, lower: T::Half, out: T) {
     assert_eq!(T::join_halves(upper, lower), out);

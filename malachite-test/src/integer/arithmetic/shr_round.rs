@@ -1,5 +1,5 @@
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 

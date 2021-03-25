@@ -1,9 +1,8 @@
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::common::test_eq_helper;
 use malachite_base_test_util::generators::{
     rounding_mode_gen, rounding_mode_pair_gen, rounding_mode_triple_gen,
 };
-
-use malachite_base::rounding_modes::RoundingMode;
 
 #[test]
 fn test_eq() {

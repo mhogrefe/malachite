@@ -1,9 +1,8 @@
-use std::mem::swap;
-use std::ops::{Add, AddAssign};
-
 use integer::Integer;
 use natural::InnerNatural::Small;
 use natural::Natural;
+use std::mem::swap;
+use std::ops::{Add, AddAssign};
 
 impl Add<Integer> for Integer {
     type Output = Integer;

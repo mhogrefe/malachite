@@ -1,10 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use rug;
-
 use malachite_nz::natural::Natural;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_assign_bit() {

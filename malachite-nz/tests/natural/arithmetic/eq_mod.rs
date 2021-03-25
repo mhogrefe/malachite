@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::EqMod;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::eq_mod::_combined_limbs_eq_limb_mod_limb;
@@ -8,6 +6,7 @@ use malachite_nz_test_util::natural::arithmetic::eq_mod::{
     limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2, limbs_eq_mod_limb_naive_1,
     limbs_eq_mod_limb_naive_2, limbs_eq_mod_naive_1, limbs_eq_mod_naive_2,
 };
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::eq_mod::{

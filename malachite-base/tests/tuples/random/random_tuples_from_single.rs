@@ -1,13 +1,11 @@
 use core::hash::Hash;
 use itertools::Itertools;
-use std::fmt::Debug;
-
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::tuples::random::{random_pairs_from_single, random_triples_from_single};
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
+use std::fmt::Debug;
 
 #[allow(clippy::type_complexity)]
 fn random_pairs_from_single_helper<I: Clone + Iterator>(

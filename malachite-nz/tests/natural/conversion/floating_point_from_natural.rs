@@ -1,13 +1,11 @@
-use std::str::FromStr;
-
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 //TODO move
 #[test]

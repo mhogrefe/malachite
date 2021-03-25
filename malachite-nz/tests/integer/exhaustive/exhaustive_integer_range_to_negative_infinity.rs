@@ -1,7 +1,6 @@
 use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::integer::exhaustive::exhaustive_integer_range_to_negative_infinity;
 use malachite_nz::integer::Integer;
 

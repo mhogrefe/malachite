@@ -1,9 +1,8 @@
-use malachite_base_test_util::stats::common_values_map::common_values_map;
-
 use itertools::Itertools;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode::{Ceiling, Down, Exact, Floor, Nearest, Up};
+use malachite_base_test_util::stats::common_values_map::common_values_map;
 
 #[allow(clippy::decimal_literal_representation)]
 #[test]

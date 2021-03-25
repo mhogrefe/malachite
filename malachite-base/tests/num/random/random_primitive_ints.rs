@@ -1,11 +1,10 @@
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::random::random_primitive_ints;
+use malachite_base::random::EXAMPLE_SEED;
 use malachite_base_test_util::stats::moments::{
     uniform_primitive_int_assertions, CheckedToF64, MomentStats,
 };
-
-use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::random::random_primitive_ints;
-use malachite_base::random::EXAMPLE_SEED;
 
 fn random_primitive_ints_helper<T: CheckedToF64 + PrimitiveInt>(
     expected_values: &[T],

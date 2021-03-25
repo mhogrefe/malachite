@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_saturating_sub_natural() {

@@ -1,11 +1,5 @@
 use core::hash::Hash;
-use std::collections::HashMap;
-use std::fmt::Debug;
-use std::iter::{once, repeat, Cloned};
-use std::slice::Iter;
-
 use itertools::{chain, Itertools};
-
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
@@ -13,6 +7,10 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_dependent_pairs_stop_after_empty_ys,
     ExhaustiveDependentPairsYsGenerator,
 };
+use std::collections::HashMap;
+use std::fmt::Debug;
+use std::iter::{once, repeat, Cloned};
+use std::slice::Iter;
 
 #[derive(Clone, Debug)]
 struct ExhaustiveGeneratorFromMap<X: Clone + Eq + Hash, Y: 'static + Clone> {

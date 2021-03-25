@@ -1,10 +1,8 @@
-use std::ops::Neg;
-
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::NegAssign;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::NotAssign;
-
-use integer::Integer;
+use std::ops::Neg;
 
 impl Neg for Integer {
     type Output = Integer;

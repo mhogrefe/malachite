@@ -1,14 +1,12 @@
-use std::fmt::Debug;
-
 use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::VecFromOtherType;
-
 use malachite_base_test_util::bench::bucketers::unsigned_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_gen;
 use malachite_base_test_util::runner::Runner;
+use std::fmt::Debug;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_unsigned_demos!(runner, demo_vec_from_other_type);

@@ -2,7 +2,6 @@ use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::natural::exhaustive::exhaustive_natural_range_to_infinity;
 use malachite_nz::natural::Natural;
 

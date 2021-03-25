@@ -19,8 +19,7 @@ pub fn test_from_power_of_two_digits_asc() {
             T::from_power_of_two_digits_asc(log_base, digits.iter().cloned()),
             out
         );
-    };
-
+    }
     test::<u8, u64>(6, &[], 0);
     test::<u16, u64>(6, &[2], 2);
     test::<u32, u16>(3, &[3, 7, 1], 123);
@@ -67,8 +66,7 @@ pub fn test_from_power_of_two_digits_desc() {
             T::from_power_of_two_digits_desc(log_base, digits.iter().cloned()),
             out
         );
-    };
-
+    }
     test::<u8, u64>(6, &[], 0);
     test::<u16, u64>(6, &[2], 2);
     test::<u32, u16>(3, &[1, 7, 3], 123);

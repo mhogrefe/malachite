@@ -1,13 +1,11 @@
-use std::cmp::Ordering;
-use std::ops::{Shr, ShrAssign};
-
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShl, ModShlAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::{Two, Zero};
-
 use natural::InnerNatural::Small;
 use natural::Natural;
+use std::cmp::Ordering;
+use std::ops::{Shr, ShrAssign};
 
 fn _mod_shl_ref_val_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T, m: Natural) -> Natural
 where

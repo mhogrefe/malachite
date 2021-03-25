@@ -1,6 +1,5 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_overflowing_div() {
@@ -10,7 +9,7 @@ fn test_overflowing_div() {
         let mut x = x;
         assert_eq!(x.overflowing_div_assign(y), overflow);
         assert_eq!(x, out);
-    };
+    }
     test::<u16>(0, 5, 0, false);
     test::<u16>(123, 456, 0, false);
     test::<u8>(100, 3, 33, false);

@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
@@ -10,6 +8,7 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_quadruples_from_single, exhaustive_quintuples_from_single,
     exhaustive_triples_from_single, exhaustive_units,
 };
+use std::fmt::Debug;
 
 macro_rules! helpers {
     ($t: ty, $ts: ident, $ts_helper: ident, $ts_small_helper: ident) => {

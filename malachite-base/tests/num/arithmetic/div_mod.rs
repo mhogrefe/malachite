@@ -1,8 +1,12 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    signed_gen, signed_gen_var_6, signed_pair_gen_var_4, unsigned_gen, unsigned_gen_var_1,
+    unsigned_pair_gen_var_12,
+};
+use std::panic::catch_unwind;
 
 #[test]
 fn test_div_mod_and_div_rem_unsigned() {
@@ -18,7 +22,7 @@ fn test_div_mod_and_div_rem_unsigned() {
         let mut mut_n = n;
         assert_eq!(mut_n.div_assign_rem(d), r);
         assert_eq!(mut_n, q);
-    };
+    }
     test::<u8>(0, 1, 0, 0);
     test::<u16>(0, 123, 0, 0);
     test::<u32>(1, 1, 1, 0);
@@ -72,6 +76,39 @@ fn test_div_mod_and_div_rem_unsigned() {
     test::<u128>(123, 1000000000000000000000000, 0, 123);
 }
 
+fn div_mod_and_div_rem_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_12::<T>().test_properties(|(x, y)| {
+        let mut mut_x = x;
+        let r = mut_x.div_assign_mod(y);
+        let q = mut_x;
+
+        assert_eq!(x.div_mod(y), (q, r));
+
+        let mut mut_x = x;
+        let r_alt = mut_x.div_assign_rem(y);
+        let q_alt = mut_x;
+        assert_eq!((q_alt, r_alt), (q, r));
+
+        assert_eq!(x.div_rem(y), (q, r));
+
+        assert_eq!((x / y, x % y), (q, r));
+        assert!(r < y);
+        assert_eq!(q * y + r, x);
+    });
+
+    unsigned_gen::<T>().test_properties(|x| {
+        assert_eq!(x.div_mod(T::ONE), (x, T::ZERO));
+    });
+
+    unsigned_gen_var_1::<T>().test_properties(|x| {
+        assert_eq!(x.div_mod(x), (T::ONE, T::ZERO));
+        assert_eq!(T::ZERO.div_mod(x), (T::ZERO, T::ZERO));
+        if x > T::ONE {
+            assert_eq!(T::ONE.div_mod(x), (T::ZERO, T::ONE));
+        }
+    });
+}
+
 #[test]
 fn test_div_mod_signed() {
     fn test<T: PrimitiveSigned>(n: T, d: T, q: T, r: T) {
@@ -80,7 +117,7 @@ fn test_div_mod_signed() {
         let mut mut_n = n;
         assert_eq!(mut_n.div_assign_mod(d), r);
         assert_eq!(mut_n, q);
-    };
+    }
     test::<i8>(0, 1, 0, 0);
     test::<i16>(0, 123, 0, 0);
     test::<i32>(1, 1, 1, 0);
@@ -341,6 +378,70 @@ pub fn div_mod_fail() {
     apply_fn_to_signeds!(div_mod_signed_fail_helper);
 }
 
+fn div_mod_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen_var_4::<T>().test_properties(|(x, y)| {
+        let mut mut_x = x;
+        let r = mut_x.div_assign_mod(y);
+        let q = mut_x;
+
+        assert_eq!(x.div_mod(y), (q, r));
+
+        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Floor), x.mod_op(y));
+        assert_eq!(q_alt, q);
+        assert_eq!(r_alt, r);
+
+        assert!(r.lt_abs(&y));
+        assert!(r == T::ZERO || (r > T::ZERO) == (y > T::ZERO));
+        if let Some(product) = q.checked_mul(y) {
+            assert_eq!(product + r, x);
+        } else if q > T::ZERO {
+            assert_eq!((q - T::ONE) * y + r + y, x);
+        } else {
+            assert_eq!((q + T::ONE) * y + r - y, x);
+        }
+        if x != T::MIN {
+            let (neg_q, neg_r) = (-x).div_mod(y);
+            assert_eq!(x.ceiling_div_mod(y), (-neg_q, -neg_r));
+        }
+        if y != T::MIN && (x != T::MIN || y != T::ONE) {
+            let (neg_q, r) = x.div_mod(-y);
+            assert_eq!(x.ceiling_div_mod(y), (-neg_q, r));
+        }
+    });
+
+    signed_gen::<T>().test_properties(|x| {
+        let (q, r) = x.div_mod(T::ONE);
+        assert_eq!(q, x);
+        assert_eq!(r, T::ZERO);
+
+        if x != T::MIN {
+            let (q, r) = x.div_mod(T::NEGATIVE_ONE);
+            assert_eq!(q, -x);
+            assert_eq!(r, T::ZERO);
+        }
+    });
+
+    signed_gen_var_6::<T>().test_properties(|x| {
+        assert_eq!(x.div_mod(T::ONE), (x, T::ZERO));
+        assert_eq!(x.div_mod(x), (T::ONE, T::ZERO));
+        assert_eq!(T::ZERO.div_mod(x), (T::ZERO, T::ZERO));
+        if x != T::MIN {
+            assert_eq!(x.div_mod(T::NEGATIVE_ONE), (-x, T::ZERO));
+            assert_eq!(x.div_mod(-x), (T::NEGATIVE_ONE, T::ZERO));
+        }
+        if x > T::ONE {
+            assert_eq!(T::ONE.div_mod(x), (T::ZERO, T::ONE));
+            assert_eq!(T::NEGATIVE_ONE.div_mod(x), (T::NEGATIVE_ONE, x - T::ONE));
+        }
+    });
+}
+
+#[test]
+fn div_mod_properties() {
+    apply_fn_to_unsigneds!(div_mod_and_div_rem_properties_helper_unsigned);
+    apply_fn_to_signeds!(div_mod_properties_helper_signed);
+}
+
 #[test]
 fn test_div_rem_signed() {
     fn test<T: PrimitiveSigned>(n: T, d: T, q: T, r: T) {
@@ -595,6 +696,60 @@ pub fn div_rem_fail() {
     apply_fn_to_signeds!(div_rem_signed_fail_helper);
 }
 
+fn div_rem_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen_var_4::<T>().test_properties(|(x, y)| {
+        let mut mut_x = x;
+        let r = mut_x.div_assign_rem(y);
+        let q = mut_x;
+
+        assert_eq!(x.div_rem(y), (q, r));
+
+        assert_eq!((x / y, x % y), (q, r));
+
+        assert!(r.lt_abs(&y));
+        assert!(r == T::ZERO || (r > T::ZERO) == (x > T::ZERO));
+        assert_eq!(q * y + r, x);
+
+        if x != T::MIN {
+            assert_eq!((-x).div_rem(y), (-q, -r));
+        }
+        if y != T::MIN && (x != T::MIN || y != T::ONE) {
+            assert_eq!(x.div_rem(-y), (-q, r));
+        }
+    });
+
+    signed_gen::<T>().test_properties(|x| {
+        let (q, r) = x.div_rem(T::ONE);
+        assert_eq!(q, x);
+        assert_eq!(r, T::ZERO);
+
+        if x != T::MIN {
+            let (q, r) = x.div_rem(T::NEGATIVE_ONE);
+            assert_eq!(q, -x);
+            assert_eq!(r, T::ZERO);
+        }
+    });
+
+    signed_gen_var_6::<T>().test_properties(|x| {
+        assert_eq!(x.div_rem(T::ONE), (x, T::ZERO));
+        assert_eq!(x.div_rem(x), (T::ONE, T::ZERO));
+        assert_eq!(T::ZERO.div_rem(x), (T::ZERO, T::ZERO));
+        if x != T::MIN {
+            assert_eq!(x.div_rem(T::NEGATIVE_ONE), (-x, T::ZERO));
+            assert_eq!(x.div_rem(-x), (T::NEGATIVE_ONE, T::ZERO));
+        }
+        if x > T::ONE {
+            assert_eq!(T::ONE.div_rem(x), (T::ZERO, T::ONE));
+            assert_eq!(T::NEGATIVE_ONE.div_rem(x), (T::ZERO, T::NEGATIVE_ONE));
+        }
+    });
+}
+
+#[test]
+fn div_rem_properties() {
+    apply_fn_to_signeds!(div_rem_properties_helper_signed);
+}
+
 #[test]
 fn test_ceiling_div_neg_mod() {
     fn test<T: PrimitiveUnsigned>(n: T, d: T, q: T, r: T) {
@@ -603,7 +758,7 @@ fn test_ceiling_div_neg_mod() {
         let mut mut_n = n;
         assert_eq!(mut_n.ceiling_div_assign_neg_mod(d), r);
         assert_eq!(mut_n, q);
-    };
+    }
     test::<u8>(0, 1, 0, 0);
     test::<u16>(0, 123, 0, 0);
     test::<u32>(1, 1, 1, 0);
@@ -675,6 +830,44 @@ pub fn ceiling_div_neg_mod_fail() {
     apply_fn_to_unsigneds!(ceiling_div_neg_mod_fail_helper);
 }
 
+fn ceiling_div_neg_mod_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_12::<T>().test_properties(|(x, y)| {
+        let mut mut_x = x;
+        let r = mut_x.ceiling_div_assign_neg_mod(y);
+        let q = mut_x;
+
+        assert_eq!(x.ceiling_div_neg_mod(y), (q, r));
+
+        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Ceiling), x.neg_mod(y));
+        assert_eq!(q_alt, q);
+        assert_eq!(r_alt, r);
+
+        assert!(r < y);
+        if let Some(product) = q.checked_mul(y) {
+            assert_eq!(product - r, x);
+        } else {
+            assert_eq!((q - T::ONE) * y - r + y, x);
+        }
+    });
+
+    unsigned_gen::<T>().test_properties(|x| {
+        assert_eq!(x.ceiling_div_neg_mod(T::ONE), (x, T::ZERO));
+    });
+
+    unsigned_gen_var_1::<T>().test_properties(|x| {
+        assert_eq!(x.ceiling_div_neg_mod(x), (T::ONE, T::ZERO));
+        assert_eq!(T::ZERO.ceiling_div_neg_mod(x), (T::ZERO, T::ZERO));
+        if x > T::ONE {
+            assert_eq!(T::ONE.ceiling_div_neg_mod(x), (T::ONE, x - T::ONE));
+        }
+    });
+}
+
+#[test]
+fn ceiling_div_neg_mod_properties() {
+    apply_fn_to_unsigneds!(ceiling_div_neg_mod_properties_helper);
+}
+
 #[test]
 fn test_ceiling_div_mod() {
     fn test<T: PrimitiveSigned>(n: T, d: T, q: T, r: T) {
@@ -683,7 +876,7 @@ fn test_ceiling_div_mod() {
         let mut mut_n = n;
         assert_eq!(mut_n.ceiling_div_assign_mod(d), r);
         assert_eq!(mut_n, q);
-    };
+    }
     test::<i8>(0, 1, 0, 0);
     test::<i16>(0, 123, 0, 0);
     test::<i32>(1, 1, 1, 0);
@@ -930,4 +1123,66 @@ fn ceiling_div_mod_fail_helper<T: PrimitiveSigned>() {
 #[test]
 pub fn ceiling_div_mod_fail() {
     apply_fn_to_signeds!(ceiling_div_mod_fail_helper);
+}
+
+fn ceiling_div_mod_properties_helper<T: PrimitiveSigned>() {
+    signed_pair_gen_var_4::<T>().test_properties(|(x, y)| {
+        let mut mut_x = x;
+        let r = mut_x.ceiling_div_assign_mod(y);
+        let q = mut_x;
+
+        assert_eq!(x.ceiling_div_mod(y), (q, r));
+
+        let (q_alt, r_alt) = (x.div_round(y, RoundingMode::Ceiling), x.ceiling_mod(y));
+        assert_eq!(q_alt, q);
+        assert_eq!(r_alt, r);
+
+        assert!(r.lt_abs(&y));
+        assert!(r == T::ZERO || (r > T::ZERO) != (y > T::ZERO));
+        if let Some(product) = q.checked_mul(y) {
+            assert_eq!(product + r, x);
+        } else if q > T::ZERO {
+            assert_eq!((q - T::ONE) * y + r + y, x);
+        } else {
+            assert_eq!((q + T::ONE) * y + r - y, x);
+        }
+
+        if x != T::MIN {
+            let (neg_q, neg_r) = (-x).ceiling_div_mod(y);
+            assert_eq!(x.div_mod(y), (-neg_q, -neg_r));
+        }
+        if y != T::MIN && (x != T::MIN || y != T::ONE) {
+            let (neg_q, r) = x.ceiling_div_mod(-y);
+            assert_eq!(x.div_mod(y), (-neg_q, r));
+        }
+    });
+
+    signed_gen::<T>().test_properties(|x| {
+        let (q, r) = x.ceiling_div_mod(T::ONE);
+        assert_eq!(q, x);
+        assert_eq!(r, T::ZERO);
+
+        if x != T::MIN {
+            let (q, r) = x.ceiling_div_mod(T::NEGATIVE_ONE);
+            assert_eq!(q, -x);
+            assert_eq!(r, T::ZERO);
+        }
+    });
+
+    signed_gen_var_6::<T>().test_properties(|x| {
+        assert_eq!(x.ceiling_div_mod(T::ONE), (x, T::ZERO));
+        if x != T::MIN {
+            assert_eq!(x.ceiling_div_mod(T::NEGATIVE_ONE), (-x, T::ZERO));
+        }
+        assert_eq!(x.ceiling_div_mod(x), (T::ONE, T::ZERO));
+        if x != T::MIN {
+            assert_eq!(x.ceiling_div_mod(-x), (T::NEGATIVE_ONE, T::ZERO));
+        }
+        assert_eq!(T::ZERO.ceiling_div_mod(x), (T::ZERO, T::ZERO));
+    });
+}
+
+#[test]
+fn ceiling_div_mod_properties() {
+    apply_fn_to_signeds!(ceiling_div_mod_properties_helper);
 }

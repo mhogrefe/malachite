@@ -1,9 +1,16 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    signed_pair_gen_var_3, signed_pair_gen_var_5, signed_rounding_mode_pair_gen,
+    signed_rounding_mode_pair_gen_var_1, signed_rounding_mode_pair_gen_var_2,
+    signed_rounding_mode_pair_gen_var_3, signed_signed_rounding_mode_triple_gen_var_1,
+    unsigned_pair_gen_var_11, unsigned_pair_gen_var_12, unsigned_pair_gen_var_13,
+    unsigned_rounding_mode_pair_gen, unsigned_rounding_mode_pair_gen_var_1,
+    unsigned_unsigned_rounding_mode_triple_gen_var_1,
+};
+use std::panic::catch_unwind;
 
 #[test]
 fn test_div_round_unsigned() {
@@ -13,7 +20,7 @@ fn test_div_round_unsigned() {
         let mut mut_n = n;
         mut_n.div_round_assign(d, rm);
         assert_eq!(mut_n, q);
-    };
+    }
     test::<u8>(0, 1, RoundingMode::Down, 0);
     test::<u8>(0, 1, RoundingMode::Floor, 0);
     test::<u8>(0, 1, RoundingMode::Up, 0);
@@ -219,7 +226,7 @@ fn test_div_round_signed() {
         let mut mut_n = n;
         mut_n.div_round_assign(d, rm);
         assert_eq!(mut_n, q);
-    };
+    }
     test::<i8>(0, 1, RoundingMode::Down, 0);
     test::<i8>(0, 1, RoundingMode::Floor, 0);
     test::<i8>(0, 1, RoundingMode::Up, 0);
@@ -1003,4 +1010,120 @@ fn div_round_signed_fail_helper<T: PrimitiveSigned>() {
 fn div_round_fail() {
     apply_fn_to_primitive_ints!(div_round_fail_helper);
     apply_fn_to_signeds!(div_round_signed_fail_helper);
+}
+
+fn div_round_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_unsigned_rounding_mode_triple_gen_var_1::<T>().test_properties(|(x, y, rm)| {
+        let mut mut_x = x;
+        mut_x.div_round_assign(y, rm);
+        let q = mut_x;
+
+        assert_eq!(x.div_round(y, rm), q);
+        assert!(q <= x);
+    });
+
+    unsigned_pair_gen_var_12::<T>().test_properties(|(x, y)| {
+        assert_eq!(
+            x.ceiling_div_neg_mod(y).0,
+            x.div_round(y, RoundingMode::Ceiling)
+        );
+    });
+
+    unsigned_pair_gen_var_11::<T>().test_properties(|(x, y)| {
+        let q = x.div_exact(y);
+        assert_eq!(x.div_round(y, RoundingMode::Down), q);
+        assert_eq!(x.div_round(y, RoundingMode::Up), q);
+        assert_eq!(x.div_round(y, RoundingMode::Floor), q);
+        assert_eq!(x.div_round(y, RoundingMode::Ceiling), q);
+        assert_eq!(x.div_round(y, RoundingMode::Nearest), q);
+        assert_eq!(x.div_round(y, RoundingMode::Exact), q);
+    });
+
+    //TODO test using Rationals
+    unsigned_pair_gen_var_13::<T>().test_properties(|(x, y)| {
+        let down = x.div_round(y, RoundingMode::Down);
+        let up = down + T::ONE;
+        assert_eq!(x.div_round(y, RoundingMode::Up), up);
+        assert_eq!(x.div_round(y, RoundingMode::Floor), down);
+        assert_eq!(x.div_round(y, RoundingMode::Ceiling), up);
+        let nearest = x.div_round(y, RoundingMode::Nearest);
+        assert!(nearest == down || nearest == up);
+    });
+
+    unsigned_rounding_mode_pair_gen::<T>().test_properties(|(x, rm)| {
+        assert_eq!(x.div_round(T::ONE, rm), x);
+    });
+
+    unsigned_rounding_mode_pair_gen_var_1::<T>().test_properties(|(x, rm)| {
+        assert_eq!(T::ZERO.div_round(x, rm), T::ZERO);
+        assert_eq!(x.div_round(x, rm), T::ONE);
+    });
+}
+
+fn div_round_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_signed_rounding_mode_triple_gen_var_1::<T>().test_properties(|(x, y, rm)| {
+        let mut mut_x = x;
+        mut_x.div_round_assign(y, rm);
+        let q = mut_x;
+
+        assert_eq!(x.div_round(y, rm), q);
+
+        assert!(q.le_abs(&x));
+        if x != T::MIN {
+            assert_eq!(-(-x).div_round(y, -rm), q);
+        }
+        if y != T::MIN && (x != T::MIN || (y != T::ONE && y != T::NEGATIVE_ONE)) {
+            assert_eq!(-x.div_round(-y, -rm), q);
+        }
+    });
+
+    signed_pair_gen_var_3::<T>().test_properties(|(x, y)| {
+        let q = x.div_exact(y);
+        assert_eq!(x.div_round(y, RoundingMode::Down), q);
+        assert_eq!(x.div_round(y, RoundingMode::Up), q);
+        assert_eq!(x.div_round(y, RoundingMode::Floor), q);
+        assert_eq!(x.div_round(y, RoundingMode::Ceiling), q);
+        assert_eq!(x.div_round(y, RoundingMode::Nearest), q);
+        assert_eq!(x.div_round(y, RoundingMode::Exact), q);
+    });
+
+    //TODO test using Rationals
+    signed_pair_gen_var_5::<T>().test_properties(|(x, y)| {
+        let down = x.div_round(y, RoundingMode::Down);
+        let up = if (x >= T::ZERO) == (y >= T::ZERO) {
+            down + T::ONE
+        } else {
+            down - T::ONE
+        };
+        let floor = x.div_round(y, RoundingMode::Floor);
+        let ceiling = floor + T::ONE;
+        assert_eq!(x.div_round(y, RoundingMode::Up), up);
+        assert_eq!(x.div_round(y, RoundingMode::Ceiling), ceiling);
+        let nearest = x.div_round(y, RoundingMode::Nearest);
+        assert!(nearest == down || nearest == up);
+    });
+
+    signed_rounding_mode_pair_gen::<T>().test_properties(|(x, rm)| {
+        assert_eq!(x.div_round(T::ONE, rm), x);
+    });
+
+    signed_rounding_mode_pair_gen_var_2::<T>().test_properties(|(x, rm)| {
+        assert_eq!(x.div_round(T::NEGATIVE_ONE, rm), -x);
+    });
+
+    signed_rounding_mode_pair_gen_var_1::<T>().test_properties(|(x, rm)| {
+        assert_eq!(T::ZERO.div_round(x, rm), T::ZERO);
+        assert_eq!(x.div_round(x, rm), T::ONE);
+    });
+
+    signed_rounding_mode_pair_gen_var_3::<T>().test_properties(|(x, rm)| {
+        assert_eq!(x.div_round(-x, rm), T::NEGATIVE_ONE);
+        assert_eq!((-x).div_round(x, rm), T::NEGATIVE_ONE);
+    });
+}
+
+#[test]
+fn div_round_properties() {
+    apply_fn_to_unsigneds!(div_round_properties_helper_unsigned);
+    apply_fn_to_signeds!(div_round_properties_helper_signed);
 }

@@ -1,7 +1,3 @@
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-use std::iter::repeat;
-
 use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::random::geometric::geometric_random_unsigneds;
@@ -9,6 +5,9 @@ use malachite_base::num::random::striped::striped_random_unsigned_vecs_from_leng
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::strings::ToBinaryString;
 use malachite_base::vecs::random_values_from_vec;
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
+use std::iter::repeat;
 
 fn striped_random_unsigned_vecs_from_length_iterator_helper<
     T: PrimitiveUnsigned,

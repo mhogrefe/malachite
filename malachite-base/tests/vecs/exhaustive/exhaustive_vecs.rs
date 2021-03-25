@@ -1,12 +1,11 @@
 use itertools::Itertools;
-use std::fmt::Debug;
-
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::exhaustive_vecs;
+use std::fmt::Debug;
 
 fn exhaustive_vecs_helper<I: Clone + Iterator>(xs: I, out: &[&[I::Item]])
 where

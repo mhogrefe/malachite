@@ -1,7 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{NextPowerOfTwo, NextPowerOfTwoAssign};
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::next_power_of_two::{

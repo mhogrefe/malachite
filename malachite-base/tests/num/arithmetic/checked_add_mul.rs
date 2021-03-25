@@ -9,7 +9,7 @@ use malachite_base_test_util::generators::{
 fn test_checked_add_mul() {
     fn test<T: PrimitiveInt>(x: T, y: T, z: T, out: Option<T>) {
         assert_eq!(x.checked_add_mul(y, z), out);
-    };
+    }
     test::<u8>(2, 3, 7, Some(23));
     test::<u32>(7, 5, 10, Some(57));
     test::<u64>(123, 456, 789, Some(359907));

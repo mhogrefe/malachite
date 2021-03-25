@@ -1,11 +1,10 @@
 use itertools::Itertools;
-use std::fmt::Debug;
-
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::exhaustive_vecs_length_range;
+use std::fmt::Debug;
 
 fn exhaustive_vecs_length_range_helper<I: Clone + Iterator>(
     a: u64,

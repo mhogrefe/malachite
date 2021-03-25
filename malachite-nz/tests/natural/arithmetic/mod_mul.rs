@@ -1,10 +1,9 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModMul, ModMulAssign};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::mod_mul::{
     limbs_mod_mul_two_limbs_naive, limbs_precompute_mod_mul_two_limbs_alt,
 };
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_mul::{

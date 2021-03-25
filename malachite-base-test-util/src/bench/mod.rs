@@ -1,13 +1,11 @@
-use itertools::Itertools;
-use std::collections::{BTreeMap, HashMap};
-use std::iter::Iterator;
-
+use bench::bucketers::Bucketer;
 use gnuplot::{AxesCommon, Caption, Color, Figure};
+use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::ExactFrom;
+use std::collections::{BTreeMap, HashMap};
+use std::iter::Iterator;
 use time::precise_time_ns;
-
-use bench::bucketers::Bucketer;
 
 fn escape_label_string(s: &str) -> String {
     let mut escaped = String::new();

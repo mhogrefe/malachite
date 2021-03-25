@@ -1,11 +1,10 @@
 use itertools::Itertools;
-use std::fmt::Debug;
-
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::shortlex_vecs_min_length;
+use std::fmt::Debug;
 
 fn shortlex_vecs_min_length_helper<I: Clone + Iterator>(min_length: u64, xs: I, out: &[&[I::Item]])
 where

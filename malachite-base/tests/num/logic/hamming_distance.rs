@@ -10,8 +10,7 @@ use malachite_base_test_util::generators::{
 pub fn test_hamming_distance() {
     fn test<T: PrimitiveUnsigned>(x: T, y: T, out: u64) {
         assert_eq!(x.hamming_distance(y), out);
-    };
-
+    }
     test(123u16, 456u16, 6);
     test(0xffffu32, 0xffff0000u32, 32);
     test(0xffffu32, u32::MAX, 16);
@@ -22,8 +21,7 @@ pub fn test_hamming_distance() {
 pub fn test_checked_hamming_distance() {
     fn test<T: PrimitiveSigned>(x: T, y: T, out: Option<u64>) {
         assert_eq!(x.checked_hamming_distance(y), out);
-    };
-
+    }
     test(123i32, 456i32, Some(6));
     test(-123i32, -456i32, Some(7));
     test(0i8, 127i8, Some(7));

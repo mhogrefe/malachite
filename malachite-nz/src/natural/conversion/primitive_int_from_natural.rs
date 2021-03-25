@@ -2,7 +2,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, FromOtherTypeSlice, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;

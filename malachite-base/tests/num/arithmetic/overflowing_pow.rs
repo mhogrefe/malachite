@@ -8,7 +8,7 @@ fn test_overflowing_pow() {
         let mut x = x;
         assert_eq!(x.overflowing_pow_assign(y), overflow);
         assert_eq!(x, out);
-    };
+    }
     test::<u8>(0, 0, 1, false);
     test::<u64>(123, 0, 1, false);
     test::<u64>(123, 1, 123, false);

@@ -29,7 +29,7 @@ fn _neg_mod_power_of_two_unsigned<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
     pow: u64,
 ) -> T {
     if x != T::ZERO && pow > T::WIDTH {
-        panic!(ERROR_MESSAGE);
+        panic!("{}", ERROR_MESSAGE);
     }
     x.wrapping_neg().mod_power_of_two(pow)
 }
@@ -210,7 +210,7 @@ fn _mod_power_of_two_signed<U: ModPowerOfTwo<Output = U> + WrappingFrom<S>, S: P
     pow: u64,
 ) -> U {
     if x < S::ZERO && pow > S::WIDTH {
-        panic!(ERROR_MESSAGE);
+        panic!("{}", ERROR_MESSAGE);
     }
     U::wrapping_from(x).mod_power_of_two(pow)
 }

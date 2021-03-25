@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
+use malachite_nz::natural::Natural;
 use num::BigUint;
 use rug;
-
-use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_clone() {

@@ -1,5 +1,4 @@
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
-
 use malachite_nz::natural::Natural;
 
 #[test]

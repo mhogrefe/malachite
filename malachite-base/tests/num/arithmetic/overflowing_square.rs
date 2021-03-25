@@ -8,7 +8,7 @@ fn test_overflowing_square() {
         let mut x = x;
         assert_eq!(x.overflowing_square_assign(), overflow);
         assert_eq!(x, out);
-    };
+    }
     test::<u8>(0, 0, false);
     test::<i16>(1, 1, false);
     test::<u32>(2, 4, false);

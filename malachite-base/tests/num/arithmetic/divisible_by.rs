@@ -4,7 +4,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 fn test_divisible_by() {
     fn test<T: PrimitiveInt>(x: T, y: T, out: bool) {
         assert_eq!(x.divisible_by(y), out);
-    };
+    }
     test::<u8>(0, 0, true);
     test::<u16>(1, 0, false);
     test::<u64>(1000000000000, 0, false);

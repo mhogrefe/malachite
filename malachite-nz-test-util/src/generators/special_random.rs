@@ -291,7 +291,9 @@ pub fn special_random_natural_unsigned_unsigned_triple_gen_var_1<
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
-pub fn special_random_unsigned_vec_unsigned_pair_gen_var_1<
+// vars 1 through 3 are in malachite-base
+
+pub fn special_random_unsigned_vec_unsigned_pair_gen_var_4<
     T: PrimitiveUnsigned + SaturatingFrom<U>,
     U: PrimitiveUnsigned,
 >(
@@ -790,3 +792,5 @@ pub fn special_random_unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>(
         3,
     )
 }
+
+// vars 24 through 27 are in malachite-base

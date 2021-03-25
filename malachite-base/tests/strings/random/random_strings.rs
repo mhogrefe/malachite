@@ -1,9 +1,8 @@
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-
 use itertools::Itertools;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::random::random_strings;
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
 
 fn random_strings_helper(
     mean_length_numerator: u64,

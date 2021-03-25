@@ -1,6 +1,5 @@
-use malachite_base_test_util::generators::{rounding_mode_gen, rounding_mode_pair_gen};
-
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{rounding_mode_gen, rounding_mode_pair_gen};
 
 #[test]
 #[allow(clippy::clone_on_copy)]

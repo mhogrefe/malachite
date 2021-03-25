@@ -1,6 +1,4 @@
-use std::cmp::{min, Ordering};
-use std::mem::swap;
-
+use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYIsZZ, XXDivModYIsQR,
@@ -10,8 +8,6 @@ use malachite_base::num::basic::traits::{Iverson, One, Zero};
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
-
-use fail_on_untested_path;
 use natural::arithmetic::add::{
     _limbs_add_same_length_with_carry_in_in_place_left,
     _limbs_add_same_length_with_carry_in_to_out, limbs_add_limb_to_out,
@@ -46,6 +42,8 @@ use platform::{
     DoubleLimb, Limb, DC_DIVAPPR_Q_THRESHOLD, DC_DIV_QR_THRESHOLD, INV_MULMOD_BNM1_THRESHOLD,
     INV_NEWTON_THRESHOLD, MAYBE_DCP1_DIVAPPR, MU_DIV_QR_SKEW_THRESHOLD, MU_DIV_QR_THRESHOLD,
 };
+use std::cmp::{min, Ordering};
+use std::mem::swap;
 
 /// The highest bit of the input must be set.
 ///
@@ -625,7 +623,7 @@ pub fn limbs_div_mod_three_limb_by_two_limb(
 /// assert_eq!(ns, &[166, 2147483626, 3, 4, 5]);
 /// ```
 ///
-/// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.1.2.
+/// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.2.1.
 pub fn limbs_div_mod_by_two_limb_normalized(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
     assert_eq!(ds.len(), 2);
     let n_len = ns.len();
@@ -674,7 +672,7 @@ pub fn limbs_div_mod_by_two_limb_normalized(qs: &mut [Limb], ns: &mut [Limb], ds
 /// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
 /// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.1.2.
+/// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.2.1.
 pub fn _limbs_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -743,7 +741,7 @@ pub fn _limbs_div_mod_schoolbook(
 ///
 /// where n = `ds.len()`
 ///
-/// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.1.2.
+/// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1.
 pub(crate) fn _limbs_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -816,7 +814,7 @@ pub(crate) fn _limbs_div_mod_divide_and_conquer_helper(
 /// length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit
 /// set.
 ///
-/// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.1.2.
+/// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1.
 pub fn _limbs_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -989,7 +987,7 @@ pub fn _limbs_div_mod_divide_and_conquer(
 /// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
 /// of `ds`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_bc_invertappr from mpn/generic/invertappr.c, GMP 6.1.2, where the return value is
+/// This is mpn_bc_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
 /// `true` iff the return value of mpn_bc_invertappr would be 0.
 pub fn _limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     let d_len = ds.len();
@@ -1051,7 +1049,7 @@ pub fn _limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut
 /// Panics if `ds` has length less than 5, `is` is shorter than `ds`, `scratch` is shorter than
 /// twice the length of `ds`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_ni_invertappr from mpn/generic/invertappr.c, GMP 6.1.2, where the return value is
+/// This is mpn_ni_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
 /// `true` iff the return value of mpn_ni_invertappr would be 0.
 pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     let d_len = ds.len();
@@ -1217,7 +1215,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
 /// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
 /// of `ds`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_invertappr from mpn/generic/invertappr.c, GMP 6.1.2, where the return value is
+/// This is mpn_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
 /// `true` iff the return value of mpn_invertappr would be 0.
 pub fn _limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     if ds.len() < INV_NEWTON_THRESHOLD {
@@ -1266,7 +1264,7 @@ pub fn _limbs_div_barrett_large_product(
 ///
 /// where n = `ns.len()`, d = `ds.len()`
 ///
-/// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.1.2.
+/// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
 fn _limbs_div_mod_barrett_preinverted(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1373,7 +1371,7 @@ fn _limbs_div_mod_barrett_preinverted(
 ///
 /// Result is O(`q_len`)
 ///
-/// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, GMP 6.1.2, where k == 0.
+/// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, GMP 6.2.1, where k == 0.
 pub const fn _limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
     let q_len_minus_1 = q_len - 1;
     if q_len > d_len {
@@ -1393,7 +1391,7 @@ pub const fn _limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize 
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.1.2.
+/// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.2.1.
 pub fn _limbs_div_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1438,7 +1436,7 @@ pub fn _limbs_div_mod_barrett_helper(
 ///
 /// Result is O(`d_len`)
 ///
-/// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.1.2, but nn is omitted
+/// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, but nn is omitted
 /// from the arguments as it is unused.
 fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
     let itch_local = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
@@ -1461,7 +1459,7 @@ pub(crate) const fn _limbs_invert_approx_scratch_len(is_len: usize) -> usize {
 ///
 /// Result is O(`n_len`)
 ///
-/// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.1.2, where mua_k == 0.
+/// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, where mua_k == 0.
 pub fn _limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let is_len = _limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
     let preinverse_len = _limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
@@ -1534,7 +1532,7 @@ pub fn _limbs_div_mod_barrett_large_helper(
 /// less than `ns.len()` - `ds.len()`, `scratch` is too short, or the last limb of `ds` does not
 /// have its highest bit set.
 ///
-/// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.1.2.
+/// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
 pub fn _limbs_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1881,7 +1879,7 @@ pub(crate) fn _limbs_div_mod_balanced(
 /// assert_eq!(limbs_div_mod(&[1, 2, 3], &[4, 5]), (vec![2576980377, 0], vec![2576980381, 2]));
 /// ```
 ///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.1.2, where qp and rp are returned.
+/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where qp and rp are returned.
 pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let d_len = ds.len();
     let mut qs = vec![0; ns.len() - d_len + 1];
@@ -1925,7 +1923,7 @@ pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
 /// assert_eq!(rs, &[2576980381, 2, 10, 10]);
 /// ```
 ///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.1.2, where dn > 1.
+/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1.
 pub fn limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();

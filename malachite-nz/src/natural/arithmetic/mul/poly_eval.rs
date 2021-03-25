@@ -1,12 +1,9 @@
 use itertools::Itertools;
-use std::cmp::Ordering;
-
 use malachite_base::num::arithmetic::traits::{Parity, WrappingAddAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
-
 use natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_to_out, limbs_slice_add_greater_in_place_left,
@@ -16,6 +13,7 @@ use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
 use natural::comparison::ord::limbs_cmp_same_length;
 use platform::Limb;
+use std::cmp::Ordering;
 
 /// Evaluate a degree-3 polynomial in +1 and -1, where each coefficient has width `n` limbs, except
 /// the last, which has width `n_high` limbs.

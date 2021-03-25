@@ -6,7 +6,7 @@ use num::basic::traits::{NegativeOne, One, Two, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, ExactInto, WrappingFrom};
 use num::float::nice_float::FmtRyuString;
-use num::logic::traits::{BitAccess, LowMask, TrailingZeros};
+use num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};
 use std::fmt::{Debug, Display, LowerExp, UpperExp};
 use std::iter::{Product, Sum};
 use std::num::FpCategory;
@@ -76,7 +76,7 @@ pub trait PrimitiveFloat:
     /// $2^{E-1}-1$
     /// - For `f32`, this is 127.
     /// - For `f64`, this is 1023.
-    const MAX_EXPONENT: u64 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
+    const MAX_EXPONENT: i64 = (1 << (Self::EXPONENT_WIDTH - 1)) - 1;
     /// $2^{2-2^{E-1}-M}$
     /// - For `f32`, this is $2^{-149}$, or `1.0e-45`.
     /// - For `f64`, this is $2^{-1074}$, or `5.0e-324`.
@@ -152,7 +152,7 @@ pub trait PrimitiveFloat:
     fn exponent(self) -> i64 {
         assert!(self.is_finite());
         assert!(self != Self::ZERO);
-        i64::exact_from(self.raw_exponent()) - i64::exact_from(Self::MAX_EXPONENT)
+        i64::exact_from(self.raw_exponent()) - Self::MAX_EXPONENT
     }
 
     fn raw_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u64) {
@@ -163,7 +163,7 @@ pub trait PrimitiveFloat:
         (mantissa, exponent)
     }
 
-    fn mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, i64) {
+    fn adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, i64) {
         assert!(self.is_finite());
         assert!(self != Self::ZERO);
         let (raw_mantissa, raw_exponent) = self.raw_mantissa_and_exponent();
@@ -187,9 +187,52 @@ pub trait PrimitiveFloat:
     }
 
     fn from_raw_mantissa_and_exponent(mantissa: Self::UnsignedOfEqualWidth, exponent: u64) -> Self {
+        assert!(mantissa.significant_bits() <= Self::MANTISSA_WIDTH);
+        assert!(exponent.significant_bits() <= Self::EXPONENT_WIDTH);
         Self::from_bits(
             (Self::UnsignedOfEqualWidth::exact_from(exponent) << Self::MANTISSA_WIDTH) | mantissa,
         )
+    }
+
+    fn from_adjusted_mantissa_and_exponent(
+        mantissa: Self::UnsignedOfEqualWidth,
+        exponent: i64,
+    ) -> Option<Self> {
+        if mantissa == Self::UnsignedOfEqualWidth::ZERO {
+            return Some(Self::ZERO);
+        }
+        let trailing_zeros = mantissa.trailing_zeros();
+        let (mantissa, adjusted_exponent) = (
+            mantissa >> trailing_zeros,
+            exponent + i64::wrapping_from(trailing_zeros),
+        );
+        let mantissa_bits = mantissa.significant_bits();
+        let exponent = adjusted_exponent
+            .checked_add(i64::exact_from(mantissa_bits))
+            .unwrap()
+            - 1;
+        let mut raw_mantissa;
+        let raw_exponent;
+        if exponent < Self::MIN_EXPONENT || exponent > Self::MAX_EXPONENT {
+            return None;
+        } else if exponent < Self::MIN_NORMAL_EXPONENT {
+            if adjusted_exponent < Self::MIN_EXPONENT {
+                return None;
+            } else {
+                raw_exponent = 0;
+                raw_mantissa = mantissa << (adjusted_exponent - Self::MIN_EXPONENT);
+            }
+        } else if mantissa_bits > Self::MANTISSA_WIDTH + 1 {
+            return None;
+        } else {
+            raw_exponent = u64::exact_from(exponent + i64::low_mask(Self::EXPONENT_WIDTH - 1));
+            raw_mantissa = mantissa << (Self::MANTISSA_WIDTH + 1 - mantissa_bits);
+            raw_mantissa.clear_bit(Self::MANTISSA_WIDTH);
+        }
+        Some(Self::from_raw_mantissa_and_exponent(
+            raw_mantissa,
+            raw_exponent,
+        ))
     }
 
     fn to_ordered_representation(self) -> Self::UnsignedOfEqualWidth {
@@ -246,6 +289,16 @@ pub trait PrimitiveFloat:
             Self::NEGATIVE_ZERO
         } else {
             Self::from_bits(self.to_bits() - Self::UnsignedOfEqualWidth::ONE)
+        }
+    }
+
+    fn max_precision_for_exponent(exponent: i64) -> u64 {
+        assert!(exponent >= Self::MIN_EXPONENT);
+        assert!(exponent <= Self::MAX_EXPONENT);
+        if exponent >= Self::MIN_NORMAL_EXPONENT {
+            Self::MANTISSA_WIDTH + 1
+        } else {
+            u64::wrapping_from(exponent - Self::MIN_EXPONENT) + 1
         }
     }
 }

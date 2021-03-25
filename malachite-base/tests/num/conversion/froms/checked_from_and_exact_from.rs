@@ -1,17 +1,15 @@
-use std::fmt::Debug;
-
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, OverflowingFrom};
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use std::fmt::Debug;
 
 #[test]
 pub fn test_checked_from() {
     fn test_single<T: CheckedFrom<T> + Copy + Debug + Eq>(n: T) {
         assert_eq!(T::checked_from(n), Some(n));
-    };
+    }
     test_single(0u8);
     test_single(5u64);
     test_single(1000u32);
@@ -22,7 +20,7 @@ pub fn test_checked_from() {
 
     fn test_double<T, U: CheckedFrom<T> + Copy + Debug + Eq>(n_in: T, n_out: Option<U>) {
         assert_eq!(U::checked_from(n_in), n_out);
-    };
+    }
     test_double(0u8, Some(0u16));
     test_double(1000u16, Some(1000i32));
     test_double(-5i16, Some(-5i8));
@@ -42,7 +40,7 @@ pub fn test_checked_from() {
 pub fn test_exact_from() {
     fn test_single<T: Copy + Debug + Eq + ExactFrom<T>>(n: T) {
         assert_eq!(T::exact_from(n), n);
-    };
+    }
     test_single(0u8);
     test_single(5u64);
     test_single(1000u32);
@@ -53,7 +51,7 @@ pub fn test_exact_from() {
 
     fn test_double<T, U: Copy + Debug + Eq + ExactFrom<T>>(n_in: T, n_out: U) {
         assert_eq!(U::exact_from(n_in), n_out);
-    };
+    }
     test_double(0u8, 0u16);
     test_double(1000u16, 1000i32);
     test_double(-5i16, -5i8);

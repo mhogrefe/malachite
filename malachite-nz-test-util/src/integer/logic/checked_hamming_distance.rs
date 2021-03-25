@@ -1,8 +1,7 @@
-use std::iter::repeat;
-
 use malachite_base::num::logic::traits::{BitIterable, HammingDistance};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
+use std::iter::repeat;
 
 pub fn integer_checked_hamming_distance_alt_1(x: &Integer, y: &Integer) -> Option<u64> {
     let negative = *x < 0;

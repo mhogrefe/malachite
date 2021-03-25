@@ -1,9 +1,8 @@
-use std::ops::{Shr, ShrAssign};
-
 use num::arithmetic::traits::{ModShl, ModShlAssign, ModShr, ModShrAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
+use std::ops::{Shr, ShrAssign};
 
 fn _mod_shr_signed<
     T: ModShl<U, T, Output = T> + PrimitiveInt + Shr<U, Output = T>,

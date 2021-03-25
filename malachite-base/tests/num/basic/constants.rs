@@ -70,7 +70,7 @@ fn test_width_constants() {
 pub fn test_named() {
     fn test<T: Named>(out: &str) {
         assert_eq!(T::NAME, out);
-    };
+    }
     test::<u8>("u8");
     test::<u16>("u16");
     test::<u32>("u32");

@@ -1,8 +1,5 @@
-use itertools::Itertools;
-use std::fmt::Debug;
-use std::iter::empty;
-
 use get_sample_output_types;
+use itertools::Itertools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::nevers::nevers;
@@ -10,6 +7,8 @@ use malachite_base::num::exhaustive::{exhaustive_positive_primitive_ints, exhaus
 use malachite_base::vecs::exhaustive::{
     exhaustive_fixed_length_vecs_1_input, exhaustive_fixed_length_vecs_2_inputs,
 };
+use std::fmt::Debug;
+use std::iter::empty;
 
 fn exhaustive_fixed_length_vecs_1_input_helper<T, I: Clone + Iterator<Item = T>>(
     xs: &I,

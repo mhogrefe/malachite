@@ -1,6 +1,5 @@
 use itertools::Itertools;
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::natural::exhaustive::exhaustive_naturals;
 
 #[test]

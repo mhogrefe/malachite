@@ -1,8 +1,7 @@
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-
 use malachite_base::chars::random::graphic_weighted_random_chars;
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
 
 fn graphic_weighted_random_chars_helper(
     w_numerator: u64,

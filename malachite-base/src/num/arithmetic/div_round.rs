@@ -1,10 +1,9 @@
-use std::fmt::Display;
-use std::ops::{Add, Div, Mul, Shr, Sub};
-
 use num::arithmetic::traits::{DivRound, DivRoundAssign, Parity, UnsignedAbs, WrappingNeg};
 use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use rounding_modes::RoundingMode;
+use std::fmt::Display;
+use std::ops::{Add, Div, Mul, Shr, Sub};
 
 fn _div_round_unsigned<
     T: Add<T, Output = T>
@@ -56,29 +55,37 @@ macro_rules! impl_div_round_unsigned {
             type Output = $t;
 
             /// Divides a value by another value and rounds according to a specified rounding mode.
-            /// See the `RoundingMode` documentation for details.
             ///
-            /// Time: Worst case O(1)
+            /// Let $q = \frac{x}{y}$:
             ///
-            /// Additional memory: Worst case O(1)
+            /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+            ///
+            /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+            ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
+            ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+            ///     \lfloor q \rfloor &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even} \\\\
+            ///     \lceil q \rceil &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is odd.}
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by
             /// `other`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::DivRound;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// assert_eq!(10u8.div_round(4, RoundingMode::Down), 2);
-            /// assert_eq!(10u16.div_round(4, RoundingMode::Up), 3);
-            /// assert_eq!(10u32.div_round(5, RoundingMode::Exact), 2);
-            /// assert_eq!(10u64.div_round(3, RoundingMode::Nearest), 3);
-            /// assert_eq!(20u128.div_round(3, RoundingMode::Nearest), 7);
-            /// assert_eq!(10usize.div_round(4, RoundingMode::Nearest), 2);
-            /// assert_eq!(14u8.div_round(4, RoundingMode::Nearest), 4);
-            /// ```
+            /// See the documentation of the `num::arithmetic::div_round` module.
             #[inline]
             fn div_round(self, other: $t, rm: RoundingMode) -> $t {
                 _div_round_unsigned(self, other, rm)
@@ -87,49 +94,19 @@ macro_rules! impl_div_round_unsigned {
 
         impl DivRoundAssign<$t> for $t {
             /// Divides a value by another value in place and rounds according to a specified
-            /// rounding mode. See the `RoundingMode` documentation for details.
+            /// rounding mode.
             ///
-            /// Time: Worst case O(1)
+            /// See the `DivRound` documentation for details.
             ///
-            /// Additional memory: Worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is zero, or if `rm` is `Exact` but `self` is not divisible by
             /// `other`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// let mut x = 10u8;
-            /// x.div_round_assign(4, RoundingMode::Down);
-            /// assert_eq!(x, 2);
-            ///
-            /// let mut x = 10u16;
-            /// x.div_round_assign(4, RoundingMode::Up);
-            /// assert_eq!(x, 3);
-            ///
-            /// let mut x = 10u32;
-            /// x.div_round_assign(5, RoundingMode::Exact);
-            /// assert_eq!(x, 2);
-            ///
-            /// let mut x = 10u64;
-            /// x.div_round_assign(3, RoundingMode::Nearest);
-            /// assert_eq!(x, 3);
-            ///
-            /// let mut x = 20u128;
-            /// x.div_round_assign(3, RoundingMode::Nearest);
-            /// assert_eq!(x, 7);
-            ///
-            /// let mut x = 10usize;
-            /// x.div_round_assign(4, RoundingMode::Nearest);
-            /// assert_eq!(x, 2);
-            ///
-            /// let mut x = 14u8;
-            /// x.div_round_assign(4, RoundingMode::Nearest);
-            /// assert_eq!(x, 4);
-            /// ```
+            /// See the documentation of the `num::arithmetic::div_round` module.
             #[inline]
             fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
                 *self = self.div_round(other, rm);
@@ -167,37 +144,41 @@ macro_rules! impl_div_round_signed {
             type Output = $t;
 
             /// Divides a value by another value and rounds according to a specified rounding mode.
-            /// See the `RoundingMode` documentation for details.
             ///
-            /// Time: Worst case O(1)
+            /// Let $q = \frac{x}{y}$:
             ///
-            /// Additional memory: Worst case O(1)
+            /// $f(x, y, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.$
+            ///
+            /// $f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) \lceil |q| \rceil.$
+            ///
+            /// $f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+            ///
+            /// $f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+            ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
+            ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+            ///     \lfloor q \rfloor &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even} \\\\
+            ///     \lceil q \rceil &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is odd.}
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is zero, if `self` is `$t::MIN` and `other` is `-1`, or if `rm` is
             /// `Exact` but `self` is not divisible by `other`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::DivRound;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// assert_eq!((-10i8).div_round(4, RoundingMode::Down), -2);
-            /// assert_eq!((-10i16).div_round(4, RoundingMode::Up), -3);
-            /// assert_eq!((-10i32).div_round(5, RoundingMode::Exact), -2);
-            /// assert_eq!((-10i64).div_round(3, RoundingMode::Nearest), -3);
-            /// assert_eq!((-20i128).div_round(3, RoundingMode::Nearest), -7);
-            /// assert_eq!((-10isize).div_round(4, RoundingMode::Nearest), -2);
-            /// assert_eq!((-14i8).div_round(4, RoundingMode::Nearest), -4);
-            ///
-            /// assert_eq!((-10i16).div_round(-4, RoundingMode::Down), 2);
-            /// assert_eq!((-10i32).div_round(-4, RoundingMode::Up), 3);
-            /// assert_eq!((-10i64).div_round(-5, RoundingMode::Exact), 2);
-            /// assert_eq!((-10i128).div_round(-3, RoundingMode::Nearest), 3);
-            /// assert_eq!((-20isize).div_round(-3, RoundingMode::Nearest), 7);
-            /// assert_eq!((-10i8).div_round(-4, RoundingMode::Nearest), 2);
-            /// assert_eq!((-14i16).div_round(-4, RoundingMode::Nearest), 4);
-            /// ```
+            /// See the documentation of the `num::arithmetic::div_round` module.
             fn div_round(self, other: $t, rm: RoundingMode) -> $t {
                 _div_round_signed(self, other, rm)
             }
@@ -206,77 +187,18 @@ macro_rules! impl_div_round_signed {
         impl DivRoundAssign<$t> for $t {
             /// Divides a value by another value in place and rounds according to a specified
             /// rounding mode.
-            /// See the `RoundingMode` documentation for details.
             ///
-            /// Time: Worst case O(1)
+            /// See the `DivRound` documentation for details.
             ///
-            /// Additional memory: Worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is zero, if `self` is `$t::MIN` and `other` is `-1`, or if `rm` is
             /// `Exact` but `self` is not divisible by `other`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::DivRoundAssign;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// let mut x = -10i8;
-            /// x.div_round_assign(4, RoundingMode::Down);
-            /// assert_eq!(x, -2);
-            ///
-            /// let mut x = -10i16;
-            /// x.div_round_assign(4, RoundingMode::Up);
-            /// assert_eq!(x, -3);
-            ///
-            /// let mut x = -10i32;
-            /// x.div_round_assign(5, RoundingMode::Exact);
-            /// assert_eq!(x, -2);
-            ///
-            /// let mut x = -10i64;
-            /// x.div_round_assign(3, RoundingMode::Nearest);
-            /// assert_eq!(x, -3);
-            ///
-            /// let mut x = -20i128;
-            /// x.div_round_assign(3, RoundingMode::Nearest);
-            /// assert_eq!(x, -7);
-            ///
-            /// let mut x = -10isize;
-            /// x.div_round_assign(4, RoundingMode::Nearest);
-            /// assert_eq!(x, -2);
-            ///
-            /// let mut x = -14i8;
-            /// x.div_round_assign(4, RoundingMode::Nearest);
-            /// assert_eq!(x, -4);
-            ///
-            /// let mut x = -10i16;
-            /// x.div_round_assign(-4, RoundingMode::Down);
-            /// assert_eq!(x, 2);
-            ///
-            /// let mut x = -10i32;
-            /// x.div_round_assign(-4, RoundingMode::Up);
-            /// assert_eq!(x, 3);
-            ///
-            /// let mut x = -10i64;
-            /// x.div_round_assign(-5, RoundingMode::Exact);
-            /// assert_eq!(x, 2);
-            ///
-            /// let mut x = -10i128;
-            /// x.div_round_assign(-3, RoundingMode::Nearest);
-            /// assert_eq!(x, 3);
-            ///
-            /// let mut x = -20isize;
-            /// x.div_round_assign(-3, RoundingMode::Nearest);
-            /// assert_eq!(x, 7);
-            ///
-            /// let mut x = -10i8;
-            /// x.div_round_assign(-4, RoundingMode::Nearest);
-            /// assert_eq!(x, 2);
-            ///
-            /// let mut x = -14i16;
-            /// x.div_round_assign(-4, RoundingMode::Nearest);
-            /// assert_eq!(x, 4);
-            /// ```
+            /// See the documentation of the `num::arithmetic::div_round` module.
             #[inline]
             fn div_round_assign(&mut self, other: $t, rm: RoundingMode) {
                 *self = self.div_round(other, rm);

@@ -92,3 +92,17 @@ pub fn natural_bit_ratio_bucketer<'a>(
         ),
     }
 }
+
+pub fn pair_1_vec_len_times_pair_2_natural_bits_bucketer<'a, T>(
+    xs_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Vec<T>, Natural)> {
+    Bucketer {
+        bucketing_function: &|&(ref xs, ref y)| {
+            xs.len()
+                .checked_mul(usize::exact_from(y.significant_bits()))
+                .unwrap()
+        },
+        bucketing_label: format!("{}.len() * {}.significant_bits()", xs_name, y_name),
+    }
+}

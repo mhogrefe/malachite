@@ -1,8 +1,7 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_mod_op_unsigned() {
@@ -12,7 +11,7 @@ fn test_mod_op_unsigned() {
         let mut mut_n = n;
         mut_n.mod_assign(d);
         assert_eq!(mut_n, r);
-    };
+    }
     test::<u8>(0, 1, 0);
     test::<u16>(0, 123, 0);
     test::<u32>(1, 1, 0);
@@ -57,7 +56,7 @@ fn test_div_mod_signed() {
         let mut mut_n = n;
         mut_n.mod_assign(d);
         assert_eq!(mut_n, r);
-    };
+    }
     test::<i8>(0, 1, 0);
     test::<i16>(0, 123, 0);
     test::<i32>(1, 1, 0);
@@ -236,7 +235,7 @@ fn test_neg_mod() {
         let mut mut_n = n;
         mut_n.neg_mod_assign(d);
         assert_eq!(mut_n, r);
-    };
+    }
     test::<u8>(0, 1, 0);
     test::<u16>(0, 123, 0);
     test::<u32>(1, 1, 0);
@@ -294,7 +293,7 @@ fn test_ceiling_mod() {
         let mut mut_n = n;
         mut_n.ceiling_mod_assign(d);
         assert_eq!(mut_n, r);
-    };
+    }
     test::<i8>(0, 1, 0);
     test::<i16>(0, 123, 0);
     test::<i32>(1, 1, 0);

@@ -1,6 +1,12 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    signed_gen, signed_gen_var_6, signed_pair_gen_var_3, unsigned_gen, unsigned_gen_var_1,
+    unsigned_pair_gen_var_11,
+};
+use std::panic::catch_unwind;
 
 #[test]
 fn test_div_exact() {
@@ -10,7 +16,7 @@ fn test_div_exact() {
         let mut x = x;
         x.div_exact_assign(y);
         assert_eq!(x, out);
-    };
+    }
     test::<u8>(0, 123, 0);
     test::<u16>(123, 1, 123);
     test::<u32>(123, 123, 1);
@@ -71,4 +77,59 @@ fn div_exact_fail_helper<T: PrimitiveInt>() {
 #[test]
 pub fn div_exact_fail() {
     apply_fn_to_primitive_ints!(div_exact_fail_helper);
+}
+
+fn div_exact_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_11::<T>().test_properties(|(x, y)| {
+        let mut mut_x = x;
+        mut_x.div_exact_assign(y);
+        let q = mut_x;
+
+        assert_eq!(x.div_exact(y), q);
+        assert_eq!(x.div_round(y, RoundingMode::Exact), q);
+        assert_eq!(q * y, x);
+    });
+
+    unsigned_gen::<T>().test_properties(|x| {
+        assert_eq!(x.div_exact(T::ONE), x);
+    });
+
+    unsigned_gen_var_1::<T>().test_properties(|x| {
+        assert_eq!(T::ZERO.div_exact(x), T::ZERO);
+        assert_eq!(x.div_exact(x), T::ONE);
+    });
+}
+
+fn div_exact_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen_var_3::<T>().test_properties(|(x, y)| {
+        let mut mut_x = x;
+        mut_x.div_exact_assign(y);
+        let q = mut_x;
+
+        assert_eq!(x.div_exact(y), q);
+        assert_eq!(x.div_round(y, RoundingMode::Exact), q);
+        assert_eq!(q * y, x);
+
+        if x != T::MIN {
+            assert_eq!((-x).div_exact(y), -q);
+        }
+        if y != T::MIN && q != T::MIN {
+            assert_eq!(x.div_exact(-y), -q);
+        }
+    });
+
+    signed_gen::<T>().test_properties(|x| {
+        assert_eq!(x.div_exact(T::ONE), x);
+    });
+
+    signed_gen_var_6::<T>().test_properties(|x| {
+        assert_eq!(T::ZERO.div_exact(x), T::ZERO);
+        assert_eq!(x.div_exact(x), T::ONE);
+    });
+}
+
+#[test]
+fn div_exact_properties() {
+    apply_fn_to_unsigneds!(div_exact_properties_helper_unsigned);
+    apply_fn_to_signeds!(div_exact_properties_helper_signed);
 }

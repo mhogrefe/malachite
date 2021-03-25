@@ -8,7 +8,7 @@ fn test_overflowing_sub() {
         let mut x = x;
         assert_eq!(x.overflowing_sub_assign(y), overflow);
         assert_eq!(x, out);
-    };
+    }
     test::<u16>(456, 123, 333, false);
     test::<u8>(123, 200, 179, true);
     test::<i16>(123, -456, 579, false);

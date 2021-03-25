@@ -15,9 +15,6 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod div_exact;
-            pub mod div_mod;
-            pub mod div_round;
             pub mod divisible_by;
             pub mod divisible_by_power_of_two;
             pub mod eq_mod;

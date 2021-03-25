@@ -8,7 +8,7 @@ use std::fmt::Debug;
 pub fn test_from_other_type_slice() {
     fn test<T: Debug + Eq, U: Copy + Debug + Eq + FromOtherTypeSlice<T>>(slice: &[T], n: U) {
         assert_eq!(U::from_other_type_slice(slice), n);
-    };
+    }
     test::<u32, u32>(&[], 0);
     test::<u32, u32>(&[123], 123);
     test::<u32, u32>(&[123, 456], 123);

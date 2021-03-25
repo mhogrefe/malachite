@@ -1,12 +1,9 @@
-use std::mem::swap;
-
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::slices::slice_test_zero;
-
 use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
@@ -28,6 +25,7 @@ use platform::{
     Limb, AORSMUL_FASTER_2AORSLSH, AORSMUL_FASTER_3AORSLSH, AORSMUL_FASTER_AORS_2AORSLSH,
     AORSMUL_FASTER_AORS_AORSLSH,
 };
+use std::mem::swap;
 
 /// Time: worst case O(k)
 ///

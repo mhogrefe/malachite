@@ -1,17 +1,15 @@
-use std::fmt::Debug;
-
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom};
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use std::fmt::Debug;
 
 #[test]
 pub fn test_convertible_from() {
     fn test_single<T: ConvertibleFrom<T> + Copy + Debug>(n: T) {
         assert!(T::convertible_from(n));
-    };
+    }
     test_single(0u8);
     test_single(5u64);
     test_single(1000u32);
@@ -22,7 +20,7 @@ pub fn test_convertible_from() {
 
     fn test_double<T, U: ConvertibleFrom<T>>(n_in: T, convertible: bool) {
         assert_eq!(U::convertible_from(n_in), convertible);
-    };
+    }
     test_double::<_, u16>(0u8, true);
     test_double::<_, i32>(1000u16, true);
     test_double::<_, i8>(-5i16, true);

@@ -1,11 +1,10 @@
-use std::str::FromStr;
-
 use malachite_base::num::logic::traits::CheckedHammingDistance;
 use malachite_nz_test_util::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
     rug_checked_hamming_distance,
 };
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::integer::logic::checked_hamming_distance::{

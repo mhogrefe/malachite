@@ -1,9 +1,7 @@
 extern crate serde;
 extern crate serde_json;
-
-use std::str::FromStr;
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 //TODO just use a simple hex string (or base64)
 

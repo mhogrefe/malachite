@@ -1,25 +1,25 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, ModPowerOfTwo, ModPowerOfTwoAssign,
     RemPowerOfTwo, RemPowerOfTwoAssign,
 };
-
 use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_mod_power_of_two() {
-    let test = |u, v: u64, out| {
-        let mut n = Integer::from_str(u).unwrap();
+    let test = |s, v: u64, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        let mut n = u.clone();
         n.mod_power_of_two_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().mod_power_of_two(v);
+        let n = u.clone().mod_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Integer::from_str(u).unwrap()).mod_power_of_two(v);
+        let n = (&u).mod_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -90,17 +90,19 @@ fn test_mod_power_of_two() {
 
 #[test]
 fn test_rem_power_of_two() {
-    let test = |u, v: u64, out| {
-        let mut n = Integer::from_str(u).unwrap();
+    let test = |s, v: u64, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        let mut n = u.clone();
         n.rem_power_of_two_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().rem_power_of_two(v);
+        let n = u.clone().rem_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Integer::from_str(u).unwrap()).rem_power_of_two(v);
+        let n = (&u).rem_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -171,17 +173,19 @@ fn test_rem_power_of_two() {
 
 #[test]
 fn test_ceiling_mod_power_of_two() {
-    let test = |u, v: u64, out| {
-        let mut n = Integer::from_str(u).unwrap();
+    let test = |s, v: u64, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        let mut n = u.clone();
         n.ceiling_mod_power_of_two_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u).unwrap().ceiling_mod_power_of_two(v);
+        let n = u.clone().ceiling_mod_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Integer::from_str(u).unwrap()).ceiling_mod_power_of_two(v);
+        let n = (&u).ceiling_mod_power_of_two(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

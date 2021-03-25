@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, SaturatingFrom,
 };
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_checked_from_integer() {

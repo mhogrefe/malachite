@@ -1,6 +1,5 @@
-use malachite_base_test_util::generators::rounding_mode_gen;
-
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::rounding_mode_gen;
 
 #[test]
 fn test_neg() {

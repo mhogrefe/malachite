@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPow, ModPowAssign};
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_pow::limbs_mod_pow;

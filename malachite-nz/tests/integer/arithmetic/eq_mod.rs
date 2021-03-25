@@ -1,8 +1,7 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::EqMod;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::{DivisibleBy, Mod};
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::integer::arithmetic::eq_mod::{

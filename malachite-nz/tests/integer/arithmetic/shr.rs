@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 macro_rules! tests_unsigned {
     (

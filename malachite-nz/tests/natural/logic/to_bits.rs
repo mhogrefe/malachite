@@ -1,11 +1,9 @@
 use itertools::Itertools;
-use std::str::FromStr;
-
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
-use malachite_nz_test_util::natural::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
-
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::natural::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
+use std::str::FromStr;
 
 #[test]
 fn test_to_bits_asc() {

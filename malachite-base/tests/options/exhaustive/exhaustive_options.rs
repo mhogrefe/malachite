@@ -1,8 +1,7 @@
-use std::fmt::Debug;
-
 use itertools::Itertools;
 use malachite_base::nevers::Never;
 use malachite_base::options::exhaustive::exhaustive_options;
+use std::fmt::Debug;
 
 fn exhaustive_options_helper<T: Clone + Debug + Eq>(xs: &[T], out: &[Option<T>]) {
     assert_eq!(

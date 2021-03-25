@@ -1,8 +1,4 @@
 use itertools::Itertools;
-use std::cmp::Ordering;
-use std::fmt::Debug;
-use std::iter::once;
-
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
@@ -10,6 +6,9 @@ use malachite_base::options::exhaustive::exhaustive_somes;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::unions::exhaustive::{exhaustive_union2s, exhaustive_union3s};
 use malachite_base::unions::{Union2, Union3};
+use std::cmp::Ordering;
+use std::fmt::Debug;
+use std::iter::once;
 
 fn exhaustive_union2s_helper<
     X: Clone + Debug + Eq,

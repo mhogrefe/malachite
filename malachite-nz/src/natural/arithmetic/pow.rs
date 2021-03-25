@@ -1,5 +1,3 @@
-use std::mem::swap;
-
 use malachite_base::num::arithmetic::traits::{
     EqModPowerOfTwo, IsPowerOfTwo, Parity, Pow, PowAssign, PowerOfTwo, ShrRound, Square,
     SquareAssign,
@@ -12,7 +10,6 @@ use malachite_base::num::logic::traits::{
 };
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_leading_zeros;
-
 use natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
 use natural::arithmetic::mul::limbs_mul_greater_to_out;
 use natural::arithmetic::shl::limbs_slice_shl_in_place;
@@ -22,6 +19,7 @@ use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
+use std::mem::swap;
 
 /// This is GMP_NUMB_HALFMAX from mpz/n_pow_ui.c, GMP 6.1.2.
 const HALF_MAX: Limb = (1 << (Limb::WIDTH >> 1)) - 1;

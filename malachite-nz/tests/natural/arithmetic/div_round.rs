@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_nz::natural::Natural;
 use num::{BigUint, Integer};
 use rug::ops::DivRounding;
-
-use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_div_round() {

@@ -1,11 +1,10 @@
+use fail_on_untested_path;
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, EqMod, EqModPowerOfTwo, NegMod, PowerOfTwo,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::TrailingZeros;
-
-use fail_on_untested_path;
-use integer::Integer;
 use natural::arithmetic::add::{limbs_add, limbs_add_limb};
 use natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_val_ref,

@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModShl, ModShlAssign};
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 macro_rules! test_mod_shl_unsigned {
     ($t:ident) => {

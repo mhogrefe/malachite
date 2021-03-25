@@ -1,8 +1,7 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::rounding_modes::RoundingMode;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_round_to_multiple_of_power_of_two() {
@@ -12,8 +11,7 @@ fn test_round_to_multiple_of_power_of_two() {
         let mut n = n;
         n.round_to_multiple_of_power_of_two_assign(pow, rm);
         assert_eq!(n, out);
-    };
-
+    }
     test::<u8>(0, 10, RoundingMode::Exact, 0);
     test::<u8>(17, 0, RoundingMode::Exact, 17);
 

@@ -8,7 +8,7 @@ fn test_pow() {
         let mut x = x;
         x.pow_assign(y);
         assert_eq!(x, out);
-    };
+    }
     test::<u8>(0, 0, 1);
     test::<u64>(123, 0, 1);
     test::<u64>(123, 1, 123);

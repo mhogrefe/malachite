@@ -1,9 +1,7 @@
 extern crate serde;
 extern crate serde_json;
-
-use std::str::FromStr;
-
 use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_serde() {

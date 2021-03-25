@@ -8,7 +8,7 @@ fn test_wrapping_sub_mul() {
         let mut x = x;
         x.wrapping_sub_mul_assign(y, z);
         assert_eq!(x, out);
-    };
+    }
     test::<u8>(100, 3, 7, 79);
     test::<u32>(60, 5, 10, 10);
     test::<u64>(1000000, 456, 789, 640216);

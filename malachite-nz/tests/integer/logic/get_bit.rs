@@ -1,8 +1,7 @@
-use std::str::FromStr;
-
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;

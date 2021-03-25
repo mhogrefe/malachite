@@ -1,10 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoIsReduced, ModPowerOfTwoShr, ModPowerOfTwoShrAssign,
 };
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 macro_rules! test_mod_power_of_two_shr {
     ($t:ident) => {

@@ -20,7 +20,7 @@ pub fn test_from_bits_asc() {
             out
         );
         assert_eq!(from_bits_asc_alt::<T, _>(bits.iter().cloned()), out);
-    };
+    }
     test_unsigned(&[], 0u8);
     test_unsigned(&[false], 0u8);
     test_unsigned(&[false, false, false], 0u8);
@@ -44,7 +44,7 @@ pub fn test_from_bits_asc() {
             out
         );
         assert_eq!(from_bits_asc_alt::<T, _>(bits.iter().cloned()), out);
-    };
+    }
     test_signed(&[], 0i8);
     test_signed(&[false], 0i8);
     test_signed(&[false, false, false], 0i8);
@@ -103,7 +103,7 @@ pub fn test_from_bits_desc() {
     fn test_unsigned<T: PrimitiveUnsigned>(bits: &[bool], out: T) {
         assert_eq!(T::from_bits_desc(bits.iter().cloned()), out);
         assert_eq!(from_bits_desc_alt::<T, _>(bits.iter().cloned()), out);
-    };
+    }
     test_unsigned(&[], 0u8);
     test_unsigned(&[false], 0u8);
     test_unsigned(&[false, false, false], 0u8);
@@ -123,7 +123,7 @@ pub fn test_from_bits_desc() {
     fn test_signed<T: PrimitiveSigned>(bits: &[bool], out: T) {
         assert_eq!(T::from_bits_desc(bits.iter().cloned()), out);
         assert_eq!(from_bits_desc_alt::<T, _>(bits.iter().cloned()), out);
-    };
+    }
     test_signed(&[], 0i8);
     test_signed(&[false], 0i8);
     test_signed(&[false, false, false], 0i8);

@@ -1,8 +1,5 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod div_exact;
-pub mod div_mod;
-pub mod div_round;
 pub mod divisible_by;
 pub mod divisible_by_power_of_two;
 pub mod eq_mod;
@@ -76,9 +73,6 @@ pub mod xxx_sub_yyy_is_zzz;
 pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    div_exact::register(registry);
-    div_mod::register(registry);
-    div_round::register(registry);
     divisible_by::register(registry);
     divisible_by_power_of_two::register(registry);
     eq_mod::register(registry);

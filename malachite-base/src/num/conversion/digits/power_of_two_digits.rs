@@ -1,10 +1,9 @@
-use std::ops::{BitOr, BitOrAssign, ShrAssign};
-
 use num::arithmetic::traits::ArithmeticCheckedShl;
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 use num::conversion::traits::{CheckedFrom, PowerOfTwoDigits, WrappingFrom};
 use num::logic::traits::SignificantBits;
+use std::ops::{BitOr, BitOrAssign, ShrAssign};
 
 fn _to_power_of_two_digits_asc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,

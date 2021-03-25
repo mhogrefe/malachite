@@ -1,12 +1,11 @@
-use std::cmp::min;
-use std::cmp::Ordering;
-use std::marker::PhantomData;
-use std::ops::Index;
-
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::logic::traits::BitIterable;
+use std::cmp::min;
+use std::cmp::Ordering;
+use std::marker::PhantomData;
+use std::ops::Index;
 
 /// A double-ended iterator over the bits of a primitive unsigned integer.
 ///

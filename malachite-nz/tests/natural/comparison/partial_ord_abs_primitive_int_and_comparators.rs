@@ -1,9 +1,7 @@
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
 use std::str::FromStr;
-
-use malachite_base::num::comparison::traits::PartialOrdAbs;
-
-use malachite_nz::natural::Natural;
 
 #[test]
 fn test_partial_cmp_abs_u32() {

@@ -1,7 +1,6 @@
-use std::str::FromStr;
-
 use num::BigUint;
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::add::{

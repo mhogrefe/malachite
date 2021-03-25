@@ -6,7 +6,6 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::rounding_modes::RoundingMode;
-
 use natural::arithmetic::mod_pow::{get_bits, get_window_size};
 use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
 use natural::arithmetic::mod_power_of_two_square::limbs_square_low;

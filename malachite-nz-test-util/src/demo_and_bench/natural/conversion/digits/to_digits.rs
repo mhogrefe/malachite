@@ -96,7 +96,7 @@ fn demo_limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
 ) where
     Limb: SaturatingFrom<T>,
 {
-    for (mut xs, base) in unsigned_vec_unsigned_pair_gen_var_1::<Limb, T>()
+    for (mut xs, base) in unsigned_vec_unsigned_pair_gen_var_4::<Limb, T>()
         .get(gm, &config)
         .take(limit)
     {
@@ -350,7 +350,7 @@ fn benchmark_limbs_to_digits_basecase_algorithms<
     run_benchmark(
         "_limbs_to_digits_basecase(&mut [Limb], u64)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_1::<Limb, T>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_4::<Limb, T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

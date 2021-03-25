@@ -1,11 +1,9 @@
-use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
-
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-
-use integer::Integer;
 use natural::Natural;
+use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn _shr_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
 where

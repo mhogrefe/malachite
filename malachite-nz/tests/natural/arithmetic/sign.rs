@@ -1,10 +1,8 @@
+use malachite_base::num::arithmetic::traits::Sign;
+use malachite_nz::natural::Natural;
+use rug;
 use std::cmp::Ordering;
 use std::str::FromStr;
-
-use malachite_base::num::arithmetic::traits::Sign;
-use rug;
-
-use malachite_nz::natural::Natural;
 
 #[test]
 fn test_sign() {

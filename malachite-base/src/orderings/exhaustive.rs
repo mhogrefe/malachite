@@ -1,8 +1,9 @@
+use orderings::ORDERINGS;
 use std::cmp::Ordering;
 use std::iter::Cloned;
 use std::slice::Iter;
 
-use orderings::ORDERINGS;
+pub type ExhaustiveOrderings = Cloned<Iter<'static, Ordering>>;
 
 /// Generates all `Ordering`s, in increasing order.
 ///
@@ -26,7 +27,7 @@ use orderings::ORDERINGS;
 /// );
 /// ```
 #[inline]
-pub fn orderings_increasing() -> Cloned<Iter<'static, Ordering>> {
+pub fn orderings_increasing() -> ExhaustiveOrderings {
     [Ordering::Less, Ordering::Equal, Ordering::Greater]
         .iter()
         .cloned()

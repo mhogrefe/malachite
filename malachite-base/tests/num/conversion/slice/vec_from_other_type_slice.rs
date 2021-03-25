@@ -10,7 +10,7 @@ use std::fmt::Debug;
 pub fn test_vec_from_other_type_slice() {
     fn test<T: Debug + Eq, U: Debug + Eq + VecFromOtherTypeSlice<T>>(slice: &[T], vec: &[U]) {
         assert_eq!(U::vec_from_other_type_slice(slice), vec);
-    };
+    }
     test::<u32, u32>(&[123, 456], &[123, 456]);
     test::<u8, u16>(
         &[0xab, 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67, 0x89, 0xff],

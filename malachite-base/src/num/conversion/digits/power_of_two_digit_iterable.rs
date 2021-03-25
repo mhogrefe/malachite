@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use num::arithmetic::traits::{DivRound, SaturatingSubAssign};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{
@@ -7,6 +5,7 @@ use num::conversion::traits::{
 };
 use num::logic::traits::BitBlockAccess;
 use rounding_modes::RoundingMode;
+use std::marker::PhantomData;
 
 /// A double-ended iterator over the base-$2^\ell$ digits of a primitive unsigned integer.
 ///

@@ -1,8 +1,6 @@
-use std::panic::catch_unwind;
-
-use malachite_base_test_util::generators::unsigned_gen_var_1;
-
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::unsigned_gen_var_1;
+use std::panic::catch_unwind;
 
 fn floor_log_two_helper<T: PrimitiveUnsigned>() {
     let test = |n: T, out| {

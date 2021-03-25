@@ -1,6 +1,5 @@
-use std::fmt::{Debug, Display, Formatter, Result};
-
 use rounding_modes::RoundingMode;
+use std::fmt::{Debug, Display, Formatter, Result};
 
 impl Display for RoundingMode {
     /// Converts a `RoundingMode` to a `String`.

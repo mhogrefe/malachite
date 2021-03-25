@@ -19,7 +19,7 @@ fn test_from_power_of_two_digits_asc() {
                 .to_string(),
             out
         );
-    };
+    }
     test::<u8>(1, &[], "0");
     test::<u8>(1, &[0, 0, 0], "0");
     test::<u16>(10, &[123], "123");
@@ -79,7 +79,7 @@ fn test_from_power_of_two_digits_desc() {
             Natural::from_power_of_two_digits_desc(log_base, digits.iter().cloned()).to_string(),
             out
         );
-    };
+    }
     test::<u8>(1, &[], "0");
     test::<u8>(1, &[0, 0, 0], "0");
     test::<u16>(10, &[123], "123");

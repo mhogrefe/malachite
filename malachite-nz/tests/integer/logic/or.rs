@@ -1,7 +1,6 @@
-use std::str::FromStr;
-
 use malachite_nz_test_util::integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::integer::logic::or::{

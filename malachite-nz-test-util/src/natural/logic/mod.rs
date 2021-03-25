@@ -1,8 +1,7 @@
-use std::iter::repeat;
-
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use std::iter::repeat;
 
 pub fn natural_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Natural, y: &Natural) -> Natural {
     let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =

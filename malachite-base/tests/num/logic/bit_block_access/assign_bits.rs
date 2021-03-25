@@ -27,7 +27,7 @@ pub fn test_assign_bits_unsigned() {
         let mut x = x_in;
         assign_bits_naive(&mut x, start, end, &bits);
         assert_eq!(x, x_out);
-    };
+    }
     // assign partially
     test(0xab5du16, 4, 8, 0xc, 0xabcd);
     test(0x5bcdu16, 12, 100, 0xa, 0xabcd);
@@ -63,7 +63,7 @@ pub fn test_assign_bits_signed() {
         let mut x = x_in;
         assign_bits_naive(&mut x, start, end, &bits);
         assert_eq!(x, x_out);
-    };
+    }
     // *self >= 0
     test(0x2b5di16, 4, 8, 0xc, 0x2bcd);
     // *self < 0

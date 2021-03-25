@@ -5,7 +5,6 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
-
 use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
 use natural::arithmetic::mod_power_of_two_square::{
     limbs_mod_power_of_two_square, limbs_mod_power_of_two_square_ref,

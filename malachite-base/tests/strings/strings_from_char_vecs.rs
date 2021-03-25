@@ -1,7 +1,6 @@
 use itertools::Itertools;
-use std::iter::repeat;
-
 use malachite_base::strings::strings_from_char_vecs;
+use std::iter::repeat;
 
 fn strings_from_char_vecs_helper<I: Iterator<Item = Vec<char>>>(css: I, out: &[&str]) {
     let css = strings_from_char_vecs(css).take(20).collect_vec();

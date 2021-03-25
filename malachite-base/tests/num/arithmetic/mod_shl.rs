@@ -18,7 +18,7 @@ fn test_mod_shl() {
         let mut t = t;
         t.mod_shl_assign(u, m);
         assert_eq!(t, out);
-    };
+    }
     test::<u64, u8>(0, 0, 1, 0);
     test::<u64, u8>(0, 0, 5, 0);
     test::<u32, i16>(8, 2, 10, 2);

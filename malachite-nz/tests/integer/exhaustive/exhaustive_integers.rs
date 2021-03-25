@@ -1,6 +1,5 @@
 use itertools::Itertools;
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::integer::exhaustive::exhaustive_integers;
 
 #[test]

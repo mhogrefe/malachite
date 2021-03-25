@@ -1,8 +1,7 @@
-use std::str::FromStr;
-
 use malachite_nz_test_util::natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
 use num::BigUint;
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::logic::and::{

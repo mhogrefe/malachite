@@ -1,9 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitScan;
 use malachite_nz_test_util::natural::logic::index_of_next_true_bit::*;
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;

@@ -18,16 +18,6 @@
 /// x.abs_assign();
 /// assert_eq!(x, 100i64);
 /// ```
-///
-/// # unsigned_abs
-/// ```
-/// use malachite_base::num::arithmetic::traits::UnsignedAbs;
-///
-/// assert_eq!(0i8.unsigned_abs(), 0u8);
-/// assert_eq!(100i64.unsigned_abs(), 100u64);
-/// assert_eq!((-100i64).unsigned_abs(), 100u64);
-/// assert_eq!((-128i8).unsigned_abs(), 128u8);
-/// ```
 pub mod abs;
 /// This module contains functions for adding a number and the product of two other numbers.
 ///
@@ -188,8 +178,348 @@ pub mod checked_sub;
 /// assert_eq!((-127i8).checked_sub_mul(2, 100), None);
 /// ```
 pub mod checked_sub_mul;
+/// This module contains functions for unchecked exact division.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # div_exact
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivExact;
+///
+/// // 123 * 456 = 56088
+/// assert_eq!(56088u32.div_exact(456), 123);
+///
+/// // -123 * -456 = 56088
+/// assert_eq!(56088i64.div_exact(-456), -123);
+/// ```
+///
+/// # div_exact_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivExactAssign;
+///
+/// // 123 * 456 = 56088
+/// let mut x = 56088u32;
+/// x.div_exact_assign(456);
+/// assert_eq!(x, 123);
+///
+/// // -123 * -456 = 56088
+/// let mut x = 56088i64;
+/// x.div_exact_assign(-456);
+/// assert_eq!(x, -123);
+/// ```
 pub mod div_exact;
+/// This module contains functions for simultaneously finding the quotient and remainder of a
+/// number, subject to various rounding rules.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # div_mod
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivMod;
+///
+/// // 2 * 10 + 3 = 23
+/// assert_eq!(23u8.div_mod(10), (2, 3));
+///
+/// // 9 * 5 + 0 = 45
+/// assert_eq!(45u32.div_mod(5), (9, 0));
+///
+/// // 2 * 10 + 3 = 23
+/// assert_eq!(23i8.div_mod(10), (2, 3));
+///
+/// // -3 * -10 + -7 = 23
+/// assert_eq!(23i16.div_mod(-10), (-3, -7));
+///
+/// // -3 * 10 + 7 = -23
+/// assert_eq!((-23i32).div_mod(10), (-3, 7));
+///
+/// // 2 * -10 + -3 = -23
+/// assert_eq!((-23i64).div_mod(-10), (2, -3));
+/// ```
+///
+/// # div_assign_mod
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivAssignMod;
+///
+/// // 2 * 10 + 3 = 23
+/// let mut x = 23u8;
+/// assert_eq!(x.div_assign_mod(10), 3);
+/// assert_eq!(x, 2);
+///
+/// // 9 * 5 + 0 = 45
+/// let mut x = 45u32;
+/// assert_eq!(x.div_assign_mod(5), 0);
+/// assert_eq!(x, 9);
+///
+/// // 2 * 10 + 3 = 23
+/// let mut x = 23i8;
+/// assert_eq!(x.div_assign_mod(10), 3);
+/// assert_eq!(x, 2);
+///
+/// // -3 * -10 + -7 = 23
+/// let mut x = 23i16;
+/// assert_eq!(x.div_assign_mod(-10), -7);
+/// assert_eq!(x, -3);
+///
+/// // -3 * 10 + 7 = -23
+/// let mut x = -23i32;
+/// assert_eq!(x.div_assign_mod(10), 7);
+/// assert_eq!(x, -3);
+///
+/// // 2 * -10 + -3 = -23
+/// let mut x = -23i64;
+/// assert_eq!(x.div_assign_mod(-10), -3);
+/// assert_eq!(x, 2);
+/// ```
+///
+/// # div_rem
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivRem;
+///
+/// // 2 * 10 + 3 = 23
+/// assert_eq!(23u8.div_rem(10), (2, 3));
+///
+/// // 9 * 5 + 0 = 45
+/// assert_eq!(45u32.div_rem(5), (9, 0));
+///
+/// // 2 * 10 + 3 = 23
+/// assert_eq!(23i8.div_rem(10), (2, 3));
+///
+/// // -2 * -10 + 3 = 23
+/// assert_eq!(23i16.div_rem(-10), (-2, 3));
+///
+/// // -2 * 10 + -3 = -23
+/// assert_eq!((-23i32).div_rem(10), (-2, -3));
+///
+/// // 2 * -10 + -3 = -23
+/// assert_eq!((-23i64).div_rem(-10), (2, -3));
+/// ```
+///
+/// # div_assign_rem
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivAssignRem;
+///
+/// // 2 * 10 + 3 = 23
+/// let mut x = 23u8;
+/// assert_eq!(x.div_assign_rem(10), 3);
+/// assert_eq!(x, 2);
+///
+/// // 9 * 5 + 0 = 45
+/// let mut x = 45u32;
+/// assert_eq!(x.div_assign_rem(5), 0);
+/// assert_eq!(x, 9);
+///
+/// // 2 * 10 + 3 = 23
+/// let mut x = 23i8;
+/// assert_eq!(x.div_assign_rem(10), 3);
+/// assert_eq!(x, 2);
+///
+/// // -2 * -10 + 3 = 23
+/// let mut x = 23i16;
+/// assert_eq!(x.div_assign_rem(-10), 3);
+/// assert_eq!(x, -2);
+///
+/// // -2 * 10 + -3 = -23
+/// let mut x = -23i32;
+/// assert_eq!(x.div_assign_rem(10), -3);
+/// assert_eq!(x, -2);
+///
+/// // 2 * -10 + -3 = -23
+/// let mut x = -23i64;
+/// assert_eq!(x.div_assign_rem(-10), -3);
+/// assert_eq!(x, 2);
+/// ```
+///
+/// # ceiling_div_neg_mod
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingDivNegMod;
+///
+/// // 3 * 10 - 7 = 23
+/// assert_eq!(23u8.ceiling_div_neg_mod(10), (3, 7));
+///
+/// // 9 * 5 + 0 = 45
+/// assert_eq!(45u32.ceiling_div_neg_mod(5), (9, 0));
+/// ```
+///
+/// # ceiling_div_assign_neg_mod
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingDivAssignNegMod;
+///
+/// // 3 * 10 - 7 = 23
+/// let mut x = 23u8;
+/// assert_eq!(x.ceiling_div_assign_neg_mod(10), 7);
+/// assert_eq!(x, 3);
+///
+/// // 9 * 5 + 0 = 45
+/// let mut x = 45u32;
+/// assert_eq!(x.ceiling_div_assign_neg_mod(5), 0);
+/// assert_eq!(x, 9);
+/// ```
+///
+/// # ceiling_div_mod
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingDivMod;
+///
+/// // 3 * 10 + -7 = 23
+/// assert_eq!(23i8.ceiling_div_mod(10), (3, -7));
+///
+/// // -2 * -10 + 3 = 23
+/// assert_eq!(23i16.ceiling_div_mod(-10), (-2, 3));
+///
+/// // -2 * 10 + -3 = -23
+/// assert_eq!((-23i32).ceiling_div_mod(10), (-2, -3));
+///
+/// // 3 * -10 + 7 = -23
+/// assert_eq!((-23i64).ceiling_div_mod(-10), (3, 7));
+/// ```
+///
+/// # ceiling_div_assign_mod
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingDivAssignMod;
+///
+/// // 3 * 10 + -7 = 23
+/// let mut x = 23i8;
+/// assert_eq!(x.ceiling_div_assign_mod(10), -7);
+/// assert_eq!(x, 3);
+///
+/// // -2 * -10 + 3 = 23
+/// let mut x = 23i16;
+/// assert_eq!(x.ceiling_div_assign_mod(-10), 3);
+/// assert_eq!(x, -2);
+///
+/// // -2 * 10 + -3 = -23
+/// let mut x = -23i32;
+/// assert_eq!(x.ceiling_div_assign_mod(10), -3);
+/// assert_eq!(x, -2);
+///
+/// // 3 * -10 + 7 = -23
+/// let mut x = -23i64;
+/// assert_eq!(x.ceiling_div_assign_mod(-10), 7);
+/// assert_eq!(x, 3);
+/// ```
 pub mod div_mod;
+/// This module contains functions dividing two numbers according to a specified `RoundingMode`.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # div_round
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivRound;
+/// use malachite_base::rounding_modes::RoundingMode;
+///
+/// assert_eq!(10u8.div_round(4, RoundingMode::Down), 2);
+/// assert_eq!(10u16.div_round(4, RoundingMode::Up), 3);
+/// assert_eq!(10u32.div_round(5, RoundingMode::Exact), 2);
+/// assert_eq!(10u64.div_round(3, RoundingMode::Nearest), 3);
+/// assert_eq!(20u128.div_round(3, RoundingMode::Nearest), 7);
+/// assert_eq!(10usize.div_round(4, RoundingMode::Nearest), 2);
+/// assert_eq!(14u8.div_round(4, RoundingMode::Nearest), 4);
+///
+/// assert_eq!((-10i8).div_round(4, RoundingMode::Down), -2);
+/// assert_eq!((-10i16).div_round(4, RoundingMode::Up), -3);
+/// assert_eq!((-10i32).div_round(5, RoundingMode::Exact), -2);
+/// assert_eq!((-10i64).div_round(3, RoundingMode::Nearest), -3);
+/// assert_eq!((-20i128).div_round(3, RoundingMode::Nearest), -7);
+/// assert_eq!((-10isize).div_round(4, RoundingMode::Nearest), -2);
+/// assert_eq!((-14i8).div_round(4, RoundingMode::Nearest), -4);
+///
+/// assert_eq!((-10i16).div_round(-4, RoundingMode::Down), 2);
+/// assert_eq!((-10i32).div_round(-4, RoundingMode::Up), 3);
+/// assert_eq!((-10i64).div_round(-5, RoundingMode::Exact), 2);
+/// assert_eq!((-10i128).div_round(-3, RoundingMode::Nearest), 3);
+/// assert_eq!((-20isize).div_round(-3, RoundingMode::Nearest), 7);
+/// assert_eq!((-10i8).div_round(-4, RoundingMode::Nearest), 2);
+/// assert_eq!((-14i16).div_round(-4, RoundingMode::Nearest), 4);
+/// ```
+///
+/// # div_round_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode;
+///
+/// let mut x = 10u8;
+/// x.div_round_assign(4, RoundingMode::Down);
+/// assert_eq!(x, 2);
+///
+/// let mut x = 10u16;
+/// x.div_round_assign(4, RoundingMode::Up);
+/// assert_eq!(x, 3);
+///
+/// let mut x = 10u32;
+/// x.div_round_assign(5, RoundingMode::Exact);
+/// assert_eq!(x, 2);
+///
+/// let mut x = 10u64;
+/// x.div_round_assign(3, RoundingMode::Nearest);
+/// assert_eq!(x, 3);
+///
+/// let mut x = 20u128;
+/// x.div_round_assign(3, RoundingMode::Nearest);
+/// assert_eq!(x, 7);
+///
+/// let mut x = 10usize;
+/// x.div_round_assign(4, RoundingMode::Nearest);
+/// assert_eq!(x, 2);
+///
+/// let mut x = 14u8;
+/// x.div_round_assign(4, RoundingMode::Nearest);
+/// assert_eq!(x, 4);
+///
+/// let mut x = -10i8;
+/// x.div_round_assign(4, RoundingMode::Down);
+/// assert_eq!(x, -2);
+///
+/// let mut x = -10i16;
+/// x.div_round_assign(4, RoundingMode::Up);
+/// assert_eq!(x, -3);
+///
+/// let mut x = -10i32;
+/// x.div_round_assign(5, RoundingMode::Exact);
+/// assert_eq!(x, -2);
+///
+/// let mut x = -10i64;
+/// x.div_round_assign(3, RoundingMode::Nearest);
+/// assert_eq!(x, -3);
+///
+/// let mut x = -20i128;
+/// x.div_round_assign(3, RoundingMode::Nearest);
+/// assert_eq!(x, -7);
+///
+/// let mut x = -10isize;
+/// x.div_round_assign(4, RoundingMode::Nearest);
+/// assert_eq!(x, -2);
+///
+/// let mut x = -14i8;
+/// x.div_round_assign(4, RoundingMode::Nearest);
+/// assert_eq!(x, -4);
+///
+/// let mut x = -10i16;
+/// x.div_round_assign(-4, RoundingMode::Down);
+/// assert_eq!(x, 2);
+///
+/// let mut x = -10i32;
+/// x.div_round_assign(-4, RoundingMode::Up);
+/// assert_eq!(x, 3);
+///
+/// let mut x = -10i64;
+/// x.div_round_assign(-5, RoundingMode::Exact);
+/// assert_eq!(x, 2);
+///
+/// let mut x = -10i128;
+/// x.div_round_assign(-3, RoundingMode::Nearest);
+/// assert_eq!(x, 3);
+///
+/// let mut x = -20isize;
+/// x.div_round_assign(-3, RoundingMode::Nearest);
+/// assert_eq!(x, 7);
+///
+/// let mut x = -10i8;
+/// x.div_round_assign(-4, RoundingMode::Nearest);
+/// assert_eq!(x, 2);
+///
+/// let mut x = -14i16;
+/// x.div_round_assign(-4, RoundingMode::Nearest);
+/// assert_eq!(x, 4);
+/// ```
 pub mod div_round;
 pub mod divisible_by;
 pub mod divisible_by_power_of_two;

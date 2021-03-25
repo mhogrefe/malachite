@@ -6,30 +6,28 @@ macro_rules! impl_div_exact {
             type Output = $t;
 
             /// Divides a value by another value. The first value must be exactly divisible by the
-            /// second. If it isn't, this function may crash or return a meaningless result.
+            /// second.
+            ///
+            /// If `self` is not exactly divisible by `other`, this function may crash or return a
+            /// meaningless result.
+            ///
+            /// $$
+            /// f(x, y) = \frac{x}{y}.
+            /// $$
             ///
             /// If you are unsure whether the division will be exact use `self / other` instead. If
             /// you're unsure and you want to know, use `self.div_mod(other)` and check whether the
             /// remainder is zero. If you want a function that panics if the division is not exact,
             /// use `self.div_round(other, RoundingMode::Exact)`.
             ///
-            /// Time: Worst case O(1)
-            ///
-            /// Additional memory: Worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is zero. May panic if `self` is not divisible by `other`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::DivExact;
-            ///
-            /// // 123 * 456 = 56088
-            /// assert_eq!(56088u32.div_exact(456), 123);
-            ///
-            /// // -123 * -456 = 56088
-            /// assert_eq!(56088i64.div_exact(-456), -123);
-            /// ```
+            /// See the documentation of the `num::arithmetic::div_exact` module.
             #[inline]
             fn div_exact(self, other: $t) -> $t {
                 self / other
@@ -38,36 +36,29 @@ macro_rules! impl_div_exact {
 
         impl DivExactAssign<$t> for $t {
             /// Divides a value by another value in place. The value being assigned to must be
-            /// exactly divisible by the value on the RHS. If it isn't, this function may crash or
-            /// assign a meaningless value to the first value.
+            /// exactly divisible by the value on the RHS.
+            ///
+            /// If `self` is not exactly divisible by `other`, this function may crash or return a
+            /// meaningless result.
+            ///
+            /// $$
+            /// x \gets \frac{x}{y}.
+            /// $$
             ///
             /// If you are unsure whether the division will be exact use `self /= other` instead. If
             /// you're unsure and you want to know, use `self.div_assign_mod(other)` and check
             /// whether the remainder is zero. If you want a function that panics if the division is
             /// not exact, use `self.div_round_assign(other, RoundingMode::Exact)`.
             ///
-            /// Time: Worst case O(1)
-            ///
-            /// Additional memory: Worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is zero or if `self` is `$t::MIN` and other is -1. May panic if
             /// `self` is not divisible by `other`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::DivExactAssign;
-            ///
-            /// // 123 * 456 = 56088
-            /// let mut x = 56088u32;
-            /// x.div_exact_assign(456);
-            /// assert_eq!(x, 123);
-            ///
-            /// // -123 * -456 = 56088
-            /// let mut x = 56088i64;
-            /// x.div_exact_assign(-456);
-            /// assert_eq!(x, -123);
-            /// ```
+            /// See the documentation of the `num::arithmetic::div_exact` module.
             #[inline]
             fn div_exact_assign(&mut self, other: $t) {
                 *self /= other;

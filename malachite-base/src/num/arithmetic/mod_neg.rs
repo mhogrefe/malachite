@@ -1,7 +1,6 @@
-use std::ops::Sub;
-
 use num::arithmetic::traits::{ModNeg, ModNegAssign};
 use num::basic::traits::Zero;
+use std::ops::Sub;
 
 fn _mod_neg<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: T, m: T) -> T {
     if x == T::ZERO {

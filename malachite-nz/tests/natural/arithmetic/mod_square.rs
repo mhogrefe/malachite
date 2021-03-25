@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModSquare, ModSquareAssign};
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_mod_square() {

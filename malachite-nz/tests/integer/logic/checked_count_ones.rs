@@ -1,10 +1,8 @@
-use std::str::FromStr;
-
+use malachite_nz::integer::Integer;
 use malachite_nz_test_util::integer::logic::checked_count_ones::{
     integer_checked_count_ones_alt_1, integer_checked_count_ones_alt_2,
 };
-
-use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_checked_count_ones() {

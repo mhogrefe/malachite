@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::CheckedSubMul;
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_checked_sub_mul() {

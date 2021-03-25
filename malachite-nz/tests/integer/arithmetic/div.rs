@@ -1,10 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::DivRem;
 use malachite_base::num::basic::traits::Zero;
-use num::BigInt;
-
 use malachite_nz::integer::Integer;
+use num::BigInt;
+use std::str::FromStr;
 
 #[test]
 fn test_div() {

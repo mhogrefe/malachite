@@ -1,5 +1,3 @@
-use malachite_base::num::arithmetic::traits::UnsignedAbs;
-
 use integer::Integer;
 use natural::Natural;
 

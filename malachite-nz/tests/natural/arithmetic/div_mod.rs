@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
     NegMod, PowerOfTwo,
@@ -23,6 +21,7 @@ use malachite_nz_test_util::natural::arithmetic::div_mod::{
 };
 use num::{BigUint, Integer};
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LeadingZeros;

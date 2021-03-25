@@ -1,8 +1,7 @@
 use itertools::Itertools;
+use named::Named;
 use std::collections::HashSet;
 use std::fmt::{Binary, Debug, LowerHex, Octal, UpperHex};
-
-use named::Named;
 
 /// Sorts the characters of a string and returns them in a new `String`.
 ///

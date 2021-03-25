@@ -1,13 +1,15 @@
 use fail_on_untested_path;
+use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{
     CheckedLogTwo, CheckedMul, DivAssignMod, DivMod, DivisibleByPowerOfTwo, ModPowerOfTwoAssign,
-    Parity, ShrRound, ShrRoundAssign, SquareAssign, XMulYIsZZ,
+    Parity, PowerOfTwo, ShrRound, ShrRoundAssign, SquareAssign, XMulYIsZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, WrappingFrom, WrappingInto,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, ExactInto, PowerOfTwoDigits, WrappingFrom,
+    WrappingInto,
 };
 use malachite_base::num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
@@ -27,8 +29,8 @@ use natural::comparison::ord::limbs_cmp_same_length;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{
-    Limb, BASES, MP_BASES_BIG_BASE_10, MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10,
-    MP_BASES_NORMALIZATION_STEPS_10,
+    Limb, BASES, FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD, MP_BASES_BIG_BASE_10,
+    MP_BASES_BIG_BASE_INVERTED_10, MP_BASES_CHARS_PER_LIMB_10, MP_BASES_NORMALIZATION_STEPS_10,
 };
 use std::cmp::Ordering;
 
@@ -759,8 +761,12 @@ const TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 50;
 
 const SQRT_MAX_LIMB: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
 
-fn compute_powers(powers: &mut Vec<Natural>, base: &Natural, bits: u64) {
+fn compute_powers_for_to_digits(base: &Natural, bits: u64) -> Vec<Natural> {
+    if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
+        return Vec::new();
+    }
     let limit = (bits + 3).shr_round(1, RoundingMode::Ceiling);
+    let mut powers = Vec::new();
     let mut power = base.clone();
     loop {
         powers.push(power.clone());
@@ -770,6 +776,7 @@ fn compute_powers(powers: &mut Vec<Natural>, base: &Natural, bits: u64) {
         }
     }
     powers.push(power);
+    powers
 }
 
 fn _to_digits_asc_divide_and_conquer_limb<
@@ -778,8 +785,8 @@ fn _to_digits_asc_divide_and_conquer_limb<
     digits: &mut Vec<T>,
     mut x: Natural,
     base: Limb,
-    powers: &mut Vec<Natural>,
-    mut power_index: usize,
+    powers: &[Natural],
+    power_index: usize,
 ) where
     Limb: Digits<T>,
     Natural: From<T>,
@@ -797,10 +804,6 @@ fn _to_digits_asc_divide_and_conquer_limb<
             _to_digits_asc_naive_primitive(digits, &x, T::exact_from(base))
         }
     } else {
-        if powers.is_empty() {
-            compute_powers(powers, &From::<Limb>::from(base), bits);
-            power_index = powers.len() - 1;
-        }
         let (q, r) = x.div_mod(&powers[power_index]);
         let start_len = digits.len();
         _to_digits_asc_divide_and_conquer_limb(digits, r, base, powers, power_index - 1);
@@ -817,17 +820,13 @@ fn _to_digits_asc_divide_and_conquer(
     digits: &mut Vec<Natural>,
     x: &Natural,
     base: &Natural,
-    powers: &mut Vec<Natural>,
-    mut power_index: usize,
+    powers: &[Natural],
+    power_index: usize,
 ) {
     let bits = x.significant_bits();
     if bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
         _to_digits_asc_naive(digits, x, base)
     } else {
-        if powers.is_empty() {
-            compute_powers(powers, base, bits);
-            power_index = powers.len() - 1;
-        }
         let (q, r) = x.div_mod(&powers[power_index]);
         let start_len = digits.len();
         _to_digits_asc_divide_and_conquer(digits, &r, base, powers, power_index - 1);
@@ -873,14 +872,17 @@ where
                     digits.reverse();
                     digits
                 } else {
-                    let mut powers = Vec::new();
+                    let powers = compute_powers_for_to_digits(
+                        &From::<Limb>::from(base),
+                        x.significant_bits(),
+                    );
                     let mut digits = Vec::new();
                     _to_digits_asc_divide_and_conquer_limb(
                         &mut digits,
                         x.clone(),
                         base,
-                        &mut powers,
-                        0,
+                        &powers,
+                        powers.len().saturating_sub(1),
                     );
                     digits
                 }
@@ -921,14 +923,17 @@ where
                     digits.truncate(len);
                     digits
                 } else {
-                    let mut powers = Vec::new();
+                    let powers = compute_powers_for_to_digits(
+                        &From::<Limb>::from(base),
+                        x.significant_bits(),
+                    );
                     let mut digits = Vec::new();
                     _to_digits_asc_divide_and_conquer_limb(
                         &mut digits,
                         x.clone(),
                         base,
-                        &mut powers,
-                        0,
+                        &powers,
+                        powers.len().saturating_sub(1),
                     );
                     digits.reverse();
                     digits
@@ -938,7 +943,7 @@ where
     }
 }
 
-// base must be large
+// optimized for large base
 pub fn _to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     if *x == 0 {
         Vec::new()
@@ -949,9 +954,15 @@ pub fn _to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     } else {
         match x {
             Natural(Large(_)) => {
-                let mut powers = Vec::new();
+                let powers = compute_powers_for_to_digits(base, x.significant_bits());
                 let mut digits = Vec::new();
-                _to_digits_asc_divide_and_conquer(&mut digits, x, base, &mut powers, 0);
+                _to_digits_asc_divide_and_conquer(
+                    &mut digits,
+                    x,
+                    base,
+                    &powers,
+                    powers.len().saturating_sub(1),
+                );
                 digits
             }
             _ => panic!("x must be large"),
@@ -959,7 +970,7 @@ pub fn _to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     }
 }
 
-// base must be large
+// optimized for large base
 pub fn _to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     if *x == 0 {
         Vec::new()
@@ -970,9 +981,15 @@ pub fn _to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     } else {
         match x {
             Natural(Large(_)) => {
-                let mut powers = Vec::new();
+                let powers = compute_powers_for_to_digits(base, x.significant_bits());
                 let mut digits = Vec::new();
-                _to_digits_asc_divide_and_conquer(&mut digits, x, base, &mut powers, 0);
+                _to_digits_asc_divide_and_conquer(
+                    &mut digits,
+                    x,
+                    base,
+                    &powers,
+                    powers.len().saturating_sub(1),
+                );
                 digits.reverse();
                 digits
             }
@@ -991,6 +1008,17 @@ where
     for &x in xs {
         n *= &base;
         n += Natural::from(x);
+    }
+    n
+}
+
+pub fn _from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Natural {
+    assert!(*base > 1);
+    let mut n = Natural::ZERO;
+    for x in xs {
+        assert!(x < base);
+        n *= base;
+        n += x;
     }
     n
 }
@@ -1031,11 +1059,15 @@ where
         if base == 10 {
             // This is a common case. Help the compiler avoid multiplication.
             for &x in chunk_tail {
-                y = y * 10 + Limb::wrapping_from(x);
+                let x = Limb::wrapping_from(x);
+                assert!(x < 10);
+                y = y * 10 + x;
             }
         } else {
             for &x in chunk_tail {
-                y = y * base + Limb::wrapping_from(x);
+                let x = Limb::wrapping_from(x);
+                assert!(x < base);
+                y = y * base + x;
             }
         }
         if size == 0 {
@@ -1062,12 +1094,16 @@ where
     if base == 10 {
         // This is a common case. Help the compiler avoid multiplication.
         for &x in remainder_tail {
-            y = y * 10 + Limb::wrapping_from(x);
+            let x = Limb::wrapping_from(x);
+            assert!(x < 10);
+            y = y * 10 + x;
             big_base *= 10;
         }
     } else {
         for &x in remainder_tail {
-            y = y * base + Limb::wrapping_from(x);
+            let x = Limb::wrapping_from(x);
+            assert!(x < base);
+            y = y * base + x;
             big_base *= base;
         }
     }
@@ -1091,7 +1127,7 @@ where
 }
 
 // must be greater than get_chars_per_limb(3), which is 40 for 64-bit build
-const SET_STR_DC_THRESHOLD: usize = 7;
+const SET_STR_DC_THRESHOLD: usize = 7100;
 
 /// The input digits are in descending order.
 ///
@@ -1209,6 +1245,219 @@ where
             &powers,
             power_len,
             &mut scratch,
+        )
+    }
+}
+
+pub fn _from_digits_desc_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    xs: &[T],
+    base: Limb,
+) -> Natural
+where
+    Limb: ExactFrom<T>,
+{
+    assert!(base >= 2);
+    assert!(T::convertible_from(base));
+    let mut digits_per_limb = 0;
+    let mut big_base = 1;
+    while let Some(next) = big_base.checked_mul(base) {
+        big_base = next;
+        digits_per_limb += 1;
+    }
+    let big_big_base = Natural::from(big_base);
+    let mut x = Natural::ZERO;
+    for chunk in xs.rchunks(digits_per_limb).rev() {
+        let big_digit = Limb::from_digits_desc(&base, chunk.iter().map(|&x| Limb::exact_from(x)));
+        x *= &big_big_base;
+        x += Natural::from(big_digit);
+    }
+    x
+}
+
+fn compute_powers_for_from_digits(base: &Natural, digits: usize) -> Vec<Natural> {
+    if u64::checked_from(digits).unwrap() * base.significant_bits()
+        < FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
+    {
+        return Vec::new();
+    }
+    let limit = digits.shr_round(1u64, RoundingMode::Ceiling);
+    let mut powers = Vec::new();
+    let mut power = base.clone();
+    let mut p = 1;
+    loop {
+        powers.push(power.clone());
+        if p >= limit {
+            break;
+        }
+        power.square_assign();
+        p <<= 1;
+    }
+    powers
+}
+
+fn _from_digits_desc_divide_and_conquer_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    xs: &[T],
+    base: Limb,
+    powers: &[Natural],
+    power_index: usize,
+) -> Natural
+where
+    Limb: ExactFrom<T>,
+    Natural: From<T>,
+{
+    let xs_len = xs.len();
+    let b = u64::checked_from(xs_len).unwrap() * base.significant_bits();
+    if power_index == 0 || b < FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD {
+        if base <= SQRT_MAX_LIMB {
+            _from_digits_desc_basecase(xs, base)
+        } else {
+            _from_digits_desc_naive_primitive(xs, T::exact_from(base))
+        }
+    } else {
+        let p = usize::power_of_two(power_index.exact_into());
+        if xs_len <= p {
+            _from_digits_desc_divide_and_conquer_limb(xs, base, powers, power_index - 1)
+        } else {
+            let (xs_hi, xs_lo) = xs.split_at(xs_len - p);
+            let out_hi =
+                _from_digits_desc_divide_and_conquer_limb(xs_hi, base, powers, power_index - 1);
+            let out_lo =
+                _from_digits_desc_divide_and_conquer_limb(xs_lo, base, powers, power_index - 1);
+            out_hi * &powers[power_index] + out_lo
+        }
+    }
+}
+
+pub fn _from_digits_desc_divide_and_conquer(
+    xs: &[Natural],
+    base: &Natural,
+    powers: &[Natural],
+    power_index: usize,
+    xs_orig: &[Natural],
+) -> Natural {
+    let xs_len = xs.len();
+    if power_index == 0
+        || u64::exact_from(xs_len) * base.significant_bits()
+            < FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
+    {
+        _from_digits_desc_naive(xs, base)
+    } else {
+        let p = usize::power_of_two(u64::exact_from(power_index));
+        if xs_len <= p {
+            _from_digits_desc_divide_and_conquer(xs, base, powers, power_index - 1, xs_orig)
+        } else {
+            let (xs_hi, xs_lo) = xs.split_at(xs_len - p);
+            let out_hi =
+                _from_digits_desc_divide_and_conquer(xs_hi, base, powers, power_index - 1, xs_orig);
+            let out_lo =
+                _from_digits_desc_divide_and_conquer(xs_lo, base, powers, power_index - 1, xs_orig);
+            out_hi * &powers[power_index] + out_lo
+        }
+    }
+}
+
+pub fn _from_digits_asc_limb<I: Iterator<Item = T>, T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    xs: I,
+    base: Limb,
+) -> Natural
+where
+    Limb: ExactFrom<T> + WrappingFrom<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    assert!(base >= 2);
+    if let Some(log_base) = base.checked_log_two() {
+        Natural::from_power_of_two_digits_asc(log_base, xs)
+    } else {
+        let mut xs = xs.collect_vec();
+        xs.reverse();
+        if base < 256 {
+            let u64_base = base.exact_into();
+            let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), u64_base))];
+            let len = _limbs_from_digits_small_base(&mut out, &xs, u64_base);
+            out.truncate(len);
+            Natural::from_owned_limbs_asc(out)
+        } else {
+            let t_base = T::exact_from(base);
+            let powers = compute_powers_for_from_digits(&Natural::from(t_base), xs.len());
+            _from_digits_desc_divide_and_conquer_limb(
+                &xs,
+                base,
+                &powers,
+                powers.len().saturating_sub(1),
+            )
+        }
+    }
+}
+
+pub fn _from_digits_desc_limb<I: Iterator<Item = T>, T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    xs: I,
+    base: Limb,
+) -> Natural
+where
+    Limb: ExactFrom<T> + WrappingFrom<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    assert!(base >= 2);
+    if let Some(log_base) = base.checked_log_two() {
+        Natural::from_power_of_two_digits_desc(log_base, xs)
+    } else {
+        let xs = xs.collect_vec();
+        if base < 256 {
+            let u64_base = base.exact_into();
+            let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), u64_base))];
+            let len = _limbs_from_digits_small_base(&mut out, &xs, u64_base);
+            out.truncate(len);
+            Natural::from_owned_limbs_asc(out)
+        } else {
+            let t_base = T::exact_from(base);
+            let powers = compute_powers_for_from_digits(&Natural::from(t_base), xs.len());
+            _from_digits_desc_divide_and_conquer_limb(
+                &xs,
+                base,
+                &powers,
+                powers.len().saturating_sub(1),
+            )
+        }
+    }
+}
+
+// optimized for large base
+pub fn _from_digits_asc_large<I: Iterator<Item = Natural>>(xs: I, base: &Natural) -> Natural {
+    let xs_orig = xs.collect_vec();
+    let xs = xs_orig.iter().cloned();
+
+    if let Some(log_base) = base.checked_log_two() {
+        Natural::from_power_of_two_digits_asc(log_base, xs)
+    } else {
+        let mut xs = xs.collect_vec();
+        xs.reverse();
+        let powers = compute_powers_for_from_digits(base, xs.len());
+        _from_digits_desc_divide_and_conquer(
+            &xs,
+            base,
+            &powers,
+            powers.len().saturating_sub(1),
+            &xs_orig,
+        )
+    }
+}
+
+// optimized for large base
+pub fn _from_digits_desc_large<I: Iterator<Item = Natural>>(xs: I, base: &Natural) -> Natural {
+    let xs_orig = xs.collect_vec();
+    let xs = xs_orig.iter().cloned();
+
+    if let Some(log_base) = base.checked_log_two() {
+        Natural::from_power_of_two_digits_desc(log_base, xs)
+    } else {
+        let xs = xs.collect_vec();
+        let powers = compute_powers_for_from_digits(base, xs.len());
+        _from_digits_desc_divide_and_conquer(
+            &xs,
+            base,
+            &powers,
+            powers.len().saturating_sub(1),
+            &xs_orig,
         )
     }
 }

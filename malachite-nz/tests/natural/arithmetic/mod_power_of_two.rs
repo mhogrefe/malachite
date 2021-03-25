@@ -1,9 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     ModPowerOfTwo, ModPowerOfTwoAssign, ModPowerOfTwoIsReduced, NegModPowerOfTwo,
     NegModPowerOfTwoAssign, RemPowerOfTwo, RemPowerOfTwoAssign,
 };
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_power_of_two::{

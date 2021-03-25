@@ -1,17 +1,15 @@
-use std::fmt::Debug;
-
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, OverflowingFrom, WrappingFrom};
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use std::fmt::Debug;
 
 #[test]
 pub fn test_overflowing_from() {
     fn test_single<T: Copy + Debug + Eq + OverflowingFrom<T>>(n: T) {
         assert_eq!(T::overflowing_from(n), (n, false));
-    };
+    }
     test_single(0u8);
     test_single(5u64);
     test_single(1000u32);
@@ -22,7 +20,7 @@ pub fn test_overflowing_from() {
 
     fn test_double<T, U: Copy + Debug + Eq + OverflowingFrom<T>>(n_in: T, n_out: (U, bool)) {
         assert_eq!(U::overflowing_from(n_in), n_out);
-    };
+    }
     test_double(0u8, (0u16, false));
     test_double(1000u16, (1000i32, false));
     test_double(-5i16, (-5i8, false));

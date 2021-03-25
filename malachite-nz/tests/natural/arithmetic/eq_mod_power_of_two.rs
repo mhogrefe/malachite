@@ -1,8 +1,7 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
 use malachite_base::num::conversion::traits::ExactFrom;
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::eq_mod_power_of_two::{

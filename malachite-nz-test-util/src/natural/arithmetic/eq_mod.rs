@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::slices::slice_trailing_zeros;
 use malachite_nz::natural::arithmetic::divisible_by::{
@@ -10,6 +8,7 @@ use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use malachite_nz::natural::arithmetic::sub::{limbs_sub, limbs_sub_limb};
 use malachite_nz::natural::comparison::ord::limbs_cmp;
 use malachite_nz::platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
+use std::cmp::Ordering;
 
 pub fn limbs_eq_limb_mod_naive_1(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     assert!(xs.len() > 1);

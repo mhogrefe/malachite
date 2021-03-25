@@ -13,7 +13,7 @@ fn test_add_mul() {
         let mut x = x;
         x.add_mul_assign(y, z);
         assert_eq!(x, out);
-    };
+    }
     test::<u8>(2, 3, 7, 23);
     test::<u32>(7, 5, 10, 57);
     test::<u64>(123, 456, 789, 359907);

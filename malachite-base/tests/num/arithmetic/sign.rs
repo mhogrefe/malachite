@@ -1,7 +1,6 @@
-use std::cmp::Ordering;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use std::cmp::Ordering;
 
 fn primitive_sign_helper<T: PrimitiveInt>() {
     let test = |n: T, out| {

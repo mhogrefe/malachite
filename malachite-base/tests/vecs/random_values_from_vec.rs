@@ -1,10 +1,9 @@
 use itertools::Itertools;
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-
 use malachite_base::nevers::Never;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::vecs::random_values_from_vec;
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
 
 #[allow(clippy::decimal_literal_representation)]
 #[test]

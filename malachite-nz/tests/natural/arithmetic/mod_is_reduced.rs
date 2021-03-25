@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::ModIsReduced;
 use malachite_base::num::basic::traits::Zero;
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_mod_is_reduced() {

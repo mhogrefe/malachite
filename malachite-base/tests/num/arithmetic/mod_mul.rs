@@ -1,5 +1,3 @@
-use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
-
 use malachite_base::num::arithmetic::mod_mul::{
     _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted, _naive_mod_mul,
     test_invert_u32_table, test_invert_u64_table,
@@ -7,6 +5,7 @@ use malachite_base::num::arithmetic::mod_mul::{
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
+use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 
 #[test]
 fn test_test_invert_u32_table() {
@@ -70,7 +69,7 @@ fn test_limbs_mod_preinverted() {
         let d_inv = limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
         assert_eq!(_limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv), out);
         assert_eq!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)), out);
-    };
+    }
     test::<u8, u16>(0, 0, 1, 0);
     test::<u32, u64>(0, 1, 1, 0);
     test::<u16, u32>(1, 0, 2, 0);

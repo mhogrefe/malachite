@@ -1,11 +1,9 @@
-use std::str::FromStr;
-
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
-use rug;
-
 use malachite_nz::natural::Natural;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_u32_checked_from_natural() {

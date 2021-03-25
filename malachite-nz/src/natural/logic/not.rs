@@ -1,10 +1,8 @@
-use std::ops::Not;
-
-use malachite_base::num::logic::traits::NotAssign;
-
 use integer::Integer;
+use malachite_base::num::logic::traits::NotAssign;
 use natural::Natural;
 use platform::Limb;
+use std::ops::Not;
 
 /// Returns the bitwise not of a slice of limbs.
 ///

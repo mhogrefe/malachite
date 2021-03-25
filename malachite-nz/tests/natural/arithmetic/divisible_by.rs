@@ -1,10 +1,9 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::divisible_by::combined_limbs_divisible_by_limb;
 use malachite_nz_test_util::natural::arithmetic::divisible_by::num_divisible_by;
 use num::BigUint;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::divisible_by::{

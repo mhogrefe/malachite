@@ -1,10 +1,9 @@
 use itertools::Itertools;
-use std::fmt::Debug;
-
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::tuples::exhaustive::exhaustive_units;
 use malachite_base::vecs::exhaustive::shortlex_vecs_length_inclusive_range;
+use std::fmt::Debug;
 
 fn shortlex_vecs_length_inclusive_range_small_helper<I: Clone + Iterator>(
     a: u64,

@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
+use malachite_nz::integer::Integer;
 use num::BigInt;
 use rug;
-
-use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_sub() {

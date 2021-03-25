@@ -7,7 +7,8 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{
     large_type_gen_var_1, unsigned_pair_gen, unsigned_vec_pair_gen_var_1,
     unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2,
-    unsigned_vec_triple_gen_var_3, unsigned_vec_unsigned_pair_gen,
+    unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_26,
+    unsigned_vec_triple_gen_var_27, unsigned_vec_triple_gen_var_3, unsigned_vec_unsigned_pair_gen,
     unsigned_vec_unsigned_unsigned_triple_gen, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_base_test_util::runner::Runner;
@@ -16,6 +17,13 @@ use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
     limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
     limbs_vec_mul_limb_in_place,
+};
+use malachite_nz::natural::arithmetic::mul::mul_low::{
+    _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
+    _limbs_mul_low_same_length_divide_and_conquer,
+    _limbs_mul_low_same_length_divide_and_conquer_scratch_len,
+    _limbs_mul_low_same_length_divide_and_conquer_shared_scratch, _limbs_mul_low_same_length_large,
+    limbs_mul_low_same_length,
 };
 use malachite_nz::natural::arithmetic::mul::toom::{
     _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
@@ -128,6 +136,14 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         demo_limbs_mul_greater_to_out_fft_input_sizes_threshold
     );
+    register_demo!(runner, demo_limbs_mul_low_same_length_basecase);
+    register_demo!(
+        runner,
+        demo_limbs_mul_low_same_length_divide_and_conquer_shared_scratch
+    );
+    register_demo!(runner, demo_limbs_mul_low_same_length_divide_and_conquer);
+    register_demo!(runner, demo_limbs_mul_low_same_length);
+
     register_bench!(runner, benchmark_limbs_mul_limb);
     register_bench!(runner, benchmark_limbs_mul_limb_with_carry_to_out);
     register_bench!(runner, benchmark_limbs_mul_limb_to_out);
@@ -224,6 +240,24 @@ pub(crate) fn register(runner: &mut Runner) {
         runner,
         benchmark_limbs_mul_greater_to_out_fft_same_length_algorithms
     );
+    register_bench!(
+        runner,
+        benchmark_limbs_mul_low_same_length_basecase_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_limbs_mul_low_same_length_basecase_algorithms_2
+    );
+    register_bench!(
+        runner,
+        benchmark_limbs_mul_low_same_length_divide_and_conquer_shared_scratch_algorithms
+    );
+    register_bench!(
+        runner,
+        benchmark_limbs_mul_low_same_length_divide_and_conquer_algorithms
+    );
+    register_bench!(runner, benchmark_limbs_mul_low_same_length_large_algorithms);
+    register_bench!(runner, benchmark_limbs_mul_low_same_length_algorithms);
 }
 
 fn demo_limbs_mul_limb(gm: GenMode, config: GenConfig, limit: usize) {
@@ -428,6 +462,67 @@ mul_valid_helper!(
     _limbs_mul_greater_to_out_fft_input_sizes_threshold,
     demo_limbs_mul_greater_to_out_fft_input_sizes_threshold
 );
+
+fn demo_limbs_mul_low_same_length_basecase(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_24()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let out_old = out.clone();
+        _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys);
+        println!(
+            "out := {:?}; _limbs_mul_low_same_length_basecase(&mut out, {:?}, {:?}); out = {:?}",
+            out_old, xs, ys, out
+        );
+    }
+}
+
+fn demo_limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) {
+    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_25()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let out_old = out.clone();
+        _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys);
+        println!(
+            "out := {:?}; \
+             _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, {:?}, {:?}); \
+             out = {:?}",
+            out_old, xs, ys, out
+        );
+    }
+}
+
+fn demo_limbs_mul_low_same_length_divide_and_conquer(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_26()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let out_old = out.clone();
+        let mut scratch = vec![0; xs.len() << 1];
+        _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch);
+        println!(
+            "out := {:?}; _limbs_mul_low_same_length_divide_and_conquer(&mut out, {:?}, {:?}); \
+             out = {:?}",
+            out_old, xs, ys, out
+        );
+    }
+}
+
+fn demo_limbs_mul_low_same_length(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut out, xs, ys) in unsigned_vec_triple_gen_var_1().get(gm, &config).take(limit) {
+        let out_old = out.clone();
+        limbs_mul_low_same_length(&mut out, &xs, &ys);
+        println!(
+            "out := {:?}; limbs_mul_low_same_length(&mut out, {:?}, {:?}); out = {:?}",
+            out_old, xs, ys, out
+        );
+    }
+}
 
 fn benchmark_limbs_mul_limb(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
@@ -1081,6 +1176,162 @@ fn benchmark_limbs_mul_greater_to_out_fft_same_length_algorithms(
             }),
             ("FFT", &mut |(mut out, xs, ys)| {
                 _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys)
+            }),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_basecase_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_mul_low_same_length_basecase(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        unsigned_vec_triple_gen_var_24().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_2_vec_len_bucketer("xs"),
+        &mut [
+            ("standard", &mut |(mut out, xs, ys)| {
+                _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys)
+            }),
+            ("alt", &mut |(mut out, xs, ys)| {
+                _limbs_mul_low_same_length_basecase_alt(&mut out, &xs, &ys)
+            }),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_basecase_algorithms_2(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_mul_low_same_length_basecase(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        unsigned_vec_triple_gen_var_1().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_2_vec_len_bucketer("xs"),
+        &mut [
+            ("basecase mul", &mut |(mut out, xs, ys)| {
+                _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys)
+            }),
+            ("basecase mul low", &mut |(mut out, xs, ys)| {
+                _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys)
+            }),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_divide_and_conquer_shared_scratch_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_mul_low_same_length_divide_and_conquer_shared_scratch\
+         (&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        unsigned_vec_triple_gen_var_25().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_2_vec_len_bucketer("xs"),
+        &mut [
+            ("basecase", &mut |(mut out, xs, ys)| {
+                _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys)
+            }),
+            ("divide-and-conquer", &mut |(mut out, xs, ys)| {
+                _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys)
+            }),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_divide_and_conquer_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_mul_low_same_length_divide_and_conquer(&mut [Limb], &[Limb], &[Limb], &mut [Limb])",
+        BenchmarkType::Algorithms,
+        unsigned_vec_triple_gen_var_26().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_2_vec_len_bucketer("xs"),
+        &mut [
+            ("basecase", &mut |(mut out, xs, ys)| {
+                _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys)
+            }),
+            ("divide-and-conquer", &mut |(mut out, xs, ys)| {
+                let mut scratch = vec![0; ys.len() << 1];
+                _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch)
+            }),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_large_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_mul_low_same_length_large(&mut [Limb], &[Limb], &[Limb], &mut [Limb])",
+        BenchmarkType::Algorithms,
+        unsigned_vec_triple_gen_var_27().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_2_vec_len_bucketer("xs"),
+        &mut [
+            ("mul low divide-and-conquer", &mut |(mut out, xs, ys)| {
+                let mut scratch =
+                    vec![0; _limbs_mul_low_same_length_divide_and_conquer_scratch_len(xs.len())];
+                _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch)
+            }),
+            ("mul low large", &mut |(mut out, xs, ys)| {
+                let mut scratch =
+                    vec![0; _limbs_mul_low_same_length_divide_and_conquer_scratch_len(xs.len())];
+                _limbs_mul_low_same_length_large(&mut out, &xs, &ys, &mut scratch)
+            }),
+        ],
+    );
+}
+
+fn benchmark_limbs_mul_low_same_length_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_mul_low_same_length(&mut [Limb], &[Limb], &[Limb])",
+        BenchmarkType::Algorithms,
+        unsigned_vec_triple_gen_var_1().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_2_vec_len_bucketer("xs"),
+        &mut [
+            ("mul low", &mut |(mut out, xs, ys)| {
+                limbs_mul_low_same_length(&mut out, &xs, &ys)
+            }),
+            ("mul", &mut |(mut out, xs, ys)| {
+                limbs_mul_same_length_to_out(&mut out, &xs, &ys)
             }),
         ],
     );

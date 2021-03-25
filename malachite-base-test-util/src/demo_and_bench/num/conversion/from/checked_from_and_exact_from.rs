@@ -1,15 +1,13 @@
-use std::fmt::{Debug, Display};
-
 use malachite_base::named::Named;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
-
 use malachite_base_test_util::bench::bucketers::{signed_bit_bucketer, unsigned_bit_bucketer};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
 use malachite_base_test_util::runner::Runner;
+use std::fmt::{Debug, Display};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_int_unsigned_demos!(runner, demo_primitive_int_checked_from_unsigned);

@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
 use malachite_base::num::conversion::traits::ExactFrom;
-
 use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_divisible_by_power_of_two() {

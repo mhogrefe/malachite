@@ -1,11 +1,10 @@
 use itertools::Itertools;
-use std::fmt::Debug;
-use std::iter::empty;
-
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::{exhaustive_positive_primitive_ints, exhaustive_unsigneds};
 use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_2_inputs;
+use std::fmt::Debug;
+use std::iter::empty;
 
 fn lex_fixed_length_vecs_2_inputs_helper<
     T: Clone + Debug + Eq,

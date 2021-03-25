@@ -1,12 +1,11 @@
-use malachite_base_test_util::generators::{
-    signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen,
-    unsigned_triple_gen,
-};
-
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::EqAbs;
+use malachite_base_test_util::generators::{
+    signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen,
+    unsigned_triple_gen,
+};
 
 #[test]
 pub fn test_eq_abs_partial_eq_abs_and_comparators() {
@@ -14,7 +13,7 @@ pub fn test_eq_abs_partial_eq_abs_and_comparators() {
         assert_eq!(x.eq_abs(&y), eq);
         assert_eq!(y.eq_abs(&x), eq);
         assert_eq!(ne, x.ne_abs(&y));
-    };
+    }
     test(123u16, 123u16, true, false);
     test(123u16, 456u16, false, true);
 

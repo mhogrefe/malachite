@@ -1,8 +1,7 @@
-use std::iter::repeat;
-
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
+use std::iter::repeat;
 
 pub fn integer_op_bits(bit_fn: &dyn Fn(bool, bool) -> bool, x: &Integer, y: &Integer) -> Integer {
     let x_negative = *x < 0;

@@ -5,8 +5,8 @@
     clippy::explicit_iter_loop,
     clippy::filter_map,
     clippy::filter_map_next,
-    clippy::find_map,
     clippy::large_digit_groups,
+    clippy::manual_find_map,
     clippy::map_flatten,
     clippy::map_unwrap_or,
     clippy::match_same_arms,
@@ -26,6 +26,7 @@
     clippy::cognitive_complexity,
     clippy::many_single_char_names,
     clippy::too_many_arguments,
+    clippy::upper_case_acronyms,
     unstable_name_collisions
 )]
 

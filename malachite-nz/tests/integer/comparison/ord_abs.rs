@@ -1,8 +1,7 @@
 use malachite_base::num::comparison::traits::OrdAbs;
 use malachite_base_test_util::common::test_custom_cmp_helper;
-use rug;
-
 use malachite_nz::integer::Integer;
+use rug;
 
 #[test]
 fn test_ord_abs() {

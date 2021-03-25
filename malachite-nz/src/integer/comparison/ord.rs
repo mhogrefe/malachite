@@ -1,6 +1,5 @@
-use std::cmp::Ordering;
-
 use integer::Integer;
+use std::cmp::Ordering;
 
 impl PartialOrd for Integer {
     /// Compares an `Integer` to another `Integer`.

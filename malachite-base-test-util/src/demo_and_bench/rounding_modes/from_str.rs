@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
 use malachite_base::rounding_modes::RoundingMode;
-
 use malachite_base_test_util::bench::bucketers::string_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{string_gen, string_gen_var_2};
 use malachite_base_test_util::runner::Runner;
+use std::str::FromStr;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_rounding_mode_from_str);

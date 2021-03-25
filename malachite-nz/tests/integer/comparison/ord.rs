@@ -1,8 +1,7 @@
 use malachite_base_test_util::common::test_cmp_helper;
+use malachite_nz::integer::Integer;
 use num::BigInt;
 use rug;
-
-use malachite_nz::integer::Integer;
 
 #[test]
 fn test_ord() {

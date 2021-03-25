@@ -1,6 +1,5 @@
-use std::cmp::Ordering;
-
 use num::BigInt;
+use std::cmp::Ordering;
 
 pub fn num_partial_cmp_primitive<T>(x: &BigInt, u: T) -> Option<Ordering>
 where

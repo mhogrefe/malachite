@@ -1,7 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::IsPowerOfTwo;
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::is_power_of_two::limbs_is_power_of_two;

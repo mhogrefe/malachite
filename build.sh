@@ -1,4 +1,26 @@
 #!/bin/bash
+rustup update &&
+cd malachite-base &&
+cargo fmt &&
+cargo check --all-targets &&
+cd ../malachite-base-test-util &&
+cargo fmt &&
+cargo check --all-targets &&
+cd ../malachite-nz &&
+cargo fmt &&
+cargo check --all-targets --features 32_bit_limbs --features serde &&
+cargo check --all-targets --features serde &&
+cd ../malachite-nz-test-util &&
+cargo fmt &&
+cargo check --all-targets &&
+cd ../malachite-bench &&
+cargo fmt &&
+cd ../malachite-test &&
+cargo fmt &&
+cargo check --all-targets --features 32_bit_limbs &&
+cargo check --all-targets &&
+cd .. &&
+python3 additional-lints.py &&
 cd malachite-base &&
 cargo update &&
 cargo fmt &&

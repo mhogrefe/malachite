@@ -5,9 +5,9 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
     large_type_gen_var_1, unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_2,
-    unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2, unsigned_vec_triple_gen_var_3,
-    unsigned_vec_unsigned_pair_gen, unsigned_vec_unsigned_unsigned_triple_gen,
-    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+    unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2, unsigned_vec_triple_gen_var_24,
+    unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_3, unsigned_vec_unsigned_pair_gen,
+    unsigned_vec_unsigned_unsigned_triple_gen, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -20,7 +20,6 @@ use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_slice_mul_limb_in_place, limbs_slice_mul_limb_with_carry_in_place,
     limbs_vec_mul_limb_in_place,
 };
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::mul_low::{
     _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
     _limbs_mul_low_same_length_divide_and_conquer,
@@ -17593,7 +17592,6 @@ fn test_limbs_mul_fft_internal() {
     );
 }
 
-#[cfg(feature = "32_bit_limbs")]
 fn verify_mul_low_1(out_before: &[Limb], xs: &[Limb], ys: &[Limb], out_after: &[Limb]) {
     let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
     let mut ns = n.into_limbs_asc();
@@ -17669,7 +17667,27 @@ fn limbs_mul_low_same_length_basecase_fail_3() {
     _limbs_mul_low_same_length_basecase(&mut out, &[], &[]);
 }
 
-#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn limbs_mul_low_same_length_basecase_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_24().test_properties_with_config(
+        &config,
+        |(out_before, xs, ys)| {
+            let mut out = out_before.to_vec();
+            _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys);
+
+            let out_after = out;
+            let mut out = out_before.to_vec();
+            _limbs_mul_low_same_length_basecase_alt(&mut out, &xs, &ys);
+            assert_eq!(out, out_after);
+
+            verify_mul_low_1(&out_before, &xs, &ys, &out_after);
+        },
+    );
+}
+
 fn verify_mul_low_2(xs: &[Limb], ys: &[Limb], out: &[Limb]) {
     let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
     let mut ns = n.into_limbs_asc();
@@ -18835,6 +18853,30 @@ fn limbs_mul_low_same_length_divide_and_conquer_fail_3() {
     let mut out = vec![10];
     let mut scratch = vec![0; 6];
     _limbs_mul_low_same_length_divide_and_conquer(&mut out, &[2], &[3], &mut scratch);
+}
+
+#[test]
+fn limbs_mul_low_same_length_divide_and_conquer_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 256 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_25().test_properties_with_config(
+        &config,
+        |(out_before, xs, ys)| {
+            let mut out = out_before.to_vec();
+            _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys);
+
+            let len = xs.len();
+            let out_after = out[..len].to_vec();
+            let mut out = out_before.to_vec();
+            let mut scratch = vec![0; xs.len() << 1];
+            _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch);
+            let out_after: &[Limb] = &out_after;
+            assert_eq!(&out[..len], out_after);
+
+            verify_mul_low_2(&xs, &ys, out_after);
+        },
+    );
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -20165,6 +20207,18 @@ fn limbs_mul_low_same_length_fail_2() {
 fn limbs_mul_low_same_length_fail_3() {
     let mut out = vec![10];
     limbs_mul_low_same_length(&mut out, &[], &[]);
+}
+
+#[test]
+fn limbs_mul_low_same_length_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 256 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_1().test_properties_with_config(&config, |(out_before, xs, ys)| {
+        let mut out = out_before.to_vec();
+        limbs_mul_low_same_length(&mut out, &xs, &ys);
+        verify_mul_low_1(&out_before, &xs, &ys, &out);
+    });
 }
 
 #[test]

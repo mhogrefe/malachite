@@ -1,10 +1,9 @@
-use malachite_base_test_util::generators::{
-    signed_unsigned_pair_gen_var_1, unsigned_gen, unsigned_pair_gen_var_2,
-};
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_unsigned_pair_gen_var_1, unsigned_gen, unsigned_pair_gen_var_2,
+};
 
 fn test_helper_primitive_int<T: PrimitiveInt>() {
     let test = |n: u64, index, out| {

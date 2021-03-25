@@ -1,8 +1,7 @@
-use std::iter::repeat;
-
 use malachite_base::num::logic::traits::{BitIterable, HammingDistance, SignificantBits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use std::iter::repeat;
 
 pub fn natural_hamming_distance_alt_1(x: &Natural, y: &Natural) -> u64 {
     let bit_zip: Box<dyn Iterator<Item = (bool, bool)>> =

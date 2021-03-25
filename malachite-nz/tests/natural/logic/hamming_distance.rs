@@ -1,10 +1,9 @@
-use std::str::FromStr;
-
 use malachite_base::num::logic::traits::HammingDistance;
 use malachite_nz_test_util::natural::logic::hamming_distance::{
     natural_hamming_distance_alt_1, natural_hamming_distance_alt_2, rug_hamming_distance,
 };
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::logic::hamming_distance::{

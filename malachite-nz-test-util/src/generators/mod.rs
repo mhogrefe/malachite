@@ -179,18 +179,29 @@ pub fn natural_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: Primi
     )
 }
 
+// -- (Vec<Natural>, Natural) --
+
+pub fn natural_vec_natural_pair_gen_var_1() -> Generator<(Vec<Natural>, Natural)> {
+    Generator::new_no_special(
+        &exhaustive_natural_vec_natural_pair_gen_var_1,
+        &random_natural_vec_natural_pair_gen_var_1,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+// vars 1 through 3 are in malachite-base
 
 // All `(Vec<T>, T>)` where `T` is unsigned, the `Vec` has at least two elements, and the `T` is
 // greater than 1 and exactly convertible to the unsigned type `U`.
-pub fn unsigned_vec_unsigned_pair_gen_var_1<
+pub fn unsigned_vec_unsigned_pair_gen_var_4<
     T: PrimitiveUnsigned + SaturatingFrom<U>,
     U: PrimitiveUnsigned,
 >() -> Generator<(Vec<T>, T)> {
     Generator::new(
-        &exhaustive_unsigned_vec_unsigned_pair_gen_var_1::<T, U>,
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_4::<T, U>,
         &random_unsigned_vec_unsigned_pair_gen_var_1::<T, U>,
-        &special_random_unsigned_vec_unsigned_pair_gen_var_1::<T, U>,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_4::<T, U>,
     )
 }
 
@@ -237,7 +248,7 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2<
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned> --
 
-// vars 1 thru 3 are in malachite-base
+// vars 1 through 3 are in malachite-base
 
 // All `(Vec<T>, Vec<T>, Vec<T>)` that are valid inputs to `_limbs_mul_greater_to_out_toom_22`.
 pub fn unsigned_vec_triple_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
@@ -446,6 +457,8 @@ pub fn unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>() -> Generator<(Vec<
         &special_random_unsigned_vec_triple_gen_var_23,
     )
 }
+
+// vars 24 through 27 are in malachite-base
 
 pub mod common;
 pub mod exhaustive;

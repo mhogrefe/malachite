@@ -1,8 +1,9 @@
-use std::iter::Cloned;
-
 use random::Seed;
 use rounding_modes::{RoundingMode, ROUNDING_MODES};
 use slices::{random_values_from_slice, RandomValuesFromSlice};
+use std::iter::Cloned;
+
+pub type RandomRoundingModes = Cloned<RandomValuesFromSlice<'static, RoundingMode>>;
 
 /// Uniformly generates a random `RoundingMode`.
 ///
@@ -29,6 +30,6 @@ use slices::{random_values_from_slice, RandomValuesFromSlice};
 /// )
 /// ```
 #[inline]
-pub fn random_rounding_modes(seed: Seed) -> Cloned<RandomValuesFromSlice<'static, RoundingMode>> {
+pub fn random_rounding_modes(seed: Seed) -> RandomRoundingModes {
     random_values_from_slice(seed, &ROUNDING_MODES).cloned()
 }

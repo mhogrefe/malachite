@@ -6,7 +6,8 @@
     clippy::range_plus_one,
     clippy::suspicious_arithmetic_impl,
     clippy::suspicious_op_assign_impl,
-    clippy::too_many_arguments
+    clippy::too_many_arguments,
+    clippy::upper_case_acronyms
 )]
 #![warn(
     clippy::cast_lossless,
@@ -15,8 +16,8 @@
     clippy::explicit_iter_loop,
     clippy::filter_map,
     clippy::filter_map_next,
-    clippy::find_map,
     clippy::large_digit_groups,
+    clippy::manual_find_map,
     clippy::map_flatten,
     clippy::map_unwrap_or,
     clippy::match_same_arms,

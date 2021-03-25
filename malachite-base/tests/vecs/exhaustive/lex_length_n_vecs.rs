@@ -1,14 +1,13 @@
 use itertools::Itertools;
-use std::cmp::Ordering;
-use std::fmt::Debug;
-use std::iter::{empty, once};
-
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
 use malachite_base::orderings::exhaustive::exhaustive_orderings;
 use malachite_base::vecs::exhaustive::{
     exhaustive_fixed_length_vecs_from_single, lex_length_2_vecs, lex_length_3_vecs,
 };
+use std::cmp::Ordering;
+use std::fmt::Debug;
+use std::iter::{empty, once};
 
 fn lex_length_2_vecs_helper<T: Clone + Debug + Eq, I: Iterator<Item = T>, J: Iterator<Item = T>>(
     xs: I,

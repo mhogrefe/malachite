@@ -1,14 +1,12 @@
-use std::fmt::Display;
-
 use malachite_base::named::Named;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::FromOtherTypeSlice;
-
 use malachite_base_test_util::bench::bucketers::vec_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_vec_gen;
 use malachite_base_test_util::runner::Runner;
+use std::fmt::Display;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_unsigned_demos!(runner, demo_from_other_type_slice);

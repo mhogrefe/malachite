@@ -1,14 +1,12 @@
-use std::cmp::Ordering;
-
-use malachite_base_test_util::generators::{
-    signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen,
-    unsigned_triple_gen,
-};
-
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::OrdAbs;
+use malachite_base_test_util::generators::{
+    signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen,
+    unsigned_triple_gen,
+};
+use std::cmp::Ordering;
 
 #[test]
 pub fn test_cmp_abs_partial_cmp_abs_and_comparators() {
@@ -19,7 +17,7 @@ pub fn test_cmp_abs_partial_cmp_abs_and_comparators() {
         assert_eq!(gt, x.gt_abs(&y));
         assert_eq!(le, x.le_abs(&y));
         assert_eq!(ge, x.ge_abs(&y));
-    };
+    }
     test(123u16, 123u16, Ordering::Equal, false, false, true, true);
     test(123u16, 456u16, Ordering::Less, true, false, true, false);
     test(456u16, 123u16, Ordering::Greater, false, true, false, true);

@@ -1,13 +1,11 @@
 use core::hash::Hash;
-use std::fmt::Debug;
-
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-
 use itertools::Itertools;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::options::random::random_somes;
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
+use std::fmt::Debug;
 
 fn random_somes_helper<I: Clone + Iterator>(
     xs: I,

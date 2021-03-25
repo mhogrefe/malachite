@@ -1,5 +1,3 @@
-use std::cmp::max;
-
 use malachite_base::chars::crement::char_to_contiguous_range;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -7,6 +5,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use std::cmp::max;
 
 pub struct Bucketer<'a, T> {
     pub bucketing_function: &'a dyn Fn(&T) -> usize,
@@ -127,6 +126,21 @@ pub fn triple_max_bit_bucketer<
         bucketing_label: format!(
             "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits())",
             x_name, y_name, z_name
+        ),
+    }
+}
+
+pub fn triple_1_2_max_bit_bucketer<'a, T: Copy + SignificantBits, U: Copy + SignificantBits, V>(
+    x_name: &str,
+    y_name: &str,
+) -> Bucketer<'a, (T, U, V)> {
+    Bucketer {
+        bucketing_function: &|&(x, y, ref _z)| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
         ),
     }
 }
@@ -255,5 +269,19 @@ pub fn assign_bits_bucketer<T, U>() -> Bucketer<'static, (T, u64, u64, U)> {
     Bucketer {
         bucketing_function: &|&(_, start, end, _)| usize::exact_from(end - start),
         bucketing_label: "end - start".to_string(),
+    }
+}
+
+pub fn pair_1_vec_len_times_pair_2_bits_bucketer<'a, T, U: PrimitiveUnsigned>(
+    xs_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Vec<T>, U)> {
+    Bucketer {
+        bucketing_function: &|&(ref xs, ref y)| {
+            xs.len()
+                .checked_mul(usize::exact_from(y.significant_bits()))
+                .unwrap()
+        },
+        bucketing_label: format!("{}.len() * {}.significant_bits()", xs_name, y_name),
     }
 }

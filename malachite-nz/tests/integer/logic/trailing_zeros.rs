@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
-use malachite_nz_test_util::integer::logic::trailing_zeros::integer_trailing_zeros_alt;
-
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::integer::logic::trailing_zeros::integer_trailing_zeros_alt;
+use std::str::FromStr;
 
 #[test]
 fn test_trailing_zeros() {

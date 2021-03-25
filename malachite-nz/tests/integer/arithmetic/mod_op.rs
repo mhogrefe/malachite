@@ -1,67 +1,55 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign,
 };
 use malachite_base::num::basic::traits::Zero;
+use malachite_nz::integer::Integer;
 use num::{BigInt, Integer as NumInteger};
 use rug::ops::RemRounding;
-
-use malachite_nz::integer::Integer;
-
-//TODO clean from_str
+use std::str::FromStr;
 
 #[test]
 fn test_mod() {
-    let test = |u, v, remainder| {
-        let mut x = Integer::from_str(u).unwrap();
-        x.mod_assign(Integer::from_str(v).unwrap());
+    let test = |s, t, remainder| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x.mod_assign(v.clone());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let mut x = Integer::from_str(u).unwrap();
-        x.mod_assign(&Integer::from_str(v).unwrap());
+        let mut x = u.clone();
+        x.mod_assign(&v);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let r = Integer::from_str(u)
-            .unwrap()
-            .mod_op(Integer::from_str(v).unwrap());
+        let r = u.clone().mod_op(v.clone());
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = Integer::from_str(u)
-            .unwrap()
-            .mod_op(&Integer::from_str(v).unwrap());
+        let r = u.clone().mod_op(&v);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = (&Integer::from_str(u).unwrap()).mod_op(Integer::from_str(v).unwrap());
+        let r = (&u).mod_op(v.clone());
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = (&Integer::from_str(u).unwrap()).mod_op(&Integer::from_str(v).unwrap());
+        let r = (&u).mod_op(&v);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = BigInt::from_str(u)
+        let r = BigInt::from_str(s)
             .unwrap()
-            .mod_floor(&BigInt::from_str(v).unwrap());
+            .mod_floor(&BigInt::from_str(t).unwrap());
         assert_eq!(r.to_string(), remainder);
 
-        let r = rug::Integer::from_str(u)
+        let r = rug::Integer::from_str(s)
             .unwrap()
-            .rem_floor(rug::Integer::from_str(v).unwrap());
+            .rem_floor(rug::Integer::from_str(t).unwrap());
         assert_eq!(r.to_string(), remainder);
 
-        assert_eq!(
-            Integer::from_str(u)
-                .unwrap()
-                .div_mod(Integer::from_str(v).unwrap())
-                .1
-                .to_string(),
-            remainder
-        );
+        assert_eq!(u.div_mod(v).1.to_string(), remainder);
     };
     test("0", "1", "0");
     test("0", "123", "0");
@@ -352,47 +340,43 @@ fn mod_ref_ref_fail() {
 
 #[test]
 fn test_rem() {
-    let test = |u, v, remainder| {
-        let mut x = Integer::from_str(u).unwrap();
-        x %= Integer::from_str(v).unwrap();
+    let test = |s, t, remainder| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x %= v.clone();
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let mut x = Integer::from_str(u).unwrap();
-        x %= &Integer::from_str(v).unwrap();
+        let mut x = u.clone();
+        x %= &v;
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let r = Integer::from_str(u).unwrap() % Integer::from_str(v).unwrap();
+        let r = u.clone() % v.clone();
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = Integer::from_str(u).unwrap() % &Integer::from_str(v).unwrap();
+        let r = u.clone() % &v;
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = &Integer::from_str(u).unwrap() % Integer::from_str(v).unwrap();
+        let r = &u % v.clone();
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = &Integer::from_str(u).unwrap() % &Integer::from_str(v).unwrap();
+        let r = &u % &v;
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = BigInt::from_str(u).unwrap() % &BigInt::from_str(v).unwrap();
+        let r = BigInt::from_str(s).unwrap() % &BigInt::from_str(t).unwrap();
         assert_eq!(r.to_string(), remainder);
 
-        let r = rug::Integer::from_str(u).unwrap() % rug::Integer::from_str(v).unwrap();
+        let r = rug::Integer::from_str(s).unwrap() % rug::Integer::from_str(t).unwrap();
         assert_eq!(r.to_string(), remainder);
 
-        assert_eq!(
-            Integer::from_str(u)
-                .unwrap()
-                .div_rem(Integer::from_str(v).unwrap())
-                .1
-                .to_string(),
-            remainder
-        );
+        assert_eq!(u.div_rem(v).1.to_string(), remainder);
     };
     test("0", "1", "0");
     test("0", "123", "0");
@@ -681,50 +665,42 @@ fn rem_ref_ref_fail() {
 
 #[test]
 fn test_ceiling_mod() {
-    let test = |u, v, remainder| {
-        let mut x = Integer::from_str(u).unwrap();
-        x.ceiling_mod_assign(Integer::from_str(v).unwrap());
+    let test = |s, t, remainder| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x.ceiling_mod_assign(v.clone());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let mut x = Integer::from_str(u).unwrap();
-        x.ceiling_mod_assign(&Integer::from_str(v).unwrap());
+        let mut x = u.clone();
+        x.ceiling_mod_assign(&v);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let r = Integer::from_str(u)
+        let r = u.clone().ceiling_mod(v.clone());
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+
+        let r = u.clone().ceiling_mod(&v);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+
+        let r = (&u).ceiling_mod(v.clone());
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+
+        let r = (&u).ceiling_mod(&v);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+
+        let r = rug::Integer::from_str(s)
             .unwrap()
-            .ceiling_mod(Integer::from_str(v).unwrap());
-        assert!(r.is_valid());
+            .rem_ceil(rug::Integer::from_str(t).unwrap());
         assert_eq!(r.to_string(), remainder);
 
-        let r = Integer::from_str(u)
-            .unwrap()
-            .ceiling_mod(&Integer::from_str(v).unwrap());
-        assert!(r.is_valid());
-        assert_eq!(r.to_string(), remainder);
-
-        let r = (&Integer::from_str(u).unwrap()).ceiling_mod(Integer::from_str(v).unwrap());
-        assert!(r.is_valid());
-        assert_eq!(r.to_string(), remainder);
-
-        let r = (&Integer::from_str(u).unwrap()).ceiling_mod(&Integer::from_str(v).unwrap());
-        assert!(r.is_valid());
-        assert_eq!(r.to_string(), remainder);
-
-        let r = rug::Integer::from_str(u)
-            .unwrap()
-            .rem_ceil(rug::Integer::from_str(v).unwrap());
-        assert_eq!(r.to_string(), remainder);
-
-        assert_eq!(
-            Integer::from_str(u)
-                .unwrap()
-                .ceiling_div_mod(Integer::from_str(v).unwrap())
-                .1
-                .to_string(),
-            remainder
-        );
+        assert_eq!(u.ceiling_div_mod(v).1.to_string(), remainder);
     };
     test("0", "1", "0");
     test("0", "123", "0");

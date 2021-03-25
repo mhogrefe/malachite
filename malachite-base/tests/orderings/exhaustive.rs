@@ -1,7 +1,6 @@
-use std::cmp::Ordering;
-
 use itertools::Itertools;
 use malachite_base::orderings::exhaustive::{exhaustive_orderings, orderings_increasing};
+use std::cmp::Ordering;
 
 #[test]
 fn test_orderings_increasing() {

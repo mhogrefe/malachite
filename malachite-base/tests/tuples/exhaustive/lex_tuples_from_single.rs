@@ -1,6 +1,4 @@
 use itertools::Itertools;
-use std::fmt::Debug;
-
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::nevers::nevers;
@@ -9,6 +7,7 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_units, lex_octuples_from_single, lex_pairs_from_single, lex_quadruples_from_single,
     lex_quintuples_from_single, lex_triples_from_single,
 };
+use std::fmt::Debug;
 
 macro_rules! helpers {
     ($t: ty, $ts: ident, $ts_helper: ident, $ts_small_helper: ident) => {

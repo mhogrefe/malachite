@@ -1,7 +1,8 @@
+use rounding_modes::{RoundingMode, ROUNDING_MODES};
 use std::iter::Cloned;
 use std::slice::Iter;
 
-use rounding_modes::{RoundingMode, ROUNDING_MODES};
+pub type ExhaustiveRoundingModes = Cloned<Iter<'static, RoundingMode>>;
 
 /// Generates all `RoundingMode`s.
 ///
@@ -28,6 +29,6 @@ use rounding_modes::{RoundingMode, ROUNDING_MODES};
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_rounding_modes() -> Cloned<Iter<'static, RoundingMode>> {
+pub fn exhaustive_rounding_modes() -> ExhaustiveRoundingModes {
     ROUNDING_MODES.iter().cloned()
 }

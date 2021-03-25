@@ -1,7 +1,6 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::_explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_xx_div_mod_y_is_qr() {

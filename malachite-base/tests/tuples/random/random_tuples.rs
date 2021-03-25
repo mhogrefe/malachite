@@ -1,10 +1,5 @@
 use core::hash::Hash;
 use itertools::Itertools;
-use std::fmt::Debug;
-
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-
 use malachite_base::bools::random::random_bools;
 use malachite_base::chars::random::random_ascii_chars;
 use malachite_base::num::random::geometric::geometric_random_signeds;
@@ -14,6 +9,9 @@ use malachite_base::tuples::random::{
     random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
 };
 use malachite_base::tuples::singletons;
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
+use std::fmt::Debug;
 
 fn random_pairs_helper<
     X: Clone + Debug + Eq + Hash + Ord,

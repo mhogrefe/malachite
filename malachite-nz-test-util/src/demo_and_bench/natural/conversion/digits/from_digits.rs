@@ -1,25 +1,47 @@
+use crate::bench::bucketers::pair_1_vec_len_times_pair_2_natural_bits_bucketer;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base_test_util::bench::bucketers::triple_2_vec_len_bucketer;
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, PowerOfTwoDigits, SaturatingFrom, WrappingFrom,
+};
+use malachite_base_test_util::bench::bucketers::{
+    pair_1_vec_len_bucketer, pair_1_vec_len_times_pair_2_bits_bucketer, triple_2_vec_len_bucketer,
+};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
+use malachite_base_test_util::generators::{
+    unsigned_vec_unsigned_pair_gen_var_5, unsigned_vec_unsigned_pair_gen_var_6,
+};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::conversion::digits::general_digits::{
+    _from_digits_asc_large, _from_digits_asc_limb, _from_digits_desc_basecase,
+    _from_digits_desc_large, _from_digits_desc_limb, _from_digits_desc_naive,
     _from_digits_desc_naive_primitive, _limbs_from_digits_small_base,
     _limbs_from_digits_small_base_basecase,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2;
+use malachite_nz_test_util::generators::{
+    natural_vec_natural_pair_gen_var_1, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+};
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_limbs_from_digits_small_base_basecase);
     register_unsigned_demos!(runner, demo_limbs_from_digits_small_base);
+    register_unsigned_demos!(runner, demo_from_digits_desc_basecase);
+    register_unsigned_demos!(runner, demo_from_digits_asc_limb);
+    register_unsigned_demos!(runner, demo_from_digits_desc_limb);
+    register_demo!(runner, demo_from_digits_asc_large);
+    register_demo!(runner, demo_from_digits_desc_large);
     register_unsigned_benches!(
         runner,
         benchmark_limbs_from_digits_small_base_basecase_algorithms
     );
     register_unsigned_benches!(runner, benchmark_limbs_from_digits_small_base_algorithms);
+    register_unsigned_benches!(runner, benchmark_from_digits_desc_basecase_algorithms);
+    register_unsigned_benches!(runner, benchmark_from_digits_asc_limb);
+    register_unsigned_benches!(runner, benchmark_from_digits_desc_limb_algorithms);
+    register_bench!(runner, benchmark_from_digits_asc_large);
+    register_bench!(runner, benchmark_from_digits_desc_large_algorithms);
 }
 
 fn demo_limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
@@ -60,6 +82,96 @@ fn demo_limbs_from_digits_small_base<T: PrimitiveUnsigned>(
             "out := {:?}; _limbs_from_digits_small_base(&mut out, {:?}, {}) = {}; \
             out = {:?}",
             old_out, xs, base, out_len, out
+        );
+    }
+}
+
+fn demo_from_digits_desc_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: CheckedFrom<T> + SaturatingFrom<T>,
+{
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_desc_basecase(&{:?}, {}) = {}",
+            xs,
+            base,
+            _from_digits_desc_basecase(&xs, base)
+        );
+    }
+}
+
+fn demo_from_digits_asc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_6::<T, Limb>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_asc_limb(&{:?}, {}) = {}",
+            xs.clone(),
+            base,
+            _from_digits_asc_limb(xs.into_iter(), base)
+        );
+    }
+}
+
+fn demo_from_digits_desc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_6::<T, Limb>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_desc_limb(&{:?}, {}) = {}",
+            xs.clone(),
+            base,
+            _from_digits_desc_limb(xs.into_iter(), base)
+        );
+    }
+}
+
+fn demo_from_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize) {
+    for (xs, base) in natural_vec_natural_pair_gen_var_1()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_asc_large(&{:?}, {}) = {}",
+            xs.clone(),
+            base,
+            _from_digits_asc_large(xs.into_iter(), &base)
+        );
+    }
+}
+
+fn demo_from_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize) {
+    for (xs, base) in natural_vec_natural_pair_gen_var_1()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_desc_large(&{:?}, {}) = {}",
+            xs.clone(),
+            base,
+            _from_digits_desc_large(xs.into_iter(), &base)
         );
     }
 }
@@ -121,6 +233,125 @@ fn benchmark_limbs_from_digits_small_base_algorithms<T: PrimitiveUnsigned>(
             }),
             ("basecase", &mut |(mut out, xs, base)| {
                 no_out!(_limbs_from_digits_small_base_basecase(&mut out, &xs, base))
+            }),
+        ],
+    );
+}
+
+fn benchmark_from_digits_desc_basecase_algorithms<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Limb: ExactFrom<T> + SaturatingFrom<T>,
+    Natural: From<T>,
+{
+    run_benchmark(
+        &format!("from_digits_desc_basecase(&[{}], u64)", T::NAME),
+        BenchmarkType::Algorithms,
+        unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_bucketer("xs"),
+        &mut [
+            ("default", &mut |(xs, base)| {
+                no_out!(_from_digits_desc_basecase(&xs, base))
+            }),
+            ("naive", &mut |(xs, base)| {
+                _from_digits_desc_naive_primitive(&xs, T::exact_from(base)).into_limbs_asc();
+            }),
+        ],
+    );
+}
+
+fn benchmark_from_digits_asc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    run_benchmark(
+        &format!("from_digits_asc_limb(&[{}], Limb)", T::NAME),
+        BenchmarkType::Algorithms,
+        unsigned_vec_unsigned_pair_gen_var_6::<T, Limb>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_times_pair_2_bits_bucketer("xs", "base"),
+        &mut [("Malachite", &mut |(xs, base)| {
+            no_out!(_from_digits_asc_limb(xs.into_iter(), base))
+        })],
+    );
+}
+
+fn benchmark_from_digits_desc_limb_algorithms<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
+    Natural: From<T> + PowerOfTwoDigits<T>,
+{
+    run_benchmark(
+        &format!("from_digits_desc_limb(&[{}], Limb)", T::NAME),
+        BenchmarkType::Algorithms,
+        unsigned_vec_unsigned_pair_gen_var_6::<T, Limb>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_times_pair_2_bits_bucketer("xs", "base"),
+        &mut [
+            ("full", &mut |(xs, base)| {
+                no_out!(_from_digits_desc_limb(xs.into_iter(), base))
+            }),
+            ("basecase", &mut |(xs, base)| {
+                no_out!(_from_digits_desc_basecase(&xs, base))
+            }),
+        ],
+    );
+}
+
+fn benchmark_from_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "from_digits_asc_large(&[Natural], Natural)",
+        BenchmarkType::Single,
+        natural_vec_natural_pair_gen_var_1().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_times_pair_2_natural_bits_bucketer("xs", "base"),
+        &mut [("Malachite", &mut |(xs, base)| {
+            no_out!(_from_digits_desc_large(xs.into_iter(), &base))
+        })],
+    );
+}
+
+fn benchmark_from_digits_desc_large_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "from_digits_desc_large(&[Natural], Natural)",
+        BenchmarkType::Algorithms,
+        natural_vec_natural_pair_gen_var_1().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_times_pair_2_natural_bits_bucketer("xs", "base"),
+        &mut [
+            ("large", &mut |(xs, base)| {
+                no_out!(_from_digits_desc_large(xs.into_iter(), &base))
+            }),
+            ("naive", &mut |(xs, base)| {
+                no_out!(_from_digits_desc_naive(&xs, &base))
             }),
         ],
     );

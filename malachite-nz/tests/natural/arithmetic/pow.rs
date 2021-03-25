@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz_test_util::natural::arithmetic::pow::{
@@ -8,6 +6,7 @@ use malachite_nz_test_util::natural::arithmetic::pow::{
 use num::traits::Pow as NumPow;
 use num::BigUint;
 use rug::ops::Pow as RugPow;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::pow::limbs_pow;

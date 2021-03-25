@@ -1,8 +1,7 @@
-use malachite_base_test_util::num::arithmetic::mod_pow::_naive_mod_pow;
-
 use malachite_base::num::arithmetic::mod_pow::_simple_binary_mod_pow;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::num::arithmetic::mod_pow::_naive_mod_pow;
 
 fn mod_pow_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, exp: u64, m, out| {

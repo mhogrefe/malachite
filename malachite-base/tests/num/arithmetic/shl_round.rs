@@ -1,9 +1,8 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::rounding_modes::RoundingMode;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_shl_round() {
@@ -18,7 +17,7 @@ fn test_shl_round() {
         let mut t = t;
         t.shl_round_assign(u, rm);
         assert_eq!(t, out);
-    };
+    }
     test::<u8, i8>(0, 0, RoundingMode::Down, 0);
     test::<u8, i8>(0, 0, RoundingMode::Up, 0);
     test::<u8, i8>(0, 0, RoundingMode::Floor, 0);

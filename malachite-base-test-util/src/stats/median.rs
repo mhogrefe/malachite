@@ -1,6 +1,5 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-
 use stats::moments::CheckedToF64;
 
 pub const fn uniform_bool_median(min: bool, max: bool) -> (bool, Option<bool>) {

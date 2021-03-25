@@ -1,10 +1,8 @@
-use std::cmp::Ordering;
-use std::str::FromStr;
-
 use malachite_base::num::comparison::traits::PartialOrdAbs;
-
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[test]
 fn test_partial_ord_integer_natural() {

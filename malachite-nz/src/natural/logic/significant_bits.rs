@@ -1,7 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 

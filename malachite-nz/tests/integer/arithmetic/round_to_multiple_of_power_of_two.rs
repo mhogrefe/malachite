@@ -1,36 +1,29 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign, ShrRound,
 };
 use malachite_base::rounding_modes::RoundingMode;
-
 use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_round_to_multiple_of_power_of_two() {
-    let test = |u, v: u64, rm: RoundingMode, out| {
-        let mut n = Integer::from_str(u).unwrap();
+    let test = |s, v: u64, rm: RoundingMode, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        let mut n = u.clone();
         n.round_to_multiple_of_power_of_two_assign(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(u)
-            .unwrap()
-            .round_to_multiple_of_power_of_two(v, rm);
+        let n = u.clone().round_to_multiple_of_power_of_two(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Integer::from_str(u)
-            .unwrap()
-            .round_to_multiple_of_power_of_two(v, rm);
+        let n = (&u).round_to_multiple_of_power_of_two(v, rm);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        assert_eq!(
-            (Integer::from_str(u).unwrap().shr_round(v, rm) << v).to_string(),
-            out
-        );
+        assert_eq!((u.shr_round(v, rm) << v).to_string(), out);
     };
     test("0", 0, RoundingMode::Down, "0");
     test("0", 0, RoundingMode::Up, "0");

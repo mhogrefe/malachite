@@ -1,11 +1,22 @@
 use iterators::{nonzero_values, NonzeroValues};
 use itertools::{Interleave, Itertools};
+use num::arithmetic::traits::PowerOfTwo;
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
+use num::basic::traits::{One, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
+use num::conversion::traits::ExactFrom;
 use num::float::nice_float::NiceFloat;
 use num::float::PrimitiveFloat;
+use num::iterators::{ruler_sequence, RulerSequence};
+use num::logic::traits::NotAssign;
 use std::iter::{once, Chain, Once, Rev};
+use std::marker::PhantomData;
+use std::vec::IntoIter;
+use tuples::exhaustive::{
+    exhaustive_dependent_pairs, lex_dependent_pairs, ExhaustiveDependentPairs,
+    ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
+};
 
 /// Generates all primitive integers in an interval.
 ///
@@ -1050,4 +1061,664 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 /// ```
 pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreasingRange<T> {
     primitive_float_increasing_inclusive_range(T::NEGATIVE_INFINITY, T::POSITIVE_INFINITY)
+}
+
+/// Generates all finite positive primitive floats with a specified exponent and precision.
+#[derive(Clone, Debug)]
+pub struct ConstantPrecisionPrimitiveFloats<T: PrimitiveFloat> {
+    n: T::UnsignedOfEqualWidth,
+    increment: T::UnsignedOfEqualWidth,
+    i: T::UnsignedOfEqualWidth,
+    count: T::UnsignedOfEqualWidth,
+}
+
+impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        if self.i == self.count {
+            None
+        } else {
+            let out = T::from_bits(self.n);
+            self.i += T::UnsignedOfEqualWidth::ONE;
+            if self.i < self.count {
+                self.n += self.increment;
+            }
+            Some(out)
+        }
+    }
+}
+
+/// Generates all finite positive primitive floats with a specified exponent and precision.
+///
+/// Positive and negative zero are both excluded.
+///
+/// A finite positive primitive float may be uniquely expressed as $x = m2^e$, where $1 \leq m < 2$
+/// and $e$ is an integer; then $e$ is the exponent. An integer $e$ occurs as the exponent of a
+/// float iff $2-2^{E-1}-M \leq e < 2^{E-1}$.
+///
+/// In the above equation, $m$ is a dyadic rational. Let $p$ be the smallest integer such that
+/// $m2^{p-1}$ is an integer. Then $p$ is the float's precision. It is also the number of
+/// significant bits.
+///
+/// For example, consider the float $100.0$. It may be written as $\frac{25}{16}2^6$, so
+/// $m=\frac{25}{16}$ and $e=6$. We can write $m$ in binary as $1.1001_2$. Thus, the exponent is 6
+/// and the precision is 5.
+///
+/// If $p$ is 1, the output length is 1; otherwise, it is $2^{p-2}$.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if the exponent is less than `T::MIN_EXPONENT` or greater than `T::MAX_EXPONENT`, or if
+/// the precision is zero or too large for the given exponent (this can be checked using
+/// `T::max_precision_for_exponent`).
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_exponent_and_precision;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+///
+/// assert_eq!(
+///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(0, 3).map(NiceFloat)
+///         .collect_vec(),
+///     &[1.25, 1.75]
+/// );
+/// assert_eq!(
+///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(0, 5).map(NiceFloat)
+///         .collect_vec(),
+///     &[1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375]
+/// );
+/// assert_eq!(
+///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(6, 5).map(NiceFloat)
+///         .collect_vec(),
+///     &[68.0, 76.0, 84.0, 92.0, 100.0, 108.0, 116.0, 124.0]
+/// );
+/// ```
+pub fn exhaustive_primitive_floats_with_exponent_and_precision<T: PrimitiveFloat>(
+    exponent: i64,
+    precision: u64,
+) -> ConstantPrecisionPrimitiveFloats<T> {
+    assert!(exponent >= T::MIN_EXPONENT);
+    assert!(exponent <= T::MAX_EXPONENT);
+    assert_ne!(precision, 0);
+    let max_precision = T::max_precision_for_exponent(exponent);
+    assert!(precision <= max_precision);
+    let increment = T::UnsignedOfEqualWidth::power_of_two(max_precision - precision + 1);
+    let first_mantissa = if precision == 1 {
+        T::UnsignedOfEqualWidth::ONE
+    } else {
+        T::UnsignedOfEqualWidth::power_of_two(precision - 1) | T::UnsignedOfEqualWidth::ONE
+    };
+    let first = T::from_adjusted_mantissa_and_exponent(
+        first_mantissa,
+        exponent - i64::exact_from(precision) + 1,
+    )
+    .unwrap()
+    .to_bits();
+    let count = if precision == 1 {
+        T::UnsignedOfEqualWidth::ONE
+    } else {
+        T::UnsignedOfEqualWidth::power_of_two(precision - 2)
+    };
+    ConstantPrecisionPrimitiveFloats {
+        n: first,
+        increment,
+        i: T::UnsignedOfEqualWidth::ZERO,
+        count,
+    }
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub struct PrimitiveFloatsWithExponentGenerator<T: PrimitiveFloat> {
+    phantom: PhantomData<*const T>,
+    exponent: i64,
+}
+
+impl<T: PrimitiveFloat>
+    ExhaustiveDependentPairsYsGenerator<u64, T, ConstantPrecisionPrimitiveFloats<T>>
+    for PrimitiveFloatsWithExponentGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, &precision: &u64) -> ConstantPrecisionPrimitiveFloats<T> {
+        exhaustive_primitive_floats_with_exponent_and_precision(self.exponent, precision)
+    }
+}
+
+#[inline]
+fn exhaustive_primitive_floats_with_exponent_helper<T: PrimitiveFloat>(
+    exponent: i64,
+) -> LexDependentPairs<
+    u64,
+    T,
+    PrimitiveFloatsWithExponentGenerator<T>,
+    PrimitiveIntIncreasingRange<u64>,
+    ConstantPrecisionPrimitiveFloats<T>,
+> {
+    lex_dependent_pairs(
+        primitive_int_increasing_inclusive_range(1, T::max_precision_for_exponent(exponent)),
+        PrimitiveFloatsWithExponentGenerator {
+            phantom: PhantomData,
+            exponent,
+        },
+    )
+}
+
+/// Generates all finite positive primitive floats with a specified exponent.
+#[derive(Clone, Debug)]
+pub struct ExhaustivePrimitiveFloatsWithExponent<T: PrimitiveFloat>(
+    LexDependentPairs<
+        u64,
+        T,
+        PrimitiveFloatsWithExponentGenerator<T>,
+        PrimitiveIntIncreasingRange<u64>,
+        ConstantPrecisionPrimitiveFloats<T>,
+    >,
+);
+
+impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+/// Generates all finite positive primitive floats with a specified exponent.
+///
+/// Positive and negative zero are both excluded.
+///
+/// A finite positive primitive float may be uniquely expressed as $x = m2^e$, where $1 \leq m < 2$
+/// and $e$ is an integer; then $e$ is the exponent. An integer $e$ occurs as the exponent of a
+/// float iff $2-2^{E-1}-M \leq e < 2^{E-1}$.
+///
+/// If $e \geq 2-2^{E-1}$ (the float is normal), the output length is $2^M$.
+/// - For `f32`, this is $2^{23}$, or 8388608.
+/// - For `f64`, this is $2^{52}$, or 4503599627370496.
+///
+/// If $e < 2-2^{E-1}$ (the float is subnormal), the output length is $2^{e+2^{E-1}+M-2}$.
+/// - For `f32`, this is $2^{e+149}$.
+/// - For `f64`, this is $2^{e+1074}$.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if the exponent is less than `T::MIN_EXPONENT` or greater than `T::MAX_EXPONENT`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_exponent;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+///
+/// assert_eq!(
+///     exhaustive_primitive_floats_with_exponent::<f32>(0).take(20).map(NiceFloat).collect_vec(),
+///     &[
+///         1.0, 1.5, 1.25, 1.75, 1.125, 1.375, 1.625, 1.875, 1.0625, 1.1875, 1.3125, 1.4375,
+///         1.5625, 1.6875, 1.8125, 1.9375, 1.03125, 1.09375, 1.15625, 1.21875
+///     ]
+/// );
+/// assert_eq!(
+///     exhaustive_primitive_floats_with_exponent::<f32>(4).take(20).map(NiceFloat).collect_vec(),
+///     &[
+///         16.0, 24.0, 20.0, 28.0, 18.0, 22.0, 26.0, 30.0, 17.0, 19.0, 21.0, 23.0, 25.0, 27.0,
+///         29.0, 31.0, 16.5, 17.5, 18.5, 19.5
+///     ]
+/// );
+/// assert_eq!(
+///     exhaustive_primitive_floats_with_exponent::<f32>(-147).map(NiceFloat).collect_vec(),
+///     &[6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_primitive_floats_with_exponent<T: PrimitiveFloat>(
+    exponent: i64,
+) -> ExhaustivePrimitiveFloatsWithExponent<T> {
+    ExhaustivePrimitiveFloatsWithExponent(exhaustive_primitive_floats_with_exponent_helper(
+        exponent,
+    ))
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub struct ExhaustivePositiveFinitePrimitiveFloatsGenerator<T: PrimitiveFloat> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveFloat>
+    ExhaustiveDependentPairsYsGenerator<i64, T, ExhaustivePrimitiveFloatsWithExponent<T>>
+    for ExhaustivePositiveFinitePrimitiveFloatsGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, &exponent: &i64) -> ExhaustivePrimitiveFloatsWithExponent<T> {
+        exhaustive_primitive_floats_with_exponent(exponent)
+    }
+}
+
+#[inline]
+fn exhaustive_positive_finite_primitive_floats_helper<T: PrimitiveFloat>(
+) -> ExhaustiveDependentPairs<
+    i64,
+    T,
+    RulerSequence<usize>,
+    ExhaustivePositiveFinitePrimitiveFloatsGenerator<T>,
+    ExhaustiveSignedRange<i64>,
+    ExhaustivePrimitiveFloatsWithExponent<T>,
+> {
+    exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_signed_inclusive_range(T::MIN_EXPONENT, T::MAX_EXPONENT),
+        ExhaustivePositiveFinitePrimitiveFloatsGenerator {
+            phantom: PhantomData,
+        },
+    )
+}
+
+/// Generates all finite positive primitive floats.
+#[derive(Clone, Debug)]
+pub struct ExhaustivePositiveFinitePrimitiveFloats<T: PrimitiveFloat>(
+    ExhaustiveDependentPairs<
+        i64,
+        T,
+        RulerSequence<usize>,
+        ExhaustivePositiveFinitePrimitiveFloatsGenerator<T>,
+        ExhaustiveSignedRange<i64>,
+        ExhaustivePrimitiveFloatsWithExponent<T>,
+    >,
+);
+
+impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFinitePrimitiveFloats<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+/// Generates all finite positive primitive floats.
+///
+/// Positive and negative zero are both excluded.
+///
+/// Roughly speaking, the simplest floats are generated first. If you want to generate the floats in
+/// ascending order instead, use `positive_finite_primitive_floats_increasing`.
+///
+/// The output length is $2^M(2^E-1)-1$.
+/// - For `f32`, this is $2^{31}-2^{23}-1$, or 2139095039.
+/// - For `f64`, this is $2^{63}-2^{52}-1$, or 9218868437227405311.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_positive_finite_primitive_floats;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+///
+/// assert_eq!(
+///     exhaustive_positive_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     &[
+///         1.0, 2.0, 1.5, 0.5, 1.25, 3.0, 1.75, 4.0, 1.125, 2.5, 1.375, 0.75, 1.625, 3.5, 1.875,
+///         0.25, 1.0625, 2.25, 1.1875, 0.625, 1.3125, 2.75, 1.4375, 6.0, 1.5625, 3.25, 1.6875,
+///         0.875, 1.8125, 3.75, 1.9375, 8.0, 1.03125, 2.125, 1.09375, 0.5625, 1.15625, 2.375,
+///         1.21875, 5.0, 1.28125, 2.625, 1.34375, 0.6875, 1.40625, 2.875, 1.46875, 0.375, 1.53125,
+///         3.125
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_positive_finite_primitive_floats<T: PrimitiveFloat>(
+) -> ExhaustivePositiveFinitePrimitiveFloats<T> {
+    ExhaustivePositiveFinitePrimitiveFloats(exhaustive_positive_finite_primitive_floats_helper())
+}
+
+/// Generates all finite negative primitive floats.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNegativeFinitePrimitiveFloats<T: PrimitiveFloat>(
+    ExhaustivePositiveFinitePrimitiveFloats<T>,
+);
+
+impl<T: PrimitiveFloat> Iterator for ExhaustiveNegativeFinitePrimitiveFloats<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        self.0.next().map(|f| -f)
+    }
+}
+
+/// Generates all finite negative primitive floats.
+///
+/// Positive and negative zero are both excluded.
+///
+/// Roughly speaking, the simplest floats are generated first. If you want to generate the floats in
+/// ascending order instead, use `negative_finite_primitive_floats_increasing`.
+///
+/// The output length is $2^M(2^E-1)-1$.
+/// - For `f32`, this is $2^{31}-2^{23}-1$, or 2139095039.
+/// - For `f64`, this is $2^{63}-2^{52}-1$, or 9218868437227405311.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_negative_finite_primitive_floats;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+///
+/// assert_eq!(
+///     exhaustive_negative_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     &[
+///         -1.0, -2.0, -1.5, -0.5, -1.25, -3.0, -1.75, -4.0, -1.125, -2.5, -1.375, -0.75, -1.625,
+///         -3.5, -1.875, -0.25, -1.0625, -2.25, -1.1875, -0.625, -1.3125, -2.75, -1.4375, -6.0,
+///         -1.5625, -3.25, -1.6875, -0.875, -1.8125, -3.75, -1.9375, -8.0, -1.03125, -2.125,
+///         -1.09375, -0.5625, -1.15625, -2.375, -1.21875, -5.0, -1.28125, -2.625, -1.34375,
+///         -0.6875, -1.40625, -2.875, -1.46875, -0.375, -1.53125, -3.125
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_negative_finite_primitive_floats<T: PrimitiveFloat>(
+) -> ExhaustiveNegativeFinitePrimitiveFloats<T> {
+    ExhaustiveNegativeFinitePrimitiveFloats(exhaustive_positive_finite_primitive_floats())
+}
+
+/// Generates all finite nonzero primitive floats.
+#[derive(Clone, Debug)]
+pub struct ExhaustiveNonzeroFinitePrimitiveFloats<T: PrimitiveFloat> {
+    toggle: bool,
+    xs: ExhaustivePositiveFinitePrimitiveFloats<T>,
+    x: T,
+}
+
+impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloats<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        self.toggle.not_assign();
+        if self.toggle {
+            self.x = self.xs.next().unwrap();
+            Some(self.x)
+        } else {
+            Some(-self.x)
+        }
+    }
+}
+
+/// Generates all finite nonzero primitive floats.
+///
+/// Positive and negative zero are both excluded.
+///
+/// Roughly speaking, the simplest floats are generated first. If you want to generate the floats in
+/// ascending order instead, use `nonzero_finite_primitive_floats_increasing`.
+///
+/// The output length is $2^{M+1}(2^E-1)-2$.
+/// - For `f32`, this is $2^{32}-2^{24}-2$, or 4278190078.
+/// - For `f64`, this is $2^{64}-2^{53}-2$, or 18437736874454810622.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_nonzero_finite_primitive_floats;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+///
+/// assert_eq!(
+///     exhaustive_nonzero_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     &[
+///         1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0,
+///         -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5,
+///         1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625,
+///         -0.625, 1.3125, -1.3125, 2.75, -2.75, 1.4375, -1.4375, 6.0, -6.0, 1.5625, -1.5625
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
+) -> ExhaustiveNonzeroFinitePrimitiveFloats<T> {
+    ExhaustiveNonzeroFinitePrimitiveFloats {
+        toggle: false,
+        xs: exhaustive_positive_finite_primitive_floats(),
+        x: T::ZERO,
+    }
+}
+
+/// Generates all finite primitive floats.
+///
+/// Positive and negative zero are both included.
+///
+/// Roughly speaking, the simplest floats are generated first. If you want to generate the floats in
+/// ascending order instead, use `finite_primitive_floats_increasing`.
+///
+/// The output length is $2^{M+1}(2^E-1)$.
+/// - For `f32`, this is $2^{32}-2^{24}$, or 4278190080.
+/// - For `f64`, this is $2^{64}-2^{53}$, or 18437736874454810624.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_finite_primitive_floats;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+///
+/// assert_eq!(
+///     exhaustive_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     &[
+///         0.0, -0.0, 1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75,
+///         -1.75, 4.0, -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625,
+///         3.5, -3.5, 1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875,
+///         0.625, -0.625, 1.3125, -1.3125, 2.75, -2.75, 1.4375, -1.4375, 6.0, -6.0
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
+) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
+    vec![T::ZERO, T::NEGATIVE_ZERO]
+        .into_iter()
+        .chain(exhaustive_nonzero_finite_primitive_floats())
+}
+
+/// Generates all positive primitive floats.
+///
+/// Positive and negative zero are both excluded.
+///
+/// Roughly speaking, the simplest floats are generated first. If you want to generate the floats in
+/// ascending order instead, use `positive_primitive_floats_increasing`.
+///
+/// The output length is $2^M(2^E-1)$.
+/// - For `f32`, this is $2^{31}-2^{23}$, or 2139095040.
+/// - For `f64`, this is $2^{63}-2^{52}$, or 9218868437227405312.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_positive_primitive_floats;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(
+///     exhaustive_positive_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     &[
+///         f32::POSITIVE_INFINITY, 1.0, 2.0, 1.5, 0.5, 1.25, 3.0, 1.75, 4.0, 1.125, 2.5, 1.375,
+///         0.75, 1.625, 3.5, 1.875, 0.25, 1.0625, 2.25, 1.1875, 0.625, 1.3125, 2.75, 1.4375, 6.0,
+///         1.5625, 3.25, 1.6875, 0.875, 1.8125, 3.75, 1.9375, 8.0, 1.03125, 2.125, 1.09375, 0.5625,
+///         1.15625, 2.375, 1.21875, 5.0, 1.28125, 2.625, 1.34375, 0.6875, 1.40625, 2.875, 1.46875,
+///         0.375, 1.53125
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>(
+) -> Chain<Once<T>, ExhaustivePositiveFinitePrimitiveFloats<T>> {
+    once(T::POSITIVE_INFINITY).chain(exhaustive_positive_finite_primitive_floats())
+}
+
+/// Generates all negative primitive floats.
+///
+/// Positive and negative zero are both excluded.
+///
+/// Roughly speaking, the simplest floats are generated first. If you want to generate the floats in
+/// ascending order instead, use `negative_primitive_floats_increasing`.
+///
+/// The output length is $2^M(2^E-1)$.
+/// - For `f32`, this is $2^{31}-2^{23}$, or 2139095040.
+/// - For `f64`, this is $2^{63}-2^{52}$, or 9218868437227405312.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_negative_primitive_floats;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(
+///     exhaustive_negative_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     &[
+///         f32::NEGATIVE_INFINITY, -1.0, -2.0, -1.5, -0.5, -1.25, -3.0, -1.75, -4.0, -1.125, -2.5,
+///         -1.375, -0.75, -1.625, -3.5, -1.875, -0.25, -1.0625, -2.25, -1.1875, -0.625, -1.3125,
+///         -2.75, -1.4375, -6.0, -1.5625, -3.25, -1.6875, -0.875, -1.8125, -3.75, -1.9375, -8.0,
+///         -1.03125, -2.125, -1.09375, -0.5625, -1.15625, -2.375, -1.21875, -5.0, -1.28125, -2.625,
+///         -1.34375, -0.6875, -1.40625, -2.875, -1.46875, -0.375, -1.53125
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
+) -> Chain<Once<T>, ExhaustiveNegativeFinitePrimitiveFloats<T>> {
+    once(T::NEGATIVE_INFINITY).chain(exhaustive_negative_finite_primitive_floats())
+}
+
+/// Generates all nonzero primitive floats.
+///
+/// Positive and negative zero are both excluded.
+///
+/// Roughly speaking, the simplest floats are generated first. If you want to generate the floats in
+/// ascending order instead, use `nonzero_primitive_floats_increasing`.
+///
+/// The output length is $2^{M+1}(2^E-1)$.
+/// - For `f32`, this is $2^{32}-2^{24}$, or 4278190080.
+/// - For `f64`, this is $2^{64}-2^{53}$, or 18437736874454810624.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_nonzero_primitive_floats;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(
+///     exhaustive_nonzero_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     &[
+///         f32::POSITIVE_INFINITY, f32::NEGATIVE_INFINITY, 1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5,
+///         -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0, -4.0, 1.125, -1.125, 2.5, -2.5, 1.375,
+///         -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5, 1.875, -1.875, 0.25, -0.25, 1.0625,
+///         -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625, -0.625, 1.3125, -1.3125, 2.75, -2.75,
+///         1.4375, -1.4375, 6.0, -6.0
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
+) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
+    vec![T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY]
+        .into_iter()
+        .chain(exhaustive_nonzero_finite_primitive_floats())
+}
+
+/// Generates all primitive floats.
+///
+/// Positive and negative zero are both included.
+///
+/// Roughly speaking, the simplest floats are generated first. If you want to generate the floats
+/// (except `NaN`) in ascending order instead, use `primitive_floats_increasing`.
+///
+/// The output length is $2^{M+1}(2^E-1)+2$.
+/// - For `f32`, this is $2^{32}-2^{24}+2$, or 4278190082.
+/// - For `f64`, this is $2^{64}-2^{53}+2$, or 18437736874454810626.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_primitive_floats;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(
+///     exhaustive_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     &[
+///         f32::NAN, f32::POSITIVE_INFINITY, f32::NEGATIVE_INFINITY, 0.0, -0.0, 1.0, -1.0, 2.0,
+///         -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0, -4.0, 1.125,
+///         -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5, 1.875, -1.875,
+///         0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625, -0.625, 1.3125,
+///         -1.3125, 2.75, -2.75, 1.4375
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_primitive_floats<T: PrimitiveFloat>(
+) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
+    vec![
+        T::NAN,
+        T::POSITIVE_INFINITY,
+        T::NEGATIVE_INFINITY,
+        T::ZERO,
+        T::NEGATIVE_ZERO,
+    ]
+    .into_iter()
+    .chain(exhaustive_nonzero_finite_primitive_floats())
 }

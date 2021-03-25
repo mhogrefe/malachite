@@ -1,16 +1,15 @@
-use malachite_base_test_util::generators::{
-    signed_gen_var_3, signed_unsigned_pair_gen_var_1, unsigned_gen, unsigned_pair_gen_var_2,
-};
-
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base_test_util::generators::{
+    signed_gen_var_3, signed_unsigned_pair_gen_var_1, unsigned_gen, unsigned_pair_gen_var_2,
+};
 
 #[test]
 pub fn test_index_of_next_false_bit() {
     fn test_unsigned<T: PrimitiveUnsigned>(x: T, start: u64, out: Option<u64>) {
         assert_eq!(x.index_of_next_false_bit(start), out);
-    };
+    }
     test_unsigned(0xb00000000u64, 0, Some(0));
     test_unsigned(0xb00000000u64, 20, Some(20));
     test_unsigned(0xb00000000u64, 31, Some(31));
@@ -31,7 +30,7 @@ pub fn test_index_of_next_false_bit() {
 
     fn test_signed<T: PrimitiveSigned>(x: T, start: u64, out: Option<u64>) {
         assert_eq!(x.index_of_next_false_bit(start), out);
-    };
+    }
     test_signed(-0x500000000i64, 0, Some(0));
     test_signed(-0x500000000i64, 20, Some(20));
     test_signed(-0x500000000i64, 31, Some(31));

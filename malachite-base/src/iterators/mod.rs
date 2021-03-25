@@ -1,9 +1,7 @@
+use itertools::Itertools;
+use num::basic::traits::Zero;
 use std::collections::HashSet;
 use std::hash::Hash;
-
-use itertools::Itertools;
-
-use num::basic::traits::Zero;
 
 /// Generates all the nonzero values of a provided iterator.
 ///

@@ -59,7 +59,7 @@ fn test_other_constants() {
 pub fn test_named() {
     fn test<T: Named>(out: &str) {
         assert_eq!(T::NAME, out);
-    };
+    }
     test::<f32>("f32");
     test::<f64>("f64");
 }

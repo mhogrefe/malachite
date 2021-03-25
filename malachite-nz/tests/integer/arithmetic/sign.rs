@@ -1,12 +1,10 @@
-use std::cmp::Ordering;
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::Sign;
+use malachite_nz::integer::Integer;
 use malachite_nz_test_util::integer::arithmetic::sign::num_sign;
 use num::BigInt;
 use rug;
-
-use malachite_nz::integer::Integer;
+use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[test]
 fn test_sign() {

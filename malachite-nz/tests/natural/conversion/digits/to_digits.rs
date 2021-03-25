@@ -80,7 +80,7 @@ fn test_limbs_to_digits_small_base_basecase() {
         let out_len = _limbs_to_digits_small_base_basecase(&mut out, len, xs, base);
         assert_eq!(&out[..out_len], out_after);
         verify_limbs_to_digits_small_base_basecase(out_before, len, xs, base, out_len, &out);
-    };
+    }
     test(&[0; 20], 0, &[], 9, &[]);
     // base != 10
     test(&[0; 20], 0, &[1], 9, &[1]);
@@ -171,7 +171,7 @@ fn test_limbs_to_digits_small_base() {
         let out_len = _limbs_to_digits_small_base(&mut out, base, &mut mut_xs, None);
         assert_eq!(&out[..out_len], out_after);
         verify_limbs_to_digits_small_base(out_before, xs, base, out_len, &out);
-    };
+    }
     // xs_len == 0
     test(&[0; 20], &[], 9, &[]);
     // 0 < xs_len < GET_STR_PRECOMPUTE_THRESHOLD
@@ -430,7 +430,7 @@ fn test_limbs_to_digits_basecase() {
         let mut digits = Vec::new();
         _to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(xs_before), base);
         assert_eq!(digits.into_iter().map(T::exact_from).collect_vec(), out);
-    };
+    }
     test::<u64>(&[0, 0], 64, &[]);
     test::<u64>(&[2, 0], 64, &[2]);
     test::<u16>(&[123, 0], 8, &[3, 7, 1]);
@@ -522,7 +522,7 @@ where
     config.insert("mean_stripe_d", 1);
     config.insert("mean_length_n", 32);
     config.insert("mean_length_d", 1);
-    unsigned_vec_unsigned_pair_gen_var_1::<Limb, T>().test_properties_with_config(
+    unsigned_vec_unsigned_pair_gen_var_4::<Limb, T>().test_properties_with_config(
         &config,
         |(mut xs, base)| {
             let xs_old = xs.clone();
@@ -883,6 +883,22 @@ fn test_to_digits_asc_large() {
             "6"
         ]
     );
+    test("1000000000000", "10000000000", &["0", "100"]);
+    test(
+        "10000000000000000000000000000000",
+        "34359738368",
+        &["27917287424", "18657454436", "8470329472"],
+    );
+    test(
+        "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
+        7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
+        "6000000000",
+        &[
+            "4373186134", "2564485756", "2124820161", "4270626619", "5254372654", "713959034",
+            "4750044302", "5833014701", "978351288", "4288991795", "972424917", "1439538405",
+            "5308114100", "1115837958", "2267585072", "4579628351", "3319271253", "139021832"
+        ]
+    );
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -974,6 +990,22 @@ fn test_to_digits_desc_large() {
             "4", "5", "3", "0", "2", "3", "3", "0", "1", "2", "0", "4", "4", "6", "2", "4", "1",
             "3", "4", "6", "3", "0", "1", "0", "2", "6", "4", "2", "0", "6", "5", "4", "1", "5",
             "4"
+        ]
+    );
+    test("1000000000000", "10000000000", &["100", "0"]);
+    test(
+        "10000000000000000000000000000000",
+        "34359738368",
+        &["8470329472", "18657454436", "27917287424"],
+    );
+    test(
+        "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
+        7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
+        "6000000000",
+        &[
+            "139021832", "3319271253", "4579628351", "2267585072", "1115837958", "5308114100",
+            "1439538405", "972424917", "4288991795", "978351288", "5833014701", "4750044302",
+            "713959034", "5254372654", "4270626619", "2124820161", "2564485756", "4373186134"
         ]
     );
 }

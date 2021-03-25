@@ -1,7 +1,7 @@
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Two;
+use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use malachite_base::num::exhaustive::{
@@ -46,7 +46,7 @@ use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
 use malachite_nz::natural::exhaustive::{
-    exhaustive_natural_range_to_infinity, exhaustive_naturals,
+    exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -162,9 +162,38 @@ pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_1<
     ))))
 }
 
+// -- (Vec<Natural>, Natural)
+
+struct ValidDigitsGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<Natural, Vec<Natural>, It<Vec<Natural>>>
+    for ValidDigitsGenerator
+{
+    #[inline]
+    fn get_ys(&self, base: &Natural) -> It<Vec<Natural>> {
+        Box::new(exhaustive_vecs(exhaustive_natural_range(
+            Natural::ZERO,
+            base.clone(),
+        )))
+    }
+}
+
+pub fn exhaustive_natural_vec_natural_pair_gen_var_1() -> It<(Vec<Natural>, Natural)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_natural_range_to_infinity(Natural::power_of_two(Limb::WIDTH)),
+        ValidDigitsGenerator,
+    )))
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)
 
-pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_1<
+// vars 1 through 3 are in malachite-base
+
+pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_4<
     T: PrimitiveUnsigned + SaturatingFrom<U>,
     U: PrimitiveInt,
 >() -> It<(Vec<T>, T)> {
@@ -173,6 +202,8 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_1<
         primitive_int_increasing_inclusive_range(T::TWO, T::saturating_from(U::MAX)),
     ))
 }
+
+// var 5 is in malachite-base
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>)
 
@@ -271,14 +302,14 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
-struct ValidDigitsGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+struct ValidDigitsGenerator1<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     phantom_t: PhantomData<*const T>,
     phantom_u: PhantomData<*const U>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     ExhaustiveDependentPairsYsGenerator<(u64, usize), (Vec<T>, Vec<U>), It<(Vec<T>, Vec<U>)>>
-    for ValidDigitsGenerator<T, U>
+    for ValidDigitsGenerator1<T, U>
 {
     #[inline]
     fn get_ys(&self, p: &(u64, usize)) -> It<(Vec<T>, Vec<U>)> {
@@ -308,7 +339,7 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2<
                 (3u64..256).filter(|&b| !b.is_power_of_two()),
                 exhaustive_positive_primitive_ints(),
             ),
-            ValidDigitsGenerator {
+            ValidDigitsGenerator1 {
                 phantom_t: PhantomData,
                 phantom_u: PhantomData,
             },
@@ -495,3 +526,5 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>(
         3,
     )
 }
+
+// vars 24 through 27 are in malachite-base

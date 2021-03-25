@@ -1,6 +1,5 @@
-use malachite_base::num::logic::traits::LowMask;
-
 use integer::Integer;
+use malachite_base::num::logic::traits::LowMask;
 use natural::Natural;
 
 impl LowMask for Integer {

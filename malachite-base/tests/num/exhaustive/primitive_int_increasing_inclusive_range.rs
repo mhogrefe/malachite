@@ -1,10 +1,9 @@
 use itertools::Itertools;
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::exhaustive::primitive_int_increasing_inclusive_range;
+use std::panic::catch_unwind;
 
 fn expected_range_len<T: PrimitiveInt>(a: T, b: T) -> usize
 where

@@ -2,12 +2,10 @@
 extern crate malachite_base_test_util;
 extern crate malachite_nz;
 extern crate malachite_nz_test_util;
-
-use malachite_base_test_util::runner::cmd::read_command_line_arguments;
-use malachite_base_test_util::runner::Runner;
-
 use demo_and_bench::register;
 use generate::digits_data::generate_string_data;
+use malachite_base_test_util::runner::cmd::read_command_line_arguments;
+use malachite_base_test_util::runner::Runner;
 
 // Examples:
 //

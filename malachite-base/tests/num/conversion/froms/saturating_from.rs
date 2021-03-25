@@ -1,17 +1,15 @@
-use std::fmt::Debug;
-
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use std::fmt::Debug;
 
 #[test]
 pub fn test_saturating_from() {
     fn test_single<T: Copy + Debug + Eq + SaturatingFrom<T>>(n: T) {
         assert_eq!(T::saturating_from(n), n);
-    };
+    }
     test_single(0u8);
     test_single(5u64);
     test_single(1000u32);
@@ -22,7 +20,7 @@ pub fn test_saturating_from() {
 
     fn test_double<T, U: Copy + Debug + Eq + SaturatingFrom<T>>(n_in: T, n_out: U) {
         assert_eq!(U::saturating_from(n_in), n_out);
-    };
+    }
     test_double(0u8, 0u16);
     test_double(1000u16, 1000i32);
     test_double(-5i16, -5i8);

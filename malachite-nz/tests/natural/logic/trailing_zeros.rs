@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use malachite_nz_test_util::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;

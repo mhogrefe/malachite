@@ -12,8 +12,7 @@ use std::panic::catch_unwind;
 pub fn test_from_digits_asc() {
     fn test<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(base: U, digits: &[U], out: T) {
         assert_eq!(T::from_digits_asc(&base, digits.iter().cloned()), out);
-    };
-
+    }
     test::<u8, u64>(64, &[], 0);
     test::<u8, u64>(64, &[0, 0, 0], 0);
     test::<u16, u64>(64, &[2], 2);
@@ -63,8 +62,7 @@ fn from_digits_asc_fail() {
 pub fn test_from_digits_desc() {
     fn test<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsigned>(base: U, digits: &[U], out: T) {
         assert_eq!(T::from_digits_desc(&base, digits.iter().cloned()), out);
-    };
-
+    }
     test::<u8, u64>(64, &[], 0);
     test::<u8, u64>(64, &[0, 0, 0], 0);
     test::<u16, u64>(64, &[2], 2);

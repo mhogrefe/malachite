@@ -1,13 +1,11 @@
-use std::cmp::Ordering;
-use std::ops::{Shr, ShrAssign};
-
 use malachite_base::num::arithmetic::traits::{
     ModMul, ModMulAssign, ModPow, ModShr, ModShrAssign, UnsignedAbs,
 };
 use malachite_base::num::basic::traits::{Two, Zero};
-
 use natural::InnerNatural::Small;
 use natural::Natural;
+use std::cmp::Ordering;
+use std::ops::{Shr, ShrAssign};
 
 fn _mod_shr_ref_val<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,

@@ -1,6 +1,5 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_wrapping_div() {
@@ -10,7 +9,7 @@ fn test_wrapping_div() {
         let mut x = x;
         x.wrapping_div_assign(y);
         assert_eq!(x, out);
-    };
+    }
     test::<u16>(0, 5, 0);
     test::<u16>(123, 456, 0);
     test::<u8>(100, 3, 33);

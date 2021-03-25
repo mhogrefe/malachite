@@ -1,12 +1,12 @@
-use std::panic::catch_unwind;
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
 use malachite_base::num::basic::traits::NegativeOne;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
-
 use malachite_nz::integer::Integer;
+use std::panic::catch_unwind;
+use std::str::FromStr;
+
+//TODO clean from_str
 
 macro_rules! test_shl_round_signed_helper {
     ($t:ident) => {

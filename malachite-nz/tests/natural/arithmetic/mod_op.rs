@@ -1,18 +1,9 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     CeilingDivNegMod, DivMod, Mod, ModAssign, ModIsReduced, NegMod, NegModAssign,
 };
 use malachite_base::num::basic::traits::Zero;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::conversion::traits::JoinHalves;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz_test_util::natural::arithmetic::mod_op::_limbs_mod_limb_alt_3;
-use malachite_nz_test_util::natural::arithmetic::mod_op::rug_neg_mod;
-use num::{BigUint, Integer};
-use rug;
-use rug::ops::RemRounding;
-
 use malachite_nz::natural::arithmetic::div_mod::{
     _limbs_div_mod_barrett_scratch_len, limbs_two_limb_inverse_helper,
 };
@@ -31,6 +22,13 @@ use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::DoubleLimb;
 use malachite_nz::platform::Limb;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::mod_op::_limbs_mod_limb_alt_3;
+use malachite_nz_test_util::natural::arithmetic::mod_op::rug_neg_mod;
+use num::{BigUint, Integer};
+use rug;
+use rug::ops::RemRounding;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

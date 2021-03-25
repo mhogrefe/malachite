@@ -1,15 +1,13 @@
 use itertools::Itertools;
-use std::str::FromStr;
-
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
-use malachite_nz_test_util::integer::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
-
 use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
     bits_vec_to_twos_complement_bits_negative,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::integer::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
+use std::str::FromStr;
 
 #[test]
 fn test_bits_to_twos_complement_bits_non_negative() {

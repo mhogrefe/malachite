@@ -1,12 +1,10 @@
-use std::str::FromStr;
-
 use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
-
 use malachite_nz::natural::logic::bit_block_access::{limbs_slice_get_bits, limbs_vec_get_bits};
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 fn verify_limbs_get_bits(xs: &[Limb], start: u64, end: u64, out: &[Limb]) {

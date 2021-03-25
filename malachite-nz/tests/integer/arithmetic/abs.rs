@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
-use num::{BigInt, Signed};
-
 use malachite_nz::integer::Integer;
+use num::{BigInt, Signed};
+use std::str::FromStr;
 
 #[test]
 fn test_abs() {

@@ -1,9 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{
     RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign, ShrRound,
 };
 use malachite_base::rounding_modes::RoundingMode;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_two::{

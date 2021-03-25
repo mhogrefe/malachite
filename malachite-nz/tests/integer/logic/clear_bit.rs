@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use malachite_base::num::logic::traits::BitAccess;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::integer::logic::bit_access::{

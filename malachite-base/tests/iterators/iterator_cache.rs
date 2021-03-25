@@ -1,5 +1,4 @@
 use itertools::__std_iter::empty;
-
 use malachite_base::iterators::iterator_cache::IteratorCache;
 use malachite_base::nevers::Never;
 use malachite_base::num::exhaustive::exhaustive_signeds;

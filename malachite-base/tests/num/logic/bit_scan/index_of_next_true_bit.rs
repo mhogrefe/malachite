@@ -1,17 +1,16 @@
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base_test_util::generators::{
     signed_gen_var_3, signed_unsigned_pair_gen_var_1, unsigned_gen, unsigned_gen_var_1,
     unsigned_pair_gen_var_2,
 };
 
-use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::logic::traits::TrailingZeros;
-
 #[test]
 pub fn test_index_of_next_true_bit() {
     fn test_unsigned<T: PrimitiveUnsigned>(x: T, start: u64, out: Option<u64>) {
         assert_eq!(x.index_of_next_true_bit(start), out);
-    };
+    }
     test_unsigned(0xb00000000u64, 0, Some(32));
     test_unsigned(0xb00000000u64, 20, Some(32));
     test_unsigned(0xb00000000u64, 31, Some(32));
@@ -34,7 +33,7 @@ pub fn test_index_of_next_true_bit() {
 
     fn test_signed<T: PrimitiveSigned>(x: T, start: u64, out: Option<u64>) {
         assert_eq!(x.index_of_next_true_bit(start), out);
-    };
+    }
     test_signed(-0x500000000i64, 0, Some(32));
     test_signed(-0x500000000i64, 20, Some(32));
     test_signed(-0x500000000i64, 31, Some(32));

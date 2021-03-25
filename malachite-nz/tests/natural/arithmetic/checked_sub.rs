@@ -1,13 +1,11 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::strings::ToDebugString;
+use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::biguint_to_natural;
 use malachite_nz_test_util::natural::arithmetic::checked_sub::checked_sub;
 use num::BigUint;
 use rug;
-
-use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_checked_sub_natural() {

@@ -1,7 +1,6 @@
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_pair_gen, unsigned_triple_gen};
-
 use malachite_base::num::arithmetic::x_mul_y_is_zz::_explicit_x_mul_y_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{unsigned_gen, unsigned_pair_gen, unsigned_triple_gen};
 
 #[test]
 fn test_x_mul_y_is_zz() {

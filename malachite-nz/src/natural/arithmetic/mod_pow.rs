@@ -1,5 +1,4 @@
-use std::cmp::{max, min, Ordering};
-
+use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     ModPow, ModPowAssign, ModPowerOfTwo, ModPowerOfTwoAssign, Parity, PowerOfTwo, WrappingNegAssign,
 };
@@ -10,8 +9,6 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
-
-use fail_on_untested_path;
 use natural::arithmetic::add::{
     _limbs_add_to_out_aliased, limbs_add_same_length_to_out,
     limbs_slice_add_same_length_in_place_left,
@@ -43,6 +40,7 @@ use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::Small;
 use natural::Natural;
 use platform::{Limb, MUL_TOOM22_THRESHOLD, SQR_BASECASE_THRESHOLD, SQR_TOOM2_THRESHOLD};
+use std::cmp::{max, min, Ordering};
 
 // Equivalent to limbs_slice_get_bits(xs, end.saturating_sub(len), end)[0]
 //
@@ -64,11 +62,12 @@ pub(crate) fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> usize {
 }
 
 // This is mpn_redc_1 from mpn/generic/redc_1.c, GMP 6.1.2.
+#[allow(clippy::redundant_slicing)]
 fn limbs_redc_limb_raw(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) -> bool {
     let len = ms.len();
     assert_ne!(len, 0);
     let xs = &mut xs[..len << 1];
-    let mut xs_tail = &mut xs[..];
+    let mut xs_tail = &mut xs[..]; // force borrow rather than move
     for _ in 0..len {
         let product = xs_tail[0].wrapping_mul(m_inv);
         let carry =

@@ -1,5 +1,4 @@
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
-
 use malachite_nz::integer::Integer;
 
 #[test]

@@ -19,8 +19,7 @@ pub fn test_to_power_of_two_digits_asc() {
             PowerOfTwoDigits::<U>::to_power_of_two_digits_asc(&x, log_base),
             out
         );
-    };
-
+    }
     test::<u8, u64>(0, 6, &[]);
     test::<u16, u64>(2, 6, &[2]);
     test::<u32, u16>(123, 3, &[3, 7, 1]);
@@ -59,8 +58,7 @@ pub fn test_to_power_of_two_digits_desc() {
             PowerOfTwoDigits::<U>::to_power_of_two_digits_desc(&x, log_base),
             out
         );
-    };
-
+    }
     test::<u8, u64>(0, 6, &[]);
     test::<u16, u64>(2, 6, &[2]);
     test::<u32, u16>(123, 3, &[1, 7, 3]);

@@ -1,33 +1,33 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_nz::integer::Integer;
 use num::traits::Pow as NumPow;
 use num::BigInt;
 use rug::ops::Pow as RugPow;
-
-use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_pow() {
-    let test = |u, exp, out| {
-        let mut x = Integer::from_str(u).unwrap();
+    let test = |s, exp, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        let mut x = u.clone();
         x.pow_assign(exp);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
-        let x = Integer::from_str(u).unwrap().pow(exp);
+        let x = u.clone().pow(exp);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
-        let x = (&Integer::from_str(u).unwrap()).pow(exp);
+        let x = (&u).pow(exp);
         assert_eq!(x.to_string(), out);
         assert!(x.is_valid());
 
-        let x = BigInt::from_str(u).unwrap().pow(exp);
+        let x = BigInt::from_str(s).unwrap().pow(exp);
         assert_eq!(x.to_string(), out);
 
-        let x = rug::Integer::from_str(u).unwrap().pow(u32::exact_from(exp));
+        let x = rug::Integer::from_str(s).unwrap().pow(u32::exact_from(exp));
         assert_eq!(x.to_string(), out);
     };
     test("0", 0, "1");

@@ -12,18 +12,20 @@ use std::str::FromStr;
 #[test]
 fn test_neg() {
     let test = |s, out| {
-        let neg = -Integer::from_str(s).unwrap();
+        let u = Integer::from_str(s).unwrap();
+
+        let neg = -u.clone();
         assert!(neg.is_valid());
         assert_eq!(neg.to_string(), out);
 
-        let neg = -&Integer::from_str(s).unwrap();
+        let neg = -&u;
         assert!(neg.is_valid());
         assert_eq!(neg.to_string(), out);
 
         assert_eq!((-BigInt::from_str(s).unwrap()).to_string(), out);
         assert_eq!((-rug::Integer::from_str(s).unwrap()).to_string(), out);
 
-        let mut x = Integer::from_str(s).unwrap();
+        let mut x = u;
         x.neg_assign();
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);

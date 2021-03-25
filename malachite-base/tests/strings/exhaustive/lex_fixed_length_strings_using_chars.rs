@@ -1,7 +1,6 @@
-use std::iter::{empty, once};
-
 use itertools::Itertools;
 use malachite_base::strings::exhaustive::lex_fixed_length_strings_using_chars;
+use std::iter::{empty, once};
 
 fn lex_fixed_length_strings_using_chars_helper<I: Iterator<Item = char>>(
     len: u64,

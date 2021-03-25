@@ -1,9 +1,10 @@
-use std::cmp::Ordering;
-use std::iter::Cloned;
-
 use orderings::ORDERINGS;
 use random::Seed;
 use slices::{random_values_from_slice, RandomValuesFromSlice};
+use std::cmp::Ordering;
+use std::iter::Cloned;
+
+pub type RandomOrderings = Cloned<RandomValuesFromSlice<'static, Ordering>>;
 
 /// Generates a random `Ordering` that has an equal probability of being `Less`, `Greater`, or
 /// `Equal`.
@@ -32,6 +33,6 @@ use slices::{random_values_from_slice, RandomValuesFromSlice};
 /// )
 /// ```
 #[inline]
-pub fn random_orderings(seed: Seed) -> Cloned<RandomValuesFromSlice<'static, Ordering>> {
+pub fn random_orderings(seed: Seed) -> RandomOrderings {
     random_values_from_slice(seed, &ORDERINGS).cloned()
 }

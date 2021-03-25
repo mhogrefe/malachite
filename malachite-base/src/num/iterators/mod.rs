@@ -1,10 +1,9 @@
-use std::cmp::Ordering;
-use std::marker::PhantomData;
-
 use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use num::arithmetic::traits::DivisibleBy;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
+use std::cmp::Ordering;
+use std::marker::PhantomData;
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]

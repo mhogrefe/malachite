@@ -18,7 +18,7 @@ fn test_arithmetic_checked_shl() {
         out: Option<T>,
     ) {
         assert_eq!(t.arithmetic_checked_shl(u), out);
-    };
+    }
     test::<u16, u8>(0, 0, Some(0));
     test::<u8, u16>(3, 6, Some(192));
     test::<u8, u32>(3, 7, None);

@@ -1,11 +1,9 @@
-use std::cmp::Ordering;
-
 use malachite_base::num::logic::traits::HammingDistance;
-
 use natural::logic::count_ones::limbs_count_ones;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::Ordering;
 
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
 /// Hamming distance between that `Natural` and a `Limb`. Both have infinitely many implicit leading

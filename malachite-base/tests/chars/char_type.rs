@@ -1,8 +1,7 @@
 use itertools::Itertools;
-use std::collections::HashSet;
-
 use malachite_base::chars::exhaustive::chars_increasing;
 use malachite_base::chars::CharType;
+use std::collections::HashSet;
 
 #[test]
 fn test_char_type() {

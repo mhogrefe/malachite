@@ -1,5 +1,4 @@
 use malachite_base::chars::crement::contiguous_range_to_char;
-
 use malachite_base_test_util::bench::bucketers::unsigned_direct_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};

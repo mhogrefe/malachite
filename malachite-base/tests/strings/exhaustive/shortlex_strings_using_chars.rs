@@ -1,8 +1,7 @@
-use std::iter::{empty, once};
-
 use itertools::Itertools;
 use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 use malachite_base::strings::exhaustive::shortlex_strings_using_chars;
+use std::iter::{empty, once};
 
 fn shortlex_strings_using_chars_helper<I: Clone + Iterator<Item = char>>(cs: I, out: &[&str]) {
     let ss = shortlex_strings_using_chars(cs).take(20).collect_vec();

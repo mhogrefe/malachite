@@ -3,11 +3,10 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::strings::ToDebugString;
 use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{biguint_to_natural, rug_integer_to_natural};
 use num::BigUint;
 use rug;
-
-use malachite_nz::natural::Natural;
 
 #[test]
 fn test_from_u32() {

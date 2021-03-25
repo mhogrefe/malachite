@@ -5,7 +5,7 @@ use std::panic::catch_unwind;
 pub fn test_raw_exponent() {
     fn test<T: PrimitiveFloat>(x: T, exponent: u64) {
         assert_eq!(x.raw_exponent(), exponent);
-    };
+    }
 
     test::<f32>(0.0, 0);
     test::<f32>(-0.0, 0);
@@ -40,8 +40,7 @@ pub fn test_raw_exponent() {
 pub fn test_exponent() {
     fn test<T: PrimitiveFloat>(x: T, exponent: i64) {
         assert_eq!(x.exponent(), exponent);
-    };
-
+    }
     test::<f32>(1.0, 0);
     test::<f32>(core::f32::consts::PI, 1);
     test::<f32>(0.1, -4);

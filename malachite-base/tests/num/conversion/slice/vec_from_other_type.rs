@@ -1,17 +1,15 @@
-use std::fmt::Debug;
-
-use malachite_base_test_util::generators::unsigned_gen;
-
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     FromOtherTypeSlice, VecFromOtherType, VecFromOtherTypeSlice,
 };
+use malachite_base_test_util::generators::unsigned_gen;
+use std::fmt::Debug;
 
 #[test]
 pub fn test_vec_from_other_type() {
     fn test<T: Debug + Eq, U: Debug + Eq + VecFromOtherType<T>>(value: T, vec: &[U]) {
         assert_eq!(U::vec_from_other_type(value), vec);
-    };
+    }
     test::<u32, u32>(123, &[123]);
     test::<u8, u16>(0xab, &[0xab]);
     test::<u16, u8>(0xcdab, &[0xab, 0xcd]);

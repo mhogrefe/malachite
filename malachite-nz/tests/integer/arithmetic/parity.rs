@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::Parity;
-
 use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_even() {

@@ -1,6 +1,5 @@
-use std::iter::{repeat, Repeat};
-
 use random::Seed;
+use std::iter::{repeat, Repeat};
 
 /// Generates random units; repeats `()`.
 ///

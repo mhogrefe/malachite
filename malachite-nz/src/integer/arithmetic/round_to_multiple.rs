@@ -1,7 +1,6 @@
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::rounding_modes::RoundingMode;
-
-use integer::Integer;
 
 impl RoundToMultiple<Integer> for Integer {
     type Output = Integer;

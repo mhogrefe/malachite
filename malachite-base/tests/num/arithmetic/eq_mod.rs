@@ -4,7 +4,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 fn test_eq_mod() {
     fn test<T: PrimitiveInt>(x: T, y: T, m: T, out: bool) {
         assert_eq!(x.eq_mod(y, m), out);
-    };
+    }
     test::<u8>(0, 0, 0, true);
     test::<u16>(0, 1, 0, false);
     test::<u32>(57, 57, 0, true);

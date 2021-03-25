@@ -1,7 +1,6 @@
-use std::fmt::Debug;
-
 use num::basic::integers::PrimitiveInt;
 use num::logic::traits::{BitConvertible, NotAssign};
+use std::fmt::Debug;
 
 const COUNTER_WIDTH: usize = u64::WIDTH as usize;
 

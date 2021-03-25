@@ -159,7 +159,7 @@ pub fn test_to_string_base() {
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:00?}", BaseFmtWrapper::new(x, base)), out);
-    };
+    }
     test_u::<u8>(0, 2, "0");
     test_u::<u8>(0, 3, "0");
     test_u::<u8>(0, 10, "0");
@@ -195,7 +195,7 @@ pub fn test_to_string_base() {
             out
         );
         test_padding_unsigned(&s, out, width);
-    };
+    }
     test_u_width::<u8>(0, 2, 0, "0");
     test_u_width::<u8>(0, 2, 1, "0");
     test_u_width::<u8>(0, 2, 2, "00");
@@ -220,7 +220,7 @@ pub fn test_to_string_base() {
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:00?}", BaseFmtWrapper::new(x, base)), out);
-    };
+    }
     test_i::<i8>(0, 2, "0");
     test_i::<i8>(0, 3, "0");
     test_i::<i8>(0, 10, "0");
@@ -271,7 +271,7 @@ pub fn test_to_string_base() {
             out
         );
         test_padding_signed(&s, out, width);
-    };
+    }
     test_i_width::<i8>(0, 2, 0, "0");
     test_i_width::<i8>(0, 2, 1, "0");
     test_i_width::<i8>(0, 2, 2, "00");
@@ -483,7 +483,7 @@ pub fn test_to_string_base_upper() {
         assert_eq!(x.to_string_base_upper(base), out);
         assert_eq!(format!("{:#}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:#?}", BaseFmtWrapper::new(x, base)), out);
-    };
+    }
     test_u::<u8>(0, 2, "0");
     test_u::<u8>(0, 3, "0");
     test_u::<u8>(0, 10, "0");
@@ -519,7 +519,7 @@ pub fn test_to_string_base_upper() {
             out
         );
         test_padding_unsigned(&s, out, width);
-    };
+    }
     test_u_width::<u8>(0, 2, 0, "0");
     test_u_width::<u8>(0, 2, 1, "0");
     test_u_width::<u8>(0, 2, 2, "00");
@@ -539,7 +539,7 @@ pub fn test_to_string_base_upper() {
         assert_eq!(x.to_string_base_upper(base), out);
         assert_eq!(format!("{:#}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:#?}", BaseFmtWrapper::new(x, base)), out);
-    };
+    }
     test_i::<i8>(0, 2, "0");
     test_i::<i8>(0, 3, "0");
     test_i::<i8>(0, 10, "0");
@@ -590,7 +590,7 @@ pub fn test_to_string_base_upper() {
             out
         );
         test_padding_signed(&s, out, width);
-    };
+    }
     test_i_width::<i8>(0, 2, 0, "0");
     test_i_width::<i8>(0, 2, 1, "0");
     test_i_width::<i8>(0, 2, 2, "00");

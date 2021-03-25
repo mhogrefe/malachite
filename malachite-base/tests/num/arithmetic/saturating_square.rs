@@ -8,7 +8,7 @@ fn test_saturating_square() {
         let mut x = x;
         x.saturating_square_assign();
         assert_eq!(x, out);
-    };
+    }
     test::<u8>(0, 0);
     test::<i16>(1, 1);
     test::<u32>(2, 4);

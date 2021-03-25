@@ -1,5 +1,4 @@
 use malachite_base::num::logic::traits::BitConvertible;
-
 use malachite_nz::integer::Integer;
 
 #[test]

@@ -1,7 +1,6 @@
-use std::str::FromStr;
-
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_from_natural() {

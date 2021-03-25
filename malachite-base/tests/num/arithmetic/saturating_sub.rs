@@ -8,7 +8,7 @@ fn test_saturating_sub() {
         let mut x = x;
         x.saturating_sub_assign(y);
         assert_eq!(x, out);
-    };
+    }
     test::<u16>(456, 123, 333);
     test::<u8>(123, 200, 0);
     test::<i16>(123, -456, 579);

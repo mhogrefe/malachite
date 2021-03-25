@@ -1,7 +1,6 @@
+use integer::Integer;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, SaturatingFrom};
-
-use integer::Integer;
 use natural::Natural;
 
 impl CheckedFrom<Integer> for Natural {

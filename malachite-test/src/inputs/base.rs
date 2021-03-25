@@ -17,8 +17,9 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
-    exhaustive_natural_signeds, exhaustive_negative_signeds, exhaustive_nonzero_signeds,
-    exhaustive_positive_primitive_ints, exhaustive_signeds, exhaustive_unsigneds,
+    exhaustive_finite_primitive_floats, exhaustive_natural_signeds, exhaustive_negative_signeds,
+    exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
+    exhaustive_signeds, exhaustive_unsigneds,
 };
 use malachite_base::num::exhaustive::{
     exhaustive_signed_range, primitive_int_increasing_inclusive_range,
@@ -65,17 +66,6 @@ use malachite_nz::natural::arithmetic::mul::limb::{
 };
 use malachite_nz::natural::arithmetic::mul::limbs_mul;
 use malachite_nz::natural::arithmetic::mul::mul_mod::*;
-use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_33_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_42_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_43_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_44_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_53_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_63_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
-};
 use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_toom_3_input_size_valid, _limbs_square_to_out_toom_4_input_size_valid,
     _limbs_square_to_out_toom_6_input_size_valid, _limbs_square_to_out_toom_8_input_size_valid,
@@ -95,7 +85,6 @@ use rust_wheels::iterators::integers_geometric::{
     i32s_geometric, positive_u32s_geometric, range_up_geometric_u32, u32s_geometric,
 };
 use rust_wheels::iterators::primitive_floats::{
-    exhaustive_f32s, exhaustive_f64s, exhaustive_finite_f32s, exhaustive_finite_f64s,
     random_finite_primitive_floats, random_primitive_floats, special_random_f32s,
     special_random_f64s, special_random_finite_f32s, special_random_finite_f64s,
 };
@@ -252,8 +241,6 @@ pub fn signeds_var_2<T: PrimitiveSigned + Rand + SampleRange>(
 macro_rules! float_gen {
     (
         $f: ident,
-        $exhaustive: ident,
-        $exhaustive_finite: ident,
         $special_random: ident,
         $special_random_finite: ident,
         $floats: ident,
@@ -265,7 +252,7 @@ macro_rules! float_gen {
     ) => {
         pub fn $floats(gm: GenerationMode) -> It<$f> {
             match gm {
-                GenerationMode::Exhaustive => Box::new($exhaustive()),
+                GenerationMode::Exhaustive => Box::new(exhaustive_primitive_floats()),
                 GenerationMode::Random(_) => Box::new(random_primitive_floats(&EXAMPLE_SEED)),
                 GenerationMode::SpecialRandom(scale) => {
                     Box::new($special_random(&EXAMPLE_SEED, scale))
@@ -275,7 +262,7 @@ macro_rules! float_gen {
 
         pub fn $finite_floats(gm: GenerationMode) -> It<$f> {
             match gm {
-                GenerationMode::Exhaustive => Box::new($exhaustive_finite()),
+                GenerationMode::Exhaustive => Box::new(exhaustive_finite_primitive_floats()),
                 GenerationMode::Random(_) => {
                     Box::new(random_finite_primitive_floats(&EXAMPLE_SEED))
                 }
@@ -292,9 +279,10 @@ macro_rules! float_gen {
 
         fn $pairs_of_finite_float_and_rounding_mode(gm: GenerationMode) -> It<($f, RoundingMode)> {
             match gm {
-                GenerationMode::Exhaustive => {
-                    Box::new(lex_pairs($exhaustive_finite(), exhaustive_rounding_modes()))
-                }
+                GenerationMode::Exhaustive => Box::new(lex_pairs(
+                    exhaustive_finite_primitive_floats(),
+                    exhaustive_rounding_modes(),
+                )),
                 GenerationMode::Random(_) => Box::new(random_pairs(
                     &EXAMPLE_SEED,
                     &random_finite_primitive_floats,
@@ -344,8 +332,6 @@ macro_rules! float_gen {
 
 float_gen!(
     f32,
-    exhaustive_f32s,
-    exhaustive_finite_f32s,
     special_random_f32s,
     special_random_finite_f32s,
     f32s,
@@ -357,8 +343,6 @@ float_gen!(
 );
 float_gen!(
     f64,
-    exhaustive_f64s,
-    exhaustive_finite_f64s,
     special_random_f64s,
     special_random_finite_f64s,
     f64s,
@@ -2679,45 +2663,6 @@ pub fn triples_of_unsigned_vec_var_9<T: PrimitiveUnsigned + Rand>(
     )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the sum of
-// the lengths of the second and the third, the second is at least as long as the third, and the
-// third is nonempty.
-pub fn triples_of_unsigned_vec_var_10<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(
-        triples_of_unsigned_vec(gm).filter(|&(ref xs, ref ys, ref zs)| {
-            !zs.is_empty() && ys.len() >= zs.len() && xs.len() >= ys.len() + zs.len()
-        }),
-    )
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
-// preconditions of `_limbs_mul_greater_to_out_toom_53`.
-pub fn triples_of_unsigned_vec_var_18<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(
-        triples_of_unsigned_vec_min_sizes(gm, 8, 5, 3).filter(|&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs.len(), ys.len())
-        }),
-    )
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the
-// preconditions of `_limbs_mul_greater_to_out_toom_63`.
-pub fn triples_of_unsigned_vec_var_21<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_min_sizes(gm, 26, 17, 9).filter(
-        |&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_63_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
-}
-
 // All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` are nonempty and have the same
 // lengths, and `out` is at least twice as long as `xs`.
 pub fn triples_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
@@ -2785,106 +2730,6 @@ pub fn triples_of_unsigned_vec_var_29<T: PrimitiveUnsigned + Rand>(
         )),
         _ => Box::new(random_triples_from_single(vecs_of_unsigned_var_1(gm))),
     }
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, and `out`,
-// `xs`, and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_33`.
-pub fn triples_of_unsigned_vec_var_30<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 10, 5).filter(
-        |&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, and `out`,
-// `xs`, and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_33` and
-// `_limbs_mul_greater_to_out_toom_44`.
-pub fn triples_of_unsigned_vec_var_31<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 10, 5).filter(
-        |&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_33_input_sizes_valid(xs.len(), ys.len())
-                && _limbs_mul_greater_to_out_toom_44_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, and `out`,
-// `xs`, and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_6h`.
-pub fn triples_of_unsigned_vec_var_32<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 84, 42).filter(
-        |&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, and `out`,
-// `xs`, and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_8h`.
-pub fn triples_of_unsigned_vec_var_33<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 172, 86).filter(
-        |&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
-}
-
-//TODO
-// Some triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same length, `out`, `xs`,
-// and `ys` meet the preconditions of `_limbs_mul_greater_to_out_toom_8h`, and `out`, `xs`, and `ys`
-// would trigger the actual FFT code of `_limbs_mul_greater_to_out_fft`.
-pub fn triples_of_unsigned_vec_var_34<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_min_sizes_1_2(gm, 172, 86).filter(
-        |&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs.len(), ys.len())
-                && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs.len(), ys.len())
-        },
-    ))
-}
-
-//TODO
-// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the preconditions
-// of `_limbs_mul_greater_to_out_toom_32` and `_limbs_mul_greater_to_out_toom_43`.
-pub fn triples_of_unsigned_vec_var_35<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_min_sizes(gm, 19, 11, 8).filter(
-        |&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs.len(), ys.len())
-                && _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs.len(), ys.len())
-        },
-    ))
-}
-
-//TODO
-// All triples of `Vec<T>`, where `T` is unsigned and `out`, `xs`, and `ys` meet the preconditions
-// of `_limbs_mul_greater_to_out_toom_42` and `_limbs_mul_greater_to_out_toom_53`.
-pub fn triples_of_unsigned_vec_var_36<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(
-        triples_of_unsigned_vec_min_sizes(gm, 8, 5, 3).filter(|&(ref out, ref xs, ref ys)| {
-            out.len() >= xs.len() + ys.len()
-                && _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs.len(), ys.len())
-                && _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs.len(), ys.len())
-        }),
-    )
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned and `qs`, `ns`, and `ds` meet the preconditions of
@@ -3426,37 +3271,6 @@ pub fn triples_of_limb_vec_var_59(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
     )
 }
 
-fn pairs_of_unsigned_vec_min_sizes_var_1_with_seed<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-    min_len: u64,
-    seed: &[u32],
-) -> It<(Vec<T>, Vec<T>)> {
-    let xss: It<Vec<T>> =
-        match gm {
-            GenerationMode::Exhaustive => Box::new(exhaustive_vecs_min_length(
-                min_len << 1,
-                exhaustive_unsigneds(),
-            )),
-            GenerationMode::Random(scale) => {
-                Box::new(random_vecs_min_length(seed, scale, min_len << 1, &random))
-            }
-            GenerationMode::SpecialRandom(scale) => Box::new(
-                special_random_unsigned_vecs_min_length(seed, scale, min_len << 1),
-            ),
-        };
-    Box::new(xss.filter(|xs| xs.len().even()).map(|xs| {
-        let half_length = xs.len() >> 1;
-        (xs[..half_length].to_vec(), xs[half_length..].to_vec())
-    }))
-}
-
-fn pairs_of_unsigned_vec_min_sizes_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-    min_len: u64,
-) -> It<(Vec<T>, Vec<T>)> {
-    pairs_of_unsigned_vec_min_sizes_var_1_with_seed(gm, min_len, &EXAMPLE_SEED)
-}
-
 fn pairs_of_unsigned_vec_min_sizes_2<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
     min_len: u64,
@@ -3499,30 +3313,6 @@ fn triples_of_unsigned_vec_min_sizes<T: PrimitiveUnsigned + Rand>(
             &(|seed| special_random_unsigned_vecs_min_length(seed, scale, min_zs_len)),
         )),
     }
-}
-
-fn triples_of_unsigned_vec_min_sizes_1_2<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-    min_xs_len: u64,
-    min_ys_zs_len: u64,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    let xss: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
-            pairs_of_unsigned_vec_min_sizes_var_1(gm, min_ys_zs_len),
-            exhaustive_vecs_min_length(min_xs_len, exhaustive_unsigneds()),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| pairs_of_unsigned_vec_min_sizes_var_1_with_seed(gm, min_xs_len, seed)),
-            &(|seed| random_vecs_min_length(seed, scale, min_xs_len, &random)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| pairs_of_unsigned_vec_min_sizes_var_1_with_seed(gm, min_xs_len, seed)),
-            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, min_xs_len)),
-        )),
-    };
-    reshape_1_2_to_3(permute_2_1(xss))
 }
 
 fn triples_of_unsigned_vec_min_sizes_3<T: PrimitiveUnsigned + Rand>(

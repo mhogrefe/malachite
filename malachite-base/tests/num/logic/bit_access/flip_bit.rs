@@ -1,10 +1,9 @@
-use malachite_base_test_util::generators::{
-    signed_unsigned_pair_gen_var_2, unsigned_pair_gen_var_3,
-};
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_unsigned_pair_gen_var_2, unsigned_pair_gen_var_3,
+};
 use std::panic::catch_unwind;
 
 fn flip_bit_helper_unsigned<T: PrimitiveInt>() {

@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};

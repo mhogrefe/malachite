@@ -1,7 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, FloorLogTwo};
 use malachite_base::num::basic::traits::Zero;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::log_two::{limbs_ceiling_log_two, limbs_floor_log_two};

@@ -6,7 +6,7 @@ use malachite_base_test_util::common::{test_cmp_helper, test_eq_helper};
 pub fn test_to_string() {
     fn test<T: PrimitiveFloat>(x: T, out: &str) {
         assert_eq!(NiceFloat(x).to_string(), out);
-    };
+    }
     test::<f32>(f32::NAN, "NaN");
     test::<f32>(f32::POSITIVE_INFINITY, "Infinity");
     test::<f32>(f32::NEGATIVE_INFINITY, "-Infinity");

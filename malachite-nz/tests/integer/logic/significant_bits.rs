@@ -1,11 +1,9 @@
-use std::str::FromStr;
-
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_nz::integer::Integer;
 use num::BigInt;
 use rug;
-
-use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_significant_bits() {

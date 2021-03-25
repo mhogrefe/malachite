@@ -1,9 +1,8 @@
-use std::fmt::Debug;
-use std::panic::catch_unwind;
-
 use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use std::fmt::Debug;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_mod_power_of_two_and_rem_power_of_two_unsigned() {
@@ -19,7 +18,7 @@ fn test_mod_power_of_two_and_rem_power_of_two_unsigned() {
         let mut mut_x = x;
         mut_x.rem_power_of_two_assign(pow);
         assert_eq!(mut_x, out);
-    };
+    }
     test::<u8>(0, 0, 0);
     test::<u16>(260, 8, 4);
     test::<u32>(1611, 4, 11);
@@ -51,7 +50,7 @@ fn test_mod_power_of_two_signed() {
         out: U,
     ) {
         assert_eq!(x.mod_power_of_two(pow), out);
-    };
+    }
     test::<_, i8>(0, 0, 0);
     test::<_, i16>(2, 1, 0);
     test::<_, i32>(260, 8, 4);
@@ -131,7 +130,7 @@ fn test_mod_power_of_two_assign_signed() {
         let mut mut_x = x;
         mut_x.mod_power_of_two_assign(pow);
         assert_eq!(mut_x, out);
-    };
+    }
     test::<i8>(0, 0, 0);
     test::<i16>(2, 1, 0);
     test::<i32>(260, 8, 4);
@@ -220,7 +219,7 @@ fn test_rem_power_of_two_signed() {
         let mut mut_x = x;
         mut_x.rem_power_of_two_assign(pow);
         assert_eq!(mut_x, out);
-    };
+    }
     test::<i8>(0, 0, 0);
     test::<i16>(2, 1, 0);
     test::<i32>(260, 8, 4);
@@ -293,7 +292,7 @@ fn test_neg_mod_power_of_two_unsigned() {
         let mut mut_x = x;
         mut_x.neg_mod_power_of_two_assign(pow);
         assert_eq!(mut_x, out);
-    };
+    }
     test::<u8>(0, 0, 0);
     test::<u16>(260, 8, 252);
     test::<u32>(1611, 4, 5);
@@ -344,7 +343,7 @@ fn test_ceiling_mod_power_of_two_signed() {
         let mut mut_x = x;
         mut_x.ceiling_mod_power_of_two_assign(pow);
         assert_eq!(mut_x, out);
-    };
+    }
     test::<i8>(0, 0, 0);
     test::<i16>(2, 1, 0);
     test::<i32>(260, 8, -252);

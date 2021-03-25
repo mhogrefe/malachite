@@ -1,9 +1,7 @@
-use std::str::FromStr;
-
 use malachite_base::num::logic::traits::NotAssign;
-use rug;
-
 use malachite_nz::integer::Integer;
+use rug;
+use std::str::FromStr;
 
 #[test]
 fn test_not() {

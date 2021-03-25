@@ -1,9 +1,8 @@
-use std::str::FromStr;
-
 use malachite_base::num::logic::traits::CountOnes;
 use malachite_nz_test_util::natural::logic::count_ones::{
     natural_count_ones_alt_1, natural_count_ones_alt_2,
 };
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;

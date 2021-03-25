@@ -1,5 +1,4 @@
 use malachite_base::num::conversion::traits::WrappingFrom;
-
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 

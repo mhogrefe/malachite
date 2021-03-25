@@ -1,9 +1,5 @@
-use itertools::Itertools;
-use std::cmp::Ordering;
-use std::fmt::Debug;
-use std::iter::once;
-
 use get_sample_output_types;
+use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::nevers::nevers;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
@@ -13,6 +9,9 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
     exhaustive_triples_xyx_custom_output,
 };
+use std::cmp::Ordering;
+use std::fmt::Debug;
+use std::iter::once;
 
 #[allow(clippy::needless_pass_by_value)]
 fn exhaustive_triples_xxy_helper<

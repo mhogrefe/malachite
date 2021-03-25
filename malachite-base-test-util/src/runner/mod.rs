@@ -1,6 +1,5 @@
-use std::collections::HashMap;
-
 use generators::common::{GenConfig, GenMode};
+use std::collections::HashMap;
 
 pub type DemoFn = &'static dyn Fn(GenMode, GenConfig, usize);
 pub type BenchFn = &'static dyn Fn(GenMode, GenConfig, usize, &str);

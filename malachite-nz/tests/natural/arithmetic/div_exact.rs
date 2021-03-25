@@ -11,11 +11,6 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz_test_util::natural::arithmetic::div_exact::{
-    limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
-};
-
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_exact::{
     self, _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
@@ -35,6 +30,10 @@ use malachite_nz::natural::arithmetic::div_exact::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::div_exact::{
+    limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
+};
 
 #[test]
 fn test_test_invert_limb_table() {

@@ -1,9 +1,8 @@
-#[cfg(feature = "32_bit_limbs")]
-use std::cmp::Ordering;
-
 use malachite_base_test_util::common::test_cmp_helper;
 use num::BigUint;
 use rug;
+#[cfg(feature = "32_bit_limbs")]
+use std::cmp::Ordering;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::comparison::ord::{limbs_cmp, limbs_cmp_same_length};

@@ -1,16 +1,14 @@
 use core::hash::Hash;
 use itertools::Itertools;
-use std::fmt::Debug;
-
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
-
 use malachite_base::chars::random::random_char_inclusive_range;
 use malachite_base::num::random::geometric::geometric_random_unsigneds;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::tuples::random::random_units;
 use malachite_base::vecs::random::random_vecs_length_range;
+use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base_test_util::stats::median;
+use std::fmt::Debug;
 
 fn random_vecs_length_range_helper<
     T: Clone + Debug + Eq + Hash + Ord,

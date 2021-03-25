@@ -1,6 +1,3 @@
-use std::fmt::Display;
-use std::ops::{Shl, ShlAssign};
-
 use malachite_base::num::arithmetic::traits::{Parity, ShrRound, ShrRoundAssign, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
@@ -8,7 +5,6 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::vecs::vec_delete_left;
-
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;
 use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
 use natural::arithmetic::shr::{limbs_shr, limbs_slice_shr_in_place, limbs_vec_shr_in_place};
@@ -16,6 +12,8 @@ use natural::logic::bit_access::limbs_get_bit;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::fmt::Display;
+use std::ops::{Shl, ShlAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
 /// limbs of the `Natural` right-shifted by a `Limb`, rounding up. The limbs should not all be zero.

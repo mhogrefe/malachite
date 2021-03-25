@@ -8,7 +8,7 @@ fn test_square() {
         let mut x = x;
         x.square_assign();
         assert_eq!(x, out);
-    };
+    }
     test::<u8>(0, 0);
     test::<i16>(1, 1);
     test::<u32>(2, 4);

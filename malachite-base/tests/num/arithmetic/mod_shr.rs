@@ -18,7 +18,7 @@ fn test_mod_shr() {
         let mut t = t;
         t.mod_shr_assign(i, m);
         assert_eq!(t, out);
-    };
+    }
     test::<u64, i8>(0, 0, 1, 0);
     test::<u64, i8>(0, 0, 5, 0);
     test::<u32, i16>(8, -2, 10, 2);

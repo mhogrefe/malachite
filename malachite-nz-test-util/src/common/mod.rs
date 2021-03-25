@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use malachite_base::num::arithmetic::traits::Sign as SignTrait;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
@@ -10,6 +8,7 @@ use malachite_nz::platform::Limb;
 use num::bigint::Sign;
 use num::{BigInt, BigUint};
 use rug::integer::Order;
+use std::cmp::Ordering;
 
 #[cfg(feature = "32_bit_limbs")]
 #[inline]

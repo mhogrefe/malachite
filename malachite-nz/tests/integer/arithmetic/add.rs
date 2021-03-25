@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
-use num::BigInt;
-
 use malachite_nz::integer::Integer;
+use num::BigInt;
+use std::str::FromStr;
 
 #[test]
 fn test_add() {

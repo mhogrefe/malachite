@@ -1,38 +1,33 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
-
 use malachite_nz::integer::Integer;
+use std::str::FromStr;
 
 #[test]
 fn test_round_to_multiple() {
-    let test = |i, j, rm, quotient| {
-        let mut n = Integer::from_str(i).unwrap();
-        n.round_to_multiple_assign(Integer::from_str(j).unwrap(), rm);
+    let test = |s, t, rm, quotient| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        let mut n = u.clone();
+        n.round_to_multiple_assign(v.clone(), rm);
         assert_eq!(n.to_string(), quotient);
         assert!(n.is_valid());
 
-        let r = Integer::from_str(i)
-            .unwrap()
-            .round_to_multiple(Integer::from_str(j).unwrap(), rm);
+        let r = u.clone().round_to_multiple(v.clone(), rm);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), quotient);
 
-        let r = Integer::from_str(i)
-            .unwrap()
-            .round_to_multiple(&Integer::from_str(j).unwrap(), rm);
+        let r = u.clone().round_to_multiple(&v, rm);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), quotient);
 
-        let r =
-            (&Integer::from_str(i).unwrap()).round_to_multiple(Integer::from_str(j).unwrap(), rm);
+        let r = (&u).round_to_multiple(v.clone(), rm);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), quotient);
 
-        let r =
-            (&Integer::from_str(i).unwrap()).round_to_multiple(&Integer::from_str(j).unwrap(), rm);
+        let r = (&u).round_to_multiple(&v, rm);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), quotient);
     };

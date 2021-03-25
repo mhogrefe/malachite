@@ -1,14 +1,5 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{One, Zero};
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz_test_util::natural::arithmetic::div::{
-    limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
-};
-use num::BigUint;
-use rug;
-
 use malachite_nz::natural::arithmetic::div::{
     _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
     _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
@@ -23,6 +14,13 @@ use malachite_nz::natural::arithmetic::div::{
 use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::natural::arithmetic::div::{
+    limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
+};
+use num::BigUint;
+use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]

@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::ModPowerOfTwoIsReduced;
-
 use malachite_nz::natural::Natural;
+use std::str::FromStr;
 
 #[test]
 fn test_mod_power_of_two_is_reduced() {

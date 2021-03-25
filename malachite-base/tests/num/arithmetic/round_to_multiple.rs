@@ -1,9 +1,8 @@
-use std::panic::catch_unwind;
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
+use std::panic::catch_unwind;
 
 #[test]
 fn test_round_to_multiple_unsigned() {
@@ -13,7 +12,7 @@ fn test_round_to_multiple_unsigned() {
         let mut mut_n = n;
         mut_n.round_to_multiple_assign(d, rm);
         assert_eq!(mut_n, q);
-    };
+    }
     test::<u8>(0, 1, RoundingMode::Down, 0);
     test::<u8>(0, 1, RoundingMode::Floor, 0);
     test::<u8>(0, 1, RoundingMode::Up, 0);
@@ -230,7 +229,7 @@ fn test_round_to_multiple_signed() {
         let mut mut_n = n;
         mut_n.round_to_multiple_assign(d, rm);
         assert_eq!(mut_n, q);
-    };
+    }
     test::<i8>(0, 1, RoundingMode::Down, 0);
     test::<i8>(0, 1, RoundingMode::Floor, 0);
     test::<i8>(0, 1, RoundingMode::Up, 0);

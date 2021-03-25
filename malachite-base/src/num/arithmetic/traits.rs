@@ -1,7 +1,6 @@
-use std::cmp::Ordering;
-
 use num::basic::traits::Two;
 use rounding_modes::RoundingMode;
+use std::cmp::Ordering;
 
 /// Checks whether `self` is reduced mod 2<sup>`pow`</sup>.
 pub trait ModPowerOfTwoIsReduced {
@@ -75,7 +74,7 @@ pub trait OverflowingNegAssign {
     fn overflowing_neg_assign(&mut self) -> bool;
 }
 
-/// Computes the absolute value of `self`. Inputs are assumed to be valid.
+/// Computes the absolute value of `self`. The input is assumed to be valid.
 pub trait Abs {
     type Output;
 
@@ -497,50 +496,50 @@ pub trait ModMulPrecomputedAssign<RHS = Self, M = Self>: ModMulPrecomputed<RHS, 
     fn mod_mul_precomputed_assign(&mut self, other: RHS, m: M, data: &Self::Data);
 }
 
-/// Computes `self + y * z`.
+/// Computes $x + yz$.
 pub trait AddMul<Y = Self, Z = Self> {
     type Output;
 
     fn add_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-/// Replaces `self` with `self + y * z`.
+/// Replaces $x$ with $x + yz$.
 pub trait AddMulAssign<Y = Self, Z = Self> {
     fn add_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Computes `self + y * z`, returning `None` if there is no valid result.
+/// Computes $x + yz$, returning `None` if there is no valid result.
 pub trait CheckedAddMul<Y = Self, Z = Self> {
     type Output;
 
     fn checked_add_mul(self, y: Y, z: Z) -> Option<Self::Output>;
 }
 
-/// Computes `self + y * z`, saturating at the numeric bounds instead of overflowing.
+/// Computes $x + yz$, saturating at the numeric bounds instead of overflowing.
 pub trait SaturatingAddMul<Y = Self, Z = Self> {
     type Output;
 
     fn saturating_add_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-/// Replaces `self` with `self + y * z`, saturating at the numeric bounds instead of overflowing.
+/// Replaces $x$ with $x + yz$, saturating at the numeric bounds instead of overflowing.
 pub trait SaturatingAddMulAssign<Y = Self, Z = Self> {
     fn saturating_add_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Computes `self + y * z`, wrapping around at the boundary of the type.
+/// Computes $x + yz$, wrapping around at the boundary of the type.
 pub trait WrappingAddMul<Y = Self, Z = Self> {
     type Output;
 
     fn wrapping_add_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-/// Replaces `self` with `self + y * z`, wrapping around at the boundary of the type.
+/// Replaces $x$ with $x + yz$, wrapping around at the boundary of the type.
 pub trait WrappingAddMulAssign<Y = Self, Z = Self> {
     fn wrapping_add_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Calculates `self + y * z`.
+/// Calculates $x + yz$.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
 /// would occur. If an overflow would have occurred then the wrapped value is returned.
@@ -550,7 +549,7 @@ pub trait OverflowingAddMul<Y = Self, Z = Self> {
     fn overflowing_add_mul(self, y: Y, z: Z) -> (Self::Output, bool);
 }
 
-/// Replaces `self` with `self + y * z`.
+/// Replaces $x$ with $x + yz$.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
 /// have occurred then the wrapped value is assigned.
@@ -558,50 +557,50 @@ pub trait OverflowingAddMulAssign<Y = Self, Z = Self> {
     fn overflowing_add_mul_assign(&mut self, y: Y, z: Z) -> bool;
 }
 
-/// Computes `self - y * z`.
+/// Computes $x - yz$.
 pub trait SubMul<Y = Self, Z = Self> {
     type Output;
 
     fn sub_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-/// Replaces `self` with `self - y * z`.
+/// Replaces $x$ with $x - yz$.
 pub trait SubMulAssign<Y = Self, Z = Self> {
     fn sub_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Computes `self - y * z`, returning `None` if there is no valid result.
+/// Computes $x - yz$, returning `None` if there is no valid result.
 pub trait CheckedSubMul<Y = Self, Z = Self> {
     type Output;
 
     fn checked_sub_mul(self, y: Y, z: Z) -> Option<Self::Output>;
 }
 
-/// Computes `self - y * z`, saturating at the numeric bounds instead of overflowing.
+/// Computes $x - yz$, saturating at the numeric bounds instead of overflowing.
 pub trait SaturatingSubMul<Y = Self, Z = Self> {
     type Output;
 
     fn saturating_sub_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-/// Replaces `self` with `self - y * z`, saturating at the numeric bounds instead of overflowing.
+/// Replaces $x$ with $x - yz$, saturating at the numeric bounds instead of overflowing.
 pub trait SaturatingSubMulAssign<Y = Self, Z = Self> {
     fn saturating_sub_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Computes `self - y * z`, wrapping around at the boundary of the type.
+/// Computes $x - yz$, wrapping around at the boundary of the type.
 pub trait WrappingSubMul<Y = Self, Z = Self> {
     type Output;
 
     fn wrapping_sub_mul(self, y: Y, z: Z) -> Self::Output;
 }
 
-/// Replaces `self` with `self - y * z`, wrapping around at the boundary of the type.
+/// Replaces $x$ with $x - yz$, wrapping around at the boundary of the type.
 pub trait WrappingSubMulAssign<Y = Self, Z = Self> {
     fn wrapping_sub_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Calculates `self - y * z`.
+/// Calculates $x - yz$.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
 /// would occur. If an overflow would have occurred then the wrapped value is returned.
@@ -611,7 +610,7 @@ pub trait OverflowingSubMul<Y = Self, Z = Self> {
     fn overflowing_sub_mul(self, y: Y, z: Z) -> (Self::Output, bool);
 }
 
-/// Replaces `self` with `self - y * z`.
+/// Replaces $x$ with $x - yz$.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
 /// have occurred then the wrapped value is assigned.
@@ -848,8 +847,9 @@ pub trait EqModPowerOfTwo<RHS = Self> {
 }
 
 /// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
-/// towards negative infinity, and the remainder has the same sign as the divisor. The quotient and
-/// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// towards negative infinity, and the remainder has the same sign as the divisor.
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait DivMod<RHS = Self> {
     type DivOutput;
     type ModOutput;
@@ -858,8 +858,9 @@ pub trait DivMod<RHS = Self> {
 }
 
 /// Divides a value by another value in place, returning the remainder. The quotient is rounded
-/// towards negative infinity, and the remainder has the same sign as the divisor. The quotient and
-/// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// towards negative infinity, and the remainder has the same sign as the divisor.
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait DivAssignMod<RHS = Self> {
     type ModOutput;
 
@@ -867,8 +868,9 @@ pub trait DivAssignMod<RHS = Self> {
 }
 
 /// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
-/// towards zero and the remainder has the same sign as the dividend. The quotient and remainder
-/// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// towards zero and the remainder has the same sign as the dividend.
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait DivRem<RHS = Self> {
     type DivOutput;
     type RemOutput;
@@ -877,8 +879,9 @@ pub trait DivRem<RHS = Self> {
 }
 
 /// Divides a value by another value in place, returning the remainder. The quotient is rounded
-/// towards zero and the remainder has the same sign as the dividend. The quotient and remainder
-/// satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// towards zero and the remainder has the same sign as the dividend.
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait DivAssignRem<RHS = Self> {
     type RemOutput;
 
@@ -886,8 +889,9 @@ pub trait DivAssignRem<RHS = Self> {
 }
 
 /// Divides a value by another value, returning the ceiling of the quotient and the remainder of the
-/// negative of the first value divided by the second. The quotient and remainder satisfy
-/// `self` = q * `other` - r and 0 <= r < `other`.
+/// negative of the first value divided by the second.
+///
+/// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
 pub trait CeilingDivNegMod<RHS = Self> {
     type DivOutput;
     type ModOutput;
@@ -896,8 +900,9 @@ pub trait CeilingDivNegMod<RHS = Self> {
 }
 
 /// Divides a value by another value in place, taking the ceiling of the quotient and returning the
-/// remainder of the negative of the first value divided by the second. The quotient and remainder
-/// satisfy `self` = q * `other` - r and 0 <= r < `other`.
+/// remainder of the negative of the first value divided by the second.
+///
+/// The quotient and remainder satisfy $x = qy - r$ and $0 \leq r < y$.
 pub trait CeilingDivAssignNegMod<RHS = Self> {
     type ModOutput;
 
@@ -905,8 +910,9 @@ pub trait CeilingDivAssignNegMod<RHS = Self> {
 }
 
 /// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
-/// towards positive infinity and the remainder has the opposite sign of the divisor. The quotient
-/// and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// towards positive infinity and the remainder has the opposite sign of the divisor.
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait CeilingDivMod<RHS = Self> {
     type DivOutput;
     type ModOutput;
@@ -916,7 +922,9 @@ pub trait CeilingDivMod<RHS = Self> {
 
 /// Divides a value by another value in place, taking the quotient and returning the remainder. The
 /// quotient is rounded towards positive infinity and the remainder has the opposite sign of the
-/// divisor. The quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// divisor.
+///
+/// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
 pub trait CeilingDivAssignMod<RHS = Self> {
     type ModOutput;
 
@@ -971,22 +979,21 @@ pub trait CeilingModAssign<RHS = Self> {
     fn ceiling_mod_assign(&mut self, other: RHS);
 }
 
-/// Divides a value by another value and rounds according to a specified rounding mode. See the
-/// `RoundingMode` documentation for details.
+/// Divides a value by another value and rounds according to a specified rounding mode.
 pub trait DivRound<RHS = Self> {
     type Output;
 
     fn div_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
 }
 
-/// Divides a value by another value in place and rounds according to a specified rounding mode. See
-/// the `RoundingMode` documentation for details.
+/// Divides a value by another value in place and rounds according to a specified rounding mode.
 pub trait DivRoundAssign<RHS = Self> {
     fn div_round_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
-/// Divides a value by another value. The first value must be exactly divisible by the second. If it
-/// isn't, this function may crash or return a meaningless result.
+/// Divides a value by another value. The first value must be exactly divisible by the second.
+///
+/// If it isn't, this function may crash or return a meaningless result.
 pub trait DivExact<RHS = Self> {
     type Output;
 
@@ -1046,8 +1053,9 @@ pub trait NextPowerOfTwoAssign {
     fn next_power_of_two_assign(&mut self);
 }
 
-/// Returns the smallest power of two greater than or equal to `self`. If the next power of two is
-/// greater than the type's maximum value, `None` is returned.
+/// Returns the smallest power of two greater than or equal to `self`.
+///
+/// If the next power of two is greater than the type's maximum value, `None` is returned.
 pub trait CheckedNextPowerOfTwo {
     type Output;
 

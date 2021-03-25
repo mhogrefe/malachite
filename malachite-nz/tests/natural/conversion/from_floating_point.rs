@@ -4,7 +4,6 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
-
 use malachite_nz::natural::Natural;
 
 #[test]

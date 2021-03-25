@@ -1,6 +1,8 @@
 use std::iter::Cloned;
 use std::slice::Iter;
 
+pub type ExhaustiveBools = Cloned<Iter<'static, bool>>;
+
 /// Generates both `bool`s.
 ///
 /// The output length is 2.
@@ -19,6 +21,6 @@ use std::slice::Iter;
 /// assert_eq!(exhaustive_bools().collect_vec(), &[false, true]);
 /// ```
 #[inline]
-pub fn exhaustive_bools() -> Cloned<Iter<'static, bool>> {
+pub fn exhaustive_bools() -> ExhaustiveBools {
     [false, true].iter().cloned()
 }

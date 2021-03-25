@@ -21,7 +21,7 @@ fn test_to_power_of_two_digits_asc() {
             out
         );
         assert_eq!(to_power_of_two_digits_asc_naive(&n, log_base), out);
-    };
+    }
     test::<u8, _>(Natural::_to_power_of_two_digits_asc_naive, "0", 1, &[]);
     test::<u16, _>(
         Natural::_to_power_of_two_digits_asc_naive,
@@ -100,7 +100,7 @@ fn test_to_power_of_two_digits_desc() {
             PowerOfTwoDigits::<T>::to_power_of_two_digits_desc(&n, log_base),
             out
         );
-    };
+    }
     test::<u8>("0", 1, &[]);
     test::<u16>("123", 10, &[123]);
     test::<u16>(

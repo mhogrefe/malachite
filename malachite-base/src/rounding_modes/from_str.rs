@@ -1,6 +1,5 @@
-use std::str::FromStr;
-
 use rounding_modes::RoundingMode;
+use std::str::FromStr;
 
 impl FromStr for RoundingMode {
     type Err = String;

@@ -1,8 +1,7 @@
-use std::str::FromStr;
-
 use malachite_nz_test_util::integer::logic::checked_count_zeros::{
     integer_checked_count_zeros_alt_1, integer_checked_count_zeros_alt_2,
 };
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::integer::logic::checked_count_zeros::limbs_count_zeros_neg;

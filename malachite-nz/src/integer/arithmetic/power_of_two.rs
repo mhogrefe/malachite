@@ -1,7 +1,6 @@
+use integer::Integer;
 use malachite_base::num::arithmetic::traits::PowerOfTwo;
 use malachite_base::num::basic::traits::One;
-
-use integer::Integer;
 
 impl PowerOfTwo for Integer {
     /// Computes 2<sup>`pow`</sup>.

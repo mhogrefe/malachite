@@ -1,5 +1,4 @@
 use malachite_base::num::arithmetic::traits::{CeilingLogTwo, CheckedLogTwo, FloorLogTwo};
-
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;

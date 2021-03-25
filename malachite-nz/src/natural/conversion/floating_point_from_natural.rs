@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
     DivisibleByPowerOfTwo, FloorLogTwo, ShrRound, ShrRoundAssign,
@@ -15,6 +13,7 @@ use natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
+use std::cmp::Ordering;
 
 macro_rules! float_impls {
     ($f: ident, $gt_max_finite_float: ident) => {
@@ -102,7 +101,7 @@ macro_rules! float_impls {
                     mantissa >>= 1;
                 }
                 mantissa.clear_bit($f::MANTISSA_WIDTH);
-                let exponent = exponent + $f::MAX_EXPONENT;
+                let exponent = exponent + u64::wrapping_from($f::MAX_EXPONENT);
                 $f::from_raw_mantissa_and_exponent(mantissa, exponent)
             }
         }
@@ -167,7 +166,7 @@ macro_rules! float_impls {
                     mantissa >>= 1;
                 }
                 mantissa.clear_bit($f::MANTISSA_WIDTH);
-                let exponent = exponent + $f::MAX_EXPONENT;
+                let exponent = exponent + u64::wrapping_from($f::MAX_EXPONENT);
                 $f::from_raw_mantissa_and_exponent(mantissa, exponent)
             }
         }
@@ -273,7 +272,7 @@ macro_rules! float_impls {
                 mantissa.clear_bit($f::MANTISSA_WIDTH);
                 Some($f::from_raw_mantissa_and_exponent(
                     mantissa,
-                    exponent + $f::MAX_EXPONENT,
+                    exponent + u64::wrapping_from($f::MAX_EXPONENT),
                 ))
             }
         }
@@ -318,7 +317,7 @@ macro_rules! float_impls {
                 let mut mantissa =
                     <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(value >> shift);
                 mantissa.clear_bit($f::MANTISSA_WIDTH);
-                let exponent = exponent + $f::MAX_EXPONENT;
+                let exponent = exponent + u64::wrapping_from($f::MAX_EXPONENT);
                 Some($f::from_raw_mantissa_and_exponent(mantissa, exponent))
             }
         }

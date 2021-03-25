@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, PowerOfTwo};
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, CeilingLogTwo, PowerOfTwo};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Two;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -44,7 +44,10 @@ use malachite_nz::natural::arithmetic::mul::toom::{
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
-use malachite_nz::natural::random::{random_natural_range_to_infinity, random_naturals};
+use malachite_nz::natural::random::{
+    get_random_natural_with_up_to_bits, random_natural_range_to_infinity, random_naturals,
+    RandomNaturalRangeToInfinity,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use std::collections::HashMap;
@@ -293,6 +296,54 @@ pub fn random_natural_unsigned_unsigned_triple_gen_var_1<
             )
         },
     ))
+}
+
+// -- (Vec<Natural>, Natural> --
+
+struct LargeDigitsRandomGenerator {
+    bases: RandomNaturalRangeToInfinity,
+    digit_counts: GeometricRandomNaturalValues<usize>,
+    xs: RandomPrimitiveInts<u64>,
+}
+
+impl Iterator for LargeDigitsRandomGenerator {
+    type Item = (Vec<Natural>, Natural);
+
+    fn next(&mut self) -> Option<(Vec<Natural>, Natural)> {
+        let base = self.bases.next().unwrap();
+        let bits = base.ceiling_log_two();
+        let digit_count = self.digit_counts.next().unwrap();
+        let mut digits = Vec::with_capacity(digit_count);
+        for _ in 0..digit_count {
+            loop {
+                let x = get_random_natural_with_up_to_bits(&mut self.xs, bits);
+                if x < base {
+                    digits.push(x);
+                    break;
+                }
+            }
+        }
+        Some((digits, base))
+    }
+}
+
+pub fn random_natural_vec_natural_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Natural>, Natural)> {
+    Box::new(LargeDigitsRandomGenerator {
+        bases: random_natural_range_to_infinity(
+            EXAMPLE_SEED.fork("bases"),
+            Natural::power_of_two(Limb::WIDTH),
+            Limb::WIDTH + 4,
+            1,
+        ),
+        digit_counts: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("digit_counts"),
+            config.get_or("digit_counts_mean_n", 4),
+            config.get_or("digit_counts_mean_d", 1),
+        ),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
 }
 
 // -- (Vec<PrimitiveInt>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
@@ -756,3 +807,5 @@ pub fn random_primitive_int_vec_triple_gen_var_23<T: PrimitiveInt>(
         3,
     )
 }
+
+// vars 24 through 27 are in malachite-base

@@ -1,7 +1,6 @@
-use std::str::FromStr;
-
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_nz_test_util::natural::arithmetic::square::_limbs_square_to_out_basecase_unrestricted;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;

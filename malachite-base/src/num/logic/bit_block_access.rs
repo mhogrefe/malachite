@@ -1,10 +1,9 @@
-use std::cmp::min;
-use std::ops::Neg;
-
 use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{BitBlockAccess, LeadingZeros};
+use std::cmp::min;
+use std::ops::Neg;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
@@ -32,7 +31,7 @@ fn _assign_bits_unsigned<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
     let bits_width = end - start;
     let bits = bits.mod_power_of_two(bits_width);
     if bits != T::ZERO && LeadingZeros::leading_zeros(bits) < start {
-        panic!(ERROR_MESSAGE);
+        panic!("{}", ERROR_MESSAGE);
     } else if start < width {
         *x &= !(T::MAX.mod_power_of_two(min(bits_width, width - start)) << start);
         *x |= bits << start;
@@ -148,7 +147,7 @@ fn _assign_bits_signed<
         let mut abs_x = x.unsigned_abs();
         abs_x.assign_bits(start, end, bits);
         if abs_x.get_highest_bit() {
-            panic!(ERROR_MESSAGE);
+            panic!("{}", ERROR_MESSAGE);
         }
         *x = T::wrapping_from(abs_x);
     } else {
@@ -157,15 +156,15 @@ fn _assign_bits_signed<
         let bits = bits.mod_power_of_two(bits_width);
         let max = U::MAX;
         if bits_width > width + 1 {
-            panic!(ERROR_MESSAGE);
+            panic!("{}", ERROR_MESSAGE);
         } else if start >= width {
             if bits != max.mod_power_of_two(bits_width) {
-                panic!(ERROR_MESSAGE);
+                panic!("{}", ERROR_MESSAGE);
             }
         } else {
             let lower_width = width - start;
             if end > width && bits >> lower_width != max.mod_power_of_two(end - width) {
-                panic!(ERROR_MESSAGE);
+                panic!("{}", ERROR_MESSAGE);
             } else {
                 *x &= T::wrapping_from(
                     !(max.mod_power_of_two(min(bits_width, lower_width)) << start),

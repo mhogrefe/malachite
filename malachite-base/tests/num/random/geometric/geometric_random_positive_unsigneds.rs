@@ -1,13 +1,11 @@
-use std::panic::catch_unwind;
-
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::random::geometric::geometric_random_positive_unsigneds;
+use malachite_base::random::EXAMPLE_SEED;
 use malachite_base_test_util::stats::moments::{
     truncated_geometric_dist_assertions, CheckedToF64, MomentStats,
 };
-
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::random::geometric::geometric_random_positive_unsigneds;
-use malachite_base::random::EXAMPLE_SEED;
+use std::panic::catch_unwind;
 
 fn geometric_random_positive_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     um_numerator: u64,
