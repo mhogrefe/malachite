@@ -2,7 +2,7 @@ use num::basic::traits::Two;
 use rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 
-/// Checks whether `self` is reduced mod 2<sup>`pow`</sup>.
+/// Checks whether `self` is reduced mod $2^p$.
 pub trait ModPowerOfTwoIsReduced {
     fn mod_power_of_two_is_reduced(&self, pow: u64) -> bool;
 }
@@ -146,16 +146,14 @@ pub trait OverflowingAbsAssign {
     fn overflowing_abs_assign(&mut self) -> bool;
 }
 
-/// Computes `-self` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Computes `-self` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoNeg {
     type Output;
 
     fn mod_power_of_two_neg(self, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `-self` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Replaces `self` with `-self` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoNegAssign {
     fn mod_power_of_two_neg_assign(&mut self, pow: u64);
 }
@@ -337,16 +335,14 @@ pub trait XXXSubYYYIsZZZ: Sized {
     ) -> (Self, Self, Self);
 }
 
-/// Computes `self + other` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Computes `self + other` mod $2^p$. Assumes the inputs are already reduced mod $2^p$.
 pub trait ModPowerOfTwoAdd<RHS = Self> {
     type Output;
 
     fn mod_power_of_two_add(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self + other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
-/// reduced mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self + other` mod $2^p$. Assumes the inputs are already reduced mod $2^p$.
 pub trait ModPowerOfTwoAddAssign<RHS = Self> {
     fn mod_power_of_two_add_assign(&mut self, other: RHS, pow: u64);
 }
@@ -363,16 +359,14 @@ pub trait ModAddAssign<RHS = Self, M = Self> {
     fn mod_add_assign(&mut self, other: RHS, m: M);
 }
 
-/// Computes `self - other` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Computes `self - other` mod $2^p$. Assumes the inputs are already reduced mod $2^p$.
 pub trait ModPowerOfTwoSub<RHS = Self> {
     type Output;
 
     fn mod_power_of_two_sub(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self - other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
-/// reduced mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self - other` mod $2^p$. Assumes the inputs are already $2^p$.
 pub trait ModPowerOfTwoSubAssign<RHS = Self> {
     fn mod_power_of_two_sub_assign(&mut self, other: RHS, pow: u64);
 }
@@ -448,16 +442,14 @@ pub trait XMulYIsZZ: Sized {
     fn x_mul_y_is_zz(x: Self, y: Self) -> (Self, Self);
 }
 
-/// Computes `self * other` mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Computes `self * other` mod $2^p$. Assumes the inputs are already reduced mod $2^p$.
 pub trait ModPowerOfTwoMul<RHS = Self> {
     type Output;
 
     fn mod_power_of_two_mul(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self * other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
-/// reduced mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self * other` mod $2^p$. Assumes the inputs are already reduced mod $2^p$.
 pub trait ModPowerOfTwoMulAssign<RHS = Self> {
     fn mod_power_of_two_mul_assign(&mut self, other: RHS, pow: u64);
 }
@@ -660,30 +652,26 @@ pub trait ArithmeticCheckedShr<RHS> {
     fn arithmetic_checked_shr(self, other: RHS) -> Option<Self::Output>;
 }
 
-/// Computes `self << other` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Computes `self << other` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoShl<RHS> {
     type Output;
 
     fn mod_power_of_two_shl(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self << other` mod 2<sup>`pow`</sup>. Assumes the input is already
-/// reduced mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self << other` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoShlAssign<RHS> {
     fn mod_power_of_two_shl_assign(&mut self, other: RHS, pow: u64);
 }
 
-/// Computes `self >> other` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Computes `self >> other` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoShr<RHS> {
     type Output;
 
     fn mod_power_of_two_shr(self, other: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self >> other` mod 2<sup>`pow`</sup>. Assumes the input is already
-/// reduced mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self >> other` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoShrAssign<RHS> {
     fn mod_power_of_two_shr_assign(&mut self, other: RHS, pow: u64);
 }
@@ -836,12 +824,12 @@ pub trait Parity {
     fn odd(self) -> bool;
 }
 
-/// Determines whether `self` is divisible by 2<sup>`pow`</sup>.
+/// Determines whether `self` is divisible by $2^p$.
 pub trait DivisibleByPowerOfTwo {
     fn divisible_by_power_of_two(self, pow: u64) -> bool;
 }
 
-/// Determines whether `self` is equal to `other` mod 2<sup>`pow`</sup>.
+/// Determines whether `self` is equal to `other` mod $2^p$.
 pub trait EqModPowerOfTwo<RHS = Self> {
     fn eq_mod_power_of_two(self, other: RHS, pow: u64) -> bool;
 }
@@ -1029,7 +1017,7 @@ pub trait RoundToMultipleAssign<RHS = Self> {
     fn round_to_multiple_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
-/// Calculates 2<sup>`pow`</sup>.
+/// Calculates $2^p$.
 pub trait PowerOfTwo {
     fn power_of_two(pow: u64) -> Self;
 }
@@ -1126,16 +1114,14 @@ pub trait OverflowingPowAssign<RHS = Self> {
     fn overflowing_pow_assign(&mut self, exp: RHS) -> bool;
 }
 
-/// Computes `self.pow(exp)` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Computes `self.pow(exp)` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoPow<RHS = Self> {
     type Output;
 
     fn mod_power_of_two_pow(self, exp: RHS, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self.pow(exp)` mod 2<sup>`pow`</sup>. Assumes the input is already reduced
-/// mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self.pow(exp)` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoPowAssign<RHS = Self> {
     fn mod_power_of_two_pow_assign(&mut self, exp: RHS, pow: u64);
 }
@@ -1240,16 +1226,14 @@ pub trait OverflowingSquareAssign {
     fn overflowing_square_assign(&mut self) -> bool;
 }
 
-/// Computes `self.square()` mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
-/// 2<sup>`pow`</sup>.
+/// Computes `self.square()` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoSquare {
     type Output;
 
     fn mod_power_of_two_square(self, pow: u64) -> Self::Output;
 }
 
-/// Replaces `self` with `self.square()` mod 2<sup>`pow`</sup>. Assumes the input is already reduced
-/// mod 2<sup>`pow`</sup>.
+/// Replaces `self` with `self.square()` mod $2^p$. Assumes the input is already reduced mod $2^p$.
 pub trait ModPowerOfTwoSquareAssign {
     fn mod_power_of_two_square_assign(&mut self, pow: u64);
 }

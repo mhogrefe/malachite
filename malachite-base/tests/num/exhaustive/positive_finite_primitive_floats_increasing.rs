@@ -8,10 +8,16 @@ fn positive_finite_primitive_floats_increasing_helper<T: PrimitiveFloat>(
     last_20: &[T],
 ) {
     let xs = positive_finite_primitive_floats_increasing::<T>();
-    assert_eq!(xs.clone().take(20).map(NiceFloat).collect_vec(), first_20);
+    assert_eq!(
+        xs.clone().take(20).map(NiceFloat).collect_vec(),
+        first_20.iter().copied().map(NiceFloat).collect_vec()
+    );
     let mut reversed = xs.rev().take(20).map(NiceFloat).collect_vec();
     reversed.reverse();
-    assert_eq!(reversed, last_20);
+    assert_eq!(
+        reversed,
+        last_20.iter().copied().map(NiceFloat).collect_vec()
+    );
 }
 
 #[test]

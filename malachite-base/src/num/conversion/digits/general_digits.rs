@@ -205,7 +205,7 @@ macro_rules! impl_digits {
                     /// # Panics
                     /// Panics if `base` is greater than `$t::MAX`, if `base` is less than 2, if the
                     /// digits represent a value that isn't representable by `$t`, or if some digit
-                    /// is greater than or equal to $b$.
+                    /// is greater than or equal to `base`.
                     ///
                     /// # Examples
                     /// See the documentation of the `num::conversion::digits::general_digits`
@@ -235,7 +235,7 @@ macro_rules! impl_digits {
                     /// # Panics
                     /// Panics if `base` is greater than `$t::MAX`, if `base` is less than 2, if the
                     /// digits represent a value that isn't representable by `$t`, or if some digit
-                    /// is greater than or equal to $b$.
+                    /// is greater than or equal to `base`.
                     ///
                     /// # Examples
                     /// See the documentation of the `num::conversion::digits::general_digits`

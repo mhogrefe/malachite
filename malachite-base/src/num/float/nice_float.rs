@@ -56,13 +56,6 @@ impl<T: PrimitiveFloat> PartialEq<NiceFloat<T>> for NiceFloat<T> {
     }
 }
 
-impl<T: PrimitiveFloat> PartialEq<T> for NiceFloat<T> {
-    #[inline]
-    fn eq(&self, other: &T) -> bool {
-        *self == NiceFloat(*other)
-    }
-}
-
 impl<T: PrimitiveFloat> Eq for NiceFloat<T> {}
 
 impl<T: PrimitiveFloat> Hash for NiceFloat<T> {

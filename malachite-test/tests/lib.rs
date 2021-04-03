@@ -15,10 +15,6 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod divisible_by;
-            pub mod divisible_by_power_of_two;
-            pub mod eq_mod;
-            pub mod eq_mod_power_of_two;
             pub mod mod_add;
             pub mod mod_is_reduced;
             pub mod mod_mul;
@@ -208,7 +204,6 @@ pub mod natural {
         pub mod mod_shr;
         pub mod mod_square;
         pub mod mod_sub;
-        pub mod mul;
         pub mod next_power_of_two;
         pub mod parity;
         pub mod pow;

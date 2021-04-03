@@ -1,3 +1,7 @@
+use crate::bench::bucketers::{
+    pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
+    triple_3_pair_natural_max_bit_bucketer,
+};
 use malachite_base_test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_sum_vec_len_bucketer, quadruple_2_vec_len_bucketer,
     triple_1_vec_len_bucketer, triple_2_3_sum_vec_len_bucketer, triple_2_vec_len_bucketer,
@@ -58,13 +62,13 @@ use malachite_nz::natural::arithmetic::mul::{
     limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use malachite_nz_test_util::generators::{
-    unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12,
-    unsigned_vec_triple_gen_var_13, unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15,
-    unsigned_vec_triple_gen_var_16, unsigned_vec_triple_gen_var_18, unsigned_vec_triple_gen_var_19,
-    unsigned_vec_triple_gen_var_20, unsigned_vec_triple_gen_var_21, unsigned_vec_triple_gen_var_22,
-    unsigned_vec_triple_gen_var_23, unsigned_vec_triple_gen_var_4, unsigned_vec_triple_gen_var_5,
-    unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
-    unsigned_vec_triple_gen_var_9,
+    natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_rm, unsigned_vec_triple_gen_var_10,
+    unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13,
+    unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16,
+    unsigned_vec_triple_gen_var_18, unsigned_vec_triple_gen_var_19, unsigned_vec_triple_gen_var_20,
+    unsigned_vec_triple_gen_var_21, unsigned_vec_triple_gen_var_22, unsigned_vec_triple_gen_var_23,
+    unsigned_vec_triple_gen_var_4, unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_6,
+    unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8, unsigned_vec_triple_gen_var_9,
 };
 use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
 
@@ -143,6 +147,12 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_demo!(runner, demo_limbs_mul_low_same_length_divide_and_conquer);
     register_demo!(runner, demo_limbs_mul_low_same_length);
+    register_demo!(runner, demo_natural_mul);
+    register_demo!(runner, demo_natural_mul_val_ref);
+    register_demo!(runner, demo_natural_mul_ref_val);
+    register_demo!(runner, demo_natural_mul_ref_ref);
+    register_demo!(runner, demo_natural_mul_assign);
+    register_demo!(runner, demo_natural_mul_assign_ref);
 
     register_bench!(runner, benchmark_limbs_mul_limb);
     register_bench!(runner, benchmark_limbs_mul_limb_with_carry_to_out);
@@ -258,6 +268,10 @@ pub(crate) fn register(runner: &mut Runner) {
     );
     register_bench!(runner, benchmark_limbs_mul_low_same_length_large_algorithms);
     register_bench!(runner, benchmark_limbs_mul_low_same_length_algorithms);
+    register_bench!(runner, benchmark_natural_mul_library_comparison);
+    register_bench!(runner, benchmark_natural_mul_evaluation_strategy);
+    register_bench!(runner, benchmark_natural_mul_assign_library_comparison);
+    register_bench!(runner, benchmark_natural_mul_assign_evaluation_strategy);
 }
 
 fn demo_limbs_mul_limb(gm: GenMode, config: GenConfig, limit: usize) {
@@ -521,6 +535,50 @@ fn demo_limbs_mul_low_same_length(gm: GenMode, config: GenConfig, limit: usize) 
             "out := {:?}; limbs_mul_low_same_length(&mut out, {:?}, {:?}); out = {:?}",
             out_old, xs, ys, out
         );
+    }
+}
+
+fn demo_natural_mul(gm: GenMode, config: GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+        let x_old = x.clone();
+        let y_old = y.clone();
+        println!("{} * {} = {}", x_old, y_old, x * y);
+    }
+}
+
+fn demo_natural_mul_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+        let x_old = x.clone();
+        println!("{} * &{} = {}", x_old, y, x * &y);
+    }
+}
+
+fn demo_natural_mul_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+        let y_old = y.clone();
+        println!("&{} * {} = {}", x, y_old, &x * y);
+    }
+}
+
+fn demo_natural_mul_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
+    for (x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+        println!("&{} * &{} = {}", x, y, &x * &y);
+    }
+}
+
+fn demo_natural_mul_assign(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+        let x_old = x.clone();
+        x *= y.clone();
+        println!("x := {}; x *= {}; x = {}", x_old, y, x);
+    }
+}
+
+fn demo_natural_mul_assign_ref(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut x, y) in natural_pair_gen().get(gm, &config).take(limit) {
+        let x_old = x.clone();
+        x *= &y;
+        println!("x := {}; x *= &{}; x = {}", x_old, y, x);
     }
 }
 
@@ -1333,6 +1391,95 @@ fn benchmark_limbs_mul_low_same_length_algorithms(
             ("mul", &mut |(mut out, xs, ys)| {
                 limbs_mul_same_length_to_out(&mut out, &xs, &ys)
             }),
+        ],
+    );
+}
+
+#[allow(clippy::no_effect, clippy::unnecessary_operation, unused_must_use)]
+fn benchmark_natural_mul_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural * Natural",
+        BenchmarkType::LibraryComparison,
+        natural_pair_gen_nrm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_3_pair_natural_max_bit_bucketer("x", "y"),
+        &mut [
+            ("Malachite", &mut |(_, _, (x, y))| no_out!(x * y)),
+            ("num", &mut |((x, y), _, _)| no_out!(x * y)),
+            ("rug", &mut |(_, (x, y), _)| no_out!(x * y)),
+        ],
+    );
+}
+
+#[allow(clippy::no_effect, unused_must_use)]
+fn benchmark_natural_mul_evaluation_strategy(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural * Natural",
+        BenchmarkType::EvaluationStrategy,
+        natural_pair_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_natural_max_bit_bucketer("x", "y"),
+        &mut [
+            ("Natural * Natural", &mut |(x, y)| no_out!(x * y)),
+            ("Natural * &Natural", &mut |(x, y)| no_out!(x * &y)),
+            ("&Natural * Natural", &mut |(x, y)| no_out!(&x * y)),
+            ("&Natural * &Natural", &mut |(x, y)| no_out!(&x * &y)),
+        ],
+    );
+}
+
+fn benchmark_natural_mul_assign_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural *= Natural",
+        BenchmarkType::LibraryComparison,
+        natural_pair_gen_rm().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_2_pair_natural_max_bit_bucketer("x", "y"),
+        &mut [
+            ("Malachite", &mut |(_, (mut x, y))| x *= y),
+            ("rug", &mut |((mut x, y), _)| x *= y),
+        ],
+    );
+}
+
+fn benchmark_natural_mul_assign_evaluation_strategy(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural *= Natural",
+        BenchmarkType::EvaluationStrategy,
+        natural_pair_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_natural_max_bit_bucketer("x", "y"),
+        &mut [
+            ("Natural *= Natural", &mut |(mut x, y)| no_out!(x *= y)),
+            ("Natural *= &Natural", &mut |(mut x, y)| no_out!(x *= &y)),
         ],
     );
 }

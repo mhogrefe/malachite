@@ -1,15 +1,16 @@
 use iterators::{nonzero_values, NonzeroValues};
 use itertools::{Interleave, Itertools};
-use num::arithmetic::traits::PowerOfTwo;
+use num::arithmetic::traits::{PowerOfTwo, RoundToMultipleOfPowerOfTwo};
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{One, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::conversion::traits::ExactFrom;
+use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::float::nice_float::NiceFloat;
 use num::float::PrimitiveFloat;
 use num::iterators::{ruler_sequence, RulerSequence};
-use num::logic::traits::NotAssign;
+use num::logic::traits::{BitAccess, NotAssign, SignificantBits};
+use rounding_modes::RoundingMode;
 use std::iter::{once, Chain, Once, Rev};
 use std::marker::PhantomData;
 use std::vec::IntoIter;
@@ -470,8 +471,8 @@ impl<T: PrimitiveFloat> DoubleEndedIterator for PrimitiveFloatIncreasingRange<T>
 
 /// Generates all primitive floats in the half-open interval $[a, b)$, in ascending order.
 ///
-/// If the interval contains zero, positive zero and negative zero are both generated. Negative zero
-/// is considered to be less than positive zero.
+/// Positive and negative zero are treated as two distinct values, with negative zero being smaller
+/// than zero.
 ///
 /// `NiceFloat(a)` must be less than or equal to `NiceFloat(b)`. If `NiceFloat(a)` and
 /// `NiceFloat(b)` are equal, the range is empty. This function cannot create a range that includes
@@ -500,11 +501,11 @@ impl<T: PrimitiveFloat> DoubleEndedIterator for PrimitiveFloatIncreasingRange<T>
 ///
 /// assert_eq!(
 ///     primitive_float_increasing_range::<f32>(1.0, 2.0).take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         1.0, 1.0000001, 1.0000002, 1.0000004, 1.0000005, 1.0000006, 1.0000007, 1.0000008,
 ///         1.000001, 1.0000011, 1.0000012, 1.0000013, 1.0000014, 1.0000015, 1.0000017, 1.0000018,
 ///         1.0000019, 1.000002, 1.0000021, 1.0000023
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = primitive_float_increasing_range::<f32>(1.0, 2.0).rev().take(20).map(NiceFloat)
@@ -512,11 +513,11 @@ impl<T: PrimitiveFloat> DoubleEndedIterator for PrimitiveFloatIncreasingRange<T>
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         1.9999976, 1.9999977, 1.9999979, 1.999998, 1.9999981, 1.9999982, 1.9999983, 1.9999985,
 ///         1.9999986, 1.9999987, 1.9999988, 1.9999989, 1.999999, 1.9999992, 1.9999993, 1.9999994,
 ///         1.9999995, 1.9999996, 1.9999998, 1.9999999
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
@@ -542,12 +543,11 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
 
 /// Generates all primitive floats in the closed interval $[a, b]$, in ascending order.
 ///
-/// If the interval contains zero, positive zero and negative zero are both generated. Negative zero
-/// is considered to be less than positive zero.
+/// Positive and negative zero are treated as two distinct values, with negative zero being smaller
+/// than zero.
 ///
 /// `NiceFloat(a)` must be less than or equal to `NiceFloat(b)`. If `NiceFloat(a)` and
-/// `NiceFloat(b)` are equal, the range is empty. If `NiceFloat(a)` and `NiceFloat(b)` are equal,
-/// the range contains a single element.
+/// `NiceFloat(b)` are equal, the range contains a single element.
 ///
 /// Let $\varphi$ be `to_ordered_representation`:
 ///
@@ -573,11 +573,11 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
 /// assert_eq!(
 ///     primitive_float_increasing_inclusive_range::<f32>(1.0, 2.0).take(20).map(NiceFloat)
 ///         .collect_vec(),
-///     &[
+///     [
 ///         1.0, 1.0000001, 1.0000002, 1.0000004, 1.0000005, 1.0000006, 1.0000007, 1.0000008,
 ///         1.000001, 1.0000011, 1.0000012, 1.0000013, 1.0000014, 1.0000015, 1.0000017, 1.0000018,
 ///         1.0000019, 1.000002, 1.0000021, 1.0000023
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = primitive_float_increasing_inclusive_range::<f32>(1.0, 2.0).rev().take(20)
@@ -585,11 +585,11 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         1.9999977, 1.9999979, 1.999998, 1.9999981, 1.9999982, 1.9999983, 1.9999985, 1.9999986,
 ///         1.9999987, 1.9999988, 1.9999989, 1.999999, 1.9999992, 1.9999993, 1.9999994, 1.9999995,
 ///         1.9999996, 1.9999998, 1.9999999, 2.0
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
@@ -642,11 +642,11 @@ pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     positive_finite_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         1.0e-45, 3.0e-45, 4.0e-45, 6.0e-45, 7.0e-45, 8.0e-45, 1.0e-44, 1.1e-44, 1.3e-44,
 ///         1.4e-44, 1.5e-44, 1.7e-44, 1.8e-44, 2.0e-44, 2.1e-44, 2.2e-44, 2.4e-44, 2.5e-44,
 ///         2.7e-44, 2.8e-44
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = positive_finite_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
@@ -654,12 +654,12 @@ pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         3.4028196e38, 3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38,
 ///         3.4028208e38, 3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38,
 ///         3.402822e38, 3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38,
 ///         3.4028233e38, 3.4028235e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -697,12 +697,12 @@ pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     negative_finite_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, -3.4028225e38,
 ///         -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, -3.4028212e38,
 ///         -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, -3.40282e38,
 ///         -3.4028198e38, -3.4028196e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = negative_finite_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
@@ -710,11 +710,11 @@ pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         -2.8e-44, -2.7e-44, -2.5e-44, -2.4e-44, -2.2e-44, -2.1e-44, -2.0e-44, -1.8e-44,
 ///         -1.7e-44, -1.5e-44, -1.4e-44, -1.3e-44, -1.1e-44, -1.0e-44, -8.0e-45, -7.0e-45,
 ///         -6.0e-45, -4.0e-45, -3.0e-45, -1.0e-45
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -755,12 +755,12 @@ pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     nonzero_finite_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, -3.4028225e38,
 ///         -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, -3.4028212e38,
 ///         -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, -3.40282e38,
 ///         -3.4028198e38, -3.4028196e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = nonzero_finite_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
@@ -768,12 +768,12 @@ pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         3.4028196e38, 3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38,
 ///         3.4028208e38, 3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38,
 ///         3.402822e38, 3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38,
 ///         3.4028233e38, 3.4028235e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -811,12 +811,12 @@ pub fn nonzero_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     finite_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, -3.4028225e38,
 ///         -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, -3.4028212e38,
 ///         -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, -3.40282e38,
 ///         -3.4028198e38, -3.4028196e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = finite_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
@@ -824,12 +824,12 @@ pub fn nonzero_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         3.4028196e38, 3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38,
 ///         3.4028208e38, 3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38,
 ///         3.402822e38, 3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38,
 ///         3.4028233e38, 3.4028235e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -867,11 +867,11 @@ pub fn finite_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloat
 ///
 /// assert_eq!(
 ///     positive_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         1.0e-45, 3.0e-45, 4.0e-45, 6.0e-45, 7.0e-45, 8.0e-45, 1.0e-44, 1.1e-44, 1.3e-44,
 ///         1.4e-44, 1.5e-44, 1.7e-44, 1.8e-44, 2.0e-44, 2.1e-44, 2.2e-44, 2.4e-44, 2.5e-44,
 ///         2.7e-44, 2.8e-44
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = positive_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
@@ -879,12 +879,12 @@ pub fn finite_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloat
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38, 3.4028208e38,
 ///         3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38, 3.402822e38,
 ///         3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38, 3.4028233e38,
 ///         3.4028235e38, f32::POSITIVE_INFINITY
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -923,12 +923,12 @@ pub fn positive_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///
 /// assert_eq!(
 ///     negative_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         f32::NEGATIVE_INFINITY, -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38,
 ///         -3.4028227e38, -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38,
 ///         -3.4028214e38, -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38,
 ///         -3.4028202e38, -3.40282e38, -3.4028198e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = negative_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
@@ -936,11 +936,11 @@ pub fn positive_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         -2.8e-44, -2.7e-44, -2.5e-44, -2.4e-44, -2.2e-44, -2.1e-44, -2.0e-44, -1.8e-44,
 ///         -1.7e-44, -1.5e-44, -1.4e-44, -1.3e-44, -1.1e-44, -1.0e-44, -8.0e-45, -7.0e-45,
 ///         -6.0e-45, -4.0e-45, -3.0e-45, -1.0e-45
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -982,12 +982,12 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///
 /// assert_eq!(
 ///     nonzero_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         f32::NEGATIVE_INFINITY, -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38,
 ///         -3.4028227e38, -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38,
 ///         -3.4028214e38, -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38,
 ///         -3.4028202e38, -3.40282e38, -3.4028198e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = nonzero_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
@@ -995,12 +995,12 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38, 3.4028208e38,
 ///         3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38, 3.402822e38,
 ///         3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38, 3.4028233e38,
 ///         3.4028235e38, f32::POSITIVE_INFINITY
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1039,24 +1039,24 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         f32::NEGATIVE_INFINITY, -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38,
 ///         -3.4028227e38, -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38,
 ///         -3.4028214e38, -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38,
 ///         -3.4028202e38, -3.40282e38, -3.4028198e38
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 ///
 /// let mut end = primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat).collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
-///     &[
+///     [
 ///         3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38, 3.4028208e38,
 ///         3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38, 3.402822e38,
 ///         3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38, 3.4028233e38,
 ///         3.4028235e38, f32::POSITIVE_INFINITY
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreasingRange<T> {
@@ -1064,7 +1064,7 @@ pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreas
 }
 
 /// Generates all finite positive primitive floats with a specified exponent and precision.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ConstantPrecisionPrimitiveFloats<T: PrimitiveFloat> {
     n: T::UnsignedOfEqualWidth,
     increment: T::UnsignedOfEqualWidth,
@@ -1127,17 +1127,19 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 /// assert_eq!(
 ///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(0, 3).map(NiceFloat)
 ///         .collect_vec(),
-///     &[1.25, 1.75]
+///     [1.25, 1.75].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
 ///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(0, 5).map(NiceFloat)
 ///         .collect_vec(),
-///     &[1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375]
+///     [1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375].iter().copied()
+///         .map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
 ///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(6, 5).map(NiceFloat)
 ///         .collect_vec(),
-///     &[68.0, 76.0, 84.0, 92.0, 100.0, 108.0, 116.0, 124.0]
+///     [68.0, 76.0, 84.0, 92.0, 100.0, 108.0, 116.0, 124.0].iter().copied().map(NiceFloat)
+///         .collect_vec()
 /// );
 /// ```
 pub fn exhaustive_primitive_floats_with_exponent_and_precision<T: PrimitiveFloat>(
@@ -1176,7 +1178,7 @@ pub fn exhaustive_primitive_floats_with_exponent_and_precision<T: PrimitiveFloat
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]
-pub struct PrimitiveFloatsWithExponentGenerator<T: PrimitiveFloat> {
+struct PrimitiveFloatsWithExponentGenerator<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
     exponent: i64,
 }
@@ -1264,21 +1266,21 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
 ///
 /// assert_eq!(
 ///     exhaustive_primitive_floats_with_exponent::<f32>(0).take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         1.0, 1.5, 1.25, 1.75, 1.125, 1.375, 1.625, 1.875, 1.0625, 1.1875, 1.3125, 1.4375,
 ///         1.5625, 1.6875, 1.8125, 1.9375, 1.03125, 1.09375, 1.15625, 1.21875
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
 ///     exhaustive_primitive_floats_with_exponent::<f32>(4).take(20).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         16.0, 24.0, 20.0, 28.0, 18.0, 22.0, 26.0, 30.0, 17.0, 19.0, 21.0, 23.0, 25.0, 27.0,
 ///         29.0, 31.0, 16.5, 17.5, 18.5, 19.5
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
 ///     exhaustive_primitive_floats_with_exponent::<f32>(-147).map(NiceFloat).collect_vec(),
-///     &[6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44]
+///     [6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1292,7 +1294,7 @@ pub fn exhaustive_primitive_floats_with_exponent<T: PrimitiveFloat>(
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]
-pub struct ExhaustivePositiveFinitePrimitiveFloatsGenerator<T: PrimitiveFloat> {
+struct ExhaustivePositiveFinitePrimitiveFloatsGenerator<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
 }
 
@@ -1372,13 +1374,13 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFinitePrimitiveFloats<T> 
 ///
 /// assert_eq!(
 ///     exhaustive_positive_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         1.0, 2.0, 1.5, 0.5, 1.25, 3.0, 1.75, 4.0, 1.125, 2.5, 1.375, 0.75, 1.625, 3.5, 1.875,
 ///         0.25, 1.0625, 2.25, 1.1875, 0.625, 1.3125, 2.75, 1.4375, 6.0, 1.5625, 3.25, 1.6875,
 ///         0.875, 1.8125, 3.75, 1.9375, 8.0, 1.03125, 2.125, 1.09375, 0.5625, 1.15625, 2.375,
 ///         1.21875, 5.0, 1.28125, 2.625, 1.34375, 0.6875, 1.40625, 2.875, 1.46875, 0.375, 1.53125,
 ///         3.125
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1427,13 +1429,13 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNegativeFinitePrimitiveFloats<T> 
 ///
 /// assert_eq!(
 ///     exhaustive_negative_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         -1.0, -2.0, -1.5, -0.5, -1.25, -3.0, -1.75, -4.0, -1.125, -2.5, -1.375, -0.75, -1.625,
 ///         -3.5, -1.875, -0.25, -1.0625, -2.25, -1.1875, -0.625, -1.3125, -2.75, -1.4375, -6.0,
 ///         -1.5625, -3.25, -1.6875, -0.875, -1.8125, -3.75, -1.9375, -8.0, -1.03125, -2.125,
 ///         -1.09375, -0.5625, -1.15625, -2.375, -1.21875, -5.0, -1.28125, -2.625, -1.34375,
 ///         -0.6875, -1.40625, -2.875, -1.46875, -0.375, -1.53125, -3.125
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1490,12 +1492,12 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloats<T> {
 ///
 /// assert_eq!(
 ///     exhaustive_nonzero_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0,
 ///         -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5,
 ///         1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625,
 ///         -0.625, 1.3125, -1.3125, 2.75, -2.75, 1.4375, -1.4375, 6.0, -6.0, 1.5625, -1.5625
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1533,12 +1535,12 @@ pub fn exhaustive_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     exhaustive_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         0.0, -0.0, 1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75,
 ///         -1.75, 4.0, -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625,
 ///         3.5, -3.5, 1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875,
 ///         0.625, -0.625, 1.3125, -1.3125, 2.75, -2.75, 1.4375, -1.4375, 6.0, -6.0
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1575,13 +1577,13 @@ pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     exhaustive_positive_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         f32::POSITIVE_INFINITY, 1.0, 2.0, 1.5, 0.5, 1.25, 3.0, 1.75, 4.0, 1.125, 2.5, 1.375,
 ///         0.75, 1.625, 3.5, 1.875, 0.25, 1.0625, 2.25, 1.1875, 0.625, 1.3125, 2.75, 1.4375, 6.0,
 ///         1.5625, 3.25, 1.6875, 0.875, 1.8125, 3.75, 1.9375, 8.0, 1.03125, 2.125, 1.09375, 0.5625,
 ///         1.15625, 2.375, 1.21875, 5.0, 1.28125, 2.625, 1.34375, 0.6875, 1.40625, 2.875, 1.46875,
 ///         0.375, 1.53125
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1616,13 +1618,13 @@ pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     exhaustive_negative_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         f32::NEGATIVE_INFINITY, -1.0, -2.0, -1.5, -0.5, -1.25, -3.0, -1.75, -4.0, -1.125, -2.5,
 ///         -1.375, -0.75, -1.625, -3.5, -1.875, -0.25, -1.0625, -2.25, -1.1875, -0.625, -1.3125,
 ///         -2.75, -1.4375, -6.0, -1.5625, -3.25, -1.6875, -0.875, -1.8125, -3.75, -1.9375, -8.0,
 ///         -1.03125, -2.125, -1.09375, -0.5625, -1.15625, -2.375, -1.21875, -5.0, -1.28125, -2.625,
 ///         -1.34375, -0.6875, -1.40625, -2.875, -1.46875, -0.375, -1.53125
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1657,13 +1659,13 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     exhaustive_nonzero_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         f32::POSITIVE_INFINITY, f32::NEGATIVE_INFINITY, 1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5,
 ///         -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0, -4.0, 1.125, -1.125, 2.5, -2.5, 1.375,
 ///         -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5, 1.875, -1.875, 0.25, -0.25, 1.0625,
 ///         -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625, -0.625, 1.3125, -1.3125, 2.75, -2.75,
 ///         1.4375, -1.4375, 6.0, -6.0
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1700,13 +1702,13 @@ pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 ///
 /// assert_eq!(
 ///     exhaustive_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
-///     &[
+///     [
 ///         f32::NAN, f32::POSITIVE_INFINITY, f32::NEGATIVE_INFINITY, 0.0, -0.0, 1.0, -1.0, 2.0,
 ///         -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0, -4.0, 1.125,
 ///         -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5, 1.875, -1.875,
 ///         0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625, -0.625, 1.3125,
 ///         -1.3125, 2.75, -2.75, 1.4375
-///     ]
+///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1721,4 +1723,491 @@ pub fn exhaustive_primitive_floats<T: PrimitiveFloat>(
     ]
     .into_iter()
     .chain(exhaustive_nonzero_finite_primitive_floats())
+}
+
+#[doc(hidden)]
+pub fn exhaustive_primitive_floats_with_exponent_and_precision_in_range<T: PrimitiveFloat>(
+    a: T,
+    b: T,
+    exponent: i64,
+    precision: u64,
+) -> ConstantPrecisionPrimitiveFloats<T> {
+    assert!(a.is_finite());
+    assert!(b.is_finite());
+    assert!(a > T::ZERO);
+    assert!(b > T::ZERO);
+    assert!(exponent >= T::MIN_EXPONENT);
+    assert!(exponent <= T::MAX_EXPONENT);
+    let (am, ae) = a.raw_mantissa_and_exponent();
+    let (bm, be) = b.raw_mantissa_and_exponent();
+    let ae_actual_exponent = if ae == 0 {
+        i64::wrapping_from(am.significant_bits()) + T::MIN_EXPONENT - 1
+    } else {
+        i64::wrapping_from(ae) - T::MAX_EXPONENT
+    };
+    let be_actual_exponent = if be == 0 {
+        i64::wrapping_from(bm.significant_bits()) + T::MIN_EXPONENT - 1
+    } else {
+        i64::wrapping_from(be) - T::MAX_EXPONENT
+    };
+    assert_eq!(ae_actual_exponent, exponent);
+    assert_eq!(be_actual_exponent, exponent);
+    assert!(am <= bm);
+    assert_ne!(precision, 0);
+    let max_precision = T::max_precision_for_exponent(exponent);
+    assert!(precision <= max_precision);
+    if precision == 1 && am == T::UnsignedOfEqualWidth::ZERO {
+        return ConstantPrecisionPrimitiveFloats {
+            n: a.to_bits(),
+            increment: T::UnsignedOfEqualWidth::ZERO,
+            i: T::UnsignedOfEqualWidth::ZERO,
+            count: T::UnsignedOfEqualWidth::ONE,
+        };
+    }
+    let trailing_zeros = max_precision - precision;
+    let increment = T::UnsignedOfEqualWidth::power_of_two(trailing_zeros + 1);
+    let mut start_mantissa = am.round_to_multiple_of_power_of_two(trailing_zeros, RoundingMode::Up);
+    if !start_mantissa.get_bit(trailing_zeros) {
+        start_mantissa.set_bit(trailing_zeros);
+    }
+    if start_mantissa > bm {
+        return ConstantPrecisionPrimitiveFloats::default();
+    }
+    let mut end_mantissa = bm.round_to_multiple_of_power_of_two(trailing_zeros, RoundingMode::Down);
+    if !end_mantissa.get_bit(trailing_zeros) {
+        let adjust = T::UnsignedOfEqualWidth::power_of_two(trailing_zeros);
+        if adjust > end_mantissa {
+            return ConstantPrecisionPrimitiveFloats::default();
+        }
+        end_mantissa -= adjust;
+    }
+    assert!(start_mantissa <= end_mantissa);
+    let count =
+        ((end_mantissa - start_mantissa) >> (trailing_zeros + 1)) + T::UnsignedOfEqualWidth::ONE;
+    let first = T::from_raw_mantissa_and_exponent(start_mantissa, ae).to_bits();
+    ConstantPrecisionPrimitiveFloats {
+        n: first,
+        increment,
+        i: T::UnsignedOfEqualWidth::ZERO,
+        count,
+    }
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+struct PrimitiveFloatsWithExponentInRangeGenerator<T: PrimitiveFloat> {
+    a: T,
+    b: T,
+    exponent: i64,
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveFloat>
+    ExhaustiveDependentPairsYsGenerator<u64, T, ConstantPrecisionPrimitiveFloats<T>>
+    for PrimitiveFloatsWithExponentInRangeGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, &precision: &u64) -> ConstantPrecisionPrimitiveFloats<T> {
+        exhaustive_primitive_floats_with_exponent_and_precision_in_range(
+            self.a,
+            self.b,
+            self.exponent,
+            precision,
+        )
+    }
+}
+
+#[inline]
+fn exhaustive_primitive_floats_with_exponent_in_range_helper<T: PrimitiveFloat>(
+    a: T,
+    b: T,
+    exponent: i64,
+) -> LexDependentPairs<
+    u64,
+    T,
+    PrimitiveFloatsWithExponentInRangeGenerator<T>,
+    PrimitiveIntIncreasingRange<u64>,
+    ConstantPrecisionPrimitiveFloats<T>,
+> {
+    lex_dependent_pairs(
+        primitive_int_increasing_inclusive_range(1, T::max_precision_for_exponent(exponent)),
+        PrimitiveFloatsWithExponentInRangeGenerator {
+            a,
+            b,
+            exponent,
+            phantom: PhantomData,
+        },
+    )
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub struct ExhaustivePrimitiveFloatsWithExponentInRange<T: PrimitiveFloat>(
+    LexDependentPairs<
+        u64,
+        T,
+        PrimitiveFloatsWithExponentInRangeGenerator<T>,
+        PrimitiveIntIncreasingRange<u64>,
+        ConstantPrecisionPrimitiveFloats<T>,
+    >,
+);
+
+impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponentInRange<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+#[doc(hidden)]
+#[inline]
+pub fn exhaustive_primitive_floats_with_exponent_in_range<T: PrimitiveFloat>(
+    a: T,
+    b: T,
+    exponent: i64,
+) -> ExhaustivePrimitiveFloatsWithExponentInRange<T> {
+    ExhaustivePrimitiveFloatsWithExponentInRange(
+        exhaustive_primitive_floats_with_exponent_in_range_helper(a, b, exponent),
+    )
+}
+
+#[derive(Clone, Debug)]
+struct ExhaustivePositiveFinitePrimitiveFloatsInRangeGenerator<T: PrimitiveFloat> {
+    a: T,
+    b: T,
+    a_exponent: i64,
+    b_exponent: i64,
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveFloat>
+    ExhaustiveDependentPairsYsGenerator<i64, T, ExhaustivePrimitiveFloatsWithExponentInRange<T>>
+    for ExhaustivePositiveFinitePrimitiveFloatsInRangeGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, &exponent: &i64) -> ExhaustivePrimitiveFloatsWithExponentInRange<T> {
+        let a = if exponent == self.a_exponent {
+            self.a
+        } else {
+            T::from_adjusted_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, exponent).unwrap()
+        };
+        let b = if exponent == self.b_exponent {
+            self.b
+        } else {
+            T::from_adjusted_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, exponent + 1)
+                .unwrap()
+                .next_lower()
+        };
+        exhaustive_primitive_floats_with_exponent_in_range(a, b, exponent)
+    }
+}
+
+#[inline]
+fn exhaustive_positive_finite_primitive_floats_in_range_helper<T: PrimitiveFloat>(
+    a: T,
+    b: T,
+) -> ExhaustiveDependentPairs<
+    i64,
+    T,
+    RulerSequence<usize>,
+    ExhaustivePositiveFinitePrimitiveFloatsInRangeGenerator<T>,
+    ExhaustiveSignedRange<i64>,
+    ExhaustivePrimitiveFloatsWithExponentInRange<T>,
+> {
+    assert!(a.is_finite());
+    assert!(b.is_finite());
+    assert!(a > T::ZERO);
+    assert!(a <= b);
+    let (am, ae) = a.raw_mantissa_and_exponent();
+    let (bm, be) = b.raw_mantissa_and_exponent();
+    let a_exponent = if ae == 0 {
+        i64::wrapping_from(am.significant_bits()) + T::MIN_EXPONENT - 1
+    } else {
+        i64::wrapping_from(ae) - T::MAX_EXPONENT
+    };
+    let b_exponent = if be == 0 {
+        i64::wrapping_from(bm.significant_bits()) + T::MIN_EXPONENT - 1
+    } else {
+        i64::wrapping_from(be) - T::MAX_EXPONENT
+    };
+    exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_signed_inclusive_range(a_exponent, b_exponent),
+        ExhaustivePositiveFinitePrimitiveFloatsInRangeGenerator {
+            a,
+            b,
+            a_exponent,
+            b_exponent,
+            phantom: PhantomData,
+        },
+    )
+}
+
+#[derive(Clone, Debug)]
+pub struct ExhaustivePositiveFinitePrimitiveFloatsInRange<T: PrimitiveFloat>(
+    ExhaustiveDependentPairs<
+        i64,
+        T,
+        RulerSequence<usize>,
+        ExhaustivePositiveFinitePrimitiveFloatsInRangeGenerator<T>,
+        ExhaustiveSignedRange<i64>,
+        ExhaustivePrimitiveFloatsWithExponentInRange<T>,
+    >,
+);
+
+impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFinitePrimitiveFloatsInRange<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        self.0.next().map(|p| p.1)
+    }
+}
+
+#[doc(hidden)]
+#[inline]
+pub fn exhaustive_positive_finite_primitive_floats_in_range<T: PrimitiveFloat>(
+    a: T,
+    b: T,
+) -> ExhaustivePositiveFinitePrimitiveFloatsInRange<T> {
+    ExhaustivePositiveFinitePrimitiveFloatsInRange(
+        exhaustive_positive_finite_primitive_floats_in_range_helper(a, b),
+    )
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub enum ExhaustiveNonzeroFinitePrimitiveFloatsInRange<T: PrimitiveFloat> {
+    AllPositive(ExhaustivePositiveFinitePrimitiveFloatsInRange<T>),
+    AllNegative(ExhaustivePositiveFinitePrimitiveFloatsInRange<T>),
+    PositiveAndNegative(
+        bool,
+        ExhaustivePositiveFinitePrimitiveFloatsInRange<T>,
+        ExhaustivePositiveFinitePrimitiveFloatsInRange<T>,
+    ),
+}
+
+impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloatsInRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        match self {
+            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllPositive(ref mut xs) => xs.next(),
+            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllNegative(ref mut xs) => {
+                xs.next().map(T::neg)
+            }
+            ExhaustiveNonzeroFinitePrimitiveFloatsInRange::PositiveAndNegative(
+                ref mut toggle,
+                ref mut pos_xs,
+                ref mut neg_xs,
+            ) => {
+                toggle.not_assign();
+                if *toggle {
+                    pos_xs.next().or_else(|| neg_xs.next().map(T::neg))
+                } else {
+                    neg_xs.next().map(T::neg).or_else(|| pos_xs.next())
+                }
+            }
+        }
+    }
+}
+
+#[doc(hidden)]
+#[inline]
+pub fn exhaustive_nonzero_finite_primitive_floats_in_range<T: PrimitiveFloat>(
+    a: T,
+    b: T,
+) -> ExhaustiveNonzeroFinitePrimitiveFloatsInRange<T> {
+    assert!(a.is_finite());
+    assert!(b.is_finite());
+    assert!(a != T::ZERO);
+    assert!(b != T::ZERO);
+    assert!(a <= b);
+    if a > T::ZERO {
+        ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllPositive(
+            exhaustive_positive_finite_primitive_floats_in_range(a, b),
+        )
+    } else if b < T::ZERO {
+        ExhaustiveNonzeroFinitePrimitiveFloatsInRange::AllNegative(
+            exhaustive_positive_finite_primitive_floats_in_range(-b, -a),
+        )
+    } else {
+        ExhaustiveNonzeroFinitePrimitiveFloatsInRange::PositiveAndNegative(
+            false,
+            exhaustive_positive_finite_primitive_floats_in_range(T::MIN_POSITIVE_SUBNORMAL, b),
+            exhaustive_positive_finite_primitive_floats_in_range(T::MIN_POSITIVE_SUBNORMAL, -a),
+        )
+    }
+}
+
+#[derive(Clone, Debug)]
+pub enum ExhaustivePrimitiveFloatInclusiveRange<T: PrimitiveFloat> {
+    JustSpecials(IntoIter<T>),
+    NotJustSpecials(Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloatsInRange<T>>),
+}
+
+impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatInclusiveRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        match self {
+            ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(ref mut xs) => xs.next(),
+            ExhaustivePrimitiveFloatInclusiveRange::NotJustSpecials(ref mut xs) => xs.next(),
+        }
+    }
+}
+
+/// Generates all primitive floats in the half-open interval $[a, b)$.
+///
+/// Positive and negative zero are treated as two distinct values, with negative zero being smaller
+/// than zero.
+///
+/// The floats are generated in a way such that simpler floats (with lower precision) are generated
+/// first. To generate floats in ascending order instead, use `primitive_float_increasing_range`
+/// instead.
+///
+/// `NiceFloat(a)` must be less than or equal to `NiceFloat(b)`. If `NiceFloat(a)` and
+/// `NiceFloat(b)` are equal, the range is empty.
+///
+/// Let $\varphi$ be `to_ordered_representation`:
+///
+/// The output length is $\varphi(b) - \varphi(a)$.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `NiceFloat(a)` > `NiceFloat(b)`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+///
+/// use malachite_base::num::exhaustive::exhaustive_primitive_float_range;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+///
+/// assert_eq!(
+///      exhaustive_primitive_float_range::<f32>(
+///         core::f32::consts::E,
+///         core::f32::consts::PI
+///     ).take(50).map(NiceFloat).collect_vec(),
+///     [
+///         3.0, 2.75, 2.875, 3.125, 2.8125, 2.9375, 3.0625, 2.71875, 2.78125, 2.84375, 2.90625,
+///         2.96875, 3.03125, 3.09375, 2.734375, 2.765625, 2.796875, 2.828125, 2.859375, 2.890625,
+///         2.921875, 2.953125, 2.984375, 3.015625, 3.046875, 3.078125, 3.109375, 3.140625,
+///         2.7265625, 2.7421875, 2.7578125, 2.7734375, 2.7890625, 2.8046875, 2.8203125, 2.8359375,
+///         2.8515625, 2.8671875, 2.8828125, 2.8984375, 2.9140625, 2.9296875, 2.9453125, 2.9609375,
+///         2.9765625, 2.9921875, 3.0078125, 3.0234375, 3.0390625, 3.0546875
+///     ].iter().copied().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_primitive_float_range<T: PrimitiveFloat>(
+    a: T,
+    b: T,
+) -> ExhaustivePrimitiveFloatInclusiveRange<T> {
+    assert!(!a.is_nan());
+    assert!(!b.is_nan());
+    assert!(NiceFloat(a) <= NiceFloat(b));
+    if NiceFloat(a) == NiceFloat(b) {
+        ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(Vec::new().into_iter())
+    } else {
+        exhaustive_primitive_float_inclusive_range(a, b.next_lower())
+    }
+}
+
+/// Generates all primitive floats in the closed interval $[a, b]$.
+///
+/// Positive and negative zero are treated as two distinct values, with negative zero being smaller
+/// than zero.
+///
+/// The floats are generated in a way such that simpler floats (with lower precision) are generated
+/// first. To generate floats in ascending order instead, use
+/// `primitive_float_increasing_inclusive_range` instead.
+///
+/// `NiceFloat(a)` must be less than or equal to `NiceFloat(b)`. If `NiceFloat(a)` and
+/// `NiceFloat(b)` are equal, the range contains a single element.
+///
+/// Let $\varphi$ be `to_ordered_representation`:
+///
+/// The output length is $\varphi(b) - \varphi(a) + 1$.
+///
+/// # Complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `NiceFloat(a)` > `NiceFloat(b)`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::exhaustive::exhaustive_primitive_float_inclusive_range;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+///
+/// assert_eq!(
+///      exhaustive_primitive_float_inclusive_range::<f32>(
+///         core::f32::consts::E,
+///         core::f32::consts::PI
+///     ).take(50).map(NiceFloat).collect_vec(),
+///     [
+///         3.0, 2.75, 2.875, 3.125, 2.8125, 2.9375, 3.0625, 2.71875, 2.78125, 2.84375, 2.90625,
+///         2.96875, 3.03125, 3.09375, 2.734375, 2.765625, 2.796875, 2.828125, 2.859375, 2.890625,
+///         2.921875, 2.953125, 2.984375, 3.015625, 3.046875, 3.078125, 3.109375, 3.140625,
+///         2.7265625, 2.7421875, 2.7578125, 2.7734375, 2.7890625, 2.8046875, 2.8203125, 2.8359375,
+///         2.8515625, 2.8671875, 2.8828125, 2.8984375, 2.9140625, 2.9296875, 2.9453125, 2.9609375,
+///         2.9765625, 2.9921875, 3.0078125, 3.0234375, 3.0390625, 3.0546875
+///     ].iter().copied().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_primitive_float_inclusive_range<T: PrimitiveFloat>(
+    mut a: T,
+    mut b: T,
+) -> ExhaustivePrimitiveFloatInclusiveRange<T> {
+    assert!(!a.is_nan());
+    assert!(!b.is_nan());
+    assert!(NiceFloat(a) <= NiceFloat(b));
+    let mut specials = Vec::new();
+    if b == T::POSITIVE_INFINITY {
+        specials.push(T::POSITIVE_INFINITY);
+        if a == T::POSITIVE_INFINITY {
+            return ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(specials.into_iter());
+        }
+        b = T::MAX_FINITE;
+    }
+    if a == T::NEGATIVE_INFINITY {
+        specials.push(T::NEGATIVE_INFINITY);
+        if b == T::NEGATIVE_INFINITY {
+            return ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(specials.into_iter());
+        }
+        a = -T::MAX_FINITE;
+    }
+    if NiceFloat(a) <= NiceFloat(T::ZERO) && NiceFloat(b) >= NiceFloat(T::ZERO) {
+        specials.push(T::ZERO);
+    }
+    if NiceFloat(a) <= NiceFloat(T::NEGATIVE_ZERO) && NiceFloat(b) >= NiceFloat(T::NEGATIVE_ZERO) {
+        specials.push(T::NEGATIVE_ZERO);
+    }
+    if a == T::ZERO {
+        if b == T::ZERO {
+            return ExhaustivePrimitiveFloatInclusiveRange::JustSpecials(specials.into_iter());
+        }
+        a = T::MIN_POSITIVE_SUBNORMAL;
+    }
+    if b == T::ZERO {
+        b = -T::MIN_POSITIVE_SUBNORMAL;
+    }
+    ExhaustivePrimitiveFloatInclusiveRange::NotJustSpecials(
+        specials
+            .into_iter()
+            .chain(exhaustive_nonzero_finite_primitive_floats_in_range(a, b)),
+    )
 }

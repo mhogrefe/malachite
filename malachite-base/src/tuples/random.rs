@@ -337,6 +337,13 @@ random_custom_tuples!(
     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]]
 );
 random_custom_tuples!(
+    RandomQuadruplesXXXY,
+    (X, X, X, Y),
+    random_quadruples_xxxy,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1], [x_2, x_2]],
+    [Y, J, ys, ys_gen, [y_3, y_3]]
+);
+random_custom_tuples!(
     RandomQuadruplesXYYZ,
     (X, Y, Y, Z),
     random_quadruples_xyyz,

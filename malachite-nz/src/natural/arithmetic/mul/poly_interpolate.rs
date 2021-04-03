@@ -593,6 +593,8 @@ pub fn _limbs_shl_and_sub_same_length(
     carry
 }
 
+// T
+
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
@@ -765,6 +767,8 @@ pub(crate) fn _limbs_mul_toom_interpolate_8_points(
 fn limbs_div_255_in_place(xs: &mut [Limb]) {
     limbs_div_divisor_of_limb_max_with_carry_in_place(xs, Limb::MAX / 255, 0);
 }
+
+// T
 
 /// Interpolation for Toom-6.5 (or Toom-6), using the evaluation points:
 /// Infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0.
@@ -991,6 +995,8 @@ pub fn _limbs_mul_toom_interpolate_12_points<'a>(
 const CORRECTED_WIDTH: u64 = 42 - Limb::WIDTH;
 #[cfg(not(feature = "32_bit_limbs"))]
 const CORRECTED_WIDTH: u64 = 42;
+
+// T
 
 /// Interpolation for Toom-8.5 (or Toom-8), using the evaluation points:
 /// Infinity(8.5 only), +-8, +-4, +-2, +-1, +-1/4, +-1/2, +-1/8, 0.

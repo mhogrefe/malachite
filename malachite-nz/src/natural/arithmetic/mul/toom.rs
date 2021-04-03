@@ -49,6 +49,7 @@ use platform::{
 };
 use std::cmp::{max, Ordering};
 
+// T
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
 /// Helper function for high degree Toom-Cook algorithms.
@@ -123,8 +124,11 @@ pub const fn _limbs_mul_greater_to_out_toom_22_scratch_len(xs_len: usize) -> usi
 pub const TUNE_PROGRAM_BUILD: bool = false;
 pub const WANT_FAT_BINARY: bool = true;
 
+// T
 pub const TOOM22_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= 2 * MUL_TOOM22_THRESHOLD;
+
+// T
 
 /// A helper function for `_limbs_mul_greater_to_out_toom_22`.
 ///
@@ -148,6 +152,8 @@ fn _limbs_mul_same_length_to_out_toom_22_recursive(
         _limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
     }
 }
+
+// T
 
 /// A helper function for `_limbs_mul_greater_to_out_toom_22`.
 ///
@@ -637,10 +643,14 @@ pub fn _limbs_mul_greater_to_out_toom_33_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
 
+// T
 pub const TOOM33_MAYBE_MUL_BASECASE: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD < 3 * MUL_TOOM22_THRESHOLD;
+// T
 pub const TOOM33_MAYBE_MUL_TOOM33: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM44_THRESHOLD >= 3 * MUL_TOOM33_THRESHOLD;
+
+// T
 
 /// A helper function for `_limbs_mul_greater_to_out_toom_33`.
 ///
@@ -2739,14 +2749,18 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
     }
 }
 
+// T
 const TOOM_6H_MAYBE_MUL_BASECASE: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM22_THRESHOLD;
+// T
 const TOOM_6H_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM33_THRESHOLD;
 const TOOM_6H_MAYBE_MUL_TOOM33: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM44_THRESHOLD;
 const TOOM_6H_MAYBE_MUL_TOOM6H: bool =
     TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= 6 * MUL_TOOM6H_THRESHOLD;
+
+// T
 
 /// Time: O(n<sup>log<sub>5</sub>(11)</sup>)
 ///
@@ -3119,8 +3133,10 @@ pub(crate) const BIT_CORRECTION: bool = true;
 #[cfg(not(feature = "32_bit_limbs"))]
 pub(crate) const BIT_CORRECTION: bool = false;
 
+// T
 const TOOM_8H_MAYBE_MUL_BASECASE: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM22_THRESHOLD << 3;
+// T
 const TOOM_8H_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM33_THRESHOLD << 3;
 const TOOM_8H_MAYBE_MUL_TOOM33: bool =
@@ -3129,6 +3145,8 @@ const TOOM_8H_MAYBE_MUL_TOOM44: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM6H_THRESHOLD << 3;
 const TOOM_8H_MAYBE_MUL_TOOM8H: bool =
     TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= MUL_TOOM8H_THRESHOLD << 3;
+
+// T
 
 /// Time: O(n<sup>log<sub>7</sub>(15)</sup>)
 ///

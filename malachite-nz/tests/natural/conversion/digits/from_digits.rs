@@ -1,20 +1,22 @@
-use itertools::Itertools;
+use itertools::{repeat_n, Itertools};
 use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, PowerOfTwoDigits, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, SaturatingFrom, WrappingFrom,
 };
+use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
-    unsigned_vec_unsigned_pair_gen_var_5, unsigned_vec_unsigned_pair_gen_var_6,
+    unsigned_pair_gen_var_10, unsigned_vec_unsigned_pair_gen_var_5,
 };
 use malachite_nz::natural::conversion::digits::general_digits::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::{
-    natural_vec_natural_pair_gen_var_1, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+    natural_unsigned_pair_gen_var_5, natural_vec_natural_pair_gen_var_1,
+    natural_vec_natural_pair_gen_var_2, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
 };
 use std::iter::empty;
 use std::panic::catch_unwind;
@@ -977,6 +979,7 @@ fn from_digits_asc_limb() {
             n
         );
     }
+    test(&[], 9, "0");
     test(&[0], 9, "0");
     test(&[1], 9, "1");
     test(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2], 3, "123456");
@@ -1045,7 +1048,7 @@ where
 {
     let mut config = GenConfig::new();
     config.insert("digit_counts_mean_n", 32);
-    unsigned_vec_unsigned_pair_gen_var_6::<T, Limb>().test_properties_with_config(
+    unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>().test_properties_with_config(
         &config,
         |(xs, base)| {
             let n = _from_digits_asc_limb(xs.iter().cloned(), base);
@@ -1075,6 +1078,7 @@ fn from_digits_desc_limb() {
             n
         );
     }
+    test(&[], 9, "0");
     // Some(log_base) != base.checked_log_two()
     // base < 256
     test(&[0], 9, "0");
@@ -1154,7 +1158,7 @@ where
 {
     let mut config = GenConfig::new();
     config.insert("digit_counts_mean_n", 32);
-    unsigned_vec_unsigned_pair_gen_var_6::<T, Limb>().test_properties_with_config(
+    unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>().test_properties_with_config(
         &config,
         |(xs, base)| {
             let n = _from_digits_desc_limb(xs.iter().cloned(), base);
@@ -1303,5 +1307,460 @@ fn from_digits_desc_large_properties() {
     natural_vec_natural_pair_gen_var_1().test_properties_with_config(&config, |(xs, base)| {
         let n = _from_digits_desc_large(xs.iter().cloned(), &base);
         assert_eq!(_from_digits_desc_naive(&xs, &base), n);
+    });
+}
+
+#[test]
+fn from_digits_asc_primitive() {
+    fn test(xs: &[Limb], base: Limb, n: &str) {
+        let n = Natural::from_str(n).unwrap();
+        assert_eq!(Natural::from_digits_asc(&base, xs.iter().copied()), n);
+    }
+    test(&[], 9, "0");
+    test(&[0], 9, "0");
+    test(&[1], 9, "1");
+    test(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2], 3, "123456");
+    test(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2, 0, 0], 3, "123456");
+    test(&[2, 4, 6, 4, 2], 8, "10658");
+    test(&[789, 456, 123], 1000, "123456789");
+    test(
+        &[
+            14, 99, 101, 37, 10, 132, 124, 140, 98, 35, 144, 50, 41, 15, 67, 39, 12, 74, 27, 9, 21,
+            135, 62, 26, 68, 86, 128, 34, 78, 25, 75, 61, 73, 80, 66, 50, 15, 132, 40, 146, 83, 66,
+            87, 40, 41, 104, 37, 3, 44, 13, 51, 59, 139, 9, 39, 25, 27, 82, 29, 121, 32, 17, 22, 81,
+            102, 0, 86, 11, 129, 90, 113, 147, 108, 45, 120, 23, 73
+        ],
+        150,
+        "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
+        709347189745346071475819587247558105442098729883999424898641968281841439662364"
+    );
+    test(
+        &[302, 2359, 150, 1581, 2859, 1843, 2403, 2039, 27, 1598],
+        3543,
+        "140578615308984594421852296827289425",
+    );
+    test(
+        &[
+            1187762660, 83185796, 570510527, 293681571, 1518538399, 1153431348,
+        ],
+        1525385058,
+        "9525530906278526930121302445905223566866929778026945776",
+    );
+    test(
+        &[
+            1535724679, 31832127, 1494323667, 798341655, 1169948427, 1204675417, 1214721934,
+            1599722999, 1842176041, 1659733906, 824969631, 1046252719
+        ],
+        1895460450,
+        "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
+        1782212965464227294329"
+    );
+}
+
+fn from_digits_asc_primitive_fail_helper<T: PrimitiveUnsigned>()
+where
+    Natural: Digits<T>,
+{
+    assert_panic!(Natural::from_digits_asc(&T::ONE, empty()));
+    assert_panic!(Natural::from_digits_asc(&T::ZERO, empty()));
+    assert_panic!(Natural::from_digits_asc(
+        &T::from(10),
+        [10, 11, 12].iter().map(|x| T::exact_from(*x)),
+    ));
+}
+
+#[test]
+fn from_digits_asc_primitive_fail() {
+    apply_fn_to_unsigneds!(from_digits_asc_primitive_fail_helper);
+}
+
+fn from_digits_asc_primitive_helper<
+    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
+>()
+where
+    Natural: Digits<T>,
+{
+    unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties(|(digits, base)| {
+        let n = Natural::from_digits_asc(&base, digits.iter().cloned());
+        assert_eq!(
+            Natural::from_digits_desc(&base, digits.iter().rev().cloned()),
+            n
+        );
+        let trailing_zeros = slice_trailing_zeros(&digits);
+        assert_eq!(
+            n.to_digits_asc(&base),
+            &digits[..digits.len() - trailing_zeros]
+        );
+    });
+
+    unsigned_pair_gen_var_10::<T, T, usize>().test_properties(|(base, u)| {
+        assert_eq!(
+            Natural::from_digits_asc(&base, repeat_n(T::ZERO, u)),
+            Natural::ZERO
+        );
+    });
+}
+
+#[test]
+fn from_digits_asc_primitive_properties() {
+    apply_fn_to_unsigneds!(from_digits_asc_primitive_helper);
+}
+
+#[test]
+fn from_digits_desc_primitive() {
+    fn test(xs: &[Limb], base: Limb, n: &str) {
+        let n = Natural::from_str(n).unwrap();
+        assert_eq!(Natural::from_digits_desc(&base, xs.iter().copied()), n);
+        assert_eq!(_from_digits_desc_naive_primitive(xs, base), n);
+    }
+    test(&[], 9, "0");
+    test(&[0], 9, "0");
+    test(&[1], 9, "1");
+    test(&[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
+    test(&[0, 0, 2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
+    test(&[2, 4, 6, 4, 2], 8, "10658");
+    test(&[123, 456, 789], 1000, "123456789");
+    test(
+        &[
+            73, 23, 120, 45, 108, 147, 113, 90, 129, 11, 86, 0, 102, 81, 22, 17, 32, 121, 29,
+            82, 27, 25, 39, 9, 139, 59, 51, 13, 44, 3, 37, 104, 41, 40, 87, 66, 83, 146, 40,
+            132, 15, 50, 66, 80, 73, 61, 75, 25, 78, 34, 128, 86, 68, 26, 62, 135, 21, 9, 27,
+            74, 12, 39, 67, 15, 41, 50, 144, 35, 98, 140, 124, 132, 10, 37, 101, 99, 14,
+        ],
+        150,
+        "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
+        709347189745346071475819587247558105442098729883999424898641968281841439662364"
+    );
+    test(
+        &[1598, 27, 2039, 2403, 1843, 2859, 1581, 150, 2359, 302],
+        3543,
+        "140578615308984594421852296827289425",
+    );
+    test(
+        &[
+            1153431348, 1518538399, 293681571, 570510527, 83185796, 1187762660,
+        ],
+        1525385058,
+        "9525530906278526930121302445905223566866929778026945776",
+    );
+    test(
+        &[
+            1046252719, 824969631, 1659733906, 1842176041, 1599722999, 1214721934, 1204675417,
+            1169948427, 798341655, 1494323667, 31832127, 1535724679
+        ],
+        1895460450,
+        "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
+        1782212965464227294329"
+    );
+}
+
+fn from_digits_desc_primitive_fail_helper<T: PrimitiveUnsigned>()
+where
+    Natural: Digits<T>,
+{
+    assert_panic!(Natural::from_digits_desc(&T::ONE, empty()));
+    assert_panic!(Natural::from_digits_desc(&T::ZERO, empty()));
+    assert_panic!(Natural::from_digits_desc(
+        &T::from(10),
+        [10, 11, 12].iter().map(|x| T::exact_from(*x)),
+    ));
+}
+
+#[test]
+fn from_digits_desc_primitive_fail() {
+    apply_fn_to_unsigneds!(from_digits_desc_primitive_fail_helper);
+}
+
+fn from_digits_desc_primitive_helper<
+    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
+>()
+where
+    Natural: Digits<T> + From<T>,
+{
+    unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties(|(digits, base)| {
+        let n = Natural::from_digits_desc(&base, digits.iter().cloned());
+        assert_eq!(
+            Natural::from_digits_asc(&base, digits.iter().rev().cloned()),
+            n
+        );
+        let leading_zeros = slice_leading_zeros(&digits);
+        assert_eq!(n.to_digits_desc(&base), &digits[leading_zeros..]);
+        assert_eq!(
+            _from_digits_desc_naive_primitive(&digits, T::exact_from(base)),
+            n
+        );
+    });
+
+    unsigned_pair_gen_var_10::<T, T, usize>().test_properties(|(base, u)| {
+        assert_eq!(
+            Natural::from_digits_desc(&base, repeat_n(T::ZERO, u)),
+            Natural::ZERO
+        );
+    });
+}
+
+#[test]
+fn from_digits_desc_primitive_properties() {
+    apply_fn_to_unsigneds!(from_digits_desc_primitive_helper);
+}
+
+#[test]
+fn from_digits_asc() {
+    fn test(xs: &[&str], base: &str, n: &str) {
+        let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
+        let base = Natural::from_str(base).unwrap();
+        let n = Natural::from_str(n).unwrap();
+        assert_eq!(Natural::from_digits_asc(&base, xs.clone()), n);
+    }
+    test(&[], "9", "0");
+    test(&["0"], "9", "0");
+    test(&["1"], "9", "1");
+    test(
+        &["0", "1", "1", "0", "0", "1", "1", "2", "0", "0", "2"],
+        "3",
+        "123456",
+    );
+    test(
+        &[
+            "0", "1", "1", "0", "0", "1", "1", "2", "0", "0", "2", "0", "0",
+        ],
+        "3",
+        "123456",
+    );
+    test(&["2", "4", "6", "4", "2"], "8", "10658");
+    test(&["789", "456", "123"], "1000", "123456789");
+    test(
+        &[
+            "14", "99", "101", "37", "10", "132", "124", "140", "98", "35", "144", "50", "41", "15",
+            "67", "39", "12", "74", "27", "9", "21", "135", "62", "26", "68", "86", "128", "34",
+            "78", "25", "75", "61", "73", "80", "66", "50", "15", "132", "40", "146", "83", "66",
+            "87", "40", "41", "104", "37", "3", "44", "13", "51", "59", "139", "9", "39", "25",
+            "27", "82", "29", "121", "32", "17", "22", "81", "102", "0", "86", "11", "129", "90",
+            "113", "147", "108", "45", "120", "23", "73"
+        ],
+        "150",
+        "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
+        709347189745346071475819587247558105442098729883999424898641968281841439662364"
+    );
+    test(
+        &[
+            "302", "2359", "150", "1581", "2859", "1843", "2403", "2039", "27", "1598",
+        ],
+        "3543",
+        "140578615308984594421852296827289425",
+    );
+    test(
+        &[
+            "1187762660",
+            "83185796",
+            "570510527",
+            "293681571",
+            "1518538399",
+            "1153431348",
+        ],
+        "1525385058",
+        "9525530906278526930121302445905223566866929778026945776",
+    );
+    test(
+        &[
+            "1535724679", "31832127", "1494323667", "798341655", "1169948427", "1204675417",
+            "1214721934", "1599722999", "1842176041", "1659733906", "824969631", "1046252719"
+        ],
+        "1895460450",
+        "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
+        1782212965464227294329"
+    );
+    test(&["0", "100"], "10000000000", "1000000000000");
+    test(
+        &["27917287424", "18657454436", "8470329472"],
+        "34359738368",
+        "10000000000000000000000000000000",
+    );
+    test(
+        &[
+            "4373186134", "2564485756", "2124820161", "4270626619", "5254372654", "713959034",
+            "4750044302", "5833014701", "978351288", "4288991795", "972424917", "1439538405",
+            "5308114100", "1115837958", "2267585072", "4579628351", "3319271253", "139021832"
+        ],
+        "6000000000",
+        "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
+        7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
+    );
+    test(
+        &[
+            "10459983243", "21532249186", "9820491776", "2837355685", "9767368393", "3483032332",
+            "21535703589", "11033729126", "9179503556", "8692905086", "4911199976", "15555287795",
+            "16865310802", "20703615271", "16296043356", "2287104975", "7356592443", "19932263435",
+            "22157300197"
+        ],
+        "24107150480",
+        "167549316476609610254199818013888896761159964082484503741352784741144483211685148473082817\
+        5855188918761759968447473283739550817700685872668984640703760436616510553858385622841396530\
+        38089626212682923"
+    );
+}
+
+#[test]
+fn from_digits_asc_fail() {
+    assert_panic!(Natural::from_digits_asc(&Natural::ZERO, empty()));
+    assert_panic!(Natural::from_digits_asc(&Natural::ONE, empty()));
+    assert_panic!(Natural::from_digits_asc(
+        &Natural::from(10u32).pow(100),
+        [Natural::from(10u32).pow(101), Natural::from(10u32).pow(102)]
+            .iter()
+            .cloned()
+    ));
+}
+
+#[test]
+fn from_digits_asc_properties() {
+    natural_vec_natural_pair_gen_var_2().test_properties(|(digits, base)| {
+        let n = Natural::from_digits_asc(&base, digits.iter().cloned());
+        assert_eq!(
+            Natural::from_digits_desc(&base, digits.iter().rev().cloned()),
+            n
+        );
+        let trailing_zeros = slice_trailing_zeros(&digits);
+        assert_eq!(
+            n.to_digits_asc(&base),
+            &digits[..digits.len() - trailing_zeros]
+        );
+    });
+
+    natural_unsigned_pair_gen_var_5().test_properties(|(base, u)| {
+        assert_eq!(
+            Natural::from_digits_asc(&base, repeat_n(Natural::ZERO, u)),
+            Natural::ZERO
+        );
+    });
+}
+
+#[test]
+fn from_digits_desc() {
+    fn test(xs: &[&str], base: &str, n: &str) {
+        let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
+        let base = Natural::from_str(base).unwrap();
+        let n = Natural::from_str(n).unwrap();
+        assert_eq!(Natural::from_digits_desc(&base, xs.clone()), n);
+        assert_eq!(_from_digits_desc_naive(&xs.collect_vec(), &base), n);
+    }
+    test(&[], "9", "0");
+    test(&["0"], "9", "0");
+    test(&["1"], "9", "1");
+    test(
+        &["2", "0", "0", "2", "1", "1", "0", "0", "1", "1", "0"],
+        "3",
+        "123456",
+    );
+    test(
+        &[
+            "0", "0", "2", "0", "0", "2", "1", "1", "0", "0", "1", "1", "0",
+        ],
+        "3",
+        "123456",
+    );
+    test(&["2", "4", "6", "4", "2"], "8", "10658");
+    test(&["123", "456", "789"], "1000", "123456789");
+    test(
+        &[
+            "73", "23", "120", "45", "108", "147", "113", "90", "129", "11", "86", "0", "102", "81",
+            "22", "17", "32", "121", "29", "82", "27", "25", "39", "9", "139", "59", "51", "13",
+            "44", "3", "37", "104", "41", "40", "87", "66", "83", "146", "40", "132", "15", "50",
+            "66", "80", "73", "61", "75", "25", "78", "34", "128", "86", "68", "26", "62", "135",
+            "21", "9", "27", "74", "12", "39", "67", "15", "41", "50", "144", "35", "98", "140",
+            "124", "132", "10", "37", "101", "99", "14",
+        ],
+        "150",
+        "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
+        709347189745346071475819587247558105442098729883999424898641968281841439662364"
+    );
+    test(
+        &[
+            "1598", "27", "2039", "2403", "1843", "2859", "1581", "150", "2359", "302",
+        ],
+        "3543",
+        "140578615308984594421852296827289425",
+    );
+    test(
+        &[
+            "1153431348",
+            "1518538399",
+            "293681571",
+            "570510527",
+            "83185796",
+            "1187762660",
+        ],
+        "1525385058",
+        "9525530906278526930121302445905223566866929778026945776",
+    );
+    test(
+        &[
+            "1046252719", "824969631", "1659733906", "1842176041", "1599722999", "1214721934",
+            "1204675417", "1169948427", "798341655", "1494323667", "31832127", "1535724679"
+        ],
+        "1895460450",
+        "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
+        1782212965464227294329"
+    );
+    test(&["100", "0"], "10000000000", "1000000000000");
+    test(
+        &["8470329472", "18657454436", "27917287424"],
+        "34359738368",
+        "10000000000000000000000000000000",
+    );
+    test(
+        &[
+            "139021832", "3319271253", "4579628351", "2267585072", "1115837958", "5308114100",
+            "1439538405", "972424917", "4288991795", "978351288", "5833014701", "4750044302",
+            "713959034", "5254372654", "4270626619", "2124820161", "2564485756", "4373186134"
+        ],
+        "6000000000",
+        "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
+        7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
+    );
+    test(
+        &[
+            "22157300197", "19932263435", "7356592443", "2287104975", "16296043356", "20703615271",
+            "16865310802", "15555287795", "4911199976", "8692905086", "9179503556", "11033729126",
+            "21535703589", "3483032332", "9767368393", "2837355685", "9820491776", "21532249186",
+            "10459983243"
+        ],
+        "24107150480",
+        "167549316476609610254199818013888896761159964082484503741352784741144483211685148473082817\
+        5855188918761759968447473283739550817700685872668984640703760436616510553858385622841396530\
+        38089626212682923"
+    );
+}
+
+#[test]
+fn from_digits_desc_fail() {
+    assert_panic!(Natural::from_digits_desc(&Natural::ZERO, empty()));
+    assert_panic!(Natural::from_digits_desc(&Natural::ONE, empty()));
+    assert_panic!(Natural::from_digits_desc(
+        &Natural::from(10u32).pow(100),
+        [Natural::from(10u32).pow(101), Natural::from(10u32).pow(102)]
+            .iter()
+            .cloned()
+    ));
+}
+
+#[test]
+fn from_digits_desc_properties() {
+    natural_vec_natural_pair_gen_var_2().test_properties(|(digits, base)| {
+        let n = Natural::from_digits_desc(&base, digits.iter().cloned());
+        assert_eq!(
+            Natural::from_digits_asc(&base, digits.iter().rev().cloned()),
+            n
+        );
+        let leading_zeros = slice_leading_zeros(&digits);
+        assert_eq!(n.to_digits_desc(&base), &digits[leading_zeros..]);
+        assert_eq!(_from_digits_desc_naive(&digits, &base), n);
+    });
+
+    natural_unsigned_pair_gen_var_5().test_properties(|(base, u)| {
+        assert_eq!(
+            Natural::from_digits_desc(&base, repeat_n(Natural::ZERO, u)),
+            Natural::ZERO
+        );
     });
 }

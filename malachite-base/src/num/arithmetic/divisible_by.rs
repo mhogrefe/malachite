@@ -11,21 +11,20 @@ macro_rules! impl_divisible_by_unsigned {
     ($t:ident) => {
         impl DivisibleBy<$t> for $t {
             /// Returns whether a value is divisible by another value; in other words, whether the
-            /// first value is a multiple of the second. This means that zero is divisible by any
-            /// number, including zero; but a nonzero number is never divisible by zero.
+            /// first value is a multiple of the second.
             ///
-            /// Time: Worst case O(1)
+            /// This means that zero is divisible by any number, including zero; but a nonzero
+            /// number is never divisible by zero.
             ///
-            /// Additional memory: Worst case O(1)
+            /// $f(x, m) = (m|x)$.
+            ///
+            /// $f(x, m) = (\exists k \in \N \ x = km)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::DivisibleBy;
-            ///
-            /// assert_eq!(0u8.divisible_by(0), true);
-            /// assert_eq!(100u16.divisible_by(3), false);
-            /// assert_eq!(102u32.divisible_by(3), true);
-            /// ```
+            /// See the documentation of the `num::arithmetic::divisible_by` module.
             #[inline]
             fn divisible_by(self, other: $t) -> bool {
                 _divisible_by_unsigned(self, other)
@@ -48,21 +47,20 @@ macro_rules! impl_divisible_by_signed {
     ($t:ident) => {
         impl DivisibleBy<$t> for $t {
             /// Returns whether a value is divisible by another value; in other words, whether the
-            /// first value is a multiple of the second. This means that zero is divisible by any
-            /// number, including zero; but a nonzero number is never divisible by zero.
+            /// first value is a multiple of the second.
             ///
-            /// Time: Worst case O(1)
+            /// This means that zero is divisible by any number, including zero; but a nonzero
+            /// number is never divisible by zero.
             ///
-            /// Additional memory: Worst case O(1)
+            /// $f(x, m) = (m|x)$.
+            ///
+            /// $f(x, m) = (\exists k \in \Z \ x = km)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::DivisibleBy;
-            ///
-            /// assert_eq!(0i8.divisible_by(0), true);
-            /// assert_eq!((-100i16).divisible_by(-3), false);
-            /// assert_eq!(102i32.divisible_by(-3), true);
-            /// ```
+            /// See the documentation of the `num::arithmetic::divisible_by` module.
             #[inline]
             fn divisible_by(self, other: $t) -> bool {
                 _divisible_by_signed(self, other)

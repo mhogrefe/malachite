@@ -1,4 +1,13 @@
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base_test_util::generators::{
+    signed_pair_gen, signed_quadruple_gen, signed_triple_gen, signed_triple_gen_var_4,
+    signed_triple_gen_var_5, unsigned_pair_gen, unsigned_quadruple_gen, unsigned_triple_gen,
+    unsigned_triple_gen_var_7, unsigned_triple_gen_var_8,
+};
 
 #[test]
 fn test_eq_mod() {
@@ -179,4 +188,80 @@ fn test_eq_mod() {
     test::<i64>(-1000000001234, -1235, -1000000000000, false);
     test::<i64>(-1000000001234, -5000000001234, -1000000000000, true);
     test::<i64>(-1000000001234, -5000000001235, -1000000000000, false);
+}
+
+fn eq_mod_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_triple_gen::<T>().test_properties(|(x, y, m)| {
+        let equal = x.eq_mod(y, m);
+        assert_eq!(y.eq_mod(x, m), equal);
+    });
+
+    unsigned_triple_gen_var_7::<T>().test_properties(|(x, y, m)| {
+        assert!(x.eq_mod(y, m));
+        assert!(y.eq_mod(x, m));
+    });
+
+    unsigned_triple_gen_var_8::<T>().test_properties(|(x, y, m)| {
+        assert!(!x.eq_mod(y, m));
+        assert!(!y.eq_mod(x, m));
+    });
+
+    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+        assert!(x.eq_mod(y, T::ONE));
+        assert_eq!(x.eq_mod(y, T::ZERO), x == y);
+        assert_eq!(x.eq_mod(T::ZERO, y), x.divisible_by(y));
+        assert!(x.eq_mod(x, y));
+    });
+
+    unsigned_quadruple_gen::<T>().test_properties(|(x, y, z, m)| {
+        if x.eq_mod(y, m) && y.eq_mod(z, m) {
+            assert!(x.eq_mod(z, m));
+        }
+    });
+}
+
+fn eq_mod_properties_helper_signed<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+>() {
+    signed_triple_gen::<S>().test_properties(|(x, y, m)| {
+        let equal = x.eq_mod(y, m);
+        assert_eq!(y.eq_mod(x, m), equal);
+
+        if x != S::MIN && y != S::MIN {
+            assert_eq!((-x).eq_mod(-y, m), equal);
+        }
+        if m != S::MIN {
+            assert_eq!(x.eq_mod(y, -m), equal);
+        }
+    });
+
+    signed_triple_gen_var_4::<U, S>().test_properties(|(x, y, m)| {
+        assert!(x.eq_mod(y, m));
+        assert!(y.eq_mod(x, m));
+    });
+
+    signed_triple_gen_var_5::<S>().test_properties(|(x, y, m)| {
+        assert!(!x.eq_mod(y, m));
+        assert!(!y.eq_mod(x, m));
+    });
+
+    signed_pair_gen::<S>().test_properties(|(x, y)| {
+        assert!(x.eq_mod(y, S::ONE));
+        assert_eq!(x.eq_mod(y, S::ZERO), x == y);
+        assert_eq!(x.eq_mod(S::ZERO, y), x.divisible_by(y));
+        assert!(x.eq_mod(x, y));
+    });
+
+    signed_quadruple_gen::<S>().test_properties(|(x, y, z, m)| {
+        if x.eq_mod(y, m) && y.eq_mod(z, m) {
+            assert!(x.eq_mod(z, m));
+        }
+    });
+}
+
+#[test]
+fn eq_mod_properties() {
+    apply_fn_to_unsigneds!(eq_mod_properties_helper_unsigned);
+    apply_fn_to_unsigned_signed_pairs!(eq_mod_properties_helper_signed);
 }

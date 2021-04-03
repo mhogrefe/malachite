@@ -1010,7 +1010,6 @@ fn _limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) 
             (2 * m + k + 2 + max_two_pow_k_width) / max_two_pow_k_width * max_two_pow_k_width;
         // r = ceil((2 * m + k + 3) / max_two_pow_k_width) * max_two_pow_k_width
         let mut r = q >> Limb::LOG_WIDTH;
-
         // we should ensure that r is a multiple of the next k
         if r >= MUL_FFT_MODF_THRESHOLD {
             loop {

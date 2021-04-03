@@ -3,11 +3,11 @@ use malachite_base::num::float::PrimitiveFloat;
 
 fn abs_negative_zeros_helper<T: PrimitiveFloat>() {
     let test = |n: T, out| {
-        assert_eq!(NiceFloat(n.abs_negative_zeros()), out);
+        assert_eq!(NiceFloat(n.abs_negative_zeros()), NiceFloat(out));
 
         let mut n = n;
         n.abs_negative_zeros_assign();
-        assert_eq!(NiceFloat(n), out);
+        assert_eq!(NiceFloat(n), NiceFloat(out));
     };
     test(T::ZERO, T::ZERO);
     test(T::NEGATIVE_ZERO, T::ZERO);

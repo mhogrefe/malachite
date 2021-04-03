@@ -3,11 +3,57 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::bucketers::Bucketer;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use std::cmp::max;
 
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<Natural> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.significant_bits()),
         bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
+pub fn pair_natural_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Natural, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn pair_2_pair_natural_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, (Natural, Natural))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y))| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn triple_3_pair_natural_max_bit_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U, (Natural, Natural))> {
+    Bucketer {
+        bucketing_function: &|(_, _, (x, y))| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
     }
 }
 

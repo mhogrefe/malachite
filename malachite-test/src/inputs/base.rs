@@ -1775,27 +1775,6 @@ pub fn pairs_of_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-pub fn pairs_of_positive_unsigned_and_rounding_mode<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, RoundingMode)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(lex_pairs(
-            exhaustive_positive_primitive_ints(),
-            exhaustive_rounding_modes(),
-        )),
-        GenerationMode::Random(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &random_positive_unsigned,
-            &random_rounding_modes,
-        )),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &special_random_positive_unsigned,
-            &random_rounding_modes,
-        )),
-    }
-}
-
 pub fn pairs_of_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, RoundingMode)>
@@ -1814,39 +1793,6 @@ where
             &random_rounding_modes,
         )),
     }
-}
-
-pub fn pairs_of_nonzero_signed_and_rounding_mode<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, RoundingMode)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(pairs_of_signed_and_rounding_mode(gm).filter(|&(x, _)| x != T::ZERO))
-}
-
-// All pairs of `T`, and `RoundingMode`, where `T` is signed and the `T` is not equal to `T::MIN`.
-pub fn pairs_of_signed_and_rounding_mode_var_1<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, RoundingMode)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(pairs_of_signed_and_rounding_mode(gm).filter(|&(x, _)| x != T::MIN))
-}
-
-// All pairs of `T`, and `RoundingMode`, where `T` is signed and the `T` is not equal to zero or
-// `T::MIN`.
-pub fn pairs_of_signed_and_rounding_mode_var_2<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, RoundingMode)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(pairs_of_signed_and_rounding_mode(gm).filter(|&(x, _)| x != T::ZERO && x != T::MIN))
 }
 
 pub fn sextuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
@@ -2169,21 +2115,6 @@ pub fn pairs_of_unsigned_vec_var_10<T: PrimitiveUnsigned + Rand>(
         )),
     };
     Box::new(ps.map(|(n, (d_1, d_0))| (n, vec![d_0, d_1])))
-}
-
-fn pairs_of_unsigned_vec_var_11_with_seed<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-    seed: &[u32],
-) -> It<(Vec<T>, Vec<T>)> {
-    Box::new(pairs_of_unsigned_vec_var_1_with_seed(gm, seed).filter(|&(ref xs, _)| !xs.is_empty()))
-}
-
-// All pairs of `Vec<T>` where `T` is unsigned and the two components of the pair have the same
-// length, which is greater than zero.
-fn pairs_of_unsigned_vec_var_11<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>)> {
-    Box::new(pairs_of_unsigned_vec_var_1(gm).filter(|&(ref xs, _)| !xs.is_empty()))
 }
 
 // All pairs of `Vec<T>`, where `T` is unsigned and first `Vec` is at least as long as the second,
@@ -2663,32 +2594,6 @@ pub fn triples_of_unsigned_vec_var_9<T: PrimitiveUnsigned + Rand>(
     )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` are nonempty and have the same
-// lengths, and `out` is at least twice as long as `xs`.
-pub fn triples_of_unsigned_vec_var_25<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    let xs: It<(Vec<T>, (Vec<T>, Vec<T>))> = match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
-            exhaustive_vecs_min_length(2, exhaustive_unsigneds()),
-            pairs_of_unsigned_vec_var_1(gm),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_vecs_min_length(seed, scale, 2, &random)),
-            &(|seed| pairs_of_unsigned_vec_var_1_with_seed(gm, seed)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_unsigned_vecs_min_length(seed, scale, 2)),
-            &(|seed| pairs_of_unsigned_vec_var_1_with_seed(gm, seed)),
-        )),
-    };
-    reshape_1_2_to_3(Box::new(xs.filter(|&(ref out, (ref xs, _))| {
-        !xs.is_empty() && out.len() >= xs.len() << 1
-    })))
-}
-
 // All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` are nonempty, `zs` has at least two
 // elements, and no slice has trailing zeros.
 pub fn triples_of_unsigned_vec_var_27<T: PrimitiveUnsigned + Rand>(
@@ -3026,75 +2931,6 @@ pub fn triples_of_limb_vec_var_45(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
     )
 }
 
-// All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
-// second, and the second and third are equally long and nonempty.
-pub fn triples_of_unsigned_vec_var_46<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    let ts: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
-            pairs_of_unsigned_vec_var_11(gm),
-            exhaustive_vecs(exhaustive_unsigneds()),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| pairs_of_unsigned_vec_var_11_with_seed(gm, seed)),
-            &(|seed| random_vecs(seed, scale, &random)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| pairs_of_unsigned_vec_var_11_with_seed(gm, seed)),
-            &(|seed| special_random_unsigned_vecs(seed, scale)),
-        )),
-    };
-    reshape_1_2_to_3(permute_2_1(Box::new(
-        ts.filter(|&((ref xs, _), ref out)| out.len() >= xs.len()),
-    )))
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
-// sum of the lengths of the second and third, and the second and third are equally long and
-// nonempty.
-pub fn triples_of_unsigned_vec_var_47<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    let ts: It<((Vec<T>, Vec<T>), Vec<T>)> = match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
-            pairs_of_unsigned_vec_var_11(gm),
-            exhaustive_vecs(exhaustive_unsigneds()),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| pairs_of_unsigned_vec_var_11_with_seed(gm, seed)),
-            &(|seed| random_vecs(seed, scale, &random)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| pairs_of_unsigned_vec_var_11_with_seed(gm, seed)),
-            &(|seed| special_random_unsigned_vecs(seed, scale)),
-        )),
-    };
-    reshape_1_2_to_3(permute_2_1(Box::new(
-        ts.filter(|&((ref xs, _), ref out)| out.len() >= xs.len() << 1),
-    )))
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned, `xs` and `ys` have the same lengths, which are at
-// least 2, and `out` is at least twice as long as `xs`.
-pub fn triples_of_unsigned_vec_var_48<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_var_25(gm).filter(|(_, xs, _)| xs.len() > 1))
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
-// second, and the second and third are equally long and have length at least 2.
-pub fn triples_of_unsigned_vec_var_49<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_var_46(gm).filter(|(_, xs, _)| xs.len() > 1))
-}
-
 // All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of
 // `_limbs_modular_div_barrett`.
 pub fn triples_of_limb_vec_var_50(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
@@ -3127,14 +2963,6 @@ pub fn triples_of_limb_vec_var_51(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
         )),
     };
     Box::new(ts.filter(|(q, n, d)| q.len() >= n.len() && n.len() >= d.len() && d[0].odd()))
-}
-
-// All triples of `Vec<T>`, T being unsigned, where the three components of the triple have the same
-// length, which is at least 2.
-pub fn triples_of_unsigned_vec_var_52<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(triples_of_unsigned_vec_var_1(gm).filter(|&(ref xs, _, _)| xs.len() >= 2))
 }
 
 // All triples of `Vec<Limb>`, where `qs`, `ns`, and `ds` meet the preconditions of

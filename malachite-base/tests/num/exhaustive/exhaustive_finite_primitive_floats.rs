@@ -9,7 +9,7 @@ fn exhaustive_finite_primitive_floats_helper<T: PrimitiveFloat>(out: &[T]) {
             .take(50)
             .map(NiceFloat)
             .collect_vec(),
-        out
+        out.iter().copied().map(NiceFloat).collect_vec()
     );
 }
 

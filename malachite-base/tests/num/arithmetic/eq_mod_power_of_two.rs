@@ -1,5 +1,14 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base_test_util::generators::{
+    signed_pair_gen, signed_signed_signed_unsigned_quadruple_gen_var_1,
+    signed_signed_unsigned_triple_gen_var_1, signed_signed_unsigned_triple_gen_var_2,
+    signed_signed_unsigned_triple_gen_var_3, signed_unsigned_pair_gen_var_1, unsigned_pair_gen,
+    unsigned_pair_gen_var_2, unsigned_quadruple_gen_var_2, unsigned_triple_gen_var_10,
+    unsigned_triple_gen_var_4, unsigned_triple_gen_var_9,
+};
 
 fn eq_mod_power_of_two_primitive_helper<T: PrimitiveInt>() {
     let test = |n: T, other, pow, out| {
@@ -203,4 +212,111 @@ fn eq_mod_power_of_two_signed_helper<T: PrimitiveSigned>() {
 fn test_eq_mod_power_of_two() {
     apply_fn_to_primitive_ints!(eq_mod_power_of_two_primitive_helper);
     apply_fn_to_signeds!(eq_mod_power_of_two_signed_helper);
+}
+
+fn eq_mod_power_of_two_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_triple_gen_var_4::<T, u64>().test_properties(|(x, y, pow)| {
+        let eq_mod_power_of_two = x.eq_mod_power_of_two(y, pow);
+        assert_eq!(y.eq_mod_power_of_two(x, pow), eq_mod_power_of_two);
+        assert_eq!(
+            x.mod_power_of_two(pow) == y.mod_power_of_two(pow),
+            eq_mod_power_of_two
+        );
+    });
+
+    unsigned_triple_gen_var_9::<T>().test_properties(|(x, y, pow)| {
+        assert!(x.eq_mod_power_of_two(y, pow));
+        assert!(y.eq_mod_power_of_two(x, pow));
+        assert_eq!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
+    });
+
+    unsigned_triple_gen_var_10::<T>().test_properties(|(x, y, pow)| {
+        assert!(!x.eq_mod_power_of_two(y, pow));
+        assert!(!y.eq_mod_power_of_two(x, pow));
+        assert_ne!(x.mod_power_of_two(pow), y.mod_power_of_two(pow));
+    });
+
+    unsigned_pair_gen_var_2::<T, u64>().test_properties(|(n, pow)| {
+        assert!(n.eq_mod_power_of_two(n, pow));
+        assert_eq!(
+            n.eq_mod_power_of_two(T::ZERO, pow),
+            n.divisible_by_power_of_two(pow)
+        );
+        assert_eq!(
+            T::ZERO.eq_mod_power_of_two(n, pow),
+            n.divisible_by_power_of_two(pow)
+        );
+    });
+
+    unsigned_quadruple_gen_var_2::<T, u64>().test_properties(|(x, y, z, pow)| {
+        if x.eq_mod_power_of_two(y, pow) && y.eq_mod_power_of_two(z, pow) {
+            assert!(x.eq_mod_power_of_two(z, pow));
+        }
+    });
+
+    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+        assert!(x.eq_mod_power_of_two(y, 0));
+    });
+}
+
+fn eq_mod_power_of_two_properties_helper_signed<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() {
+    signed_signed_unsigned_triple_gen_var_2::<S, u64>().test_properties(|(x, y, pow)| {
+        let eq_mod_power_of_two = x.eq_mod_power_of_two(y, pow);
+        assert_eq!(y.eq_mod_power_of_two(x, pow), eq_mod_power_of_two);
+        assert_eq!(
+            U::wrapping_from(x).mod_power_of_two(pow) == U::wrapping_from(y).mod_power_of_two(pow),
+            eq_mod_power_of_two,
+        );
+    });
+
+    signed_signed_unsigned_triple_gen_var_1::<U, S>().test_properties(|(x, y, pow)| {
+        assert!(x.eq_mod_power_of_two(y, pow));
+        assert!(y.eq_mod_power_of_two(x, pow));
+        assert_eq!(
+            U::wrapping_from(x).mod_power_of_two(pow),
+            U::wrapping_from(y).mod_power_of_two(pow),
+        );
+    });
+
+    signed_signed_unsigned_triple_gen_var_3::<S>().test_properties(|(x, y, pow)| {
+        assert!(!x.eq_mod_power_of_two(y, pow));
+        assert!(!y.eq_mod_power_of_two(x, pow));
+        assert_ne!(
+            U::wrapping_from(x).mod_power_of_two(pow),
+            U::wrapping_from(y).mod_power_of_two(pow),
+        );
+    });
+
+    signed_unsigned_pair_gen_var_1::<S, u64>().test_properties(|(n, pow)| {
+        assert!(n.eq_mod_power_of_two(n, pow));
+        assert_eq!(
+            n.eq_mod_power_of_two(S::ZERO, pow),
+            n.divisible_by_power_of_two(pow)
+        );
+        assert_eq!(
+            S::ZERO.eq_mod_power_of_two(n, pow),
+            n.divisible_by_power_of_two(pow)
+        );
+    });
+
+    signed_signed_signed_unsigned_quadruple_gen_var_1::<S, u64>().test_properties(
+        |(x, y, z, pow)| {
+            if x.eq_mod_power_of_two(y, pow) && y.eq_mod_power_of_two(z, pow) {
+                assert!(x.eq_mod_power_of_two(z, pow));
+            }
+        },
+    );
+
+    signed_pair_gen::<S>().test_properties(|(x, y)| {
+        assert!(x.eq_mod_power_of_two(y, 0));
+    });
+}
+
+#[test]
+fn eq_mod_power_of_two_properties() {
+    apply_fn_to_unsigneds!(eq_mod_power_of_two_properties_helper_unsigned);
+    apply_fn_to_unsigned_signed_pairs!(eq_mod_power_of_two_properties_helper_signed);
 }

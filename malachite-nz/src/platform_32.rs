@@ -6,13 +6,13 @@ pub type SignedHalfLimb = i16;
 pub type SignedDoubleLimb = i64;
 pub type FloatWithLimbWidth = f32;
 
-pub const AORSMUL_FASTER_2AORSLSH: bool = true;
+pub const AORSMUL_FASTER_2AORSLSH: bool = true; // T
 pub const AORSMUL_FASTER_3AORSLSH: bool = true;
 pub const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
 pub const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
-pub const MUL_TOOM22_THRESHOLD: usize = 118;
-pub const MUL_TOOM33_THRESHOLD: usize = 101;
+pub const MUL_TOOM22_THRESHOLD: usize = 118; // T
+pub const MUL_TOOM33_THRESHOLD: usize = 101; // T
 pub const MUL_TOOM44_THRESHOLD: usize = 530;
 pub const MUL_TOOM6H_THRESHOLD: usize = 738;
 pub const MUL_TOOM8H_THRESHOLD: usize = 984;

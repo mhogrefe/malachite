@@ -5,37 +5,40 @@ use std::str::FromStr;
 
 #[test]
 fn test_sub() {
-    let test = |i, j, out| {
-        let mut n = Integer::from_str(i).unwrap();
-        n -= Integer::from_str(j).unwrap();
+    let test = |s, t, out| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        let mut n = u.clone();
+        n -= v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Integer::from_str(i).unwrap();
-        n -= &Integer::from_str(j).unwrap();
+        let mut n = u.clone();
+        n -= &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(i).unwrap() - Integer::from_str(j).unwrap();
+        let n = u.clone() - v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Integer::from_str(i).unwrap() - Integer::from_str(j).unwrap();
+        let n = &u - v.clone();
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Integer::from_str(i).unwrap() - &Integer::from_str(j).unwrap();
+        let n = u.clone() - &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = &Integer::from_str(i).unwrap() - &Integer::from_str(j).unwrap();
+        let n = &u - &v;
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = BigInt::from_str(i).unwrap() - BigInt::from_str(j).unwrap();
+        let n = BigInt::from_str(s).unwrap() - BigInt::from_str(t).unwrap();
         assert_eq!(n.to_string(), out);
 
-        let n = rug::Integer::from_str(i).unwrap() - rug::Integer::from_str(j).unwrap();
+        let n = rug::Integer::from_str(s).unwrap() - rug::Integer::from_str(t).unwrap();
         assert_eq!(n.to_string(), out);
     };
     test("0", "0", "0");

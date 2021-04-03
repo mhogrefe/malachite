@@ -1131,8 +1131,7 @@ where
         let digits = x.to_digits_asc(&base);
         let mut digits_alt = Vec::new();
         _to_digits_asc_naive_primitive(&mut digits_alt, &x, base);
-        assert_eq!(digits_alt, digits, "{} {}", x, base);
-        //TODO from digits
+        assert_eq!(digits_alt, digits);
         if x != 0 {
             assert_ne!(*digits.last().unwrap(), T::ZERO);
         }
@@ -1141,6 +1140,7 @@ where
             x.to_digits_desc(&base)
         );
         assert!(digits.iter().all(|&digit| digit < base));
+        assert_eq!(Natural::from_digits_asc(&base, digits.iter().cloned()), x);
 
         let digits_alt = Digits::<Natural>::to_digits_asc(&x, &Natural::from(base));
         assert_eq!(
@@ -1249,7 +1249,6 @@ where
     config.insert("mean_stripe_n", 128);
     natural_unsigned_pair_gen_var_2::<T>().test_properties_with_config(&config, |(x, base)| {
         let digits = x.to_digits_desc(&base);
-        //TODO from digits
         if x != 0 {
             assert_ne!(digits[0], T::ZERO);
         }
@@ -1258,6 +1257,7 @@ where
             x.to_digits_asc(&base)
         );
         assert!(digits.iter().all(|&digit| digit < base));
+        assert_eq!(Natural::from_digits_desc(&base, digits.iter().cloned()), x);
 
         let digits_alt = Digits::<Natural>::to_digits_desc(&x, &Natural::from(base));
         assert_eq!(
@@ -1446,7 +1446,6 @@ fn to_digits_asc_natural_properties() {
         let mut digits_alt = Vec::new();
         _to_digits_asc_naive(&mut digits_alt, &x, &base);
         assert_eq!(digits_alt, digits);
-        //TODO from digits
         if x != 0 {
             assert_ne!(*digits.last().unwrap(), 0);
         }
@@ -1454,7 +1453,8 @@ fn to_digits_asc_natural_properties() {
             digits.iter().cloned().rev().collect_vec(),
             x.to_digits_desc(&base)
         );
-        assert!(digits.into_iter().all(|digit| digit < base));
+        assert!(digits.iter().all(|digit| *digit < base));
+        assert_eq!(Natural::from_digits_asc(&base, digits.into_iter()), x);
     });
 
     natural_gen().test_properties_with_config(&config, |x| {
@@ -1621,7 +1621,6 @@ fn to_digits_desc_natural_properties() {
     config.insert("mean_stripe_n", 128);
     natural_pair_gen_var_2().test_properties_with_config(&config, |(x, base)| {
         let digits = x.to_digits_desc(&base);
-        //TODO from digits
         if x != 0 {
             assert_ne!(digits[0], 0);
         }
@@ -1629,7 +1628,8 @@ fn to_digits_desc_natural_properties() {
             digits.iter().cloned().rev().collect_vec(),
             x.to_digits_asc(&base)
         );
-        assert!(digits.into_iter().all(|digit| digit < base));
+        assert!(digits.iter().all(|digit| *digit < base));
+        assert_eq!(Natural::from_digits_desc(&base, digits.into_iter()), x);
     });
 
     natural_gen().test_properties_with_config(&config, |x| {

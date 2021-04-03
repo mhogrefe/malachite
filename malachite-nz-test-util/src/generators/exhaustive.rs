@@ -100,6 +100,10 @@ pub fn exhaustive_natural_gen_var_1() -> It<Natural> {
 
 // -- (Natural, Natural) --
 
+pub fn exhaustive_natural_pair_gen() -> It<(Natural, Natural)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_naturals()))
+}
+
 pub fn exhaustive_natural_pair_gen_var_1() -> It<(Natural, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_natural_range_to_infinity(Natural::power_of_two(Limb::WIDTH)),
@@ -112,6 +116,12 @@ pub fn exhaustive_natural_pair_gen_var_2() -> It<(Natural, Natural)> {
         exhaustive_naturals(),
         exhaustive_natural_range_to_infinity(Natural::TWO),
     ))
+}
+
+// -- (Natural, Natural, Natural) --
+
+pub fn exhaustive_natural_triple_gen() -> It<(Natural, Natural, Natural)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_naturals()))
 }
 
 // -- (Natural, PrimitiveInt) --
@@ -146,6 +156,13 @@ pub fn exhaustive_natural_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUn
 pub fn exhaustive_natural_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_naturals(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_natural_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_natural_range_to_infinity(Natural::TWO),
         exhaustive_unsigneds(),
     ))
 }
@@ -185,6 +202,17 @@ pub fn exhaustive_natural_vec_natural_pair_gen_var_1() -> It<(Vec<Natural>, Natu
             BitDistributorOutputType::normal(1),
         ),
         exhaustive_natural_range_to_infinity(Natural::power_of_two(Limb::WIDTH)),
+        ValidDigitsGenerator,
+    )))
+}
+
+pub fn exhaustive_natural_vec_natural_pair_gen_var_2() -> It<(Vec<Natural>, Natural)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_natural_range_to_infinity(Natural::TWO),
         ValidDigitsGenerator,
     )))
 }

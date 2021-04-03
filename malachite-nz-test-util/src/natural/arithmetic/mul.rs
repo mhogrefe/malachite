@@ -5,6 +5,8 @@ use malachite_nz::platform::{Limb, MUL_TOOM22_THRESHOLD};
 // In GMP this is hardcoded to 500
 pub const MUL_BASECASE_MAX_UN: usize = 500;
 
+// T
+
 // We must have 1 < ys.len() < MUL_TOOM22_THRESHOLD < MUL_BASECASE_MAX_UN < xs.len().
 fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
@@ -32,6 +34,8 @@ fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb
         }
     }
 }
+
+// T
 
 /// A version of `limbs_mul_greater_to_out_basecase` that attempts to be more efficient by
 /// increasing cache locality. It is currently not measurably better than ordinary basecase.

@@ -179,7 +179,7 @@ pub fn limbs_mod_three_limb_by_two_limb(
 /// );
 /// ```
 ///
-/// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.1.2, returning the two limbs of the
+/// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.2.1, returning the two limbs of the
 /// remainder.
 pub fn limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
     assert_eq!(ds.len(), 2);
@@ -221,7 +221,7 @@ pub fn limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb
 /// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, or the last limb of `ds`
 /// does not have its highest bit set.
 ///
-/// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.1.2, where only the remainder is
+/// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.2.1, where only the remainder is
 /// calculated.
 pub fn _limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let d_len = ds.len();
@@ -277,7 +277,7 @@ pub fn _limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
 ///
 /// where n = `ds.len()`
 ///
-/// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.1.2, where only the remainder
+/// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1, where only the remainder
 /// is calculated.
 fn _limbs_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
@@ -345,7 +345,7 @@ fn _limbs_mod_divide_and_conquer_helper(
 /// length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit
 /// set.
 ///
-/// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.1.2, where only the remainder is
+/// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1, where only the remainder is
 /// calculated.
 pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let n_len = ns.len();
@@ -497,7 +497,7 @@ pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
 ///
 /// where n = `ns.len()`, d = `ds.len()`
 ///
-/// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.1.2, where only the remainder
+/// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1, where only the remainder
 /// is calculated.
 fn _limbs_mod_barrett_preinverted(
     qs: &mut [Limb],
@@ -595,7 +595,7 @@ fn _limbs_mod_barrett_preinverted(
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.1.2, where only the remainder is
+/// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.2.1, where only the remainder is
 /// calculated.
 pub fn _limbs_mod_barrett_helper(
     qs: &mut [Limb],
@@ -685,7 +685,7 @@ fn _limbs_mod_barrett_large_helper(
 /// Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()`, `qs` has length
 /// less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 ///
-/// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.1.2.
+/// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
 pub fn _limbs_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -831,7 +831,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
 /// assert_eq!(limbs_mod(&[1, 2, 3], &[4, 5]), &[2576980381, 2]);
 /// ```
 ///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.1.2, where qp is not calculated and rp is
+/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where qp is not calculated and rp is
 /// returned.
 pub fn limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut rs = vec![0; ds.len()];
@@ -868,7 +868,7 @@ pub fn limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(rs, &[2576980381, 2, 10, 10]);
 /// ```
 ///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.1.2, where qp is not calculated.
+/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where qp is not calculated.
 pub fn limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -910,7 +910,7 @@ fn _limbs_rem_naive(ns: &[Limb], d: Limb) -> Limb {
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c, GMP 6.1.2, with
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c, GMP 6.2.1, with
 /// DIV_QR_1N_METHOD == 2, but not computing the quotient.
 fn limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv: Limb) -> Limb {
     let len = ns.len();
@@ -952,7 +952,7 @@ fn limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv: Limb) -
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c, GMP 6.1.2, with
+/// This is mpn_div_qr_1n_pi1 from mpn/generic/div_qr_1n_pi1.c, GMP 6.2.1, with
 /// DIV_QR_1N_METHOD == 2, but not computing the quotient, and where the input is left-shifted by
 /// `bits`.
 fn limbs_mod_limb_normalized_shl(
@@ -1004,7 +1004,7 @@ fn limbs_mod_limb_normalized_shl(
     _mod_by_preinversion(sum_high, sum_low, d, d_inv)
 }
 
-/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where the quotient is not computed
+/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.2.1, where the quotient is not computed
 /// and the remainder is returned. Experiments show that this is always slower than
 /// `_limbs_mod_limb`.
 pub fn _limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
@@ -1079,7 +1079,7 @@ pub fn _limbs_mod_limb_small_normalized_large(ns: &[Limb], d: Limb, mut r: Limb)
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mod_1_norm from mpn/generic/mod_1.c, GMP 6.1.2.
+/// This is mpn_mod_1_norm from mpn/generic/mod_1.c, GMP 6.2.1.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_mod_limb_small_normalized(ns: &[Limb], d: Limb) -> Limb {
     let mut len = ns.len();
@@ -1125,7 +1125,7 @@ pub fn _limbs_mod_limb_small_unnormalized_large(ns: &[Limb], mut d: Limb, mut r:
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mod_1_unnorm from mpn/generic/mod_1.c, GMP 6.1.2, where UDIV_NEEDS_NORMALIZATION is
+/// This is mpn_mod_1_unnorm from mpn/generic/mod_1.c, GMP 6.2.1, where UDIV_NEEDS_NORMALIZATION is
 /// false.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_mod_limb_small_unnormalized(ns: &[Limb], d: Limb) -> Limb {
@@ -1167,7 +1167,7 @@ pub fn _limbs_mod_limb_any_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mod_1_1p_cps_1 combined with mpn_mod_1_1p_1 from mpn/generic/mod_1.c, GMP 6.1.2.
+/// This is mpn_mod_1_1p_cps_1 combined with mpn_mod_1_1p_1 from mpn/generic/mod_1.c, GMP 6.2.1.
 pub fn _limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
     let len = ns.len();
     assert!(len >= 2);
@@ -1209,7 +1209,7 @@ pub fn _limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mod_1_1p_cps_2 combined with mpn_mod_1_1p_2 from mpn/generic/mod_1.c, GMP 6.1.2.
+/// This is mpn_mod_1_1p_cps_2 combined with mpn_mod_1_1p_2 from mpn/generic/mod_1.c, GMP 6.2.1.
 pub fn _limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
     let len = ns.len();
     assert!(len >= 2);
@@ -1333,7 +1333,7 @@ pub fn _limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb {
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mod_1s_4p_cps combined with mpn_mod_1s_4p from mpn/generic/mod_1_4.c, GMP 6.1.2.
+/// This is mpn_mod_1s_4p_cps combined with mpn_mod_1s_4p from mpn/generic/mod_1_4.c, GMP 6.2.1.
 pub fn _limbs_mod_limb_at_least_2_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
     let mut len = ns.len();
     assert_ne!(len, 0);
@@ -1411,7 +1411,7 @@ const HIGHEST_TWO_BITS_MASK: Limb = !(Limb::MAX >> 2);
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mod_1 from mpn/generic/mod_1.c, GMP 6.1.2, where n > 1.
+/// This is mpn_mod_1 from mpn/generic/mod_1.c, GMP 6.2.1, where n > 1.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_mod_limb_alt_2(ns: &[Limb], d: Limb) -> Limb {
     let len = ns.len();

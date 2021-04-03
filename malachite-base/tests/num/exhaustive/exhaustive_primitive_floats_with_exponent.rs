@@ -6,7 +6,10 @@ use std::panic::catch_unwind;
 
 fn exhaustive_primitive_floats_with_exponent_helper<T: PrimitiveFloat>(exponent: i64, out: &[T]) {
     let xs = exhaustive_primitive_floats_with_exponent::<T>(exponent);
-    assert_eq!(xs.take(20).map(NiceFloat).collect_vec(), out);
+    assert_eq!(
+        xs.take(20).map(NiceFloat).collect_vec(),
+        out.iter().copied().map(NiceFloat).collect_vec()
+    );
 }
 
 #[test]

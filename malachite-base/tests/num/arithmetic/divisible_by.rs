@@ -1,4 +1,11 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_gen, signed_gen_var_6, signed_pair_gen, signed_pair_gen_var_3, signed_pair_gen_var_5,
+    unsigned_gen, unsigned_gen_var_1, unsigned_pair_gen, unsigned_pair_gen_var_11,
+    unsigned_pair_gen_var_13,
+};
 
 #[test]
 fn test_divisible_by() {
@@ -98,4 +105,86 @@ fn test_divisible_by() {
     test::<i128>(-1000000000000000000000000, -0xffffffff, false);
     test::<i128>(-1000000000000000000000000, -1000000000000, true);
     test::<i128>(-1000000000000000000000000, -1000000000001, false);
+}
+
+fn divisible_by_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+        let divisible = x.divisible_by(y);
+        assert_eq!(x == T::ZERO || y != T::ZERO && x % y == T::ZERO, divisible);
+    });
+
+    unsigned_pair_gen_var_11::<T>().test_properties(|(x, y)| {
+        assert!(x.divisible_by(y));
+        assert!(x == T::ZERO || y != T::ZERO && x % y == T::ZERO);
+    });
+
+    unsigned_pair_gen_var_13::<T>().test_properties(|(x, y)| {
+        assert!(!x.divisible_by(y));
+        assert!(x != T::ZERO && (y == T::ZERO || x % y != T::ZERO));
+    });
+
+    unsigned_gen::<T>().test_properties(|n| {
+        assert!(n.divisible_by(T::ONE));
+    });
+
+    unsigned_gen_var_1::<T>().test_properties(|n| {
+        assert!(!n.divisible_by(T::ZERO));
+        assert!(T::ZERO.divisible_by(n));
+        if n > T::ONE {
+            assert!(!T::ONE.divisible_by(n));
+        }
+        assert!(n.divisible_by(n));
+    });
+}
+
+fn divisible_by_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen::<T>().test_properties(|(x, y)| {
+        let divisible = x.divisible_by(y);
+        assert_eq!(
+            x == T::ZERO || x == T::MIN && y == T::NEGATIVE_ONE || y != T::ZERO && x % y == T::ZERO,
+            divisible
+        );
+        if x != T::MIN {
+            assert_eq!((-x).divisible_by(y), divisible);
+        }
+        if y != T::MIN {
+            assert_eq!(x.divisible_by(-y), divisible);
+        }
+    });
+
+    signed_pair_gen_var_3::<T>().test_properties(|(x, y)| {
+        assert!(x.divisible_by(y));
+        assert!(
+            x == T::ZERO || x == T::MIN && y == T::NEGATIVE_ONE || y != T::ZERO && x % y == T::ZERO
+        );
+    });
+
+    signed_pair_gen_var_5::<T>().test_properties(|(x, y)| {
+        assert!(!x.divisible_by(y));
+        assert!(
+            x != T::ZERO
+                && (x != T::MIN || y != T::NEGATIVE_ONE)
+                && (y == T::ZERO || x % y != T::ZERO)
+        );
+    });
+
+    signed_gen::<T>().test_properties(|n| {
+        assert!(n.divisible_by(T::ONE));
+        assert!(n.divisible_by(T::NEGATIVE_ONE));
+    });
+
+    signed_gen_var_6::<T>().test_properties(|n| {
+        assert!(!n.divisible_by(T::ZERO));
+        assert!(T::ZERO.divisible_by(n));
+        if n > T::ONE {
+            assert!(!T::ONE.divisible_by(n));
+        }
+        assert!(n.divisible_by(n));
+    });
+}
+
+#[test]
+fn divisible_by_properties() {
+    apply_fn_to_unsigneds!(divisible_by_properties_helper_unsigned);
+    apply_fn_to_signeds!(divisible_by_properties_helper_signed);
 }

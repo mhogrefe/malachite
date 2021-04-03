@@ -10,7 +10,10 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_helper<T: PrimitiveFl
     out: &[T],
 ) {
     let xs = exhaustive_primitive_floats_with_exponent_and_precision::<T>(exponent, precision);
-    assert_eq!(xs.take(20).map(NiceFloat).collect_vec(), out);
+    assert_eq!(
+        xs.take(20).map(NiceFloat).collect_vec(),
+        out.iter().copied().map(NiceFloat).collect_vec()
+    );
 }
 
 #[test]

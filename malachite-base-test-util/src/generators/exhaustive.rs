@@ -29,6 +29,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
+    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
     exhaustive_quadruples_xyyz_custom_output, exhaustive_triples, exhaustive_triples_custom_output,
     exhaustive_triples_from_single, exhaustive_triples_xxy_custom_output, exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
@@ -43,6 +44,7 @@ use malachite_base::vecs::exhaustive::{
 };
 use rounding_modes::ROUNDING_MODE_CHARS;
 use std::cmp::min;
+use std::iter::once;
 use std::marker::PhantomData;
 
 // general
@@ -275,6 +277,195 @@ pub fn exhaustive_signed_triple_gen_var_3<T: PrimitiveSigned>() -> It<(T, T, T)>
     )
 }
 
+struct SignedModEqTriplesInnerGenerator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
+    phantom_u: PhantomData<*const U>,
+    phantom_s: PhantomData<*const S>,
+}
+
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
+    ExhaustiveDependentPairsYsGenerator<(U, U), (S, S), It<(S, S)>>
+    for SignedModEqTriplesInnerGenerator<U, S>
+{
+    #[inline]
+    fn get_ys(&self, p: &(U, U)) -> It<(S, S)> {
+        let &(m, k) = p;
+        if k == U::ZERO {
+            Box::new(exhaustive_signeds().map(|x| (x, x)))
+        } else {
+            let d = m.checked_mul(k).unwrap();
+            let d_s = S::wrapping_from(d);
+            Box::new(
+                exhaustive_signed_inclusive_range(S::MIN, S::MAX.wrapping_sub(d_s))
+                    .map(move |n| (n, n.wrapping_add(d_s)))
+                    .interleave(
+                        exhaustive_signed_inclusive_range(S::MIN, S::MAX.wrapping_sub(d_s))
+                            .map(move |n| (n.wrapping_add(d_s), n)),
+                    ),
+            )
+        }
+    }
+}
+
+struct SignedModEqTriplesGenerator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
+    phantom_u: PhantomData<*const U>,
+    phantom_s: PhantomData<*const S>,
+}
+
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>>
+    ExhaustiveDependentPairsYsGenerator<S, (S, S), It<(S, S)>>
+    for SignedModEqTriplesGenerator<U, S>
+{
+    #[inline]
+    fn get_ys(&self, m: &S) -> It<(S, S)> {
+        let m = *m;
+        let m_abs = m.unsigned_abs();
+        if m == S::ZERO {
+            Box::new(exhaustive_signeds().map(|x| (x, x)))
+        } else {
+            Box::new(
+                exhaustive_dependent_pairs(
+                    bit_distributor_sequence(
+                        BitDistributorOutputType::normal(1),
+                        BitDistributorOutputType::normal(1),
+                    ),
+                    primitive_int_increasing_inclusive_range(U::ZERO, U::MAX / m_abs)
+                        .map(move |k| (m_abs, k)),
+                    SignedModEqTriplesInnerGenerator {
+                        phantom_u: PhantomData,
+                        phantom_s: PhantomData,
+                    },
+                )
+                .map(|p| p.1),
+            )
+        }
+    }
+}
+
+pub fn exhaustive_signed_triple_gen_var_4<
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+>() -> It<(S, S, S)> {
+    reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_signeds(),
+        SignedModEqTriplesGenerator {
+            phantom_u: PhantomData,
+            phantom_s: PhantomData,
+        },
+    ))))
+}
+
+pub fn exhaustive_signed_triple_gen_var_5<T: PrimitiveSigned>() -> It<(T, T, T)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_signeds::<T>())
+            .filter(|&(x, y, m)| !x.eq_mod(y, m)),
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
+
+pub fn exhaustive_signed_quadruple_gen<T: PrimitiveSigned>() -> It<(T, T, T, T)> {
+    Box::new(exhaustive_quadruples_from_single(exhaustive_signeds()))
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_signed_signed_signed_unsigned_quadruple_gen_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(T, T, T, U)> {
+    Box::new(exhaustive_quadruples_xxxy_custom_output(
+        exhaustive_signeds(),
+        exhaustive_unsigneds(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned) --
+
+struct SignedModPow2EqTriplesInnerGenerator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
+    phantom_u: PhantomData<*const U>,
+    phantom_s: PhantomData<*const S>,
+}
+
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
+    ExhaustiveDependentPairsYsGenerator<(u64, U), (S, S), It<(S, S)>>
+    for SignedModPow2EqTriplesInnerGenerator<U, S>
+{
+    #[inline]
+    fn get_ys(&self, p: &(u64, U)) -> It<(S, S)> {
+        let &(pow, k) = p;
+        if k == U::ZERO {
+            Box::new(exhaustive_signeds().map(|x| (x, x)))
+        } else {
+            let d = k << pow;
+            let d_s = S::wrapping_from(d);
+            Box::new(
+                exhaustive_signed_inclusive_range(S::MIN, S::MAX.wrapping_sub(d_s))
+                    .map(move |n| (n, n.wrapping_add(d_s)))
+                    .interleave(
+                        exhaustive_signed_inclusive_range(S::MIN, S::MAX.wrapping_sub(d_s))
+                            .map(move |n| (n.wrapping_add(d_s), n)),
+                    ),
+            )
+        }
+    }
+}
+
+struct SignedModPow2EqTriplesGenerator<U: PrimitiveUnsigned, S: PrimitiveSigned> {
+    phantom_u: PhantomData<*const U>,
+    phantom_s: PhantomData<*const S>,
+}
+
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>
+    ExhaustiveDependentPairsYsGenerator<u64, (S, S), It<(S, S)>>
+    for SignedModPow2EqTriplesGenerator<U, S>
+{
+    #[inline]
+    fn get_ys(&self, pow: &u64) -> It<(S, S)> {
+        let pow = *pow;
+        if pow >= S::WIDTH {
+            Box::new(exhaustive_signeds().map(|x| (x, x)))
+        } else {
+            Box::new(
+                exhaustive_dependent_pairs(
+                    bit_distributor_sequence(
+                        BitDistributorOutputType::normal(1),
+                        BitDistributorOutputType::normal(1),
+                    ),
+                    primitive_int_increasing_inclusive_range(U::ZERO, U::MAX >> pow)
+                        .map(move |k| (pow, k)),
+                    SignedModPow2EqTriplesInnerGenerator {
+                        phantom_u: PhantomData,
+                        phantom_s: PhantomData,
+                    },
+                )
+                .map(|p| p.1),
+            )
+        }
+    }
+}
+
+pub fn exhaustive_signed_signed_unsigned_triple_gen_var_1<
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() -> It<(S, S, u64)> {
+    reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_unsigneds(),
+        SignedModPow2EqTriplesGenerator::<U, S> {
+            phantom_u: PhantomData,
+            phantom_s: PhantomData,
+        },
+    ))))
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, RoundingMode) --
 
 pub fn exhaustive_signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
@@ -362,6 +553,50 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_8<
     ))
 }
 
+pub fn exhaustive_signed_unsigned_pair_gen_var_9<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> It<(T, U)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_signeds::<T>(), exhaustive_unsigneds::<U>())
+            .filter(|&(x, y)| !x.divisible_by_power_of_two(y.exact_into())),
+    )
+}
+
+struct SignedDivisibleByP2PairsGenerator<T: PrimitiveSigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveSigned> ExhaustiveDependentPairsYsGenerator<u64, T, It<T>>
+    for SignedDivisibleByP2PairsGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, pow: &u64) -> It<T> {
+        let pow = *pow;
+        if pow >= T::WIDTH {
+            Box::new(once(T::ZERO))
+        } else if pow == 0 {
+            Box::new(exhaustive_signeds())
+        } else {
+            Box::new(
+                exhaustive_signed_inclusive_range(
+                    -T::low_mask(T::WIDTH - pow),
+                    T::low_mask(T::WIDTH - pow),
+                )
+                .map(move |k| k << pow),
+            )
+        }
+    }
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_10<T: PrimitiveSigned>() -> It<(T, u64)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_unsigneds(),
+        SignedDivisibleByP2PairsGenerator {
+            phantom: PhantomData,
+        },
+    )))
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>() -> It<(T, u64, bool)>
@@ -429,6 +664,32 @@ pub fn exhaustive_signed_unsigned_unsigned_triple_gen_var_3<
         exhaustive_pairs_big_tiny(exhaustive_signeds(), exhaustive_unsigneds()),
         primitive_int_increasing_inclusive_range(U::TWO, U::exact_from(36u8)),
     ))))
+}
+
+pub fn exhaustive_signed_unsigned_unsigned_triple_gen_var_4<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> It<(T, T, U)> {
+    Box::new(exhaustive_triples_xxy_custom_output(
+        exhaustive_signeds(),
+        exhaustive_unsigneds(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+pub fn exhaustive_signed_signed_unsigned_triple_gen_var_5<T: PrimitiveSigned>() -> It<(T, T, u64)> {
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_signeds::<T>(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .filter(|&(x, y, pow)| !x.eq_mod_power_of_two(y, pow)),
+    )
 }
 
 // -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -690,6 +951,45 @@ pub fn exhaustive_unsigned_pair_gen_var_11<T: PrimitiveUnsigned>() -> It<(T, T)>
     )
 }
 
+pub fn exhaustive_unsigned_pair_gen_var_12<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> T1<T, U>
+{
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_unsigneds::<T>(), exhaustive_unsigneds::<U>())
+            .filter(|&(x, y)| !x.divisible_by_power_of_two(y.exact_into())),
+    )
+}
+
+struct UnsignedDivisibleByP2PairsGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned> ExhaustiveDependentPairsYsGenerator<u64, T, It<T>>
+    for UnsignedDivisibleByP2PairsGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, pow: &u64) -> It<T> {
+        let pow = *pow;
+        if pow >= T::WIDTH {
+            Box::new(once(T::ZERO))
+        } else {
+            Box::new(
+                primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(T::WIDTH - pow))
+                    .map(move |k| k << pow),
+            )
+        }
+    }
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_13<T: PrimitiveUnsigned>() -> It<(T, u64)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_unsigneds(),
+        UnsignedDivisibleByP2PairsGenerator {
+            phantom: PhantomData,
+        },
+    )))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -763,7 +1063,168 @@ pub fn exhaustive_unsigned_triple_gen_var_5<
     ))))
 }
 
+struct UnsignedModEqTriplesInnerGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned> ExhaustiveDependentPairsYsGenerator<(T, T), (T, T), It<(T, T)>>
+    for UnsignedModEqTriplesInnerGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, p: &(T, T)) -> It<(T, T)> {
+        let &(m, k) = p;
+        if k == T::ZERO {
+            Box::new(exhaustive_unsigneds().map(|x| (x, x)))
+        } else {
+            let d = m.checked_mul(k).unwrap();
+            Box::new(
+                primitive_int_increasing_inclusive_range(T::ZERO, T::MAX - d)
+                    .map(move |n| (n, n + d))
+                    .interleave(
+                        primitive_int_increasing_inclusive_range(T::ZERO, T::MAX - d)
+                            .map(move |n| (n + d, n)),
+                    ),
+            )
+        }
+    }
+}
+
+struct UnsignedModEqTriplesGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned> ExhaustiveDependentPairsYsGenerator<T, (T, T), It<(T, T)>>
+    for UnsignedModEqTriplesGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, m: &T) -> It<(T, T)> {
+        let m = *m;
+        if m == T::ZERO {
+            Box::new(exhaustive_unsigneds().map(|x| (x, x)))
+        } else {
+            Box::new(
+                exhaustive_dependent_pairs(
+                    bit_distributor_sequence(
+                        BitDistributorOutputType::normal(1),
+                        BitDistributorOutputType::normal(1),
+                    ),
+                    primitive_int_increasing_inclusive_range(T::ZERO, T::MAX / m)
+                        .map(move |k| (m, k)),
+                    UnsignedModEqTriplesInnerGenerator {
+                        phantom: PhantomData,
+                    },
+                )
+                .map(|p| p.1),
+            )
+        }
+    }
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
+    reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_unsigneds(),
+        UnsignedModEqTriplesGenerator {
+            phantom: PhantomData,
+        },
+    ))))
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_7<T: PrimitiveUnsigned>() -> It<(T, T, T)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_unsigneds::<T>())
+            .filter(|&(x, y, m)| !x.eq_mod(y, m)),
+    )
+}
+
+struct UnsignedModPow2EqTriplesInnerGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned> ExhaustiveDependentPairsYsGenerator<(u64, T), (T, T), It<(T, T)>>
+    for UnsignedModPow2EqTriplesInnerGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, p: &(u64, T)) -> It<(T, T)> {
+        let &(pow, k) = p;
+        if k == T::ZERO {
+            Box::new(exhaustive_unsigneds().map(|x| (x, x)))
+        } else {
+            let d = k << pow;
+            Box::new(
+                primitive_int_increasing_inclusive_range(T::ZERO, T::MAX - d)
+                    .map(move |n| (n, n + d))
+                    .interleave(
+                        primitive_int_increasing_inclusive_range(T::ZERO, T::MAX - d)
+                            .map(move |n| (n + d, n)),
+                    ),
+            )
+        }
+    }
+}
+
+struct UnsignedModPow2EqTriplesGenerator<T: PrimitiveUnsigned> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned> ExhaustiveDependentPairsYsGenerator<u64, (T, T), It<(T, T)>>
+    for UnsignedModPow2EqTriplesGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, pow: &u64) -> It<(T, T)> {
+        let pow = *pow;
+        if pow >= T::WIDTH {
+            Box::new(exhaustive_unsigneds().map(|x| (x, x)))
+        } else {
+            Box::new(
+                exhaustive_dependent_pairs(
+                    bit_distributor_sequence(
+                        BitDistributorOutputType::normal(1),
+                        BitDistributorOutputType::normal(1),
+                    ),
+                    primitive_int_increasing_inclusive_range(T::ZERO, T::MAX >> pow)
+                        .map(move |k| (pow, k)),
+                    UnsignedModPow2EqTriplesInnerGenerator {
+                        phantom: PhantomData,
+                    },
+                )
+                .map(|p| p.1),
+            )
+        }
+    }
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_8<T: PrimitiveUnsigned>() -> It<(T, T, u64)> {
+    reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_unsigneds(),
+        UnsignedModPow2EqTriplesGenerator {
+            phantom: PhantomData,
+        },
+    ))))
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_9<T: PrimitiveUnsigned>() -> It<(T, T, u64)> {
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_unsigneds::<T>(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .filter(|&(x, y, pow)| !x.eq_mod_power_of_two(y, pow)),
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn exhaustive_unsigned_quadruple_gen<T: PrimitiveUnsigned>() -> It<(T, T, T, T)> {
+    Box::new(exhaustive_quadruples_from_single(exhaustive_unsigneds()))
+}
 
 pub fn exhaustive_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
 ) -> It<(T, u64, u64, U)> {
@@ -787,6 +1248,18 @@ pub fn exhaustive_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned, U: Primitiv
             })
         }),
     )
+}
+
+pub fn exhaustive_unsigned_quadruple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(T, T, T, U)> {
+    Box::new(exhaustive_quadruples_xxxy_custom_output(
+        exhaustive_unsigneds(),
+        exhaustive_unsigneds(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
@@ -1199,23 +1672,6 @@ impl<T: PrimitiveUnsigned + WrappingFrom<U>, U: PrimitiveUnsigned>
     }
 }
 
-pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_6<
-    T: PrimitiveUnsigned + WrappingFrom<U>,
-    U: PrimitiveUnsigned + SaturatingFrom<T>,
->() -> It<(Vec<T>, U)> {
-    permute_2_1(Box::new(exhaustive_dependent_pairs(
-        bit_distributor_sequence(
-            BitDistributorOutputType::normal(1),
-            BitDistributorOutputType::normal(1),
-        ),
-        primitive_int_increasing_inclusive_range(U::TWO, U::saturating_from(T::MAX)),
-        ValidDigitsGenerator2 {
-            phantom_t: PhantomData,
-            phantom_u: PhantomData,
-        },
-    )))
-}
-
 // --(Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>(
@@ -1553,7 +2009,7 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_26<T: PrimitiveUnsigned>(
     )
 }
 
-pub struct UnsignedVecTripleXXXLenGenerator;
+struct UnsignedVecTripleXXXLenGenerator;
 
 impl<T: PrimitiveUnsigned>
     ExhaustiveDependentPairsYsGenerator<

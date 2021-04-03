@@ -152,6 +152,14 @@ pub fn random_natural_gen_var_1(config: &GenConfig) -> It<Natural> {
 
 // -- (Natural, Natural) --
 
+pub fn random_natural_pair_gen(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_pairs_from_single(random_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 pub fn random_natural_pair_gen_var_1(config: &GenConfig) -> It<(Natural, Natural)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
@@ -193,6 +201,16 @@ pub fn random_natural_pair_gen_var_2(config: &GenConfig) -> It<(Natural, Natural
             )
         },
     ))
+}
+
+// -- (Natural, Natural, Natural) --
+
+pub fn random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
+    Box::new(random_triples_from_single(random_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
 }
 
 // -- (Natural, PrimitiveUnsigned) --
@@ -256,6 +274,29 @@ pub fn random_natural_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
         &|seed| {
             random_naturals(
                 seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_natural_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_natural_range_to_infinity(
+                seed,
+                Natural::TWO,
                 config.get_or("mean_bits_n", 64),
                 config.get_or("mean_bits_d", 1),
             )
@@ -336,6 +377,25 @@ pub fn random_natural_vec_natural_pair_gen_var_1(
             Natural::power_of_two(Limb::WIDTH),
             Limb::WIDTH + 4,
             1,
+        ),
+        digit_counts: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("digit_counts"),
+            config.get_or("digit_counts_mean_n", 4),
+            config.get_or("digit_counts_mean_d", 1),
+        ),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
+
+pub fn random_natural_vec_natural_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Natural>, Natural)> {
+    Box::new(LargeDigitsRandomGenerator {
+        bases: random_natural_range_to_infinity(
+            EXAMPLE_SEED.fork("bases"),
+            Natural::TWO,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
         ),
         digit_counts: geometric_random_unsigneds(
             EXAMPLE_SEED.fork("digit_counts"),

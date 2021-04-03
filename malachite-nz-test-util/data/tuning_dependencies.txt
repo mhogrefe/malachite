@@ -1,0 +1,187 @@
+AORSMUL_FASTER_2AORSLSH*
+  constants:
+
+MUL_TOOM22_THRESHOLD*
+  constants:
+
+MUL_TOOM33_THRESHOLD*
+  constants:
+
+MUL_TOOM33_THRESHOLD_LIMIT
+  constants:
+    MUL_TOOM33_THRESHOLD
+
+SCALED_MUL_TOOM22_THRESHOLD
+  constants:
+    MUL_TOOM22_THRESHOLD
+
+SCALED_MUL_TOOM33_THRESHOLD
+  constants:
+    MUL_TOOM33_THRESHOLD
+
+TOOM22_MAYBE_MUL_TOOM22
+  constants:
+    MUL_TOOM22_THRESHOLD
+    MUL_TOOM33_THRESHOLD
+    TUNE_PROGRAM_BUILD
+    WANT_FAT_BINARY
+
+TOOM33_MAYBE_MUL_BASECASE
+  constants:
+    MUL_TOOM22_THRESHOLD
+    MUL_TOOM33_THRESHOLD
+    ...
+
+TOOM33_MAYBE_MUL_TOOM33
+  constants:
+    MUL_TOOM33_THRESHOLD
+    ...
+
+TOOM_6H_MAYBE_MUL_BASECASE
+  constants:
+    MUL_TOOM22_THRESHOLD
+    ...
+
+TOOM_6H_MAYBE_MUL_TOOM22
+  constants:
+    MUL_TOOM33_THRESHOLD
+    ...
+
+TOOM_8H_MAYBE_MUL_BASECASE
+  constants:
+    MUL_TOOM22_THRESHOLD
+    ...
+
+TOOM_8H_MAYBE_MUL_TOOM22
+  constants:
+    MUL_TOOM33_THRESHOLD
+    ...
+
+_limbs_mul_greater_to_out_toom_22_recursive
+  constants:
+    MUL_TOOM22_THRESHOLD
+    ...
+  functions:
+    ...
+
+_limbs_mul_same_length_to_out_toom_22_recursive
+  constants:
+    MUL_TOOM22_THRESHOLD
+    ...
+  functions:
+    ...
+
+_limbs_mul_same_length_to_out_toom_33_recursive
+  constants:
+    MUL_TOOM22_THRESHOLD
+    MUL_TOOM33_THRESHOLD
+    ...
+  functions:
+    ...
+
+_limbs_mul_same_length_to_out_toom_6h_recursive
+  constants:
+    MUL_TOOM22_THRESHOLD
+    MUL_TOOM33_THRESHOLD
+    ...
+  functions:
+    ...
+
+_limbs_mul_same_length_to_out_toom_8h_recursive
+  constants:
+    MUL_TOOM22_THRESHOLD
+    MUL_TOOM33_THRESHOLD
+    ...
+  functions:
+    ...
+
+_limbs_mul_toom_interpolate_12_points
+  constants:
+    AORSMUL_FASTER_2AORSLSH
+  functions:
+    _limbs_shl_and_add_same_length_in_place_left
+    _limbs_shl_and_sub
+    _limbs_shl_and_sub_same_length
+    limbs_add_limb_to_out
+    limbs_add_same_length_to_out
+    limbs_div_255_in_place
+    limbs_div_exact_limb_in_place
+    limbs_slice_add_mul_limb_same_length_in_place_left
+    limbs_slice_add_same_length_in_place_left
+    limbs_slice_shr_in_place
+    limbs_sub_limb_in_place
+    limbs_sub_mul_limb_same_length_in_place_left
+    limbs_sub_same_length_in_place_left
+    limbs_sub_same_length_in_place_right
+    limbs_sub_same_length_to_out
+
+_limbs_mul_toom_interpolate_16_points
+  constants:
+    AORSMUL_FASTER_2AORSLSH
+  functions:
+    ...
+
+_limbs_shl_and_add_same_length_in_place_left
+  constants:
+  functions:
+    limbs_shl_to_out
+    limbs_slice_add_same_length_in_place_left
+
+_limbs_shl_and_sub
+  constants:
+  functions:
+    _limbs_shl_and_sub_same_length
+    limbs_sub_limb_in_place
+
+limbs_mul_greater_to_out
+  constants:
+    MUL_TOOM22_THRESHOLD
+    MUL_TOOM33_THRESHOLD
+    ...
+  functions:
+    ...
+
+limbs_mul_greater_to_out_basecase_mem_opt
+  constants:
+    MUL_TOOM22_THRESHOLD
+    ...
+  functions:
+    ...
+
+limbs_mul_greater_to_out_basecase_mem_opt_helper
+  constants:
+    MUL_TOOM22_THRESHOLD
+    ...
+  functions:
+    ...
+
+limbs_mul_same_length_to_out
+  constants:
+    MUL_FFT_THRESHOLD
+    MUL_TOOM22_THRESHOLD
+    MUL_TOOM33_THRESHOLD
+    MUL_TOOM33_THRESHOLD_LIMIT
+    MUL_TOOM44_THRESHOLD
+    MUL_TOOM6H_THRESHOLD
+    MUL_TOOM8H_THRESHOLD
+  functions:
+    _limbs_mul_greater_to_out_basecase
+    _limbs_mul_greater_to_out_fft
+    _limbs_mul_greater_to_out_toom_22
+    _limbs_mul_greater_to_out_toom_22_scratch_len
+    _limbs_mul_greater_to_out_toom_33
+    _limbs_mul_greater_to_out_toom_33_scratch_len
+    _limbs_mul_greater_to_out_toom_44
+    _limbs_mul_greater_to_out_toom_44_scratch_len
+    _limbs_mul_greater_to_out_toom_6h
+    _limbs_mul_greater_to_out_toom_8h
+    _limbs_mul_same_length_to_out_toom_6h_scratch_len
+    _limbs_mul_same_length_to_out_toom_8h_scratch_len
+    limbs_square_to_out
+
+select_fns
+  constants:
+    MUL_TOOM22_THRESHOLD
+    ...
+  functions:
+    ...

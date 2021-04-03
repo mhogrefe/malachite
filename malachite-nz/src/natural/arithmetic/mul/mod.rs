@@ -92,6 +92,8 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     }
 }
 
+// T
+
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s
 /// to an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long
@@ -157,6 +159,8 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < ys_len << 2
 }
+
+// T
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output

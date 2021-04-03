@@ -5,10 +5,16 @@ use malachite_base::num::float::PrimitiveFloat;
 
 fn positive_primitive_floats_increasing_helper<T: PrimitiveFloat>(first_20: &[T], last_20: &[T]) {
     let xs = positive_primitive_floats_increasing::<T>();
-    assert_eq!(xs.clone().take(20).map(NiceFloat).collect_vec(), first_20);
+    assert_eq!(
+        xs.clone().take(20).map(NiceFloat).collect_vec(),
+        first_20.iter().copied().map(NiceFloat).collect_vec()
+    );
     let mut reversed = xs.rev().take(20).map(NiceFloat).collect_vec();
     reversed.reverse();
-    assert_eq!(reversed, last_20);
+    assert_eq!(
+        reversed,
+        last_20.iter().copied().map(NiceFloat).collect_vec()
+    );
 }
 
 #[test]

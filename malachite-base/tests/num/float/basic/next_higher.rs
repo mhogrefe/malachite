@@ -6,7 +6,7 @@ use std::panic::catch_unwind;
 #[test]
 pub fn test_next_higher() {
     fn test<T: PrimitiveFloat>(x: T, out: T) {
-        assert_eq!(NiceFloat(x.next_higher()), out);
+        assert_eq!(NiceFloat(x.next_higher()), NiceFloat(out));
     }
     test::<f32>(f32::NEGATIVE_INFINITY, -f32::MAX_FINITE);
     test::<f32>(-f32::MAX_FINITE, -3.4028233e38);

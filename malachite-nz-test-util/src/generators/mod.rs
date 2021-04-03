@@ -1,4 +1,7 @@
-use crate::generators::common::{integer_nrm, integer_pair_1_nrm, natural_nrm, natural_pair_1_nrm};
+use crate::generators::common::{
+    integer_nrm, integer_pair_1_nrm, natural_nrm, natural_pair_1_nrm, natural_pair_nrm,
+    natural_pair_rm,
+};
 use crate::generators::exhaustive::*;
 use crate::generators::random::*;
 use crate::generators::special_random::*;
@@ -97,6 +100,35 @@ pub fn natural_gen_var_1() -> Generator<Natural> {
 
 // -- (Natural, Natural) --
 
+pub fn natural_pair_gen() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen,
+        &random_natural_pair_gen,
+        &special_random_natural_pair_gen,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn natural_pair_gen_nrm() -> Generator<(
+    (BigUint, BigUint),
+    (rug::Integer, rug::Integer),
+    (Natural, Natural),
+)> {
+    Generator::new(
+        &|| natural_pair_nrm(exhaustive_natural_pair_gen()),
+        &|config| natural_pair_nrm(random_natural_pair_gen(config)),
+        &|config| natural_pair_nrm(special_random_natural_pair_gen(config)),
+    )
+}
+
+pub fn natural_pair_gen_rm() -> Generator<((rug::Integer, rug::Integer), (Natural, Natural))> {
+    Generator::new(
+        &|| natural_pair_rm(exhaustive_natural_pair_gen()),
+        &|config| natural_pair_rm(random_natural_pair_gen(config)),
+        &|config| natural_pair_rm(special_random_natural_pair_gen(config)),
+    )
+}
+
 // All pairs of `Natural`s where the first `Natural` is large (at least 2^`Limb::WIDTH`) and the
 // second is at least 2.
 pub fn natural_pair_gen_var_1() -> Generator<(Natural, Natural)> {
@@ -112,6 +144,16 @@ pub fn natural_pair_gen_var_2() -> Generator<(Natural, Natural)> {
         &exhaustive_natural_pair_gen_var_2,
         &random_natural_pair_gen_var_2,
         &special_random_natural_pair_gen_var_1,
+    )
+}
+
+// -- (Natural, Natural, Natural) --
+
+pub fn natural_triple_gen() -> Generator<(Natural, Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_triple_gen,
+        &random_natural_triple_gen,
+        &special_random_natural_triple_gen,
     )
 }
 
@@ -166,6 +208,14 @@ pub fn natural_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(Nat
     )
 }
 
+// All `(Natural, T)` where the `Natural` is at least 2 and the `T` is unsigned and small.
+pub fn natural_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
+    Generator::new_no_special(
+        &exhaustive_natural_unsigned_pair_gen_var_3,
+        &random_natural_unsigned_pair_gen_var_5,
+    )
+}
+
 // -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 // All `(Natural, T, U)` where `T` and `U` are unsigned, the `T` is between 2 and 36, inclusive, and
@@ -181,10 +231,21 @@ pub fn natural_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: Primi
 
 // -- (Vec<Natural>, Natural) --
 
+// All `(Vec<Natural>, Natural)` where the second element of the pair is `Large` and every element
+// of the `Vec` is smaller than that second element.
 pub fn natural_vec_natural_pair_gen_var_1() -> Generator<(Vec<Natural>, Natural)> {
     Generator::new_no_special(
         &exhaustive_natural_vec_natural_pair_gen_var_1,
         &random_natural_vec_natural_pair_gen_var_1,
+    )
+}
+
+// All `(Vec<Natural>, Natural)` where and every element of the `Vec` is smaller than the second
+// element of the pair.
+pub fn natural_vec_natural_pair_gen_var_2() -> Generator<(Vec<Natural>, Natural)> {
+    Generator::new_no_special(
+        &exhaustive_natural_vec_natural_pair_gen_var_2,
+        &random_natural_vec_natural_pair_gen_var_2,
     )
 }
 

@@ -153,6 +153,16 @@ pub fn special_random_natural_gen(config: &GenConfig) -> It<Natural> {
 
 // -- (Natural, Natural) --
 
+pub fn special_random_natural_pair_gen(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_pairs_from_single(striped_random_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 pub fn special_random_natural_pair_gen_var_1(config: &GenConfig) -> It<(Natural, Natural)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
@@ -174,6 +184,18 @@ pub fn special_random_natural_pair_gen_var_1(config: &GenConfig) -> It<(Natural,
             )
         },
     ))
+}
+
+// -- (Natural, Natural, Natural) --
+
+pub fn special_random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
+    Box::new(random_triples_from_single(striped_random_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
 }
 
 // -- (Natural, PrimitiveUnsigned) --

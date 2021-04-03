@@ -521,9 +521,66 @@ pub mod div_mod;
 /// assert_eq!(x, 4);
 /// ```
 pub mod div_round;
+/// This module contains functions determining whether one number is divisible by another.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # divisible_by
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivisibleBy;
+///
+/// assert_eq!(0u8.divisible_by(0), true);
+/// assert_eq!(100u16.divisible_by(3), false);
+/// assert_eq!(102u32.divisible_by(3), true);
+///
+/// assert_eq!(0i8.divisible_by(0), true);
+/// assert_eq!((-100i16).divisible_by(-3), false);
+/// assert_eq!(102i32.divisible_by(-3), true);
+/// ```
 pub mod divisible_by;
+/// This module contains functions determining whether one number is divisible by a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # divisible_by_power_of_two
+/// ```
+/// use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
+///
+/// assert_eq!(0u8.divisible_by_power_of_two(100), true);
+/// assert_eq!(96u16.divisible_by_power_of_two(5), true);
+/// assert_eq!(96u32.divisible_by_power_of_two(6), false);
+///
+/// assert_eq!(0i8.divisible_by_power_of_two(100), true);
+/// assert_eq!((-96i16).divisible_by_power_of_two(5), true);
+/// assert_eq!(96i32.divisible_by_power_of_two(6), false);
+/// ```
 pub mod divisible_by_power_of_two;
+/// This module contains functions determining whether one number is equal by another, mod a third.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # eq_mod
+/// ```
+/// use malachite_base::num::arithmetic::traits::EqMod;
+///
+/// assert_eq!(123u16.eq_mod(223, 100), true);
+/// assert_eq!((-123i32).eq_mod(277, 100), true);
+/// assert_eq!((-123i64).eq_mod(278, 100), false);
+/// ```
 pub mod eq_mod;
+/// This module contains functions determining whether one number is equal by another, mod a power
+/// of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # eq_mod_power_of_two
+/// ```
+/// use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
+///
+/// assert_eq!(0u16.eq_mod_power_of_two(256, 8), true);
+/// assert_eq!((-0b1101i32).eq_mod_power_of_two(0b11011, 3), true);
+/// assert_eq!((-0b1101i64).eq_mod_power_of_two(0b11011, 4), false);
+/// ```
 pub mod eq_mod_power_of_two;
 pub mod is_power_of_two;
 pub mod mod_add;

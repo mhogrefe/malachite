@@ -7,7 +7,9 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{Digits, ExactFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{
+    Digits, ExactFrom, SaturatingFrom, WrappingFrom, WrappingInto,
+};
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
@@ -294,6 +296,84 @@ pub fn signed_triple_gen_var_3<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
     )
 }
 
+// All triples of signeds (x, y, m) where x is equal to y mod m.
+pub fn signed_triple_gen_var_4<
+    U: PrimitiveUnsigned + WrappingInto<S> + WrappingFrom<S>,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+>() -> Generator<(S, S, S)> {
+    Generator::new(
+        &exhaustive_signed_triple_gen_var_4,
+        &random_signed_triple_gen_var_4::<U, S>,
+        &special_random_signed_triple_gen_var_4::<U, S>,
+    )
+}
+
+// All triples of signeds (x, y, m) where x is not equal to y mod m.
+pub fn signed_triple_gen_var_5<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_signed_triple_gen_var_5,
+        &random_primitive_int_triple_gen_var_1,
+        &special_random_signed_triple_gen_var_5,
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
+
+pub fn signed_quadruple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_signed_quadruple_gen,
+        &random_primitive_int_quadruple_gen,
+        &special_random_signed_quadruple_gen,
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned) --
+
+// All `(T, T, T, U)` where `T` is signed, `U` is unsigned, and the `U` is small.
+pub fn signed_signed_signed_unsigned_quadruple_gen_var_1<
+    T: PrimitiveSigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(T, T, T, U)> {
+    Generator::new(
+        &exhaustive_signed_signed_signed_unsigned_quadruple_gen_var_1,
+        &random_primitive_int_primitive_int_primitive_int_unsigned_quadruple_gen_var_1,
+        &special_random_signed_signed_signed_unsigned_quadruple_gen_var_2,
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveSigned, PrimitiveUnsigned) --
+
+// All triples `(T, T, u64)` (x, y, p) where `T` is signed and x is equal to y mod $2^p$.
+pub fn signed_signed_unsigned_triple_gen_var_1<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() -> Generator<(S, S, u64)> {
+    Generator::new(
+        &exhaustive_signed_signed_unsigned_triple_gen_var_1::<U, S>,
+        &random_signed_signed_unsigned_triple_gen_var_1::<U, S>,
+        &special_random_signed_signed_unsigned_triple_gen_var_1::<U, S>,
+    )
+}
+
+// All `(T, T, U)` where `T` is signed, `U` is unsigned, and the `U` is small.
+pub fn signed_signed_unsigned_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, T, U)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_unsigned_triple_gen_var_4,
+        &random_primitive_int_primitive_int_unsigned_triple_gen_var_2,
+        &special_random_signed_signed_unsigned_triple_gen_var_2,
+    )
+}
+
+// All triples `(T, T, u64)` (x, y, p) where `T` is unsigned and x is not equal to y mod $2^p$.
+pub fn signed_signed_unsigned_triple_gen_var_3<T: PrimitiveSigned>() -> Generator<(T, T, u64)> {
+    Generator::new(
+        &exhaustive_signed_signed_unsigned_triple_gen_var_5,
+        &random_primitive_int_primitive_int_unsigned_triple_gen_var_3,
+        &special_random_signed_signed_unsigned_triple_gen_var_3,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, RoundingMode) --
 
 pub fn signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
@@ -376,6 +456,28 @@ pub fn signed_unsigned_pair_gen_var_7<T: PrimitiveSigned, U: ExactFrom<u8> + Pri
         &exhaustive_signed_unsigned_pair_gen_var_8,
         &random_signed_unsigned_pair_gen_var_4,
         &special_random_signed_unsigned_pair_gen_var_7,
+    )
+}
+
+// All `(T, U)`s where `T` is signed, `U` is unsigned, the `U` is small, and the `T` is not
+// divisible by 2 to the power of the `U`.
+pub fn signed_unsigned_pair_gen_var_8<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen_var_9,
+        &random_primitive_int_unsigned_pair_gen_var_6,
+        &special_random_signed_unsigned_pair_gen_var_8,
+    )
+}
+
+// All `(T, U)`s where `T` is signed, `U` is unsigned, the `U` is small, and the `T` is divisible by
+// 2 to the power of the `U`.
+pub fn signed_unsigned_pair_gen_var_9<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, u64)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_pair_gen_var_10,
+        &random_primitive_int_unsigned_pair_gen_var_7,
+        &special_random_signed_unsigned_pair_gen_var_9,
     )
 }
 
@@ -727,6 +829,26 @@ pub fn unsigned_pair_gen_var_13<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     )
 }
 
+// All `(T, U)`s where `T` and `U` are unsigned, the `U` is small, and the `T` is not divisible by 2
+// to the power of the `U`.
+pub fn unsigned_pair_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_12,
+        &random_primitive_int_unsigned_pair_gen_var_6,
+        &special_random_unsigned_pair_gen_var_10,
+    )
+}
+
+// All `(T, U)`s where `T` and `U` are unsigned, the `U` is small, and the `T` not divisible by 2 to
+// the power of the `U`.
+pub fn unsigned_pair_gen_var_15<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_13,
+        &random_primitive_int_unsigned_pair_gen_var_7,
+        &special_random_unsigned_pair_gen_var_11,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 // All (`T`, `u64`, `bool`) where `T` is unsigned and either the `bool` is false or the `u64` is
@@ -814,7 +936,51 @@ pub fn unsigned_triple_gen_var_6<
     )
 }
 
+// All triples of unsigneds (x, y, m) where x is equal to y mod m.
+pub fn unsigned_triple_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_6,
+        &random_unsigned_triple_gen_var_3,
+        &special_random_unsigned_triple_gen_var_7,
+    )
+}
+
+// All triples of signeds (x, y, m) where x is not equal to y mod m.
+pub fn unsigned_triple_gen_var_8<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_7,
+        &random_primitive_int_triple_gen_var_1,
+        &special_random_unsigned_triple_gen_var_8,
+    )
+}
+
+// All triples `(T, T, u64)` (x, y, p) where `T` is unsigned and x is equal to y mod $2^p$.
+pub fn unsigned_triple_gen_var_9<T: PrimitiveUnsigned>() -> Generator<(T, T, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_8,
+        &random_unsigned_triple_gen_var_4,
+        &special_random_unsigned_triple_gen_var_9,
+    )
+}
+
+// All triples `(T, T, u64)` (x, y, p) where `T` is unsigned and x is not equal to y mod $2^p$.
+pub fn unsigned_triple_gen_var_10<T: PrimitiveUnsigned>() -> Generator<(T, T, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_9,
+        &random_primitive_int_primitive_int_unsigned_triple_gen_var_3,
+        &special_random_unsigned_triple_gen_var_10,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+pub fn unsigned_quadruple_gen<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_quadruple_gen,
+        &random_primitive_int_quadruple_gen,
+        &special_random_unsigned_quadruple_gen,
+    )
+}
 
 // All `(T, u64, u64, U)` where `T` and `U` are unsigned, both `u64`s are small, and the four values
 // are valid arguments to `assign_bits`.
@@ -824,6 +990,16 @@ pub fn unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
         &exhaustive_unsigned_quadruple_gen_var_1,
         &random_primitive_int_unsigned_unsigned_unsigned_quadruple_gen_var_1,
         &special_random_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// All `(T, T, T, U)` where `T` and `U` are unsigned and the `U` is small.
+pub fn unsigned_quadruple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, T, T, U)> {
+    Generator::new(
+        &exhaustive_unsigned_quadruple_gen_var_2,
+        &random_primitive_int_primitive_int_primitive_int_unsigned_quadruple_gen_var_1,
+        &special_random_unsigned_quadruple_gen_var_2,
     )
 }
 
@@ -1085,17 +1261,6 @@ pub fn unsigned_vec_unsigned_pair_gen_var_5<
     Generator::new_no_special(
         &exhaustive_unsigned_vec_unsigned_pair_gen_var_5::<T, U>,
         &random_unsigned_vec_unsigned_pair_gen_var_3::<T, U>,
-    )
-}
-
-// All `(Vec<T>, U)` that are valid inputs to _from_digits_desc_limb in malachite-nz.
-pub fn unsigned_vec_unsigned_pair_gen_var_6<
-    T: ExactFrom<U> + PrimitiveUnsigned + WrappingFrom<U>,
-    U: PrimitiveUnsigned + SaturatingFrom<T>,
->() -> Generator<(Vec<T>, U)> {
-    Generator::new_no_special(
-        &exhaustive_unsigned_vec_unsigned_pair_gen_var_6::<T, U>,
-        &random_unsigned_vec_unsigned_pair_gen_var_4::<T, U>,
     )
 }
 

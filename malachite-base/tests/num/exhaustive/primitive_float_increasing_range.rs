@@ -11,10 +11,16 @@ fn primitive_float_increasing_range_helper<T: PrimitiveFloat>(
     last_20: &[T],
 ) {
     let xs = primitive_float_increasing_range::<T>(a, b);
-    assert_eq!(xs.clone().take(20).map(NiceFloat).collect_vec(), first_20);
+    assert_eq!(
+        xs.clone().take(20).map(NiceFloat).collect_vec(),
+        first_20.iter().copied().map(NiceFloat).collect_vec()
+    );
     let mut reversed = xs.rev().take(20).map(NiceFloat).collect_vec();
     reversed.reverse();
-    assert_eq!(reversed, last_20);
+    assert_eq!(
+        reversed,
+        last_20.iter().copied().map(NiceFloat).collect_vec()
+    );
 }
 
 #[allow(clippy::approx_constant)]
@@ -176,6 +182,99 @@ fn test_primitive_float_increasing_range() {
             3.4028235e38,
         ],
     );
+    primitive_float_increasing_range_helper::<f32>(
+        -f32::MIN_POSITIVE_SUBNORMAL,
+        f32::MIN_POSITIVE_SUBNORMAL,
+        &[-1.0e-45, -0.0, 0.0],
+        &[-1.0e-45, -0.0, 0.0],
+    );
+    primitive_float_increasing_range_helper::<f32>(
+        -0.0,
+        f32::MIN_POSITIVE_SUBNORMAL,
+        &[-0.0, 0.0],
+        &[-0.0, 0.0],
+    );
+    primitive_float_increasing_range_helper::<f32>(
+        0.0,
+        f32::MIN_POSITIVE_SUBNORMAL,
+        &[0.0],
+        &[0.0],
+    );
+    primitive_float_increasing_range_helper::<f32>(
+        -f32::MIN_POSITIVE_SUBNORMAL,
+        -0.0,
+        &[-1.0e-45],
+        &[-1.0e-45],
+    );
+    primitive_float_increasing_range_helper::<f32>(
+        -f32::MIN_POSITIVE_SUBNORMAL,
+        0.0,
+        &[-1.0e-45, -0.0],
+        &[-1.0e-45, -0.0],
+    );
+    primitive_float_increasing_range_helper::<f32>(
+        f32::NEGATIVE_INFINITY,
+        f32::POSITIVE_INFINITY,
+        &[
+            f32::NEGATIVE_INFINITY,
+            -3.4028235e38,
+            -3.4028233e38,
+            -3.402823e38,
+            -3.4028229e38,
+            -3.4028227e38,
+            -3.4028225e38,
+            -3.4028222e38,
+            -3.402822e38,
+            -3.4028218e38,
+            -3.4028216e38,
+            -3.4028214e38,
+            -3.4028212e38,
+            -3.402821e38,
+            -3.4028208e38,
+            -3.4028206e38,
+            -3.4028204e38,
+            -3.4028202e38,
+            -3.40282e38,
+            -3.4028198e38,
+        ],
+        &[
+            3.4028196e38,
+            3.4028198e38,
+            3.40282e38,
+            3.4028202e38,
+            3.4028204e38,
+            3.4028206e38,
+            3.4028208e38,
+            3.402821e38,
+            3.4028212e38,
+            3.4028214e38,
+            3.4028216e38,
+            3.4028218e38,
+            3.402822e38,
+            3.4028222e38,
+            3.4028225e38,
+            3.4028227e38,
+            3.4028229e38,
+            3.402823e38,
+            3.4028233e38,
+            3.4028235e38,
+        ],
+    );
+    primitive_float_increasing_range_helper::<f32>(
+        f32::NEGATIVE_INFINITY,
+        f32::NEGATIVE_INFINITY,
+        &[],
+        &[],
+    );
+    primitive_float_increasing_range_helper::<f32>(
+        f32::POSITIVE_INFINITY,
+        f32::POSITIVE_INFINITY,
+        &[],
+        &[],
+    );
+    primitive_float_increasing_range_helper::<f32>(0.0, 0.0, &[], &[]);
+    primitive_float_increasing_range_helper::<f32>(-0.0, -0.0, &[], &[]);
+    primitive_float_increasing_range_helper::<f32>(-0.0, 0.0, &[-0.0], &[-0.0]);
 
     primitive_float_increasing_range_helper::<f64>(1.0, 1.0, &[], &[]);
     primitive_float_increasing_range_helper::<f64>(
@@ -418,10 +517,104 @@ fn test_primitive_float_increasing_range() {
             1.7976931348623157e308,
         ],
     );
+    primitive_float_increasing_range_helper::<f64>(
+        -f64::MIN_POSITIVE_SUBNORMAL,
+        f64::MIN_POSITIVE_SUBNORMAL,
+        &[-5.0e-324, -0.0, 0.0],
+        &[-5.0e-324, -0.0, 0.0],
+    );
+    primitive_float_increasing_range_helper::<f64>(
+        -0.0,
+        f64::MIN_POSITIVE_SUBNORMAL,
+        &[-0.0, 0.0],
+        &[-0.0, 0.0],
+    );
+    primitive_float_increasing_range_helper::<f64>(
+        0.0,
+        f64::MIN_POSITIVE_SUBNORMAL,
+        &[0.0],
+        &[0.0],
+    );
+    primitive_float_increasing_range_helper::<f64>(
+        -f64::MIN_POSITIVE_SUBNORMAL,
+        -0.0,
+        &[-5.0e-324],
+        &[-5.0e-324],
+    );
+    primitive_float_increasing_range_helper::<f64>(
+        -f64::MIN_POSITIVE_SUBNORMAL,
+        0.0,
+        &[-5.0e-324, -0.0],
+        &[-5.0e-324, -0.0],
+    );
+    primitive_float_increasing_range_helper::<f64>(
+        f64::NEGATIVE_INFINITY,
+        f64::POSITIVE_INFINITY,
+        &[
+            f64::NEGATIVE_INFINITY,
+            -1.7976931348623157e308,
+            -1.7976931348623155e308,
+            -1.7976931348623153e308,
+            -1.7976931348623151e308,
+            -1.797693134862315e308,
+            -1.7976931348623147e308,
+            -1.7976931348623145e308,
+            -1.7976931348623143e308,
+            -1.7976931348623141e308,
+            -1.797693134862314e308,
+            -1.7976931348623137e308,
+            -1.7976931348623135e308,
+            -1.7976931348623133e308,
+            -1.7976931348623131e308,
+            -1.797693134862313e308,
+            -1.7976931348623127e308,
+            -1.7976931348623125e308,
+            -1.7976931348623123e308,
+            -1.7976931348623121e308,
+        ],
+        &[
+            1.797693134862312e308,
+            1.7976931348623121e308,
+            1.7976931348623123e308,
+            1.7976931348623125e308,
+            1.7976931348623127e308,
+            1.797693134862313e308,
+            1.7976931348623131e308,
+            1.7976931348623133e308,
+            1.7976931348623135e308,
+            1.7976931348623137e308,
+            1.797693134862314e308,
+            1.7976931348623141e308,
+            1.7976931348623143e308,
+            1.7976931348623145e308,
+            1.7976931348623147e308,
+            1.797693134862315e308,
+            1.7976931348623151e308,
+            1.7976931348623153e308,
+            1.7976931348623155e308,
+            1.7976931348623157e308,
+        ],
+    );
+    primitive_float_increasing_range_helper::<f64>(
+        f64::NEGATIVE_INFINITY,
+        f64::NEGATIVE_INFINITY,
+        &[],
+        &[],
+    );
+    primitive_float_increasing_range_helper::<f64>(
+        f64::POSITIVE_INFINITY,
+        f64::POSITIVE_INFINITY,
+        &[],
+        &[],
+    );
+    primitive_float_increasing_range_helper::<f64>(0.0, 0.0, &[], &[]);
+    primitive_float_increasing_range_helper::<f64>(-0.0, -0.0, &[], &[]);
+    primitive_float_increasing_range_helper::<f64>(-0.0, 0.0, &[-0.0], &[-0.0]);
 }
 
 fn primitive_float_increasing_range_fail_helper<T: PrimitiveFloat>() {
     assert_panic!(primitive_float_increasing_range::<T>(T::ONE, T::ZERO));
+    assert_panic!(primitive_float_increasing_range::<T>(T::ONE, T::NAN));
 }
 
 #[test]

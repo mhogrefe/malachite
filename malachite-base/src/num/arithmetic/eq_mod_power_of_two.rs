@@ -3,20 +3,17 @@ use num::arithmetic::traits::{DivisibleByPowerOfTwo, EqModPowerOfTwo};
 macro_rules! impl_eq_mod_power_of_two {
     ($t:ident) => {
         impl EqModPowerOfTwo<$t> for $t {
-            /// Returns whether `self` is equal to `other` mod 2<sup>`pow`</sup>.
+            /// Returns whether `self` is equal to `other` mod $2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $f(x, y, p) = (x \equiv y \mod 2^p)$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $f(x, y, p) = (\exists k \in \Z \ x - y = k2^p)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
-            ///
-            /// assert_eq!(0u16.eq_mod_power_of_two(256, 8), true);
-            /// assert_eq!((-0b1101i32).eq_mod_power_of_two(0b11011, 3), true);
-            /// assert_eq!((-0b1101i64).eq_mod_power_of_two(0b11011, 4), false);
-            /// ```
+            /// See the documentation of the `num::arithmetic::eq_mod_power_of_two` module.
             #[inline]
             fn eq_mod_power_of_two(self, other: $t, pow: u64) -> bool {
                 (self ^ other).divisible_by_power_of_two(pow)

@@ -5,9 +5,12 @@ use std::str::FromStr;
 #[test]
 fn test_square() {
     let test = |x, out| {
-        assert_eq!(Integer::from_str(x).unwrap().square().to_string(), out);
+        let u = Integer::from_str(x).unwrap();
 
-        let mut x = Integer::from_str(x).unwrap();
+        assert_eq!(u.clone().square().to_string(), out);
+        assert_eq!((&u).square().to_string(), out);
+
+        let mut x = u;
         x.square_assign();
         assert_eq!(x.to_string(), out);
     };

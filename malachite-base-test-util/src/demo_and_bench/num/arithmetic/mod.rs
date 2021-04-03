@@ -11,6 +11,10 @@ pub(crate) fn register(runner: &mut Runner) {
     div_exact::register(runner);
     div_mod::register(runner);
     div_round::register(runner);
+    divisible_by::register(runner);
+    divisible_by_power_of_two::register(runner);
+    eq_mod::register(runner);
+    eq_mod_power_of_two::register(runner);
     sub_mul::register(runner);
     x_mul_y_is_zz::register(runner);
 }
@@ -25,5 +29,9 @@ mod checked_sub_mul;
 mod div_exact;
 mod div_mod;
 mod div_round;
+mod divisible_by;
+mod divisible_by_power_of_two;
+mod eq_mod;
+mod eq_mod_power_of_two;
 mod sub_mul;
 mod x_mul_y_is_zz;

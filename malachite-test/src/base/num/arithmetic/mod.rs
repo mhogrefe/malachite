@@ -1,9 +1,5 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod divisible_by;
-pub mod divisible_by_power_of_two;
-pub mod eq_mod;
-pub mod eq_mod_power_of_two;
 pub mod log_two;
 pub mod mod_add;
 pub mod mod_is_reduced;
@@ -73,10 +69,6 @@ pub mod xxx_sub_yyy_is_zzz;
 pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    divisible_by::register(registry);
-    divisible_by_power_of_two::register(registry);
-    eq_mod::register(registry);
-    eq_mod_power_of_two::register(registry);
     log_two::register(registry);
     mod_add::register(registry);
     mod_is_reduced::register(registry);

@@ -6,21 +6,21 @@ use malachite_nz::integer::Integer;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
-//TODO clean from_str
-
 macro_rules! test_shl_round_signed_helper {
     ($t:ident) => {
         let test = |i, j: $t, rm: RoundingMode, out| {
-            let mut n = Integer::from_str(i).unwrap();
+            let u = Integer::from_str(i).unwrap();
+
+            let mut n = u.clone();
             n.shl_round_assign(j, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
 
-            let n = Integer::from_str(i).unwrap().shl_round(j, rm);
+            let n = u.clone().shl_round(j, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
 
-            let n = &Integer::from_str(i).unwrap().shl_round(j, rm);
+            let n = (&u).shl_round(j, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
         };

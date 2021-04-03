@@ -6,7 +6,7 @@ pub fn test_from_raw_mantissa_and_exponent() {
     fn test<T: PrimitiveFloat>(mantissa: T::UnsignedOfEqualWidth, exponent: u64, x: T) {
         assert_eq!(
             NiceFloat(T::from_raw_mantissa_and_exponent(mantissa, exponent)),
-            x
+            NiceFloat(x)
         );
     }
     test::<f32>(0, 0, 0.0);

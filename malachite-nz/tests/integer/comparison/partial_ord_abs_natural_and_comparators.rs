@@ -4,6 +4,8 @@ use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
 use std::str::FromStr;
 
+//TODO clean from_str
+
 #[test]
 fn test_partial_ord_integer_natural() {
     let test = |x, y, cmp, lt: bool, gt: bool, le: bool, ge: bool| {

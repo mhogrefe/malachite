@@ -9,16 +9,18 @@ use std::str::FromStr;
 macro_rules! test_shr_round_unsigned_helper {
     ($t:ident) => {
         let test = |u, v: $t, rm: RoundingMode, out| {
-            let mut n = Integer::from_str(u).unwrap();
+            let u = Integer::from_str(u).unwrap();
+
+            let mut n = u.clone();
             n.shr_round_assign(v, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
 
-            let n = Integer::from_str(u).unwrap().shr_round(v, rm);
+            let n = u.clone().shr_round(v, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
 
-            let n = &Integer::from_str(u).unwrap().shr_round(v, rm);
+            let n = (&u).shr_round(v, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
         };
@@ -1055,16 +1057,18 @@ fn shr_round_unsigned_fail() {
 macro_rules! test_shr_round_signed_helper {
     ($t:ident) => {
         let test = |i, j: $t, rm: RoundingMode, out| {
-            let mut n = Integer::from_str(i).unwrap();
+            let u = Integer::from_str(i).unwrap();
+
+            let mut n = u.clone();
             n.shr_round_assign(j, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
 
-            let n = Integer::from_str(i).unwrap().shr_round(j, rm);
+            let n = u.clone().shr_round(j, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
 
-            let n = &Integer::from_str(i).unwrap().shr_round(j, rm);
+            let n = (&u).shr_round(j, rm);
             assert_eq!(n.to_string(), out);
             assert!(n.is_valid());
         };

@@ -13,16 +13,18 @@ macro_rules! tests_unsigned {
         #[test]
         fn $test_shr_u() {
             let test = |$u, $v: $t, $out| {
-                let mut n = Integer::from_str($u).unwrap();
+                let u = Integer::from_str($u).unwrap();
+
+                let mut n = u.clone();
                 n >>= $v;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 
-                let n = Integer::from_str($u).unwrap() >> $v;
+                let n = u.clone() >> $v;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 
-                let n = &Integer::from_str($u).unwrap() >> $v;
+                let n = &u >> $v;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 
@@ -139,16 +141,18 @@ macro_rules! tests_signed {
         #[test]
         fn $test_shr_i() {
             let test = |$i, $j: $t, $out| {
-                let mut n = Integer::from_str($i).unwrap();
+                let u = Integer::from_str($i).unwrap();
+
+                let mut n = u.clone();
                 n >>= $j;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 
-                let n = Integer::from_str($i).unwrap() >> $j;
+                let n = u.clone() >> $j;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 
-                let n = &Integer::from_str($i).unwrap() >> $j;
+                let n = &u >> $j;
                 assert_eq!(n.to_string(), $out);
                 assert!(n.is_valid());
 

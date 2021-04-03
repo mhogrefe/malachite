@@ -1350,6 +1350,24 @@ custom_tuples!(
     ]
 );
 custom_tuples!(
+    ExhaustiveQuadruplesXXXY,
+    (X, X, X, Y),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xxxy,
+    exhaustive_quadruples_xxxy_custom_output,
+    [
+        X,
+        I,
+        xs,
+        xs_done,
+        [0, output_type_xs_0],
+        [1, output_type_xs_1],
+        [2, output_type_xs_2]
+    ],
+    [Y, J, ys, ys_done, [3, output_type_ys_3]]
+);
+custom_tuples!(
     ExhaustiveQuadruplesXYYZ,
     (X, Y, Y, Z),
     (None, None, None, None),

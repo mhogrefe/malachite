@@ -33,7 +33,7 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 /// assert_eq!(limbs_divisible_by_limb(&[332, 333], 3), false);
 /// ```
 ///
-/// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.1.2, where a is non-negative and the
+/// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.2.1, where a is non-negative and the
 /// ABOVE_THRESHOLD branch is excluded.
 pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     assert!(ns.len() > 1);
@@ -71,7 +71,7 @@ pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
 /// );
 /// ```
 ///
-/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.1.2, where an >= dn and neither are
+/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
@@ -179,7 +179,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 /// );
 /// ```
 ///
-/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.1.2, where an >= dn and neither are
+/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
@@ -290,7 +290,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
 /// );
 /// ```
 ///
-/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.1.2, where an >= dn and neither are
+/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
@@ -397,7 +397,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 /// );
 /// ```
 ///
-/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.1.2, where an >= dn and neither are
+/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {

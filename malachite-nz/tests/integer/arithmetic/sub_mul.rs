@@ -156,67 +156,48 @@ fn limbs_overflowing_sub_mul_in_place_left_fail_2() {
 
 #[test]
 fn test_sub_mul() {
-    let test = |i, j, k, out| {
-        let mut a = Integer::from_str(i).unwrap();
-        a.sub_mul_assign(Integer::from_str(j).unwrap(), Integer::from_str(k).unwrap());
+    let test = |r, s, t, out| {
+        let u = Integer::from_str(r).unwrap();
+        let v = Integer::from_str(s).unwrap();
+        let w = Integer::from_str(t).unwrap();
+
+        let mut a = u.clone();
+        a.sub_mul_assign(v.clone(), w.clone());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Integer::from_str(i).unwrap();
-        a.sub_mul_assign(
-            Integer::from_str(j).unwrap(),
-            &Integer::from_str(k).unwrap(),
-        );
+        let mut a = u.clone();
+        a.sub_mul_assign(v.clone(), &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Integer::from_str(i).unwrap();
-        a.sub_mul_assign(
-            &Integer::from_str(j).unwrap(),
-            Integer::from_str(k).unwrap(),
-        );
+        let mut a = u.clone();
+        a.sub_mul_assign(&v, w.clone());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Integer::from_str(i).unwrap();
-        a.sub_mul_assign(
-            &Integer::from_str(j).unwrap(),
-            &Integer::from_str(k).unwrap(),
-        );
+        let mut a = u.clone();
+        a.sub_mul_assign(&v, &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Integer::from_str(i)
-            .unwrap()
-            .sub_mul(Integer::from_str(j).unwrap(), Integer::from_str(k).unwrap());
+        let a = u.clone().sub_mul(v.clone(), w.clone());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Integer::from_str(i).unwrap().sub_mul(
-            Integer::from_str(j).unwrap(),
-            &Integer::from_str(k).unwrap(),
-        );
+        let a = u.clone().sub_mul(v.clone(), &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Integer::from_str(i).unwrap().sub_mul(
-            &Integer::from_str(j).unwrap(),
-            Integer::from_str(k).unwrap(),
-        );
+        let a = u.clone().sub_mul(&v, w.clone());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Integer::from_str(i).unwrap().sub_mul(
-            &Integer::from_str(j).unwrap(),
-            &Integer::from_str(k).unwrap(),
-        );
+        let a = u.clone().sub_mul(&v, &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = (&Integer::from_str(i).unwrap()).sub_mul(
-            &Integer::from_str(j).unwrap(),
-            &Integer::from_str(k).unwrap(),
-        );
+        let a = (&u).sub_mul(&v, &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
     };

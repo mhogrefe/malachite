@@ -1,13 +1,16 @@
 #[cfg(not(feature = "32_bit_limbs"))]
 use itertools::Itertools;
+use malachite_base::num::arithmetic::traits::{DivMod, Square};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
-    large_type_gen_var_1, unsigned_vec_pair_gen_var_1, unsigned_vec_pair_gen_var_2,
-    unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2, unsigned_vec_triple_gen_var_24,
-    unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_3, unsigned_vec_unsigned_pair_gen,
-    unsigned_vec_unsigned_unsigned_triple_gen, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+    large_type_gen_var_1, unsigned_pair_gen, unsigned_vec_pair_gen_var_1,
+    unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2,
+    unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_3,
+    unsigned_vec_unsigned_pair_gen, unsigned_vec_unsigned_unsigned_triple_gen,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
 };
 use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
 #[cfg(not(feature = "32_bit_limbs"))]
@@ -47,13 +50,17 @@ use malachite_nz::natural::arithmetic::mul::{
     limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{DoubleLimb, Limb};
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
 use malachite_nz_test_util::generators::{
-    unsigned_vec_triple_gen_var_10, unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12,
-    unsigned_vec_triple_gen_var_13, unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15,
-    unsigned_vec_triple_gen_var_16, unsigned_vec_triple_gen_var_17, unsigned_vec_triple_gen_var_4,
-    unsigned_vec_triple_gen_var_5, unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7,
-    unsigned_vec_triple_gen_var_8, unsigned_vec_triple_gen_var_9,
+    natural_gen, natural_pair_gen, natural_triple_gen, unsigned_vec_triple_gen_var_10,
+    unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13,
+    unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16,
+    unsigned_vec_triple_gen_var_17, unsigned_vec_triple_gen_var_4, unsigned_vec_triple_gen_var_5,
+    unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
+    unsigned_vec_triple_gen_var_9,
 };
 use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
 use num::BigUint;
@@ -20304,4 +20311,79 @@ fn test_mul() {
         9079906337286599226335508424466369316294442004040440528589582239717042654541745348050157252\
         3448224036804997350851153108395928780441635856",
     );
+}
+
+#[test]
+fn mul_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    natural_pair_gen().test_properties(|(x, y)| {
+        let product_val_val = x.clone() * y.clone();
+        let product_val_ref = x.clone() * &y;
+        let product_ref_val = &x * y.clone();
+        let product = &x * &y;
+        assert!(product_val_val.is_valid());
+        assert!(product_val_ref.is_valid());
+        assert!(product_ref_val.is_valid());
+        assert!(product.is_valid());
+        assert_eq!(product_val_val, product);
+        assert_eq!(product_val_ref, product);
+        assert_eq!(product_ref_val, product);
+
+        let mut mut_x = x.clone();
+        mut_x *= y.clone();
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, product);
+
+        let mut mut_x = x.clone();
+        mut_x *= &y;
+        assert_eq!(mut_x, product);
+        assert!(mut_x.is_valid());
+
+        assert_eq!(
+            biguint_to_natural(&(natural_to_biguint(&x) * natural_to_biguint(&y))),
+            product
+        );
+        assert_eq!(
+            rug_integer_to_natural(&(natural_to_rug_integer(&x) * natural_to_rug_integer(&y))),
+            product
+        );
+        assert_eq!(&y * &x, product);
+        if x != 0 {
+            let (q, r) = (&product).div_mod(&x);
+            assert_eq!(q, y);
+            assert_eq!(r, 0);
+        }
+        if y != 0 {
+            let (q, r) = (&product).div_mod(&y);
+            assert_eq!(q, x);
+            assert_eq!(r, 0);
+        }
+        if x != 0 && y != 0 {
+            assert!(product >= x);
+            assert!(product >= y);
+        }
+    });
+
+    unsigned_pair_gen::<Limb>().test_properties(|(x, y)| {
+        assert_eq!(
+            Natural::from(DoubleLimb::from(x) * DoubleLimb::from(y)),
+            Natural::from(x) * Natural::from(y)
+        );
+    });
+
+    natural_gen().test_properties(|ref x| {
+        assert_eq!(x * Natural::ZERO, 0);
+        assert_eq!(Natural::ZERO * x, 0);
+        assert_eq!(x * Natural::ONE, *x);
+        assert_eq!(Natural::ONE * x, *x);
+        assert_eq!(x * x, x.square());
+    });
+
+    natural_triple_gen().test_properties(|(ref x, ref y, ref z)| {
+        assert_eq!((x * y) * z, x * (y * z));
+        assert_eq!(x * (y + z), x * y + x * z);
+        assert_eq!((x + y) * z, x * z + y * z);
+    });
 }

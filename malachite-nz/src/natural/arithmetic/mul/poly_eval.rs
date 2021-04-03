@@ -391,6 +391,8 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     v_neg_2_pow_neg
 }
 
+// T
+
 /// Given a `Natural` whose limbs are `ys`, multiplies the `Natural` by 2<sup>`shift`</sup> and adds
 /// the `Natural` whose limbs are the lowest `ys.len()` limbs of `xs`, writing the lowest `ys.len()`
 /// limbs of the result to those limbs, and returning the highest limb as a carry.

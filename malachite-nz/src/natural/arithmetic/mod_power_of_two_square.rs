@@ -97,7 +97,7 @@ pub fn _limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
 const SQRLO_BASECASE_THRESHOLD: usize = 8;
 
 /// This is MAYBE_range_basecase from mpn/generic/sqrlo.c, GMP 6.1.2.
-const MAYBE_RANGE_BASECASE: bool = TUNE_PROGRAM_BUILD
+const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
     || (if SQRLO_DC_THRESHOLD == 0 {
         SQRLO_BASECASE_THRESHOLD
@@ -106,7 +106,7 @@ const MAYBE_RANGE_BASECASE: bool = TUNE_PROGRAM_BUILD
     }) < SQR_TOOM2_THRESHOLD * 36 / (36 - 11);
 
 /// This is MAYBE_range_toom22 from mpn/generic/sqrlo.c, GMP 6.1.2.
-const MAYBE_RANGE_TOOM22: bool = TUNE_PROGRAM_BUILD
+const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
     || (if SQRLO_DC_THRESHOLD == 0 {
         SQRLO_BASECASE_THRESHOLD
@@ -131,9 +131,10 @@ pub fn _limbs_square_low_divide_and_conquer(out: &mut [Limb], xs: &[Limb], scrat
     assert!(len > 1);
     // We need a fractional approximation of the value 0 < a <= 1/2, giving the minimum in the
     // function k = (1 - a) ^ e / (1 - 2 * a ^ e).
-    let len_small = if MAYBE_RANGE_BASECASE && len < SQR_TOOM2_THRESHOLD * 36 / (36 - 11) {
+    let len_small = if MAYBE_RANGE_BASECASE_MOD_SQUARE && len < SQR_TOOM2_THRESHOLD * 36 / (36 - 11)
+    {
         len >> 1
-    } else if MAYBE_RANGE_TOOM22 && len < SQR_TOOM3_THRESHOLD * 36 / (36 - 11) {
+    } else if MAYBE_RANGE_TOOM22_MOD_SQUARE && len < SQR_TOOM3_THRESHOLD * 36 / (36 - 11) {
         len * 11 / 36 // n1 ~= n*(1-.694...)
     } else if len < SQR_TOOM4_THRESHOLD * 40 / (40 - 9) {
         len * 9 / 40 // n1 ~= n*(1-.775...)

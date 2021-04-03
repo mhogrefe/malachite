@@ -160,6 +160,8 @@ fn limbs_redc_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[Limb]
     limbs_redc(out, xs, ms, is)
 }
 
+// T
+
 #[allow(clippy::absurd_extreme_comparisons, clippy::type_complexity)]
 fn select_fns(
     ms_len: usize,
