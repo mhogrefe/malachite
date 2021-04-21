@@ -12,9 +12,10 @@ pub fn _to_string_base_naive(x: &Natural, base: u64) -> String {
         let mut x = x.clone();
         let mut cs = Vec::new();
         while x != 0 {
-            cs.push(char::from(digit_to_display_byte_lower(u8::wrapping_from(
-                x.div_assign_mod_limb(base),
-            ))));
+            cs.push(char::from(
+                digit_to_display_byte_lower(u8::wrapping_from(x.div_assign_mod_limb(base)))
+                    .unwrap(),
+            ));
         }
         cs.into_iter().rev().collect()
     }

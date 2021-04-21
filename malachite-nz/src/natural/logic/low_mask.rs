@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{ModPowerOfTwoAssign, ShrRound};
+use malachite_base::num::arithmetic::traits::{ModPowerOf2Assign, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
@@ -27,9 +27,7 @@ pub fn limbs_low_mask(bits: u64) -> Vec<Limb> {
     let remaining_bits = bits & Limb::WIDTH_MASK;
     let mut xs = vec![Limb::MAX; usize::exact_from(len)];
     if remaining_bits != 0 {
-        xs.last_mut()
-            .unwrap()
-            .mod_power_of_two_assign(remaining_bits);
+        xs.last_mut().unwrap().mod_power_of_2_assign(remaining_bits);
     }
     xs
 }

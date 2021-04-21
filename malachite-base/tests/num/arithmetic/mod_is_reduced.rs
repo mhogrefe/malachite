@@ -1,4 +1,5 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::unsigned_pair_gen_var_12;
 use std::panic::catch_unwind;
 
 fn mod_is_reduced_helper<T: PrimitiveUnsigned>() {
@@ -25,4 +26,15 @@ fn mod_is_reduced_fail_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn mod_is_reduced_fail() {
     apply_fn_to_unsigneds!(mod_is_reduced_fail_helper);
+}
+
+fn mod_is_reduced_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_12::<T>().test_properties(|(n, m)| {
+        assert_eq!(n.mod_is_reduced(&m), n % m == n);
+    });
+}
+
+#[test]
+fn mod_is_reduced_properties() {
+    apply_fn_to_unsigneds!(mod_is_reduced_properties_helper);
 }

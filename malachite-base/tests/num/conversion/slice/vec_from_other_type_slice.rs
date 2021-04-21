@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::NegModPowerOfTwo;
+use malachite_base::num::arithmetic::traits::NegModPowerOf2;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::VecFromOtherTypeSlice;
 use malachite_base::slices::slice_test_zero;
@@ -38,7 +38,7 @@ fn vec_from_other_type_slice_helper<
         if U::WIDTH >= T::WIDTH {
             assert_eq!(xs_alt, xs);
         } else {
-            let number_of_extra_zeros = xs.len().neg_mod_power_of_two(T::LOG_WIDTH - U::LOG_WIDTH);
+            let number_of_extra_zeros = xs.len().neg_mod_power_of_2(T::LOG_WIDTH - U::LOG_WIDTH);
             let (xs_alt_lo, xs_alt_hi) = xs_alt.split_at(xs.len());
             assert_eq!(xs_alt_hi.len(), number_of_extra_zeros);
             assert_eq!(xs_alt_lo, xs);

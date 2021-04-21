@@ -24,13 +24,13 @@ fn limbs_div_limb_normalized_in_place(ns: &mut [Limb], ns_high: Limb, d: Limb, d
         ns[0] = _div_by_preinversion(ns_high, ns[0], d, d_inv);
         return;
     }
-    let power_of_two = d.wrapping_neg().wrapping_mul(d_inv);
+    let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
     let (mut q_high, mut q_low) = Limb::x_mul_y_is_zz(d_inv, ns_high);
     q_high.wrapping_add_assign(ns_high);
     let second_highest_limb = ns[len - 1];
     ns[len - 1] = q_high;
     let (sum, mut big_carry) = DoubleLimb::join_halves(second_highest_limb, ns[len - 2])
-        .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(ns_high));
+        .overflowing_add(DoubleLimb::from(power_of_2) * DoubleLimb::from(ns_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
         let (t, r) = Limb::x_mul_y_is_zz(sum_high, d_inv);
@@ -38,7 +38,7 @@ fn limbs_div_limb_normalized_in_place(ns: &mut [Limb], ns_high: Limb, d: Limb, d
         q_low = r;
         if big_carry {
             q.wrapping_add_assign(DoubleLimb::join_halves(1, d_inv));
-            let (sum, carry) = sum_low.overflowing_add(power_of_two);
+            let (sum, carry) = sum_low.overflowing_add(power_of_2);
             sum_low = sum;
             if carry {
                 sum_low.wrapping_sub_assign(d);
@@ -49,7 +49,7 @@ fn limbs_div_limb_normalized_in_place(ns: &mut [Limb], ns_high: Limb, d: Limb, d
         ns[j + 1] = q_high;
         assert!(!limbs_slice_add_limb_in_place(&mut ns[j + 2..], q_higher,));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, ns[j])
-            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));
+            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
         big_carry = carry;
@@ -93,12 +93,12 @@ fn limbs_div_limb_normalized_to_out(
         out[0] = _div_by_preinversion(ns_high, ns[0], d, d_inv);
         return;
     }
-    let power_of_two = d.wrapping_neg().wrapping_mul(d_inv);
+    let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
     let (mut q_high, mut q_low) = Limb::x_mul_y_is_zz(d_inv, ns_high);
     q_high.wrapping_add_assign(ns_high);
     out[len - 1] = q_high;
     let (sum, mut big_carry) = DoubleLimb::join_halves(ns[len - 1], ns[len - 2])
-        .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(ns_high));
+        .overflowing_add(DoubleLimb::from(power_of_2) * DoubleLimb::from(ns_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
         let (t, r) = Limb::x_mul_y_is_zz(sum_high, d_inv);
@@ -106,7 +106,7 @@ fn limbs_div_limb_normalized_to_out(
         q_low = r;
         if big_carry {
             q.wrapping_add_assign(DoubleLimb::join_halves(1, d_inv));
-            let (sum, carry) = sum_low.overflowing_add(power_of_two);
+            let (sum, carry) = sum_low.overflowing_add(power_of_2);
             sum_low = sum;
             if carry {
                 sum_low.wrapping_sub_assign(d);
@@ -117,7 +117,7 @@ fn limbs_div_limb_normalized_to_out(
         out[j + 1] = q_high;
         assert!(!limbs_slice_add_limb_in_place(&mut out[j + 2..], q_higher,));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, ns[j])
-            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));
+            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
         big_carry = carry;

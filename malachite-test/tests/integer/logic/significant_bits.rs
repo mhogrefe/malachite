@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{Abs, PowerOfTwo};
+use malachite_base::num::arithmetic::traits::{Abs, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -28,8 +28,8 @@ fn significant_bits_properties() {
         let x_abs = x.abs();
         assert_eq!(x_abs <= Limb::MAX, significant_bits <= Limb::WIDTH);
         if x_abs != 0 {
-            assert!(Natural::power_of_two(significant_bits - 1) <= x_abs);
-            assert!(x_abs < Natural::power_of_two(significant_bits));
+            assert!(Natural::power_of_2(significant_bits - 1) <= x_abs);
+            assert!(x_abs < Natural::power_of_2(significant_bits));
         }
     });
 

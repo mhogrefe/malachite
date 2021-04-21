@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitIterable, SignificantBits};
@@ -148,7 +148,7 @@ impl<'a> DoubleEndedIterator for NaturalBitIterator<'a> {
             let bit = self.current_limb_back & self.j_mask != 0;
             self.j_mask >>= 1;
             if self.j_mask == 0 {
-                self.j_mask = Limb::power_of_two(Limb::WIDTH - 1);
+                self.j_mask = Limb::power_of_2(Limb::WIDTH - 1);
                 if let Some(next_back) = self.limbs.next_back() {
                     self.current_limb_back = next_back;
                 } else {
@@ -256,9 +256,9 @@ impl<'a> BitIterable for &'a Natural {
             current_limb_back: 0,
             i_mask: 1,
             j_mask: if remainder != 0 {
-                Limb::power_of_two(remainder - 1)
+                Limb::power_of_2(remainder - 1)
             } else {
-                Limb::power_of_two(Limb::WIDTH - 1)
+                Limb::power_of_2(Limb::WIDTH - 1)
             },
         };
         if let Some(next) = bits.limbs.next() {

@@ -1,6 +1,6 @@
 use comparison::traits::{Max, Min};
 use named::Named;
-use num::arithmetic::traits::{ModPowerOfTwo, NegAssign};
+use num::arithmetic::traits::{ModPowerOf2, NegAssign};
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::{NegativeOne, One, Two, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -146,7 +146,7 @@ pub trait PrimitiveFloat:
 
     fn raw_exponent(self) -> u64 {
         let exponent: u64 = (self.to_bits() >> Self::MANTISSA_WIDTH).exact_into();
-        exponent.mod_power_of_two(Self::EXPONENT_WIDTH)
+        exponent.mod_power_of_2(Self::EXPONENT_WIDTH)
     }
 
     fn exponent(self) -> i64 {
@@ -157,9 +157,9 @@ pub trait PrimitiveFloat:
 
     fn raw_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, u64) {
         let bits = self.to_bits();
-        let mantissa = bits.mod_power_of_two(Self::MANTISSA_WIDTH);
+        let mantissa = bits.mod_power_of_2(Self::MANTISSA_WIDTH);
         let exponent: u64 = (bits >> Self::MANTISSA_WIDTH).exact_into();
-        let exponent = exponent.mod_power_of_two(Self::EXPONENT_WIDTH);
+        let exponent = exponent.mod_power_of_2(Self::EXPONENT_WIDTH);
         (mantissa, exponent)
     }
 

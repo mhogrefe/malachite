@@ -44,6 +44,7 @@ impl<T> BaseFmtWrapper<T> {
     }
 }
 
+pub mod from_string;
 /// This module contains trait implementations for converting numbers to strings.
 ///
 /// Here are usage examples of the macro-generated functions:

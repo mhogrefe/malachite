@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
@@ -62,7 +62,7 @@ fn set_bit_properties() {
         rug_n.set_bit(u32::exact_from(index), true);
         assert_eq!(rug_integer_to_natural(&rug_n), result);
 
-        assert_eq!(n | Natural::power_of_two(index), result);
+        assert_eq!(n | Natural::power_of_2(index), result);
 
         assert_ne!(result, 0);
         assert!(result >= *n);

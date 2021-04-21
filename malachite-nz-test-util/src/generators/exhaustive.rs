@@ -1,5 +1,5 @@
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, PowerOfTwo};
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -106,7 +106,7 @@ pub fn exhaustive_natural_pair_gen() -> It<(Natural, Natural)> {
 
 pub fn exhaustive_natural_pair_gen_var_1() -> It<(Natural, Natural)> {
     Box::new(exhaustive_pairs(
-        exhaustive_natural_range_to_infinity(Natural::power_of_two(Limb::WIDTH)),
+        exhaustive_natural_range_to_infinity(Natural::power_of_2(Limb::WIDTH)),
         exhaustive_natural_range_to_infinity(Natural::TWO),
     ))
 }
@@ -201,7 +201,7 @@ pub fn exhaustive_natural_vec_natural_pair_gen_var_1() -> It<(Vec<Natural>, Natu
             BitDistributorOutputType::normal(1),
             BitDistributorOutputType::normal(1),
         ),
-        exhaustive_natural_range_to_infinity(Natural::power_of_two(Limb::WIDTH)),
+        exhaustive_natural_range_to_infinity(Natural::power_of_2(Limb::WIDTH)),
         ValidDigitsGenerator,
     )))
 }

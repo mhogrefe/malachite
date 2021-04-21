@@ -185,32 +185,32 @@ pub mod num {
         pub mod div_mod;
         pub mod div_round;
         pub mod divisible_by;
-        pub mod divisible_by_power_of_two;
+        pub mod divisible_by_power_of_2;
         pub mod eq_mod;
-        pub mod eq_mod_power_of_two;
-        pub mod log_two;
+        pub mod eq_mod_power_of_2;
+        pub mod log_base_2;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_mul;
         pub mod mod_neg;
         pub mod mod_op;
         pub mod mod_pow;
-        pub mod mod_power_of_two;
-        pub mod mod_power_of_two_add;
-        pub mod mod_power_of_two_is_reduced;
-        pub mod mod_power_of_two_mul;
-        pub mod mod_power_of_two_neg;
-        pub mod mod_power_of_two_pow;
-        pub mod mod_power_of_two_shl;
-        pub mod mod_power_of_two_shr;
-        pub mod mod_power_of_two_square;
-        pub mod mod_power_of_two_sub;
+        pub mod mod_power_of_2;
+        pub mod mod_power_of_2_add;
+        pub mod mod_power_of_2_is_reduced;
+        pub mod mod_power_of_2_mul;
+        pub mod mod_power_of_2_neg;
+        pub mod mod_power_of_2_pow;
+        pub mod mod_power_of_2_shl;
+        pub mod mod_power_of_2_shr;
+        pub mod mod_power_of_2_square;
+        pub mod mod_power_of_2_sub;
         pub mod mod_shl;
         pub mod mod_shr;
         pub mod mod_square;
         pub mod mod_sub;
         pub mod neg;
-        pub mod next_power_of_two;
+        pub mod next_power_of_2;
         pub mod overflowing_abs;
         pub mod overflowing_add;
         pub mod overflowing_add_mul;
@@ -223,9 +223,9 @@ pub mod num {
         pub mod overflowing_sub_mul;
         pub mod parity;
         pub mod pow;
-        pub mod power_of_two;
+        pub mod power_of_2;
         pub mod round_to_multiple;
-        pub mod round_to_multiple_of_power_of_two;
+        pub mod round_to_multiple_of_power_of_2;
         pub mod saturating_abs;
         pub mod saturating_add;
         pub mod saturating_add_mul;
@@ -272,10 +272,10 @@ pub mod num {
                 pub mod from_digits;
                 pub mod to_digits;
             }
-            pub mod power_of_two_digits {
-                pub mod from_power_of_two_digits;
-                pub mod power_of_two_digit_iterable;
-                pub mod to_power_of_two_digits;
+            pub mod power_of_2_digits {
+                pub mod from_power_of_2_digits;
+                pub mod power_of_2_digit_iterable;
+                pub mod to_power_of_2_digits;
             }
         }
         pub mod froms {
@@ -298,6 +298,7 @@ pub mod num {
             pub mod vec_from_other_type_slice;
         }
         pub mod string {
+            pub mod from_string;
             pub mod to_string;
         }
     }
@@ -400,12 +401,22 @@ pub mod num {
             pub mod geometric_random_unsigneds;
             pub mod mean;
         }
+        pub mod random_finite_primitive_floats;
         pub mod random_highest_bit_set_unsigneds;
         pub mod random_natural_signeds;
+        pub mod random_negative_finite_primitive_floats;
+        pub mod random_negative_primitive_floats;
         pub mod random_negative_signeds;
+        pub mod random_nonzero_finite_primitive_floats;
+        pub mod random_nonzero_primitive_floats;
         pub mod random_nonzero_signeds;
+        pub mod random_positive_finite_primitive_floats;
+        pub mod random_positive_primitive_floats;
         pub mod random_positive_signeds;
         pub mod random_positive_unsigneds;
+        pub mod random_primitive_float_inclusive_range;
+        pub mod random_primitive_float_range;
+        pub mod random_primitive_floats;
         pub mod random_primitive_ints;
         pub mod random_signed_bit_chunks;
         pub mod random_signed_inclusive_range;

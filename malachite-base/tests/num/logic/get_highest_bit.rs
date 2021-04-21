@@ -14,7 +14,7 @@ pub fn test_get_highest_bit() {
 
 fn get_highest_bit_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_gen::<T>().test_properties(|u| {
-        assert_eq!(u.get_highest_bit(), u >= T::power_of_two(T::WIDTH - 1));
+        assert_eq!(u.get_highest_bit(), u >= T::power_of_2(T::WIDTH - 1));
     });
 }
 

@@ -25,95 +25,109 @@
 /// ```
 /// use malachite_base::num::conversion::traits::Digits;
 ///
-/// assert_eq!(u8::from_digits_asc(&64, [0u64, 0, 0].iter().cloned()), 0);
+/// assert_eq!(u8::from_digits_asc(&64, [0u64, 0, 0].iter().cloned()), Some(0));
 /// assert_eq!(
 ///     u32::from_digits_asc(&3, [0u64, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2].iter().cloned()),
-///     123456
+///     Some(123456)
 /// );
-/// assert_eq!(u32::from_digits_asc(&8, [3u16, 7, 1].iter().cloned()), 123);
+/// assert_eq!(u32::from_digits_asc(&8, [3u16, 7, 1].iter().cloned()), Some(123));
+///
+/// assert!(u64::from_digits_asc(&64, [1u8; 1000].iter().cloned()).is_none());
+/// assert!(u64::from_digits_asc(&2, [2u8].iter().cloned()).is_none());
+/// assert!(u8::from_digits_asc(&1000, [1u16, 2, 3].iter().cloned()).is_none());
 /// ```
 ///
 /// # from_digits_desc
 /// ```
 /// use malachite_base::num::conversion::traits::Digits;
 ///
-/// assert_eq!(u8::from_digits_desc(&64, [0u64, 0, 0].iter().cloned()), 0);
+/// assert_eq!(u8::from_digits_desc(&64, [0u64, 0, 0].iter().cloned()), Some(0));
 /// assert_eq!(
 ///     u32::from_digits_desc(&3, [2u64, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0].iter().cloned()),
-///     123456
+///     Some(123456)
 /// );
-/// assert_eq!(u32::from_digits_desc(&8, [1u16, 7, 3].iter().cloned()), 123);
+/// assert_eq!(u32::from_digits_desc(&8, [1u16, 7, 3].iter().cloned()), Some(123));
+///
+/// assert!(u64::from_digits_desc(&64, [1u8; 1000].iter().cloned()).is_none());
+/// assert!(u64::from_digits_desc(&2, [2u8].iter().cloned()).is_none());
+/// assert!(u8::from_digits_desc(&1000, [1u16, 2, 3].iter().cloned()).is_none());
 /// ```
 pub mod general_digits;
 /// This module provides a double-ended iterator for iterating over a number's digits, if the base
-/// is a power of two.
+/// is a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # power_of_two_digits
+/// # power_of_2_digits
 /// ```
 /// extern crate itertools;
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::num::conversion::digits::power_of_two_digit_iterable::*;
-/// use malachite_base::num::conversion::traits::PowerOfTwoDigitIterable;
+/// use malachite_base::num::conversion::digits::power_of_2_digit_iterable::*;
+/// use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
 ///
-/// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(0u8, 2);
+/// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(0u8, 2);
 /// assert!(digits.next().is_none());
 ///
 /// // 107 = 1101011b
-/// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
+/// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
 /// assert_eq!(digits.collect_vec(), &[3, 2, 2, 1]);
 ///
-/// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(0u8, 2);
+/// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(0u8, 2);
 /// assert!(digits.next_back().is_none());
 ///
 /// // 107 = 1101011b
-/// let mut digits = PowerOfTwoDigitIterable::<u8>::power_of_two_digits(107u32, 2);
+/// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(107u32, 2);
 /// assert_eq!(digits.rev().collect_vec(), &[1, 2, 2, 3]);
 /// ```
-pub mod power_of_two_digit_iterable;
+pub mod power_of_2_digit_iterable;
 /// This module provides traits for extracting digits from numbers and constructing numbers from
-/// digits, where the base is a power of two.
+/// digits, where the base is a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # to_power_of_two_digits_asc
+/// # to_power_of_2_digits_asc
 /// ```
-/// use malachite_base::num::conversion::traits::PowerOfTwoDigits;
+/// use malachite_base::num::conversion::traits::PowerOf2Digits;
 ///
-/// assert_eq!(PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&0u8, 6), &[]);
-/// assert_eq!(PowerOfTwoDigits::<u64>::to_power_of_two_digits_asc(&2u16, 6), &[2]);
+/// assert_eq!(PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&0u8, 6), &[]);
+/// assert_eq!(PowerOf2Digits::<u64>::to_power_of_2_digits_asc(&2u16, 6), &[2]);
 /// // 123_10 = 173_8
-/// assert_eq!(PowerOfTwoDigits::<u16>::to_power_of_two_digits_asc(&123u32, 3), &[3, 7, 1]);
+/// assert_eq!(PowerOf2Digits::<u16>::to_power_of_2_digits_asc(&123u32, 3), &[3, 7, 1]);
 /// ```
 ///
-/// # to_power_of_two_digits_desc
+/// # to_power_of_2_digits_desc
 /// ```
-/// use malachite_base::num::conversion::traits::PowerOfTwoDigits;
+/// use malachite_base::num::conversion::traits::PowerOf2Digits;
 ///
-/// assert_eq!(PowerOfTwoDigits::<u64>::to_power_of_two_digits_desc(&0u8, 6), &[]);
-/// assert_eq!(PowerOfTwoDigits::<u64>::to_power_of_two_digits_desc(&2u16, 6), &[2]);
+/// assert_eq!(PowerOf2Digits::<u64>::to_power_of_2_digits_desc(&0u8, 6), &[]);
+/// assert_eq!(PowerOf2Digits::<u64>::to_power_of_2_digits_desc(&2u16, 6), &[2]);
 /// // 123_10 = 173_8
-/// assert_eq!(PowerOfTwoDigits::<u16>::to_power_of_two_digits_desc(&123u32, 3), &[1, 7, 3]);
+/// assert_eq!(PowerOf2Digits::<u16>::to_power_of_2_digits_desc(&123u32, 3), &[1, 7, 3]);
 /// ```
 ///
-/// # from_power_of_two_digits_asc
+/// # from_power_of_2_digits_asc
 /// ```
-/// use malachite_base::num::conversion::traits::PowerOfTwoDigits;
+/// use malachite_base::num::conversion::traits::PowerOf2Digits;
 ///
-/// assert_eq!(u8::from_power_of_two_digits_asc(6, [0u64, 0, 0].iter().cloned()), 0);
-/// assert_eq!(u16::from_power_of_two_digits_asc(6, [2u64, 0].iter().cloned()), 2);
-/// assert_eq!(u32::from_power_of_two_digits_asc(3, [3u16, 7, 1].iter().cloned()), 123);
+/// assert_eq!(u8::from_power_of_2_digits_asc(6, [0u64, 0, 0].iter().cloned()), Some(0));
+/// assert_eq!(u16::from_power_of_2_digits_asc(6, [2u64, 0].iter().cloned()), Some(2));
+/// assert_eq!(u32::from_power_of_2_digits_asc(3, [3u16, 7, 1].iter().cloned()), Some(123));
+///
+/// assert!(u8::from_power_of_2_digits_asc(4, [1u64; 100].iter().cloned()).is_none());
+/// assert!(u8::from_power_of_2_digits_asc(1, [2u64].iter().cloned()).is_none());
 /// ```
 ///
-/// # from_power_of_two_digits_desc
+/// # from_power_of_2_digits_desc
 /// ```
-/// use malachite_base::num::conversion::traits::PowerOfTwoDigits;
+/// use malachite_base::num::conversion::traits::PowerOf2Digits;
 ///
-/// assert_eq!(u8::from_power_of_two_digits_desc(6, [0u64, 0, 0].iter().cloned()), 0);
-/// assert_eq!(u16::from_power_of_two_digits_desc(6, [0u64, 2].iter().cloned()), 2);
-/// assert_eq!(u32::from_power_of_two_digits_desc(3, [1u16, 7, 3].iter().cloned()), 123);
+/// assert_eq!(u8::from_power_of_2_digits_desc(6, [0u64, 0, 0].iter().cloned()), Some(0));
+/// assert_eq!(u16::from_power_of_2_digits_desc(6, [0u64, 2].iter().cloned()), Some(2));
+/// assert_eq!(u32::from_power_of_2_digits_desc(3, [1u16, 7, 3].iter().cloned()), Some(123));
+///
+/// assert!(u8::from_power_of_2_digits_desc(4, [1u64; 100].iter().cloned()).is_none());
+/// assert!(u8::from_power_of_2_digits_desc(1, [2u64].iter().cloned()).is_none());
 /// ```
-pub mod power_of_two_digits;
+pub mod power_of_2_digits;

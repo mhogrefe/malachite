@@ -1,5 +1,5 @@
 use num::arithmetic::traits::{
-    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, Parity, PowerOfTwo,
+    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, Parity, PowerOf2,
     WrappingSubAssign,
 };
 use num::basic::integers::PrimitiveInt;
@@ -71,8 +71,8 @@ const INVERT_U32_TABLE: [u32; INVERT_U32_TABLE_SIZE] = [
 /// ```
 pub fn test_invert_u32_table() {
     for (i, &x) in INVERT_U32_TABLE.iter().enumerate() {
-        let value = (u32::power_of_two(24) - u32::power_of_two(14) + u32::power_of_two(9))
-            / (u32::power_of_two(9) + u32::exact_from(i));
+        let value = (u32::power_of_2(24) - u32::power_of_2(14) + u32::power_of_2(9))
+            / (u32::power_of_2(9) + u32::exact_from(i));
         assert_eq!(
             x, value,
             "INVERT_U32_TABLE gives incorrect value, {}, for index {}",
@@ -137,8 +137,8 @@ const INVERT_U64_TABLE: [u64; INVERT_U64_TABLE_SIZE] = [
 /// ```
 pub fn test_invert_u64_table() {
     for (i, &x) in INVERT_U64_TABLE.iter().enumerate() {
-        let value = (u64::power_of_two(19) - 3 * u64::power_of_two(8))
-            / (u64::power_of_two(8) + u64::exact_from(i));
+        let value = (u64::power_of_2(19) - 3 * u64::power_of_2(8))
+            / (u64::power_of_2(8) + u64::exact_from(i));
         assert_eq!(
             x, value,
             "INVERT_U64_TABLE gives incorrect value, {}, for index {}",
@@ -155,7 +155,7 @@ pub fn _limbs_invert_limb_u64(x: u64) -> u64 {
     let a = (x >> 24) + 1;
     let b = INVERT_U64_TABLE[usize::exact_from(x << 1 >> 56)];
     let c = (b << 11).wrapping_sub(((b * b).wrapping_mul(a) >> 40) + 1);
-    let d = (c.wrapping_mul(u64::power_of_two(60).wrapping_sub(c.wrapping_mul(a))) >> 47)
+    let d = (c.wrapping_mul(u64::power_of_2(60).wrapping_sub(c.wrapping_mul(a))) >> 47)
         .wrapping_add(c << 13);
     let mut e = d.wrapping_mul(x >> 1).wrapping_neg();
     if x.odd() {

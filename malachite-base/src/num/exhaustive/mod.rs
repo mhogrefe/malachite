@@ -1,6 +1,6 @@
 use iterators::{nonzero_values, NonzeroValues};
 use itertools::{Interleave, Itertools};
-use num::arithmetic::traits::{PowerOfTwo, RoundToMultipleOfPowerOfTwo};
+use num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2};
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{One, Zero};
@@ -1151,11 +1151,11 @@ pub fn exhaustive_primitive_floats_with_exponent_and_precision<T: PrimitiveFloat
     assert_ne!(precision, 0);
     let max_precision = T::max_precision_for_exponent(exponent);
     assert!(precision <= max_precision);
-    let increment = T::UnsignedOfEqualWidth::power_of_two(max_precision - precision + 1);
+    let increment = T::UnsignedOfEqualWidth::power_of_2(max_precision - precision + 1);
     let first_mantissa = if precision == 1 {
         T::UnsignedOfEqualWidth::ONE
     } else {
-        T::UnsignedOfEqualWidth::power_of_two(precision - 1) | T::UnsignedOfEqualWidth::ONE
+        T::UnsignedOfEqualWidth::power_of_2(precision - 1) | T::UnsignedOfEqualWidth::ONE
     };
     let first = T::from_adjusted_mantissa_and_exponent(
         first_mantissa,
@@ -1166,7 +1166,7 @@ pub fn exhaustive_primitive_floats_with_exponent_and_precision<T: PrimitiveFloat
     let count = if precision == 1 {
         T::UnsignedOfEqualWidth::ONE
     } else {
-        T::UnsignedOfEqualWidth::power_of_two(precision - 2)
+        T::UnsignedOfEqualWidth::power_of_2(precision - 2)
     };
     ConstantPrecisionPrimitiveFloats {
         n: first,
@@ -1635,7 +1635,7 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates all nonzero primitive floats.
 ///
-/// Positive and negative zero are both excluded.
+/// Positive and negative zero are both excluded. NaN is excluded as well.
 ///
 /// Roughly speaking, the simplest floats are generated first. If you want to generate the floats in
 /// ascending order instead, use `nonzero_primitive_floats_increasing`.
@@ -1765,17 +1765,17 @@ pub fn exhaustive_primitive_floats_with_exponent_and_precision_in_range<T: Primi
         };
     }
     let trailing_zeros = max_precision - precision;
-    let increment = T::UnsignedOfEqualWidth::power_of_two(trailing_zeros + 1);
-    let mut start_mantissa = am.round_to_multiple_of_power_of_two(trailing_zeros, RoundingMode::Up);
+    let increment = T::UnsignedOfEqualWidth::power_of_2(trailing_zeros + 1);
+    let mut start_mantissa = am.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Up);
     if !start_mantissa.get_bit(trailing_zeros) {
         start_mantissa.set_bit(trailing_zeros);
     }
     if start_mantissa > bm {
         return ConstantPrecisionPrimitiveFloats::default();
     }
-    let mut end_mantissa = bm.round_to_multiple_of_power_of_two(trailing_zeros, RoundingMode::Down);
+    let mut end_mantissa = bm.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Down);
     if !end_mantissa.get_bit(trailing_zeros) {
-        let adjust = T::UnsignedOfEqualWidth::power_of_two(trailing_zeros);
+        let adjust = T::UnsignedOfEqualWidth::power_of_2(trailing_zeros);
         if adjust > end_mantissa {
             return ConstantPrecisionPrimitiveFloats::default();
         }

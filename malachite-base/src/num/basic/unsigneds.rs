@@ -1,33 +1,32 @@
 use num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogTwo, CheckedLogTwo, CheckedNextPowerOfTwo,
-    FloorLogTwo, IsPowerOfTwo, ModAdd, ModAddAssign, ModIsReduced, ModMul, ModMulAssign,
-    ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign,
-    ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOfTwo, ModPowerOfTwoAdd,
-    ModPowerOfTwoAddAssign, ModPowerOfTwoIsReduced, ModPowerOfTwoMul, ModPowerOfTwoMulAssign,
-    ModPowerOfTwoNeg, ModPowerOfTwoNegAssign, ModPowerOfTwoPow, ModPowerOfTwoPowAssign,
-    ModPowerOfTwoShl, ModPowerOfTwoShlAssign, ModPowerOfTwoShr, ModPowerOfTwoShrAssign,
-    ModPowerOfTwoSquare, ModPowerOfTwoSquareAssign, ModPowerOfTwoSub, ModPowerOfTwoSubAssign,
-    ModSquare, ModSquareAssign, ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub,
-    ModSubAssign, NegMod, NegModAssign, NegModPowerOfTwo, NegModPowerOfTwoAssign, NextPowerOfTwo,
-    NextPowerOfTwoAssign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
-    XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase2, CheckedLogBase2,
+    CheckedNextPowerOf2, FloorLogBase2, IsPowerOf2, ModAdd, ModAddAssign, ModIsReduced, ModMul,
+    ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow,
+    ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add,
+    ModPowerOf2AddAssign, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign,
+    ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
+    ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Square,
+    ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
+    ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
+    NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, XMulYIsZZ, XXAddYYIsZZ,
+    XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{
-    FromOtherTypeSlice, PowerOfTwoDigitIterable, PowerOfTwoDigits, VecFromOtherType,
+    FromOtherTypeSlice, PowerOf2DigitIterable, PowerOf2Digits, VecFromOtherType,
     VecFromOtherTypeSlice,
 };
 use num::logic::traits::HammingDistance;
 
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:
-    CeilingLogTwo
+    CeilingLogBase2
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
     + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
-    + CheckedLogTwo
-    + CheckedNextPowerOfTwo<Output = Self>
-    + FloorLogTwo
+    + CheckedLogBase2
+    + CheckedNextPowerOf2<Output = Self>
+    + FloorLogBase2
     + From<u8>
     + FromOtherTypeSlice<u8>
     + FromOtherTypeSlice<u16>
@@ -36,7 +35,7 @@ pub trait PrimitiveUnsigned:
     + FromOtherTypeSlice<u128>
     + FromOtherTypeSlice<usize>
     + HammingDistance
-    + IsPowerOfTwo
+    + IsPowerOf2
     + ModIsReduced<Self>
     + ModAdd<Self, Self, Output = Self>
     + ModAddAssign<Self, Self>
@@ -48,53 +47,53 @@ pub trait PrimitiveUnsigned:
     + ModNegAssign<Self>
     + ModPow<u64, Self, Output = Self>
     + ModPowAssign<u64, Self>
-    + ModPowerOfTwo<Output = Self>
-    + ModPowerOfTwoAdd<Self, Output = Self>
-    + ModPowerOfTwoAddAssign<Self>
-    + ModPowerOfTwoIsReduced
-    + ModPowerOfTwoMul<Self, Output = Self>
-    + ModPowerOfTwoMulAssign<Self>
-    + ModPowerOfTwoNeg<Output = Self>
-    + ModPowerOfTwoNegAssign
-    + ModPowerOfTwoPow<u64, Output = Self>
-    + ModPowerOfTwoPowAssign<u64>
-    + ModPowerOfTwoShl<i8, Output = Self>
-    + ModPowerOfTwoShl<i16, Output = Self>
-    + ModPowerOfTwoShl<i32, Output = Self>
-    + ModPowerOfTwoShl<i64, Output = Self>
-    + ModPowerOfTwoShl<i128, Output = Self>
-    + ModPowerOfTwoShl<u8, Output = Self>
-    + ModPowerOfTwoShl<u16, Output = Self>
-    + ModPowerOfTwoShl<u32, Output = Self>
-    + ModPowerOfTwoShl<u64, Output = Self>
-    + ModPowerOfTwoShl<u128, Output = Self>
-    + ModPowerOfTwoShlAssign<u8>
-    + ModPowerOfTwoShlAssign<u16>
-    + ModPowerOfTwoShlAssign<u32>
-    + ModPowerOfTwoShlAssign<u64>
-    + ModPowerOfTwoShlAssign<u128>
-    + ModPowerOfTwoShlAssign<usize>
-    + ModPowerOfTwoShlAssign<i8>
-    + ModPowerOfTwoShlAssign<i16>
-    + ModPowerOfTwoShlAssign<i32>
-    + ModPowerOfTwoShlAssign<i64>
-    + ModPowerOfTwoShlAssign<i128>
-    + ModPowerOfTwoShlAssign<isize>
-    + ModPowerOfTwoShr<i8, Output = Self>
-    + ModPowerOfTwoShr<i16, Output = Self>
-    + ModPowerOfTwoShr<i32, Output = Self>
-    + ModPowerOfTwoShr<i64, Output = Self>
-    + ModPowerOfTwoShr<i128, Output = Self>
-    + ModPowerOfTwoShrAssign<i8>
-    + ModPowerOfTwoShrAssign<i16>
-    + ModPowerOfTwoShrAssign<i32>
-    + ModPowerOfTwoShrAssign<i64>
-    + ModPowerOfTwoShrAssign<i128>
-    + ModPowerOfTwoShrAssign<isize>
-    + ModPowerOfTwoSquare<Output = Self>
-    + ModPowerOfTwoSquareAssign
-    + ModPowerOfTwoSub<Self, Output = Self>
-    + ModPowerOfTwoSubAssign<Self>
+    + ModPowerOf2<Output = Self>
+    + ModPowerOf2Add<Self, Output = Self>
+    + ModPowerOf2AddAssign<Self>
+    + ModPowerOf2IsReduced
+    + ModPowerOf2Mul<Self, Output = Self>
+    + ModPowerOf2MulAssign<Self>
+    + ModPowerOf2Neg<Output = Self>
+    + ModPowerOf2NegAssign
+    + ModPowerOf2Pow<u64, Output = Self>
+    + ModPowerOf2PowAssign<u64>
+    + ModPowerOf2Shl<i8, Output = Self>
+    + ModPowerOf2Shl<i16, Output = Self>
+    + ModPowerOf2Shl<i32, Output = Self>
+    + ModPowerOf2Shl<i64, Output = Self>
+    + ModPowerOf2Shl<i128, Output = Self>
+    + ModPowerOf2Shl<u8, Output = Self>
+    + ModPowerOf2Shl<u16, Output = Self>
+    + ModPowerOf2Shl<u32, Output = Self>
+    + ModPowerOf2Shl<u64, Output = Self>
+    + ModPowerOf2Shl<u128, Output = Self>
+    + ModPowerOf2ShlAssign<u8>
+    + ModPowerOf2ShlAssign<u16>
+    + ModPowerOf2ShlAssign<u32>
+    + ModPowerOf2ShlAssign<u64>
+    + ModPowerOf2ShlAssign<u128>
+    + ModPowerOf2ShlAssign<usize>
+    + ModPowerOf2ShlAssign<i8>
+    + ModPowerOf2ShlAssign<i16>
+    + ModPowerOf2ShlAssign<i32>
+    + ModPowerOf2ShlAssign<i64>
+    + ModPowerOf2ShlAssign<i128>
+    + ModPowerOf2ShlAssign<isize>
+    + ModPowerOf2Shr<i8, Output = Self>
+    + ModPowerOf2Shr<i16, Output = Self>
+    + ModPowerOf2Shr<i32, Output = Self>
+    + ModPowerOf2Shr<i64, Output = Self>
+    + ModPowerOf2Shr<i128, Output = Self>
+    + ModPowerOf2ShrAssign<i8>
+    + ModPowerOf2ShrAssign<i16>
+    + ModPowerOf2ShrAssign<i32>
+    + ModPowerOf2ShrAssign<i64>
+    + ModPowerOf2ShrAssign<i128>
+    + ModPowerOf2ShrAssign<isize>
+    + ModPowerOf2Square<Output = Self>
+    + ModPowerOf2SquareAssign
+    + ModPowerOf2Sub<Self, Output = Self>
+    + ModPowerOf2SubAssign<Self>
     + ModPowPrecomputed<u64, Self, Output = Self>
     + ModPowPrecomputedAssign<u64, Self>
     + ModSquare<Self, Output = Self>
@@ -105,22 +104,22 @@ pub trait PrimitiveUnsigned:
     + ModSubAssign<Self, Self>
     + NegMod<Self, Output = Self>
     + NegModAssign<Self>
-    + NegModPowerOfTwo<Output = Self>
-    + NegModPowerOfTwoAssign
-    + NextPowerOfTwo<Output = Self>
-    + NextPowerOfTwoAssign
-    + PowerOfTwoDigits<u8>
-    + PowerOfTwoDigits<u16>
-    + PowerOfTwoDigits<u32>
-    + PowerOfTwoDigits<u64>
-    + PowerOfTwoDigits<u128>
-    + PowerOfTwoDigits<usize>
-    + PowerOfTwoDigitIterable<u8>
-    + PowerOfTwoDigitIterable<u16>
-    + PowerOfTwoDigitIterable<u32>
-    + PowerOfTwoDigitIterable<u64>
-    + PowerOfTwoDigitIterable<u128>
-    + PowerOfTwoDigitIterable<usize>
+    + NegModPowerOf2<Output = Self>
+    + NegModPowerOf2Assign
+    + NextPowerOf2<Output = Self>
+    + NextPowerOf2Assign
+    + PowerOf2Digits<u8>
+    + PowerOf2Digits<u16>
+    + PowerOf2Digits<u32>
+    + PowerOf2Digits<u64>
+    + PowerOf2Digits<u128>
+    + PowerOf2Digits<usize>
+    + PowerOf2DigitIterable<u8>
+    + PowerOf2DigitIterable<u16>
+    + PowerOf2DigitIterable<u32>
+    + PowerOf2DigitIterable<u64>
+    + PowerOf2DigitIterable<u128>
+    + PowerOf2DigitIterable<usize>
     + PrimitiveInt
     + VecFromOtherType<u8>
     + VecFromOtherType<u16>

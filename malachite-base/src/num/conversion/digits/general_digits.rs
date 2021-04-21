@@ -1,7 +1,9 @@
 use itertools::Itertools;
-use num::arithmetic::traits::{CheckedAdd, CheckedLogTwo, CheckedMul, DivAssignMod};
+use num::arithmetic::traits::{CheckedAdd, CheckedLogBase2, CheckedMul, DivAssignMod};
 use num::basic::traits::{One, Zero};
-use num::conversion::traits::{ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, WrappingFrom};
+use num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, WrappingFrom,
+};
 use std::cmp::Ord;
 
 pub fn _unsigned_to_digits_asc_naive<
@@ -27,9 +29,9 @@ fn _to_digits_asc<
         + DivAssignMod<T, ModOutput = T>
         + Eq
         + ExactFrom<U>
-        + PowerOfTwoDigits<U>
+        + PowerOf2Digits<U>
         + Zero,
-    U: CheckedLogTwo + Copy + One + Ord + WrappingFrom<T>,
+    U: CheckedLogBase2 + Copy + One + Ord + WrappingFrom<T>,
 >(
     x: &T,
     base: &U,
@@ -37,8 +39,8 @@ fn _to_digits_asc<
     assert!(T::convertible_from(*base));
     if *x == T::ZERO {
         Vec::new()
-    } else if let Some(log_base) = base.checked_log_two() {
-        x.to_power_of_two_digits_asc(log_base)
+    } else if let Some(log_base) = base.checked_log_base_2() {
+        x.to_power_of_2_digits_asc(log_base)
     } else {
         _unsigned_to_digits_asc_naive(x, *base)
     }
@@ -50,9 +52,9 @@ fn _to_digits_desc<
         + DivAssignMod<T, ModOutput = T>
         + Eq
         + ExactFrom<U>
-        + PowerOfTwoDigits<U>
+        + PowerOf2Digits<U>
         + Zero,
-    U: CheckedLogTwo + Copy + One + Ord + WrappingFrom<T>,
+    U: CheckedLogBase2 + Copy + One + Ord + WrappingFrom<T>,
 >(
     x: &T,
     base: &U,
@@ -60,8 +62,8 @@ fn _to_digits_desc<
     assert!(T::convertible_from(*base));
     if *x == T::ZERO {
         Vec::new()
-    } else if let Some(log_base) = base.checked_log_two() {
-        x.to_power_of_two_digits_desc(log_base)
+    } else if let Some(log_base) = base.checked_log_base_2() {
+        x.to_power_of_2_digits_desc(log_base)
     } else {
         let mut digits = _unsigned_to_digits_asc_naive(x, *base);
         digits.reverse();
@@ -70,15 +72,15 @@ fn _to_digits_desc<
 }
 
 fn _from_digits_asc<
-    T: Digits<U> + PowerOfTwoDigits<U>,
-    U: CheckedLogTwo + Copy,
+    T: Digits<U> + PowerOf2Digits<U>,
+    U: CheckedLogBase2 + Copy,
     I: Iterator<Item = U>,
 >(
     base: &U,
     digits: I,
-) -> T {
-    if let Some(log_base) = base.checked_log_two() {
-        T::from_power_of_two_digits_asc(log_base, digits)
+) -> Option<T> {
+    if let Some(log_base) = base.checked_log_base_2() {
+        T::from_power_of_2_digits_asc(log_base, digits)
     } else {
         let mut digits = digits.collect_vec();
         digits.reverse();
@@ -91,28 +93,30 @@ fn _from_digits_desc<
         + CheckedMul<T, Output = T>
         + Copy
         + Digits<U>
-        + ExactFrom<U>
+        + CheckedFrom<U>
         + Ord
-        + PowerOfTwoDigits<U>
+        + PowerOf2Digits<U>
         + Zero,
-    U: CheckedLogTwo + Copy + One + Ord,
+    U: CheckedLogBase2 + Copy + One + Ord,
     I: Iterator<Item = U>,
 >(
     base: &U,
     digits: I,
-) -> T {
+) -> Option<T> {
     assert!(*base > U::ONE);
-    if let Some(log_base) = base.checked_log_two() {
-        T::from_power_of_two_digits_desc(log_base, digits)
+    if let Some(log_base) = base.checked_log_base_2() {
+        T::from_power_of_2_digits_desc(log_base, digits)
     } else {
-        let base = T::exact_from(*base);
+        let base = T::checked_from(*base)?;
         let mut x = T::ZERO;
         for digit in digits {
-            let digit = T::exact_from(digit);
-            assert!(digit < base);
-            x = x.checked_mul(base).unwrap().checked_add(digit).unwrap();
+            let digit = T::checked_from(digit)?;
+            if digit >= base {
+                return None;
+            }
+            x = x.checked_mul(base)?.checked_add(digit)?;
         }
-        x
+        Some(x)
     }
 }
 
@@ -189,7 +193,8 @@ macro_rules! impl_digits {
                     ///
                     /// The input digits are in ascending order (least- to most-significant). The
                     /// type of each digit is `$u`, and `base` must be no larger than `$t::MAX`. The
-                    /// function panics if the input represents a number that can't fit in `$t`.
+                    /// function returns `None` if the input represents a number that can't fit in
+                    /// `$t`, or if `base` is greater than `$t::MAX`.
                     ///
                     /// $$
                     /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^id_i.
@@ -203,15 +208,13 @@ macro_rules! impl_digits {
                     /// where $T$ is time, $M$ is additional memory, and $n$ is `digits.count()`.
                     ///
                     /// # Panics
-                    /// Panics if `base` is greater than `$t::MAX`, if `base` is less than 2, if the
-                    /// digits represent a value that isn't representable by `$t`, or if some digit
-                    /// is greater than or equal to `base`.
+                    /// Panics if `base` is less than 2.
                     ///
                     /// # Examples
                     /// See the documentation of the `num::conversion::digits::general_digits`
                     /// module.
                     #[inline]
-                    fn from_digits_asc<I: Iterator<Item = $u>>(base: &$u, digits: I) -> $t {
+                    fn from_digits_asc<I: Iterator<Item = $u>>(base: &$u, digits: I) -> Option<$t> {
                         _from_digits_asc(base, digits)
                     }
 
@@ -219,7 +222,8 @@ macro_rules! impl_digits {
                     ///
                     /// The input digits are in descending order (most- to least-significant). The
                     /// type of each digit is `$u`, and `base` must be no larger than `$t::MAX`. The
-                    /// function panics if the input represents a number that can't fit in `$t`.
+                    /// function returns `None` if the input represents a number that can't fit in
+                    /// `$t`, or if `base` is greater than `$t::MAX`.
                     ///
                     /// $$
                     /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^{k-i-1}d_i.
@@ -233,15 +237,16 @@ macro_rules! impl_digits {
                     /// where $T$ is time, $M$ is additional memory, and $n$ is `digits.count()`.
                     ///
                     /// # Panics
-                    /// Panics if `base` is greater than `$t::MAX`, if `base` is less than 2, if the
-                    /// digits represent a value that isn't representable by `$t`, or if some digit
-                    /// is greater than or equal to `base`.
+                    /// Panics if `base` is less than 2.
                     ///
                     /// # Examples
                     /// See the documentation of the `num::conversion::digits::general_digits`
                     /// module.
                     #[inline]
-                    fn from_digits_desc<I: Iterator<Item = $u>>(base: &$u, digits: I) -> $t {
+                    fn from_digits_desc<I: Iterator<Item = $u>>(
+                        base: &$u,
+                        digits: I,
+                    ) -> Option<$t> {
                         _from_digits_desc(base, digits)
                     }
                 }

@@ -1,6 +1,6 @@
 use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
+    DivisibleByPowerOf2, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
@@ -1311,7 +1311,7 @@ pub(crate) fn _limbs_mul_fft(
     k: usize,
 ) -> bool {
     let square = std::ptr::eq(xs, ys);
-    assert!(p.divisible_by_power_of_two(u64::exact_from(k)));
+    assert!(p.divisible_by_power_of_2(u64::exact_from(k)));
     let n = p << Limb::LOG_WIDTH;
     let two_pow_k = 1 << k;
     let m = n >> k; // n == 2 ^ k * m

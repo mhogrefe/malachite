@@ -1,11 +1,11 @@
 use itertools::Itertools;
 #[cfg(feature = "32_bit_limbs")]
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, SaturatingFrom,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom,
 };
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::slices::slice_leading_zeros;
@@ -229,7 +229,7 @@ fn test_limbs_to_digits_small_base() {
     // digits_in_base == exp in _limbs_compute_power_table_using_div
     // digits_in_base != exp in _limbs_compute_power_table_using_div
     // remainder[adjust] == 0
-    //      && remainder[adjust + 1].divisible_by_power_of_two(big_base_trailing_zeros)
+    //      && remainder[adjust + 1].divisible_by_power_of_2(big_base_trailing_zeros)
     //      in _limbs_compute_power_table_using_div
     // xs_len >= GET_STR_DC_THRESHOLD in _limbs_to_digits_small_base_divide_and_conquer
     // xs_len > total_len || xs_len == total_len
@@ -481,7 +481,7 @@ fn test_limbs_to_digits_basecase() {
     );
     test::<u64>(
         &[123, 456, 789],
-        Limb::power_of_two(16),
+        Limb::power_of_2(16),
         &[123, 0, 456, 0, 789],
     );
 }
@@ -553,7 +553,7 @@ fn test_to_digits_asc_limb() {
         out: &[T],
     ) where
         Limb: Digits<T>,
-        Natural: From<T> + PowerOfTwoDigits<T>,
+        Natural: From<T> + PowerOf2Digits<T>,
     {
         let x = Natural::from_str(x).unwrap();
         assert_eq!(_to_digits_asc_limb::<T>(&x, base), out);
@@ -563,10 +563,10 @@ fn test_to_digits_asc_limb() {
     }
     test::<u8>("0", 10, &[]);
     test::<u8>("0", 16, &[]);
-    // base is not a power of two
+    // base is not a power of 2
     // x is small
     test::<u8>("123", 10, &[3, 2, 1]);
-    // base is a power of two
+    // base is a power of 2
     test::<u8>("123", 8, &[3, 7, 1]);
     // x is large
     // x is large and base < 256
@@ -624,7 +624,7 @@ fn to_digits_asc_limb_fail_helper<
 >()
 where
     Limb: Digits<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     assert_panic!(_to_digits_asc_limb::<T>(&Natural::exact_from(10), 0));
     assert_panic!(_to_digits_asc_limb::<T>(&Natural::exact_from(10), 1));
@@ -642,7 +642,7 @@ fn to_digits_asc_limb_properties_helper<
 >()
 where
     Limb: Digits<T> + SaturatingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     let mut config = GenConfig::new();
     config.insert("mean_bits_n", 256);
@@ -681,7 +681,7 @@ fn test_to_digits_desc_limb() {
         out: &[T],
     ) where
         Limb: Digits<T>,
-        Natural: From<T> + PowerOfTwoDigits<T>,
+        Natural: From<T> + PowerOf2Digits<T>,
     {
         let x = Natural::from_str(x).unwrap();
         assert_eq!(_to_digits_desc_limb::<T>(&x, base), out);
@@ -734,7 +734,7 @@ fn to_digits_desc_limb_fail_helper<
 >()
 where
     Limb: Digits<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     assert_panic!(_to_digits_desc_limb::<T>(&Natural::exact_from(10), 0));
     assert_panic!(_to_digits_desc_limb::<T>(&Natural::exact_from(10), 1));
@@ -752,7 +752,7 @@ fn to_digits_desc_limb_properties_helper<
 >()
 where
     Limb: Digits<T> + SaturatingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     let mut config = GenConfig::new();
     config.insert("mean_bits_n", 256);
@@ -796,7 +796,7 @@ fn test_to_digits_asc_large() {
         assert_eq!(digits_alt, out);
     }
     // x >= base
-    // base is not a power of two
+    // base is not a power of 2
     // bits / base.significant_bits() < TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
     test(
         "1000000000000",
@@ -805,7 +805,7 @@ fn test_to_digits_asc_large() {
             "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "1",
         ],
     );
-    // base is a power of two
+    // base is a power of 2
     test(
         "1000000000000",
         "16",
@@ -1140,7 +1140,10 @@ where
             x.to_digits_desc(&base)
         );
         assert!(digits.iter().all(|&digit| digit < base));
-        assert_eq!(Natural::from_digits_asc(&base, digits.iter().cloned()), x);
+        assert_eq!(
+            Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap(),
+            x
+        );
 
         let digits_alt = Digits::<Natural>::to_digits_asc(&x, &Natural::from(base));
         assert_eq!(
@@ -1257,7 +1260,10 @@ where
             x.to_digits_asc(&base)
         );
         assert!(digits.iter().all(|&digit| digit < base));
-        assert_eq!(Natural::from_digits_desc(&base, digits.iter().cloned()), x);
+        assert_eq!(
+            Natural::from_digits_desc(&base, digits.iter().cloned()).unwrap(),
+            x
+        );
 
         let digits_alt = Digits::<Natural>::to_digits_desc(&x, &Natural::from(base));
         assert_eq!(
@@ -1454,7 +1460,10 @@ fn to_digits_asc_natural_properties() {
             x.to_digits_desc(&base)
         );
         assert!(digits.iter().all(|digit| *digit < base));
-        assert_eq!(Natural::from_digits_asc(&base, digits.into_iter()), x);
+        assert_eq!(
+            Natural::from_digits_asc(&base, digits.into_iter()).unwrap(),
+            x
+        );
     });
 
     natural_gen().test_properties_with_config(&config, |x| {
@@ -1629,7 +1638,10 @@ fn to_digits_desc_natural_properties() {
             x.to_digits_asc(&base)
         );
         assert!(digits.iter().all(|digit| *digit < base));
-        assert_eq!(Natural::from_digits_desc(&base, digits.into_iter()), x);
+        assert_eq!(
+            Natural::from_digits_desc(&base, digits.into_iter()).unwrap(),
+            x
+        );
     });
 
     natural_gen().test_properties_with_config(&config, |x| {

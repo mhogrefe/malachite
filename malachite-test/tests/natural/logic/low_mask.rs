@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::logic::traits::{BitScan, CountOnes, LowMask};
 use malachite_nz::natural::logic::low_mask::limbs_low_mask;
@@ -24,7 +24,7 @@ fn low_mask_properties() {
         let n = Natural::low_mask(bits);
         assert!(n.is_valid());
 
-        assert_eq!(n, Natural::power_of_two(bits) - Natural::ONE);
+        assert_eq!(n, Natural::power_of_2(bits) - Natural::ONE);
         assert_eq!(n.count_ones(), bits);
         assert_eq!(n.index_of_next_false_bit(0), Some(bits));
     });

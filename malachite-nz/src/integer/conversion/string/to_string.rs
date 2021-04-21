@@ -127,7 +127,7 @@ impl ToStringBase for Integer {
                 .unsigned_abs_ref()
                 .to_digits_desc(&u8::wrapping_from(base));
             for digit in &mut digits {
-                *digit = digit_to_display_byte_lower(*digit);
+                *digit = digit_to_display_byte_lower(*digit).unwrap();
             }
             if *self < 0 {
                 vec_pad_left(&mut digits, 1, b'-');
@@ -171,7 +171,7 @@ impl ToStringBase for Integer {
                 .unsigned_abs_ref()
                 .to_digits_desc(&u8::wrapping_from(base));
             for digit in &mut digits {
-                *digit = digit_to_display_byte_upper(*digit);
+                *digit = digit_to_display_byte_upper(*digit).unwrap();
             }
             if *self < 0 {
                 vec_pad_left(&mut digits, 1, b'-');

@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{Abs, IsPowerOfTwo, ShlRound};
+use malachite_base::num::arithmetic::traits::{Abs, IsPowerOf2, ShlRound};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -67,7 +67,7 @@ macro_rules! properties_unsigned {
 
             test_properties_no_special(small_unsigneds::<$t>, |&u| {
                 assert_eq!(Integer::ZERO << u, 0);
-                assert!(Natural::exact_from(Integer::ONE << u).is_power_of_two());
+                assert!(Natural::exact_from(Integer::ONE << u).is_power_of_2());
             });
 
             test_properties(pairs_of_natural_and_small_unsigned::<$t>, |&(ref n, u)| {

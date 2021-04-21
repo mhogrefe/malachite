@@ -119,10 +119,7 @@ fn properties_helper_unsigned<T: BitBlockAccess<Bits = T> + PrimitiveUnsigned>()
         let mut mut_n_alt = n;
         assign_bits_naive::<T, T>(&mut mut_n_alt, start, end, &bits);
         assert_eq!(mut_n_alt, mut_n);
-        assert_eq!(
-            mut_n.get_bits(start, end),
-            bits.mod_power_of_two(end - start)
-        );
+        assert_eq!(mut_n.get_bits(start, end), bits.mod_power_of_2(end - start));
     });
 
     unsigned_triple_gen_var_4::<T, u64>().test_properties(|(n, bits, start)| {
@@ -158,10 +155,7 @@ fn properties_helper_signed<
             let mut mut_n_alt = n;
             assign_bits_naive::<T, U>(&mut mut_n_alt, start, end, &bits);
             assert_eq!(mut_n_alt, mut_n);
-            assert_eq!(
-                mut_n.get_bits(start, end),
-                bits.mod_power_of_two(end - start)
-            );
+            assert_eq!(mut_n.get_bits(start, end), bits.mod_power_of_2(end - start));
             assert_eq!(mut_n >= T::ZERO, n >= T::ZERO);
         },
     );

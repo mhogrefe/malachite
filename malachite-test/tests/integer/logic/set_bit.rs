@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign};
 use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 use malachite_nz::integer::Integer;
@@ -34,7 +34,7 @@ fn set_bit_properties() {
         mut_n.assign_bit(index, true);
         assert_eq!(mut_n, result);
 
-        assert_eq!(n | Integer::power_of_two(index), result);
+        assert_eq!(n | Integer::power_of_2(index), result);
 
         assert_ne!(result, 0);
         assert!(result >= *n);

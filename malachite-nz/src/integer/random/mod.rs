@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -861,13 +861,13 @@ fn signed_min_bit_range(
         uniform_random_integer_range(
             seed.fork("min_bit_xs"),
             a,
-            Integer::power_of_two(unsigned_min_bits),
+            Integer::power_of_2(unsigned_min_bits),
         )
     } else {
         uniform_random_integer_inclusive_range(
             seed.fork("min_bit_xs"),
             a,
-            -Integer::power_of_two(unsigned_min_bits - 1),
+            -Integer::power_of_2(unsigned_min_bits - 1),
         )
     }
 }
@@ -880,14 +880,14 @@ fn signed_max_bit_range(
     if a > 0 {
         uniform_random_integer_inclusive_range(
             seed.fork("max_bit_xs"),
-            Integer::power_of_two(unsigned_max_bits - 1),
+            Integer::power_of_2(unsigned_max_bits - 1),
             a,
         )
     } else {
         // also handles a == 0
         uniform_random_integer_inclusive_range(
             seed.fork("max_bit_xs"),
-            -Integer::power_of_two(unsigned_max_bits) + Integer::ONE,
+            -Integer::power_of_2(unsigned_max_bits) + Integer::ONE,
             a,
         )
     }

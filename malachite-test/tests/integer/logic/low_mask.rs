@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitScan, LowMask};
@@ -15,7 +15,7 @@ fn low_mask_properties() {
         let n = Integer::low_mask(bits);
         assert!(n.is_valid());
 
-        assert_eq!(n, Integer::power_of_two(bits) - Integer::ONE);
+        assert_eq!(n, Integer::power_of_2(bits) - Integer::ONE);
         assert_eq!(Natural::exact_from(&n), Natural::low_mask(bits));
         assert_eq!(n.index_of_next_false_bit(0), Some(bits));
     });

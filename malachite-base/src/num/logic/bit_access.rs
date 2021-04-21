@@ -2,12 +2,12 @@ use num::basic::integers::PrimitiveInt;
 use num::logic::traits::BitAccess;
 
 fn _get_bit_unsigned<T: PrimitiveInt>(x: &T, index: u64) -> bool {
-    index < T::WIDTH && *x & T::power_of_two(index) != T::ZERO
+    index < T::WIDTH && *x & T::power_of_2(index) != T::ZERO
 }
 
 fn _set_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
-        *x |= T::power_of_two(index);
+        *x |= T::power_of_2(index);
     } else {
         panic!(
             "Cannot set bit {} in non-negative value of width {}",
@@ -19,7 +19,7 @@ fn _set_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
 
 fn _clear_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
-        *x &= !T::power_of_two(index);
+        *x &= !T::power_of_2(index);
     }
 }
 

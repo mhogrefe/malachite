@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
@@ -19,9 +19,9 @@ where
 
 fn exhaustive_positive_primitive_ints_long_helper<T: PrimitiveInt>(last_20: &[T]) {
     let expected_len = if T::MIN == T::ZERO {
-        usize::power_of_two(T::WIDTH) - 1
+        usize::power_of_2(T::WIDTH) - 1
     } else {
-        usize::power_of_two(T::WIDTH - 1) - 1
+        usize::power_of_2(T::WIDTH - 1) - 1
     };
     let xs = exhaustive_positive_primitive_ints::<T>();
     assert_eq!(xs.clone().count(), expected_len);

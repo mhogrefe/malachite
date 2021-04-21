@@ -1,10 +1,9 @@
 use itertools::{repeat_n, Itertools};
-use malachite_base::num::arithmetic::traits::Pow;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOfTwoDigits, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base_test_util::generators::common::GenConfig;
@@ -32,8 +31,9 @@ fn verify_limbs_from_digits_small_base<T: PrimitiveUnsigned>(
 ) where
     Natural: From<T>,
 {
-    let mut expected_limbs =
-        _from_digits_desc_naive_primitive(xs, T::exact_from(base)).into_limbs_asc();
+    let mut expected_limbs = _from_digits_desc_naive_primitive(xs, T::exact_from(base))
+        .unwrap()
+        .into_limbs_asc();
     assert!(expected_limbs.len() <= out_len);
     expected_limbs.resize(out_len, 0);
     assert_eq!(expected_limbs, &out[..out_len]);
@@ -47,7 +47,7 @@ fn verify_limbs_from_digits_small_base<T: PrimitiveUnsigned>(
 fn test_limbs_from_digits_small_base_basecase() {
     fn test(out_before: &[Limb], xs: &[u8], base: u64, out_after: &[Limb]) {
         let mut out = out_before.to_vec();
-        let out_len = _limbs_from_digits_small_base_basecase(&mut out, xs, base);
+        let out_len = _limbs_from_digits_small_base_basecase(&mut out, xs, base).unwrap();
         assert_eq!(&out[..out_len], out_after);
         verify_limbs_from_digits_small_base(out_before, xs, base, out_len, &out, true);
     }
@@ -127,7 +127,7 @@ where
         &config,
         |(mut out, xs, base)| {
             let old_out = out.clone();
-            let out_len = _limbs_from_digits_small_base_basecase(&mut out, &xs, base);
+            let out_len = _limbs_from_digits_small_base_basecase(&mut out, &xs, base).unwrap();
             verify_limbs_from_digits_small_base(&old_out, &xs, base, out_len, &out, true);
         },
     );
@@ -142,7 +142,7 @@ fn limbs_from_digits_small_base_basecase_properties() {
 fn test_limbs_from_digits_small_base() {
     fn test(out_before: &[Limb], xs: &[u8], base: u64, out_after: &[Limb]) {
         let mut out = out_before.to_vec();
-        let out_len = _limbs_from_digits_small_base(&mut out, xs, base);
+        let out_len = _limbs_from_digits_small_base(&mut out, xs, base).unwrap();
         assert_eq!(&out[..out_len], out_after);
         verify_limbs_from_digits_small_base(out_before, xs, base, out_len, &out, false);
     }
@@ -884,7 +884,7 @@ where
         &config,
         |(mut out, xs, base)| {
             let old_out = out.clone();
-            let out_len = _limbs_from_digits_small_base(&mut out, &xs, base);
+            let out_len = _limbs_from_digits_small_base(&mut out, &xs, base).unwrap();
             verify_limbs_from_digits_small_base(&old_out, &xs, base, out_len, &out, false);
         },
     );
@@ -897,19 +897,19 @@ fn limbs_from_digits_small_base_properties() {
 
 #[test]
 fn test_from_digits_desc_basecase() {
-    fn test(xs: &[u8], base: Limb, n: &str) {
+    fn test_ok(xs: &[u8], base: Limb, n: &str) {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(_from_digits_desc_basecase(xs, base), n);
+        assert_eq!(_from_digits_desc_basecase(xs, base).unwrap(), n);
         assert_eq!(
-            _from_digits_desc_naive_primitive(xs, u8::exact_from(base)),
+            _from_digits_desc_naive_primitive(xs, u8::exact_from(base)).unwrap(),
             n
         );
     }
-    test(&[0], 9, "0");
-    test(&[1], 9, "1");
-    test(&[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
-    test(&[0, 0, 2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
-    test(
+    test_ok(&[0], 9, "0");
+    test_ok(&[1], 9, "1");
+    test_ok(&[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
+    test_ok(&[0, 0, 2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
+    test_ok(
         &[
             73, 23, 120, 45, 108, 147, 113, 90, 129, 11, 86, 0, 102, 81, 22, 17, 32, 121, 29,
             82, 27, 25, 39, 9, 139, 59, 51, 13, 44, 3, 37, 104, 41, 40, 87, 66, 83, 146, 40,
@@ -920,6 +920,12 @@ fn test_from_digits_desc_basecase() {
         "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
         709347189745346071475819587247558105442098729883999424898641968281841439662364"
     );
+
+    fn test_err(xs: &[u8], base: Limb) {
+        assert!(_from_digits_desc_basecase(xs, base).is_none());
+        assert!(_from_digits_desc_naive_primitive(xs, u8::exact_from(base)).is_none(),);
+    }
+    test_err(&[10, 11, 12], 10);
 }
 
 fn from_digits_desc_basecase_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
@@ -928,10 +934,6 @@ where
 {
     assert_panic!(_from_digits_desc_basecase::<T>(&[], 0));
     assert_panic!(_from_digits_desc_basecase::<T>(&[], 1));
-    assert_panic!(_from_digits_desc_basecase::<T>(
-        &[T::exact_from(10), T::exact_from(11), T::exact_from(12)],
-        10
-    ));
     if T::WIDTH < Limb::WIDTH {
         assert_panic!(_from_digits_desc_basecase::<T>(&[], Limb::MAX));
     }
@@ -968,25 +970,26 @@ fn from_digits_desc_basecase_properties() {
 
 #[test]
 fn from_digits_asc_limb() {
-    fn test(xs: &[u32], base: Limb, n: &str) {
+    fn test_ok(xs: &[u32], base: Limb, n: &str) {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(_from_digits_asc_limb(xs.iter().copied(), base), n);
+        assert_eq!(_from_digits_asc_limb(xs.iter().copied(), base).unwrap(), n);
         assert_eq!(
             _from_digits_desc_naive_primitive(
                 &xs.iter().copied().rev().collect_vec(),
                 u32::exact_from(base)
-            ),
+            )
+            .unwrap(),
             n
         );
     }
-    test(&[], 9, "0");
-    test(&[0], 9, "0");
-    test(&[1], 9, "1");
-    test(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2], 3, "123456");
-    test(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2, 0, 0], 3, "123456");
-    test(&[2, 4, 6, 4, 2], 8, "10658");
-    test(&[789, 456, 123], 1000, "123456789");
-    test(
+    test_ok(&[], 9, "0");
+    test_ok(&[0], 9, "0");
+    test_ok(&[1], 9, "1");
+    test_ok(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2], 3, "123456");
+    test_ok(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2, 0, 0], 3, "123456");
+    test_ok(&[2, 4, 6, 4, 2], 8, "10658");
+    test_ok(&[789, 456, 123], 1000, "123456789");
+    test_ok(
         &[
             14, 99, 101, 37, 10, 132, 124, 140, 98, 35, 144, 50, 41, 15, 67, 39, 12, 74, 27, 9, 21,
             135, 62, 26, 68, 86, 128, 34, 78, 25, 75, 61, 73, 80, 66, 50, 15, 132, 40, 146, 83, 66,
@@ -997,19 +1000,19 @@ fn from_digits_asc_limb() {
         "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
         709347189745346071475819587247558105442098729883999424898641968281841439662364"
     );
-    test(
+    test_ok(
         &[302, 2359, 150, 1581, 2859, 1843, 2403, 2039, 27, 1598],
         3543,
         "140578615308984594421852296827289425",
     );
-    test(
+    test_ok(
         &[
             1187762660, 83185796, 570510527, 293681571, 1518538399, 1153431348,
         ],
         1525385058,
         "9525530906278526930121302445905223566866929778026945776",
     );
-    test(
+    test_ok(
         &[
             1535724679, 31832127, 1494323667, 798341655, 1169948427, 1204675417, 1214721934,
             1599722999, 1842176041, 1659733906, 824969631, 1046252719
@@ -1018,19 +1021,25 @@ fn from_digits_asc_limb() {
         "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
         1782212965464227294329"
     );
+
+    fn test_err(xs: &[u32], base: Limb) {
+        assert!(_from_digits_asc_limb(xs.iter().copied(), base).is_none());
+        assert!(_from_digits_desc_naive_primitive(
+            &xs.iter().copied().rev().collect_vec(),
+            u32::exact_from(base)
+        )
+        .is_none(),);
+    }
+    test_err(&[12, 11, 10], 10);
 }
 
 fn from_digits_asc_limb_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
 where
     Limb: CheckedFrom<T> + WrappingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     assert_panic!(_from_digits_asc_limb::<_, T>(empty(), 0));
     assert_panic!(_from_digits_asc_limb::<_, T>(empty(), 1));
-    assert_panic!(_from_digits_asc_limb::<_, T>(
-        [12, 11, 10].iter().map(|x| T::exact_from(*x)),
-        10
-    ));
     if T::WIDTH < Limb::WIDTH {
         assert_panic!(_from_digits_asc_limb::<_, T>(empty(), Limb::MAX));
     }
@@ -1044,7 +1053,7 @@ fn from_digits_asc_limb_fail() {
 fn from_digits_asc_limb_properties_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
 where
     Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     let mut config = GenConfig::new();
     config.insert("digit_counts_mean_n", 32);
@@ -1070,29 +1079,29 @@ fn from_digits_asc_limb_properties() {
 
 #[test]
 fn from_digits_desc_limb() {
-    fn test(xs: &[u32], base: Limb, n: &str) {
+    fn test_ok(xs: &[u32], base: Limb, n: &str) {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(_from_digits_desc_limb(xs.iter().copied(), base), n);
+        assert_eq!(_from_digits_desc_limb(xs.iter().copied(), base).unwrap(), n);
         assert_eq!(
-            _from_digits_desc_naive_primitive(xs, u32::exact_from(base)),
+            _from_digits_desc_naive_primitive(xs, u32::exact_from(base)).unwrap(),
             n
         );
     }
-    test(&[], 9, "0");
-    // Some(log_base) != base.checked_log_two()
+    test_ok(&[], 9, "0");
+    // Some(log_base) != base.checked_log_base_2()
     // base < 256
-    test(&[0], 9, "0");
-    test(&[1], 9, "1");
-    test(&[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
-    test(&[0, 0, 2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
-    // Some(log_base) = base.checked_log_two()
-    test(&[2, 4, 6, 4, 2], 8, "10658");
+    test_ok(&[0], 9, "0");
+    test_ok(&[1], 9, "1");
+    test_ok(&[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
+    test_ok(&[0, 0, 2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
+    // Some(log_base) = base.checked_log_base_2()
+    test_ok(&[2, 4, 6, 4, 2], 8, "10658");
     // base >= 256
     // _from_digits_desc_divide_and_conquer_limb; power_index == 0 ||
     //      b < FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
     // _from_digits_desc_divide_and_conquer_limb; base <= SQRT_MAX_LIMB
-    test(&[123, 456, 789], 1000, "123456789");
-    test(
+    test_ok(&[123, 456, 789], 1000, "123456789");
+    test_ok(
         &[
             73, 23, 120, 45, 108, 147, 113, 90, 129, 11, 86, 0, 102, 81, 22, 17, 32, 121, 29,
             82, 27, 25, 39, 9, 139, 59, 51, 13, 44, 3, 37, 104, 41, 40, 87, 66, 83, 146, 40,
@@ -1105,13 +1114,13 @@ fn from_digits_desc_limb() {
     );
     // power_index != 0 && b >= FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
     // _from_digits_desc_divide_and_conquer_limb; xs_len > p
-    test(
+    test_ok(
         &[1598, 27, 2039, 2403, 1843, 2859, 1581, 150, 2359, 302],
         3543,
         "140578615308984594421852296827289425",
     );
     // _from_digits_desc_divide_and_conquer_limb; base > SQRT_MAX_LIMB
-    test(
+    test_ok(
         &[
             1153431348, 1518538399, 293681571, 570510527, 83185796, 1187762660,
         ],
@@ -1119,7 +1128,7 @@ fn from_digits_desc_limb() {
         "9525530906278526930121302445905223566866929778026945776",
     );
     // _from_digits_desc_divide_and_conquer_limb; xs_len <= p
-    test(
+    test_ok(
         &[
             1046252719, 824969631, 1659733906, 1842176041, 1599722999, 1214721934, 1204675417,
             1169948427, 798341655, 1494323667, 31832127, 1535724679
@@ -1128,19 +1137,21 @@ fn from_digits_desc_limb() {
         "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
         1782212965464227294329"
     );
+
+    fn test_err(xs: &[u32], base: Limb) {
+        assert!(_from_digits_desc_limb(xs.iter().copied(), base).is_none());
+        assert!(_from_digits_desc_naive_primitive(xs, u32::exact_from(base)).is_none());
+    }
+    test_err(&[10, 11, 12], 10);
 }
 
 fn from_digits_desc_limb_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
 where
     Limb: CheckedFrom<T> + WrappingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     assert_panic!(_from_digits_desc_limb::<_, T>(empty(), 0));
     assert_panic!(_from_digits_desc_limb::<_, T>(empty(), 1));
-    assert_panic!(_from_digits_desc_limb::<_, T>(
-        [10, 11, 12].iter().map(|x| T::exact_from(*x)),
-        10
-    ));
     if T::WIDTH < Limb::WIDTH {
         assert_panic!(_from_digits_desc_limb::<_, T>(empty(), Limb::MAX));
     }
@@ -1154,7 +1165,7 @@ fn from_digits_desc_limb_fail() {
 fn from_digits_desc_limb_properties_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
 where
     Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     let mut config = GenConfig::new();
     config.insert("digit_counts_mean_n", 32);
@@ -1177,20 +1188,23 @@ fn from_digits_desc_limb_properties() {
 
 #[test]
 fn from_digits_asc_large() {
-    fn test(xs: &[&str], base: &str, n: &str) {
+    fn test_ok(xs: &[&str], base: &str, n: &str) {
         let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
         let base = Natural::from_str(base).unwrap();
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(_from_digits_asc_large(xs.clone(), &base), n);
-        assert_eq!(_from_digits_desc_naive(&xs.rev().collect_vec(), &base), n);
+        assert_eq!(_from_digits_asc_large(xs.clone(), &base).unwrap(), n);
+        assert_eq!(
+            _from_digits_desc_naive(&xs.rev().collect_vec(), &base).unwrap(),
+            n
+        );
     }
-    test(&["0", "100"], "10000000000", "1000000000000");
-    test(
+    test_ok(&["0", "100"], "10000000000", "1000000000000");
+    test_ok(
         &["27917287424", "18657454436", "8470329472"],
         "34359738368",
         "10000000000000000000000000000000",
     );
-    test(
+    test_ok(
         &[
             "4373186134", "2564485756", "2124820161", "4270626619", "5254372654", "713959034",
             "4750044302", "5833014701", "978351288", "4288991795", "972424917", "1439538405",
@@ -1200,7 +1214,7 @@ fn from_digits_asc_large() {
         "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
         7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
     );
-    test(
+    test_ok(
         &[
             "10459983243", "21532249186", "9820491776", "2837355685", "9767368393", "3483032332",
             "21535703589", "11033729126", "9179503556", "8692905086", "4911199976", "15555287795",
@@ -1212,18 +1226,23 @@ fn from_digits_asc_large() {
         5855188918761759968447473283739550817700685872668984640703760436616510553858385622841396530\
         38089626212682923"
     );
+
+    fn test_err(xs: &[&str], base: &str) {
+        let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
+        let base = Natural::from_str(base).unwrap();
+        assert!(_from_digits_asc_large(xs.clone(), &base).is_none());
+        assert!(_from_digits_desc_naive(&xs.rev().collect_vec(), &base).is_none());
+    }
+    test_err(
+        &["1000000000000000000000001", "1000000000000000000000002"],
+        "1000000000000000000000000",
+    );
 }
 
 #[test]
 fn from_digits_asc_large_fail() {
     assert_panic!(_from_digits_asc_large(empty(), &Natural::ZERO));
     assert_panic!(_from_digits_asc_large(empty(), &Natural::ONE));
-    assert_panic!(_from_digits_asc_large(
-        [Natural::from(10u32).pow(101), Natural::from(10u32).pow(102)]
-            .iter()
-            .cloned(),
-        &Natural::from(10u32).pow(100)
-    ));
 }
 
 #[test]
@@ -1241,20 +1260,23 @@ fn from_digits_asc_large_properties() {
 
 #[test]
 fn from_digits_desc_large() {
-    fn test(xs: &[&str], base: &str, n: &str) {
+    fn test_ok(xs: &[&str], base: &str, n: &str) {
         let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
         let base = Natural::from_str(base).unwrap();
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(_from_digits_desc_large(xs.clone(), &base), n);
-        assert_eq!(_from_digits_desc_naive(&xs.collect_vec(), &base), n);
+        assert_eq!(_from_digits_desc_large(xs.clone(), &base).unwrap(), n);
+        assert_eq!(
+            _from_digits_desc_naive(&xs.collect_vec(), &base).unwrap(),
+            n
+        );
     }
-    // Some(log_base) != base.checked_log_two()
+    // Some(log_base) != base.checked_log_base_2()
     // _from_digits_desc_divide_and_conquer; power_index == 0 ||
     //      u64::exact_from(xs_len) * base.significant_bits() <
     //      FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
-    test(&["100", "0"], "10000000000", "1000000000000");
-    // Some(log_base) = base.checked_log_two()
-    test(
+    test_ok(&["100", "0"], "10000000000", "1000000000000");
+    // Some(log_base) = base.checked_log_base_2()
+    test_ok(
         &["8470329472", "18657454436", "27917287424"],
         "34359738368",
         "10000000000000000000000000000000",
@@ -1263,7 +1285,7 @@ fn from_digits_desc_large() {
     //      u64::exact_from(xs_len) * base.significant_bits() >=
     //      FROM_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD
     // _from_digits_desc_divide_and_conquer; xs_len > p
-    test(
+    test_ok(
         &[
             "139021832", "3319271253", "4579628351", "2267585072", "1115837958", "5308114100",
             "1439538405", "972424917", "4288991795", "978351288", "5833014701", "4750044302",
@@ -1274,7 +1296,7 @@ fn from_digits_desc_large() {
         7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
     );
     // _from_digits_desc_divide_and_conquer; xs_len <= p
-    test(
+    test_ok(
         &[
             "22157300197", "19932263435", "7356592443", "2287104975", "16296043356", "20703615271",
             "16865310802", "15555287795", "4911199976", "8692905086", "9179503556", "11033729126",
@@ -1286,18 +1308,23 @@ fn from_digits_desc_large() {
         5855188918761759968447473283739550817700685872668984640703760436616510553858385622841396530\
         38089626212682923"
     );
+
+    fn test_err(xs: &[&str], base: &str) {
+        let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
+        let base = Natural::from_str(base).unwrap();
+        assert!(_from_digits_desc_large(xs.clone(), &base).is_none());
+        assert!(_from_digits_desc_naive(&xs.collect_vec(), &base).is_none());
+    }
+    test_err(
+        &["1000000000000000000000000", "1000000000000000000000001"],
+        "1000000000000000000000000",
+    );
 }
 
 #[test]
 fn from_digits_desc_large_fail() {
     assert_panic!(_from_digits_desc_large(empty(), &Natural::ZERO));
     assert_panic!(_from_digits_desc_large(empty(), &Natural::ONE));
-    assert_panic!(_from_digits_desc_large(
-        [Natural::from(10u32).pow(101), Natural::from(10u32).pow(102)]
-            .iter()
-            .cloned(),
-        &Natural::from(10u32).pow(100)
-    ));
 }
 
 #[test]
@@ -1312,18 +1339,21 @@ fn from_digits_desc_large_properties() {
 
 #[test]
 fn from_digits_asc_primitive() {
-    fn test(xs: &[Limb], base: Limb, n: &str) {
+    fn test_ok(xs: &[Limb], base: Limb, n: &str) {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(Natural::from_digits_asc(&base, xs.iter().copied()), n);
+        assert_eq!(
+            Natural::from_digits_asc(&base, xs.iter().copied()).unwrap(),
+            n
+        );
     }
-    test(&[], 9, "0");
-    test(&[0], 9, "0");
-    test(&[1], 9, "1");
-    test(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2], 3, "123456");
-    test(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2, 0, 0], 3, "123456");
-    test(&[2, 4, 6, 4, 2], 8, "10658");
-    test(&[789, 456, 123], 1000, "123456789");
-    test(
+    test_ok(&[], 9, "0");
+    test_ok(&[0], 9, "0");
+    test_ok(&[1], 9, "1");
+    test_ok(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2], 3, "123456");
+    test_ok(&[0, 1, 1, 0, 0, 1, 1, 2, 0, 0, 2, 0, 0], 3, "123456");
+    test_ok(&[2, 4, 6, 4, 2], 8, "10658");
+    test_ok(&[789, 456, 123], 1000, "123456789");
+    test_ok(
         &[
             14, 99, 101, 37, 10, 132, 124, 140, 98, 35, 144, 50, 41, 15, 67, 39, 12, 74, 27, 9, 21,
             135, 62, 26, 68, 86, 128, 34, 78, 25, 75, 61, 73, 80, 66, 50, 15, 132, 40, 146, 83, 66,
@@ -1334,19 +1364,19 @@ fn from_digits_asc_primitive() {
         "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
         709347189745346071475819587247558105442098729883999424898641968281841439662364"
     );
-    test(
+    test_ok(
         &[302, 2359, 150, 1581, 2859, 1843, 2403, 2039, 27, 1598],
         3543,
         "140578615308984594421852296827289425",
     );
-    test(
+    test_ok(
         &[
             1187762660, 83185796, 570510527, 293681571, 1518538399, 1153431348,
         ],
         1525385058,
         "9525530906278526930121302445905223566866929778026945776",
     );
-    test(
+    test_ok(
         &[
             1535724679, 31832127, 1494323667, 798341655, 1169948427, 1204675417, 1214721934,
             1599722999, 1842176041, 1659733906, 824969631, 1046252719
@@ -1355,6 +1385,11 @@ fn from_digits_asc_primitive() {
         "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
         1782212965464227294329"
     );
+
+    fn test_err(xs: &[Limb], base: Limb) {
+        assert!(Natural::from_digits_asc(&base, xs.iter().copied()).is_none());
+    }
+    test_err(&[10, 11, 12], 10);
 }
 
 fn from_digits_asc_primitive_fail_helper<T: PrimitiveUnsigned>()
@@ -1363,10 +1398,6 @@ where
 {
     assert_panic!(Natural::from_digits_asc(&T::ONE, empty()));
     assert_panic!(Natural::from_digits_asc(&T::ZERO, empty()));
-    assert_panic!(Natural::from_digits_asc(
-        &T::from(10),
-        [10, 11, 12].iter().map(|x| T::exact_from(*x)),
-    ));
 }
 
 #[test]
@@ -1381,9 +1412,9 @@ where
     Natural: Digits<T>,
 {
     unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties(|(digits, base)| {
-        let n = Natural::from_digits_asc(&base, digits.iter().cloned());
+        let n = Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap();
         assert_eq!(
-            Natural::from_digits_desc(&base, digits.iter().rev().cloned()),
+            Natural::from_digits_desc(&base, digits.iter().rev().cloned()).unwrap(),
             n
         );
         let trailing_zeros = slice_trailing_zeros(&digits);
@@ -1396,7 +1427,7 @@ where
     unsigned_pair_gen_var_10::<T, T, usize>().test_properties(|(base, u)| {
         assert_eq!(
             Natural::from_digits_asc(&base, repeat_n(T::ZERO, u)),
-            Natural::ZERO
+            Some(Natural::ZERO)
         );
     });
 }
@@ -1408,19 +1439,22 @@ fn from_digits_asc_primitive_properties() {
 
 #[test]
 fn from_digits_desc_primitive() {
-    fn test(xs: &[Limb], base: Limb, n: &str) {
+    fn test_ok(xs: &[Limb], base: Limb, n: &str) {
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(Natural::from_digits_desc(&base, xs.iter().copied()), n);
-        assert_eq!(_from_digits_desc_naive_primitive(xs, base), n);
+        assert_eq!(
+            Natural::from_digits_desc(&base, xs.iter().copied()).unwrap(),
+            n
+        );
+        assert_eq!(_from_digits_desc_naive_primitive(xs, base).unwrap(), n);
     }
-    test(&[], 9, "0");
-    test(&[0], 9, "0");
-    test(&[1], 9, "1");
-    test(&[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
-    test(&[0, 0, 2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
-    test(&[2, 4, 6, 4, 2], 8, "10658");
-    test(&[123, 456, 789], 1000, "123456789");
-    test(
+    test_ok(&[], 9, "0");
+    test_ok(&[0], 9, "0");
+    test_ok(&[1], 9, "1");
+    test_ok(&[2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
+    test_ok(&[0, 0, 2, 0, 0, 2, 1, 1, 0, 0, 1, 1, 0], 3, "123456");
+    test_ok(&[2, 4, 6, 4, 2], 8, "10658");
+    test_ok(&[123, 456, 789], 1000, "123456789");
+    test_ok(
         &[
             73, 23, 120, 45, 108, 147, 113, 90, 129, 11, 86, 0, 102, 81, 22, 17, 32, 121, 29,
             82, 27, 25, 39, 9, 139, 59, 51, 13, 44, 3, 37, 104, 41, 40, 87, 66, 83, 146, 40,
@@ -1431,19 +1465,19 @@ fn from_digits_desc_primitive() {
         "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
         709347189745346071475819587247558105442098729883999424898641968281841439662364"
     );
-    test(
+    test_ok(
         &[1598, 27, 2039, 2403, 1843, 2859, 1581, 150, 2359, 302],
         3543,
         "140578615308984594421852296827289425",
     );
-    test(
+    test_ok(
         &[
             1153431348, 1518538399, 293681571, 570510527, 83185796, 1187762660,
         ],
         1525385058,
         "9525530906278526930121302445905223566866929778026945776",
     );
-    test(
+    test_ok(
         &[
             1046252719, 824969631, 1659733906, 1842176041, 1599722999, 1214721934, 1204675417,
             1169948427, 798341655, 1494323667, 31832127, 1535724679
@@ -1452,6 +1486,12 @@ fn from_digits_desc_primitive() {
         "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
         1782212965464227294329"
     );
+
+    fn test_err(xs: &[Limb], base: Limb) {
+        assert!(Natural::from_digits_desc(&base, xs.iter().copied()).is_none());
+        assert!(_from_digits_desc_naive_primitive(xs, base).is_none());
+    }
+    test_err(&[10, 11, 12], 10);
 }
 
 fn from_digits_desc_primitive_fail_helper<T: PrimitiveUnsigned>()
@@ -1460,10 +1500,6 @@ where
 {
     assert_panic!(Natural::from_digits_desc(&T::ONE, empty()));
     assert_panic!(Natural::from_digits_desc(&T::ZERO, empty()));
-    assert_panic!(Natural::from_digits_desc(
-        &T::from(10),
-        [10, 11, 12].iter().map(|x| T::exact_from(*x)),
-    ));
 }
 
 #[test]
@@ -1478,15 +1514,15 @@ where
     Natural: Digits<T> + From<T>,
 {
     unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties(|(digits, base)| {
-        let n = Natural::from_digits_desc(&base, digits.iter().cloned());
+        let n = Natural::from_digits_desc(&base, digits.iter().cloned()).unwrap();
         assert_eq!(
-            Natural::from_digits_asc(&base, digits.iter().rev().cloned()),
+            Natural::from_digits_asc(&base, digits.iter().rev().cloned()).unwrap(),
             n
         );
         let leading_zeros = slice_leading_zeros(&digits);
         assert_eq!(n.to_digits_desc(&base), &digits[leading_zeros..]);
         assert_eq!(
-            _from_digits_desc_naive_primitive(&digits, T::exact_from(base)),
+            _from_digits_desc_naive_primitive(&digits, T::exact_from(base)).unwrap(),
             n
         );
     });
@@ -1494,7 +1530,7 @@ where
     unsigned_pair_gen_var_10::<T, T, usize>().test_properties(|(base, u)| {
         assert_eq!(
             Natural::from_digits_desc(&base, repeat_n(T::ZERO, u)),
-            Natural::ZERO
+            Some(Natural::ZERO)
         );
     });
 }
@@ -1506,30 +1542,30 @@ fn from_digits_desc_primitive_properties() {
 
 #[test]
 fn from_digits_asc() {
-    fn test(xs: &[&str], base: &str, n: &str) {
+    fn test_ok(xs: &[&str], base: &str, n: &str) {
         let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
         let base = Natural::from_str(base).unwrap();
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(Natural::from_digits_asc(&base, xs.clone()), n);
+        assert_eq!(Natural::from_digits_asc(&base, xs.clone()).unwrap(), n);
     }
-    test(&[], "9", "0");
-    test(&["0"], "9", "0");
-    test(&["1"], "9", "1");
-    test(
+    test_ok(&[], "9", "0");
+    test_ok(&["0"], "9", "0");
+    test_ok(&["1"], "9", "1");
+    test_ok(
         &["0", "1", "1", "0", "0", "1", "1", "2", "0", "0", "2"],
         "3",
         "123456",
     );
-    test(
+    test_ok(
         &[
             "0", "1", "1", "0", "0", "1", "1", "2", "0", "0", "2", "0", "0",
         ],
         "3",
         "123456",
     );
-    test(&["2", "4", "6", "4", "2"], "8", "10658");
-    test(&["789", "456", "123"], "1000", "123456789");
-    test(
+    test_ok(&["2", "4", "6", "4", "2"], "8", "10658");
+    test_ok(&["789", "456", "123"], "1000", "123456789");
+    test_ok(
         &[
             "14", "99", "101", "37", "10", "132", "124", "140", "98", "35", "144", "50", "41", "15",
             "67", "39", "12", "74", "27", "9", "21", "135", "62", "26", "68", "86", "128", "34",
@@ -1542,14 +1578,14 @@ fn from_digits_asc() {
         "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
         709347189745346071475819587247558105442098729883999424898641968281841439662364"
     );
-    test(
+    test_ok(
         &[
             "302", "2359", "150", "1581", "2859", "1843", "2403", "2039", "27", "1598",
         ],
         "3543",
         "140578615308984594421852296827289425",
     );
-    test(
+    test_ok(
         &[
             "1187762660",
             "83185796",
@@ -1561,7 +1597,7 @@ fn from_digits_asc() {
         "1525385058",
         "9525530906278526930121302445905223566866929778026945776",
     );
-    test(
+    test_ok(
         &[
             "1535724679", "31832127", "1494323667", "798341655", "1169948427", "1204675417",
             "1214721934", "1599722999", "1842176041", "1659733906", "824969631", "1046252719"
@@ -1570,13 +1606,13 @@ fn from_digits_asc() {
         "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
         1782212965464227294329"
     );
-    test(&["0", "100"], "10000000000", "1000000000000");
-    test(
+    test_ok(&["0", "100"], "10000000000", "1000000000000");
+    test_ok(
         &["27917287424", "18657454436", "8470329472"],
         "34359738368",
         "10000000000000000000000000000000",
     );
-    test(
+    test_ok(
         &[
             "4373186134", "2564485756", "2124820161", "4270626619", "5254372654", "713959034",
             "4750044302", "5833014701", "978351288", "4288991795", "972424917", "1439538405",
@@ -1586,7 +1622,7 @@ fn from_digits_asc() {
         "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
         7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
     );
-    test(
+    test_ok(
         &[
             "10459983243", "21532249186", "9820491776", "2837355685", "9767368393", "3483032332",
             "21535703589", "11033729126", "9179503556", "8692905086", "4911199976", "15555287795",
@@ -1598,26 +1634,27 @@ fn from_digits_asc() {
         5855188918761759968447473283739550817700685872668984640703760436616510553858385622841396530\
         38089626212682923"
     );
+
+    fn test_err(xs: &[&str], base: &str) {
+        let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
+        let base = Natural::from_str(base).unwrap();
+        assert!(Natural::from_digits_asc(&base, xs.clone()).is_none());
+    }
+    test_err(&["101", "102"], "100");
 }
 
 #[test]
 fn from_digits_asc_fail() {
     assert_panic!(Natural::from_digits_asc(&Natural::ZERO, empty()));
     assert_panic!(Natural::from_digits_asc(&Natural::ONE, empty()));
-    assert_panic!(Natural::from_digits_asc(
-        &Natural::from(10u32).pow(100),
-        [Natural::from(10u32).pow(101), Natural::from(10u32).pow(102)]
-            .iter()
-            .cloned()
-    ));
 }
 
 #[test]
 fn from_digits_asc_properties() {
     natural_vec_natural_pair_gen_var_2().test_properties(|(digits, base)| {
-        let n = Natural::from_digits_asc(&base, digits.iter().cloned());
+        let n = Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap();
         assert_eq!(
-            Natural::from_digits_desc(&base, digits.iter().rev().cloned()),
+            Natural::from_digits_desc(&base, digits.iter().rev().cloned()).unwrap(),
             n
         );
         let trailing_zeros = slice_trailing_zeros(&digits);
@@ -1630,38 +1667,41 @@ fn from_digits_asc_properties() {
     natural_unsigned_pair_gen_var_5().test_properties(|(base, u)| {
         assert_eq!(
             Natural::from_digits_asc(&base, repeat_n(Natural::ZERO, u)),
-            Natural::ZERO
+            Some(Natural::ZERO)
         );
     });
 }
 
 #[test]
 fn from_digits_desc() {
-    fn test(xs: &[&str], base: &str, n: &str) {
+    fn test_ok(xs: &[&str], base: &str, n: &str) {
         let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
         let base = Natural::from_str(base).unwrap();
         let n = Natural::from_str(n).unwrap();
-        assert_eq!(Natural::from_digits_desc(&base, xs.clone()), n);
-        assert_eq!(_from_digits_desc_naive(&xs.collect_vec(), &base), n);
+        assert_eq!(Natural::from_digits_desc(&base, xs.clone()).unwrap(), n);
+        assert_eq!(
+            _from_digits_desc_naive(&xs.collect_vec(), &base).unwrap(),
+            n
+        );
     }
-    test(&[], "9", "0");
-    test(&["0"], "9", "0");
-    test(&["1"], "9", "1");
-    test(
+    test_ok(&[], "9", "0");
+    test_ok(&["0"], "9", "0");
+    test_ok(&["1"], "9", "1");
+    test_ok(
         &["2", "0", "0", "2", "1", "1", "0", "0", "1", "1", "0"],
         "3",
         "123456",
     );
-    test(
+    test_ok(
         &[
             "0", "0", "2", "0", "0", "2", "1", "1", "0", "0", "1", "1", "0",
         ],
         "3",
         "123456",
     );
-    test(&["2", "4", "6", "4", "2"], "8", "10658");
-    test(&["123", "456", "789"], "1000", "123456789");
-    test(
+    test_ok(&["2", "4", "6", "4", "2"], "8", "10658");
+    test_ok(&["123", "456", "789"], "1000", "123456789");
+    test_ok(
         &[
             "73", "23", "120", "45", "108", "147", "113", "90", "129", "11", "86", "0", "102", "81",
             "22", "17", "32", "121", "29", "82", "27", "25", "39", "9", "139", "59", "51", "13",
@@ -1674,14 +1714,14 @@ fn from_digits_desc() {
         "176685760608531978263731938997517835399219565848609872558191310084297042793489341607854254\
         709347189745346071475819587247558105442098729883999424898641968281841439662364"
     );
-    test(
+    test_ok(
         &[
             "1598", "27", "2039", "2403", "1843", "2859", "1581", "150", "2359", "302",
         ],
         "3543",
         "140578615308984594421852296827289425",
     );
-    test(
+    test_ok(
         &[
             "1153431348",
             "1518538399",
@@ -1693,7 +1733,7 @@ fn from_digits_desc() {
         "1525385058",
         "9525530906278526930121302445905223566866929778026945776",
     );
-    test(
+    test_ok(
         &[
             "1046252719", "824969631", "1659733906", "1842176041", "1599722999", "1214721934",
             "1204675417", "1169948427", "798341655", "1494323667", "31832127", "1535724679"
@@ -1702,13 +1742,13 @@ fn from_digits_desc() {
         "118713086621740109729266002848273602283691336549480820142301294962906804654789322428658177\
         1782212965464227294329"
     );
-    test(&["100", "0"], "10000000000", "1000000000000");
-    test(
+    test_ok(&["100", "0"], "10000000000", "1000000000000");
+    test_ok(
         &["8470329472", "18657454436", "27917287424"],
         "34359738368",
         "10000000000000000000000000000000",
     );
-    test(
+    test_ok(
         &[
             "139021832", "3319271253", "4579628351", "2267585072", "1115837958", "5308114100",
             "1439538405", "972424917", "4288991795", "978351288", "5833014701", "4750044302",
@@ -1718,7 +1758,7 @@ fn from_digits_desc() {
         "235317521501133049587746364812444472287442159306443086833887479789539173449622133054745814\
         7574478578278803560754066959663745455193666960506455349780493525811386914540373186134",
     );
-    test(
+    test_ok(
         &[
             "22157300197", "19932263435", "7356592443", "2287104975", "16296043356", "20703615271",
             "16865310802", "15555287795", "4911199976", "8692905086", "9179503556", "11033729126",
@@ -1730,37 +1770,39 @@ fn from_digits_desc() {
         5855188918761759968447473283739550817700685872668984640703760436616510553858385622841396530\
         38089626212682923"
     );
+
+    fn test_err(xs: &[&str], base: &str) {
+        let xs = xs.iter().map(|x| Natural::from_str(x).unwrap());
+        let base = Natural::from_str(base).unwrap();
+        assert!(Natural::from_digits_desc(&base, xs.clone()).is_none());
+        assert!(_from_digits_desc_naive(&xs.collect_vec(), &base).is_none());
+    }
+    test_err(&["101", "102"], "100");
 }
 
 #[test]
 fn from_digits_desc_fail() {
     assert_panic!(Natural::from_digits_desc(&Natural::ZERO, empty()));
     assert_panic!(Natural::from_digits_desc(&Natural::ONE, empty()));
-    assert_panic!(Natural::from_digits_desc(
-        &Natural::from(10u32).pow(100),
-        [Natural::from(10u32).pow(101), Natural::from(10u32).pow(102)]
-            .iter()
-            .cloned()
-    ));
 }
 
 #[test]
 fn from_digits_desc_properties() {
     natural_vec_natural_pair_gen_var_2().test_properties(|(digits, base)| {
-        let n = Natural::from_digits_desc(&base, digits.iter().cloned());
+        let n = Natural::from_digits_desc(&base, digits.iter().cloned()).unwrap();
         assert_eq!(
-            Natural::from_digits_asc(&base, digits.iter().rev().cloned()),
+            Natural::from_digits_asc(&base, digits.iter().rev().cloned()).unwrap(),
             n
         );
         let leading_zeros = slice_leading_zeros(&digits);
         assert_eq!(n.to_digits_desc(&base), &digits[leading_zeros..]);
-        assert_eq!(_from_digits_desc_naive(&digits, &base), n);
+        assert_eq!(_from_digits_desc_naive(&digits, &base).unwrap(), n);
     });
 
     natural_unsigned_pair_gen_var_5().test_properties(|(base, u)| {
         assert_eq!(
             Natural::from_digits_desc(&base, repeat_n(Natural::ZERO, u)),
-            Natural::ZERO
+            Some(Natural::ZERO)
         );
     });
 }

@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModAssign, ModPowerOfTwo, NegMod, NegModAssign, Parity, PowerOfTwo, WrappingAddAssign,
+    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, Parity, PowerOf2, WrappingAddAssign,
     WrappingMulAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -917,20 +917,20 @@ fn limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv: Limb) -
     if len == 1 {
         return _mod_by_preinversion(ns_high, ns[0], d, d_inv);
     }
-    let power_of_two = d.wrapping_neg().wrapping_mul(d_inv);
+    let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
     let (sum, mut big_carry) = DoubleLimb::join_halves(ns[len - 1], ns[len - 2])
-        .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(ns_high));
+        .overflowing_add(DoubleLimb::from(power_of_2) * DoubleLimb::from(ns_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for &n in ns[..len - 2].iter().rev() {
         if big_carry {
-            let (sum, carry) = sum_low.overflowing_add(power_of_two);
+            let (sum, carry) = sum_low.overflowing_add(power_of_2);
             sum_low = sum;
             if carry {
                 sum_low.wrapping_sub_assign(d);
             }
         }
         let (sum, carry) = DoubleLimb::join_halves(sum_low, n)
-            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));
+            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
         big_carry = carry;
@@ -966,7 +966,7 @@ fn limbs_mod_limb_normalized_shl(
     if len == 1 {
         return _mod_by_preinversion(ns_high, ns[0] << bits, d, d_inv);
     }
-    let power_of_two = d.wrapping_neg().wrapping_mul(d_inv);
+    let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
     let cobits = Limb::WIDTH - bits;
     let second_highest = ns[len - 2];
     let highest_after_shl = (ns[len - 1] << bits) | (second_highest >> cobits);
@@ -975,11 +975,11 @@ fn limbs_mod_limb_normalized_shl(
         second_highest_after_shl |= ns[len - 3] >> cobits;
     }
     let (sum, mut big_carry) = DoubleLimb::join_halves(highest_after_shl, second_highest_after_shl)
-        .overflowing_add(DoubleLimb::from(power_of_two) * DoubleLimb::from(ns_high));
+        .overflowing_add(DoubleLimb::from(power_of_2) * DoubleLimb::from(ns_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
         if big_carry {
-            let (sum, carry) = sum_low.overflowing_add(power_of_two);
+            let (sum, carry) = sum_low.overflowing_add(power_of_2);
             sum_low = sum;
             if carry {
                 sum_low.wrapping_sub_assign(d);
@@ -990,7 +990,7 @@ fn limbs_mod_limb_normalized_shl(
             n |= ns[j - 1] >> cobits;
         }
         let (sum, carry) = DoubleLimb::join_halves(sum_low, n)
-            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_two));
+            .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
         big_carry = carry;
@@ -1176,8 +1176,7 @@ pub fn _limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
     let d_inv = limbs_invert_limb(d);
     let mut base_mod_d = d.wrapping_neg();
     if shift != 0 {
-        base_mod_d
-            .wrapping_mul_assign((d_inv >> (Limb::WIDTH - shift)) | Limb::power_of_two(shift));
+        base_mod_d.wrapping_mul_assign((d_inv >> (Limb::WIDTH - shift)) | Limb::power_of_2(shift));
     }
     assert!(base_mod_d <= d); // not fully reduced mod divisor
     let base_pow_2_mod_d =
@@ -1221,7 +1220,7 @@ pub fn _limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
     } else {
         let base_mod_d = d
             .wrapping_neg()
-            .wrapping_mul((d_inv >> (Limb::WIDTH - shift)) | Limb::power_of_two(shift));
+            .wrapping_mul((d_inv >> (Limb::WIDTH - shift)) | Limb::power_of_2(shift));
         assert!(base_mod_d <= d); // not fully reduced mod divisor
         DoubleLimb::from(base_mod_d >> shift)
     };
@@ -1276,7 +1275,7 @@ pub fn _limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
 ///
 /// where n = `ns.len()`
 ///
-/// This is mpn_mod_1s_2p_cps combined with mpn_mod_1s_2p from mpn/generic/mod_1_2.c, GMP 6.1.2.
+/// This is mpn_mod_1s_2p_cps combined with mpn_mod_1s_2p from mpn/generic/mod_1_2.c, GMP 6.2.1.
 pub fn _limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb {
     let mut len = ns.len();
     assert_ne!(len, 0);
@@ -1287,7 +1286,7 @@ pub fn _limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb {
     let d_inv = limbs_invert_limb(d);
     let base_mod_d = d
         .wrapping_neg()
-        .wrapping_mul((d_inv >> co_shift) | Limb::power_of_two(shift));
+        .wrapping_mul((d_inv >> co_shift) | Limb::power_of_2(shift));
     assert!(base_mod_d <= d); // not fully reduced mod divisor
     let base_pow_2_mod_d = mod_by_preinversion_special(base_mod_d, 0, d, d_inv);
     let base_mod_d = DoubleLimb::from(base_mod_d >> shift);
@@ -1344,7 +1343,7 @@ pub fn _limbs_mod_limb_at_least_2_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
     let d_inv = limbs_invert_limb(d);
     let base_mod_d = d
         .wrapping_neg()
-        .wrapping_mul((d_inv >> co_shift) | Limb::power_of_two(shift));
+        .wrapping_mul((d_inv >> co_shift) | Limb::power_of_2(shift));
     assert!(base_mod_d <= d); // not fully reduced mod divisor
     let base_pow_2_mod_d = mod_by_preinversion_special(base_mod_d, 0, d, d_inv);
     let base_mod_d = DoubleLimb::from(base_mod_d >> shift);
@@ -1355,7 +1354,7 @@ pub fn _limbs_mod_limb_at_least_2_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
     let base_pow_5_mod_d =
         DoubleLimb::from(mod_by_preinversion_special(base_pow_4_mod_d, 0, d, d_inv) >> shift);
     let base_pow_4_mod_d = DoubleLimb::from(base_pow_4_mod_d >> shift);
-    let (mut r_hi, mut r_lo) = match len.mod_power_of_two(2) {
+    let (mut r_hi, mut r_lo) = match len.mod_power_of_2(2) {
         0 => {
             len -= 4;
             (DoubleLimb::from(ns[len + 3]) * base_pow_3_mod_d)

@@ -1,13 +1,13 @@
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use integer::Integer;
-use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, ShrRound};
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros, TrailingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::vecs::vec_delete_left;
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;
-use natural::arithmetic::mod_power_of_two::limbs_vec_mod_power_of_two_in_place;
+use natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::limbs_sub_limb_in_place;
 use natural::logic::bit_block_access::limbs_assign_bits_helper;
@@ -68,7 +68,7 @@ pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
         }
         out
     };
-    limbs_vec_mod_power_of_two_in_place(&mut out, bit_len);
+    limbs_vec_mod_power_of_2_in_place(&mut out, bit_len);
     out
 }
 
@@ -117,7 +117,7 @@ pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> 
                 Limb::MAX;
                 usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling))
             ];
-        limbs_vec_mod_power_of_two_in_place(&mut out, bit_len);
+        limbs_vec_mod_power_of_2_in_place(&mut out, bit_len);
         return out;
     }
     let end_i = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
@@ -137,7 +137,7 @@ pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> 
     } else {
         limbs_not_in_place(&mut out);
     }
-    limbs_vec_mod_power_of_two_in_place(&mut out, bit_len);
+    limbs_vec_mod_power_of_2_in_place(&mut out, bit_len);
     out
 }
 
@@ -185,7 +185,7 @@ pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
             Limb::MAX;
             usize::exact_from(bit_len.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling))
         ];
-        limbs_vec_mod_power_of_two_in_place(&mut xs, bit_len);
+        limbs_vec_mod_power_of_2_in_place(&mut xs, bit_len);
         return xs;
     }
     let end_i = usize::exact_from(end >> Limb::LOG_WIDTH) + 1;
@@ -201,7 +201,7 @@ pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
     } else {
         limbs_not_in_place(&mut xs);
     }
-    limbs_vec_mod_power_of_two_in_place(&mut xs, bit_len);
+    limbs_vec_mod_power_of_2_in_place(&mut xs, bit_len);
     xs
 }
 
@@ -270,7 +270,7 @@ impl Natural {
             if let (&mut Natural(Small(ref mut small_self)), &Natural(Small(small_bits))) =
                 (&mut *self, bits)
             {
-                let small_bits = (!small_bits).mod_power_of_two(bits_width);
+                let small_bits = (!small_bits).mod_power_of_2(bits_width);
                 if small_bits == 0 || LeadingZeros::leading_zeros(small_bits) >= start {
                     let mut new_small_self = *small_self - 1;
                     new_small_self.assign_bits(start, end, &small_bits);

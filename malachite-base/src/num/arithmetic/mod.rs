@@ -141,9 +141,9 @@ pub mod checked_div;
 pub mod checked_mul;
 /// This module wraps the `checked_neg` function into an implementation of `CheckedNeg`.
 pub mod checked_neg;
-/// This module wraps the `checked_next_power_of_two` function into an implementation of
-/// `CheckedNextPowerOfTwo`.
-pub mod checked_next_power_of_two;
+/// This module wraps the `checked_next_power_of_2` function into an implementation of
+/// `CheckedNextPowerOf2`.
+pub mod checked_next_power_of_2;
 /// This module wraps the `checked_pow` function into an implementation of `CheckedPow`.
 pub mod checked_pow;
 /// This module contains functions for squaring a number and checking whether the result is
@@ -542,19 +542,19 @@ pub mod divisible_by;
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # divisible_by_power_of_two
+/// # divisible_by_power_of_2
 /// ```
-/// use malachite_base::num::arithmetic::traits::DivisibleByPowerOfTwo;
+/// use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 ///
-/// assert_eq!(0u8.divisible_by_power_of_two(100), true);
-/// assert_eq!(96u16.divisible_by_power_of_two(5), true);
-/// assert_eq!(96u32.divisible_by_power_of_two(6), false);
+/// assert_eq!(0u8.divisible_by_power_of_2(100), true);
+/// assert_eq!(96u16.divisible_by_power_of_2(5), true);
+/// assert_eq!(96u32.divisible_by_power_of_2(6), false);
 ///
-/// assert_eq!(0i8.divisible_by_power_of_two(100), true);
-/// assert_eq!((-96i16).divisible_by_power_of_two(5), true);
-/// assert_eq!(96i32.divisible_by_power_of_two(6), false);
+/// assert_eq!(0i8.divisible_by_power_of_2(100), true);
+/// assert_eq!((-96i16).divisible_by_power_of_2(5), true);
+/// assert_eq!(96i32.divisible_by_power_of_2(6), false);
 /// ```
-pub mod divisible_by_power_of_two;
+pub mod divisible_by_power_of_2;
 /// This module contains functions determining whether one number is equal by another, mod a third.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -573,38 +573,120 @@ pub mod eq_mod;
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # eq_mod_power_of_two
+/// # eq_mod_power_of_2
 /// ```
-/// use malachite_base::num::arithmetic::traits::EqModPowerOfTwo;
+/// use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 ///
-/// assert_eq!(0u16.eq_mod_power_of_two(256, 8), true);
-/// assert_eq!((-0b1101i32).eq_mod_power_of_two(0b11011, 3), true);
-/// assert_eq!((-0b1101i64).eq_mod_power_of_two(0b11011, 4), false);
+/// assert_eq!(0u16.eq_mod_power_of_2(256, 8), true);
+/// assert_eq!((-0b1101i32).eq_mod_power_of_2(0b11011, 3), true);
+/// assert_eq!((-0b1101i64).eq_mod_power_of_2(0b11011, 4), false);
 /// ```
-pub mod eq_mod_power_of_two;
-pub mod is_power_of_two;
+pub mod eq_mod_power_of_2;
+pub mod is_power_of_2;
 pub mod mod_add;
+/// This module contains functions for checking whether a number is reduced mod another number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_is_reduced
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModIsReduced;
+///
+/// assert_eq!(0u8.mod_is_reduced(&5), true);
+/// assert_eq!(100u64.mod_is_reduced(&100), false);
+/// assert_eq!(100u16.mod_is_reduced(&101), true);
+/// ```
 pub mod mod_is_reduced;
 pub mod mod_mul;
+/// This module contains functions for negating a number, mod another number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_neg
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModNeg;
+///
+/// assert_eq!(0u8.mod_neg(5), 0);
+/// assert_eq!(7u32.mod_neg(10), 3);
+/// assert_eq!(100u16.mod_neg(101), 1);
+/// ```
+///
+/// # mod_neg_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModNegAssign;
+///
+/// let mut n = 0u8;
+/// n.mod_neg_assign(5);
+/// assert_eq!(n, 0);
+///
+/// let mut n = 7u32;
+/// n.mod_neg_assign(10);
+/// assert_eq!(n, 3);
+///
+/// let mut n = 100u16;
+/// n.mod_neg_assign(101);
+/// assert_eq!(n, 1);
+/// ```
 pub mod mod_neg;
 pub mod mod_op;
 pub mod mod_pow;
-pub mod mod_power_of_two;
-pub mod mod_power_of_two_add;
-pub mod mod_power_of_two_is_reduced;
-pub mod mod_power_of_two_mul;
-pub mod mod_power_of_two_neg;
-pub mod mod_power_of_two_pow;
-pub mod mod_power_of_two_shl;
-pub mod mod_power_of_two_shr;
-pub mod mod_power_of_two_square;
-pub mod mod_power_of_two_sub;
+pub mod mod_power_of_2;
+pub mod mod_power_of_2_add;
+/// This module contains functions for checking whether a number is reduced mod a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_power_of_2_is_reduced
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2IsReduced;
+///
+/// assert_eq!(0u8.mod_power_of_2_is_reduced(5), true);
+/// assert_eq!(100u64.mod_power_of_2_is_reduced(5), false);
+/// assert_eq!(100u16.mod_power_of_2_is_reduced(8), true);
+/// ```
+pub mod mod_power_of_2_is_reduced;
+pub mod mod_power_of_2_mul;
+/// This module contains functions for negating a number, mod a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_power_of_2_neg
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Neg;
+///
+/// assert_eq!(0u8.mod_power_of_2_neg(5), 0);
+/// assert_eq!(10u32.mod_power_of_2_neg(4), 6);
+/// assert_eq!(100u16.mod_power_of_2_neg(8), 156);
+/// ```
+///
+/// # mod_power_of_2_neg_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2NegAssign;
+///
+/// let mut n = 0u8;
+/// n.mod_power_of_2_neg_assign(5);
+/// assert_eq!(n, 0);
+///
+/// let mut n = 10u32;
+/// n.mod_power_of_2_neg_assign(4);
+/// assert_eq!(n, 6);
+///
+/// let mut n = 100u16;
+/// n.mod_power_of_2_neg_assign(8);
+/// assert_eq!(n, 156);
+/// ```
+pub mod mod_power_of_2_neg;
+pub mod mod_power_of_2_pow;
+pub mod mod_power_of_2_shl;
+pub mod mod_power_of_2_shr;
+pub mod mod_power_of_2_square;
+pub mod mod_power_of_2_sub;
 pub mod mod_shl;
 pub mod mod_shr;
 pub mod mod_square;
 pub mod mod_sub;
 pub mod neg;
-pub mod next_power_of_two;
+pub mod next_power_of_2;
 pub mod overflowing_abs;
 pub mod overflowing_add;
 pub mod overflowing_add_mul;
@@ -617,9 +699,9 @@ pub mod overflowing_sub;
 pub mod overflowing_sub_mul;
 pub mod parity;
 pub mod pow;
-pub mod power_of_two;
+pub mod power_of_2;
 pub mod round_to_multiple;
-pub mod round_to_multiple_of_power_of_two;
+pub mod round_to_multiple_of_power_of_2;
 pub mod saturating_abs;
 pub mod saturating_add;
 pub mod saturating_add_mul;

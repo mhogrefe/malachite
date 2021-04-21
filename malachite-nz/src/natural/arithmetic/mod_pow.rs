@@ -1,6 +1,6 @@
 use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    ModPow, ModPowAssign, ModPowerOfTwo, ModPowerOfTwoAssign, Parity, PowerOfTwo, WrappingNegAssign,
+    ModPow, ModPowAssign, ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, WrappingNegAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -19,7 +19,7 @@ use natural::arithmetic::div_exact::{
 };
 use natural::arithmetic::div_mod::limbs_div_limb_to_out_mod;
 use natural::arithmetic::mod_op::limbs_mod_to_out;
-use natural::arithmetic::mod_power_of_two_pow::limbs_pow_low;
+use natural::arithmetic::mod_power_of_2_pow::limbs_pow_low;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::arithmetic::mul::mul_mod::{
     _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
@@ -44,10 +44,11 @@ use std::cmp::{max, min, Ordering};
 
 // Equivalent to limbs_slice_get_bits(xs, end.saturating_sub(len), end)[0]
 //
-// This is getbits from mpn/generic/powm.c and mpn/generic/powlo.c, GMP 6.1.2.
+// This is getbits from mpn/generic/powm.c and mpn/generic/powlo.c, GMP 6.2.1. Investigate changes
+// from 6.1.2?
 pub(crate) fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> usize {
     usize::exact_from(if end < len {
-        xs[0].mod_power_of_two(end)
+        xs[0].mod_power_of_2(end)
     } else {
         end -= len;
         let i = usize::exact_from(end >> Limb::LOG_WIDTH);
@@ -57,7 +58,7 @@ pub(crate) fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> usize {
         if coend < len {
             bits += xs[i + 1] << coend;
         }
-        bits.mod_power_of_two(len)
+        bits.mod_power_of_2(len)
     })
 }
 
@@ -80,7 +81,7 @@ fn limbs_redc_limb_raw(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Li
     limbs_add_same_length_to_out(out, xs_hi, xs_lo)
 }
 
-// This is MPN_REDC_1 from mpn/generic/powm.c, GMP 6.1.2.
+// This is MPN_REDC_1 from mpn/generic/powm.c, GMP 6.2.1. Investigate changes from 6.1.2?
 fn limbs_redc_limb(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) {
     if limbs_redc_limb_raw(out, xs, ms, m_inv) {
         limbs_sub_same_length_in_place_left(&mut out[..ms.len()], ms);
@@ -89,7 +90,7 @@ fn limbs_redc_limb(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) 
 
 const WIDTH_LIMITS: [u64; 10] = [7, 25, 81, 241, 673, 1793, 4609, 11521, 28161, u64::MAX];
 
-// This is win_size from mpn/generic/powm.c, GMP 6.1.2.
+// This is win_size from mpn/generic/powm.c, 6.2.1. Investigate changes from 6.1.2?
 pub(crate) fn get_window_size(width: u64) -> u64 {
     u64::wrapping_from(
         WIDTH_LIMITS
@@ -125,7 +126,7 @@ fn limbs_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb], is: &[Limb]) {
 }
 
 // Convert U to REDC form, U_r = B^n * U mod M
-// This is redcify from mpn/generic/powm.c, GMP 6.1.2.
+// This is redcify from mpn/generic/powm.c, 6.2.1. Investigate changes from 6.1.2?
 fn to_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb]) {
     let xs_len = xs.len();
     let ms_len = ms.len();
@@ -307,7 +308,7 @@ pub fn limbs_mod_pow_odd(
     limbs_square_to_out(scratch, powers[0]);
     redc_fn(out, scratch, ms, is);
     // Precompute odd powers of x and put them in `powers`.
-    for i in 1..usize::power_of_two(window_size - 1) {
+    for i in 1..usize::power_of_2(window_size - 1) {
         let (powers_lo, powers_hi) = powers.split_at_mut(i);
         limbs_mul_same_length_to_out(scratch, powers_lo[i - 1], out);
         redc_fn(powers_hi[0], scratch, ms, is);
@@ -384,7 +385,8 @@ pub fn limbs_mod_pow_odd(
 /// assert_eq!(out, &[0, 4, 10]);
 /// ```
 ///
-/// This is mpz_powm from mpn/generic/powm.c, GMP 6.1.2, where b, e, and m are non-negative.
+/// This is mpz_powm from mpn/generic/powm.c, GMP 6.2.1, where b, e, and m are non-negative.
+/// Investigate changes from 6.1.2?
 pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
     let ms_len = ms.len();
     let es_len = es.len();
@@ -438,8 +440,8 @@ pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
                     ((ms_zero_len - 1) << Limb::LOG_WIDTH) + usize::exact_from(ms_twos)
                 };
                 // Count number of low zero bits in `xs`, up to 3.
-                let bits = (Limb::exact_from(0x1213) >> (xs[0].mod_power_of_two(3) << 1))
-                    .mod_power_of_two(2);
+                let bits =
+                    (Limb::exact_from(0x1213) >> (xs[0].mod_power_of_2(3) << 1)).mod_power_of_2(2);
                 // Note that es[0] * bits might overflow, but that just results in a missed
                 // optimization.
                 if let Some(t) = Limb::checked_from(t) {
@@ -467,7 +469,7 @@ pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
         limbs_sub_in_place_left(scratch_0, &out[..min(ms_zero_len, ms_nonzero_len)]);
         limbs_mul_low_same_length(scratch_2, &scratch_1[..ms_zero_len], scratch_0);
         if ms_twos != 0 {
-            scratch_2[ms_zero_len - 1].mod_power_of_two_assign(ms_twos);
+            scratch_2[ms_zero_len - 1].mod_power_of_2_assign(ms_twos);
         }
         limbs_mul_to_out(
             scratch_0_1,

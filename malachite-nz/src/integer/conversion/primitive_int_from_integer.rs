@@ -1,6 +1,6 @@
 use integer::Integer;
 use malachite_base::comparison::traits::Min;
-use malachite_base::num::arithmetic::traits::{DivisibleByPowerOfTwo, WrappingNeg};
+use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, WrappingNeg};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
@@ -113,7 +113,7 @@ fn _convertible_from_signed<T: PrimitiveInt>(value: &Integer) -> bool {
         } => {
             let significant_bits = abs.significant_bits();
             significant_bits < T::WIDTH
-                || significant_bits == T::WIDTH && abs.divisible_by_power_of_two(T::WIDTH - 1)
+                || significant_bits == T::WIDTH && abs.divisible_by_power_of_2(T::WIDTH - 1)
         }
     }
 }

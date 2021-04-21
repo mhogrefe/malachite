@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::ModPowerOfTwo;
+use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
@@ -27,7 +27,7 @@ macro_rules! unsigned_properties {
             assert_eq!(result.is_none(), $t::overflowing_from(x).1);
 
             let result = $t::wrapping_from(x);
-            assert_eq!(result, $t::exact_from((&x).mod_power_of_two($t::WIDTH)));
+            assert_eq!(result, $t::exact_from((&x).mod_power_of_2($t::WIDTH)));
         });
     };
 }

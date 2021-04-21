@@ -50,45 +50,46 @@ fn test_padding_signed(mut s: &str, mut s_padded: &str, mut width: usize) {
 
 #[test]
 fn test_digit_to_display_byte_lower() {
-    let test = |x, y| {
-        assert_eq!(digit_to_display_byte_lower(x), y);
+    let test_ok = |x, y| {
+        assert_eq!(digit_to_display_byte_lower(x).unwrap(), y);
     };
-    test(0, b'0');
-    test(1, b'1');
-    test(2, b'2');
-    test(3, b'3');
-    test(4, b'4');
-    test(5, b'5');
-    test(6, b'6');
-    test(7, b'7');
-    test(8, b'8');
-    test(9, b'9');
-    test(10, b'a');
-    test(11, b'b');
-    test(12, b'c');
-    test(33, b'x');
-    test(34, b'y');
-    test(35, b'z');
-}
+    test_ok(0, b'0');
+    test_ok(1, b'1');
+    test_ok(2, b'2');
+    test_ok(3, b'3');
+    test_ok(4, b'4');
+    test_ok(5, b'5');
+    test_ok(6, b'6');
+    test_ok(7, b'7');
+    test_ok(8, b'8');
+    test_ok(9, b'9');
+    test_ok(10, b'a');
+    test_ok(11, b'b');
+    test_ok(12, b'c');
+    test_ok(33, b'x');
+    test_ok(34, b'y');
+    test_ok(35, b'z');
 
-#[test]
-#[should_panic]
-fn digit_to_display_byte_lower_fail_1() {
-    digit_to_display_byte_lower(36);
-}
-
-#[test]
-#[should_panic]
-fn digit_to_display_byte_lower_fail_2() {
-    digit_to_display_byte_lower(100);
+    let test_err = |x| {
+        assert!(digit_to_display_byte_lower(x).is_none());
+    };
+    test_err(36);
+    test_err(100);
 }
 
 #[test]
 fn digit_to_display_byte_lower_properties() {
+    unsigned_gen().test_properties(|b| {
+        assert_eq!(
+            digit_to_display_byte_lower(b).is_some(),
+            (0..36).contains(&b)
+        );
+    });
+
     unsigned_gen_var_7().test_properties(|b| {
-        let display_byte = digit_to_display_byte_lower(b);
+        let display_byte = digit_to_display_byte_lower(b).unwrap();
         assert!((b'0'..=b'9').contains(&display_byte) || (b'a'..=b'z').contains(&display_byte));
-        let display_byte_upper = digit_to_display_byte_upper(b);
+        let display_byte_upper = digit_to_display_byte_upper(b).unwrap();
         assert_eq!(display_byte == display_byte_upper, (0..=9).contains(&b));
         assert_eq!(
             char::from(display_byte).to_ascii_uppercase(),
@@ -99,45 +100,46 @@ fn digit_to_display_byte_lower_properties() {
 
 #[test]
 fn test_digit_to_display_byte_upper() {
-    let test = |x, y| {
-        assert_eq!(digit_to_display_byte_upper(x), y);
+    let test_ok = |x, y| {
+        assert_eq!(digit_to_display_byte_upper(x).unwrap(), y);
     };
-    test(0, b'0');
-    test(1, b'1');
-    test(2, b'2');
-    test(3, b'3');
-    test(4, b'4');
-    test(5, b'5');
-    test(6, b'6');
-    test(7, b'7');
-    test(8, b'8');
-    test(9, b'9');
-    test(10, b'A');
-    test(11, b'B');
-    test(12, b'C');
-    test(33, b'X');
-    test(34, b'Y');
-    test(35, b'Z');
-}
+    test_ok(0, b'0');
+    test_ok(1, b'1');
+    test_ok(2, b'2');
+    test_ok(3, b'3');
+    test_ok(4, b'4');
+    test_ok(5, b'5');
+    test_ok(6, b'6');
+    test_ok(7, b'7');
+    test_ok(8, b'8');
+    test_ok(9, b'9');
+    test_ok(10, b'A');
+    test_ok(11, b'B');
+    test_ok(12, b'C');
+    test_ok(33, b'X');
+    test_ok(34, b'Y');
+    test_ok(35, b'Z');
 
-#[test]
-#[should_panic]
-fn digit_to_display_byte_upper_fail_1() {
-    digit_to_display_byte_upper(36);
-}
-
-#[test]
-#[should_panic]
-fn digit_to_display_byte_upper_fail_2() {
-    digit_to_display_byte_upper(100);
+    let test_err = |x| {
+        assert!(digit_to_display_byte_upper(x).is_none());
+    };
+    test_err(36);
+    test_err(100);
 }
 
 #[test]
 fn digit_to_display_byte_upper_properties() {
+    unsigned_gen().test_properties(|b| {
+        assert_eq!(
+            digit_to_display_byte_upper(b).is_some(),
+            (0..36).contains(&b)
+        );
+    });
+
     unsigned_gen_var_7().test_properties(|b| {
-        let display_byte = digit_to_display_byte_upper(b);
+        let display_byte = digit_to_display_byte_upper(b).unwrap();
         assert!((b'0'..=b'9').contains(&display_byte) || (b'A'..=b'Z').contains(&display_byte));
-        let display_byte_lower = digit_to_display_byte_lower(b);
+        let display_byte_lower = digit_to_display_byte_lower(b).unwrap();
         assert_eq!(display_byte == display_byte_lower, (0..=9).contains(&b));
         assert_eq!(
             char::from(display_byte).to_ascii_lowercase(),

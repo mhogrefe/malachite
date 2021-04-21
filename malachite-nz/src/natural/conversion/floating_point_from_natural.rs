@@ -1,6 +1,6 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOfTwo, FloorLogTwo, ShrRound, ShrRoundAssign,
+    DivisibleByPowerOf2, FloorLogBase2, ShrRound, ShrRoundAssign,
 };
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
@@ -8,7 +8,7 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
+use natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use natural::logic::bit_scan::limbs_index_of_next_false_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
@@ -31,7 +31,7 @@ macro_rules! float_impls {
                             const TRAILING_ZEROS_OF_MAX: u64 =
                                 ($f::MAX_EXPONENT as u64) - $f::MANTISSA_WIDTH;
                             limbs_index_of_next_false_bit(limbs, TRAILING_ZEROS_OF_MAX) >= MAX_WIDTH
-                                && !limbs_divisible_by_power_of_two(limbs, TRAILING_ZEROS_OF_MAX)
+                                && !limbs_divisible_by_power_of_2(limbs, TRAILING_ZEROS_OF_MAX)
                         }
                     }
                 }
@@ -92,7 +92,7 @@ macro_rules! float_impls {
                         _ => $f::POSITIVE_INFINITY,
                     };
                 }
-                let mut exponent = value.floor_log_two();
+                let mut exponent = value.floor_log_base_2();
                 let shift = i64::exact_from(exponent) - i64::exact_from($f::MANTISSA_WIDTH);
                 value.shr_round_assign(shift, rm);
                 let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::exact_from(value);
@@ -156,7 +156,7 @@ macro_rules! float_impls {
                         _ => $f::POSITIVE_INFINITY,
                     };
                 }
-                let mut exponent = value.floor_log_two();
+                let mut exponent = value.floor_log_base_2();
                 let shift = i64::exact_from(exponent) - i64::exact_from($f::MANTISSA_WIDTH);
                 let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::exact_from(
                     value.shr_round(shift, rm),
@@ -261,9 +261,9 @@ macro_rules! float_impls {
                 if $gt_max_finite_float(&value) {
                     return None;
                 }
-                let exponent = value.floor_log_two();
+                let exponent = value.floor_log_base_2();
                 let shift = i64::exact_from(exponent) - i64::exact_from($f::MANTISSA_WIDTH);
-                if shift >= 0 && !value.divisible_by_power_of_two(u64::wrapping_from(shift)) {
+                if shift >= 0 && !value.divisible_by_power_of_2(u64::wrapping_from(shift)) {
                     return None;
                 }
                 value >>= shift;
@@ -309,9 +309,9 @@ macro_rules! float_impls {
                 if $gt_max_finite_float(value) {
                     return None;
                 }
-                let exponent = value.floor_log_two();
+                let exponent = value.floor_log_base_2();
                 let shift = i64::exact_from(exponent) - i64::exact_from($f::MANTISSA_WIDTH);
-                if shift >= 0 && !value.divisible_by_power_of_two(u64::wrapping_from(shift)) {
+                if shift >= 0 && !value.divisible_by_power_of_2(u64::wrapping_from(shift)) {
                     return None;
                 }
                 let mut mantissa =
@@ -379,9 +379,9 @@ macro_rules! float_impls {
             fn convertible_from(value: &'a Natural) -> bool {
                 *value == 0
                     || !$gt_max_finite_float(&value) && {
-                        let shift = i64::exact_from(value.floor_log_two())
+                        let shift = i64::exact_from(value.floor_log_base_2())
                             - i64::exact_from($f::MANTISSA_WIDTH);
-                        shift < 0 || value.divisible_by_power_of_two(u64::wrapping_from(shift))
+                        shift < 0 || value.divisible_by_power_of_2(u64::wrapping_from(shift))
                     }
             }
         }

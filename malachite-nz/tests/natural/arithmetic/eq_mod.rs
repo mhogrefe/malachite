@@ -133,7 +133,7 @@ fn test_limbs_eq_limb_mod() {
         assert_eq!(limbs_eq_limb_mod_naive_1(xs, y, ms), equal);
         assert_eq!(limbs_eq_limb_mod_naive_2(xs, y, ms), equal);
     };
-    // xs[0].eq_mod_power_of_two(y, u64::from(m_trailing_zeros))
+    // xs[0].eq_mod_power_of_2(y, u64::from(m_trailing_zeros))
     // m_len != 2 || m_0 == 0
     test(&[1, 1], 1, &[0, 1], true);
     // m_len == 2 && m_0 != 0
@@ -145,7 +145,7 @@ fn test_limbs_eq_limb_mod() {
     test(&[6; 40], 2, &[2, 1], false);
     // y_0 >= m_0
     test(&[6; 40], 0x80000002, &[2, 1], false);
-    // !xs[0].eq_mod_power_of_two(y, u64::from(m_trailing_zeros))
+    // !xs[0].eq_mod_power_of_2(y, u64::from(m_trailing_zeros))
     test(&[0, 1], 1, &[0, 1], false);
     // m_1 >= 1 << m_trailing_zeros
     test(&[0, 1], 1, &[1, 1], false);
@@ -304,7 +304,7 @@ fn test_limbs_eq_mod_limb() {
         assert_eq!(limbs_eq_mod_limb_naive_2(xs, ys, m), equal);
     };
     // xs != ys in limbs_eq_mod_limb_greater
-    // xs[0].eq_mod_power_of_two(ys[0], u64::from(m.trailing_zeros())) in limbs_eq_mod_limb_greater
+    // xs[0].eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros())) in limbs_eq_mod_limb_greater
     // limbs_cmp(xs, ys) < Ordering::Equal in limbs_eq_mod_limb_greater
     // scratch.len() > 1 in limbs_eq_mod_limb_greater
     test(&[1, 1], &[3, 4], 5, true);
@@ -314,7 +314,7 @@ fn test_limbs_eq_mod_limb() {
     test(&[0, 0, 1], &[0, 1], 1, true);
     // scratch.len() == 1 in limbs_eq_mod_limb_greater
     test(&[0, 1], &[1, 1], 1, true);
-    // !xs[0].eq_mod_power_of_two(ys[0], u64::from(m.trailing_zeros())) in limbs_eq_mod_limb_greater
+    // !xs[0].eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros())) in limbs_eq_mod_limb_greater
     test(&[0, 1], &[1, 1], 2, false);
 }
 
@@ -442,10 +442,10 @@ fn test_limbs_eq_mod_ref_ref_ref() {
         assert_eq!(limbs_eq_mod_naive_2(xs, ys, ms), equal);
     };
     // xs != ys in limbs_eq_mod_greater
-    // xs[0].eq_mod_power_of_two(ys[0], u64::from(ms[0].trailing_zeros())) in limbs_eq_mod_greater
+    // xs[0].eq_mod_power_of_2(ys[0], u64::from(ms[0].trailing_zeros())) in limbs_eq_mod_greater
     // limbs_cmp(xs, ys) == Ordering::Less
     test(&[1, 1, 1], &[1, 0, 3], &[0, 7], true);
-    // !xs[0].eq_mod_power_of_two(ys[0], u64::from(ms[0].trailing_zeros())) in limbs_eq_mod_greater
+    // !xs[0].eq_mod_power_of_2(ys[0], u64::from(ms[0].trailing_zeros())) in limbs_eq_mod_greater
     test(&[0, 1, 1], &[1, 0, 3], &[0, 7], false);
     // limbs_cmp(xs, ys) >= Ordering::Equal
     test(&[1, 3], &[1, 1, 2], &[0, 5], true);

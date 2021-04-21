@@ -1,10 +1,8 @@
 use comparison::traits::{Max, Min};
 use num::basic::traits::Zero;
 use num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, FromStrRadix, OverflowingFrom, SaturatingFrom,
-    WrappingFrom,
+    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
-use std::num::ParseIntError;
 
 /// This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {
@@ -454,15 +452,3 @@ no_containment_conversion!(usize, isize);
 no_containment_conversion!(i32, isize);
 no_containment_conversion!(i64, isize);
 no_containment_conversion!(i128, isize);
-
-macro_rules! impl_conversion_traits {
-    ($t:ident) => {
-        impl FromStrRadix for $t {
-            #[inline]
-            fn from_str_radix(src: &str, radix: u64) -> Result<Self, ParseIntError> {
-                $t::from_str_radix(src, u32::exact_from(radix))
-            }
-        }
-    };
-}
-apply_to_primitive_ints!(impl_conversion_traits);

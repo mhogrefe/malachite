@@ -304,6 +304,15 @@ macro_rules! apply_to_primitive_floats {
 
 #[doc(hidden)]
 #[macro_export]
+macro_rules! apply_to_primitive_float_unsigned_pairs {
+    ($m: tt) => {
+        $m!(f32, u32);
+        $m!(f64, u64);
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
 macro_rules! apply_fn_to_primitive_floats {
     ($f: ident) => {
         $f::<f32>();

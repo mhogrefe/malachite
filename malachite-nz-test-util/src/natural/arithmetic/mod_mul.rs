@@ -1,11 +1,11 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
 
 pub fn limbs_precompute_mod_mul_two_limbs_alt(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
-    let out_limbs = (Natural::power_of_two(Limb::WIDTH << 2)
+    let out_limbs = (Natural::power_of_2(Limb::WIDTH << 2)
         / Natural::from(DoubleLimb::join_halves(m_1, m_0)))
     .into_limbs_asc();
     assert_eq!(out_limbs.len(), 3);

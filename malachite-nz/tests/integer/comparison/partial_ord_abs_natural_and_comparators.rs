@@ -4,72 +4,22 @@ use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
 use std::str::FromStr;
 
-//TODO clean from_str
-
 #[test]
 fn test_partial_ord_integer_natural() {
-    let test = |x, y, cmp, lt: bool, gt: bool, le: bool, ge: bool| {
-        assert_eq!(
-            Integer::from_str(x)
-                .unwrap()
-                .partial_cmp_abs(&Natural::from_str(y).unwrap()),
-            cmp
-        );
-        assert_eq!(
-            Natural::from_str(y)
-                .unwrap()
-                .partial_cmp_abs(&Integer::from_str(x).unwrap())
-                .map(Ordering::reverse),
-            cmp
-        );
-        assert_eq!(
-            lt,
-            Integer::from_str(x)
-                .unwrap()
-                .lt_abs(&Natural::from_str(y).unwrap())
-        );
-        assert_eq!(
-            gt,
-            Integer::from_str(x)
-                .unwrap()
-                .gt_abs(&Natural::from_str(y).unwrap())
-        );
-        assert_eq!(
-            le,
-            Integer::from_str(x)
-                .unwrap()
-                .le_abs(&Natural::from_str(y).unwrap())
-        );
-        assert_eq!(
-            ge,
-            Integer::from_str(x)
-                .unwrap()
-                .ge_abs(&Natural::from_str(y).unwrap())
-        );
-        assert_eq!(
-            lt,
-            Natural::from_str(y)
-                .unwrap()
-                .gt_abs(&Integer::from_str(x).unwrap())
-        );
-        assert_eq!(
-            gt,
-            Natural::from_str(y)
-                .unwrap()
-                .lt_abs(&Integer::from_str(x).unwrap())
-        );
-        assert_eq!(
-            le,
-            Natural::from_str(y)
-                .unwrap()
-                .ge_abs(&Integer::from_str(x).unwrap())
-        );
-        assert_eq!(
-            ge,
-            Natural::from_str(y)
-                .unwrap()
-                .le_abs(&Integer::from_str(x).unwrap())
-        );
+    let test = |s, t, cmp, lt: bool, gt: bool, le: bool, ge: bool| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        assert_eq!(u.partial_cmp_abs(&v), cmp);
+        assert_eq!(v.partial_cmp_abs(&u).map(Ordering::reverse), cmp);
+        assert_eq!(lt, u.lt_abs(&v));
+        assert_eq!(gt, u.gt_abs(&v));
+        assert_eq!(le, u.le_abs(&v));
+        assert_eq!(ge, u.ge_abs(&v));
+        assert_eq!(lt, v.gt_abs(&u));
+        assert_eq!(gt, v.lt_abs(&u));
+        assert_eq!(le, v.ge_abs(&u));
+        assert_eq!(ge, v.le_abs(&u));
     };
     test("0", "0", Some(Ordering::Equal), false, false, true, true);
     test("0", "5", Some(Ordering::Less), true, false, true, false);

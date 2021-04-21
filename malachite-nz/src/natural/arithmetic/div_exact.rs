@@ -1,7 +1,7 @@
 use fail_on_untested_path;
 use integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, ModPowerOfTwo, Parity, ShrRound, ShrRoundAssign, WrappingSubAssign,
+    DivExact, DivExactAssign, ModPowerOf2, Parity, ShrRound, ShrRoundAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -100,7 +100,7 @@ pub fn test_invert_limb_table() {
 /// This is binvert_limb from gmp-impl.h, GMP 6.2.1.
 pub fn limbs_modular_invert_limb(x: Limb) -> Limb {
     assert!(x.odd());
-    let index = (x >> 1).mod_power_of_two(INVERT_LIMB_TABLE_LOG_SIZE);
+    let index = (x >> 1).mod_power_of_2(INVERT_LIMB_TABLE_LOG_SIZE);
     let mut inv = Limb::from(INVERT_LIMB_TABLE[usize::exact_from(index)]);
     inv = (inv << 1).wrapping_sub((inv * inv).wrapping_mul(x));
     inv = (inv << 1).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));

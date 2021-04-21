@@ -170,7 +170,7 @@ fn _bits_unsigned<T: PrimitiveUnsigned>(x: T) -> PrimitiveUnsignedBitIterator<T>
         value: x,
         some_remaining: significant_bits != 0,
         i_mask: T::ONE,
-        j_mask: T::power_of_two(significant_bits.saturating_sub(1)),
+        j_mask: T::power_of_2(significant_bits.saturating_sub(1)),
     }
 }
 
@@ -330,7 +330,7 @@ fn _bits_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(
             value: unsigned,
             some_remaining: significant_bits != 0,
             i_mask: U::ONE,
-            j_mask: U::power_of_two(significant_bits.saturating_sub(1)),
+            j_mask: U::power_of_2(significant_bits.saturating_sub(1)),
         },
     }
 }

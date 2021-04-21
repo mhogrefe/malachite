@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::mod_mul::{
     _fast_mod_mul, _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted,
     _naive_mod_mul,
 };
-use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, PowerOfTwo};
+use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
@@ -151,7 +151,7 @@ fn benchmark_limbs_invert_limb_u32_algorithms(gm: GenerationMode, limit: usize, 
         gm.name(),
         limit,
         file_name,
-        &(|&x| usize::exact_from((x - u32::power_of_two(u32::WIDTH - 1)).significant_bits())),
+        &(|&x| usize::exact_from((x - u32::power_of_2(u32::WIDTH - 1)).significant_bits())),
         "(x - (1 << 31)).significant_bits()",
         &mut [
             ("default", &mut (|x| no_out!(_limbs_invert_limb_u32(x)))),
@@ -171,7 +171,7 @@ fn benchmark_limbs_invert_limb_u64_algorithms(gm: GenerationMode, limit: usize, 
         gm.name(),
         limit,
         file_name,
-        &(|&x| usize::exact_from((x - u64::power_of_two(u64::WIDTH - 1)).significant_bits())),
+        &(|&x| usize::exact_from((x - u64::power_of_2(u64::WIDTH - 1)).significant_bits())),
         "(x - (1 << 63)).significant_bits()",
         &mut [
             ("default", &mut (|x| no_out!(_limbs_invert_limb_u64(x)))),

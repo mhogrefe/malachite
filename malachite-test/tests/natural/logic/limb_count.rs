@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -14,8 +14,8 @@ fn limb_count_properties() {
         assert_eq!(*x <= Limb::MAX, x.limb_count() <= 1);
         if *x != 0 {
             let n = limb_count;
-            assert!(Natural::power_of_two((n - 1) << Limb::LOG_WIDTH) <= *x);
-            assert!(*x < Natural::power_of_two(n << Limb::LOG_WIDTH));
+            assert!(Natural::power_of_2((n - 1) << Limb::LOG_WIDTH) <= *x);
+            assert!(*x < Natural::power_of_2(n << Limb::LOG_WIDTH));
         }
     });
 

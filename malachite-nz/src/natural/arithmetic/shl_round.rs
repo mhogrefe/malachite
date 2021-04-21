@@ -44,7 +44,7 @@ macro_rules! impl_natural_shl_round_signed {
             /// and takes the floor) and rounds according to the specified rounding mode, taking the
             /// `Natural` by value. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
             /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_two(bits)`.
+            /// `bits > 0 || self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(`bits`)
             ///
@@ -117,7 +117,7 @@ macro_rules! impl_natural_shl_round_signed {
             /// and takes the floor) and rounds according to the specified rounding mode, taking the
             /// `Natural` by reference. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
             /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_two(bits)`.
+            /// `bits > 0 || self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(`bits`)
             ///
@@ -193,7 +193,7 @@ macro_rules! impl_natural_shl_round_signed {
             /// and takes the floor) and rounds according to the specified rounding mode, in place.
             /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>=`.
             /// To test whether `RoundingMode::Exact` can be passed, use
-            /// `bits > 0 || self.divisible_by_power_of_two(bits)`.
+            /// `bits > 0 || self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(`bits`)
             ///

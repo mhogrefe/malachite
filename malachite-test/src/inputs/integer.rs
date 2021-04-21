@@ -3,7 +3,7 @@ use std::ops::{Shl, Shr};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo,
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -545,7 +545,7 @@ pub fn pairs_of_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Integer, T)> {
     Box::new(
         pairs_of_integer_and_small_unsigned::<T>(gm)
-            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.exact_into())),
+            .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u.exact_into())),
     )
 }
 
@@ -892,7 +892,7 @@ pub fn triples_of_integer_integer_and_small_unsigned_var_2<T: PrimitiveUnsigned 
 ) -> It<(Integer, Integer, T)> {
     Box::new(
         triples_of_integer_integer_and_small_unsigned::<T>(gm)
-            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.exact_into())),
+            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_2(y, pow.exact_into())),
     )
 }
 

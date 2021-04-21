@@ -1,16 +1,19 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{Digits, SaturatingFrom};
-use malachite_base_test_util::bench::bucketers::pair_2_vec_len_bucketer;
+use malachite_base_test_util::bench::bucketers::pair_1_vec_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{
-    unsigned_unsigned_vec_pair_gen_var_1, unsigned_unsigned_vec_pair_gen_var_2,
+    unsigned_vec_unsigned_pair_gen_var_7, unsigned_vec_unsigned_pair_gen_var_8,
+    unsigned_vec_unsigned_pair_gen_var_9,
 };
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_unsigned_demos!(runner, demo_from_digits_asc);
     register_unsigned_unsigned_demos!(runner, demo_from_digits_desc);
+    register_unsigned_unsigned_demos!(runner, demo_from_digits_asc_targeted);
+    register_unsigned_unsigned_demos!(runner, demo_from_digits_desc_targeted);
     register_unsigned_unsigned_benches!(runner, benchmark_from_digits_asc);
     register_unsigned_unsigned_benches!(runner, benchmark_from_digits_desc);
 }
@@ -23,12 +26,12 @@ fn demo_from_digits_asc<
     config: GenConfig,
     limit: usize,
 ) {
-    for (base, xs) in unsigned_unsigned_vec_pair_gen_var_2::<T, U>()
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_9::<T>()
         .get(gm, &config)
         .take(limit)
     {
         println!(
-            "{}.from_digits_asc({}, {:?}) = {}",
+            "{}.from_digits_asc({}, {:?}) = {:?}",
             U::NAME,
             base,
             xs,
@@ -45,7 +48,51 @@ fn demo_from_digits_desc<
     config: GenConfig,
     limit: usize,
 ) {
-    for (base, xs) in unsigned_unsigned_vec_pair_gen_var_1::<T, U>()
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_9::<T>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "{}.from_digits_desc({}, {:?}) = {:?}",
+            U::NAME,
+            base,
+            xs,
+            U::from_digits_desc(&base, xs.iter().copied())
+        );
+    }
+}
+
+fn demo_from_digits_asc_targeted<
+    T: PrimitiveUnsigned + SaturatingFrom<U>,
+    U: Digits<T> + PrimitiveUnsigned,
+>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) {
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_8::<T, U>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "{}.from_digits_asc({}, {:?}) = {}",
+            U::NAME,
+            base,
+            xs,
+            U::from_digits_asc(&base, xs.iter().copied()).unwrap()
+        );
+    }
+}
+
+fn demo_from_digits_desc_targeted<
+    T: PrimitiveUnsigned + SaturatingFrom<U>,
+    U: Digits<T> + PrimitiveUnsigned,
+>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) {
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_7::<T, U>()
         .get(gm, &config)
         .take(limit)
     {
@@ -54,7 +101,7 @@ fn demo_from_digits_desc<
             U::NAME,
             base,
             xs,
-            U::from_digits_desc(&base, xs.iter().copied())
+            U::from_digits_desc(&base, xs.iter().copied()).unwrap()
         );
     }
 }
@@ -76,12 +123,12 @@ fn benchmark_from_digits_asc<
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_unsigned_vec_pair_gen_var_2::<T, U>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_8::<T, U>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
-        &pair_2_vec_len_bucketer("digits"),
-        &mut [("Malachite", &mut |(base, xs)| {
+        &pair_1_vec_len_bucketer("digits"),
+        &mut [("Malachite", &mut |(xs, base)| {
             no_out!(U::from_digits_asc(&base, xs.iter().copied()))
         })],
     );
@@ -104,12 +151,12 @@ fn benchmark_from_digits_desc<
             T::NAME
         ),
         BenchmarkType::Single,
-        unsigned_unsigned_vec_pair_gen_var_1::<T, U>().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_7::<T, U>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
-        &pair_2_vec_len_bucketer("digits"),
-        &mut [("Malachite", &mut |(base, xs)| {
+        &pair_1_vec_len_bucketer("digits"),
+        &mut [("Malachite", &mut |(xs, base)| {
             no_out!(U::from_digits_desc(&base, xs.iter().copied()))
         })],
     );

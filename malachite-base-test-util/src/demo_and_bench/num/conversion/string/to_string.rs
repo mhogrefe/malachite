@@ -10,8 +10,8 @@ use malachite_base_test_util::bench::bucketers::{pair_1_bit_bucketer, triple_1_b
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{
-    signed_unsigned_pair_gen_var_5, signed_unsigned_unsigned_triple_gen_var_3, unsigned_gen_var_7,
-    unsigned_pair_gen_var_8, unsigned_triple_gen_var_6,
+    signed_unsigned_pair_gen_var_5, signed_unsigned_unsigned_triple_gen_var_3, unsigned_gen,
+    unsigned_gen_var_7, unsigned_pair_gen_var_8, unsigned_triple_gen_var_6,
 };
 use malachite_base_test_util::num::conversion::string::to_string::{
     _to_string_base_signed_naive, _to_string_base_unsigned_naive,
@@ -22,6 +22,8 @@ use std::fmt::Display;
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_digit_to_display_byte_lower);
     register_demo!(runner, demo_digit_to_display_byte_upper);
+    register_demo!(runner, demo_digit_to_display_byte_lower_targeted);
+    register_demo!(runner, demo_digit_to_display_byte_upper_targeted);
     register_unsigned_demos!(runner, demo_to_string_base_unsigned);
     register_signed_demos!(runner, demo_to_string_base_signed);
     register_unsigned_demos!(runner, demo_to_string_base_upper_unsigned);
@@ -52,9 +54,9 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_digit_to_display_byte_lower(gm: GenMode, config: GenConfig, limit: usize) {
-    for b in unsigned_gen_var_7().get(gm, &config).take(limit) {
+    for b in unsigned_gen().get(gm, &config).take(limit) {
         println!(
-            "digit_to_display_byte_lower({}) = {}",
+            "digit_to_display_byte_lower({}) = {:?}",
             b,
             digit_to_display_byte_lower(b)
         );
@@ -62,11 +64,31 @@ fn demo_digit_to_display_byte_lower(gm: GenMode, config: GenConfig, limit: usize
 }
 
 fn demo_digit_to_display_byte_upper(gm: GenMode, config: GenConfig, limit: usize) {
+    for b in unsigned_gen().get(gm, &config).take(limit) {
+        println!(
+            "digit_to_display_byte_upper({}) = {:?}",
+            b,
+            digit_to_display_byte_upper(b)
+        );
+    }
+}
+
+fn demo_digit_to_display_byte_lower_targeted(gm: GenMode, config: GenConfig, limit: usize) {
+    for b in unsigned_gen_var_7().get(gm, &config).take(limit) {
+        println!(
+            "digit_to_display_byte_lower({}) = {}",
+            b,
+            digit_to_display_byte_lower(b).unwrap()
+        );
+    }
+}
+
+fn demo_digit_to_display_byte_upper_targeted(gm: GenMode, config: GenConfig, limit: usize) {
     for b in unsigned_gen_var_7().get(gm, &config).take(limit) {
         println!(
             "digit_to_display_byte_upper({}) = {}",
             b,
-            digit_to_display_byte_upper(b)
+            digit_to_display_byte_upper(b).unwrap()
         );
     }
 }

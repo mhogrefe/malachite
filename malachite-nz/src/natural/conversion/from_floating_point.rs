@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{DivisibleByPowerOfTwo, ShlRound};
+use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, ShlRound};
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
@@ -172,7 +172,7 @@ macro_rules! float_impls {
                     mantissa.set_bit($f::MANTISSA_WIDTH);
                     let exponent = i64::exact_from(exponent) + $f::MIN_EXPONENT - 1;
                     if exponent >= 0
-                        || mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
+                        || mantissa.divisible_by_power_of_2(u64::wrapping_from(-exponent))
                     {
                         Some(Natural::from(mantissa) << exponent)
                     } else {
@@ -225,8 +225,7 @@ macro_rules! float_impls {
                     let (mut mantissa, exponent) = value.raw_mantissa_and_exponent();
                     mantissa.set_bit($f::MANTISSA_WIDTH);
                     let exponent = i64::exact_from(exponent) + $f::MIN_EXPONENT - 1;
-                    exponent >= 0
-                        || mantissa.divisible_by_power_of_two(u64::wrapping_from(-exponent))
+                    exponent >= 0 || mantissa.divisible_by_power_of_2(u64::wrapping_from(-exponent))
                 }
             }
         }

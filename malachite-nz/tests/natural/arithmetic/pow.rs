@@ -243,7 +243,7 @@ fn test_pow() {
     // xs.len() == 2 && x_1 != 0
     // len >> 1 && exp.odd()
     // len != 1
-    // !CountOnes::count_ones(exp).eq_mod_power_of_two(bits, 1)
+    // !CountOnes::count_ones(exp).eq_mod_power_of_2(bits, 1)
     // len != 1 && !bit
     // len != 1 && bit
     test(
@@ -258,7 +258,7 @@ fn test_pow() {
         6821921"
     );
     // xs.len() == 2 && trailing_zero_bits_in != 0
-    // CountOnes::count_ones(exp).eq_mod_power_of_two(bits, 1)
+    // CountOnes::count_ones(exp).eq_mod_power_of_2(bits, 1)
     test(
         "26872817533106",
         12,

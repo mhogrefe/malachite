@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
-    NegMod, PowerOfTwo,
+    NegMod, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
@@ -398,7 +398,7 @@ fn limbs_div_mod_extra_in_place_fail_3() {
 
 #[cfg(feature = "32_bit_limbs")]
 fn verify_limbs_two_limb_inverse_helper(hi: Limb, lo: Limb, result: Limb) {
-    let b = Natural::power_of_two(Limb::WIDTH);
+    let b = Natural::power_of_2(Limb::WIDTH);
     let b_cubed_minus_1 = Natural::low_mask(Limb::WIDTH * 3);
     let x = Natural::from(DoubleLimb::join_halves(hi, lo));
     let expected_result = &b_cubed_minus_1 / &x - &b;
@@ -2103,10 +2103,10 @@ fn verify_limbs_invert_approx(
     let d = Natural::from_limbs_asc(ds);
     let n = ds.len();
     let bits = u64::exact_from(n << Limb::LOG_WIDTH);
-    let product = Natural::power_of_two(bits << 1);
+    let product = Natural::power_of_2(bits << 1);
     //TODO compare to limbs_invert
     let mut expected_i = (&product - Natural::ONE) / &d;
-    let offset = Natural::power_of_two(bits);
+    let offset = Natural::power_of_2(bits);
     expected_i -= &offset;
     let i = Natural::from_limbs_asc(&is_out[..n]);
     let x = (&i + &offset) * &d;

@@ -6,7 +6,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::vecs::vec_delete_left;
 use natural::arithmetic::add::limbs_vec_add_limb_in_place;
-use natural::arithmetic::divisible_by_power_of_two::limbs_divisible_by_power_of_two;
+use natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use natural::arithmetic::shr::{limbs_shr, limbs_slice_shr_in_place, limbs_vec_shr_in_place};
 use natural::logic::bit_access::limbs_get_bit;
 use natural::InnerNatural::{Large, Small};
@@ -111,7 +111,7 @@ pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
         xs.to_vec()
     } else if !limbs_get_bit(xs, bits - 1) {
         limbs_shr(xs, bits)
-    } else if !limbs_divisible_by_power_of_two(xs, bits - 1) {
+    } else if !limbs_divisible_by_power_of_2(xs, bits - 1) {
         limbs_shr_round_up(xs, bits)
     } else {
         limbs_shr_round_half_integer_to_even(xs, bits)
@@ -145,7 +145,7 @@ pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_exact(&[u32::MAX, u32::MAX], 32), None);
 /// ```
 pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
-    if limbs_divisible_by_power_of_two(xs, bits) {
+    if limbs_divisible_by_power_of_2(xs, bits) {
         Some(limbs_shr(xs, bits))
     } else {
         None
@@ -351,7 +351,7 @@ pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
     if bits == 0 {
     } else if !limbs_get_bit(xs, bits - 1) {
         limbs_vec_shr_in_place(xs, bits)
-    } else if !limbs_divisible_by_power_of_two(xs, bits - 1) {
+    } else if !limbs_divisible_by_power_of_2(xs, bits - 1) {
         limbs_vec_shr_round_up_in_place(xs, bits)
     } else {
         limbs_vec_shr_round_half_integer_to_even_in_place(xs, bits)
@@ -409,7 +409,7 @@ pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
 /// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 32), false);
 /// ```
 pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
-    if limbs_divisible_by_power_of_two(xs, bits) {
+    if limbs_divisible_by_power_of_2(xs, bits) {
         limbs_vec_shr_in_place(xs, bits);
         true
     } else {
@@ -550,7 +550,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// specified rounding mode, taking the `Natural` by value. Passing
             /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
             /// whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_two(bits)`.
+            /// `self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(n)
             ///
@@ -614,7 +614,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// specified rounding mode, taking the `Natural` by reference. Passing
             /// `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to using `>>`. To test
             /// whether `RoundingMode::Exact` can be passed, use
-            /// `self.divisible_by_power_of_two(bits)`.
+            /// `self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(n)
             ///
@@ -676,7 +676,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// Shifts a `Natural` right (divides it by a power of 2) and rounds according to the
             /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>=`. To test whether
-            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_two(bits)`.
+            /// `RoundingMode::Exact` can be passed, use `self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(n)
             ///
@@ -776,7 +776,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// multiplies it by a power of 2) and rounds according to the specified rounding mode,
             /// taking the `Natural` by value. Passing `RoundingMode::Floor` or `RoundingMode::Down`
             /// is equivalent to using `>>`. To test whether `RoundingMode::Exact` can be passed,
-            /// use `bits < 0 || self.divisible_by_power_of_two(bits)`.
+            /// use `bits < 0 || self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(`bits`)
             ///
@@ -850,7 +850,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// taking the `Natural` by reference. Passing `RoundingMode::Floor` or
             /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
             /// `RoundingMode::Exact` can be passed, use
-            /// `bits < 0 || self.divisible_by_power_of_two(bits)`.
+            /// `bits < 0 || self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(`bits`)
             ///
@@ -922,7 +922,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// multiplies it by a power of 2) and rounds according to the specified rounding mode,
             /// in place. Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
             /// using `>>=`. To test whether `RoundingMode::Exact` can be passed, use
-            /// `bits < 0 || self.divisible_by_power_of_two(bits)`.
+            /// `bits < 0 || self.divisible_by_power_of_2(bits)`.
             ///
             /// Time: worst case O(`bits`)
             ///

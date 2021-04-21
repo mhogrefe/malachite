@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, CeilingLogTwo, PowerOfTwo};
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, CeilingLogBase2, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Two;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -166,7 +166,7 @@ pub fn random_natural_pair_gen_var_1(config: &GenConfig) -> It<(Natural, Natural
         &|seed| {
             random_natural_range_to_infinity(
                 seed,
-                Natural::power_of_two(Limb::WIDTH),
+                Natural::power_of_2(Limb::WIDTH),
                 config.get_or("mean_bits_n", 64 + Limb::WIDTH),
                 config.get_or("mean_bits_d", 1),
             )
@@ -352,7 +352,7 @@ impl Iterator for LargeDigitsRandomGenerator {
 
     fn next(&mut self) -> Option<(Vec<Natural>, Natural)> {
         let base = self.bases.next().unwrap();
-        let bits = base.ceiling_log_two();
+        let bits = base.ceiling_log_base_2();
         let digit_count = self.digit_counts.next().unwrap();
         let mut digits = Vec::with_capacity(digit_count);
         for _ in 0..digit_count {
@@ -374,7 +374,7 @@ pub fn random_natural_vec_natural_pair_gen_var_1(
     Box::new(LargeDigitsRandomGenerator {
         bases: random_natural_range_to_infinity(
             EXAMPLE_SEED.fork("bases"),
-            Natural::power_of_two(Limb::WIDTH),
+            Natural::power_of_2(Limb::WIDTH),
             Limb::WIDTH + 4,
             1,
         ),

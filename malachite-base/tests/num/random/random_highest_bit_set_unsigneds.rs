@@ -16,7 +16,7 @@ fn random_highest_bit_set_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>(
 ) {
     uniform_primitive_int_assertions(
         random_highest_bit_set_unsigneds(EXAMPLE_SEED),
-        T::power_of_two(T::WIDTH - 1),
+        T::power_of_2(T::WIDTH - 1),
         T::MAX,
         expected_values,
         expected_common_values,

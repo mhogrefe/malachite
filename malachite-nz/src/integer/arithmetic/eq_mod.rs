@@ -1,7 +1,7 @@
 use fail_on_untested_path;
 use integer::Integer;
 use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, EqMod, EqModPowerOfTwo, NegMod, PowerOfTwo,
+    DivisibleBy, EqMod, EqModPowerOf2, NegMod, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::TrailingZeros;
@@ -98,14 +98,14 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
     let m_0 = ms[0];
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
     let twos = TrailingZeros::trailing_zeros(m_0);
-    if !xs[0].wrapping_neg().eq_mod_power_of_two(y, twos) {
+    if !xs[0].wrapping_neg().eq_mod_power_of_2(y, twos) {
         return Some(false);
     }
     // m_0 == 0 is avoided since we don't want to bother handling extra low zero bits if m_1 is even
     // (would involve borrow if x_0, y_0 != 0).
     if m_len == 2 && m_0 != 0 {
         let m_1 = ms[1];
-        if m_1 < Limb::power_of_two(twos) {
+        if m_1 < Limb::power_of_2(twos) {
             let m_0 = (m_0 >> twos) | (m_1 << (Limb::WIDTH - twos));
             let y = quick_neg_mod(y, m_0);
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
@@ -239,7 +239,7 @@ fn limbs_pos_eq_mod_neg_limb_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
     if !xs[0]
         .wrapping_neg()
-        .eq_mod_power_of_two(ys[0], TrailingZeros::trailing_zeros(m))
+        .eq_mod_power_of_2(ys[0], TrailingZeros::trailing_zeros(m))
     {
         return false;
     }
@@ -257,7 +257,7 @@ fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], ms: &[Limb]) ->
     // Check x == y mod low zero bits of m_0. This might catch a few cases of x != y quickly.
     if !xs[0]
         .wrapping_neg()
-        .eq_mod_power_of_two(ys[0], TrailingZeros::trailing_zeros(ms[0]))
+        .eq_mod_power_of_2(ys[0], TrailingZeros::trailing_zeros(ms[0]))
     {
         Some(false)
     } else {

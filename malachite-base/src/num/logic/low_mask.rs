@@ -7,7 +7,7 @@ fn _low_mask_unsigned<T: PrimitiveInt>(bits: u64) -> T {
     if bits == T::WIDTH {
         T::MAX
     } else {
-        T::power_of_two(bits) - T::ONE
+        T::power_of_2(bits) - T::ONE
     }
 }
 
@@ -43,7 +43,7 @@ fn _low_mask_signed<T: NegativeOne + PrimitiveInt>(bits: u64) -> T {
     } else if bits == T::WIDTH - 1 {
         T::MAX
     } else {
-        T::power_of_two(bits) - T::ONE
+        T::power_of_2(bits) - T::ONE
     }
 }
 

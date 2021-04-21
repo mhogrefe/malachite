@@ -12,6 +12,7 @@ fn iterator_to_bit_chunks_helper<T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wr
 ) {
     assert_eq!(
         iterator_to_bit_chunks::<_, T, U>(xs.iter().cloned(), in_chunk_size, out_chunk_size)
+            .map(Option::unwrap)
             .collect_vec()
             .as_slice(),
         out

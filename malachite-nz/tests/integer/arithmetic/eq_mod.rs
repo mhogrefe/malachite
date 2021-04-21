@@ -85,9 +85,9 @@ fn test_limbs_pos_eq_neg_limb_mod() {
         );
         assert_eq!((x - y).divisible_by(m), equal);
     };
-    // !xs[0].wrapping_neg().eq_mod_power_of_two(y, u64::from(twos))
+    // !xs[0].wrapping_neg().eq_mod_power_of_2(y, u64::from(twos))
     test(&[1, 2], 2, &[2, 1], false);
-    // xs[0].wrapping_neg().eq_mod_power_of_two(y, u64::from(twos))
+    // xs[0].wrapping_neg().eq_mod_power_of_2(y, u64::from(twos))
     // m_len == 2 && m_0 != 0
     // m_1 < 1 << twos
     // x_len < BMOD_1_TO_MOD_1_THRESHOLD
@@ -195,12 +195,12 @@ fn test_limbs_pos_eq_neg_mod_limb() {
         );
         assert_eq!((x - y).divisible_by(m), equal);
     };
-    // xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(m.trailing_zeros()))
+    // xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros()))
     //      in limbs_pos_eq_mod_neg_limb_greater
     test(&[0, 1], &[0, 1], 1, true);
     test(&[0, 1], &[0, 1], 2, true);
     test(&[0, 1], &[6, 1], 2, true);
-    // !xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(m.trailing_zeros()))
+    // !xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros()))
     //      in limbs_pos_eq_mod_neg_limb_greater
     test(&[0, 1], &[7, 1], 2, false);
 }
@@ -258,11 +258,11 @@ fn test_limbs_pos_eq_neg_mod() {
         );
         assert_eq!((x - y).divisible_by(m), equal);
     };
-    // !xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(ms[0].trailing_zeros()))
+    // !xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(ms[0].trailing_zeros()))
     //      in limbs_pos_eq_neg_mod_greater
     test(&[1, 2], &[3, 4], &[0, 1], false);
     test(&[0, 0, 1], &[0, 1], &[1, 1], true);
-    // xs[0].wrapping_neg().eq_mod_power_of_two(ys[0], u64::from(ms[0].trailing_zeros()))
+    // xs[0].wrapping_neg().eq_mod_power_of_2(ys[0], u64::from(ms[0].trailing_zeros()))
     //      in limbs_pos_eq_neg_mod_greater
     test(
         &[

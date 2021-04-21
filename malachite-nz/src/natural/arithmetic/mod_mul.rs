@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::traits::{
-    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModPowerOfTwoMul,
-    ModPowerOfTwoMulAssign, PowerOfTwo, XMulYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ,
-    XXXXAddYYYYIsZZZZ,
+    ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModPowerOf2Mul,
+    ModPowerOf2MulAssign, PowerOf2, XMulYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, Zero};
@@ -23,7 +22,7 @@ pub fn _limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb,
         xs[4] = 1;
         assert!(!limbs_div_mod_by_two_limb_normalized(out, xs, &[m_0, m_1]));
     } else {
-        xs[4] = Limb::power_of_two(bits);
+        xs[4] = Limb::power_of_2(bits);
         assert!(!limbs_div_mod_by_two_limb_normalized(
             out,
             xs,
@@ -578,7 +577,7 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
                 Natural(Small(m)),
                 &ModMulData::OneLimb(inv),
             ) => Natural::from(x.mod_mul_precomputed(y, m, &inv)),
-            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul(y, Limb::WIDTH),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs(&y, &m, inv_2, inv_1, inv_0)
             }
@@ -736,7 +735,7 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
                 Natural(Small(m)),
                 &ModMulData::OneLimb(inv),
             ) => Natural::from(x.mod_mul_precomputed(y, m, &inv)),
-            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul(y, Limb::WIDTH),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs(y, &m, inv_2, inv_1, inv_0)
             }
@@ -821,7 +820,7 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
                 &Natural(Small(m)),
                 &ModMulData::OneLimb(inv),
             ) => Natural::from(x.mod_mul_precomputed(y, m, &inv)),
-            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul(y, Limb::WIDTH),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs(y, m, inv_2, inv_1, inv_0)
             }
@@ -878,7 +877,7 @@ impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
                 Natural(Small(m)),
                 &ModMulData::OneLimb(inv),
             ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
-            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul_assign(y, Limb::WIDTH),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs_assign(&y, &m, inv_2, inv_1, inv_0)
             }
@@ -939,7 +938,7 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
                 &Natural(Small(m)),
                 &ModMulData::OneLimb(inv),
             ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
-            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul_assign(y, Limb::WIDTH),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs_assign(&y, m, inv_2, inv_1, inv_0)
             }
@@ -1000,7 +999,7 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
                 Natural(Small(m)),
                 &ModMulData::OneLimb(inv),
             ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
-            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul_assign(y, Limb::WIDTH),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs_assign(y, &m, inv_2, inv_1, inv_0)
             }
@@ -1065,7 +1064,7 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
                 &Natural(Small(m)),
                 &ModMulData::OneLimb(inv),
             ) => *self = Natural::from(x.mod_mul_precomputed(y, m, &inv)),
-            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_two_mul_assign(y, Limb::WIDTH),
+            (x, y, _, &ModMulData::MinTwoLimbs) => x.mod_power_of_2_mul_assign(y, Limb::WIDTH),
             (x, y, m, &ModMulData::TwoLimbs(inv_2, inv_1, inv_0)) => {
                 x.mod_mul_precomputed_two_limbs_assign(y, m, inv_2, inv_1, inv_0)
             }

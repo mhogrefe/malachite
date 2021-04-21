@@ -65,7 +65,7 @@ fn _fast_pow_mod<
     shift: u64,
 ) -> T {
     if exp == 0 {
-        let x = T::power_of_two(shift);
+        let x = T::power_of_2(shift);
         if x == m {
             T::ZERO
         } else {
@@ -78,7 +78,7 @@ fn _fast_pow_mod<
         let mut out = if bits.next().unwrap() {
             x
         } else {
-            T::power_of_two(shift)
+            T::power_of_2(shift)
         };
         for bit in bits {
             x = mul_mod_helper::<T, DT>(x, x, m, inverse, shift);

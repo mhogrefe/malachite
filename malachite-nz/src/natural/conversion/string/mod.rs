@@ -53,4 +53,5 @@ impl<T> BaseFmtWrapper<T> {
     }
 }
 
+pub mod from_string;
 pub mod to_string;

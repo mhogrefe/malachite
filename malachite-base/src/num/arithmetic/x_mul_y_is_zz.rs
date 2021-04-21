@@ -21,7 +21,7 @@ pub fn _explicit_x_mul_y_is_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
     let (x_0_y_0_1, x_0_y_0_0) = wide_split_in_half(x_0_y_0);
     x_0_y_1.wrapping_add_assign(x_0_y_0_1);
     if x_0_y_1.overflowing_add_assign(x_1_y_0) {
-        x_1_y_1.wrapping_add_assign(T::power_of_two(T::WIDTH >> 1));
+        x_1_y_1.wrapping_add_assign(T::power_of_2(T::WIDTH >> 1));
     }
     let z_1 = x_1_y_1.wrapping_add(wide_upper_half(x_0_y_1));
     let z_0 = wide_join_halves(x_0_y_1, x_0_y_0_0);

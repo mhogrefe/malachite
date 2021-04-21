@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::Integer;
@@ -25,6 +25,6 @@ fn flip_bit_properties() {
         mut_result.flip_bit(index);
         assert_eq!(mut_result, *n);
 
-        assert_eq!(n ^ Integer::power_of_two(index), result);
+        assert_eq!(n ^ Integer::power_of_2(index), result);
     });
 }

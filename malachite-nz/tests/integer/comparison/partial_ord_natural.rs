@@ -5,21 +5,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_partial_ord_integer_natural() {
-    let test = |u, v, out| {
-        assert_eq!(
-            Integer::from_str(u)
-                .unwrap()
-                .partial_cmp(&Natural::from_str(v).unwrap()),
-            out
-        );
+    let test = |s, t, out| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
 
-        assert_eq!(
-            Natural::from_str(v)
-                .unwrap()
-                .partial_cmp(&Integer::from_str(u).unwrap())
-                .map(Ordering::reverse),
-            out
-        );
+        assert_eq!(u.partial_cmp(&v), out);
+        assert_eq!(v.partial_cmp(&u).map(Ordering::reverse), out);
     };
     test("0", "0", Some(Ordering::Equal));
     test("0", "5", Some(Ordering::Less));

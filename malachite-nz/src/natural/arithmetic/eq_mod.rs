@@ -1,6 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Parity, PowerOfTwo,
-    WrappingAddAssign,
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity, PowerOf2, WrappingAddAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::SplitInHalf;
@@ -129,7 +128,7 @@ pub fn limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
     assert!(xs.len() > 1);
     let r = if m.even() {
         let twos = TrailingZeros::trailing_zeros(m);
-        if !xs[0].wrapping_sub(y).divisible_by_power_of_two(twos) {
+        if !xs[0].wrapping_sub(y).divisible_by_power_of_2(twos) {
             return false;
         }
         _limbs_mod_exact_odd_limb(xs, m >> twos, y)
@@ -155,12 +154,12 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
     let m_0 = ms[0];
     // Check xs == ys mod low zero bits of m_0.
     let m_0_trailing_zeros = TrailingZeros::trailing_zeros(m_0);
-    if !xs[0].eq_mod_power_of_two(y, m_0_trailing_zeros) {
+    if !xs[0].eq_mod_power_of_2(y, m_0_trailing_zeros) {
         return Some(false);
     }
     if m_len == 2 && m_0 != 0 {
         let m_1 = ms[1];
-        if m_1 < Limb::power_of_two(m_0_trailing_zeros) {
+        if m_1 < Limb::power_of_2(m_0_trailing_zeros) {
             let m_0 = (m_0 >> m_0_trailing_zeros) | (m_1 << (Limb::WIDTH - m_0_trailing_zeros));
             return Some(if x_len >= BMOD_1_TO_MOD_1_THRESHOLD {
                 let r = limbs_mod_limb(xs, m_0);
@@ -338,7 +337,7 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], m: Limb) -> Option<bool> {
     assert_ne!(m, 0);
     if xs == ys {
         Some(true)
-    } else if !xs[0].eq_mod_power_of_two(ys[0], u64::from(m.trailing_zeros())) {
+    } else if !xs[0].eq_mod_power_of_2(ys[0], u64::from(m.trailing_zeros())) {
         // Check xs == ys mod low zero bits of m.
         Some(false)
     } else {
@@ -526,8 +525,7 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], m: &[Limb]) -> Option<bool> {
     assert_ne!(*m.last().unwrap(), 0);
     if xs == ys {
         Some(true)
-    } else if m_len > x_len
-        || !xs[0].eq_mod_power_of_two(ys[0], TrailingZeros::trailing_zeros(m[0]))
+    } else if m_len > x_len || !xs[0].eq_mod_power_of_2(ys[0], TrailingZeros::trailing_zeros(m[0]))
     {
         // Either: x < m, y < m, and x != y, so x != y mod m
         // Or: xs != ys mod low zero bits of m_0

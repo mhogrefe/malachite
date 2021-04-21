@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOfTwo, ShrRound};
+use malachite_base::num::arithmetic::traits::{Parity, RoundToMultipleOfPowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
@@ -33,15 +33,15 @@ pub(crate) fn _limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     if n < low_threshold {
         n
     } else if n <= (low_threshold - 1) << 2 {
-        n.round_to_multiple_of_power_of_two(1, RoundingMode::Ceiling)
+        n.round_to_multiple_of_power_of_2(1, RoundingMode::Ceiling)
     } else if n <= (low_threshold - 1) << 3 {
-        n.round_to_multiple_of_power_of_two(2, RoundingMode::Ceiling)
+        n.round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling)
     } else {
         let ceiling_half_n: usize = n.shr_round(1, RoundingMode::Ceiling);
         if ceiling_half_n < high_threshold {
-            n.round_to_multiple_of_power_of_two(3, RoundingMode::Ceiling)
+            n.round_to_multiple_of_power_of_2(3, RoundingMode::Ceiling)
         } else {
-            ceiling_half_n.round_to_multiple_of_power_of_two(
+            ceiling_half_n.round_to_multiple_of_power_of_2(
                 u64::exact_from(_limbs_mul_fft_best_k(ceiling_half_n, square)),
                 RoundingMode::Ceiling,
             ) << 1

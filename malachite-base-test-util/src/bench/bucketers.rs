@@ -76,10 +76,17 @@ pub fn string_len_bucketer<'a>() -> Bucketer<'a, String> {
     }
 }
 
-pub fn pair_string_len_bucketer<'a>() -> Bucketer<'a, (String, String)> {
+pub fn pair_string_max_len_bucketer<'a>() -> Bucketer<'a, (String, String)> {
     Bucketer {
         bucketing_function: &|(s, t)| max(s.len(), t.len()),
         bucketing_label: "max(s.len(), t.len())".to_string(),
+    }
+}
+
+pub fn pair_2_string_len_bucketer<T>(s_name: &str) -> Bucketer<(T, String)> {
+    Bucketer {
+        bucketing_function: &|&(_, ref s)| s.len(),
+        bucketing_label: format!("{}.len()", s_name),
     }
 }
 
@@ -182,6 +189,13 @@ pub fn pair_1_bit_bucketer<T: Copy + SignificantBits, U>(x_name: &str) -> Bucket
     }
 }
 
+pub fn pair_2_bit_bucketer<T, U: Copy + SignificantBits>(x_name: &str) -> Bucketer<(T, U)> {
+    Bucketer {
+        bucketing_function: &|&(_, x)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", x_name),
+    }
+}
+
 pub fn triple_1_bit_bucketer<T: Copy + SignificantBits, U, V>(x_name: &str) -> Bucketer<(T, U, V)> {
     Bucketer {
         bucketing_function: &|&(x, _, _)| usize::exact_from(x.significant_bits()),
@@ -192,13 +206,6 @@ pub fn triple_1_bit_bucketer<T: Copy + SignificantBits, U, V>(x_name: &str) -> B
 pub fn pair_1_vec_len_bucketer<T, U>(xs_name: &str) -> Bucketer<(Vec<T>, U)> {
     Bucketer {
         bucketing_function: &|&(ref xs, _)| xs.len(),
-        bucketing_label: format!("{}.len()", xs_name),
-    }
-}
-
-pub fn pair_2_vec_len_bucketer<T, U>(xs_name: &str) -> Bucketer<(T, Vec<U>)> {
-    Bucketer {
-        bucketing_function: &|&(_, ref xs)| xs.len(),
         bucketing_label: format!("{}.len()", xs_name),
     }
 }

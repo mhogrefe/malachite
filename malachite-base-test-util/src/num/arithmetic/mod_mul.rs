@@ -7,5 +7,5 @@ pub fn limbs_invert_limb_naive<
 >(
     x: T,
 ) -> T {
-    T::exact_from(DT::MAX / DT::from(x) - DT::power_of_two(T::WIDTH))
+    T::exact_from(DT::MAX / DT::from(x) - DT::power_of_2(T::WIDTH))
 }

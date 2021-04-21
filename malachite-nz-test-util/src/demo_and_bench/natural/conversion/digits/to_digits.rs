@@ -1,7 +1,7 @@
 use crate::bench::bucketers::{natural_bit_ratio_bucketer, pair_1_natural_bit_bucketer};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, PowerOfTwoDigits, SaturatingFrom,
+    CheckedFrom, ConvertibleFrom, Digits, PowerOf2Digits, SaturatingFrom,
 };
 use malachite_base_test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_3_vec_len_bucketer, triple_3_vec_len_bucketer,
@@ -116,7 +116,7 @@ fn demo_to_digits_asc_limb<T: ConvertibleFrom<Limb> + CheckedFrom<Natural> + Pri
     limit: usize,
 ) where
     Limb: Digits<T> + SaturatingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     for (x, base) in natural_unsigned_pair_gen_var_1::<Limb, T>()
         .get(gm, &config)
@@ -137,7 +137,7 @@ fn demo_to_digits_desc_limb<T: ConvertibleFrom<Limb> + CheckedFrom<Natural> + Pr
     limit: usize,
 ) where
     Limb: Digits<T> + SaturatingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     for (x, base) in natural_unsigned_pair_gen_var_1::<Limb, T>()
         .get(gm, &config)
@@ -345,7 +345,7 @@ fn benchmark_limbs_to_digits_basecase_algorithms<
     file_name: &str,
 ) where
     Limb: Digits<T> + SaturatingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     run_benchmark(
         "_limbs_to_digits_basecase(&mut [Limb], u64)",
@@ -376,7 +376,7 @@ fn benchmark_to_digits_asc_limb<
     file_name: &str,
 ) where
     Limb: Digits<T> + SaturatingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     run_benchmark(
         "_to_digits_asc_limb(&Natural, Limb)",
@@ -401,7 +401,7 @@ fn benchmark_to_digits_desc_limb<
     file_name: &str,
 ) where
     Limb: Digits<T> + SaturatingFrom<T>,
-    Natural: From<T> + PowerOfTwoDigits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
 {
     run_benchmark(
         "_to_digits_desc_limb(&Natural, Limb)",

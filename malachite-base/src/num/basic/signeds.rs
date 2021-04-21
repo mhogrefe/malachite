@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{
     Abs, AbsAssign, CeilingDivAssignMod, CeilingDivMod, CeilingMod, CeilingModAssign,
-    CeilingModPowerOfTwo, CeilingModPowerOfTwoAssign, CheckedAbs, NegAssign, OverflowingAbs,
+    CeilingModPowerOf2, CeilingModPowerOf2Assign, CheckedAbs, NegAssign, OverflowingAbs,
     OverflowingAbsAssign, SaturatingAbs, SaturatingAbsAssign, SaturatingNeg, SaturatingNegAssign,
     UnsignedAbs, WrappingAbs, WrappingAbsAssign,
 };
@@ -19,8 +19,8 @@ pub trait PrimitiveSigned:
     + CeilingDivMod<Self, DivOutput = Self, ModOutput = Self>
     + CeilingMod<Self, Output = Self>
     + CeilingModAssign<Self>
-    + CeilingModPowerOfTwo<Output = Self>
-    + CeilingModPowerOfTwoAssign
+    + CeilingModPowerOf2<Output = Self>
+    + CeilingModPowerOf2Assign
     + CheckedAbs<Output = Self>
     + CheckedHammingDistance
     + From<i8>

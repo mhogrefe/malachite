@@ -1,5 +1,5 @@
 use malachite_base::strings::string_is_subset;
-use malachite_base_test_util::bench::bucketers::pair_string_len_bucketer;
+use malachite_base_test_util::bench::bucketers::pair_string_max_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{string_pair_gen, string_pair_gen_var_1};
@@ -41,7 +41,7 @@ fn benchmark_string_is_subset(gm: GenMode, config: GenConfig, limit: usize, file
         gm.name(),
         limit,
         file_name,
-        &pair_string_len_bucketer(),
+        &pair_string_max_len_bucketer(),
         &mut [("Malachite", &mut |(s, t)| no_out!(string_is_subset(&s, &t)))],
     );
 }

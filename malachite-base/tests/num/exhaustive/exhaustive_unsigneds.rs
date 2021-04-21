@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::exhaustive::exhaustive_unsigneds;
@@ -18,7 +18,7 @@ where
 }
 
 fn exhaustive_unsigneds_long_helper<T: PrimitiveUnsigned>(last_20: &[T]) {
-    let expected_len = usize::power_of_two(T::WIDTH);
+    let expected_len = usize::power_of_2(T::WIDTH);
     let xs = exhaustive_unsigneds::<T>();
     assert_eq!(xs.clone().count(), expected_len);
     assert_eq!(xs.skip(expected_len - 20).collect_vec(), last_20)

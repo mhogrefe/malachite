@@ -3,7 +3,7 @@ use std::ops::{Shl, Shr};
 
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::arithmetic::traits::{
-    DivRound, DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, PowerOfTwo,
+    DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -357,7 +357,7 @@ pub fn pairs_of_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natural, u64)> 
         GenerationMode::Exhaustive => Box::new(
             exhaustive_dependent_pairs_infinite_log((), exhaustive_unsigneds(), |_, &pow| {
                 Box::new(
-                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow))
+                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(pow))
                         .map(Option::Some)
                         .chain(repeat(None)),
                 )
@@ -665,7 +665,7 @@ pub fn pairs_of_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
 ) -> It<(Natural, T)> {
     Box::new(
         pairs_of_natural_and_small_unsigned::<T>(gm)
-            .filter(|&(ref n, u)| !n.divisible_by_power_of_two(u.exact_into())),
+            .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u.exact_into())),
     )
 }
 
@@ -1027,7 +1027,7 @@ pub fn triples_of_natural_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned 
 ) -> It<(Natural, Natural, T)> {
     Box::new(
         triples_of_natural_natural_and_small_unsigned::<T>(gm)
-            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_two(y, pow.exact_into())),
+            .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_2(y, pow.exact_into())),
     )
 }
 
@@ -1038,7 +1038,7 @@ pub fn triples_of_natural_natural_and_u64_var_1(gm: GenerationMode) -> It<(Natur
         GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigneds(), |&pow| {
             lex_pairs_from_single(exhaustive_natural_range(
                 Natural::ZERO,
-                Natural::power_of_two(pow),
+                Natural::power_of_2(pow),
             ))
         })),
         GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
@@ -1076,7 +1076,7 @@ pub fn triples_of_natural_natural_and_u64_var_2(gm: GenerationMode) -> It<(Natur
             exhaustive_unsigneds(),
             |_, &pow| {
                 exhaustive_pairs(
-                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow)),
+                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(pow)),
                     exhaustive_naturals(),
                 )
             },
@@ -1140,7 +1140,7 @@ pub fn triples_of_natural_small_unsigned_and_u64_var_1<T: PrimitiveUnsigned>(
             exhaustive_dependent_pairs_infinite((), exhaustive_unsigneds(), |_, &pow| {
                 Box::new(
                     exhaustive_pairs_big_small(
-                        exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow)),
+                        exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(pow)),
                         exhaustive_unsigneds(),
                     )
                     .map(Option::Some)
@@ -1193,7 +1193,7 @@ pub fn triples_of_natural_small_signed_and_u64_var_1<T: PrimitiveSigned>(
             exhaustive_dependent_pairs_infinite((), exhaustive_unsigneds(), |_, &pow| {
                 Box::new(
                     exhaustive_pairs_big_small(
-                        exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow)),
+                        exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(pow)),
                         exhaustive_signeds(),
                     )
                     .map(Option::Some)
@@ -1796,7 +1796,7 @@ pub fn quadruples_of_three_naturals_and_u64_var_1(
         GenerationMode::Exhaustive => Box::new(dependent_pairs(exhaustive_unsigneds(), |&pow| {
             lex_triples_from_single(exhaustive_natural_range(
                 Natural::ZERO,
-                Natural::power_of_two(pow),
+                Natural::power_of_2(pow),
             ))
         })),
         GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
@@ -1836,7 +1836,7 @@ pub fn quadruples_of_three_naturals_and_u64_var_2(
             exhaustive_unsigneds(),
             |_, &pow| {
                 exhaustive_triples_xxy(
-                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow)),
+                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(pow)),
                     exhaustive_naturals(),
                 )
             },
@@ -1884,7 +1884,7 @@ pub fn quadruples_of_three_naturals_and_u64_var_3(
             exhaustive_unsigneds(),
             |_, &pow| {
                 exhaustive_triples_xyy(
-                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(pow)),
+                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(pow)),
                     exhaustive_naturals(),
                 )
             },
@@ -2005,13 +2005,12 @@ fn pairs_of_u64_and_natural_vec_var_1_special_random_helper(
 }
 
 // All pairs of `u64` and `Vec<Natural>`, where each pair is a valid input to
-// `from_power_of_two_digits_asc<Natural, Natural>`.
+// `from_power_of_2_digits_asc<Natural, Natural>`.
 pub fn pairs_of_u64_and_natural_vec_var_1(gm: GenerationMode) -> It<(u64, Vec<Natural>)> {
     match gm {
         GenerationMode::Exhaustive => {
             let f = |_: &(), &log_base: &u64| -> It<Vec<Natural>> {
-                let digits =
-                    exhaustive_natural_range(Natural::ZERO, Natural::power_of_two(log_base));
+                let digits = exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(log_base));
                 if log_base == 1 {
                     Box::new(shortlex_vecs(digits))
                 } else {

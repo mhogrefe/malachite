@@ -23,18 +23,13 @@ macro_rules! impl_mod_neg {
 
             /// Computes `-self` mod `m`. Assumes the input is already reduced mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// $f(x, m) = y$, where $x, y < m$ and $-x \equiv y \mod m$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModNeg;
-            ///
-            /// assert_eq!(0u8.mod_neg(5), 0);
-            /// assert_eq!(7u32.mod_neg(10), 3);
-            /// assert_eq!(100u16.mod_neg(101), 1);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_neg` module.
             ///
             /// This is nmod_neg from nmod_vec.h, FLINT Dev 1.
             #[inline]
@@ -46,28 +41,15 @@ macro_rules! impl_mod_neg {
         impl ModNegAssign for $t {
             /// Replaces `self` with `-self` mod `m`. Assumes the input is already reduced mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets y$, where $x, y < m$ and $-x \equiv y \mod m$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModNegAssign;
+            /// See the documentation of the `num::arithmetic::mod_neg` module.
             ///
-            /// let mut n = 0u8;
-            /// n.mod_neg_assign(5);
-            /// assert_eq!(n, 0);
-            ///
-            /// let mut n = 7u32;
-            /// n.mod_neg_assign(10);
-            /// assert_eq!(n, 3);
-            ///
-            /// let mut n = 100u16;
-            /// n.mod_neg_assign(101);
-            /// assert_eq!(n, 1);
-            /// ```
-            ///
-            /// This is nmod_neg from nmod_vec.h, FLINT Dev 1, where the output is assign to a.
+            /// This is nmod_neg from nmod_vec.h, FLINT Dev 1, where the output is assigned to a.
             #[inline]
             fn mod_neg_assign(&mut self, m: $t) {
                 _mod_neg_assign(self, m)

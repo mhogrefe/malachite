@@ -6,7 +6,7 @@ use malachite_base::num::conversion::string::to_string::{
 };
 use malachite_base::num::conversion::string::BaseFmtWrapper as BaseBaseFmtWrapper;
 use malachite_base::num::conversion::traits::{
-    Digits, ExactFrom, PowerOfTwoDigitIterable, ToStringBase, WrappingFrom,
+    Digits, ExactFrom, PowerOf2DigitIterable, ToStringBase, WrappingFrom,
 };
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
@@ -50,11 +50,11 @@ impl<'a> Display for BaseFmtWrapper<&'a Natural> {
             let mut digits = self.x.to_digits_desc(&u8::wrapping_from(self.base));
             if f.alternate() {
                 for digit in &mut digits {
-                    *digit = digit_to_display_byte_upper(*digit);
+                    *digit = digit_to_display_byte_upper(*digit).unwrap();
                 }
             } else {
                 for digit in &mut digits {
-                    *digit = digit_to_display_byte_lower(*digit);
+                    *digit = digit_to_display_byte_lower(*digit).unwrap();
                 }
             }
             f.pad_integral(true, "", std::str::from_utf8(&digits).unwrap())
@@ -124,7 +124,7 @@ impl ToStringBase for Natural {
         } else {
             let mut digits = self.to_digits_desc(&u8::wrapping_from(base));
             for digit in &mut digits {
-                *digit = digit_to_display_byte_lower(*digit);
+                *digit = digit_to_display_byte_lower(*digit).unwrap();
             }
             String::from_utf8(digits).unwrap()
         }
@@ -159,7 +159,7 @@ impl ToStringBase for Natural {
         } else {
             let mut digits = self.to_digits_desc(&u8::wrapping_from(base));
             for digit in &mut digits {
-                *digit = digit_to_display_byte_upper(*digit);
+                *digit = digit_to_display_byte_upper(*digit).unwrap();
             }
             String::from_utf8(digits).unwrap()
         }
@@ -194,7 +194,7 @@ impl Display for Natural {
                 let len = _limbs_to_digits_small_base(&mut digits, 10, &mut xs, None);
                 digits.truncate(len);
                 for digit in &mut digits {
-                    *digit = digit_to_display_byte_lower(*digit);
+                    *digit = digit_to_display_byte_lower(*digit).unwrap();
                 }
                 f.pad_integral(true, "", std::str::from_utf8(&digits).unwrap())
             }
@@ -377,8 +377,8 @@ impl Octal for NaturalAlt {
                     f.write_char('0')?;
                 }
             }
-            for digit in PowerOfTwoDigitIterable::<u8>::power_of_two_digits(&self.0, 3).rev() {
-                f.write_char(char::from(digit_to_display_byte_lower(digit)))?;
+            for digit in PowerOf2DigitIterable::<u8>::power_of_2_digits(&self.0, 3).rev() {
+                f.write_char(char::from(digit_to_display_byte_lower(digit).unwrap()))?;
             }
             Ok(())
         }
@@ -526,14 +526,15 @@ impl Octal for Natural {
                 let mut limb = *limbs.next().unwrap();
                 for digit in digits.iter_mut().rev() {
                     if remaining_bits >= 3 {
-                        *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 7));
+                        *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 7)).unwrap();
                         remaining_bits -= 3;
                         limb >>= 3;
                     } else {
                         match remaining_bits {
                             0 => {
                                 limb = *limbs.next().unwrap();
-                                *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 7));
+                                *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 7))
+                                    .unwrap();
                                 remaining_bits = Limb::WIDTH - 3;
                                 limb >>= 3;
                             }
@@ -542,7 +543,8 @@ impl Octal for Natural {
                                 limb = *limbs.next().unwrap_or(&0);
                                 *digit = digit_to_display_byte_lower(u8::wrapping_from(
                                     ((limb & 3) << 1) | previous_limb,
-                                ));
+                                ))
+                                .unwrap();
                                 remaining_bits = Limb::WIDTH - 2;
                                 limb >>= 2;
                             }
@@ -551,7 +553,8 @@ impl Octal for Natural {
                                 limb = *limbs.next().unwrap_or(&0);
                                 *digit = digit_to_display_byte_lower(u8::wrapping_from(
                                     ((limb & 1) << 2) | previous_limb,
-                                ));
+                                ))
+                                .unwrap();
                                 remaining_bits = Limb::WIDTH - 1;
                                 limb >>= 1;
                             }
@@ -586,8 +589,8 @@ impl LowerHex for NaturalAlt {
                     f.write_char('0')?;
                 }
             }
-            for digit in PowerOfTwoDigitIterable::<u8>::power_of_two_digits(&self.0, 4).rev() {
-                f.write_char(char::from(digit_to_display_byte_lower(digit)))?;
+            for digit in PowerOf2DigitIterable::<u8>::power_of_2_digits(&self.0, 4).rev() {
+                f.write_char(char::from(digit_to_display_byte_lower(digit).unwrap()))?;
             }
             Ok(())
         }
@@ -677,7 +680,7 @@ impl LowerHex for Natural {
                         remaining_digits = DIGITS_PER_LIMB;
                         limb = *limbs.next().unwrap();
                     }
-                    *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 15));
+                    *digit = digit_to_display_byte_lower(u8::wrapping_from(limb & 15)).unwrap();
                     limb >>= 4;
                     remaining_digits -= 1;
                 }
@@ -737,7 +740,7 @@ impl UpperHex for Natural {
                         remaining_digits = DIGITS_PER_LIMB;
                         limb = *limbs.next().unwrap();
                     }
-                    *digit = digit_to_display_byte_upper(u8::wrapping_from(limb & 15));
+                    *digit = digit_to_display_byte_upper(u8::wrapping_from(limb & 15)).unwrap();
                     limb >>= 4;
                     remaining_digits -= 1;
                 }

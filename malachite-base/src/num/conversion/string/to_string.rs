@@ -9,28 +9,27 @@ use vecs::vec_pad_left;
 /// represents the digit.
 ///
 /// Digits from 0 to 9 become bytes corresponding to `char`s from '0' to '9'. Digits from 10 to 35
-/// become bytes representing the lowercase `char`s 'a' to 'z'.
+/// become bytes representing the lowercase `char`s 'a' to 'z'. Passing a digit greater than 35
+/// gives a `None`.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
-///
-/// # Panics
-/// Panics if `b` is greater than 35.
 ///
 /// # Examples
 /// ```
 /// use malachite_base::num::conversion::string::to_string::digit_to_display_byte_lower;
 ///
-/// assert_eq!(digit_to_display_byte_lower(0), b'0');
-/// assert_eq!(digit_to_display_byte_lower(9), b'9');
-/// assert_eq!(digit_to_display_byte_lower(10), b'a');
-/// assert_eq!(digit_to_display_byte_lower(35), b'z');
+/// assert_eq!(digit_to_display_byte_lower(0), Some(b'0'));
+/// assert_eq!(digit_to_display_byte_lower(9), Some(b'9'));
+/// assert_eq!(digit_to_display_byte_lower(10), Some(b'a'));
+/// assert_eq!(digit_to_display_byte_lower(35), Some(b'z'));
+/// assert_eq!(digit_to_display_byte_lower(100), None);
 /// ```
-pub fn digit_to_display_byte_lower(b: u8) -> u8 {
+pub const fn digit_to_display_byte_lower(b: u8) -> Option<u8> {
     match b {
-        0..=9 => b + b'0',
-        10..=35 => b + b'a' - 10,
-        _ => panic!("Invalid byte: {}", b),
+        0..=9 => Some(b + b'0'),
+        10..=35 => Some(b + b'a' - 10),
+        _ => None,
     }
 }
 
@@ -38,28 +37,27 @@ pub fn digit_to_display_byte_lower(b: u8) -> u8 {
 /// represents the digit.
 ///
 /// Digits from 0 to 9 become bytes corresponding to `char`s from '0' to '9'. Digits from 10 to 35
-/// become bytes representing the lowercase `char`s 'A' to 'Z'.
+/// become bytes representing the lowercase `char`s 'A' to 'Z'. Passing a digit greater than 35
+/// gives a `None`.
 ///
 /// # Worst-case complexity
 /// Constant time and additional memory.
-///
-/// # Panics
-/// Panics if `b` is greater than 35.
 ///
 /// # Examples
 /// ```
 /// use malachite_base::num::conversion::string::to_string::digit_to_display_byte_upper;
 ///
-/// assert_eq!(digit_to_display_byte_upper(0), b'0');
-/// assert_eq!(digit_to_display_byte_upper(9), b'9');
-/// assert_eq!(digit_to_display_byte_upper(10), b'A');
-/// assert_eq!(digit_to_display_byte_upper(35), b'Z');
+/// assert_eq!(digit_to_display_byte_upper(0), Some(b'0'));
+/// assert_eq!(digit_to_display_byte_upper(9), Some(b'9'));
+/// assert_eq!(digit_to_display_byte_upper(10), Some(b'A'));
+/// assert_eq!(digit_to_display_byte_upper(35), Some(b'Z'));
+/// assert_eq!(digit_to_display_byte_upper(100), None);
 /// ```
-pub fn digit_to_display_byte_upper(b: u8) -> u8 {
+pub const fn digit_to_display_byte_upper(b: u8) -> Option<u8> {
     match b {
-        0..=9 => b + b'0',
-        10..=35 => b + b'A' - 10,
-        _ => panic!("Invalid byte: {}", b),
+        0..=9 => Some(b + b'0'),
+        10..=35 => Some(b + b'A' - 10),
+        _ => None,
     }
 }
 
@@ -70,11 +68,11 @@ fn _fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
     let mut digits = w.x.to_digits_desc(&u8::wrapping_from(w.base));
     if f.alternate() {
         for digit in &mut digits {
-            *digit = digit_to_display_byte_upper(*digit);
+            *digit = digit_to_display_byte_upper(*digit).unwrap();
         }
     } else {
         for digit in &mut digits {
-            *digit = digit_to_display_byte_lower(*digit);
+            *digit = digit_to_display_byte_lower(*digit).unwrap();
         }
     }
     if w.x == T::ZERO {
@@ -90,7 +88,7 @@ fn _to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) 
     } else {
         let mut digits = x.to_digits_desc(&u8::wrapping_from(base));
         for digit in &mut digits {
-            *digit = digit_to_display_byte_lower(*digit);
+            *digit = digit_to_display_byte_lower(*digit).unwrap();
         }
         String::from_utf8(digits).unwrap()
     }
@@ -103,7 +101,7 @@ fn _to_string_base_upper_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base:
     } else {
         let mut digits = x.to_digits_desc(&u8::wrapping_from(base));
         for digit in &mut digits {
-            *digit = digit_to_display_byte_upper(*digit);
+            *digit = digit_to_display_byte_upper(*digit).unwrap();
         }
         String::from_utf8(digits).unwrap()
     }
@@ -234,7 +232,7 @@ fn _to_string_base_signed<U: Digits<u8>, S: Copy + Eq + Ord + UnsignedAbs<Output
     } else {
         let mut digits = x.unsigned_abs().to_digits_desc(&u8::wrapping_from(base));
         for digit in &mut digits {
-            *digit = digit_to_display_byte_lower(*digit);
+            *digit = digit_to_display_byte_lower(*digit).unwrap();
         }
         if *x < S::ZERO {
             vec_pad_left(&mut digits, 1, b'-');
@@ -256,7 +254,7 @@ fn _to_string_base_upper_signed<
     } else {
         let mut digits = x.unsigned_abs().to_digits_desc(&u8::wrapping_from(base));
         for digit in &mut digits {
-            *digit = digit_to_display_byte_upper(*digit);
+            *digit = digit_to_display_byte_upper(*digit).unwrap();
         }
         if *x < S::ZERO {
             vec_pad_left(&mut digits, 1, b'-');

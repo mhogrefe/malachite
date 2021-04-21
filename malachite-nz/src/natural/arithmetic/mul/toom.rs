@@ -1,6 +1,6 @@
 use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, EqModPowerOfTwo, ShrRound, WrappingAddAssign, WrappingSubAssign,
+    ArithmeticCheckedShl, DivRound, EqModPowerOf2, ShrRound, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
@@ -2725,7 +2725,7 @@ pub fn _limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len
         };
         let pn = (p - 1) * n;
         let qn = (q - 1) * n;
-        if !p.eq_mod_power_of_two(q, 1) {
+        if !p.eq_mod_power_of_2(q, 1) {
             // Recover from-badly chosen splitting
             if xs_len <= pn {
                 xl += n;
@@ -2904,7 +2904,7 @@ pub fn _limbs_mul_greater_to_out_toom_6h(
         let mut pn = p * n;
         let mut qn = q * n;
         // With LIMIT = 16 / 15, the following recovery is needed only if `ys_len` <= 73.
-        if !p.eq_mod_power_of_two(q, 1) {
+        if !p.eq_mod_power_of_2(q, 1) {
             // Recover from badly-chosen splitting
             if xs_len <= pn {
                 p -= 1;
@@ -3102,7 +3102,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len: usize, ys_len
         };
         let pn = (p - 1) * n;
         let qn = (q - 1) * n;
-        if !p.eq_mod_power_of_two(q, 1) {
+        if !p.eq_mod_power_of_2(q, 1) {
             // Recover from badly chosen splitting
             if xs_len <= pn {
                 xl += n;
@@ -3307,7 +3307,7 @@ pub fn _limbs_mul_greater_to_out_toom_8h(
         q -= 1;
         let mut pn = p * n;
         let mut qn = q * n;
-        if !p.eq_mod_power_of_two(q, 1) {
+        if !p.eq_mod_power_of_2(q, 1) {
             // Recover from badly chosen splitting
             if xs_len <= pn {
                 p -= 1;

@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{Parity, Pow, PowAssign, PowerOfTwo, Square};
+use malachite_base::num::arithmetic::traits::{Parity, Pow, PowAssign, PowerOf2, Square};
 use malachite_base::num::basic::traits::{Iverson, NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::integer::Integer;
@@ -68,7 +68,7 @@ fn pow_properties() {
     test_properties_no_special(small_unsigneds, |&exp| {
         assert_eq!(Integer::ZERO.pow(exp), u64::iverson(exp == 0));
         assert_eq!(Integer::ONE.pow(exp), 1);
-        assert_eq!(Integer::TWO.pow(exp), Integer::power_of_two(exp));
+        assert_eq!(Integer::TWO.pow(exp), Integer::power_of_2(exp));
 
         assert_eq!(
             Integer::NEGATIVE_ONE.pow(exp),

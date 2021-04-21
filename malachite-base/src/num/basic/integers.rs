@@ -4,28 +4,28 @@ use num::arithmetic::traits::{
     AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedAdd, CheckedAddMul,
     CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedSquare, CheckedSub, CheckedSubMul,
     DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign,
-    DivisibleBy, DivisibleByPowerOfTwo, EqMod, EqModPowerOfTwo, Mod, ModAssign, ModPowerOfTwo,
-    ModPowerOfTwoAssign, OverflowingAdd, OverflowingAddAssign, OverflowingAddMul,
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Mod, ModAssign, ModPowerOf2,
+    ModPowerOf2Assign, OverflowingAdd, OverflowingAddAssign, OverflowingAddMul,
     OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
     OverflowingPowAssign, OverflowingSquare, OverflowingSquareAssign, OverflowingSub,
     OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowAssign,
-    PowerOfTwo, RemPowerOfTwo, RemPowerOfTwoAssign, RoundToMultiple, RoundToMultipleAssign,
-    RoundToMultipleOfPowerOfTwo, RoundToMultipleOfPowerOfTwoAssign, SaturatingAdd,
-    SaturatingAddAssign, SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul,
-    SaturatingMulAssign, SaturatingPow, SaturatingPowAssign, SaturatingSquare,
-    SaturatingSquareAssign, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
-    SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, Square,
-    SquareAssign, SubMul, SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul,
-    WrappingAddMulAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
-    WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign, WrappingSquare,
-    WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
+    PowerOf2, RemPowerOf2, RemPowerOf2Assign, RoundToMultiple, RoundToMultipleAssign,
+    RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, SaturatingAdd, SaturatingAddAssign,
+    SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
+    SaturatingPowAssign, SaturatingSquare, SaturatingSquareAssign, SaturatingSub,
+    SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound, ShlRoundAssign,
+    ShrRound, ShrRoundAssign, Sign, Square, SquareAssign, SubMul, SubMulAssign, WrappingAdd,
+    WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign, WrappingDiv, WrappingDivAssign,
+    WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign,
+    WrappingSquare, WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul,
+    WrappingSubMulAssign,
 };
 use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use num::conversion::traits::{
-    CheckedFrom, CheckedInto, ExactFrom, ExactInto, OverflowingFrom, OverflowingInto,
-    SaturatingFrom, SaturatingInto, ToStringBase, WrappingFrom, WrappingInto,
+    CheckedFrom, CheckedInto, ExactFrom, ExactInto, FromStringBase, OverflowingFrom,
+    OverflowingInto, SaturatingFrom, SaturatingInto, ToStringBase, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
@@ -132,7 +132,7 @@ pub trait PrimitiveInt:
     + DivExact<Self, Output = Self>
     + DivExactAssign<Self>
     + DivisibleBy<Self>
-    + DivisibleByPowerOfTwo
+    + DivisibleByPowerOf2
     + DivMod<Self, DivOutput = Self, ModOutput = Self>
     + DivRem<Self, DivOutput = Self, RemOutput = Self>
     + DivRound<Self, Output = Self>
@@ -140,7 +140,7 @@ pub trait PrimitiveInt:
     + Eq
     + EqAbs<Self>
     + EqMod<Self, Self>
-    + EqModPowerOfTwo<Self>
+    + EqModPowerOf2<Self>
     + ExactFrom<u8>
     + ExactFrom<u16>
     + ExactFrom<u32>
@@ -166,6 +166,7 @@ pub trait PrimitiveInt:
     + ExactInto<i128>
     + ExactInto<isize>
     + FromStr
+    + FromStringBase
     + Hash
     + HasRandomPrimitiveInts
     + Iverson
@@ -176,8 +177,8 @@ pub trait PrimitiveInt:
     + Max
     + Mod<Self, Output = Self>
     + ModAssign<Self>
-    + ModPowerOfTwo
-    + ModPowerOfTwoAssign
+    + ModPowerOf2
+    + ModPowerOf2Assign
     + Mul<Self, Output = Self>
     + MulAssign<Self>
     + Named
@@ -235,16 +236,16 @@ pub trait PrimitiveInt:
     + PartialOrdAbs<Self>
     + Pow<u64, Output = Self>
     + PowAssign<u64>
-    + PowerOfTwo
+    + PowerOf2
     + Product
     + Rem<Self, Output = Self>
     + RemAssign<Self>
-    + RemPowerOfTwo<Output = Self>
-    + RemPowerOfTwoAssign
+    + RemPowerOf2<Output = Self>
+    + RemPowerOf2Assign
     + RoundToMultiple<Self, Output = Self>
     + RoundToMultipleAssign<Self>
-    + RoundToMultipleOfPowerOfTwo<u64, Output = Self>
-    + RoundToMultipleOfPowerOfTwoAssign<u64>
+    + RoundToMultipleOfPowerOf2<u64, Output = Self>
+    + RoundToMultipleOfPowerOf2Assign<u64>
     + SaturatingAdd<Self, Output = Self>
     + SaturatingAddAssign<Self>
     + SaturatingAddMul<Self, Self, Output = Self>

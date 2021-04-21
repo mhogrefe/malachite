@@ -337,6 +337,8 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_4<
     ))
 }
 
+// var 1 5 is in malachite-base
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
 
 struct DigitsSpecialRandomGenerator<T: PrimitiveUnsigned> {

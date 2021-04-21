@@ -12,7 +12,7 @@ fn unsigned_overflowing_neg_assign_properties_helper<T: PrimitiveUnsigned + Rand
         let overflow = neg.overflowing_neg_assign();
         assert_eq!((neg, overflow), n.overflowing_neg());
         assert_eq!(neg, n.wrapping_neg());
-        assert_eq!(neg == n, n == T::ZERO || n == T::power_of_two(T::WIDTH - 1));
+        assert_eq!(neg == n, n == T::ZERO || n == T::power_of_2(T::WIDTH - 1));
         assert_eq!(n != T::ZERO, overflow);
     });
 }

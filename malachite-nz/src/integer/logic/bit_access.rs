@@ -1,5 +1,5 @@
 use integer::Integer;
-use malachite_base::num::arithmetic::traits::{PowerOfTwo, WrappingAddAssign, WrappingNegAssign};
+use malachite_base::num::arithmetic::traits::{PowerOf2, WrappingAddAssign, WrappingNegAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
@@ -94,7 +94,7 @@ pub fn limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
         Ordering::Less => {
             assert!(!limbs_sub_limb_in_place(
                 &mut xs[x_i..],
-                Limb::power_of_two(reduced_index),
+                Limb::power_of_2(reduced_index),
             ));
         }
         Ordering::Greater => {
@@ -187,7 +187,7 @@ pub fn limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
         }
     } else {
         xs.resize(x_i, 0);
-        xs.push(Limb::power_of_two(reduced_index));
+        xs.push(Limb::power_of_2(reduced_index));
     }
 }
 

@@ -7,18 +7,16 @@ use std::str::FromStr;
 
 #[test]
 fn test_partial_cmp_u32() {
-    let test = |u, v: u32, out| {
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp(&v), out);
+    let test = |s, v: u32, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u.partial_cmp(&v), out);
         assert_eq!(
-            num_partial_cmp_primitive(&BigInt::from_str(u).unwrap(), v),
+            num_partial_cmp_primitive(&BigInt::from_str(s).unwrap(), v),
             out
         );
-        assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
-
-        assert_eq!(
-            v.partial_cmp(&Integer::from_str(u).unwrap()),
-            out.map(Ordering::reverse)
-        );
+        assert_eq!(rug::Integer::from_str(s).unwrap().partial_cmp(&v), out);
+        assert_eq!(v.partial_cmp(&u), out.map(Ordering::reverse));
     };
     test("0", 0, Some(Ordering::Equal));
     test("0", 5, Some(Ordering::Less));
@@ -34,18 +32,16 @@ fn test_partial_cmp_u32() {
 
 #[test]
 fn test_partial_cmp_u64() {
-    let test = |u, v: u64, out| {
-        assert_eq!(Integer::from_str(u).unwrap().partial_cmp(&v), out);
+    let test = |s, v: u64, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u.partial_cmp(&v), out);
         assert_eq!(
-            num_partial_cmp_primitive(&BigInt::from_str(u).unwrap(), v),
+            num_partial_cmp_primitive(&BigInt::from_str(s).unwrap(), v),
             out
         );
-        assert_eq!(rug::Integer::from_str(u).unwrap().partial_cmp(&v), out);
-
-        assert_eq!(
-            v.partial_cmp(&Integer::from_str(u).unwrap()),
-            out.map(Ordering::reverse)
-        );
+        assert_eq!(rug::Integer::from_str(s).unwrap().partial_cmp(&v), out);
+        assert_eq!(v.partial_cmp(&u), out.map(Ordering::reverse));
     };
     test("0", 0, Some(Ordering::Equal));
     test("0", 5, Some(Ordering::Less));

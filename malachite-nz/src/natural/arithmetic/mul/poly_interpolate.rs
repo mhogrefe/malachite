@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOfTwo, Parity, WrappingAddAssign, WrappingSubAssign,
+    DivisibleByPowerOf2, Parity, WrappingAddAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
@@ -479,7 +479,7 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     limbs_slice_shr_in_place(w1, 1);
     limbs_sub_in_place_left(w4, w0);
     limbs_sub_same_length_in_place_left(w4, w1);
-    assert!(w4[0].divisible_by_power_of_two(2));
+    assert!(w4[0].divisible_by_power_of_2(2));
     limbs_slice_shr_in_place(w4, 2); // w4 >= 0
     scratch[n_high] = limbs_shl_to_out(scratch, w6, 4);
     limbs_sub_in_place_left(w4, &scratch[..=n_high]);

@@ -31,7 +31,7 @@ fn to_digits_asc_fail_helper<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsig
     assert_panic!(T::exact_from(100).to_digits_asc(&U::ZERO));
     assert_panic!(T::exact_from(100).to_digits_asc(&U::ONE));
     if T::WIDTH < U::WIDTH {
-        assert_panic!(T::exact_from(100).to_digits_asc(&U::power_of_two(T::WIDTH)));
+        assert_panic!(T::exact_from(100).to_digits_asc(&U::power_of_2(T::WIDTH)));
     }
 }
 
@@ -64,7 +64,7 @@ fn to_digits_desc_fail_helper<T: Digits<U> + PrimitiveUnsigned, U: PrimitiveUnsi
     assert_panic!(T::exact_from(100).to_digits_desc(&U::ZERO));
     assert_panic!(T::exact_from(100).to_digits_desc(&U::ONE));
     if T::WIDTH < U::WIDTH {
-        assert_panic!(T::exact_from(100).to_digits_desc(&U::power_of_two(T::WIDTH)));
+        assert_panic!(T::exact_from(100).to_digits_desc(&U::power_of_2(T::WIDTH)));
     }
 }
 
@@ -80,7 +80,10 @@ fn to_digits_asc_helper<
     unsigned_pair_gen_var_6::<T, U>().test_properties(|(u, base)| {
         let digits = u.to_digits_asc(&base);
         assert_eq!(_unsigned_to_digits_asc_naive(&u, base), digits);
-        assert_eq!(T::from_digits_asc(&base, digits.iter().copied()), u);
+        assert_eq!(
+            T::from_digits_asc(&base, digits.iter().copied()).unwrap(),
+            u
+        );
         if u != T::ZERO {
             assert_ne!(*digits.last().unwrap(), U::ZERO);
         }
@@ -117,7 +120,10 @@ fn to_digits_desc_helper<
 >() {
     unsigned_pair_gen_var_6::<T, U>().test_properties(|(u, base)| {
         let digits = u.to_digits_desc(&base);
-        assert_eq!(T::from_digits_desc(&base, digits.iter().copied()), u);
+        assert_eq!(
+            T::from_digits_desc(&base, digits.iter().copied()).unwrap(),
+            u
+        );
         if u != T::ZERO {
             assert_ne!(digits[0], U::ZERO);
         }

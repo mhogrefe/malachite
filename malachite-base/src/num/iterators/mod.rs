@@ -19,8 +19,8 @@ pub struct SameWidthIteratorToBitChunks<
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     SameWidthIteratorToBitChunks<I, T, U>
 {
-    fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<U> {
-        self.xs.next().map(wrap)
+    fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
+        self.xs.next().map(|x| Some(wrap(x)))
     }
 }
 
@@ -47,6 +47,7 @@ pub struct EvenFractionIteratorToBitChunks<
     xs: I,
     x: T,
     multiple: u64,
+    x_width: u64,
     y_width: u64,
     counter: u64,
     phantom: PhantomData<*const U>,
@@ -55,9 +56,12 @@ pub struct EvenFractionIteratorToBitChunks<
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     EvenFractionIteratorToBitChunks<I, T, U>
 {
-    fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<U> {
+    fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
         if self.counter == 0 {
             if let Some(x) = self.xs.next() {
+                if x.significant_bits() > self.x_width {
+                    return Some(None);
+                }
                 self.x = x;
                 self.counter = self.multiple;
             } else {
@@ -66,9 +70,9 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         } else {
             self.x >>= self.y_width;
         }
-        let y = wrap(self.x.mod_power_of_two(self.y_width));
+        let y = wrap(self.x.mod_power_of_2(self.y_width));
         self.counter -= 1;
-        Some(y)
+        Some(Some(y))
     }
 }
 
@@ -85,6 +89,7 @@ fn even_fraction_iterator_to_bit_chunks<
         xs,
         x: T::ZERO,
         multiple,
+        x_width: multiple * out_chunk_size,
         y_width: out_chunk_size,
         counter: 0,
         phantom: PhantomData,
@@ -109,7 +114,7 @@ pub struct EvenMultipleIteratorToBitChunks<
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     EvenMultipleIteratorToBitChunks<I, T, U>
 {
-    fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<U> {
+    fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
         if self.done {
             return None;
         }
@@ -117,6 +122,9 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         let mut shift = 0;
         while shift < self.y_width {
             if let Some(x) = self.xs.next() {
+                if x.significant_bits() > self.x_width {
+                    return Some(None);
+                }
                 y |= wrap(x) << shift;
                 shift += self.x_width;
             } else {
@@ -127,7 +135,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         if shift == 0 {
             None
         } else {
-            Some(y)
+            Some(Some(y))
         }
     }
 }
@@ -170,12 +178,15 @@ pub struct IrregularIteratorToBitChunks<
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     IrregularIteratorToBitChunks<I, T, U>
 {
-    fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<U> {
+    fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
         let mut y = U::ZERO;
         let mut remaining_y_bits = self.y_width;
         loop {
             if !self.in_inner_loop {
                 if let Some(x) = self.xs.next() {
+                    if x.significant_bits() > self.x_width {
+                        return Some(None);
+                    }
                     self.x = x;
                 } else {
                     break;
@@ -190,13 +201,13 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
                     remaining_y_bits -= self.remaining_x_bits;
                     self.remaining_x_bits = 0;
                 } else {
-                    y |= wrap(self.x).mod_power_of_two(remaining_y_bits) << y_index;
+                    y |= wrap(self.x).mod_power_of_2(remaining_y_bits) << y_index;
                     self.x >>= remaining_y_bits;
                     self.remaining_x_bits -= remaining_y_bits;
                     remaining_y_bits = 0;
                 }
                 if remaining_y_bits == 0 {
-                    return Some(y);
+                    return Some(Some(y));
                 }
             }
             self.in_inner_loop = false;
@@ -204,7 +215,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         if y == U::ZERO {
             None
         } else {
-            Some(y)
+            Some(Some(y))
         }
     }
 }
@@ -244,7 +255,7 @@ pub enum IteratorToBitChunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pri
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     IteratorToBitChunks<I, T, U>
 {
-    pub(crate) fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<U> {
+    pub(crate) fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
         match *self {
             IteratorToBitChunks::SameWidth(ref mut xs) => xs.next_with_wrapping(wrap),
             IteratorToBitChunks::EvenFraction(ref mut xs) => xs.next_with_wrapping(wrap),
@@ -257,10 +268,10 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
 impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<T>> Iterator
     for IteratorToBitChunks<I, T, U>
 {
-    type Item = U;
+    type Item = Option<U>;
 
     #[inline]
-    fn next(&mut self) -> Option<U> {
+    fn next(&mut self) -> Option<Option<U>> {
         self.next_with_wrapping(U::wrapping_from)
     }
 }
@@ -302,12 +313,13 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 /// use malachite_base::num::iterators::iterator_to_bit_chunks;
 ///
 /// assert_eq!(
-///     iterator_to_bit_chunks::<_, u16, u32>([123, 456].iter().cloned(), 10, 10).collect_vec(),
+///     iterator_to_bit_chunks::<_, u16, u32>([123, 456].iter().cloned(), 10, 10)
+///         .map(Option::unwrap).collect_vec(),
 ///     &[123, 456]
 /// );
 /// assert_eq!(
 ///     iterator_to_bit_chunks::<_, u16, u16>([0b000111111, 0b110010010].iter().cloned(), 9, 3)
-///         .collect_vec(),
+///         .map(Option::unwrap).collect_vec(),
 ///     &[0b111, 0b111, 0b000, 0b010, 0b010, 0b110]
 /// );
 /// assert_eq!(
@@ -315,7 +327,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 ///         [0b111, 0b111, 0b000, 0b010, 0b010, 0b110].iter().cloned(),
 ///         3,
 ///         9
-///     ).collect_vec(),
+///     ).map(Option::unwrap).collect_vec(),
 ///     &[0b000111111, 0b110010010]
 /// );
 /// assert_eq!(
@@ -323,7 +335,7 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 ///         [0b1010101, 0b1111101, 0b0100001, 0b110010].iter().cloned(),
 ///         7,
 ///         6
-///     ).collect_vec(),
+///     ).map(Option::unwrap).collect_vec(),
 ///     &[0b010101, 0b111011, 0b000111, 0b010010, 0b110]
 /// );
 /// ```

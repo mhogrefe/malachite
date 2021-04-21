@@ -31,7 +31,7 @@ fn _shr_round_unsigned_unsigned<
                 shifted + T::ONE
             }
         }
-        RoundingMode::Nearest if bits == width && x > T::power_of_two(T::WIDTH - 1) => T::ONE,
+        RoundingMode::Nearest if bits == width && x > T::power_of_2(T::WIDTH - 1) => T::ONE,
         RoundingMode::Nearest if bits >= width => T::ZERO,
         RoundingMode::Nearest => {
             let mostly_shifted = x >> (bits - U::ONE);
@@ -87,7 +87,7 @@ fn _shr_round_assign_unsigned_unsigned<
                 *x += T::ONE;
             }
         }
-        RoundingMode::Nearest if bits == width && *x > T::power_of_two(T::WIDTH - 1) => {
+        RoundingMode::Nearest if bits == width && *x > T::power_of_2(T::WIDTH - 1) => {
             *x = T::ONE;
         }
         RoundingMode::Nearest if bits >= width => *x = T::ZERO,
@@ -133,7 +133,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// specified rounding mode. Passing `RoundingMode::Floor` or
                     /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
                     /// `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_two(bits)`.
+                    /// `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// Time: worst case O(1)
                     ///
@@ -170,7 +170,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
                     /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
                     /// `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_two(bits)`.
+                    /// `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// Time: worst case O(1)
                     ///
@@ -264,7 +264,7 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// specified rounding mode. Passing `RoundingMode::Floor` or
                     /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
                     /// `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_two(bits)`.
+                    /// `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// Time: worst case O(1)
                     ///
@@ -301,7 +301,7 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
                     /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
                     /// `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_two(bits)`.
+                    /// `self.divisible_by_power_of_2(bits)`.
                     ///
                     /// Time: worst case O(1)
                     ///
@@ -413,7 +413,7 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// specified rounding mode. Passing `RoundingMode::Floor` or
                     /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
                     /// `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_two(bits)`. Rounding might only be necessary if
+                    /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
                     /// `bits` is non-negative.
                     ///
                     /// Time: worst case O(1)
@@ -451,7 +451,7 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// specified rounding mode, in place. Passing `RoundingMode::Floor` or
                     /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
                     /// `RoundingMode::Exact` can be passed, use
-                    /// `self.divisible_by_power_of_two(bits)`. Rounding might only be necessary if
+                    /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
                     /// `bits` is non-negative.
                     ///
                     /// Time: worst case O(1)

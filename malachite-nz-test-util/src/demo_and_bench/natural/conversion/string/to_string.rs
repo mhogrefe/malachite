@@ -705,10 +705,7 @@ fn benchmark_natural_to_string_base_algorithms(
         file_name,
         &pair_1_natural_bit_bucketer("x"),
         &mut [
-            (
-                "to_string",
-                &mut |(x, base)| no_out!(x.to_string_base(base)),
-            ),
+            ("default", &mut |(x, base)| no_out!(x.to_string_base(base))),
             ("using fmt", &mut |(x, base)| {
                 no_out!(format!("{}", BaseFmtWrapper::new(&x, base)))
             }),

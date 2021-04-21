@@ -1,8 +1,11 @@
 use iterators::{nonzero_values, NonzeroValues};
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
+use num::basic::traits::{One, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
+use num::float::nice_float::NiceFloat;
+use num::float::PrimitiveFloat;
 use num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
 use num::logic::traits::BitAccess;
 use rand::Rng;
@@ -265,7 +268,7 @@ impl<T: PrimitiveUnsigned> Iterator for RandomUnsignedBitChunks<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        self.xs.next_with_wrapping(identity)
+        self.xs.next_with_wrapping(identity).map(Option::unwrap)
     }
 }
 
@@ -588,7 +591,7 @@ pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
         RandomUnsignedsLessThan::One
     } else {
         RandomUnsignedsLessThan::AtLeastTwo(
-            random_unsigned_bit_chunks(seed, limit.ceiling_log_two()),
+            random_unsigned_bit_chunks(seed, limit.ceiling_log_base_2()),
             limit,
         )
     }
@@ -902,7 +905,513 @@ pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
 ) -> RandomHighestBitSetValues<RandomUnsignedBitChunks<T>> {
     RandomHighestBitSetValues {
         xs: random_unsigned_bit_chunks(seed, T::WIDTH - 1),
-        mask: T::power_of_two(T::WIDTH - 1),
+        mask: T::power_of_2(T::WIDTH - 1),
+    }
+}
+
+/// Generates random floats in the half-open interval $[a, b)$.
+///
+/// This `struct` is created by the `random_primitive_float_range` function. See its documentation
+/// for more.
+#[derive(Clone, Debug)]
+pub struct RandomPrimitiveFloatRange<T: PrimitiveFloat> {
+    xs: RandomUnsignedRange<T::UnsignedOfEqualWidth>,
+}
+
+impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        self.xs.next().map(T::from_ordered_representation)
+    }
+}
+
+/// Generates random floats in the closed interval $[a, b]$.
+///
+/// This `struct` is created by the `random_primitive_float_inclusive_range` function. See its
+/// documentation for more.
+#[derive(Clone, Debug)]
+pub struct RandomPrimitiveFloatInclusiveRange<T: PrimitiveFloat> {
+    xs: RandomUnsignedInclusiveRange<T::UnsignedOfEqualWidth>,
+}
+
+impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        self.xs.next().map(T::from_ordered_representation)
+    }
+}
+
+/// Generates random floats in the half-open interval $[a, b)$.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, if the range
+/// is $[0, 2)$, a float in $[1/4, 1/2)$ is as likely to be chosen as a float in $[1, 2)$, since
+/// these subranges contain an equal number of floats.
+///
+/// Positive and negative zero are treated as two distinct values, with negative zero being smaller
+/// than zero.
+///
+/// `NaN` is never generated.
+///
+/// `a` must be less than `b`. This function cannot create a range that includes
+/// `T::POSITIVE_INFINITY`; for that,  use `random_primitive_float_inclusive_range`.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_primitive_float_range;
+///
+/// assert_eq!(
+///     random_primitive_float_range::<f32>(EXAMPLE_SEED, -0.1, 0.1)
+///         .map(NiceFloat).take(10).collect_vec(),
+///     [
+///         5.664681e-11, 1.2492925e-35, 2.3242339e-29, 4.699183e-7, -2.8244436e-36, -2.264039e-37,
+///         -0.0000017299129, 1.40616e-23, 2.7418007e-27, 1.5418819e-16
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_primitive_float_range<T: PrimitiveFloat>(
+    seed: Seed,
+    a: T,
+    b: T,
+) -> RandomPrimitiveFloatRange<T> {
+    assert!(!a.is_nan());
+    assert!(!b.is_nan());
+    if NiceFloat(a) >= NiceFloat(b) {
+        panic!(
+            "a must be less than b. a: {}, b: {}",
+            NiceFloat(a),
+            NiceFloat(b)
+        );
+    }
+    RandomPrimitiveFloatRange {
+        xs: random_unsigned_range(
+            seed,
+            a.to_ordered_representation(),
+            b.to_ordered_representation(),
+        ),
+    }
+}
+
+/// Generates random primitive floats in the closed interval $[a, b]$.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, if the range
+/// is $[0, 2]$, a float in $[1/4, 1/2)$ is as likely to be chosen as a float in $[1, 2)$, since
+/// these subranges contain an equal number of floats.
+///
+/// Positive and negative zero are treated as two distinct values, with negative zero being smaller
+/// than zero.
+///
+/// `a` must be less than or equal to `b`.
+///
+/// `NaN` is never generated.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if $a > b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_primitive_float_inclusive_range;
+///
+/// assert_eq!(
+///     random_primitive_float_inclusive_range::<f32>(EXAMPLE_SEED, -0.1, 0.1)
+///         .map(NiceFloat).take(10).collect_vec(),
+///     [
+///         5.664681e-11, 1.2492925e-35, 2.3242339e-29, 4.699183e-7, -2.8244436e-36, -2.264039e-37,
+///         -0.0000017299129, 1.40616e-23, 2.7418007e-27, 1.5418819e-16
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_primitive_float_inclusive_range<T: PrimitiveFloat>(
+    seed: Seed,
+    a: T,
+    b: T,
+) -> RandomPrimitiveFloatInclusiveRange<T> {
+    assert!(!a.is_nan());
+    assert!(!b.is_nan());
+    if NiceFloat(a) > NiceFloat(b) {
+        panic!(
+            "a must be less than or equal to b. a: {}, b: {}",
+            NiceFloat(a),
+            NiceFloat(b)
+        );
+    }
+    RandomPrimitiveFloatInclusiveRange {
+        xs: random_unsigned_inclusive_range(
+            seed,
+            a.to_ordered_representation(),
+            b.to_ordered_representation(),
+        ),
+    }
+}
+
+/// Generates finite positive primitive floats.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, a float in
+/// $[1/4, 1/2)$ is as likely to be chosen as a float in $[1, 2)$, since these subranges contain an
+/// equal number of floats.
+///
+/// Positive zero is generated; negative zero is not. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_positive_finite_primitive_floats;
+///
+/// assert_eq!(
+///     random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED)
+///         .map(NiceFloat).take(10).collect_vec(),
+///     [
+///         9.5715654e26, 209.6476, 386935780.0, 7.965817e30, 0.00021030706, 0.0027270128,
+///         3.4398167e-34, 2.3397111e14, 44567765000.0, 2.3479653e21
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_positive_finite_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+) -> RandomPrimitiveFloatInclusiveRange<T> {
+    random_primitive_float_inclusive_range(seed, T::MIN_POSITIVE_SUBNORMAL, T::MAX_FINITE)
+}
+
+/// Generates finite negative primitive floats.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, a float in
+/// $(-1/2, 1/4]$ is as likely to be chosen as a float in $(-2, -1]$, since these subranges contain
+/// an equal number of floats.
+///
+/// Negative zero is generated; positive zero is not. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_negative_finite_primitive_floats;
+///
+/// assert_eq!(
+///     random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED)
+///         .map(NiceFloat).take(10).collect_vec(),
+///     [
+///         -2.3484663e-27, -0.010641626, -5.8060583e-9, -2.8182442e-31, -10462.532, -821.12994,
+///         -6.303163e33, -9.50376e-15, -4.9561126e-11, -8.565163e-22
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_negative_finite_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+) -> RandomPrimitiveFloatInclusiveRange<T> {
+    random_primitive_float_inclusive_range(seed, -T::MAX_FINITE, -T::MIN_POSITIVE_SUBNORMAL)
+}
+
+/// Generates finite nonzero primitive floats.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, a float in
+/// $[1/4, 1/2)$ is as likely to be chosen as a float in $[1, 2)$, since these subranges contain an
+/// equal number of floats.
+///
+/// Neither positive nor negative zero are generated. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_nonzero_finite_primitive_floats;
+///
+/// assert_eq!(
+///     random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED)
+///         .map(NiceFloat).take(10).collect_vec(),
+///     [
+///         -2.3484663e-27, 2.287989e-18, -2.0729893e-12, 3.360012e28, -9.021723e-32, 3564911.2,
+///         -0.0000133769445, -1.8855448e18, 8.2494555e-29, 2.2178014e-38
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+) -> NonzeroValues<RandomPrimitiveFloatInclusiveRange<T>> {
+    nonzero_values(random_finite_primitive_floats(seed))
+}
+
+/// Generates finite primitive floats.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, a float in
+/// $[1/4, 1/2)$ is as likely to be chosen as a float in $[1, 2)$, since these subranges contain an
+/// equal number of floats.
+///
+/// Positive zero and negative zero are both generated. `NaN` is not.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_finite_primitive_floats;
+///
+/// assert_eq!(
+///     random_finite_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     [
+///         -2.3484663e-27, 2.287989e-18, -2.0729893e-12, 3.360012e28, -9.021723e-32, 3564911.2,
+///         -0.0000133769445, -1.8855448e18, 8.2494555e-29, 2.2178014e-38
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_finite_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+) -> RandomPrimitiveFloatInclusiveRange<T> {
+    random_primitive_float_inclusive_range(seed, -T::MAX_FINITE, T::MAX_FINITE)
+}
+
+/// Generates positive primitive floats.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, a float in
+/// $[1/4, 1/2)$ is as likely to be chosen as a float in $[1, 2)$, since these subranges contain an
+/// equal number of floats.
+///
+/// Positive zero is generated; negative zero is not. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_positive_primitive_floats;
+///
+/// assert_eq!(
+///     random_positive_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     [
+///         9.5715654e26, 209.6476, 386935780.0, 7.965817e30, 0.00021030706, 0.0027270128,
+///         3.4398167e-34, 2.3397111e14, 44567765000.0, 2.3479653e21
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_positive_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+) -> RandomPrimitiveFloatInclusiveRange<T> {
+    random_primitive_float_inclusive_range(seed, T::MIN_POSITIVE_SUBNORMAL, T::POSITIVE_INFINITY)
+}
+
+/// Generates negative primitive floats.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, a float in
+/// $(-1/2, 1/4]$ is as likely to be chosen as a float in $(-2, -1]$, since these subranges contain
+/// an equal number of floats.
+///
+/// Negative zero is generated; positive zero is not. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_negative_primitive_floats;
+///
+/// assert_eq!(
+///     random_negative_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     [
+///         -2.3484665e-27, -0.010641627, -5.8060587e-9, -2.8182444e-31, -10462.533, -821.13,
+///         -6.3031636e33, -9.5037605e-15, -4.956113e-11, -8.565164e-22
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_negative_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+) -> RandomPrimitiveFloatInclusiveRange<T> {
+    random_primitive_float_inclusive_range(seed, T::NEGATIVE_INFINITY, -T::MIN_POSITIVE_SUBNORMAL)
+}
+
+/// Generates nonzero primitive floats.
+///
+/// Every float within the range has an equal probability of being chosen. This does not mean that
+/// the distribution approximates a uniform distribution over the reals. For example, a float in
+/// $[1/4, 1/2)$ is as likely to be chosen as a float in $[1, 2)$, since these subranges contain an
+/// equal number of floats.
+///
+/// Neither positive nor negative zero are generated. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_nonzero_primitive_floats;
+///
+/// assert_eq!(
+///     random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     [
+///         -2.3484665e-27, 2.2879888e-18, -2.0729896e-12, 3.3600117e28, -9.0217234e-32, 3564911.0,
+///         -0.000013376945, -1.885545e18, 8.249455e-29, 2.2178013e-38
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_nonzero_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+) -> NonzeroValues<RandomPrimitiveFloats<T>> {
+    nonzero_values(random_primitive_floats(seed))
+}
+
+/// Generates random floats.
+///
+/// This `struct` is created by the `random_primitive_floats` function. See its documentation for
+/// more.
+#[derive(Clone, Debug)]
+pub struct RandomPrimitiveFloats<T: PrimitiveFloat> {
+    pub(crate) xs: RandomUnsignedInclusiveRange<T::UnsignedOfEqualWidth>,
+    nan: T::UnsignedOfEqualWidth,
+}
+
+impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloats<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        self.xs.next().map(|x| {
+            if x == self.nan {
+                T::NAN
+            } else {
+                T::from_ordered_representation(x)
+            }
+        })
+    }
+}
+
+/// Generates finite primitive floats.
+///
+/// Every float has an equal probability of being chosen. This does not mean that the distribution
+/// approximates a uniform distribution over the reals. For example, a float in $[1/4, 1/2)$ is as
+/// likely to be chosen as a float in $[1, 2)$, since these subranges contain an equal number of
+/// floats.
+///
+/// Positive zero, negative zero, and `NaN` are all generated.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::random_primitive_floats;
+///
+/// assert_eq!(
+///     random_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     [
+///         -2.3484665e-27, 2.2879888e-18, -2.0729896e-12, 3.3600117e28, -9.0217234e-32, 3564911.0,
+///         -0.000013376945, -1.885545e18, 8.249455e-29, 2.2178013e-38
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn random_primitive_floats<T: PrimitiveFloat>(seed: Seed) -> RandomPrimitiveFloats<T> {
+    let nan = T::POSITIVE_INFINITY.to_ordered_representation() + T::UnsignedOfEqualWidth::ONE;
+    RandomPrimitiveFloats {
+        xs: random_unsigned_inclusive_range(seed, T::UnsignedOfEqualWidth::ZERO, nan),
+        nan,
     }
 }
 
@@ -964,7 +1473,7 @@ impl VariableRangeGenerator {
                     remaining_y_bits -= self.remaining_x_bits;
                     self.remaining_x_bits = 0;
                 } else {
-                    y |= T::wrapping_from(self.x).mod_power_of_two(remaining_y_bits) << y_index;
+                    y |= T::wrapping_from(self.x).mod_power_of_2(remaining_y_bits) << y_index;
                     self.x >>= remaining_y_bits;
                     self.remaining_x_bits -= remaining_y_bits;
                     remaining_y_bits = 0;
@@ -1010,7 +1519,7 @@ impl VariableRangeGenerator {
         if limit == T::ONE {
             T::ZERO
         } else {
-            let chunk_size = limit.ceiling_log_two();
+            let chunk_size = limit.ceiling_log_base_2();
             loop {
                 let x = self.next_bit_chunk(chunk_size);
                 if x < limit {

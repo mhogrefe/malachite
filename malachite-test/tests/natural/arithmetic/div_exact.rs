@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    DivExact, DivExactAssign, DivMod, DivRound, EqModPowerOfTwo, ModPowerOfTwo,
+    DivExact, DivExactAssign, DivMod, DivRound, EqModPowerOf2, ModPowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -43,7 +43,7 @@ fn verify_limbs_modular_invert(ds: &[Limb], is: &[Limb]) {
     let d = Natural::from_limbs_asc(ds);
     let i = Natural::from_limbs_asc(is);
     let pow = u64::wrapping_from(ds.len()) << Limb::LOG_WIDTH;
-    assert!((d * i).eq_mod_power_of_two(&Natural::ONE, pow));
+    assert!((d * i).eq_mod_power_of_2(&Natural::ONE, pow));
 }
 
 fn verify_limbs_modular_div_mod(ns: &[Limb], ds: &[Limb], borrow: bool, qs: &[Limb], rs: &[Limb]) {
@@ -56,9 +56,9 @@ fn verify_limbs_modular_div_mod(ns: &[Limb], ds: &[Limb], borrow: bool, qs: &[Li
     let q_len = n_len - d_len;
     let qd = q * d;
     assert_eq!(n < qd, borrow);
-    assert!(qd.eq_mod_power_of_two(&n, u64::wrapping_from(q_len) << Limb::LOG_WIDTH));
+    assert!(qd.eq_mod_power_of_2(&n, u64::wrapping_from(q_len) << Limb::LOG_WIDTH));
     let expected_r = (Integer::from(n) - Integer::from(qd))
-        .mod_power_of_two(u64::wrapping_from(n_len) << Limb::LOG_WIDTH)
+        .mod_power_of_2(u64::wrapping_from(n_len) << Limb::LOG_WIDTH)
         >> (u64::wrapping_from(q_len) << Limb::LOG_WIDTH);
     assert_eq!(expected_r, r);
 }
@@ -68,7 +68,7 @@ fn verify_limbs_modular_div(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
     let d = Natural::from_limbs_asc(ds);
     let q = Natural::from_limbs_asc(qs);
     assert_eq!(
-        (q * d).mod_power_of_two(u64::wrapping_from(ns.len()) << Limb::LOG_WIDTH),
+        (q * d).mod_power_of_2(u64::wrapping_from(ns.len()) << Limb::LOG_WIDTH),
         n
     );
 }

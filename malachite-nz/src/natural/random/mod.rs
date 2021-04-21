@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::{CeilingLogTwo, PowerOfTwo, ShrRound};
+use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -14,7 +14,7 @@ use malachite_base::num::random::striped::{get_striped_unsigned_vec, StripedBitS
 use malachite_base::num::random::{random_primitive_ints, RandomPrimitiveInts};
 use malachite_base::random::Seed;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::arithmetic::mod_power_of_two::limbs_slice_mod_power_of_two_in_place;
+use natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
 use natural::logic::bit_access::limbs_slice_set_bit;
 use natural::Natural;
 
@@ -56,6 +56,7 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
         u64::WIDTH,
         u32::WIDTH,
     )
+    .map(Option::unwrap)
     .collect_vec();
     #[cfg(not(feature = "32_bit_limbs"))]
     let mut xs = xs
@@ -63,7 +64,7 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
             bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling),
         ))
         .collect_vec();
-    limbs_slice_mod_power_of_two_in_place(&mut xs, bits);
+    limbs_slice_mod_power_of_2_in_place(&mut xs, bits);
     Natural::from_owned_limbs_asc(xs)
 }
 
@@ -103,6 +104,7 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
         u64::WIDTH,
         u32::WIDTH,
     )
+    .map(Option::unwrap)
     .collect_vec();
     #[cfg(not(feature = "32_bit_limbs"))]
     let mut xs = xs
@@ -110,7 +112,7 @@ pub fn get_random_natural_with_bits(xs: &mut RandomPrimitiveInts<u64>, bits: u64
             bits.shr_round(u64::LOG_WIDTH, RoundingMode::Ceiling),
         ))
         .collect_vec();
-    limbs_slice_mod_power_of_two_in_place(&mut xs, bits);
+    limbs_slice_mod_power_of_2_in_place(&mut xs, bits);
     limbs_slice_set_bit(&mut xs, bits - 1);
     Natural::from_owned_limbs_asc(xs)
 }
@@ -545,7 +547,7 @@ impl Iterator for RandomNaturalsLessThan {
 pub fn random_naturals_less_than(seed: Seed, limit: Natural) -> RandomNaturalsLessThan {
     assert_ne!(limit, 0);
     RandomNaturalsLessThan {
-        bits: limit.ceiling_log_two(),
+        bits: limit.ceiling_log_base_2(),
         limit,
         limbs: random_primitive_ints(seed),
     }
@@ -772,7 +774,7 @@ pub fn random_natural_range_to_infinity(
         min_bit_xs: uniform_random_natural_range(
             seed.fork("min_bit_xs"),
             a,
-            Natural::power_of_two(min_bits),
+            Natural::power_of_2(min_bits),
         ),
     }
 }
@@ -1006,11 +1008,11 @@ pub fn random_natural_inclusive_range(
             min_bit_xs: uniform_random_natural_range(
                 seed.fork("min_bit_xs"),
                 a,
-                Natural::power_of_two(min_bits),
+                Natural::power_of_2(min_bits),
             ),
             max_bit_xs: uniform_random_natural_inclusive_range(
                 seed.fork("max_bit_xs"),
-                Natural::power_of_two(max_bits - 1),
+                Natural::power_of_2(max_bits - 1),
                 b,
             ),
         })

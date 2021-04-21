@@ -16,9 +16,9 @@ where
         let base = T::wrapping_from(base);
         let mut cs = Vec::new();
         while x != T::ZERO {
-            cs.push(char::from(digit_to_display_byte_lower(u8::wrapping_from(
-                x.div_assign_mod(base),
-            ))));
+            cs.push(char::from(
+                digit_to_display_byte_lower(u8::wrapping_from(x.div_assign_mod(base))).unwrap(),
+            ));
         }
         cs.into_iter().rev().collect()
     }
@@ -37,9 +37,9 @@ where
         let mut cs = Vec::new();
         let mut abs_x = x.unsigned_abs();
         while abs_x != <T as UnsignedAbs>::Output::ZERO {
-            cs.push(char::from(digit_to_display_byte_lower(u8::wrapping_from(
-                abs_x.div_assign_mod(base),
-            ))));
+            cs.push(char::from(
+                digit_to_display_byte_lower(u8::wrapping_from(abs_x.div_assign_mod(base))).unwrap(),
+            ));
         }
         if x < T::ZERO {
             cs.push('-');

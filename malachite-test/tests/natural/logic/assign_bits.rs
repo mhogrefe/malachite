@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{ModPowerOfTwo, NegModPowerOfTwo};
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, NegModPowerOf2};
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
 use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
@@ -53,10 +53,10 @@ fn assign_bits_properties() {
             n.assign_bits(start, end, bits);
             assert_eq!(n, result);
             let bits_width = end - start;
-            assert_eq!(n.get_bits(start, end), bits.mod_power_of_two(bits_width));
+            assert_eq!(n.get_bits(start, end), bits.mod_power_of_2(bits_width));
             let mut n = !old_n;
-            //TODO use sub_mod_power_of_two
-            let mut not_bits = bits.neg_mod_power_of_two(bits_width);
+            //TODO use sub_mod_power_of_2
+            let mut not_bits = bits.neg_mod_power_of_2(bits_width);
             if not_bits == 0 {
                 not_bits = Natural::low_mask(bits_width);
             } else {

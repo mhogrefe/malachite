@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::PowerOfTwo;
+use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::LowMask;
@@ -62,8 +62,8 @@ fn benchmark_natural_low_mask_algorithms(
                 &mut (|bits| no_out!(Natural::low_mask(bits))),
             ),
             (
-                "Natural.power_of_two(u64) - 1",
-                &mut (|bits| no_out!(Natural::power_of_two(bits) - Natural::ONE)),
+                "Natural.power_of_2(u64) - 1",
+                &mut (|bits| no_out!(Natural::power_of_2(bits) - Natural::ONE)),
             ),
         ],
     );

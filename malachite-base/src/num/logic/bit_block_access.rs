@@ -1,4 +1,4 @@
-use num::arithmetic::traits::{ModPowerOfTwo, UnsignedAbs};
+use num::arithmetic::traits::{ModPowerOf2, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{BitBlockAccess, LeadingZeros};
@@ -7,20 +7,16 @@ use std::ops::Neg;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-fn _get_bits_unsigned<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
-    x: &T,
-    start: u64,
-    end: u64,
-) -> T {
+fn _get_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: &T, start: u64, end: u64) -> T {
     assert!(start <= end);
     if start >= T::WIDTH {
         T::ZERO
     } else {
-        (*x >> start).mod_power_of_two(end - start)
+        (*x >> start).mod_power_of_2(end - start)
     }
 }
 
-fn _assign_bits_unsigned<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
+fn _assign_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(
     x: &mut T,
     start: u64,
     end: u64,
@@ -29,11 +25,11 @@ fn _assign_bits_unsigned<T: ModPowerOfTwo<Output = T> + PrimitiveInt>(
     assert!(start <= end);
     let width = T::WIDTH;
     let bits_width = end - start;
-    let bits = bits.mod_power_of_two(bits_width);
+    let bits = bits.mod_power_of_2(bits_width);
     if bits != T::ZERO && LeadingZeros::leading_zeros(bits) < start {
         panic!("{}", ERROR_MESSAGE);
     } else if start < width {
-        *x &= !(T::MAX.mod_power_of_two(min(bits_width, width - start)) << start);
+        *x &= !(T::MAX.mod_power_of_2(min(bits_width, width - start)) << start);
         *x |= bits << start;
     }
 }
@@ -119,7 +115,7 @@ macro_rules! impl_bit_block_access_unsigned {
 }
 apply_to_unsigneds!(impl_bit_block_access_unsigned);
 
-fn _get_bits_signed<T: ModPowerOfTwo<Output = U> + Neg<Output = T> + PrimitiveInt, U>(
+fn _get_bits_signed<T: ModPowerOf2<Output = U> + Neg<Output = T> + PrimitiveInt, U>(
     x: &T,
     start: u64,
     end: u64,
@@ -130,12 +126,12 @@ fn _get_bits_signed<T: ModPowerOfTwo<Output = U> + Neg<Output = T> + PrimitiveIn
     } else {
         *x >> start
     })
-    .mod_power_of_two(end - start)
+    .mod_power_of_2(end - start)
 }
 
 fn _assign_bits_signed<
     T: PrimitiveInt + UnsignedAbs<Output = U> + WrappingFrom<U>,
-    U: BitBlockAccess<Bits = U> + ModPowerOfTwo<Output = U> + PrimitiveInt,
+    U: BitBlockAccess<Bits = U> + ModPowerOf2<Output = U> + PrimitiveInt,
 >(
     x: &mut T,
     start: u64,
@@ -153,22 +149,21 @@ fn _assign_bits_signed<
     } else {
         let width = T::WIDTH - 1;
         let bits_width = end - start;
-        let bits = bits.mod_power_of_two(bits_width);
+        let bits = bits.mod_power_of_2(bits_width);
         let max = U::MAX;
         if bits_width > width + 1 {
             panic!("{}", ERROR_MESSAGE);
         } else if start >= width {
-            if bits != max.mod_power_of_two(bits_width) {
+            if bits != max.mod_power_of_2(bits_width) {
                 panic!("{}", ERROR_MESSAGE);
             }
         } else {
             let lower_width = width - start;
-            if end > width && bits >> lower_width != max.mod_power_of_two(end - width) {
+            if end > width && bits >> lower_width != max.mod_power_of_2(end - width) {
                 panic!("{}", ERROR_MESSAGE);
             } else {
-                *x &= T::wrapping_from(
-                    !(max.mod_power_of_two(min(bits_width, lower_width)) << start),
-                );
+                *x &=
+                    T::wrapping_from(!(max.mod_power_of_2(min(bits_width, lower_width)) << start));
                 *x |= T::wrapping_from(bits << start);
             }
         }

@@ -26,7 +26,7 @@ fn _to_bits_desc_unsigned<T: PrimitiveInt>(x: &T) -> Vec<bool> {
     if *x == T::ONE {
         return bits;
     }
-    let mut mask = T::power_of_two(T::WIDTH - LeadingZeros::leading_zeros(*x) - 2);
+    let mut mask = T::power_of_2(T::WIDTH - LeadingZeros::leading_zeros(*x) - 2);
     while mask != T::ZERO {
         bits.push(*x & mask != T::ZERO);
         mask >>= 1;
@@ -58,7 +58,7 @@ fn _from_bits_asc_unsigned<
 #[inline]
 fn _from_bits_desc_unsigned<T: PrimitiveInt, I: Iterator<Item = bool>>(bits: I) -> T {
     let mut n = T::ZERO;
-    let high_mask = T::power_of_two(T::WIDTH - 1);
+    let high_mask = T::power_of_2(T::WIDTH - 1);
     for bit in bits {
         if n & high_mask != T::ZERO {
             panic!("Bits cannot fit in integer of type {}", T::NAME);
@@ -206,7 +206,7 @@ fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInt>(x: &T) -> Vec<bool> {
         if *x == T::ONE {
             return bits;
         }
-        let mut mask = T::power_of_two(T::WIDTH - LeadingZeros::leading_zeros(*x) - 2);
+        let mut mask = T::power_of_2(T::WIDTH - LeadingZeros::leading_zeros(*x) - 2);
         while mask != T::ZERO {
             bits.push(*x & mask != T::ZERO);
             mask >>= 1;
@@ -220,7 +220,7 @@ fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInt>(x: &T) -> Vec<bool> {
         if *x == T::NEGATIVE_ONE << 1 {
             return bits;
         }
-        let mut mask = T::power_of_two(T::WIDTH - LeadingZeros::leading_zeros(!*x) - 2);
+        let mut mask = T::power_of_2(T::WIDTH - LeadingZeros::leading_zeros(!*x) - 2);
         while mask != T::ZERO {
             bits.push(*x & mask != T::ZERO);
             mask >>= 1;
@@ -275,7 +275,7 @@ fn _from_bits_desc_signed<U: PrimitiveInt, S: Named + WrappingFrom<U>, I: Iterat
     bits: I,
 ) -> S {
     let mut n = U::ZERO;
-    let high_mask = U::power_of_two(U::WIDTH - 2);
+    let high_mask = U::power_of_2(U::WIDTH - 2);
     let mut first = true;
     let mut sign_bit = false;
     for bit in bits {

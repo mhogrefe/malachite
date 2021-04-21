@@ -56,7 +56,6 @@ pub fn fail_on_untested_path(message: &str) {
 #[inline]
 pub const fn fail_on_untested_path(_message: &str) {}
 
-pub mod error;
 #[cfg(feature = "32_bit_limbs")]
 pub mod platform_32;
 #[cfg(not(feature = "32_bit_limbs"))]

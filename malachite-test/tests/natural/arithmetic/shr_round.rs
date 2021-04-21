@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShr, DivRound, DivisibleByPowerOfTwo, ShlRound, ShrRound, ShrRoundAssign,
+    ArithmeticCheckedShr, DivRound, DivisibleByPowerOf2, ShlRound, ShrRound, ShrRoundAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -66,7 +66,7 @@ fn limbs_shr_exact_properties() {
                 assert_eq!(Natural::from_owned_limbs_asc(result_limbs), m);
                 assert_eq!(m << bits, n);
             } else {
-                assert!(!n.divisible_by_power_of_two(bits));
+                assert!(!n.divisible_by_power_of_2(bits));
             }
         },
     );
@@ -86,7 +86,7 @@ fn limbs_shr_round_properties() {
                 }
             } else {
                 assert_eq!(rm, RoundingMode::Exact);
-                assert!(!n.divisible_by_power_of_two(bits));
+                assert!(!n.divisible_by_power_of_2(bits));
             }
         },
     );
@@ -132,7 +132,7 @@ fn limbs_vec_shr_exact_in_place_properties() {
                 assert_eq!(Natural::from_owned_limbs_asc(limbs), m);
                 assert_eq!(m << bits, n);
             } else {
-                assert!(!n.divisible_by_power_of_two(bits));
+                assert!(!n.divisible_by_power_of_2(bits));
             }
         },
     );
@@ -153,7 +153,7 @@ fn limbs_vec_shr_round_in_place_properties() {
                 }
             } else {
                 assert_eq!(rm, RoundingMode::Exact);
-                assert!(!n.divisible_by_power_of_two(bits));
+                assert!(!n.divisible_by_power_of_2(bits));
             }
         },
     );

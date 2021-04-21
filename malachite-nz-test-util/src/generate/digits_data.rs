@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOfTwo, Parity, Pow, PowerOfTwo, ShrRound, Square,
+    ModPowerOf2, Parity, Pow, PowerOf2, ShrRound, Square,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -13,7 +13,7 @@ use std::cmp::Ordering;
 /// Calculate r satisfying r*d == 1 mod 2^n.
 ///
 /// This is mpz_invert_2exp from bootstrap.c, GMP 6.2.1.
-fn invert_mod_power_of_two(x: &Natural, pow: u64) -> Natural {
+fn invert_mod_power_of_2(x: &Natural, pow: u64) -> Natural {
     assert!(x.odd());
     let mut inverse = Natural::ONE;
     for i in 0..pow {
@@ -21,7 +21,7 @@ fn invert_mod_power_of_two(x: &Natural, pow: u64) -> Natural {
             inverse.set_bit(i);
         }
     }
-    assert_eq!((&inverse * x).mod_power_of_two(pow), 1);
+    assert_eq!((&inverse * x).mod_power_of_2(pow), 1);
     inverse
 }
 
@@ -48,8 +48,8 @@ fn simple_sqrt(x: &Natural) -> Natural {
 // This is mp_2logb from gen-bases.c, GMP 6.2.1.
 fn get_log_base_of_2(base: u64, precision: u64) -> Natural {
     let extended_precision = precision + 16;
-    let mut t = Natural::power_of_two(extended_precision);
-    let two = Natural::power_of_two(extended_precision + 1);
+    let mut t = Natural::power_of_2(extended_precision);
+    let two = Natural::power_of_2(extended_precision + 1);
     let mut log = Natural::ZERO;
     let mut base = Natural::from(base) << extended_precision;
     for i in (0..precision).rev() {
@@ -74,7 +74,7 @@ struct BaseData {
 
 // This is generate from gen-bases.c, GMP 6.2.1
 fn generate(base: u64) -> BaseData {
-    let limit = Natural::power_of_two(Limb::WIDTH);
+    let limit = Natural::power_of_2(Limb::WIDTH);
     let mut big_base = Natural::ONE;
     let mut chars_per_limb = 0;
     while big_base <= limit {
@@ -85,11 +85,11 @@ fn generate(base: u64) -> BaseData {
     big_base = Natural::from(base).pow(chars_per_limb);
     let normalization_steps = Limb::WIDTH.wrapping_sub(big_base.significant_bits());
     let mut big_base_inverted =
-        Natural::power_of_two((Limb::WIDTH << 1).wrapping_sub(normalization_steps)) / &big_base;
+        Natural::power_of_2((Limb::WIDTH << 1).wrapping_sub(normalization_steps)) / &big_base;
     big_base_inverted.clear_bit(Limb::WIDTH);
     let big_base_trailing_zeros = big_base.trailing_zeros().unwrap();
     let big_base_odd = &big_base >> big_base_trailing_zeros;
-    let big_base_inverted_mod_b = invert_mod_power_of_two(&big_base_odd, Limb::WIDTH);
+    let big_base_inverted_mod_b = invert_mod_power_of_2(&big_base_odd, Limb::WIDTH);
     BaseData {
         chars_per_limb,
         big_base_trailing_zeros,

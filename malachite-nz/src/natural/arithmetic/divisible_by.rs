@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOfTwo, Parity};
+use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, Parity};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
@@ -39,7 +39,7 @@ pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     assert!(ns.len() > 1);
     if d.even() {
         let twos = TrailingZeros::trailing_zeros(d);
-        ns[0].divisible_by_power_of_two(twos) && _limbs_mod_exact_odd_limb(ns, d >> twos, 0) == 0
+        ns[0].divisible_by_power_of_2(twos) && _limbs_mod_exact_odd_limb(ns, d >> twos, 0) == 0
     } else {
         _limbs_mod_exact_odd_limb(ns, d, 0) == 0
     }

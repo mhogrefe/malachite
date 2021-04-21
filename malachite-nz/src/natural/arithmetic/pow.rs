@@ -1,6 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    EqModPowerOfTwo, IsPowerOfTwo, Parity, Pow, PowAssign, PowerOfTwo, ShrRound, Square,
-    SquareAssign,
+    EqModPowerOf2, IsPowerOf2, Parity, Pow, PowAssign, PowerOf2, ShrRound, Square, SquareAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -181,7 +180,7 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
             }
         } else {
             // Arrange the final result ends up in `out`, not in `scratch`
-            if !CountOnes::count_ones(exp).eq_mod_power_of_two(bits, 1) {
+            if !CountOnes::count_ones(exp).eq_mod_power_of_2(bits, 1) {
                 swap(&mut out, &mut scratch);
                 swap(&mut out_alloc, &mut scratch_len);
             }
@@ -342,7 +341,7 @@ fn limbs_pow_to_out_alt<'a>(
     // Count number of bits in exp, and compute where to put initial square in order to magically
     // get results in the entry out.
     let bits = exp.significant_bits();
-    if bits.eq_mod_power_of_two(CountOnes::count_ones(exp), 1) {
+    if bits.eq_mod_power_of_2(CountOnes::count_ones(exp), 1) {
         swap(&mut out, &mut scratch);
     }
     limbs_square_to_out(out, xs);
@@ -387,9 +386,7 @@ impl Natural {
             (natural_zero!(), _) => Natural::ZERO,
             (x, 1) => x.clone(),
             (x, 2) => x.square(),
-            (x, exp) if x.is_power_of_two() => {
-                Natural::power_of_two((x.significant_bits() - 1) * exp)
-            }
+            (x, exp) if x.is_power_of_2() => Natural::power_of_2((x.significant_bits() - 1) * exp),
             (Natural(Small(small)), exp) => {
                 if small.significant_bits() * exp <= Limb::WIDTH {
                     Natural(Small(small.checked_pow(u32::wrapping_from(exp)).unwrap()))
@@ -408,8 +405,8 @@ impl Natural {
             (x, 0) => *x = Natural::ONE,
             (_, 1) | (natural_zero!(), _) | (natural_one!(), _) => {}
             (x, 2) => x.square_assign(),
-            (x, exp) if x.is_power_of_two() => {
-                *x = Natural::power_of_two((x.significant_bits() - 1) * exp)
+            (x, exp) if x.is_power_of_2() => {
+                *x = Natural::power_of_2((x.significant_bits() - 1) * exp)
             }
             (Natural(Small(ref mut small)), exp) => {
                 if small.significant_bits() * exp <= Limb::WIDTH {
