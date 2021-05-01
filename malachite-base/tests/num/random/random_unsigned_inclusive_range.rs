@@ -30,7 +30,6 @@ fn random_unsigned_inclusive_range_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_unsigned_inclusive_range() {
     // u8, 5, 5

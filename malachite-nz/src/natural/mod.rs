@@ -1,6 +1,7 @@
 use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::conversion::traits::FromStringBase;
 use malachite_base::slices::slice_trailing_zeros;
 use natural::InnerNatural::{Large, Small};
 use platform::Limb;
@@ -14,15 +15,33 @@ use std::str::FromStr;
 /// On a 64-bit system, a `Natural` takes up 32 bytes of space on the stack.
 #[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(from = "SerdeNatural", into = "SerdeNatural"))]
 pub struct Natural(pub(crate) InnerNatural);
 
 /// We want to limit the visibility of the `Small` and `Large` constructors to within this crate. To
 /// do this, we wrap the `InnerNatural` enum in a struct that gets compiled away.
 #[derive(Clone, Eq, Hash, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub(crate) enum InnerNatural {
     Small(Limb),
     Large(Vec<Limb>),
+}
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+struct SerdeNatural(String);
+
+impl From<Natural> for SerdeNatural {
+    #[inline]
+    fn from(x: Natural) -> SerdeNatural {
+        SerdeNatural(format!("{:#x}", x))
+    }
+}
+
+impl From<SerdeNatural> for Natural {
+    #[inline]
+    fn from(s: SerdeNatural) -> Natural {
+        assert!(s.0.starts_with("0x"));
+        Natural::from_string_base(16, &s.0[2..]).unwrap()
+    }
 }
 
 macro_rules! natural_zero {

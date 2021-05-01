@@ -8,7 +8,9 @@ use malachite_base_test_util::bench::bucketers::{
 };
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
-use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen_var_5;
+use malachite_base_test_util::generators::{
+    unsigned_vec_unsigned_pair_gen_var_12, unsigned_vec_unsigned_pair_gen_var_5,
+};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::conversion::digits::general_digits::{
     _from_digits_asc_large, _from_digits_asc_limb, _from_digits_desc_basecase,
@@ -20,21 +22,35 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::{
     natural_vec_natural_pair_gen_var_1, natural_vec_natural_pair_gen_var_2,
+    natural_vec_natural_pair_gen_var_3, natural_vec_natural_pair_gen_var_4,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_demos!(runner, demo_limbs_from_digits_small_base_basecase);
+    register_unsigned_demos!(runner, demo_limbs_from_digits_small_base_basecase_targeted);
     register_unsigned_demos!(runner, demo_limbs_from_digits_small_base);
+    register_unsigned_demos!(runner, demo_limbs_from_digits_small_base_targeted);
     register_unsigned_demos!(runner, demo_from_digits_desc_basecase);
+    register_unsigned_demos!(runner, demo_from_digits_desc_basecase_targeted);
     register_unsigned_demos!(runner, demo_from_digits_asc_limb);
     register_unsigned_demos!(runner, demo_from_digits_desc_limb);
+    register_unsigned_demos!(runner, demo_from_digits_asc_limb_targeted);
+    register_unsigned_demos!(runner, demo_from_digits_desc_limb_targeted);
     register_demo!(runner, demo_from_digits_asc_large);
     register_demo!(runner, demo_from_digits_desc_large);
+    register_demo!(runner, demo_from_digits_asc_large_targeted);
+    register_demo!(runner, demo_from_digits_desc_large_targeted);
     register_unsigned_demos!(runner, demo_from_digits_asc_unsigned);
     register_unsigned_demos!(runner, demo_from_digits_desc_unsigned);
+    register_unsigned_demos!(runner, demo_from_digits_asc_unsigned_targeted);
+    register_unsigned_demos!(runner, demo_from_digits_desc_unsigned_targeted);
     register_demo!(runner, demo_from_digits_asc);
     register_demo!(runner, demo_from_digits_desc);
+    register_demo!(runner, demo_from_digits_asc_targeted);
+    register_demo!(runner, demo_from_digits_desc_targeted);
+
     register_unsigned_benches!(
         runner,
         benchmark_limbs_from_digits_small_base_basecase_algorithms
@@ -52,6 +68,27 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: WrappingFrom<T>,
+{
+    for (mut out, xs, base) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3::<T, Limb>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let old_out = out.to_vec();
+        let out_len = _limbs_from_digits_small_base_basecase(&mut out, &xs, base);
+        println!(
+            "out := {:?}; _limbs_from_digits_small_base_basecase(&mut out, {:?}, {}) = {:?}; \
+            out = {:?}",
+            old_out, xs, base, out_len, out
+        );
+    }
+}
+
+fn demo_limbs_from_digits_small_base_basecase_targeted<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -79,6 +116,26 @@ fn demo_limbs_from_digits_small_base<T: PrimitiveUnsigned>(
 ) where
     Limb: WrappingFrom<T>,
 {
+    for (mut out, xs, base) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3::<T, Limb>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let old_out = out.to_vec();
+        let out_len = _limbs_from_digits_small_base(&mut out, &xs, base);
+        println!(
+            "out := {:?}; _limbs_from_digits_small_base(&mut out, {:?}, {}) = {:?}; out = {:?}",
+            old_out, xs, base, out_len, out
+        );
+    }
+}
+
+fn demo_limbs_from_digits_small_base_targeted<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: WrappingFrom<T>,
+{
     for (mut out, xs, base) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2::<T, Limb>()
         .get(gm, &config)
         .take(limit)
@@ -98,7 +155,27 @@ fn demo_from_digits_desc_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     config: GenConfig,
     limit: usize,
 ) where
-    Limb: CheckedFrom<T> + SaturatingFrom<T>,
+    Limb: SaturatingFrom<T> + WrappingFrom<T>,
+{
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_12::<T, Limb>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_desc_basecase(&{:?}, {}) = {:?}",
+            xs,
+            base,
+            _from_digits_desc_basecase(&xs, base)
+        );
+    }
+}
+
+fn demo_from_digits_desc_basecase_targeted<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: SaturatingFrom<T> + WrappingFrom<T>,
 {
     for (xs, base) in unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>()
         .get(gm, &config)
@@ -121,6 +198,48 @@ fn demo_from_digits_asc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_12::<T, Limb>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_asc_limb(&{:?}, {}) = {:?}",
+            xs.clone(),
+            base,
+            _from_digits_asc_limb(xs.into_iter(), base)
+        );
+    }
+}
+
+fn demo_from_digits_desc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
+{
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_12::<T, Limb>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_desc_limb(&{:?}, {}) = {:?}",
+            xs.clone(),
+            base,
+            _from_digits_desc_limb(xs.into_iter(), base)
+        );
+    }
+}
+
+fn demo_from_digits_asc_limb_targeted<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
+{
     for (xs, base) in unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>()
         .get(gm, &config)
         .take(limit)
@@ -134,7 +253,7 @@ fn demo_from_digits_asc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     }
 }
 
-fn demo_from_digits_desc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+fn demo_from_digits_desc_limb_targeted<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -142,7 +261,7 @@ fn demo_from_digits_desc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     Limb: ExactFrom<T> + SaturatingFrom<T> + WrappingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
-    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>()
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_12::<T, Limb>()
         .get(gm, &config)
         .take(limit)
     {
@@ -156,6 +275,34 @@ fn demo_from_digits_desc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
 }
 
 fn demo_from_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize) {
+    for (xs, base) in natural_vec_natural_pair_gen_var_3()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_asc_large(&{:?}, {}) = {:?}",
+            xs.clone(),
+            base,
+            _from_digits_asc_large(xs.into_iter(), &base)
+        );
+    }
+}
+
+fn demo_from_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize) {
+    for (xs, base) in natural_vec_natural_pair_gen_var_3()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "_from_digits_desc_large(&{:?}, {}) = {:?}",
+            xs.clone(),
+            base,
+            _from_digits_desc_large(xs.into_iter(), &base)
+        );
+    }
+}
+
+fn demo_from_digits_asc_large_targeted(gm: GenMode, config: GenConfig, limit: usize) {
     for (xs, base) in natural_vec_natural_pair_gen_var_1()
         .get(gm, &config)
         .take(limit)
@@ -169,7 +316,7 @@ fn demo_from_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_from_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_from_digits_desc_large_targeted(gm: GenMode, config: GenConfig, limit: usize) {
     for (xs, base) in natural_vec_natural_pair_gen_var_1()
         .get(gm, &config)
         .take(limit)
@@ -193,6 +340,52 @@ fn demo_from_digits_asc_unsigned<
     Limb: SaturatingFrom<T>,
     Natural: Digits<T>,
 {
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "Natural::from_digits_asc({}, &{:?}) = {:?}",
+            base,
+            xs.clone(),
+            Natural::from_digits_asc(&base, xs.into_iter())
+        );
+    }
+}
+
+fn demo_from_digits_desc_unsigned<
+    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
+>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: SaturatingFrom<T>,
+    Natural: Digits<T>,
+{
+    for (xs, base) in unsigned_vec_unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "Natural::from_digits_desc({}, &{:?}) = {:?}",
+            base,
+            xs.clone(),
+            Natural::from_digits_desc(&base, xs.into_iter())
+        );
+    }
+}
+
+fn demo_from_digits_asc_unsigned_targeted<
+    T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
+>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
+    Limb: SaturatingFrom<T>,
+    Natural: Digits<T>,
+{
     for (xs, base) in unsigned_vec_unsigned_pair_gen_var_5::<T, T>()
         .get(gm, &config)
         .take(limit)
@@ -206,7 +399,7 @@ fn demo_from_digits_asc_unsigned<
     }
 }
 
-fn demo_from_digits_desc_unsigned<
+fn demo_from_digits_desc_unsigned_targeted<
     T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
 >(
     gm: GenMode,
@@ -230,6 +423,34 @@ fn demo_from_digits_desc_unsigned<
 }
 
 fn demo_from_digits_asc(gm: GenMode, config: GenConfig, limit: usize) {
+    for (xs, base) in natural_vec_natural_pair_gen_var_4()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "Natural::from_digits_asc({}, &{:?}) = {:?}",
+            base,
+            xs.clone(),
+            Natural::from_digits_asc(&base, xs.into_iter())
+        );
+    }
+}
+
+fn demo_from_digits_desc(gm: GenMode, config: GenConfig, limit: usize) {
+    for (xs, base) in natural_vec_natural_pair_gen_var_4()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "Natural::from_digits_desc({}, &{:?}) = {:?}",
+            base,
+            xs.clone(),
+            Natural::from_digits_desc(&base, xs.into_iter())
+        );
+    }
+}
+
+fn demo_from_digits_asc_targeted(gm: GenMode, config: GenConfig, limit: usize) {
     for (xs, base) in natural_vec_natural_pair_gen_var_2()
         .get(gm, &config)
         .take(limit)
@@ -243,7 +464,7 @@ fn demo_from_digits_asc(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_from_digits_desc(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_from_digits_desc_targeted(gm: GenMode, config: GenConfig, limit: usize) {
     for (xs, base) in natural_vec_natural_pair_gen_var_2()
         .get(gm, &config)
         .take(limit)
@@ -327,7 +548,7 @@ fn benchmark_from_digits_desc_basecase_algorithms<T: ConvertibleFrom<Limb> + Pri
     limit: usize,
     file_name: &str,
 ) where
-    Limb: ExactFrom<T> + SaturatingFrom<T>,
+    Limb: SaturatingFrom<T> + WrappingFrom<T>,
     Natural: From<T>,
 {
     run_benchmark(

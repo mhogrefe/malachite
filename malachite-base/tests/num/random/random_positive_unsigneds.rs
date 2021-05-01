@@ -27,7 +27,6 @@ fn random_positive_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_positive_unsigneds() {
     // u8

@@ -3,7 +3,6 @@ use malachite_base::chars::char_is_graphic;
 use malachite_base::chars::exhaustive::{ascii_chars_increasing, chars_increasing};
 use malachite_base::iterators::matching_intervals_in_iterator;
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_is_graphic() {
     let test = |c, out| {

@@ -1,10 +1,11 @@
 use generators::common::{reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, GenConfig, It};
 use generators::{
-    digits_valid, reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned,
+    digits_valid, get_two_highest, reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned,
     reduce_to_fit_sub_mul_signed, reduce_to_fit_sub_mul_unsigned, signed_assign_bits_valid,
     unsigned_assign_bits_valid,
 };
 use itertools::repeat_n;
+use itertools::Itertools;
 use malachite_base::chars::random::{
     graphic_weighted_random_ascii_chars, graphic_weighted_random_char_inclusive_range,
     graphic_weighted_random_char_range, graphic_weighted_random_chars,
@@ -15,9 +16,12 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    ExactFrom, SaturatingFrom, WrappingFrom, WrappingInto,
+    CheckedFrom, ExactFrom, HasHalf, JoinHalves, SaturatingFrom, SplitInHalf, WrappingFrom,
+    WrappingInto,
 };
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitBlockAccess;
+use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::num::random::geometric::{
     geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
     geometric_random_signeds, geometric_random_unsigned_range, geometric_random_unsigneds,
@@ -34,9 +38,9 @@ use malachite_base::num::random::striped::{
     StripedRandomUnsignedBitChunks,
 };
 use malachite_base::num::random::{
-    random_signed_range, random_unsigned_inclusive_range, random_unsigned_range,
-    random_unsigneds_less_than, variable_range_generator, RandomUnsignedInclusiveRange,
-    VariableRangeGenerator,
+    random_primitive_floats, random_signed_range, random_unsigned_inclusive_range,
+    random_unsigned_range, random_unsigneds_less_than, variable_range_generator,
+    RandomUnsignedInclusiveRange, VariableRangeGenerator,
 };
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
@@ -49,7 +53,9 @@ use malachite_base::tuples::random::{
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
+use num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use std::cmp::{min, Ordering};
+use std::collections::HashMap;
 use std::marker::PhantomData;
 
 // -- char --
@@ -57,8 +63,8 @@ use std::marker::PhantomData;
 pub fn special_random_char_gen(config: &GenConfig) -> It<char> {
     Box::new(graphic_weighted_random_chars(
         EXAMPLE_SEED,
-        config.get_or("graphic_char_weight_n", 50),
-        config.get_or("graphic_char_weight_d", 1),
+        config.get_or("graphic_char_prob_n", 50),
+        config.get_or("graphic_char_prob_d", 51),
     ))
 }
 
@@ -68,8 +74,8 @@ pub fn special_random_char_gen_var_1(config: &GenConfig) -> It<char> {
         EXAMPLE_SEED,
         char::MIN,
         char::MAX,
-        config.get_or("graphic_char_weight_n", 50),
-        config.get_or("graphic_char_weight_d", 1),
+        config.get_or("graphic_char_prob_n", 50),
+        config.get_or("graphic_char_prob_d", 51),
     ))
 }
 
@@ -79,8 +85,8 @@ pub fn special_random_char_gen_var_2(config: &GenConfig) -> It<char> {
         EXAMPLE_SEED,
         '\u{1}',
         char::MAX,
-        config.get_or("graphic_char_weight_n", 50),
-        config.get_or("graphic_char_weight_d", 1),
+        config.get_or("graphic_char_prob_n", 50),
+        config.get_or("graphic_char_prob_d", 51),
     ))
 }
 
@@ -89,9 +95,15 @@ pub fn special_random_char_gen_var_2(config: &GenConfig) -> It<char> {
 pub fn special_random_char_pair_gen(config: &GenConfig) -> It<(char, char)> {
     Box::new(random_pairs_from_single(graphic_weighted_random_chars(
         EXAMPLE_SEED,
-        config.get_or("graphic_char_weight_n", 50),
-        config.get_or("graphic_char_weight_d", 1),
+        config.get_or("graphic_char_prob_n", 50),
+        config.get_or("graphic_char_prob_d", 51),
     )))
+}
+
+// -- PrimitiveFloat --
+
+pub fn special_random_primitive_float_gen<T: PrimitiveFloat>(_config: &GenConfig) -> It<T> {
+    Box::new(random_primitive_floats(EXAMPLE_SEED))
 }
 
 // -- PrimitiveSigned --
@@ -1789,6 +1801,31 @@ pub fn special_random_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>(
     })
 }
 
+pub fn special_random_unsigned_triple_gen_var_12<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T)> {
+    Box::new(
+        random_triples_from_single(striped_random_unsigneds::<T>(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .flat_map(|(x, y, z)| {
+            let ranking = [(x, 0), (y, 1), (z, 2)];
+            let (hi, next_hi) = get_two_highest(&ranking);
+            if hi.0 == next_hi.0 {
+                None
+            } else {
+                Some(match hi.1 {
+                    0 => (y, z, x),
+                    1 => (x, z, y),
+                    _ => (x, y, z),
+                })
+            }
+        }),
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn special_random_unsigned_quadruple_gen<T: PrimitiveUnsigned>(
@@ -1908,6 +1945,63 @@ pub fn special_random_unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>(
         mean_stripe_n: config.get_or("mean_stripe_n", T::WIDTH >> 1),
         mean_stripe_d: config.get_or("mean_stripe_d", 1),
     })
+}
+
+pub fn special_random_unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(
+        random_quadruples_from_single(striped_random_unsigneds::<T>(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .flat_map(|(x, y, z, w)| {
+            let ranking = [(x, 0), (y, 1), (z, 2), (w, 3)];
+            let (hi, next_hi) = get_two_highest(&ranking);
+            if hi.0 == next_hi.0 {
+                None
+            } else {
+                Some(match hi.1 {
+                    0 => (y, z, w, x),
+                    1 => (x, z, w, y),
+                    2 => (x, y, w, z),
+                    _ => (x, y, z, w),
+                })
+            }
+        }),
+    )
+}
+
+pub fn special_random_unsigned_quadruple_gen_var_5<
+    T: CheckedFrom<DT> + PrimitiveUnsigned,
+    DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
+>(
+    config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(x_1, x_0, d)| {
+            let inv = limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
+            (x_1, x_0, d, inv)
+        }),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, RoundingMode) --
@@ -2070,8 +2164,8 @@ pub fn special_random_string_gen(config: &GenConfig) -> It<String> {
         &|seed| {
             graphic_weighted_random_chars(
                 seed,
-                config.get_or("graphic_char_weight_n", 50),
-                config.get_or("graphic_char_weight_d", 1),
+                config.get_or("graphic_char_prob_n", 50),
+                config.get_or("graphic_char_prob_d", 51),
             )
         },
         config.get_or("mean_length_n", 32),
@@ -2085,8 +2179,8 @@ pub fn special_random_string_gen_var_1(config: &GenConfig) -> It<String> {
         &|seed| {
             graphic_weighted_random_ascii_chars(
                 seed,
-                config.get_or("graphic_char_weight_n", 50),
-                config.get_or("graphic_char_weight_d", 1),
+                config.get_or("graphic_char_prob_n", 50),
+                config.get_or("graphic_char_prob_d", 51),
             )
         },
         config.get_or("mean_length_n", 32),
@@ -2102,8 +2196,8 @@ pub fn special_random_string_pair_gen(config: &GenConfig) -> It<(String, String)
         &|seed| {
             graphic_weighted_random_chars(
                 seed,
-                config.get_or("graphic_char_weight_n", 50),
-                config.get_or("graphic_char_weight_d", 1),
+                config.get_or("graphic_char_prob_n", 50),
+                config.get_or("graphic_char_prob_d", 51),
             )
         },
         config.get_or("mean_length_n", 32),
@@ -2117,8 +2211,8 @@ pub fn special_random_string_pair_gen_var_1(config: &GenConfig) -> It<(String, S
         &|seed| {
             graphic_weighted_random_ascii_chars(
                 seed,
-                config.get_or("graphic_char_weight_n", 50),
-                config.get_or("graphic_char_weight_d", 1),
+                config.get_or("graphic_char_prob_n", 50),
+                config.get_or("graphic_char_prob_d", 51),
             )
         },
         config.get_or("mean_length_n", 32),
@@ -2486,6 +2580,108 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>
             )
         },
         &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::MAX),
+    ))
+}
+
+struct PowerOfTwoDigitsGenerator<T: PrimitiveUnsigned> {
+    log_bases: GeometricRandomNaturalValues<u64>,
+    digit_counts: GeometricRandomNaturalValues<usize>,
+    digit_map: HashMap<u64, StripedRandomUnsignedBitChunks<T>>,
+    mean_stripe_n: u64,
+    mean_stripe_d: u64,
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for PowerOfTwoDigitsGenerator<T> {
+    type Item = (Vec<T>, u64);
+
+    fn next(&mut self) -> Option<(Vec<T>, u64)> {
+        let log_base = self.log_bases.next().unwrap();
+        let digit_count = self.digit_counts.next().unwrap();
+        let mean_stripe_n = self.mean_stripe_n;
+        let mean_stripe_d = self.mean_stripe_d;
+        let digits = self.digit_map.entry(log_base).or_insert_with(|| {
+            striped_random_unsigned_bit_chunks(
+                EXAMPLE_SEED.fork(&log_base.to_string()),
+                log_base,
+                mean_stripe_n,
+                mean_stripe_d,
+            )
+        });
+        let digits = digits.take(digit_count).collect_vec();
+        Some((digits, log_base))
+    }
+}
+
+pub fn special_random_unsigned_vec_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, u64)> {
+    Box::new(PowerOfTwoDigitsGenerator::<T> {
+        log_bases: geometric_random_unsigned_range(
+            EXAMPLE_SEED.fork("log_bases"),
+            1,
+            T::WIDTH,
+            config.get_or("mean_log_base_n", 4),
+            config.get_or("mean_log_base_d", 1),
+        ),
+        digit_counts: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("digit_count"),
+            config.get_or("mean_digit_count_n", 4),
+            config.get_or("mean_digit_count_d", 1),
+        ),
+        digit_map: HashMap::new(),
+        mean_stripe_n: config.get_or("mean_stripe_n", T::WIDTH << 1),
+        mean_stripe_d: config.get_or("mean_stripe_d", 1),
+        phantom: PhantomData,
+    })
+}
+
+pub fn special_random_unsigned_vec_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigned_vecs(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigned_range(
+                seed.fork("log_bases"),
+                1,
+                T::WIDTH,
+                config.get_or("mean_log_base_n", 4),
+                config.get_or("mean_log_base_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_unsigned_vec_unsigned_pair_gen_var_9<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigned_vecs(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            random_unsigned_inclusive_range(seed.fork("base"), U::TWO, U::saturating_from(T::MAX))
+        },
     ))
 }
 

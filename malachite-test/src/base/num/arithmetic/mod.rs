@@ -1,22 +1,16 @@
 use malachite_test::common::DemoBenchRegistry;
 
 pub mod log_base_2;
-pub mod mod_add;
-pub mod mod_mul;
 pub mod mod_op;
 pub mod mod_pow;
 pub mod mod_power_of_2;
-pub mod mod_power_of_2_add;
-pub mod mod_power_of_2_mul;
 pub mod mod_power_of_2_pow;
 pub mod mod_power_of_2_shl;
 pub mod mod_power_of_2_shr;
 pub mod mod_power_of_2_square;
-pub mod mod_power_of_2_sub;
 pub mod mod_shl;
 pub mod mod_shr;
 pub mod mod_square;
-pub mod mod_sub;
 pub mod neg;
 pub mod next_power_of_2;
 pub mod overflowing_abs;
@@ -66,22 +60,16 @@ pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     log_base_2::register(registry);
-    mod_add::register(registry);
-    mod_mul::register(registry);
     mod_op::register(registry);
     mod_pow::register(registry);
     mod_power_of_2::register(registry);
-    mod_power_of_2_add::register(registry);
-    mod_power_of_2_mul::register(registry);
     mod_power_of_2_pow::register(registry);
     mod_power_of_2_shl::register(registry);
     mod_power_of_2_shr::register(registry);
     mod_power_of_2_square::register(registry);
-    mod_power_of_2_sub::register(registry);
     mod_shl::register(registry);
     mod_shr::register(registry);
     mod_square::register(registry);
-    mod_sub::register(registry);
     neg::register(registry);
     next_power_of_2::register(registry);
     overflowing_abs::register(registry);

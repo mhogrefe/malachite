@@ -8,8 +8,8 @@ use malachite_base_test_util::stats::median;
 use std::fmt::Debug;
 
 fn random_options_helper<I: Clone + Iterator>(
-    w_numerator: u64,
-    w_denominator: u64,
+    p_none_numerator: u64,
+    p_none_denominator: u64,
     xs_gen: &dyn Fn(Seed) -> I,
     expected_values: &[Option<I::Item>],
     expected_common_values: &[(Option<I::Item>, usize)],
@@ -17,7 +17,7 @@ fn random_options_helper<I: Clone + Iterator>(
 ) where
     I::Item: Clone + Debug + Eq + Hash + Ord,
 {
-    let xs = random_options(EXAMPLE_SEED, w_numerator, w_denominator, xs_gen);
+    let xs = random_options(EXAMPLE_SEED, p_none_numerator, p_none_denominator, xs_gen);
     let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
@@ -27,13 +27,12 @@ fn random_options_helper<I: Clone + Iterator>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_options() {
-    // w = 1
+    // p = 1/2
     random_options_helper(
         1,
-        1,
+        2,
         &random_primitive_ints::<u8>,
         &[
             Some(85),
@@ -71,10 +70,10 @@ fn test_random_options() {
         ],
         (None, None),
     );
-    // w = 1/50
+    // p = 50/51
     random_options_helper(
-        1,
         50,
+        51,
         &random_primitive_ints::<u8>,
         &[None; 20],
         &[
@@ -91,10 +90,10 @@ fn test_random_options() {
         ],
         (None, None),
     );
-    // w = 50
+    // p = 1/51
     random_options_helper(
-        50,
         1,
+        51,
         &random_primitive_ints::<u8>,
         &[
             Some(85),
@@ -132,11 +131,11 @@ fn test_random_options() {
         ],
         (Some(125), None),
     );
-    // w = 10
+    // p = 1/11
     random_options_helper(
-        10,
         1,
-        &|seed| random_options(seed, 10, 1, &random_primitive_ints::<u8>),
+        11,
+        &|seed| random_options(seed, 1, 11, &random_primitive_ints::<u8>),
         &[
             Some(Some(229)),
             Some(Some(58)),
@@ -178,23 +177,11 @@ fn test_random_options() {
 #[test]
 #[should_panic]
 fn random_options_fail_1() {
-    random_options(EXAMPLE_SEED, 0, 1, &random_primitive_ints::<u8>);
-}
-
-#[test]
-#[should_panic]
-fn random_options_fail_2() {
     random_options(EXAMPLE_SEED, 1, 0, &random_primitive_ints::<u8>);
 }
 
 #[test]
 #[should_panic]
-fn random_options_fail_3() {
-    random_options(EXAMPLE_SEED, 1, u64::MAX, &random_primitive_ints::<u8>);
-}
-
-#[test]
-#[should_panic]
-fn random_options_fail_4() {
-    random_options(EXAMPLE_SEED, u64::MAX, 1, &random_primitive_ints::<u8>);
+fn random_options_fail_2() {
+    random_options(EXAMPLE_SEED, 2, 1, &random_primitive_ints::<u8>);
 }

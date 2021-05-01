@@ -466,10 +466,11 @@ pub trait ModMulAssign<RHS = Self, M = Self> {
     fn mod_mul_assign(&mut self, other: RHS, m: M);
 }
 
-/// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. If multiple
-/// modular multiplications with the same modulus are necessary, it can be quicker to precompute
-/// some piece of data and reuse it in the multiplication calls. This trait provides a function for
-/// precomputing the data and a function for using it during multiplication.
+/// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
+///
+/// If multiple modular multiplications with the same modulus are necessary, it can be quicker to
+/// precompute some piece of data and reuse it in the multiplication calls. This trait provides a
+/// function for precomputing the data and a function for using it during multiplication.
 pub trait ModMulPrecomputed<RHS = Self, M = Self> {
     type Output;
     type Data;
@@ -479,8 +480,9 @@ pub trait ModMulPrecomputed<RHS = Self, M = Self> {
     fn mod_mul_precomputed(self, other: RHS, m: M, data: &Self::Data) -> Self::Output;
 }
 
-/// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. If
-/// multiple modular multiplications with the same modulus are necessary, it can be quicker to
+/// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
+///
+/// If multiple modular multiplications with the same modulus are necessary, it can be quicker to
 /// precompute some piece of data and reuse it in the multiplication calls. This trait provides a
 /// function for using precomputed data during multiplication. For precomputing the data, use the
 /// `precompute_mod_mul_data` function in `ModMulPrecomputed`.

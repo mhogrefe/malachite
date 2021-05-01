@@ -7,6 +7,7 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use num::logic::traits::LeadingZeros;
 
+#[doc(hidden)]
 pub fn _naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
     let (product_1, product_0) = T::x_mul_y_is_zz(x, y);
     T::xx_div_mod_y_is_qr(product_1, product_0, m).1
@@ -17,7 +18,6 @@ const INVERT_U32_TABLE_LOG_SIZE: u64 = 9;
 const INVERT_U32_TABLE_SIZE: usize = 1 << INVERT_U32_TABLE_LOG_SIZE;
 
 // INVERT_U32_TABLE[i] = floor((2^24 - 2^14 + 2^9) / (2^9 + i))
-#[allow(clippy::decimal_literal_representation)]
 const INVERT_U32_TABLE: [u32; INVERT_U32_TABLE_SIZE] = [
     32737, 32673, 32609, 32546, 32483, 32420, 32357, 32295, 32233, 32171, 32109, 32048, 31987,
     31926, 31865, 31805, 31744, 31684, 31625, 31565, 31506, 31447, 31388, 31329, 31271, 31212,
@@ -81,7 +81,16 @@ pub fn test_invert_u32_table() {
     }
 }
 
-/// Computes (B ^ 2 - B * x - 1) / x = (B ^ 2 - 1) / x - B. The highest bit of `x` must be set.
+/// Computes
+/// $$
+/// f(x) = \left \lfloor \frac{2^{64} - 2^{32}x - 1}{x} \right \rfloor =
+///     \left \lfloor \frac{2^{64}-1}{x}-2^{32} \right \rfloor.
+/// $$
+///
+/// The highest bit of `x` must be set.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
 ///
 /// This is invert_limb from longlong.h, FLINT Dev 1, when GMP_LIMB_BITS == 32.
 pub fn _limbs_invert_limb_u32(x: u32) -> u32 {
@@ -147,7 +156,16 @@ pub fn test_invert_u64_table() {
     }
 }
 
-/// Computes (B ^ 2 - B * x - 1) / x = (B ^ 2 - 1) / x - B. The highest bit of `x` must be set.
+/// Computes
+/// $$
+/// f(x) = \left \lfloor \frac{2^{128} - 2^{64}x - 1}{x} \right \rfloor =
+///     \left \lfloor \frac{2^{128}-1}{x}-2^{64} \right \rfloor.
+/// $$
+///
+/// The highest bit of `x` must be set.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
 ///
 /// This is invert_limb from longlong.h, FLINT Dev 1, when GMP_LIMB_BITS == 64.
 pub fn _limbs_invert_limb_u64(x: u64) -> u64 {
@@ -171,6 +189,7 @@ pub fn _limbs_invert_limb_u64(x: u64) -> u64 {
 }
 
 /// This is n_ll_mod_preinv from ulong_extras/ll_mod_preinv.c, FLINT Dev 1.
+#[doc(hidden)]
 pub fn _limbs_mod_preinverted<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
@@ -236,7 +255,8 @@ pub fn _limbs_mod_preinverted<
     }
 }
 
-// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
+/// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
+#[doc(hidden)]
 pub fn _fast_mod_mul<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
@@ -260,9 +280,8 @@ macro_rules! impl_mod_mul_precomputed_fast {
             /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
             /// `mod_mul_precomputed_assign`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
             fn precompute_mod_mul_data(&m: &$t) -> $t {
@@ -270,28 +289,16 @@ macro_rules! impl_mod_mul_precomputed_fast {
             }
 
             /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
+            ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular multiplications with the same modulus. The precomputed data should be
             /// obtained using `precompute_mod_mul_data`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
-            ///
-            /// let data = u32::precompute_mod_mul_data(&7);
-            /// assert_eq!(2u32.mod_mul_precomputed(3, 7, &data), 6);
-            /// assert_eq!(5u32.mod_mul_precomputed(3, 7, &data), 1);
-            /// assert_eq!(4u32.mod_mul_precomputed(4, 7, &data), 2);
-            ///
-            /// let data = u64::precompute_mod_mul_data(&10);
-            /// assert_eq!(7u64.mod_mul_precomputed(3, 10, &data), 1);
-            /// assert_eq!(4u64.mod_mul_precomputed(9, 10, &data), 6);
-            /// assert_eq!(5u64.mod_mul_precomputed(8, 10, &data), 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_mul` module.
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
             fn mod_mul_precomputed(self, other: $t, m: $t, data: &$t) -> $t {
@@ -312,9 +319,8 @@ macro_rules! impl_mod_mul_precomputed_promoted {
             /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
             /// `mod_mul_precomputed_assign`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
             fn precompute_mod_mul_data(&m: &$t) -> u32 {
@@ -322,28 +328,16 @@ macro_rules! impl_mod_mul_precomputed_promoted {
             }
 
             /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
+            ///
             /// Some precomputed data is provided; this speeds up computations involving several
             /// modular multiplications with the same modulus. The precomputed data should be
             /// obtained using `precompute_mod_mul_data`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
-            ///
-            /// let data = u8::precompute_mod_mul_data(&7);
-            /// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
-            /// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
-            /// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
-            ///
-            /// let data = u16::precompute_mod_mul_data(&10);
-            /// assert_eq!(7u16.mod_mul_precomputed(3, 10, &data), 1);
-            /// assert_eq!(4u16.mod_mul_precomputed(9, 10, &data), 6);
-            /// assert_eq!(5u16.mod_mul_precomputed(8, 10, &data), 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_mul` module.
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
             fn mod_mul_precomputed(self, other: $t, m: $t, data: &u32) -> $t {
@@ -366,34 +360,21 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
     /// `mod_mul_precomputed_assign`.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn precompute_mod_mul_data(_m: &u128) {}
 
-    /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. Some
-    /// precomputed data is provided; this speeds up computations involving several modular
+    /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
     /// `precompute_mod_mul_data`.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// # Examples
-    /// ```
-    /// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
-    ///
-    /// let data = u128::precompute_mod_mul_data(&7);
-    /// assert_eq!(2u128.mod_mul_precomputed(3, 7, &data), 6);
-    /// assert_eq!(5u128.mod_mul_precomputed(3, 7, &data), 1);
-    /// assert_eq!(4u128.mod_mul_precomputed(4, 7, &data), 2);
-    ///
-    /// let data = u128::precompute_mod_mul_data(&10);
-    /// assert_eq!(7u128.mod_mul_precomputed(3, 10, &data), 1);
-    /// assert_eq!(4u128.mod_mul_precomputed(9, 10, &data), 6);
-    /// assert_eq!(5u128.mod_mul_precomputed(8, 10, &data), 0);
-    /// ```
+    /// See the documentation of the `num::arithmetic::mod_mul` module.
     ///
     /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
     #[inline]
@@ -409,9 +390,8 @@ impl ModMulPrecomputed<usize, usize> for usize {
     /// Precomputes data for modular multiplication. See `mod_mul_precomputed` and
     /// `mod_mul_precomputed_assign`.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// This is n_preinvert_limb from ulong_extras.h, FLINT Dev 1.
     fn precompute_mod_mul_data(&m: &usize) -> usize {
@@ -422,14 +402,14 @@ impl ModMulPrecomputed<usize, usize> for usize {
         }
     }
 
-    /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`. Some
-    /// precomputed data is provided; this speeds up computations involving several modular
+    /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
+    ///
+    /// Some precomputed data is provided; this speeds up computations involving several modular
     /// multiplications with the same modulus. The precomputed data should be obtained using
     /// `precompute_mod_mul_data`.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1.
     fn mod_mul_precomputed(self, other: usize, m: usize, data: &usize) -> usize {
@@ -453,48 +433,17 @@ macro_rules! impl_mod_mul {
     ($t:ident) => {
         impl ModMulPrecomputedAssign<$t, $t> for $t {
             /// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced
-            /// mod `m`. Some precomputed data is provided; this speeds up computations involving
-            /// several modular multiplications with the same modulus. The precomputed data should
-            /// be obtained using `precompute_mod_mul_data`.
+            /// mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// Some precomputed data is provided; this speeds up computations involving several
+            /// modular multiplications with the same modulus. The precomputed data should be
+            /// obtained using `precompute_mod_mul_data`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::{
-            ///     ModMulPrecomputed, ModMulPrecomputedAssign,
-            /// };
-            ///
-            /// let data = u8::precompute_mod_mul_data(&7);
-            ///
-            /// let mut x = 2u8;
-            /// x.mod_mul_precomputed_assign(3, 7, &data);
-            /// assert_eq!(x, 6);
-            ///
-            /// let mut x = 5u8;
-            /// x.mod_mul_precomputed_assign(3, 7, &data);
-            /// assert_eq!(x, 1);
-            ///
-            /// let mut x = 4u8;
-            /// x.mod_mul_precomputed_assign(4, 7, &data);
-            /// assert_eq!(x, 2);
-            ///
-            /// let data = u32::precompute_mod_mul_data(&10);
-            ///
-            /// let mut x = 7u32;
-            /// x.mod_mul_precomputed_assign(3, 10, &data);
-            /// assert_eq!(x, 1);
-            ///
-            /// let mut x = 4u32;
-            /// x.mod_mul_precomputed_assign(9, 10, &data);
-            /// assert_eq!(x, 6);
-            ///
-            /// let mut x = 5u32;
-            /// x.mod_mul_precomputed_assign(8, 10, &data);
-            /// assert_eq!(x, 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_mul` module.
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT Dev 1, where the return value is
             /// assigned to a.
@@ -509,17 +458,13 @@ macro_rules! impl_mod_mul {
 
             /// Computes `self * other` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// $f(x, y, m) = z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModMul;
-            ///
-            /// assert_eq!(2u8.mod_mul(3, 7), 6);
-            /// assert_eq!(7u32.mod_mul(3, 10), 1);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_mul` module.
             ///
             /// This is nmod_mul from nmod_vec.h, FLINT Dev 1.
             #[inline]
@@ -532,22 +477,13 @@ macro_rules! impl_mod_mul {
             /// Replaces `self` with `self * other` mod `m`. Assumes the inputs are already reduced
             /// mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets z$, where $x, y, z < m$ and $xy \equiv z \mod m$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModMulAssign;
-            ///
-            /// let mut n = 2u8;
-            /// n.mod_mul_assign(3, 7);
-            /// assert_eq!(n, 6);
-            ///
-            /// let mut n = 7u32;
-            /// n.mod_mul_assign(3, 10);
-            /// assert_eq!(n, 1);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_mul` module.
             ///
             /// This is nmod_mul from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]

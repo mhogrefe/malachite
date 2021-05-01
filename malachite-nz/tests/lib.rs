@@ -2,6 +2,7 @@
     unstable_name_collisions,
     clippy::assertions_on_constants,
     clippy::cognitive_complexity,
+    clippy::excessive_precision,
     clippy::many_single_char_names,
     clippy::range_plus_one,
     clippy::suspicious_arithmetic_impl,
@@ -11,7 +12,6 @@
 )]
 #![warn(
     clippy::cast_lossless,
-    clippy::decimal_literal_representation,
     clippy::explicit_into_iter_loop,
     clippy::explicit_iter_loop,
     clippy::filter_map,
@@ -100,8 +100,10 @@ pub mod integer {
         pub mod from_twos_complement_limbs;
         pub mod natural_from_integer;
         pub mod primitive_int_from_integer;
+        #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
+            pub mod from_string;
             pub mod to_string;
         }
         pub mod to_twos_complement_limbs;
@@ -244,8 +246,10 @@ pub mod natural {
         pub mod from_limbs;
         pub mod from_primitive_int;
         pub mod primitive_int_from_natural;
+        #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
+            pub mod from_string;
             pub mod to_string;
         }
         pub mod to_limbs;

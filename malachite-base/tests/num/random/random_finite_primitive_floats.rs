@@ -39,7 +39,6 @@ fn random_finite_primitive_floats_helper<T: CheckedToF64 + PrimitiveFloat>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation, clippy::excessive_precision)]
 #[test]
 fn test_random_finite_primitive_floats() {
     // f32

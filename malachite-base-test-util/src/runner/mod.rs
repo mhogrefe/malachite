@@ -110,6 +110,13 @@ macro_rules! register_signed_demos {
 }
 
 #[macro_export]
+macro_rules! register_primitive_float_demos {
+    ($runner: ident, $f: ident) => {
+        register_generic_demos!($runner, $f, f32, f64);
+    };
+}
+
+#[macro_export]
 macro_rules! register_signed_unsigned_match_demos {
     ($runner: ident, $f: ident) => {
         register_generic_demos_2_only_first_in_key!(
@@ -384,6 +391,13 @@ macro_rules! register_unsigned_benches {
 macro_rules! register_signed_benches {
     ($runner: ident, $f: ident) => {
         register_generic_benches!($runner, $f, i8, i16, i32, i64, i128, isize);
+    };
+}
+
+#[macro_export]
+macro_rules! register_primitive_float_benches {
+    ($runner: ident, $f: ident) => {
+        register_generic_benches!($runner, $f, f32, f64);
     };
 }
 

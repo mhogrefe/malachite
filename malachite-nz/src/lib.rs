@@ -11,7 +11,6 @@
 )]
 #![warn(
     clippy::cast_lossless,
-    clippy::decimal_literal_representation,
     clippy::explicit_into_iter_loop,
     clippy::explicit_iter_loop,
     clippy::filter_map,

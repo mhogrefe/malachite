@@ -1,5 +1,6 @@
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
+use malachite_base::num::conversion::traits::FromStringBase;
 use natural::InnerNatural::Small;
 use natural::Natural;
 use std::str::FromStr;
@@ -12,10 +13,35 @@ use std::str::FromStr;
 /// On a 64-bit system, an `Integer` takes up 40 bytes of space on the stack.
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
+#[cfg_attr(feature = "serde", serde(from = "SerdeInteger", into = "SerdeInteger"))]
 pub struct Integer {
     // whether the `Integer` is non-negative
     pub(crate) sign: bool,
     pub(crate) abs: Natural,
+}
+
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serde", serde(transparent))]
+struct SerdeInteger(String);
+
+impl From<Integer> for SerdeInteger {
+    #[inline]
+    fn from(x: Integer) -> SerdeInteger {
+        SerdeInteger(format!("{:#x}", x))
+    }
+}
+
+impl From<SerdeInteger> for Integer {
+    #[inline]
+    fn from(s: SerdeInteger) -> Integer {
+        if s.0.starts_with('-') {
+            assert!(s.0.starts_with("-0x"));
+            Integer::from_sign_and_abs(false, Natural::from_string_base(16, &s.0[3..]).unwrap())
+        } else {
+            assert!(s.0.starts_with("0x"));
+            Integer::from(Natural::from_string_base(16, &s.0[2..]).unwrap())
+        }
+    }
 }
 
 impl Integer {

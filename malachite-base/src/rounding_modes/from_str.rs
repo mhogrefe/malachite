@@ -4,10 +4,10 @@ use std::str::FromStr;
 impl FromStr for RoundingMode {
     type Err = String;
 
-    /// Converts a `String` to a `RoundingMode`.
+    /// Converts a `&str` to a `RoundingMode`.
     ///
     /// If the `&str` does not represent a valid `RoundingMode`, an `Err` is returned with the
-    /// unparseable `String`.
+    /// unparseable string.
     ///
     /// # Worst-case complexity
     /// $T(n) = O(n)$

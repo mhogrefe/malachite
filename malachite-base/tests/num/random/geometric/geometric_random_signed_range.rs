@@ -85,7 +85,6 @@ fn geometric_random_signed_range_helper<
     }
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_geometric_random_signed_range() {
     // i8, 5, 6, um = 10 (um is irrelevant here)

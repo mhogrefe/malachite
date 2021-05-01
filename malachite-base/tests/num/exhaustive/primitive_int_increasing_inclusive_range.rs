@@ -120,7 +120,6 @@ where
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_primitive_int_increasing_inclusive_range() {
     apply_fn_to_primitive_ints!(primitive_int_increasing_inclusive_range_helper);

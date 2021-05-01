@@ -1,5 +1,5 @@
 use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
-use num::arithmetic::traits::DivisibleBy;
+use num::arithmetic::traits::{DivMod, DivisibleBy};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use std::cmp::Ordering;
@@ -13,6 +13,7 @@ pub struct SameWidthIteratorToBitChunks<
     U: PrimitiveUnsigned,
 > {
     xs: I,
+    width: u64,
     phantom: PhantomData<*const U>,
 }
 
@@ -20,7 +21,13 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     SameWidthIteratorToBitChunks<I, T, U>
 {
     fn next_with_wrapping<F: Fn(T) -> U>(&mut self, wrap: F) -> Option<Option<U>> {
-        self.xs.next().map(|x| Some(wrap(x)))
+        self.xs.next().map(|x| {
+            if x.significant_bits() <= self.width {
+                Some(wrap(x))
+            } else {
+                None
+            }
+        })
     }
 }
 
@@ -30,9 +37,11 @@ fn same_width_iterator_to_bit_chunks<
     U: PrimitiveUnsigned,
 >(
     xs: I,
+    width: u64,
 ) -> SameWidthIteratorToBitChunks<I, T, U> {
     SameWidthIteratorToBitChunks {
         xs,
+        width,
         phantom: PhantomData,
     }
 }
@@ -350,7 +359,10 @@ pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pr
     assert!(out_chunk_size <= U::WIDTH);
     match in_chunk_size.cmp(&out_chunk_size) {
         Ordering::Equal => {
-            return IteratorToBitChunks::SameWidth(same_width_iterator_to_bit_chunks(xs))
+            return IteratorToBitChunks::SameWidth(same_width_iterator_to_bit_chunks(
+                xs,
+                in_chunk_size,
+            ))
         }
         Ordering::Less => {
             if out_chunk_size.divisible_by(in_chunk_size) {
@@ -362,8 +374,8 @@ pub fn iterator_to_bit_chunks<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: Pr
             }
         }
         Ordering::Greater => {
-            let multiple = in_chunk_size / out_chunk_size;
-            if multiple * out_chunk_size == in_chunk_size {
+            let (multiple, remainder) = in_chunk_size.div_mod(out_chunk_size);
+            if remainder == 0 {
                 return IteratorToBitChunks::EvenFraction(even_fraction_iterator_to_bit_chunks(
                     xs,
                     multiple,

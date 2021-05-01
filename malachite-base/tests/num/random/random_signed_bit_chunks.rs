@@ -52,7 +52,6 @@ fn random_signed_bit_chunks_helper<T: CheckedToF64 + PrimitiveSigned>(
     }
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_signed_bit_chunks() {
     // i16, chunk_size = 1

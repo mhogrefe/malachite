@@ -54,7 +54,6 @@ fn striped_random_unsigned_bit_chunks_helper<T: CheckedToF64 + PrimitiveUnsigned
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_striped_random_unsigned_bit_chunks() {
     // u8, chunk_size = 0, m = 4

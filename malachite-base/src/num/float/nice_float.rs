@@ -4,6 +4,33 @@ use std::fmt::{self, Debug, Display, Formatter};
 use std::hash::{Hash, Hasher};
 use std::str::FromStr;
 
+/// `NiceFloat` is a wrapper around primitive float types that provides nicer `Eq`, `Ord`, `Hash`,
+/// `Display`, and `FromStr` instances.
+///
+/// It's well-known that in most languages, floats behave weirdly due to the IEEE 754 standard. The
+/// `NiceFloat` type ignores this standard.
+/// - Using `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
+///   concept of signalling `NaN`s. Positive and negative zero are two distinct values, not equal to
+///   each other.
+/// - The `NiceFloat` hash respects this equality.
+/// - Using `NiceFloat`, there is a somewhat-arbitrary total order on floats. These are the classes
+///   of floats, in ascending order:
+///   - Negative infinity
+///   - Negative nonzero finite floats
+///   - Negative zero
+///   - NaN
+///   - Positive zero
+///   - Positive nonzero finite floats
+///   - Positive floats
+/// - `NiceFloat` uses a different `Display` implementation than floats do by default in Rust. For
+///   example, Rust will convert `f32::MIN_POSITIVE_SUBNORMAL` to something with many zeros, but
+///   `NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)` just converts to `1.0e-45`. The conversion function
+///   uses David Tolnay's `ryu` crate, with a few modifications:
+///   - All finite floats have a decimal point. For example, Ryu by itself would convert
+///     `f32::MIN_POSITIVE_SUBNORMAL` to `1e-45`.
+///   - Positive infinity, negative infinity, and NaN are converted to the strings `"Infinity"`,
+///     `"-Infinity"`, and "`NaN`", respectively. This is just a personal preference.
+/// - `FromStr` accepts these strings.
 #[derive(Clone, Copy)]
 pub struct NiceFloat<T: PrimitiveFloat>(pub T);
 
@@ -19,25 +46,21 @@ enum FloatType {
 }
 
 impl<T: PrimitiveFloat> NiceFloat<T> {
-    #[inline]
-    pub fn unwrap(self) -> T {
-        self.0
-    }
-
     fn float_type(self) -> FloatType {
-        if self.0.is_nan() {
+        let f = self.0;
+        if f.is_nan() {
             FloatType::NaN
-        } else if self.0.is_sign_positive() {
-            if self.0 == T::ZERO {
+        } else if f.is_sign_positive() {
+            if f == T::ZERO {
                 FloatType::PositiveZero
-            } else if self.0.is_finite() {
+            } else if f.is_finite() {
                 FloatType::PositiveFinite
             } else {
                 FloatType::PositiveInfinity
             }
-        } else if self.0 == T::ZERO {
+        } else if f == T::ZERO {
             FloatType::NegativeZero
-        } else if self.0.is_finite() {
+        } else if f.is_finite() {
             FloatType::NegativeFinite
         } else {
             FloatType::NegativeInfinity
@@ -48,11 +71,9 @@ impl<T: PrimitiveFloat> NiceFloat<T> {
 impl<T: PrimitiveFloat> PartialEq<NiceFloat<T>> for NiceFloat<T> {
     #[inline]
     fn eq(&self, other: &NiceFloat<T>) -> bool {
-        if self.0 == T::ZERO {
-            other.0 == T::ZERO && self.0.is_sign_positive() == other.0.is_sign_positive()
-        } else {
-            self.0 == other.0 || self.0.is_nan() && other.0.is_nan()
-        }
+        let f = self.0;
+        let g = other.0;
+        f.to_bits() == g.to_bits() || f.is_nan() && g.is_nan()
     }
 }
 
@@ -60,10 +81,11 @@ impl<T: PrimitiveFloat> Eq for NiceFloat<T> {}
 
 impl<T: PrimitiveFloat> Hash for NiceFloat<T> {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        if self.0.is_nan() {
+        let f = self.0;
+        if f.is_nan() {
             "NaN".hash(state)
         } else {
-            self.0.to_bits().hash(state)
+            f.to_bits().hash(state)
         }
     }
 }
@@ -89,6 +111,7 @@ impl<T: PrimitiveFloat> PartialOrd<NiceFloat<T>> for NiceFloat<T> {
     }
 }
 
+#[doc(hidden)]
 pub trait FmtRyuString: Copy {
     fn fmt_ryu_string(self, f: &mut Formatter<'_>) -> fmt::Result;
 }
@@ -108,11 +131,11 @@ macro_rules! impl_fmt_ryu_string {
                     match b {
                         b'.' => {
                             found_dot = true;
-                            break;
+                            break; // If there's a '.', we don't need to do anything
                         }
                         b'e' => {
                             e_index = Some(i);
-                            break;
+                            break; // OK to break since there won't be a '.' after an 'e'
                         }
                         _ => {}
                     }
@@ -141,6 +164,37 @@ impl_fmt_ryu_string!(f32);
 impl_fmt_ryu_string!(f64);
 
 impl<T: PrimitiveFloat> Display for NiceFloat<T> {
+    /// Converts a `NiceFloat` to a `String`.
+    ///
+    /// `NiceFloat` uses a different `Display` implementation than floats do by default in Rust. For
+    /// example, Rust will convert `f32::MIN_POSITIVE_SUBNORMAL` to something with many zeros, but
+    /// `NiceFloat(f32::MIN_POSITIVE_SUBNORMAL)` just converts to `1.0e-45`. The conversion function
+    /// uses David Tolnay's `ryu` crate, with a few modifications:
+    /// - All finite floats have a decimal point. For example, Ryu by itself would convert
+    ///   `f32::MIN_POSITIVE_SUBNORMAL` to `1e-45`.
+    /// - Positive infinity, negative infinity, and NaN are converted to the strings `"Infinity"`,
+    ///   `"-Infinity"`, and "`NaN`", respectively. This is just a personal preference.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::nice_float::NiceFloat;
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// assert_eq!(NiceFloat(0.0).to_string(), "0.0");
+    /// assert_eq!(NiceFloat(-0.0).to_string(), "-0.0");
+    /// assert_eq!(NiceFloat(f32::POSITIVE_INFINITY).to_string(), "Infinity");
+    /// assert_eq!(NiceFloat(f32::NEGATIVE_INFINITY).to_string(), "-Infinity");
+    /// assert_eq!(NiceFloat(f32::NAN).to_string(), "NaN");
+    ///
+    /// assert_eq!(NiceFloat(1.0).to_string(), "1.0");
+    /// assert_eq!(NiceFloat(-1.0).to_string(), "-1.0");
+    /// assert_eq!(NiceFloat(f32::MIN_POSITIVE_SUBNORMAL).to_string(), "1.0e-45");
+    /// assert_eq!(NiceFloat(std::f64::consts::E).to_string(), "2.718281828459045");
+    /// assert_eq!(NiceFloat(std::f64::consts::PI).to_string(), "3.141592653589793");
+    /// ```
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         if self.0.is_nan() {
             f.write_str("NaN")

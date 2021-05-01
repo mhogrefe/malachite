@@ -1458,12 +1458,12 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloats<T> {
     #[inline]
     fn next(&mut self) -> Option<T> {
         self.toggle.not_assign();
-        if self.toggle {
+        Some(if self.toggle {
             self.x = self.xs.next().unwrap();
-            Some(self.x)
+            self.x
         } else {
-            Some(-self.x)
-        }
+            -self.x
+        })
     }
 }
 

@@ -8,8 +8,10 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    Digits, ExactFrom, SaturatingFrom, WrappingFrom, WrappingInto,
+    CheckedFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom, SplitInHalf, WrappingFrom,
+    WrappingInto,
 };
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
@@ -140,6 +142,16 @@ pub fn char_pair_gen() -> Generator<(char, char)> {
         &exhaustive_char_pair_gen,
         &random_char_pair_gen,
         &special_random_char_pair_gen,
+    )
+}
+
+// -- PrimitiveFloat --
+
+pub fn primitive_float_gen<T: PrimitiveFloat>() -> Generator<T> {
+    Generator::new(
+        &exhaustive_primitive_float_gen,
+        &random_primitive_float_gen,
+        &special_random_primitive_float_gen,
     )
 }
 
@@ -686,6 +698,22 @@ pub fn unsigned_gen_var_10() -> Generator<u8> {
     Generator::new_no_special(&exhaustive_unsigned_gen_var_6, &random_unsigned_gen_var_10)
 }
 
+// All small positive unsigned `T`s.
+pub fn unsigned_gen_var_11<T: PrimitiveUnsigned>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_gen_var_1::<T>,
+        &random_unsigned_gen_var_11::<T>,
+    )
+}
+
+// All unsigned `T`s whose highest bit is set.
+pub fn unsigned_gen_var_12<T: PrimitiveUnsigned>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_gen_var_7::<T>,
+        &random_unsigned_gen_var_12::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 // All `(T, U)`s where `T` is unsigned, `U` is signed, and the `U` is small.
@@ -778,7 +806,7 @@ pub fn unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
 pub fn unsigned_pair_gen_var_8<T: PrimitiveUnsigned, U: ExactFrom<u8> + PrimitiveUnsigned>(
 ) -> Generator<(T, U)> {
     Generator::new(
-        &exhaustive_unsigned_pair_gen_var_7,
+        &exhaustive_unsigned_primitive_int_pair_gen_var_2,
         &random_primitive_int_unsigned_pair_gen_var_5,
         &special_random_unsigned_pair_gen_var_6,
     )
@@ -789,7 +817,7 @@ pub fn unsigned_pair_gen_var_8<T: PrimitiveUnsigned, U: ExactFrom<u8> + Primitiv
 pub fn unsigned_pair_gen_var_9<T: PrimitiveUnsigned, U: ExactFrom<u8> + PrimitiveUnsigned>(
 ) -> Generator<(T, U)> {
     Generator::new_no_special(
-        &exhaustive_unsigned_pair_gen_var_7,
+        &exhaustive_unsigned_primitive_int_pair_gen_var_2,
         &random_unsigned_pair_gen_var_3,
     )
 }
@@ -802,7 +830,7 @@ pub fn unsigned_pair_gen_var_10<
     V: PrimitiveUnsigned,
 >() -> Generator<(T, V)> {
     Generator::new_no_special(
-        &exhaustive_unsigned_pair_gen_var_8::<T, U, V>,
+        &exhaustive_unsigned_pair_gen_var_7::<T, U, V>,
         &random_unsigned_pair_gen_var_4::<T, U, V>,
     )
 }
@@ -810,7 +838,7 @@ pub fn unsigned_pair_gen_var_10<
 // All pairs of unsigned `T` where the first is divisible by the second.
 pub fn unsigned_pair_gen_var_11<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     Generator::new(
-        &exhaustive_unsigned_pair_gen_var_9,
+        &exhaustive_unsigned_pair_gen_var_8,
         &random_unsigned_pair_gen_var_5,
         &special_random_unsigned_pair_gen_var_7,
     )
@@ -819,7 +847,7 @@ pub fn unsigned_pair_gen_var_11<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
 // All pairs of unsigned `T` where the second `T` is positive.
 pub fn unsigned_pair_gen_var_12<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     Generator::new(
-        &exhaustive_unsigned_pair_gen_var_10,
+        &exhaustive_unsigned_pair_gen_var_9,
         &random_unsigned_pair_gen_var_6,
         &special_random_unsigned_pair_gen_var_8,
     )
@@ -829,7 +857,7 @@ pub fn unsigned_pair_gen_var_12<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
 // second.
 pub fn unsigned_pair_gen_var_13<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     Generator::new(
-        &exhaustive_unsigned_pair_gen_var_11,
+        &exhaustive_unsigned_pair_gen_var_10,
         &random_unsigned_pair_gen_var_7,
         &special_random_unsigned_pair_gen_var_9,
     )
@@ -839,7 +867,7 @@ pub fn unsigned_pair_gen_var_13<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
 // to the power of the `U`.
 pub fn unsigned_pair_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
     Generator::new(
-        &exhaustive_unsigned_pair_gen_var_12,
+        &exhaustive_unsigned_pair_gen_var_11,
         &random_primitive_int_unsigned_pair_gen_var_6,
         &special_random_unsigned_pair_gen_var_10,
     )
@@ -849,16 +877,16 @@ pub fn unsigned_pair_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() ->
 // the power of the `U`.
 pub fn unsigned_pair_gen_var_15<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
     Generator::new(
-        &exhaustive_unsigned_pair_gen_var_13,
+        &exhaustive_unsigned_pair_gen_var_12,
         &random_primitive_int_unsigned_pair_gen_var_7,
         &special_random_unsigned_pair_gen_var_11,
     )
 }
 
-// All `(T, T)` where `T` is unsigned and the first element is less than to the second.
+// All `(T, T)` where `T` is unsigned and the first element is less than the second.
 pub fn unsigned_pair_gen_var_16<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
     Generator::new(
-        &exhaustive_unsigned_pair_gen_var_14,
+        &exhaustive_unsigned_pair_gen_var_13,
         &random_primitive_int_pair_gen_var_2,
         &special_random_unsigned_pair_gen_var_12,
     )
@@ -868,9 +896,28 @@ pub fn unsigned_pair_gen_var_16<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
 // than 2 to the power of the `u64`.
 pub fn unsigned_pair_gen_var_17<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
     Generator::new(
-        &exhaustive_unsigned_pair_gen_var_15,
+        &exhaustive_unsigned_pair_gen_var_14,
         &random_unsigned_pair_gen_var_8,
         &special_random_unsigned_pair_gen_var_13,
+    )
+}
+
+// All `(T, U)` where `T` and `U` are unsigned, the `T` and the `U` are small, and the `U` is
+// positive.
+pub fn unsigned_pair_gen_var_18<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_unsigned_gen_var_1,
+        &random_unsigned_pair_gen_var_9,
+    )
+}
+
+// All `(T, U)`s where `T` and `U` are unsigned, the `T` is positive and small, and the `U` is
+// greater than 1 and no greater than 36.
+pub fn unsigned_pair_gen_var_19<T: PrimitiveUnsigned, U: ExactFrom<u8> + PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_pair_gen_var_1,
+        &random_unsigned_pair_gen_var_10,
     )
 }
 
@@ -1007,6 +1054,15 @@ pub fn unsigned_triple_gen_var_11<T: PrimitiveUnsigned>() -> Generator<(T, T, u6
     )
 }
 
+// All `(T, T, T)` where `T` is unsigned and the first and second elements are less than the third.
+pub fn unsigned_triple_gen_var_12<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_triple_gen_var_11,
+        &random_primitive_int_triple_gen_var_2,
+        &special_random_unsigned_triple_gen_var_12,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn unsigned_quadruple_gen<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
@@ -1038,13 +1094,35 @@ pub fn unsigned_quadruple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     )
 }
 
-// All `(T, u64)` where `T` is unsigned, the u64 is no greater than `T::WIDTH`, and all three `T`s
-// are less than 2 to the power of the `u64`.
+// All `(T, T, T, u64)` where `T` is unsigned, the u64 is no greater than `T::WIDTH`, and all three
+// `T`s are less than 2 to the power of the `u64`.
 pub fn unsigned_quadruple_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(T, T, T, u64)> {
     Generator::new(
         &exhaustive_unsigned_quadruple_gen_var_3,
         &random_unsigned_quadruple_gen_var_1,
         &special_random_unsigned_quadruple_gen_var_3,
+    )
+}
+
+// All `(T, T, T, T)` where `T` is unsigned and the first three elements are each less than the
+// fourth.
+pub fn unsigned_quadruple_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_quadruple_gen_var_4,
+        &random_primitive_int_quadruple_gen_var_1,
+        &special_random_unsigned_quadruple_gen_var_4,
+    )
+}
+
+// All `(T, T, T, T)` that are valid inputs to `_limbs_mod_preinverted`.
+pub fn unsigned_quadruple_gen_var_5<
+    T: CheckedFrom<DT> + PrimitiveUnsigned,
+    DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
+>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_quadruple_gen_var_5::<T, DT>,
+        &random_unsigned_quadruple_gen_var_2::<T, DT>,
+        &special_random_unsigned_quadruple_gen_var_5::<T, DT>,
     )
 }
 
@@ -1192,6 +1270,22 @@ pub fn string_gen_var_4() -> Generator<String> {
     Generator::new_no_special(&exhaustive_string_gen_var_4, &random_string_gen_var_4)
 }
 
+// All nonempty `String`s containing only the characters '0' and '1'.
+pub fn string_gen_var_5() -> Generator<String> {
+    Generator::new_no_special(&exhaustive_string_gen_var_5, &random_string_gen_var_5)
+}
+
+// All nonempty `String`s containing only the characters '0' through '7'.
+pub fn string_gen_var_6() -> Generator<String> {
+    Generator::new_no_special(&exhaustive_string_gen_var_6, &random_string_gen_var_6)
+}
+
+// All nonempty `String`s containing only the characters '0' through '9', 'a' through 'f', or 'A'
+// through 'F'.
+pub fn string_gen_var_7() -> Generator<String> {
+    Generator::new_no_special(&exhaustive_string_gen_var_7, &random_string_gen_var_7)
+}
+
 // -- (String, String) --
 
 pub fn string_pair_gen() -> Generator<(String, String)> {
@@ -1310,7 +1404,8 @@ pub fn unsigned_vec_unsigned_pair_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUn
 
 // var 4 is in malachite-nz
 
-// All `(Vec<T>, U)` that are valid inputs to _from_digits_desc_basecase in malachite-nz.
+// All `(Vec<T>, U)` that are valid, `Some`-returning inputs to _from_digits_desc_basecase in
+// malachite-nz.
 pub fn unsigned_vec_unsigned_pair_gen_var_5<
     T: ExactFrom<U> + PrimitiveUnsigned + WrappingFrom<U>,
     U: PrimitiveUnsigned + SaturatingFrom<T>,
@@ -1364,6 +1459,38 @@ pub fn unsigned_vec_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>() -> Generator
         &exhaustive_unsigned_vec_unsigned_pair_gen_var_9::<T>,
         &random_unsigned_vec_unsigned_pair_gen_var_6::<T>,
         &special_random_unsigned_vec_unsigned_pair_gen_var_6::<T>,
+    )
+}
+
+// All `(Vec<T>, u64)`, where the `u64` is between 1 and `T::WIDTH`, inclusive, and each `T` in the
+// `Vec` is less than 2 to the power of the `u64`.
+pub fn unsigned_vec_unsigned_pair_gen_var_10<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_10,
+        &random_unsigned_vec_unsigned_pair_gen_var_7,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_7,
+    )
+}
+
+// All `(Vec<T>, u64)`, where the `u64` is between 1 and `T::WIDTH`, inclusive.
+pub fn unsigned_vec_unsigned_pair_gen_var_11<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_11,
+        &random_primitive_int_vec_unsigned_pair_gen_var_3,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_8,
+    )
+}
+
+// All `(Vec<T>, U)` that are valid, inputs to _from_digits_desc_basecase in malachite-nz,
+// regardless of whether they return `Some` or `None`.
+pub fn unsigned_vec_unsigned_pair_gen_var_12<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned + SaturatingFrom<T>,
+>() -> Generator<(Vec<T>, U)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_12::<T, U>,
+        &random_primitive_int_vec_unsigned_pair_gen_var_4::<T, U>,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_9::<T, U>,
     )
 }
 

@@ -25,7 +25,6 @@ fn random_somes_helper<I: Clone + Iterator>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_somes() {
     random_somes_helper(

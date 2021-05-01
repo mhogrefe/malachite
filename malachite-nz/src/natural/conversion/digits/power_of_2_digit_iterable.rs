@@ -762,7 +762,7 @@ impl<'a> ExactSizeIterator for NIIterator<'a> {}
 
 impl<'a> NIIterator<'a> {
     fn get(&self, index: u64) -> Natural {
-        let start_index = index * self.log_base;
+        let start_index = index.checked_mul(self.log_base).unwrap();
         Natural::from_owned_limbs_asc(limbs_slice_get_bits(
             self.limbs,
             start_index,

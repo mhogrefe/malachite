@@ -1,6 +1,5 @@
 #![warn(
     clippy::cast_lossless,
-    clippy::decimal_literal_representation,
     clippy::explicit_into_iter_loop,
     clippy::explicit_iter_loop,
     clippy::filter_map,
@@ -24,6 +23,7 @@
 )]
 #![allow(
     clippy::cognitive_complexity,
+    clippy::excessive_precision,
     clippy::too_many_arguments,
     clippy::upper_case_acronyms,
     unstable_name_collisions
@@ -352,7 +352,10 @@ pub mod num {
             pub mod next_lower;
             pub mod to_ordered_representation;
         }
-        pub mod nice_float;
+        pub mod nice_float {
+            pub mod to_string;
+        }
+        pub mod nice_float_old;
     }
     pub mod iterators {
         pub mod bit_distributor_sequence;
@@ -425,6 +428,14 @@ pub mod num {
         pub mod random_unsigned_inclusive_range;
         pub mod random_unsigned_range;
         pub mod random_unsigneds_less_than;
+        pub mod special_random_finite_primitive_floats;
+        pub mod special_random_negative_finite_primitive_floats;
+        pub mod special_random_negative_primitive_floats;
+        pub mod special_random_nonzero_finite_primitive_floats;
+        pub mod special_random_nonzero_primitive_floats;
+        pub mod special_random_positive_finite_primitive_floats;
+        pub mod special_random_positive_primitive_floats;
+        pub mod special_random_primitive_floats;
         pub mod striped {
             pub mod get_striped_bool_vec;
             pub mod get_striped_unsigned_vec;
@@ -482,7 +493,6 @@ pub mod random {
 }
 pub mod rounding_modes {
     pub mod clone;
-    pub mod display;
     pub mod eq;
     pub mod exhaustive;
     pub mod from_str;
@@ -491,6 +501,7 @@ pub mod rounding_modes {
     pub mod ord;
     pub mod random;
     pub mod size;
+    pub mod to_string;
 }
 pub mod slices {
     pub mod exhaustive_slice_permutations;

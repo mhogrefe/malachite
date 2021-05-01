@@ -20,7 +20,6 @@ fn random_char_range_helper(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_char_range() {
     random_char_range_helper(

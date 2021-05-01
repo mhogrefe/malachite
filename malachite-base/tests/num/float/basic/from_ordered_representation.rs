@@ -2,7 +2,7 @@ use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use std::panic::catch_unwind;
 
-#[allow(clippy::approx_constant, clippy::decimal_literal_representation)]
+#[allow(clippy::approx_constant)]
 #[test]
 pub fn test_from_ordered_representation() {
     fn test<T: PrimitiveFloat>(n: T::UnsignedOfEqualWidth, out: T) {

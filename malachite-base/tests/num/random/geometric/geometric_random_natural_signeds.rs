@@ -32,7 +32,6 @@ fn geometric_random_natural_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_geometric_random_natural_signeds() {
     // i64, um = 1 / 64

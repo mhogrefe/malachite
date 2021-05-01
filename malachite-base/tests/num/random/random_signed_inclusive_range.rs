@@ -30,7 +30,6 @@ fn random_signed_inclusive_range_helper<T: CheckedToF64 + PrimitiveSigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_signed_inclusive_range() {
     // i8, 5, 5

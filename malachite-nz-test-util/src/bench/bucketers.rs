@@ -152,3 +152,16 @@ pub fn pair_1_vec_len_times_pair_2_natural_bits_bucketer<'a, T>(
         bucketing_label: format!("{}.len() * {}.significant_bits()", xs_name, y_name),
     }
 }
+
+pub fn pair_1_vec_len_times_pair_2_bucketer<'a, T, U: Copy>(
+    xs_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Vec<T>, U)>
+where
+    usize: ExactFrom<U>,
+{
+    Bucketer {
+        bucketing_function: &|&(ref xs, y)| xs.len().checked_mul(usize::exact_from(y)).unwrap(),
+        bucketing_label: format!("{}.len() * {}", xs_name, y_name),
+    }
+}

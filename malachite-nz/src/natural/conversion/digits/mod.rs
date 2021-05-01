@@ -42,6 +42,8 @@
 ///     123456
 /// );
 /// assert_eq!(Natural::from_digits_asc(&8u16, [3, 7, 1].iter().cloned()).unwrap(), 123);
+///
+/// assert!(Natural::from_digits_asc(&8u16, [3, 10, 1].iter().cloned()).is_none());
 /// ```
 ///
 /// # from_digits_desc, where `base` is a primitive integer
@@ -58,6 +60,8 @@
 ///     123456
 /// );
 /// assert_eq!(Natural::from_digits_desc(&8u16, [1, 7, 3].iter().cloned()).unwrap(), 123);
+///
+/// assert!(Natural::from_digits_desc(&8u16, [3, 10, 1].iter().cloned()).is_none());
 /// ```
 pub mod general_digits;
 pub mod power_of_2_digit_iterable;

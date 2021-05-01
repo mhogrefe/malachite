@@ -4,13 +4,13 @@ use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 
 fn graphic_weighted_random_chars_helper(
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
     expected_values: &str,
     expected_common_values: &[(char, usize)],
     expected_median: (char, Option<char>),
 ) {
-    let xs = graphic_weighted_random_chars(EXAMPLE_SEED, w_numerator, w_denominator);
+    let xs = graphic_weighted_random_chars(EXAMPLE_SEED, p_numerator, p_denominator);
     let values = xs.clone().take(200).collect::<String>();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
@@ -20,13 +20,12 @@ fn graphic_weighted_random_chars_helper(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_graphic_weighted_random_chars() {
-    // w = 1
+    // p = 1/2
     graphic_weighted_random_chars_helper(
         1,
-        1,
+        2,
         "\u{8c401}𘓸\u{369b5}𰫖\u{d5da0}祝\u{e5f4d}껆\u{3788e}\u{d2033}ꆍ\u{8acd2}枽쮱𬭊▟𣡌⢻𱉳\u{372f8}\
         灋ՠ𦷆\u{70942}𪑘𧎊𦂥\u{c5f64}𢇸𡄒\u{c3991}\u{51fe9}\u{ed369}\u{349d9}叩\u{f0bb9}𡦢\u{15f13}\
         \u{34b40}\u{593db}𫗗\u{de850}\u{bf376}⌁𑗇𐫱⎿\u{f8479}\u{a9825}\u{6ca51}𢿓\u{e935c}撖𘉔\
@@ -44,10 +43,10 @@ fn test_graphic_weighted_random_chars() {
           ('༰', 12), ('ẫ', 12), ('㐠', 12)],
         ('𮊳', None)
     );
-    // w = 1/50
+    // p = 1/51
     graphic_weighted_random_chars_helper(
         1,
-        50,
+        51,
         "\u{8c401}\u{369b5}𘓸\u{d5da0}\u{e5f4d}\u{3788e}\u{d2033}\u{8acd2}\u{372f8}\u{70942}\
         \u{c5f64}\u{c3991}\u{51fe9}\u{ed369}\u{349d9}\u{f0bb9}\u{15f13}\u{34b40}\u{593db}\u{de850}\
         \u{bf376}\u{f8479}\u{a9825}\u{6ca51}\u{e935c}\u{19b9e}\u{31c2f}\u{6083d}\u{75b66}\u{b01a3}\
@@ -73,10 +72,10 @@ fn test_graphic_weighted_random_chars() {
           ('\u{68e83}', 8), ('\u{7922b}', 8), ('\u{a5cb8}', 8), ('\u{c49cc}', 8), ('\u{c62dc}', 8)],
         ('\u{97180}', Some('\u{97182}'))
     );
-    // w = 50
+    // p = 50/51
     graphic_weighted_random_chars_helper(
         50,
-        1,
+        51,
         "𘓸𰫖祝껆ꆍ枽쮱𬭊▟𣡌⢻𱉳灋ՠ𦷆𪑘𧎊𦂥𢇸𡄒叩𡦢𫗗⌁𑗇𐫱⎿𢿓撖𘉔蛇𔔺𦳝𗍔𦐷𢝾뜯䃈𣚻ἅ쁰𠙗𫻫𬉠𖤍懓숷𢌱㇎쮘𤳉𬑍𐕯ᄛ𢿺𰃶𠃦𧦱줧\
         咷𭑖䎫𩆷娗𰘆\u{8c401}𨆓𭜏𐎾䇟𬆨𓆭돬𣅷𝡌𔐋𦿷㩠ֆ뉅𫓤𨂮𝝑𠘶讁𤝞𝖢𠑩鏌徕𰰽𦳃𢛏🖠𧝏𬩵𭨟𑑑衄𪎫鑕🥘ㆎ聃𥧳ꕾ𧀜𧼖殡𢄋틅𦖒𥱰\
         筄翽𢢕𝑍𣄎𗖮𣶋𭤓斄羯𧅢𤀸𣭯𤽰𘞂ᖙ뷩\u{369b5}샡𗄡𨒢阒赜𩚗𓋼𮘈𥯏𪕬𤾘𒁙𭞴𰱣𤣚揠𠵮✰㖶궶𘆹𦾏㿓𘉐襲𖩔𰆣𨈢𑈁틯䰸🙻𫝃𠻱𘯅\
@@ -90,23 +89,11 @@ fn test_graphic_weighted_random_chars() {
 #[test]
 #[should_panic]
 fn graphic_weighted_random_chars_fail_1() {
-    graphic_weighted_random_chars(EXAMPLE_SEED, 0, 1);
-}
-
-#[test]
-#[should_panic]
-fn graphic_weighted_random_chars_fail_2() {
     graphic_weighted_random_chars(EXAMPLE_SEED, 1, 0);
 }
 
 #[test]
 #[should_panic]
-fn graphic_weighted_random_chars_fail_3() {
-    graphic_weighted_random_chars(EXAMPLE_SEED, 1, u64::MAX);
-}
-
-#[test]
-#[should_panic]
-fn graphic_weighted_random_chars_fail_4() {
-    graphic_weighted_random_chars(EXAMPLE_SEED, u64::MAX, 1);
+fn graphic_weighted_random_chars_fail_2() {
+    graphic_weighted_random_chars(EXAMPLE_SEED, 2, 1);
 }

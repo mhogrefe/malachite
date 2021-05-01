@@ -1,7 +1,6 @@
 use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 
-#[allow(clippy::decimal_literal_representation)]
 pub fn test_from_raw_mantissa_and_exponent() {
     fn test<T: PrimitiveFloat>(mantissa: T::UnsignedOfEqualWidth, exponent: u64, x: T) {
         assert_eq!(

@@ -1,7 +1,7 @@
 use malachite_base::num::float::PrimitiveFloat;
 use std::panic::catch_unwind;
 
-#[allow(clippy::approx_constant, clippy::decimal_literal_representation)]
+#[allow(clippy::approx_constant)]
 #[test]
 pub fn test_to_ordered_representation() {
     fn test<T: PrimitiveFloat>(x: T, out: T::UnsignedOfEqualWidth) {

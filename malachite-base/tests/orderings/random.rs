@@ -5,7 +5,6 @@ use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 use std::cmp::Ordering::{Equal, Greater, Less};
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_orderings() {
     let xs = random_orderings(EXAMPLE_SEED);

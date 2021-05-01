@@ -26,17 +26,13 @@ macro_rules! impl_mod_add {
 
             /// Computes `self + other` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// $f(x, y, m) = z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModAdd;
-            ///
-            /// assert_eq!(0u8.mod_add(3, 5), 3);
-            /// assert_eq!(7u32.mod_add(5, 10), 2);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_add` module.
             ///
             /// This is nmod_add from nmod_vec.h, FLINT Dev 1.
             #[inline]
@@ -49,22 +45,13 @@ macro_rules! impl_mod_add {
             /// Replaces `self` with `self + other` mod `m`. Assumes the inputs are already reduced
             /// mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets z$, where $x, y, z < m$ and $x + y \equiv z \mod m$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModAddAssign;
-            ///
-            /// let mut n = 0u8;
-            /// n.mod_add_assign(3, 5);
-            /// assert_eq!(n, 3);
-            ///
-            /// let mut n = 7u32;
-            /// n.mod_add_assign(5, 10);
-            /// assert_eq!(n, 2);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_add` module.
             ///
             /// This is nmod_add from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]

@@ -102,7 +102,6 @@ where
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_exhaustive_signed_range() {
     apply_fn_to_signeds!(exhaustive_signed_range_helper);

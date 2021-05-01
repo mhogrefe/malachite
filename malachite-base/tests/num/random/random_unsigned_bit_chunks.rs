@@ -43,7 +43,6 @@ fn random_unsigned_bit_chunks_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     }
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_unsigned_bit_chunks() {
     // u16, chunk_size = 1

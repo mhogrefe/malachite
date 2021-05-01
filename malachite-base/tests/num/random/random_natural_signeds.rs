@@ -27,7 +27,6 @@ fn random_natural_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_natural_signeds() {
     // i8

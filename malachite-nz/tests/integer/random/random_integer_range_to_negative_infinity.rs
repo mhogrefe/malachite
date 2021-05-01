@@ -63,7 +63,6 @@ fn random_integer_range_to_negative_infinity_helper(
     );
 }
 
-#[allow(clippy::excessive_precision)]
 #[test]
 fn test_random_integer_range_to_negative_infinity() {
     let values = &[

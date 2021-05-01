@@ -16,7 +16,6 @@ fn exhaustive_positive_finite_primitive_floats_in_range_helper<T: PrimitiveFloat
     );
 }
 
-#[allow(clippy::excessive_precision)]
 #[test]
 fn test_exhaustive_positive_finite_primitive_floats_in_range() {
     exhaustive_positive_finite_primitive_floats_in_range_helper::<f32>(

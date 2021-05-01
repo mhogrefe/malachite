@@ -1,6 +1,10 @@
 use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
-use malachite_base_test_util::common::{test_cmp_helper, test_eq_helper};
+use malachite_base::strings::string_is_subset;
+use malachite_base_test_util::generators::primitive_float_gen;
+use malachite_base_test_util::num::float::PRIMITIVE_FLOAT_CHARS;
+use std::fmt::Debug;
+use std::str::FromStr;
 
 #[test]
 pub fn test_to_string() {
@@ -48,24 +52,22 @@ pub fn test_to_string() {
     test::<f64>(std::f64::consts::PI, "3.141592653589793");
 }
 
-const TEST_STRINGS: [&str; 7] = [
-    "-Infinity",
-    "-5.0e5",
-    "-0.0",
-    "NaN",
-    "0.0",
-    "0.123",
-    "Infinity",
-];
-
-#[test]
-pub fn test_eq() {
-    test_eq_helper::<NiceFloat<f32>>(&TEST_STRINGS);
-    test_eq_helper::<NiceFloat<f64>>(&TEST_STRINGS);
+fn to_string_properties_helper<T: PrimitiveFloat>()
+where
+    <T as FromStr>::Err: Debug,
+{
+    primitive_float_gen::<T>().test_properties(|f| {
+        let s = NiceFloat(f).to_string();
+        assert_eq!(NiceFloat::from_str(&s).unwrap(), NiceFloat(f));
+        assert!(string_is_subset(&s, PRIMITIVE_FLOAT_CHARS));
+        if f.is_finite() {
+            assert!(s.contains('.'));
+            assert_eq!(NiceFloat(T::from_str(&s).unwrap()), NiceFloat(f));
+        }
+    });
 }
 
 #[test]
-pub fn test_cmp() {
-    test_cmp_helper::<NiceFloat<f32>>(&TEST_STRINGS);
-    test_cmp_helper::<NiceFloat<f64>>(&TEST_STRINGS);
+fn to_string_properties() {
+    apply_fn_to_primitive_floats!(to_string_properties_helper);
 }

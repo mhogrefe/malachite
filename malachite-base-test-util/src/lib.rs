@@ -12,7 +12,6 @@
 )]
 #![warn(
     clippy::cast_lossless,
-    clippy::decimal_literal_representation,
     clippy::explicit_into_iter_loop,
     clippy::explicit_iter_loop,
     clippy::filter_map,
@@ -56,6 +55,7 @@ pub mod num {
             pub mod to_string;
         }
     }
+    pub mod float;
     pub mod logic {
         pub mod bit_block_access;
         pub mod bit_convertible;

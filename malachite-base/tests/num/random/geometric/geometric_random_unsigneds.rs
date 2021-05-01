@@ -32,7 +32,6 @@ fn geometric_random_unsigneds_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_geometric_random_unsigneds() {
     // u64, um = 1 / 64

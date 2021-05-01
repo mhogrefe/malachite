@@ -38,7 +38,6 @@ fn geometric_random_negative_signeds_helper<
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_geometric_random_negative_signeds() {
     // i64, um = -65 / 64

@@ -8,12 +8,14 @@ use std::str::FromStr;
 
 #[test]
 fn test_checked_from_integer() {
-    let test = |n, out| {
-        let on = Natural::checked_from(Integer::from_str(n).unwrap());
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        let on = Natural::checked_from(u.clone());
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Natural::checked_from(&Integer::from_str(n).unwrap());
+        let on = Natural::checked_from(&u);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };
@@ -30,12 +32,14 @@ fn test_checked_from_integer() {
 
 #[test]
 fn test_exact_from_integer() {
-    let test = |u, out| {
-        let n = Natural::exact_from(Integer::from_str(u).unwrap());
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        let n = Natural::exact_from(u.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::exact_from(&Integer::from_str(u).unwrap());
+        let n = Natural::exact_from(&u);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -96,12 +100,14 @@ fn natural_exact_from_integer_ref_fail_4() {
 
 #[test]
 fn test_saturating_from_integer() {
-    let test = |u, out| {
-        let n = Natural::saturating_from(Integer::from_str(u).unwrap());
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        let n = Natural::saturating_from(u.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::saturating_from(&Integer::from_str(u).unwrap());
+        let n = Natural::saturating_from(&u);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -118,15 +124,11 @@ fn test_saturating_from_integer() {
 
 #[test]
 fn test_convertible_from_integer() {
-    let test = |u, out| {
-        assert_eq!(
-            Natural::convertible_from(Integer::from_str(u).unwrap()),
-            out
-        );
-        assert_eq!(
-            Natural::convertible_from(&Integer::from_str(u).unwrap()),
-            out
-        );
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(Natural::convertible_from(u.clone()), out);
+        assert_eq!(Natural::convertible_from(&u), out);
     };
     test("0", true);
     test("123", true);

@@ -27,7 +27,6 @@ fn random_primitive_ints_helper<T: CheckedToF64 + PrimitiveInt>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_primitive_ints() {
     // u8

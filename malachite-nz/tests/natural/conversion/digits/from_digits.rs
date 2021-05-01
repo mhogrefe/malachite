@@ -8,14 +8,17 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
-    unsigned_pair_gen_var_10, unsigned_vec_unsigned_pair_gen_var_5,
+    unsigned_pair_gen_var_10, unsigned_vec_unsigned_pair_gen_var_12,
+    unsigned_vec_unsigned_pair_gen_var_5,
 };
 use malachite_nz::natural::conversion::digits::general_digits::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::{
     natural_unsigned_pair_gen_var_5, natural_vec_natural_pair_gen_var_1,
-    natural_vec_natural_pair_gen_var_2, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+    natural_vec_natural_pair_gen_var_2, natural_vec_natural_pair_gen_var_3,
+    natural_vec_natural_pair_gen_var_4, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3,
 };
 use std::iter::empty;
 use std::panic::catch_unwind;
@@ -123,6 +126,17 @@ where
     config.insert("mean_stripe_n", 4 << Limb::LOG_WIDTH);
     config.insert("mean_digit_count_n", 32);
     config.insert("mean_excess_limb_count_n", 32);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3::<T, Limb>().test_properties_with_config(
+        &config,
+        |(mut out, xs, base)| {
+            let t_base = T::exact_from(base);
+            assert_eq!(
+                _limbs_from_digits_small_base_basecase(&mut out, &xs, base).is_some(),
+                xs.iter().all(|&x| x < t_base)
+            );
+        },
+    );
+
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2::<T, Limb>().test_properties_with_config(
         &config,
         |(mut out, xs, base)| {
@@ -173,8 +187,8 @@ fn test_limbs_from_digits_small_base() {
                 2930655271, 132298638, 866385569, 3068,
             ],
         );
-        // len_hi >= SET_STR_DC_THRESHOLD in _limbs_from_digits_small_base_divide_and_conquer;
-        // len_lo >= SET_STR_DC_THRESHOLD in _limbs_from_digits_small_base_divide_and_conquer;
+        // len_hi >= SET_STR_DC_THRESHOLD in _limbs_from_digits_small_base_divide_and_conquer
+        // len_lo >= SET_STR_DC_THRESHOLD in _limbs_from_digits_small_base_divide_and_conquer
         test(
             &[10; 26],
             &[
@@ -800,6 +814,9 @@ fn test_limbs_from_digits_small_base() {
                 4197100817, 2130486321, 3647628851, 2365959588, 146012,
             ],
         );
+        // out_len_hi == 0 in _limbs_from_digits_small_base_divide_and_conquer
+        // out_len_lo == 0 in _limbs_from_digits_small_base_divide_and_conquer
+        test(&[10; 739], &[0; 7100], 10, &[0; 369]);
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
@@ -880,6 +897,17 @@ where
     config.insert("mean_stripe_n", 4 << Limb::LOG_WIDTH);
     config.insert("mean_digit_count_n", 2048);
     config.insert("mean_excess_limb_count_n", 32);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3::<T, Limb>().test_properties_with_config(
+        &config,
+        |(mut out, xs, base)| {
+            let t_base = T::exact_from(base);
+            assert_eq!(
+                _limbs_from_digits_small_base(&mut out, &xs, base).is_some(),
+                xs.iter().all(|&x| x < t_base)
+            );
+        },
+    );
+
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2::<T, Limb>().test_properties_with_config(
         &config,
         |(mut out, xs, base)| {
@@ -930,13 +958,10 @@ fn test_from_digits_desc_basecase() {
 
 fn from_digits_desc_basecase_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
 where
-    Limb: CheckedFrom<T>,
+    Limb: WrappingFrom<T>,
 {
     assert_panic!(_from_digits_desc_basecase::<T>(&[], 0));
     assert_panic!(_from_digits_desc_basecase::<T>(&[], 1));
-    if T::WIDTH < Limb::WIDTH {
-        assert_panic!(_from_digits_desc_basecase::<T>(&[], Limb::MAX));
-    }
 }
 
 #[test]
@@ -946,11 +971,23 @@ fn from_digits_desc_basecase_fail() {
 
 fn from_digits_desc_basecase_properties_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>()
 where
-    Limb: CheckedFrom<T> + SaturatingFrom<T>,
+    Limb: SaturatingFrom<T> + WrappingFrom<T>,
     Natural: From<T>,
 {
     let mut config = GenConfig::new();
-    config.insert("digit_counts_mean_n", 32);
+    config.insert("mean_digit_count_n", 32);
+    config.insert("mean_length_n", 32);
+    unsigned_vec_unsigned_pair_gen_var_12::<T, Limb>().test_properties_with_config(
+        &config,
+        |(xs, base)| {
+            let t_base = T::exact_from(base);
+            assert_eq!(
+                _from_digits_desc_basecase(&xs, base).is_some(),
+                xs.iter().all(|&x| x < t_base)
+            );
+        },
+    );
+
     unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>().test_properties_with_config(
         &config,
         |(xs, base)| {
@@ -1028,7 +1065,7 @@ fn from_digits_asc_limb() {
             &xs.iter().copied().rev().collect_vec(),
             u32::exact_from(base)
         )
-        .is_none(),);
+        .is_none());
     }
     test_err(&[12, 11, 10], 10);
 }
@@ -1040,9 +1077,6 @@ where
 {
     assert_panic!(_from_digits_asc_limb::<_, T>(empty(), 0));
     assert_panic!(_from_digits_asc_limb::<_, T>(empty(), 1));
-    if T::WIDTH < Limb::WIDTH {
-        assert_panic!(_from_digits_asc_limb::<_, T>(empty(), Limb::MAX));
-    }
 }
 
 #[test]
@@ -1056,7 +1090,18 @@ where
     Natural: From<T> + PowerOf2Digits<T>,
 {
     let mut config = GenConfig::new();
-    config.insert("digit_counts_mean_n", 32);
+    config.insert("mean_digit_count_n", 32);
+    unsigned_vec_unsigned_pair_gen_var_12::<T, Limb>().test_properties_with_config(
+        &config,
+        |(xs, base)| {
+            let t_base = T::exact_from(base);
+            assert_eq!(
+                _from_digits_asc_limb(xs.iter().cloned(), base).is_some(),
+                xs.iter().all(|&x| x < t_base)
+            );
+        },
+    );
+
     unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>().test_properties_with_config(
         &config,
         |(xs, base)| {
@@ -1152,9 +1197,6 @@ where
 {
     assert_panic!(_from_digits_desc_limb::<_, T>(empty(), 0));
     assert_panic!(_from_digits_desc_limb::<_, T>(empty(), 1));
-    if T::WIDTH < Limb::WIDTH {
-        assert_panic!(_from_digits_desc_limb::<_, T>(empty(), Limb::MAX));
-    }
 }
 
 #[test]
@@ -1168,7 +1210,18 @@ where
     Natural: From<T> + PowerOf2Digits<T>,
 {
     let mut config = GenConfig::new();
-    config.insert("digit_counts_mean_n", 32);
+    config.insert("mean_digit_count_n", 32);
+    unsigned_vec_unsigned_pair_gen_var_12::<T, Limb>().test_properties_with_config(
+        &config,
+        |(xs, base)| {
+            let t_base = T::exact_from(base);
+            assert_eq!(
+                _from_digits_desc_limb(xs.iter().cloned(), base).is_some(),
+                xs.iter().all(|&x| x < t_base)
+            );
+        },
+    );
+
     unsigned_vec_unsigned_pair_gen_var_5::<T, Limb>().test_properties_with_config(
         &config,
         |(xs, base)| {
@@ -1248,7 +1301,14 @@ fn from_digits_asc_large_fail() {
 #[test]
 fn from_digits_asc_large_properties() {
     let mut config = GenConfig::new();
-    config.insert("digit_counts_mean_n", 32);
+    config.insert("mean_digit_count_n", 32);
+    natural_vec_natural_pair_gen_var_3().test_properties_with_config(&config, |(xs, base)| {
+        assert_eq!(
+            _from_digits_asc_large(xs.iter().cloned(), &base).is_some(),
+            xs.iter().all(|x| x < &base)
+        );
+    });
+
     natural_vec_natural_pair_gen_var_1().test_properties_with_config(&config, |(xs, base)| {
         let n = _from_digits_asc_large(xs.iter().cloned(), &base);
         assert_eq!(
@@ -1330,7 +1390,14 @@ fn from_digits_desc_large_fail() {
 #[test]
 fn from_digits_desc_large_properties() {
     let mut config = GenConfig::new();
-    config.insert("digit_counts_mean_n", 32);
+    config.insert("mean_digit_count_n", 32);
+    natural_vec_natural_pair_gen_var_3().test_properties_with_config(&config, |(xs, base)| {
+        assert_eq!(
+            _from_digits_desc_large(xs.iter().cloned(), &base).is_some(),
+            xs.iter().all(|x| x < &base)
+        );
+    });
+
     natural_vec_natural_pair_gen_var_1().test_properties_with_config(&config, |(xs, base)| {
         let n = _from_digits_desc_large(xs.iter().cloned(), &base);
         assert_eq!(_from_digits_desc_naive(&xs, &base), n);
@@ -1338,7 +1405,7 @@ fn from_digits_desc_large_properties() {
 }
 
 #[test]
-fn from_digits_asc_primitive() {
+fn from_digits_asc_unsigned() {
     fn test_ok(xs: &[Limb], base: Limb, n: &str) {
         let n = Natural::from_str(n).unwrap();
         assert_eq!(
@@ -1392,7 +1459,7 @@ fn from_digits_asc_primitive() {
     test_err(&[10, 11, 12], 10);
 }
 
-fn from_digits_asc_primitive_fail_helper<T: PrimitiveUnsigned>()
+fn from_digits_asc_unsigned_fail_helper<T: PrimitiveUnsigned>()
 where
     Natural: Digits<T>,
 {
@@ -1401,28 +1468,44 @@ where
 }
 
 #[test]
-fn from_digits_asc_primitive_fail() {
-    apply_fn_to_unsigneds!(from_digits_asc_primitive_fail_helper);
+fn from_digits_asc_unsigned_fail() {
+    apply_fn_to_unsigneds!(from_digits_asc_unsigned_fail_helper);
 }
 
-fn from_digits_asc_primitive_helper<
+fn from_digits_asc_unsigned_helper<
     T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
 >()
 where
     Natural: Digits<T>,
 {
-    unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties(|(digits, base)| {
-        let n = Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap();
-        assert_eq!(
-            Natural::from_digits_desc(&base, digits.iter().rev().cloned()).unwrap(),
-            n
-        );
-        let trailing_zeros = slice_trailing_zeros(&digits);
-        assert_eq!(
-            n.to_digits_asc(&base),
-            &digits[..digits.len() - trailing_zeros]
-        );
-    });
+    let mut config = GenConfig::new();
+    config.insert("mean_digit_count_n", 32);
+    unsigned_vec_unsigned_pair_gen_var_12::<T, T>().test_properties_with_config(
+        &config,
+        |(xs, base)| {
+            let t_base = T::exact_from(base);
+            assert_eq!(
+                Natural::from_digits_asc(&base, xs.iter().cloned()).is_some(),
+                xs.iter().all(|&x| x < t_base)
+            );
+        },
+    );
+
+    unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties_with_config(
+        &config,
+        |(digits, base)| {
+            let n = Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap();
+            assert_eq!(
+                Natural::from_digits_desc(&base, digits.iter().rev().cloned()).unwrap(),
+                n
+            );
+            let trailing_zeros = slice_trailing_zeros(&digits);
+            assert_eq!(
+                n.to_digits_asc(&base),
+                &digits[..digits.len() - trailing_zeros]
+            );
+        },
+    );
 
     unsigned_pair_gen_var_10::<T, T, usize>().test_properties(|(base, u)| {
         assert_eq!(
@@ -1433,12 +1516,12 @@ where
 }
 
 #[test]
-fn from_digits_asc_primitive_properties() {
-    apply_fn_to_unsigneds!(from_digits_asc_primitive_helper);
+fn from_digits_asc_unsigned_properties() {
+    apply_fn_to_unsigneds!(from_digits_asc_unsigned_helper);
 }
 
 #[test]
-fn from_digits_desc_primitive() {
+fn from_digits_desc_unsigned() {
     fn test_ok(xs: &[Limb], base: Limb, n: &str) {
         let n = Natural::from_str(n).unwrap();
         assert_eq!(
@@ -1494,7 +1577,7 @@ fn from_digits_desc_primitive() {
     test_err(&[10, 11, 12], 10);
 }
 
-fn from_digits_desc_primitive_fail_helper<T: PrimitiveUnsigned>()
+fn from_digits_desc_unsigned_fail_helper<T: PrimitiveUnsigned>()
 where
     Natural: Digits<T>,
 {
@@ -1503,29 +1586,45 @@ where
 }
 
 #[test]
-fn from_digits_desc_primitive_fail() {
-    apply_fn_to_unsigneds!(from_digits_desc_primitive_fail_helper);
+fn from_digits_desc_unsigned_fail() {
+    apply_fn_to_unsigneds!(from_digits_desc_unsigned_fail_helper);
 }
 
-fn from_digits_desc_primitive_helper<
+fn from_digits_desc_unsigned_helper<
     T: CheckedFrom<T> + PrimitiveUnsigned + SaturatingFrom<T> + WrappingFrom<T>,
 >()
 where
     Natural: Digits<T> + From<T>,
 {
-    unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties(|(digits, base)| {
-        let n = Natural::from_digits_desc(&base, digits.iter().cloned()).unwrap();
-        assert_eq!(
-            Natural::from_digits_asc(&base, digits.iter().rev().cloned()).unwrap(),
-            n
-        );
-        let leading_zeros = slice_leading_zeros(&digits);
-        assert_eq!(n.to_digits_desc(&base), &digits[leading_zeros..]);
-        assert_eq!(
-            _from_digits_desc_naive_primitive(&digits, T::exact_from(base)).unwrap(),
-            n
-        );
-    });
+    let mut config = GenConfig::new();
+    config.insert("mean_digit_count_n", 32);
+    unsigned_vec_unsigned_pair_gen_var_12::<T, T>().test_properties_with_config(
+        &config,
+        |(xs, base)| {
+            let t_base = T::exact_from(base);
+            assert_eq!(
+                Natural::from_digits_desc(&base, xs.iter().cloned()).is_some(),
+                xs.iter().all(|&x| x < t_base)
+            );
+        },
+    );
+
+    unsigned_vec_unsigned_pair_gen_var_5::<T, T>().test_properties_with_config(
+        &config,
+        |(digits, base)| {
+            let n = Natural::from_digits_desc(&base, digits.iter().cloned()).unwrap();
+            assert_eq!(
+                Natural::from_digits_asc(&base, digits.iter().rev().cloned()).unwrap(),
+                n
+            );
+            let leading_zeros = slice_leading_zeros(&digits);
+            assert_eq!(n.to_digits_desc(&base), &digits[leading_zeros..]);
+            assert_eq!(
+                _from_digits_desc_naive_primitive(&digits, T::exact_from(base)).unwrap(),
+                n
+            );
+        },
+    );
 
     unsigned_pair_gen_var_10::<T, T, usize>().test_properties(|(base, u)| {
         assert_eq!(
@@ -1536,8 +1635,8 @@ where
 }
 
 #[test]
-fn from_digits_desc_primitive_properties() {
-    apply_fn_to_unsigneds!(from_digits_desc_primitive_helper);
+fn from_digits_desc_unsigned_properties() {
+    apply_fn_to_unsigneds!(from_digits_desc_unsigned_helper);
 }
 
 #[test]
@@ -1651,7 +1750,17 @@ fn from_digits_asc_fail() {
 
 #[test]
 fn from_digits_asc_properties() {
-    natural_vec_natural_pair_gen_var_2().test_properties(|(digits, base)| {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 64);
+    config.insert("mean_digit_count_n", 32);
+    natural_vec_natural_pair_gen_var_4().test_properties_with_config(&config, |(xs, base)| {
+        assert_eq!(
+            Natural::from_digits_asc(&base, xs.iter().cloned()).is_some(),
+            xs.iter().all(|x| x < &base)
+        );
+    });
+
+    natural_vec_natural_pair_gen_var_2().test_properties_with_config(&config, |(digits, base)| {
         let n = Natural::from_digits_asc(&base, digits.iter().cloned()).unwrap();
         assert_eq!(
             Natural::from_digits_desc(&base, digits.iter().rev().cloned()).unwrap(),
@@ -1788,7 +1897,17 @@ fn from_digits_desc_fail() {
 
 #[test]
 fn from_digits_desc_properties() {
-    natural_vec_natural_pair_gen_var_2().test_properties(|(digits, base)| {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 64);
+    config.insert("mean_digit_count_n", 32);
+    natural_vec_natural_pair_gen_var_4().test_properties_with_config(&config, |(xs, base)| {
+        assert_eq!(
+            Natural::from_digits_desc(&base, xs.iter().cloned()).is_some(),
+            xs.iter().all(|x| x < &base)
+        );
+    });
+
+    natural_vec_natural_pair_gen_var_2().test_properties_with_config(&config, |(digits, base)| {
         let n = Natural::from_digits_desc(&base, digits.iter().cloned()).unwrap();
         assert_eq!(
             Natural::from_digits_asc(&base, digits.iter().rev().cloned()).unwrap(),

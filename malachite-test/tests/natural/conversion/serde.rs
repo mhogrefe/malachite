@@ -7,13 +7,11 @@ use malachite_nz::natural::Natural;
 use malachite_test::common::test_properties;
 use malachite_test::inputs::natural::naturals;
 
-//TODO just use a simple hex string (or base64)
-
 #[test]
 fn serde_properties() {
     test_properties(naturals, |x| {
         let s = serde_json::to_string(&x).unwrap();
         assert_eq!(serde_json::from_str::<Natural>(&s).unwrap(), *x);
-        assert!(string_is_subset(&s, r#"",0123456789:LS[]aeglmr{}"#));
+        assert!(string_is_subset(&s, "\"0123456789abcdefx"));
     });
 }

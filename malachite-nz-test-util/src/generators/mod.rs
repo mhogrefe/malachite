@@ -216,6 +216,24 @@ pub fn natural_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(Nat
     )
 }
 
+// All `(Natural, u64)`, where the `u64` is between 1 and `T::WIDTH`, inclusive.
+pub fn natural_unsigned_pair_gen_var_6<T: PrimitiveInt>() -> Generator<(Natural, u64)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_pair_gen_var_4::<T>,
+        &random_natural_unsigned_pair_gen_var_6::<T>,
+        &special_random_natural_unsigned_pair_gen_var_5::<T>,
+    )
+}
+
+// All `(Natural, T)` where `T` is unsigned, positive, and small.
+pub fn natural_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_primitive_int_pair_gen_var_3,
+        &random_natural_unsigned_pair_gen_var_7,
+        &special_random_natural_unsigned_pair_gen_var_6,
+    )
+}
+
 // -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 // All `(Natural, T, U)` where `T` and `U` are unsigned, the `T` is between 2 and 36, inclusive, and
@@ -226,6 +244,52 @@ pub fn natural_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: Primi
         &exhaustive_natural_unsigned_unsigned_triple_gen_var_1,
         &random_natural_unsigned_unsigned_triple_gen_var_1,
         &special_random_natural_unsigned_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(Natural, u64, T)` where `T` is unsigned, `U` is a primitive int, the `u64` is between 1 and
+// `U::WIDTH`, inclusive, and the `T` is small.
+pub fn natural_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveInt>(
+) -> Generator<(Natural, u64, T)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_unsigned_triple_gen_var_2::<T, U>,
+        &random_natural_unsigned_unsigned_triple_gen_var_2::<T, U>,
+        &special_random_natural_unsigned_unsigned_triple_gen_var_2::<T, U>,
+    )
+}
+
+// All `(Natural, T, U)` where `T` and `U` are unsigned, the `T` and the `U` are small, and the `T`
+// is positive.
+pub fn natural_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(Natural, T, U)> {
+    Generator::new(
+        &exhaustive_natural_primitive_int_unsigned_triple_gen_var_3,
+        &random_natural_unsigned_unsigned_triple_gen_var_3,
+        &special_random_natural_unsigned_unsigned_triple_gen_var_3,
+    )
+}
+
+// -- (Natural, PrimitiveUnsigned, Vec<bool>) --
+
+// All `(Natural, u64, Vec<bool>)` where the `u64` is small and the `Vec<bool>` has as many elements
+// as the `Natural` has digits when expessed in base 2 to the power of the `u64`.
+pub fn natural_unsigned_bool_vec_triple_gen_var_1() -> Generator<(Natural, u64, Vec<bool>)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_bool_vec_triple_gen_var_1,
+        &random_natural_unsigned_bool_vec_triple_gen_var_1,
+        &special_random_natural_unsigned_bool_vec_triple_gen_var_1,
+    )
+}
+
+// All `(Natural, u64, Vec<bool>)` where the `u64` is between 1 and `T::WIDTH`, inclusive, and the
+// `Vec<bool>` has as many elements as the `Natural` has digits when expessed in base 2 to the power
+// of the `u64`.
+pub fn natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>(
+) -> Generator<(Natural, u64, Vec<bool>)> {
+    Generator::new(
+        &exhaustive_natural_unsigned_bool_vec_triple_gen_var_2::<T>,
+        &random_natural_unsigned_bool_vec_triple_gen_var_2::<T>,
+        &special_random_natural_unsigned_bool_vec_triple_gen_var_2::<T>,
     )
 }
 
@@ -240,12 +304,51 @@ pub fn natural_vec_natural_pair_gen_var_1() -> Generator<(Vec<Natural>, Natural)
     )
 }
 
-// All `(Vec<Natural>, Natural)` where and every element of the `Vec` is smaller than the second
-// element of the pair.
+// All `(Vec<Natural>, Natural)` where the second element of the pair is at least 2, and every
+// element of the `Vec` is smaller than the second element of the pair.
 pub fn natural_vec_natural_pair_gen_var_2() -> Generator<(Vec<Natural>, Natural)> {
     Generator::new_no_special(
         &exhaustive_natural_vec_natural_pair_gen_var_2,
         &random_natural_vec_natural_pair_gen_var_2,
+    )
+}
+
+// All `(Vec<Natural>, Natural)` where the second element of the pair is `Large`.
+pub fn natural_vec_natural_pair_gen_var_3() -> Generator<(Vec<Natural>, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vec_natural_pair_gen_var_3,
+        &random_natural_vec_natural_pair_gen_var_3,
+        &special_random_natural_vec_natural_pair_gen_var_1,
+    )
+}
+
+// All `(Vec<Natural>, Natural)` where the second element of the pair is at least 2.
+pub fn natural_vec_natural_pair_gen_var_4() -> Generator<(Vec<Natural>, Natural)> {
+    Generator::new(
+        &exhaustive_natural_vec_natural_pair_gen_var_4,
+        &random_natural_vec_natural_pair_gen_var_4,
+        &special_random_natural_vec_natural_pair_gen_var_2,
+    )
+}
+
+// -- (Vec<Natural>, PrimitiveUnsigned) --
+
+// All `(Vec<Natural>, u64)`, where the `u64` is positive and each `Natural` in the `Vec` is less
+// than 2 to the power of the `u64`.
+pub fn natural_vec_unsigned_pair_gen_var_1() -> Generator<(Vec<Natural>, u64)> {
+    Generator::new(
+        &exhaustive_natural_vec_unsigned_pair_gen_var_1,
+        &random_natural_vec_unsigned_pair_gen_var_1,
+        &special_random_natural_vec_unsigned_pair_gen_var_1,
+    )
+}
+
+// All `(Vec<Natural>, T)`, where the `T` is positive.
+pub fn natural_vec_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Vec<Natural>, T)> {
+    Generator::new(
+        &exhaustive_natural_vec_primitive_int_pair_gen_var_1,
+        &random_natural_vec_unsigned_pair_gen_var_2,
+        &special_random_natural_vec_unsigned_pair_gen_var_2,
     )
 }
 
@@ -295,7 +398,8 @@ pub fn unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1<T: Primit
 
 // var 1 is in malachite-base
 
-// All `(Vec<U>, Vec<T>, u64)` that are valid inputs to `_limbs_from_digits_small_base_basecase`.
+// All `(Vec<U>, Vec<T>, u64)` that are valid, `Some`-returning inputs to
+// `_limbs_from_digits_small_base_basecase`.
 pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2<
     T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
@@ -304,6 +408,19 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2<
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
         &random_primitive_int_vec_unsigned_vec_unsigned_triple_gen_var_1,
         &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(Vec<U>, Vec<T>, u64)` that are inputs to `_limbs_from_digits_small_base_basecase`,
+// regardless of whether they return `Some` or `None`.
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(Vec<U>, Vec<T>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3,
+        &random_primitive_int_vec_unsigned_vec_unsigned_triple_gen_var_2,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3,
     )
 }
 

@@ -42,7 +42,6 @@ fn random_primitive_float_inclusive_range_helper<T: CheckedToF64 + PrimitiveFloa
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_primitive_float_inclusive_range() {
     // f32, a = 1.0, b = 2.0

@@ -7,10 +7,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_u32_checked_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u32::checked_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u32::checked_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u32::checked_from(u.clone()), out);
+        assert_eq!(u32::checked_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_u32(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -25,10 +27,12 @@ fn test_u32_checked_from_integer() {
 
 #[test]
 fn test_u32_exact_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u32::exact_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u32::exact_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32().unwrap(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u32::exact_from(u.clone()), out);
+        assert_eq!(u32::exact_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_u32().unwrap(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -73,10 +77,12 @@ fn u32_exact_from_integer_fail_6() {
 
 #[test]
 fn test_u32_wrapping_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u32::wrapping_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u32::wrapping_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_u32_wrapping(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u32::wrapping_from(u.clone()), out);
+        assert_eq!(u32::wrapping_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_u32_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -91,9 +97,10 @@ fn test_u32_wrapping_from_integer() {
 
 #[test]
 fn test_u32_saturating_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u32::saturating_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u32::saturating_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u32::saturating_from(u.clone()), out);
+        assert_eq!(u32::saturating_from(&u), out);
     };
     test("0", 0);
     test("123", 123);
@@ -108,9 +115,10 @@ fn test_u32_saturating_from_integer() {
 
 #[test]
 fn test_u32_overflowing_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u32::overflowing_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u32::overflowing_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u32::overflowing_from(u.clone()), out);
+        assert_eq!(u32::overflowing_from(&u), out);
     };
     test("0", (0, false));
     test("123", (123, false));
@@ -125,9 +133,10 @@ fn test_u32_overflowing_from_integer() {
 
 #[test]
 fn test_u32_convertible_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u32::convertible_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u32::convertible_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u32::convertible_from(u.clone()), out);
+        assert_eq!(u32::convertible_from(&u), out);
     };
     test("0", true);
     test("123", true);
@@ -142,10 +151,11 @@ fn test_u32_convertible_from_integer() {
 
 #[test]
 fn test_u64_checked_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u64::checked_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u64::checked_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_u64(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u64::checked_from(u.clone()), out);
+        assert_eq!(u64::checked_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_u64(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -160,10 +170,11 @@ fn test_u64_checked_from_integer() {
 
 #[test]
 fn test_u64_exact_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u64::exact_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u64::exact_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_u64().unwrap(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u64::exact_from(u.clone()), out);
+        assert_eq!(u64::exact_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_u64().unwrap(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -203,10 +214,11 @@ fn u64_exact_from_integer_fail_5() {
 
 #[test]
 fn test_u64_wrapping_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u64::wrapping_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u64::wrapping_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_u64_wrapping(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u64::wrapping_from(u.clone()), out);
+        assert_eq!(u64::wrapping_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_u64_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -221,9 +233,10 @@ fn test_u64_wrapping_from_integer() {
 
 #[test]
 fn test_u64_saturating_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u64::saturating_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u64::saturating_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u64::saturating_from(u.clone()), out);
+        assert_eq!(u64::saturating_from(&u), out);
     };
     test("0", 0);
     test("123", 123);
@@ -238,9 +251,10 @@ fn test_u64_saturating_from_integer() {
 
 #[test]
 fn test_u64_overflowing_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u64::overflowing_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u64::overflowing_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u64::overflowing_from(u.clone()), out);
+        assert_eq!(u64::overflowing_from(&u), out);
     };
     test("0", (0, false));
     test("123", (123, false));
@@ -255,9 +269,10 @@ fn test_u64_overflowing_from_integer() {
 
 #[test]
 fn test_u64_convertible_from_integer() {
-    let test = |n, out| {
-        assert_eq!(u64::convertible_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(u64::convertible_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(u64::convertible_from(u.clone()), out);
+        assert_eq!(u64::convertible_from(&u), out);
     };
     test("0", true);
     test("123", true);
@@ -272,10 +287,11 @@ fn test_u64_convertible_from_integer() {
 
 #[test]
 fn test_i32_checked_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i32::checked_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i32::checked_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_i32(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i32::checked_from(u.clone()), out);
+        assert_eq!(i32::checked_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_i32(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -290,10 +306,11 @@ fn test_i32_checked_from_integer() {
 
 #[test]
 fn test_i32_exact_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i32::exact_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i32::exact_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_i32().unwrap(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i32::exact_from(u.clone()), out);
+        assert_eq!(i32::exact_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_i32().unwrap(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -328,10 +345,11 @@ fn i32_exact_from_integer_fail_4() {
 
 #[test]
 fn test_i32_wrapping_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i32::wrapping_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i32::wrapping_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i32::wrapping_from(u.clone()), out);
+        assert_eq!(i32::wrapping_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_i32_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -346,9 +364,10 @@ fn test_i32_wrapping_from_integer() {
 
 #[test]
 fn test_i32_saturating_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i32::saturating_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i32::saturating_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i32::saturating_from(u.clone()), out);
+        assert_eq!(i32::saturating_from(&u), out);
     };
     test("0", 0);
     test("123", 123);
@@ -363,9 +382,10 @@ fn test_i32_saturating_from_integer() {
 
 #[test]
 fn test_i32_overflowing_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i32::overflowing_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i32::overflowing_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i32::overflowing_from(u.clone()), out);
+        assert_eq!(i32::overflowing_from(&u), out);
     };
     test("0", (0, false));
     test("123", (123, false));
@@ -380,9 +400,10 @@ fn test_i32_overflowing_from_integer() {
 
 #[test]
 fn test_i32_convertible_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i32::convertible_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i32::convertible_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i32::convertible_from(u.clone()), out);
+        assert_eq!(i32::convertible_from(&u), out);
     };
     test("0", true);
     test("123", true);
@@ -397,10 +418,11 @@ fn test_i32_convertible_from_integer() {
 
 #[test]
 fn test_i64_checked_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i64::checked_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i64::checked_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_i64(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i64::checked_from(u.clone()), out);
+        assert_eq!(i64::checked_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_i64(), out);
     };
     test("0", Some(0));
     test("123", Some(123));
@@ -415,10 +437,11 @@ fn test_i64_checked_from_integer() {
 
 #[test]
 fn test_i64_exact_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i64::exact_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i64::exact_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_i64().unwrap(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i64::exact_from(u.clone()), out);
+        assert_eq!(i64::exact_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_i64().unwrap(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -453,10 +476,11 @@ fn i64_exact_from_integer_fail_4() {
 
 #[test]
 fn test_i64_wrapping_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i64::wrapping_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i64::wrapping_from(&Integer::from_str(n).unwrap()), out);
-        assert_eq!(rug::Integer::from_str(n).unwrap().to_i64_wrapping(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i64::wrapping_from(u.clone()), out);
+        assert_eq!(i64::wrapping_from(&u), out);
+        assert_eq!(rug::Integer::from_str(s).unwrap().to_i64_wrapping(), out);
     };
     test("0", 0);
     test("123", 123);
@@ -471,9 +495,10 @@ fn test_i64_wrapping_from_integer() {
 
 #[test]
 fn test_i64_saturating_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i64::saturating_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i64::saturating_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i64::saturating_from(u.clone()), out);
+        assert_eq!(i64::saturating_from(&u), out);
     };
     test("0", 0);
     test("123", 123);
@@ -488,9 +513,10 @@ fn test_i64_saturating_from_integer() {
 
 #[test]
 fn test_i64_overflowing_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i64::overflowing_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i64::overflowing_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i64::overflowing_from(u.clone()), out);
+        assert_eq!(i64::overflowing_from(&u), out);
     };
     test("0", (0, false));
     test("123", (123, false));
@@ -505,9 +531,10 @@ fn test_i64_overflowing_from_integer() {
 
 #[test]
 fn test_i64_convertible_from_integer() {
-    let test = |n, out| {
-        assert_eq!(i64::convertible_from(Integer::from_str(n).unwrap()), out);
-        assert_eq!(i64::convertible_from(&Integer::from_str(n).unwrap()), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(i64::convertible_from(u.clone()), out);
+        assert_eq!(i64::convertible_from(&u), out);
     };
     test("0", true);
     test("123", true);

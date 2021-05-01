@@ -20,7 +20,8 @@ use platform::Limb;
 ///
 /// //TODO complexity
 ///
-/// This is mpn_powlo from mpn/generic/powlo.c, GMP 6.1.2, where rp == bp.
+/// This is mpn_powlo from mpn/generic/powlo.c, GMP 6.2.1, where rp == bp. Investigate changes from
+/// 6.1.2?
 pub fn limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);

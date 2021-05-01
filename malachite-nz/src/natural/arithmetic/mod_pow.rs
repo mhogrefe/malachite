@@ -62,7 +62,7 @@ pub(crate) fn get_bits(xs: &[Limb], mut end: u64, len: u64) -> usize {
     })
 }
 
-// This is mpn_redc_1 from mpn/generic/redc_1.c, GMP 6.1.2.
+// This is mpn_redc_1 from mpn/generic/redc_1.c, GMP 6.2.1.
 #[allow(clippy::redundant_slicing)]
 fn limbs_redc_limb_raw(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], m_inv: Limb) -> bool {
     let len = ms.len();
@@ -101,7 +101,7 @@ pub(crate) fn get_window_size(width: u64) -> u64 {
     )
 }
 
-// This is mpn_redc_n from mpn/generic/redc_n.c, GMP 6.1.2.
+// This is mpn_redc_n from mpn/generic/redc_n.c, GMP 6.2.1.
 fn limbs_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb], is: &[Limb]) {
     let ms_len = ms.len();
     assert!(ms_len > 8);
@@ -266,7 +266,7 @@ fn select_fns(
 /// assert_eq!(out, &[2939877551, 399, 10]);
 /// ```
 ///
-/// This is mpn_powm from mpn/generic/powm.c, GMP 6.1.2.
+/// This is mpn_powm from mpn/generic/powm.c, GMP 6.2.1.
 pub fn limbs_mod_pow_odd(
     out: &mut [Limb],
     xs: &[Limb],

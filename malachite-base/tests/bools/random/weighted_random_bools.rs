@@ -5,13 +5,13 @@ use malachite_base_test_util::stats::common_values_map::common_values_map;
 use malachite_base_test_util::stats::median;
 
 fn weighted_random_bools_helper(
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
     expected_values: &[bool],
     expected_common_values: &[(bool, usize)],
     expected_median: (bool, Option<bool>),
 ) {
-    let xs = weighted_random_bools(EXAMPLE_SEED, w_numerator, w_denominator);
+    let xs = weighted_random_bools(EXAMPLE_SEED, p_numerator, p_denominator);
     let values = xs.clone().take(20).collect_vec();
     let common_values = common_values_map(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
@@ -21,13 +21,16 @@ fn weighted_random_bools_helper(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_weighted_random_bools() {
-    // w = 1
+    // p = 0
+    weighted_random_bools_helper(0, 1, &[false; 20], &[(false, 1000000)], (false, None));
+    // p = 1
+    weighted_random_bools_helper(1, 1, &[true; 20], &[(true, 1000000)], (true, None));
+    // p = 1/2
     weighted_random_bools_helper(
         1,
-        1,
+        2,
         &[
             false, true, true, true, false, false, false, true, false, false, false, false, true,
             false, false, false, false, true, false, true,
@@ -35,10 +38,10 @@ fn test_weighted_random_bools() {
         &[(false, 500473), (true, 499527)],
         (false, None),
     );
-    // w = 1/50
+    // p = 1/51
     weighted_random_bools_helper(
         1,
-        50,
+        51,
         &[
             false, false, false, false, false, false, false, false, false, false, false, false,
             false, false, false, false, false, false, false, false,
@@ -46,10 +49,10 @@ fn test_weighted_random_bools() {
         &[(false, 980406), (true, 19594)],
         (false, None),
     );
-    // w = 50
+    // w = 50/51
     weighted_random_bools_helper(
         50,
-        1,
+        51,
         &[
             true, true, true, true, true, true, true, true, true, true, true, true, true, true,
             true, true, false, true, true, true,
@@ -62,23 +65,11 @@ fn test_weighted_random_bools() {
 #[test]
 #[should_panic]
 fn weighted_random_bools_fail_1() {
-    weighted_random_bools(EXAMPLE_SEED, 0, 1);
-}
-
-#[test]
-#[should_panic]
-fn weighted_random_bools_fail_2() {
     weighted_random_bools(EXAMPLE_SEED, 1, 0);
 }
 
 #[test]
 #[should_panic]
-fn weighted_random_bools_fail_3() {
-    weighted_random_bools(EXAMPLE_SEED, 1, u64::MAX);
-}
-
-#[test]
-#[should_panic]
-fn weighted_random_bools_fail_4() {
-    weighted_random_bools(EXAMPLE_SEED, u64::MAX, 1);
+fn weighted_random_bools_fail_2() {
+    weighted_random_bools(EXAMPLE_SEED, 2, 1);
 }

@@ -20,17 +20,13 @@ macro_rules! impl_mod_sub {
 
             /// Computes `self - other` mod `m`. Assumes the inputs are already reduced mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// $f(x, y, m) = z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModSub;
-            ///
-            /// assert_eq!(4u8.mod_sub(3, 5), 1);
-            /// assert_eq!(7u32.mod_sub(9, 10), 8);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_sub` module.
             ///
             /// This is nmod_sub from nmod_vec.h, FLINT Dev 1.
             #[inline]
@@ -43,22 +39,13 @@ macro_rules! impl_mod_sub {
             /// Replaces `self` with `self - other` mod `m`. Assumes the inputs are already reduced
             /// mod `m`.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets z$, where $x, y, z < m$ and $x - y \equiv z \mod m$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModSubAssign;
-            ///
-            /// let mut n = 4u8;
-            /// n.mod_sub_assign(3, 5);
-            /// assert_eq!(n, 1);
-            ///
-            /// let mut n = 7u32;
-            /// n.mod_sub_assign(9, 10);
-            /// assert_eq!(n, 8);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_sub` module.
             ///
             /// This is nmod_sub from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
             #[inline]

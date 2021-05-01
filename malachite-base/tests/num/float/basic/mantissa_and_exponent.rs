@@ -1,7 +1,6 @@
 use malachite_base::num::float::PrimitiveFloat;
 use std::panic::catch_unwind;
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 pub fn test_raw_mantissa_and_exponent() {
     fn test<T: PrimitiveFloat>(x: T, mantissa: T::UnsignedOfEqualWidth, exponent: u64) {

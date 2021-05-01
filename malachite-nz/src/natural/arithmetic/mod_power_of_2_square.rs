@@ -27,7 +27,7 @@ use platform::{
     SQR_TOOM2_THRESHOLD, SQR_TOOM3_THRESHOLD, SQR_TOOM4_THRESHOLD, SQR_TOOM8_THRESHOLD,
 };
 
-/// This is MPN_SQRLO_DIAGONAL from mpn/generic/sqrlo_basecase.c, GMP 6.1.2.
+/// This is MPN_SQRLO_DIAGONAL from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
 fn _limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let half_n = n >> 1;
@@ -37,7 +37,7 @@ fn _limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
     }
 }
 
-/// This is MPN_SQRLO_DIAG_ADDLSH1 from mpn/generic/sqrlo_basecase.c, GMP 6.1.2.
+/// This is MPN_SQRLO_DIAG_ADDLSH1 from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
 pub fn _limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     assert_eq!(scratch.len(), n - 1);
@@ -58,7 +58,7 @@ const SQRLO_BASECASE_ALLOC: usize = if SQRLO_DC_THRESHOLD_LIMIT < 2 {
 
 /// TODO complexity
 ///
-/// This is mpn_sqrlo_basecase from mpn/generic/sqrlo_basecase.c, GMP 6.1.2.
+/// This is mpn_sqrlo_basecase from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
 pub fn _limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let out = &mut out[..n];
@@ -96,7 +96,8 @@ pub fn _limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
 //TODO tune
 const SQRLO_BASECASE_THRESHOLD: usize = 8;
 
-/// This is MAYBE_range_basecase from mpn/generic/sqrlo.c, GMP 6.1.2.
+/// This is MAYBE_range_basecase from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from
+/// 6.1.2?
 const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
     || (if SQRLO_DC_THRESHOLD == 0 {
@@ -105,7 +106,7 @@ const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
         SQRLO_DC_THRESHOLD
     }) < SQR_TOOM2_THRESHOLD * 36 / (36 - 11);
 
-/// This is MAYBE_range_toom22 from mpn/generic/sqrlo.c, GMP 6.1.2.
+/// This is MAYBE_range_toom22 from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
 const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
     || (if SQRLO_DC_THRESHOLD == 0 {
@@ -114,7 +115,7 @@ const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
         SQRLO_DC_THRESHOLD
     }) < SQR_TOOM3_THRESHOLD * 36 / (36 - 11);
 
-/// This is mpn_sqrlo_itch from mpn/generic/sqrlo.c, GMP 6.1.2.
+/// This is mpn_sqrlo_itch from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
 pub const fn _limbs_square_low_scratch_len(len: usize) -> usize {
     len << 1
 }
@@ -123,7 +124,7 @@ pub const fn _limbs_square_low_scratch_len(len: usize) -> usize {
 ///
 /// TODO complexity
 ///
-/// This is mpn_dc_sqrlo from mpn/generic/sqrlo.c, GMP 6.1.2.
+/// This is mpn_dc_sqrlo from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn _limbs_square_low_divide_and_conquer(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let len = xs.len();
@@ -180,7 +181,7 @@ const SQR_BASECASE_ALLOC: usize = if SQRLO_BASECASE_THRESHOLD_LIMIT == 0 {
 ///
 /// //TODO complexity
 ///
-/// This is mpn_sqrlo from mpn/generic/sqrlo.c, GMP 6.1.2.
+/// This is mpn_sqrlo from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
 pub fn limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
     assert!(SQRLO_BASECASE_THRESHOLD_LIMIT >= SQRLO_BASECASE_THRESHOLD);
     let len = xs.len();

@@ -83,15 +83,6 @@ impl SimpleRational {
 
     // unwrap not const yet
     #[allow(clippy::missing_const_for_fn)]
-    pub(crate) fn add_u64(self, x: u64) -> SimpleRational {
-        SimpleRational {
-            n: self.n.checked_add(x.checked_mul(self.d).unwrap()).unwrap(),
-            d: self.d,
-        }
-    }
-
-    // unwrap not const yet
-    #[allow(clippy::missing_const_for_fn)]
     fn sub_u64(self, x: u64) -> SimpleRational {
         SimpleRational {
             n: self.n.checked_sub(x.checked_mul(self.d).unwrap()).unwrap(),
@@ -123,7 +114,7 @@ fn geometric_random_natural_values_range<T: PrimitiveInt>(
     assert_ne!(um_denominator, 0);
     let (numerator, denominator) = mean_to_p_with_min(min, um_numerator, um_denominator);
     GeometricRandomNaturalValues {
-        xs: weighted_random_bools(seed, numerator, denominator),
+        xs: weighted_random_bools(seed, numerator, numerator + denominator),
         min,
         max,
     }
@@ -172,7 +163,7 @@ fn geometric_random_negative_signeds_range<T: PrimitiveSigned>(
         abs_um_denominator,
     );
     GeometricRandomNegativeSigneds {
-        xs: weighted_random_bools(seed, numerator, denominator),
+        xs: weighted_random_bools(seed, numerator, numerator + denominator),
         abs_min,
         abs_max,
     }
@@ -230,7 +221,7 @@ fn geometric_random_nonzero_signeds_range<T: PrimitiveSigned>(
     let (numerator, denominator) = mean_to_p_with_min(T::ONE, abs_um_numerator, abs_um_denominator);
     GeometricRandomNonzeroSigneds {
         bs: random_bools(seed.fork("bs")),
-        xs: weighted_random_bools(seed.fork("xs"), numerator, denominator),
+        xs: weighted_random_bools(seed.fork("xs"), numerator, numerator + denominator),
         min,
         max,
     }
@@ -296,7 +287,7 @@ fn geometric_random_signeds_range<T: PrimitiveSigned>(
         mean_to_p_with_min(T::ZERO, abs_um_numerator, abs_um_denominator);
     GeometricRandomSigneds {
         bs: random_bools(seed.fork("bs")),
-        xs: weighted_random_bools(seed.fork("xs"), numerator, denominator),
+        xs: weighted_random_bools(seed.fork("xs"), numerator, numerator + denominator),
         min,
         max,
     }

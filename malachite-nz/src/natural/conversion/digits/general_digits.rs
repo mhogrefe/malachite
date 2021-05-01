@@ -1194,7 +1194,6 @@ where
     let shift = power.shift;
     let adjusted_power_len = power.power.len() + shift;
     if out_len_hi == 0 {
-        fail_on_untested_path("_limbs_from_digits_small_base_divide_and_conquer, out_len_hi == 0");
         // Zero +1 limb here, to avoid reading an allocated but uninitialized limb in
         // limbs_slice_add_limb_in_place below.
         slice_set_zero(&mut out[..adjusted_power_len + 1]);
@@ -1221,8 +1220,6 @@ where
         if limbs_slice_add_same_length_in_place_left(out_lo, &scratch[..out_len_lo]) {
             assert!(!limbs_slice_add_limb_in_place(out_hi, 1));
         }
-    } else {
-        fail_on_untested_path("_limbs_from_digits_small_base_divide_and_conquer, out_len_lo == 0");
     }
     let mut n = out_len_hi + adjusted_power_len;
     if out[n - 1] == 0 {
@@ -1273,15 +1270,12 @@ where
     }
 }
 
-pub fn _from_digits_desc_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
-    xs: &[T],
-    base: Limb,
-) -> Option<Natural>
+pub fn _from_digits_desc_basecase<T: PrimitiveUnsigned>(xs: &[T], base: Limb) -> Option<Natural>
 where
-    Limb: ExactFrom<T>,
+    Limb: WrappingFrom<T>,
 {
     assert!(base >= 2);
-    assert!(T::convertible_from(base));
+    let t_base = T::checked_from(base)?;
     let mut digits_per_limb = 0;
     let mut big_base = 1;
     while let Some(next) = big_base.checked_mul(base) {
@@ -1291,7 +1285,13 @@ where
     let big_big_base = Natural::from(big_base);
     let mut x = Natural::ZERO;
     for chunk in xs.rchunks(digits_per_limb).rev() {
-        let big_digit = Limb::from_digits_desc(&base, chunk.iter().map(|&x| Limb::exact_from(x)))?;
+        for &y in chunk.iter() {
+            if y >= t_base {
+                return None;
+            }
+        }
+        let big_digit =
+            Limb::from_digits_desc(&base, chunk.iter().map(|&x| Limb::wrapping_from(x)))?;
         x *= &big_big_base;
         x += Natural::from(big_digit);
     }
@@ -1319,14 +1319,14 @@ fn compute_powers_for_from_digits(base: &Natural, digits: usize) -> Vec<Natural>
     powers
 }
 
-fn _from_digits_desc_divide_and_conquer_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+fn _from_digits_desc_divide_and_conquer_limb<T: PrimitiveUnsigned>(
     xs: &[T],
     base: Limb,
     powers: &[Natural],
     power_index: usize,
 ) -> Option<Natural>
 where
-    Limb: ExactFrom<T>,
+    Limb: WrappingFrom<T>,
     Natural: From<T>,
 {
     let xs_len = xs.len();
@@ -1379,7 +1379,7 @@ pub fn _from_digits_desc_divide_and_conquer(
     }
 }
 
-pub fn _from_digits_asc_limb<I: Iterator<Item = T>, T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+pub fn _from_digits_asc_limb<I: Iterator<Item = T>, T: CheckedFrom<Limb> + PrimitiveUnsigned>(
     xs: I,
     base: Limb,
 ) -> Option<Natural>
@@ -1392,7 +1392,7 @@ where
         Natural::from_power_of_2_digits_asc(log_base, xs)
     } else {
         let mut xs = xs.collect_vec();
-        assert!(T::convertible_from(base));
+        T::checked_from(base)?;
         if xs.is_empty() {
             return Some(Natural::ZERO);
         }
@@ -1416,12 +1416,56 @@ where
     }
 }
 
-pub fn _from_digits_desc_limb<I: Iterator<Item = T>, T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+fn _from_digits_asc_limb_from_natural<
+    I: Iterator<Item = Natural>,
+    T: CheckedFrom<Limb> + CheckedFrom<Natural> + PrimitiveUnsigned,
+>(
     xs: I,
     base: Limb,
 ) -> Option<Natural>
 where
-    Limb: ExactFrom<T> + WrappingFrom<T>,
+    Limb: WrappingFrom<T>,
+    Natural: From<T>,
+{
+    assert!(base >= 2);
+    if let Some(log_base) = base.checked_log_base_2() {
+        Natural::from_power_of_2_digits_asc(log_base, xs)
+    } else {
+        let large_xs = xs;
+        let mut xs = Vec::new();
+        T::checked_from(base)?;
+        for x in large_xs {
+            xs.push(T::checked_from(x)?);
+        }
+        if xs.is_empty() {
+            return Some(Natural::ZERO);
+        }
+        xs.reverse();
+        if base < 256 {
+            let u64_base = base.exact_into();
+            let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), u64_base))];
+            let len = _limbs_from_digits_small_base(&mut out, &xs, u64_base)?;
+            out.truncate(len);
+            Some(Natural::from_owned_limbs_asc(out))
+        } else {
+            let t_base = T::wrapping_from(base);
+            let powers = compute_powers_for_from_digits(&Natural::from(t_base), xs.len());
+            _from_digits_desc_divide_and_conquer_limb(
+                &xs,
+                base,
+                &powers,
+                powers.len().saturating_sub(1),
+            )
+        }
+    }
+}
+
+pub fn _from_digits_desc_limb<I: Iterator<Item = T>, T: PrimitiveUnsigned>(
+    xs: I,
+    base: Limb,
+) -> Option<Natural>
+where
+    Limb: WrappingFrom<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
     assert!(base >= 2);
@@ -1429,7 +1473,50 @@ where
         Natural::from_power_of_2_digits_desc(log_base, xs)
     } else {
         let xs = xs.collect_vec();
-        assert!(T::convertible_from(base));
+        T::checked_from(base)?;
+        if xs.is_empty() {
+            return Some(Natural::ZERO);
+        }
+        if base < 256 {
+            let u64_base = base.exact_into();
+            let mut out = vec![0; usize::exact_from(limbs_per_digit_in_base(xs.len(), u64_base))];
+            let len = _limbs_from_digits_small_base(&mut out, &xs, u64_base)?;
+            out.truncate(len);
+            Some(Natural::from_owned_limbs_asc(out))
+        } else {
+            let t_base = T::wrapping_from(base);
+            let powers = compute_powers_for_from_digits(&Natural::from(t_base), xs.len());
+            _from_digits_desc_divide_and_conquer_limb(
+                &xs,
+                base,
+                &powers,
+                powers.len().saturating_sub(1),
+            )
+        }
+    }
+}
+
+fn _from_digits_desc_limb_from_natural<
+    I: Iterator<Item = Natural>,
+    T: CheckedFrom<Limb> + CheckedFrom<Natural> + PrimitiveUnsigned,
+>(
+    xs: I,
+    base: Limb,
+) -> Option<Natural>
+where
+    Limb: WrappingFrom<T>,
+    Natural: From<T>,
+{
+    assert!(base >= 2);
+    if let Some(log_base) = base.checked_log_base_2() {
+        Natural::from_power_of_2_digits_desc(log_base, xs)
+    } else {
+        let large_xs = xs;
+        let mut xs = Vec::new();
+        T::checked_from(base)?;
+        for x in large_xs {
+            xs.push(T::checked_from(x)?);
+        }
         if xs.is_empty() {
             return Some(Natural::ZERO);
         }
@@ -1570,6 +1657,8 @@ impl Digits<u8> for Natural {
     /// The input digits are in ascending order (least- to most-significant). The type of each
     /// digit, and the type of `base`, is `u8`.
     ///
+    /// Returns `None` if some digit is greater than or equal to `base`.
+    ///
     /// $$
     /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^id_i.
     /// $$
@@ -1578,7 +1667,7 @@ impl Digits<u8> for Natural {
     /// TODO
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or if some digit is greater than or equal to `base`.
+    /// Panics if `base` is less than 2.
     ///
     /// # Examples
     /// See the documentation of the `natural::conversion::digits::general_digits` module.
@@ -1604,6 +1693,8 @@ impl Digits<u8> for Natural {
     /// The input digits are in descending order (most- to least-significant). The type of each
     /// digit, and the type of `base`, is `u8`.
     ///
+    /// Returns `None` if some digit is greater than or equal to `base`.
+    ///
     /// $$
     /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^{k-i-1}d_i.
     /// $$
@@ -1612,7 +1703,7 @@ impl Digits<u8> for Natural {
     /// TODO
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or if some digit is greater than or equal to `base`.
+    /// Panics if `base` is less than 2.
     ///
     /// # Examples
     /// See the documentation of the `natural::conversion::digits::general_digits` module.
@@ -1763,6 +1854,8 @@ macro_rules! digits_unsigned {
             /// The input digits are in ascending order (least- to most-significant). The type of
             /// each digit, and the type of `base`, is `$t`.
             ///
+            /// Returns `None` if some digit is greater than or equal to `base`.
+            ///
             /// $$
             /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^id_i.
             /// $$
@@ -1771,7 +1864,7 @@ macro_rules! digits_unsigned {
             /// TODO
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or if some digit is greater than or equal to `base`.
+            /// Panics if `base` is less than 2.
             ///
             /// # Examples
             /// See the documentation of the `natural::conversion::digits::general_digits` module.
@@ -1785,6 +1878,8 @@ macro_rules! digits_unsigned {
             /// The input digits are in descending order (most- to least-significant). The type of
             /// each digit, and the type of `base`, is `$t`.
             ///
+            /// Returns `None` if some digit is greater than or equal to `base`.
+            ///
             /// $$
             /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^{k-i-1}d_i.
             /// $$
@@ -1793,7 +1888,7 @@ macro_rules! digits_unsigned {
             /// TODO
             ///
             /// # Panics
-            /// Panics if `base` is less than 2 or if some digit is greater than or equal to `base`.
+            /// Panics if `base` is less than 2.
             ///
             /// # Examples
             /// See the documentation of the `natural::conversion::digits::general_digits` module.
@@ -1922,6 +2017,8 @@ impl Digits<Natural> for Natural {
     /// The input digits are in ascending order (least- to most-significant). The type of each
     /// digit, and the type of `base`, is `Natural`.
     ///
+    /// Returns `None` if some digit is greater than or equal to `base`.
+    ///
     /// $$
     /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^id_i.
     /// $$
@@ -1930,7 +2027,7 @@ impl Digits<Natural> for Natural {
     /// TODO
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or if some digit is greater than or equal to `base`.
+    /// Panics if `base` is less than 2.
     ///
     /// # Examples
     /// ```
@@ -1963,11 +2060,18 @@ impl Digits<Natural> for Natural {
     ///     ).unwrap(),
     ///     123
     /// );
+    ///
+    /// assert!(
+    ///     Natural::from_digits_asc(
+    ///         &Natural::from(8u32),
+    ///         ["1", "10", "3"].iter().map(|s| Natural::from_str(s).unwrap())
+    ///     ).is_none(),
+    /// );
     /// ```
     #[inline]
     fn from_digits_asc<I: Iterator<Item = Natural>>(base: &Natural, digits: I) -> Option<Natural> {
         match base {
-            Natural(Small(b)) => _from_digits_asc_limb(digits.map(Limb::exact_from), *b),
+            Natural(Small(b)) => _from_digits_asc_limb_from_natural::<_, Limb>(digits, *b),
             _ => _from_digits_asc_large(digits, base),
         }
     }
@@ -1977,6 +2081,8 @@ impl Digits<Natural> for Natural {
     /// The input digits are in descending order (most- to least-significant). The type of each
     /// digit, and the type of `base`, is `Natural`.
     ///
+    /// Returns `None` if some digit is greater than or equal to `base`.
+    ///
     /// $$
     /// f((d_i)_ {i=0}^{k-1}, b) = \sum_{i=0}^{k-1}b^{k-i-1}d_i.
     /// $$
@@ -1985,7 +2091,7 @@ impl Digits<Natural> for Natural {
     /// TODO
     ///
     /// # Panics
-    /// Panics if `base` is less than 2 or if some digit is greater than or equal to `base`.
+    /// Panics if `base` is less than 2.
     ///
     /// # Examples
     /// ```
@@ -2018,11 +2124,18 @@ impl Digits<Natural> for Natural {
     ///     ).unwrap(),
     ///     123
     /// );
+    ///
+    /// assert!(
+    ///     Natural::from_digits_desc(
+    ///         &Natural::from(8u32),
+    ///         ["1", "10", "3"].iter().map(|s| Natural::from_str(s).unwrap())
+    ///     ).is_none(),
+    /// );
     /// ```
     #[inline]
     fn from_digits_desc<I: Iterator<Item = Natural>>(base: &Natural, digits: I) -> Option<Natural> {
         match base {
-            Natural(Small(b)) => _from_digits_desc_limb(digits.map(Limb::exact_from), *b),
+            Natural(Small(b)) => _from_digits_desc_limb_from_natural::<_, Limb>(digits, *b),
             _ => _from_digits_desc_large(digits, base),
         }
     }

@@ -5,11 +5,13 @@ use std::str::FromStr;
 #[test]
 fn test_from_natural() {
     let test = |s| {
-        let x = Integer::from(Natural::from_str(s).unwrap());
+        let u = Natural::from_str(s).unwrap();
+
+        let x = Integer::from(u.clone());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), s);
 
-        let x = Integer::from(&Natural::from_str(s).unwrap());
+        let x = Integer::from(&u);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), s);
     };

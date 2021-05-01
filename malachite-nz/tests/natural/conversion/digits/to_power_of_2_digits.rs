@@ -1,7 +1,20 @@
+use itertools::Itertools;
+use malachite_base::num::arithmetic::traits::DivRound;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::PowerOf2Digits;
+use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, PowerOf2Digits};
+use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
+use malachite_base_test_util::generators::{
+    unsigned_gen_var_11, unsigned_gen_var_3, unsigned_pair_gen_var_4,
+};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    natural_gen, natural_unsigned_pair_gen_var_6, natural_unsigned_pair_gen_var_7,
+};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -229,4 +242,241 @@ fn test_to_power_of_2_digits_desc_natural() {
 #[should_panic]
 fn to_power_of_2_digits_desc_natural_fail() {
     PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::trillion(), 0);
+}
+
+fn to_power_of_2_digits_asc_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>()
+where
+    Limb: PowerOf2Digits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
+{
+    natural_unsigned_pair_gen_var_6::<T>().test_properties(|(ref n, log_base)| {
+        let digits = n.to_power_of_2_digits_asc(log_base);
+        assert_eq!(
+            Natural::_to_power_of_2_digits_asc_naive::<T>(n, log_base),
+            digits
+        );
+        assert_eq!(
+            Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
+            *n
+        );
+        if *n != 0 {
+            assert_ne!(*digits.last().unwrap(), T::ZERO);
+        }
+        assert_eq!(
+            digits.iter().cloned().rev().collect_vec(),
+            n.to_power_of_2_digits_desc(log_base)
+        );
+        assert_eq!(
+            digits.len(),
+            usize::exact_from(
+                n.significant_bits()
+                    .div_round(log_base, RoundingMode::Ceiling)
+            )
+        );
+        assert!(digits
+            .iter()
+            .all(|digit| digit.significant_bits() <= log_base));
+
+        assert_eq!(
+            PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(n, log_base),
+            digits.iter().cloned().map(Natural::from).collect_vec()
+        );
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!(
+            n.to_power_of_2_digits_asc(1)
+                .into_iter()
+                .map(|digit: T| digit == T::ONE)
+                .collect_vec(),
+            n.to_bits_asc()
+        );
+    });
+
+    unsigned_gen_var_3::<T>().test_properties(|log_base| {
+        assert!(PowerOf2Digits::<T>::to_power_of_2_digits_asc(&Natural::ZERO, log_base).is_empty());
+    });
+
+    unsigned_pair_gen_var_4::<Limb, T>().test_properties(|(u, log_base)| {
+        let n: Natural = From::from(u);
+        assert_eq!(
+            PowerOf2Digits::<T>::to_power_of_2_digits_asc(&u, log_base),
+            PowerOf2Digits::<T>::to_power_of_2_digits_asc(&n, log_base)
+        );
+    });
+}
+
+#[test]
+fn to_power_of_2_digits_asc_properties() {
+    apply_fn_to_unsigneds!(to_power_of_2_digits_asc_properties_helper);
+
+    natural_gen().test_properties(|ref n| {
+        assert_eq!(
+            PowerOf2Digits::<Limb>::to_power_of_2_digits_asc(n, Limb::WIDTH),
+            n.to_limbs_asc()
+        );
+    });
+}
+
+fn to_power_of_2_digits_desc_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>()
+where
+    Limb: PowerOf2Digits<T>,
+    Natural: From<T> + PowerOf2Digits<T>,
+{
+    natural_unsigned_pair_gen_var_6::<T>().test_properties(|(ref n, log_base)| {
+        let digits = n.to_power_of_2_digits_desc(log_base);
+        assert_eq!(
+            Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
+            *n
+        );
+        if *n != 0 {
+            assert_ne!(digits[0], T::ZERO);
+        }
+        assert_eq!(
+            digits.iter().cloned().rev().collect_vec(),
+            n.to_power_of_2_digits_asc(log_base)
+        );
+        assert_eq!(
+            digits.len(),
+            usize::exact_from(
+                n.significant_bits()
+                    .div_round(log_base, RoundingMode::Ceiling)
+            )
+        );
+        assert!(digits
+            .iter()
+            .all(|digit| digit.significant_bits() <= log_base));
+
+        assert_eq!(
+            PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(n, log_base),
+            digits.iter().cloned().map(Natural::from).collect_vec()
+        );
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!(
+            n.to_power_of_2_digits_desc(1)
+                .into_iter()
+                .map(|digit: T| digit == T::ONE)
+                .collect_vec(),
+            n.to_bits_desc()
+        );
+    });
+
+    unsigned_gen_var_3::<T>().test_properties(|log_base| {
+        assert!(
+            PowerOf2Digits::<T>::to_power_of_2_digits_desc(&Natural::ZERO, log_base).is_empty()
+        );
+    });
+
+    unsigned_pair_gen_var_4::<Limb, T>().test_properties(|(u, log_base)| {
+        let n: Natural = From::from(u);
+        assert_eq!(
+            PowerOf2Digits::<T>::to_power_of_2_digits_desc(&u, log_base),
+            PowerOf2Digits::<T>::to_power_of_2_digits_desc(&n, log_base)
+        );
+    });
+}
+
+#[test]
+fn to_power_of_2_digits_desc_properties() {
+    apply_fn_to_unsigneds!(to_power_of_2_digits_desc_properties_helper);
+
+    natural_gen().test_properties(|ref n| {
+        assert_eq!(
+            PowerOf2Digits::<Limb>::to_power_of_2_digits_desc(n, Limb::WIDTH),
+            n.to_limbs_desc()
+        );
+    });
+}
+
+#[test]
+fn to_power_of_2_digits_asc_natural_properties() {
+    natural_unsigned_pair_gen_var_7().test_properties(|(ref n, log_base)| {
+        let digits: Vec<Natural> = n.to_power_of_2_digits_asc(log_base);
+        assert_eq!(n._to_power_of_2_digits_asc_natural_naive(log_base), digits);
+        assert_eq!(
+            Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
+            *n
+        );
+        if *n != 0 {
+            assert_ne!(*digits.last().unwrap(), 0);
+        }
+        assert_eq!(
+            digits.iter().cloned().rev().collect_vec(),
+            PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(n, log_base)
+        );
+        assert_eq!(
+            digits.len(),
+            usize::exact_from(
+                n.significant_bits()
+                    .div_round(log_base, RoundingMode::Ceiling)
+            )
+        );
+        assert!(digits
+            .iter()
+            .all(|digit| digit.significant_bits() <= log_base));
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!(
+            n.to_power_of_2_digits_asc(1)
+                .into_iter()
+                .map(|digit: Natural| digit == 1)
+                .collect_vec(),
+            n.to_bits_asc()
+        );
+    });
+
+    unsigned_gen_var_11().test_properties(|log_base| {
+        assert!(
+            PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&Natural::ZERO, log_base)
+                .is_empty()
+        );
+    });
+}
+
+#[test]
+fn to_power_of_2_digits_desc_natural_properties() {
+    natural_unsigned_pair_gen_var_7().test_properties(|(ref n, log_base)| {
+        let digits: Vec<Natural> = n.to_power_of_2_digits_desc(log_base);
+        assert_eq!(
+            Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
+            *n
+        );
+        if *n != 0 {
+            assert_ne!(digits[0], 0);
+        }
+        assert_eq!(
+            digits.iter().cloned().rev().collect_vec(),
+            PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(n, log_base)
+        );
+        assert_eq!(
+            digits.len(),
+            usize::exact_from(
+                n.significant_bits()
+                    .div_round(log_base, RoundingMode::Ceiling)
+            )
+        );
+        assert!(digits
+            .iter()
+            .all(|digit| digit.significant_bits() <= log_base));
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!(
+            n.to_power_of_2_digits_desc(1)
+                .into_iter()
+                .map(|digit: Natural| digit == 1)
+                .collect_vec(),
+            n.to_bits_desc()
+        );
+    });
+
+    unsigned_gen_var_11().test_properties(|log_base| {
+        assert!(
+            PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::ZERO, log_base)
+                .is_empty()
+        );
+    });
 }

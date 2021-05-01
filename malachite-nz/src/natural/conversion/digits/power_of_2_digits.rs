@@ -245,6 +245,8 @@ macro_rules! power_of_2_digits_unsigned {
             /// order: least- to most-significant. The type of each digit is `$t`, and `log_base`
             /// must be no larger than the width of `$t`.
             ///
+            /// If some digit is greater than $2^\ell$, `None` is returned.
+            ///
             /// Time: worst case O(n)
             ///
             /// Additional memory: worst case O(n)
@@ -252,8 +254,7 @@ macro_rules! power_of_2_digits_unsigned {
             /// where n = `digits.count()`
             ///
             /// # Panics
-            /// Panics if `log_base` is greater than the width of `$t`, if `log_base` is zero, or if
-            /// some digit is greater than 2<sup>`log_base`.</sup>
+            /// Panics if `log_base` is zero or greater than the width of `$t`.
             ///
             /// # Examples
             /// ```
@@ -275,6 +276,8 @@ macro_rules! power_of_2_digits_unsigned {
             ///     Natural::from_power_of_2_digits_asc(3, [3u16, 7, 1].iter().cloned()).unwrap(),
             ///     123
             /// );
+            ///
+            /// assert!(Natural::from_power_of_2_digits_asc(3, [100u8].iter().cloned()).is_none());
             /// ```
             #[inline]
             fn from_power_of_2_digits_asc<I: Iterator<Item = $t>>(
@@ -289,6 +292,8 @@ macro_rules! power_of_2_digits_unsigned {
             /// order: most- to least-significant. The type of each digit is `$t`, and `log_base`
             /// must be no larger than the width of `$t`.
             ///
+            /// If some digit is greater than $2^\ell$, `None` is returned.
+            ///
             /// Time: worst case O(n)
             ///
             /// Additional memory: worst case O(n)
@@ -296,8 +301,7 @@ macro_rules! power_of_2_digits_unsigned {
             /// where n = `digits.count()`
             ///
             /// # Panics
-            /// Panics if `log_base` is greater than the width of `$t`, if `log_base` is zero, or if
-            /// some digit is greater than 2<sup>`log_base`.</sup>
+            /// Panics if `log_base` is zero or greater than the width of `$t`.
             ///
             /// # Examples
             /// ```
@@ -320,6 +324,8 @@ macro_rules! power_of_2_digits_unsigned {
             ///         .unwrap(),
             ///     123
             /// );
+            ///
+            /// assert!(Natural::from_power_of_2_digits_desc(3, [100u8].iter().cloned()).is_none());
             /// ```
             #[inline]
             fn from_power_of_2_digits_desc<I: Iterator<Item = $t>>(
@@ -497,6 +503,8 @@ impl PowerOf2Digits<Natural> for Natural {
     /// base-2 logarithm of the base is specified. The input digits are in ascending order: least-
     /// to most-significant. The type of each digit is `Natural`.
     ///
+    /// If some digit is greater than $2^\ell$, `None` is returned.
+    ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
@@ -504,7 +512,7 @@ impl PowerOf2Digits<Natural> for Natural {
     /// where n = `digits.count()` * `log_base`
     ///
     /// # Panics
-    /// Panics if `log_base` is zero or if some digit is greater than 2<sup>`log_base`.</sup>
+    /// Panics if `log_base` is zero.
     ///
     /// # Examples
     /// ```
@@ -523,6 +531,9 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// let digits = &[Natural::from(3u32), Natural::from(7u32), Natural::ONE];
     /// assert_eq!(Natural::from_power_of_2_digits_asc(3, digits.iter().cloned()).unwrap(), 123);
+    ///
+    /// let digits = &[Natural::from(100u32)];
+    /// assert!(Natural::from_power_of_2_digits_asc(3, digits.iter().cloned()).is_none());
     /// ```
     fn from_power_of_2_digits_asc<I: Iterator<Item = Natural>>(
         log_base: u64,
@@ -558,13 +569,11 @@ impl PowerOf2Digits<Natural> for Natural {
                     let mut offset = 0;
                     let chunk_size = usize::wrapping_from(log_base >> Limb::LOG_WIDTH);
                     for digit in digits {
-                        offset += chunk_size;
-                        for limb in digit.limbs() {
-                            if limb.significant_bits() > log_base {
-                                return None;
-                            }
-                            limbs.push(limb);
+                        if digit.significant_bits() > log_base {
+                            return None;
                         }
+                        offset += chunk_size;
+                        limbs.extend(digit.limbs());
                         limbs.resize(offset, 0);
                     }
                 }
@@ -589,6 +598,8 @@ impl PowerOf2Digits<Natural> for Natural {
     /// base-2 logarithm of the base is specified. The input digits are in descending order: least-
     /// to most-significant. The type of each digit is `Natural`.
     ///
+    /// If some digit is greater than $2^\ell$, `None` is returned.
+    ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
@@ -596,7 +607,7 @@ impl PowerOf2Digits<Natural> for Natural {
     /// where n = `digits.count()` * `log_base`
     ///
     /// # Panics
-    /// Panics if `log_base` is zero or if some digit is greater than 2<sup>`log_base`.</sup>
+    /// Panics if `log_base` is zero.
     ///
     /// # Examples
     /// ```
@@ -615,6 +626,9 @@ impl PowerOf2Digits<Natural> for Natural {
     ///
     /// let digits = &[Natural::ONE, Natural::from(7u32), Natural::from(3u32)];
     /// assert_eq!(Natural::from_power_of_2_digits_desc(3, digits.iter().cloned()).unwrap(), 123);
+    ///
+    /// let digits = &[Natural::from(100u32)];
+    /// assert!(Natural::from_power_of_2_digits_desc(3, digits.iter().cloned()).is_none());
     /// ```
     fn from_power_of_2_digits_desc<I: Iterator<Item = Natural>>(
         log_base: u64,
@@ -657,9 +671,7 @@ impl PowerOf2Digits<Natural> for Natural {
                             return None;
                         }
                         offset += chunk_size;
-                        for limb in digit.limbs() {
-                            limbs.push(limb);
-                        }
+                        limbs.extend(digit.limbs());
                         limbs.resize(offset, 0);
                     }
                 }

@@ -6,13 +6,12 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use std::str::FromStr;
 
-//TODO clean from_str
-
 #[test]
 fn test_f32_rounding_from_integer() {
-    let test = |n: &str, rm: RoundingMode, out| {
-        assert_eq!(f32::rounding_from(Integer::from_str(n).unwrap(), rm), out);
-        assert_eq!(f32::rounding_from(&Integer::from_str(n).unwrap(), rm), out);
+    let test = |s: &str, rm: RoundingMode, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f32::rounding_from(u.clone(), rm), out);
+        assert_eq!(f32::rounding_from(&u, rm), out);
     };
     test("3", RoundingMode::Exact, 3.0);
     test("-3", RoundingMode::Exact, -3.0);
@@ -293,8 +292,10 @@ fn f32_rounding_from_integer_ref_fail_4() {
 
 #[test]
 fn test_f64_rounding_from_integer() {
-    let test = |n: &str, rm: RoundingMode, out| {
-        assert_eq!(f64::rounding_from(Integer::from_str(n).unwrap(), rm), out);
+    let test = |s: &str, rm: RoundingMode, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f64::rounding_from(u.clone(), rm), out);
+        assert_eq!(f64::rounding_from(&u, rm), out);
     };
     test("3", RoundingMode::Exact, 3.0);
     test("-3", RoundingMode::Exact, -3.0);
@@ -635,8 +636,10 @@ fn f64_rounding_from_integer_ref_fail_3() {
 
 #[test]
 fn test_f32_from_integer() {
-    let test = |n: &str, out| {
-        assert_eq!(f32::from(Integer::from_str(n).unwrap()), out);
+    let test = |s: &str, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f32::from(u.clone()), out);
+        assert_eq!(f32::from(&u), out);
     };
     test("3", 3.0);
     test("-3", -3.0);
@@ -679,8 +682,10 @@ fn test_f32_from_integer() {
 
 #[test]
 fn test_f64_from_integer() {
-    let test = |n: &str, out| {
-        assert_eq!(f64::from(Integer::from_str(n).unwrap()), out);
+    let test = |s: &str, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f64::from(u.clone()), out);
+        assert_eq!(f64::from(&u), out);
     };
     test("3", 3.0);
     test("-3", -3.0);
@@ -739,8 +744,10 @@ fn test_f64_from_integer() {
 
 #[test]
 fn test_f32_checked_from_integer() {
-    let test = |n: &str, out| {
-        assert_eq!(f32::checked_from(Integer::from_str(n).unwrap()), out);
+    let test = |s: &str, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f32::checked_from(u.clone()), out);
+        assert_eq!(f32::checked_from(&u), out);
     };
     test("3", Some(3.0));
     test("-3", Some(-3.0));
@@ -789,8 +796,10 @@ fn test_f32_checked_from_integer() {
 
 #[test]
 fn test_f64_checked_from_integer() {
-    let test = |n: &str, out| {
-        assert_eq!(f64::checked_from(Integer::from_str(n).unwrap()), out);
+    let test = |s: &str, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f64::checked_from(u.clone()), out);
+        assert_eq!(f64::checked_from(&u), out);
     };
     test("3", Some(3.0));
     test("-3", Some(-3.0));
@@ -849,8 +858,10 @@ fn test_f64_checked_from_integer() {
 
 #[test]
 fn test_f32_exact_from_integer() {
-    let test = |n: &str, out| {
-        assert_eq!(f32::exact_from(Integer::from_str(n).unwrap()), out);
+    let test = |s: &str, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f32::exact_from(u.clone()), out);
+        assert_eq!(f32::exact_from(&u), out);
     };
     test("3", 3.0);
     test("-3", -3.0);
@@ -1073,8 +1084,10 @@ fn f32_exact_from_integer_ref_fail_16() {
 
 #[test]
 fn test_f64_exact_from_integer() {
-    let test = |n: &str, out| {
-        assert_eq!(f64::exact_from(Integer::from_str(n).unwrap()), out);
+    let test = |s: &str, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f64::exact_from(u.clone()), out);
+        assert_eq!(f64::exact_from(&u), out);
     };
     test("3", 3.0);
     test("-3", -3.0);
@@ -1281,8 +1294,10 @@ fn f64_exact_from_integer_ref_fail_12() {
 
 #[test]
 fn test_f32_convertible_from_integer() {
-    let test = |n: &str, out| {
-        assert_eq!(f32::convertible_from(Integer::from_str(n).unwrap()), out);
+    let test = |s: &str, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f32::convertible_from(u.clone()), out);
+        assert_eq!(f32::convertible_from(&u), out);
     };
     test("3", true);
     test("-3", true);
@@ -1325,8 +1340,10 @@ fn test_f32_convertible_from_integer() {
 
 #[test]
 fn test_f64_convertible_from_integer() {
-    let test = |n: &str, out| {
-        assert_eq!(f64::convertible_from(Integer::from_str(n).unwrap()), out);
+    let test = |s: &str, out| {
+        let u = Integer::from_str(s).unwrap();
+        assert_eq!(f64::convertible_from(u.clone()), out);
+        assert_eq!(f64::convertible_from(&u), out);
     };
     test("3", true);
     test("-3", true);

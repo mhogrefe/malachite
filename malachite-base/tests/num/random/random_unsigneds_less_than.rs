@@ -29,7 +29,6 @@ fn random_unsigneds_less_than_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_unsigneds_less_than() {
     // u8, limit = 1

@@ -1,4 +1,6 @@
+use bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
 use iterators::{nonzero_values, NonzeroValues};
+use num::arithmetic::traits::PowerOf2;
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{One, Zero};
@@ -8,11 +10,18 @@ use num::float::nice_float::NiceFloat;
 use num::float::PrimitiveFloat;
 use num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
 use num::logic::traits::BitAccess;
+use num::random::geometric::{
+    geometric_random_signed_inclusive_range, geometric_random_unsigned_inclusive_range,
+    GeometricRandomNaturalValues, GeometricRandomSignedRange,
+};
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
-use random::Seed;
+use random::{Seed, EXAMPLE_SEED};
+use std::collections::HashMap;
 use std::convert::identity;
 use std::fmt::Debug;
+use std::marker::PhantomData;
+use vecs::{random_values_from_vec, RandomValuesFromVec};
 
 /// Uniformly generates random primitive integers.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -909,7 +918,7 @@ pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
     }
 }
 
-/// Generates random floats in the half-open interval $[a, b)$.
+/// Generates random primitive floats in the half-open interval $[a, b)$.
 ///
 /// This `struct` is created by the `random_primitive_float_range` function. See its documentation
 /// for more.
@@ -926,7 +935,7 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatRange<T> {
     }
 }
 
-/// Generates random floats in the closed interval $[a, b]$.
+/// Generates random primitive floats in the closed interval $[a, b]$.
 ///
 /// This `struct` is created by the `random_primitive_float_inclusive_range` function. See its
 /// documentation for more.
@@ -943,7 +952,7 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
     }
 }
 
-/// Generates random floats in the half-open interval $[a, b)$.
+/// Generates random primitive floats in the half-open interval $[a, b)$.
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, if the range
@@ -1350,7 +1359,7 @@ pub fn random_nonzero_primitive_floats<T: PrimitiveFloat>(
     nonzero_values(random_primitive_floats(seed))
 }
 
-/// Generates random floats.
+/// Generates random primitive floats.
 ///
 /// This `struct` is created by the `random_primitive_floats` function. See its documentation for
 /// more.
@@ -1413,6 +1422,690 @@ pub fn random_primitive_floats<T: PrimitiveFloat>(seed: Seed) -> RandomPrimitive
         xs: random_unsigned_inclusive_range(seed, T::UnsignedOfEqualWidth::ZERO, nan),
         nan,
     }
+}
+
+/// Generates positive finite primitive floats.
+///
+/// This `struct` is created by the `special_random_positive_finite_primitive_floats` function. See
+/// its documentation for more.
+#[derive(Clone, Debug)]
+pub struct SpecialRandomPositiveFiniteFloats<T: PrimitiveFloat> {
+    exponents: GeometricRandomSignedRange<i64>,
+    range_map: HashMap<i64, GeometricRandomNaturalValues<u64>>,
+    ranges: VariableRangeGenerator,
+    mean_precision_n: u64,
+    mean_precision_d: u64,
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        let exponent = self.exponents.next().unwrap();
+        let mean_precision_n = self.mean_precision_n;
+        let mean_precision_d = self.mean_precision_d;
+        let precisions = self.range_map.entry(exponent).or_insert_with(move || {
+            geometric_random_unsigned_inclusive_range(
+                EXAMPLE_SEED.fork(&exponent.to_string()),
+                1,
+                T::max_precision_for_exponent(exponent),
+                mean_precision_n,
+                mean_precision_d,
+            )
+        });
+        let precision = precisions.next().unwrap();
+        let mantissa = if precision == 1 {
+            T::UnsignedOfEqualWidth::ONE
+        } else {
+            // e.g. if precision is 4, generate odd values from 1001 through 1111, inclusive
+            let x = self.ranges.next_in_range(
+                T::UnsignedOfEqualWidth::power_of_2(precision - 2),
+                T::UnsignedOfEqualWidth::power_of_2(precision - 1),
+            );
+            (x << 1) | T::UnsignedOfEqualWidth::ONE
+        };
+        T::from_adjusted_mantissa_and_exponent(
+            mantissa,
+            exponent - i64::wrapping_from(precision) + 1,
+        )
+    }
+}
+
+/// Generates finite positive primitive floats.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
+/// You can specify the mean absolute exponent and precision by passing the numerators and
+/// denominators of their means. This is the preferred way to generate floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
+///   they may be as high as you like.
+///
+/// Positive zero is generated; negative zero is not. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::special_random_positive_finite_primitive_floats;
+///
+/// assert_eq!(
+///     special_random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
+///         .map(NiceFloat).take(20).collect_vec(),
+///     [
+///         0.86257935, 0.00000166893, 0.015594482, 0.75, 70336.0, 0.012937546, 0.021591187,
+///         3.03125, 7.4140625, 0.00004196167, 0.30628967, 22528.0, 36864.0, 1.0625, 46.0,
+///         0.3203125, 0.0018615723, 1637.875, 0.15625, 0.0010681152
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+pub fn special_random_positive_finite_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> SpecialRandomPositiveFiniteFloats<T> {
+    assert_ne!(mean_precision_denominator, 0);
+    assert!(mean_precision_numerator > mean_precision_denominator);
+    SpecialRandomPositiveFiniteFloats {
+        exponents: geometric_random_signed_inclusive_range(
+            EXAMPLE_SEED.fork("exponents"),
+            T::MIN_EXPONENT,
+            T::MAX_EXPONENT,
+            mean_exponent_numerator,
+            mean_exponent_denominator,
+        ),
+        range_map: HashMap::new(),
+        ranges: variable_range_generator(seed.fork("ranges")),
+        mean_precision_n: mean_precision_numerator,
+        mean_precision_d: mean_precision_denominator,
+        phantom: PhantomData,
+    }
+}
+
+/// Generates negative finite primitive floats.
+///
+/// This `struct` is created by the `special_random_negative_finite_primitive_floats` function. See
+/// its documentation for more.
+#[derive(Clone, Debug)]
+pub struct SpecialRandomNegativeFiniteFloats<T: PrimitiveFloat>(
+    SpecialRandomPositiveFiniteFloats<T>,
+);
+
+impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        self.0.next().map(|f| -f)
+    }
+}
+
+/// Generates finite negative primitive floats.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
+/// You can specify the mean absolute exponent and precision by passing the numerators and
+/// denominators of their means. This is the preferred way to generate floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
+///   they may be as high as you like.
+///
+/// Negative zero is generated; positive zero is not. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::special_random_negative_finite_primitive_floats;
+///
+/// assert_eq!(
+///     special_random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
+///         .map(NiceFloat).take(20).collect_vec(),
+///     [
+///         -0.86257935, -0.00000166893, -0.015594482, -0.75, -70336.0, -0.012937546, -0.021591187,
+///         -3.03125, -7.4140625, -0.00004196167, -0.30628967, -22528.0, -36864.0, -1.0625, -46.0,
+///         -0.3203125, -0.0018615723, -1637.875, -0.15625, -0.0010681152
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn special_random_negative_finite_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> SpecialRandomNegativeFiniteFloats<T> {
+    SpecialRandomNegativeFiniteFloats(special_random_positive_finite_primitive_floats(
+        seed,
+        mean_exponent_numerator,
+        mean_exponent_denominator,
+        mean_precision_numerator,
+        mean_precision_denominator,
+    ))
+}
+
+/// Generates nonzero finite primitive floats.
+///
+/// This `struct` is created by the `special_random_nonzero_finite_primitive_floats` function. See
+/// its documentation for more.
+#[derive(Clone, Debug)]
+pub struct SpecialRandomNonzeroFiniteFloats<T: PrimitiveFloat> {
+    bs: RandomBools,
+    xs: SpecialRandomPositiveFiniteFloats<T>,
+}
+
+impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
+    type Item = T;
+
+    #[inline]
+    fn next(&mut self) -> Option<T> {
+        let x = self.xs.next().unwrap();
+        Some(if self.bs.next().unwrap() { x } else { -x })
+    }
+}
+
+/// Generates finite nonzero primitive floats.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
+/// You can specify the mean absolute exponent and precision by passing the numerators and
+/// denominators of their means. This is the preferred way to generate floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
+///   they may be as high as you like.
+///
+/// Neither positive not negative zero is generated. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::random::special_random_nonzero_finite_primitive_floats;
+///
+/// assert_eq!(
+///     special_random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
+///         .map(NiceFloat).take(20).collect_vec(),
+///     [
+///         -0.5688782, -0.00000166893, -0.015167236, 0.75, -92864.0, 0.012998581, -0.02949524,
+///         -3.28125, -7.5703125, 0.00005722046, 0.33540344, 18432.0, -61440.0, -1.4375, 50.0,
+///         -0.4140625, -0.001739502, -1388.125, -0.15625, -0.001373291
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> SpecialRandomNonzeroFiniteFloats<T> {
+    SpecialRandomNonzeroFiniteFloats {
+        bs: random_bools(seed.fork("bs")),
+        xs: special_random_positive_finite_primitive_floats(
+            seed.fork("xs"),
+            mean_exponent_numerator,
+            mean_exponent_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ),
+    }
+}
+
+/// Generates floats that contain special values (infinities, zeros, or NaN).
+#[derive(Clone, Debug)]
+pub struct WithSpecialValues<I: Iterator>
+where
+    I::Item: Clone,
+{
+    bs: WeightedRandomBools,
+    special_values: RandomValuesFromVec<I::Item>,
+    xs: I,
+}
+
+impl<I: Iterator> Iterator for WithSpecialValues<I>
+where
+    I::Item: Clone,
+{
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<I::Item> {
+        if self.bs.next().unwrap() {
+            self.special_values.next()
+        } else {
+            self.xs.next()
+        }
+    }
+}
+
+fn with_special_values<I: Iterator>(
+    seed: Seed,
+    special_values: Vec<I::Item>,
+    p_numerator: u64,
+    p_denominator: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+) -> WithSpecialValues<I>
+where
+    I::Item: Clone,
+{
+    WithSpecialValues {
+        bs: weighted_random_bools(seed.fork("bs"), p_numerator, p_denominator),
+        special_values: random_values_from_vec(seed.fork("special_values"), special_values),
+        xs: xs_gen(seed.fork("xs")),
+    }
+}
+
+/// Generates finite primitive floats.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
+/// You can specify the numerator and denominator of the probability that a zero will be generated.
+/// You can also specify the mean absolute exponent and precision by passing the numerators and
+/// denominators of their means of the nonzero floats. This is the preferred way to generate floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
+///   they may be as high as you like.
+///
+/// Positive and negative zero are both generated. `NaN` is not.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::random::special_random_finite_primitive_floats;
+///
+/// assert_eq!(
+///     special_random_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///         .map(NiceFloat).take(20).collect_vec(),
+///     [
+///         0.9171448, 0.00000166893, 0.013153076, 0.0, -0.75, -102720.0, -0.012674332,
+///         -0.022476196, 2.65625, 4.2109375, -0.000049591064, -0.3943634, -18432.0, -0.0, -45056.0,
+///         -1.4375, -58.0, 0.0, 0.3046875, -0.0018005371
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_zero_p_numerator: u64,
+    mean_zero_p_denominator: u64,
+) -> WithSpecialValues<SpecialRandomNonzeroFiniteFloats<T>> {
+    with_special_values(
+        seed,
+        vec![T::ZERO, T::NEGATIVE_ZERO],
+        mean_zero_p_numerator,
+        mean_zero_p_denominator,
+        &|seed_2| {
+            special_random_nonzero_finite_primitive_floats(
+                seed_2,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            )
+        },
+    )
+}
+
+/// Generates positive primitive floats.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
+/// You can specify the numerator and denominator of the probability that positive infinity will be
+/// generated. You can also specify the mean absolute exponent and precision by passing the
+/// numerators and denominators of their means of the finite floats. This is the preferred way to
+/// generate floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
+///   they may be as high as you like.
+///
+/// Positive zero is generated; negative zero is not. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::random::special_random_positive_primitive_floats;
+///
+/// assert_eq!(
+///     special_random_positive_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///         .map(NiceFloat).take(20).collect_vec(),
+///     [
+///         0.5688782, 0.00000166893, 0.015167236, f32::POSITIVE_INFINITY, 0.75, 92864.0,
+///         0.012998581, 0.02949524, 3.28125, 7.5703125, 0.00005722046, 0.33540344, 18432.0,
+///         f32::POSITIVE_INFINITY, 61440.0, 1.4375, 50.0, f32::POSITIVE_INFINITY, 0.4140625,
+///         0.001739502
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_special_p_numerator: u64,
+    mean_special_p_denominator: u64,
+) -> WithSpecialValues<SpecialRandomPositiveFiniteFloats<T>> {
+    with_special_values(
+        seed,
+        vec![T::POSITIVE_INFINITY],
+        mean_special_p_numerator,
+        mean_special_p_denominator,
+        &|seed_2| {
+            special_random_positive_finite_primitive_floats(
+                seed_2,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            )
+        },
+    )
+}
+
+/// Generates negative primitive floats.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
+/// You can specify the numerator and denominator of the probability that negative infinity will be
+/// generated. You can also specify the mean absolute exponent and precision by passing the
+/// numerators and denominators of their means of the finite floats. This is the preferred way to
+/// generate floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
+///   they may be as high as you like.
+///
+/// Negative zero is generated; positive zero is not. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::random::special_random_negative_primitive_floats;
+///
+/// assert_eq!(
+///     special_random_negative_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///         .map(NiceFloat).take(20).collect_vec(),
+///     [
+///         -0.5688782, -0.00000166893, -0.015167236, f32::NEGATIVE_INFINITY, -0.75, -92864.0,
+///         -0.012998581, -0.02949524, -3.28125, -7.5703125, -0.00005722046, -0.33540344, -18432.0,
+///         f32::NEGATIVE_INFINITY, -61440.0, -1.4375, -50.0, f32::NEGATIVE_INFINITY, -0.4140625,
+///         -0.001739502
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_special_p_numerator: u64,
+    mean_special_p_denominator: u64,
+) -> WithSpecialValues<SpecialRandomNegativeFiniteFloats<T>> {
+    with_special_values(
+        seed,
+        vec![T::NEGATIVE_INFINITY],
+        mean_special_p_numerator,
+        mean_special_p_denominator,
+        &|seed_2| {
+            special_random_negative_finite_primitive_floats(
+                seed_2,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            )
+        },
+    )
+}
+
+/// Generates nonzero primitive floats.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
+/// You can specify the numerator and denominator of the probability that an infinity will be
+/// generated. You can also specify the mean absolute exponent and precision by passing the
+/// numerators and denominators of their means of the finite floats. This is the preferred way to
+/// generate floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
+///   they may be as high as you like.
+///
+/// Neither negative not positive zero is generated. `NaN` is not generated either.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::random::special_random_nonzero_primitive_floats;
+///
+/// assert_eq!(
+///     special_random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///         .map(NiceFloat).take(20).collect_vec(),
+///     [
+///         0.9171448, 0.00000166893, 0.013153076, f32::POSITIVE_INFINITY, -0.75, -102720.0,
+///         -0.012674332, -0.022476196, 2.65625, 4.2109375, -0.000049591064, -0.3943634, -18432.0,
+///         f32::NEGATIVE_INFINITY, -45056.0, -1.4375, -58.0, f32::POSITIVE_INFINITY, 0.3046875,
+///         -0.0018005371
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_special_p_numerator: u64,
+    mean_special_p_denominator: u64,
+) -> WithSpecialValues<SpecialRandomNonzeroFiniteFloats<T>> {
+    with_special_values(
+        seed,
+        vec![T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY],
+        mean_special_p_numerator,
+        mean_special_p_denominator,
+        &|seed_2| {
+            special_random_nonzero_finite_primitive_floats(
+                seed_2,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            )
+        },
+    )
+}
+
+/// Generates primitive floats.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
+/// You can specify the numerator and denominator of the probability that zero, infinity, or NaN
+/// will be generated. You can also specify the mean absolute exponent and precision by passing the
+/// numerators and denominators of their means of the finite floats. This is the preferred way to
+/// generate floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
+///   they may be as high as you like.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::random::special_random_primitive_floats;
+///
+/// assert_eq!(
+///     special_random_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
+///         .map(NiceFloat).take(20).collect_vec(),
+///     [
+///         0.9171448, 0.00000166893, 0.013153076, f32::POSITIVE_INFINITY, -0.75, -102720.0,
+///         -0.012674332, -0.022476196, 2.65625, 4.2109375, -0.000049591064, -0.3943634, -18432.0,
+///         f32::POSITIVE_INFINITY, -45056.0, -1.4375, -58.0, f32::POSITIVE_INFINITY, 0.3046875,
+///         -0.0018005371
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+#[inline]
+pub fn special_random_primitive_floats<T: PrimitiveFloat>(
+    seed: Seed,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_special_p_numerator: u64,
+    mean_special_p_denominator: u64,
+) -> WithSpecialValues<SpecialRandomNonzeroFiniteFloats<T>> {
+    with_special_values(
+        seed,
+        vec![
+            T::ZERO,
+            T::NEGATIVE_ZERO,
+            T::POSITIVE_INFINITY,
+            T::NEGATIVE_INFINITY,
+            T::NAN,
+        ],
+        mean_special_p_numerator,
+        mean_special_p_denominator,
+        &|seed_2| {
+            special_random_nonzero_finite_primitive_floats(
+                seed_2,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            )
+        },
+    )
 }
 
 /// Generates ranges of unsigneds. A single generator can generate many different ranges.

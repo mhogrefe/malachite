@@ -62,7 +62,6 @@ fn random_natural_range_to_infinity_helper(
     );
 }
 
-#[allow(clippy::excessive_precision)]
 #[test]
 fn test_random_natural_range_to_infinity() {
     let values = &[

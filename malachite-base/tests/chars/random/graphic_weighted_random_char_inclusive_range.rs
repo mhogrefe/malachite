@@ -6,8 +6,8 @@ use malachite_base_test_util::stats::median;
 fn graphic_weighted_random_char_inclusive_range_helper(
     a: char,
     b: char,
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
     expected_values: &str,
     expected_common_values: &[(char, usize)],
     expected_median: (char, Option<char>),
@@ -16,8 +16,8 @@ fn graphic_weighted_random_char_inclusive_range_helper(
         EXAMPLE_SEED,
         a,
         b,
-        w_numerator,
-        w_denominator,
+        p_numerator,
+        p_denominator,
     );
     let values = xs.clone().take(200).collect::<String>();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
@@ -28,15 +28,14 @@ fn graphic_weighted_random_char_inclusive_range_helper(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_graphic_weighted_random_char_inclusive_range() {
-    // 'a', '\u{7f}', w = 1
+    // 'a', '\u{7f}', p = 1/2
     graphic_weighted_random_char_inclusive_range_helper(
         'a',
         '\u{7f}',
         1,
-        1,
+        2,
         "\u{7f}y\u{7f}g\u{7f}c\u{7f}k\u{7f}\u{7f}}\u{7f}ccjlybr\u{7f}tue\u{7f}}ye\u{7f}oz\u{7f}\
         \u{7f}\u{7f}\u{7f}d\u{7f}f\u{7f}\u{7f}\u{7f}f\u{7f}\u{7f}fmxr\u{7f}\u{7f}\u{7f}g\u{7f}hy\
         \u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}q\u{7f}\u{7f}t\u{7f}\u{7f}pk\u{7f}oh\u{7f}\u{7f}i\
@@ -59,12 +58,12 @@ fn test_graphic_weighted_random_char_inclusive_range() {
         ],
         ('~', None),
     );
-    // 'a', '\u{7f}', w = 1/50
+    // 'a', '\u{7f}', p = 1/51
     graphic_weighted_random_char_inclusive_range_helper(
         'a',
         '\u{7f}',
         1,
-        50,
+        51,
         "\u{7f}\u{7f}y\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\
         \u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\
         \u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}g\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\u{7f}\
@@ -93,12 +92,12 @@ fn test_graphic_weighted_random_char_inclusive_range() {
         ],
         ('\u{7f}', None),
     );
-    // 'a', '\u{7f}', w = 50
+    // 'a', '\u{7f}', p = 50/51
     graphic_weighted_random_char_inclusive_range_helper(
         'a',
         '\u{7f}',
         50,
-        1,
+        51,
         "ygck}ccjlybrtue}yeozdfffmxrghyqtpkohiqnflsqftdemm|{z|wudscf{trtqh\u{7f}klx~xculy~d~fmxflkv\
         cu{ebyhnzevu}yuzvtuz}{b~yyzin}zsjthazlcluvu}a\u{7f}yvhhbgevdxo}unwjqepanjmpckouxtwwbi{nla\
         \u{7f}cs{vphyrdaqhzndmqdqg\u{7f}{{mfwk|xf",
@@ -107,12 +106,12 @@ fn test_graphic_weighted_random_char_inclusive_range() {
         ('p', None)
     );
 
-    // '\u{100}', '\u{3ff}', w = 1
+    // '\u{100}', '\u{3ff}', p = 1/2
     graphic_weighted_random_char_inclusive_range_helper(
         '\u{100}',
         '\u{3ff}',
         1,
-        1,
+        2,
         "\u{31b}ǘ\u{324}ɂ\u{35a}Ŝ\u{367}Ȣ\u{337}\u{342}Ι\u{36e}Ƙƣʅΰǟ˳ˊ\u{315}ȇʰɥ\u{32c}ΈϞƃ\u{30b}ʌμ\
         \u{346}\u{36a}\u{328}\u{334}Ƣ\u{380}ϳ\u{32e}\u{359}\u{36b}Ϫ\u{333}\u{312}ǰɪŗŽ\u{302}\u{305}\
         \u{32e}ƽ\u{357}ɥϻ\u{349}\u{35f}\u{316}\u{33a}\u{383}\u{301}\u{31d}ƚ\u{360}\u{35d}ʧ\u{30c}\
@@ -128,12 +127,12 @@ fn test_graphic_weighted_random_char_inclusive_range() {
           ('\u{327}', 4221), ('\u{325}', 4217)],
         ('\u{319}', None)
     );
-    // '\u{100}', '\u{3ff}', w = 1/50
+    // '\u{100}', '\u{3ff}', p = 1/51
     graphic_weighted_random_char_inclusive_range_helper(
         '\u{100}',
         '\u{3ff}',
         1,
-        50,
+        51,
         "\u{31b}\u{324}ǘ\u{35a}\u{367}\u{337}\u{342}\u{36e}\u{315}\u{32c}\u{30b}\u{346}\u{36a}\
         \u{328}\u{334}\u{380}\u{32e}\u{359}\u{36b}\u{333}\u{312}\u{302}\u{305}\u{32e}\u{357}\u{349}\
         \u{35f}\u{316}\u{33a}\u{383}\u{301}\u{31d}\u{360}\u{35d}\u{30c}\u{30c}\u{34a}\u{367}ɂ\
@@ -164,12 +163,12 @@ fn test_graphic_weighted_random_char_inclusive_range() {
         ],
         ('\u{33b}', None),
     );
-    // '\u{100}', '\u{3ff}', w = 50
+    // '\u{100}', '\u{3ff}', p = 50/51
     graphic_weighted_random_char_inclusive_range_helper(
         '\u{100}',
         '\u{3ff}',
         50,
-        1,
+        51,
         "ǘɂŜȢΙƘƣʅΰǟ˳ˊȇʰɥΈϞƃʌμƢϳϪǰɪŗŽƽɥϻƚʧƙϮșϒϢćɾɢǧǁʴȶƐďȭˬɂϰȁʺċλǿαăǰʹʃŰǐƬɖϾ\u{31b}ƾƱǒȆɈϪʶťˍďǑɶɁȭƭğȾ˹\
         ĺǗʋǆ˺ʐǍŋɽɷϲŸȃĨŞ˭ƪřœɃˡϹƤǁĥɨʎʄˬıɐƺˀǍǷěέƼȞŞȩǀ΄ʱǱȭ\u{324}ʚǃϧśŅˊǉΰϿǟϵȟǘĹϋȎʜɴϻϝͺĪƕ˪ϥŪˍʸĻέ˙ĠĢĄšǝ˿Ί\
         \u{35a}ΗʩǊŰŦʝŋƶˈąŠɂŻǱƲɛΚʜťγ\u{367}ϽϹčǇīϥſʏȵ",
@@ -182,35 +181,23 @@ fn test_graphic_weighted_random_char_inclusive_range() {
 #[test]
 #[should_panic]
 fn graphic_weighted_random_char_inclusive_range_fail_1() {
-    graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, 'a', '\u{80}', 0, 1);
-}
-
-#[test]
-#[should_panic]
-fn graphic_weighted_random_char_inclusive_range_fail_2() {
     graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, 'a', '\u{80}', 1, 0);
 }
 
 #[test]
 #[should_panic]
+fn graphic_weighted_random_char_inclusive_range_fail_2() {
+    graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, 'a', '\u{80}', 2, 1);
+}
+
+#[test]
+#[should_panic]
 fn graphic_weighted_random_char_inclusive_range_fail_3() {
-    graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, 'a', '\u{80}', 1, u64::MAX);
-}
-
-#[test]
-#[should_panic]
-fn graphic_weighted_random_char_inclusive_range_fail_4() {
-    graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, 'a', '\u{80}', u64::MAX, 1);
-}
-
-#[test]
-#[should_panic]
-fn graphic_weighted_random_char_inclusive_range_fail_5() {
     graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, '\u{80}', 'a', 1, 1);
 }
 
 #[test]
 #[should_panic]
-fn graphic_weighted_random_char_inclusive_range_fail_6() {
+fn graphic_weighted_random_char_inclusive_range_fail_4() {
     graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, 'a', 'z', 1, 1);
 }

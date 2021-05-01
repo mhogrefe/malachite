@@ -88,16 +88,16 @@ impl Iterator for WeightedRandomBools {
 
 /// Generates random `bool`s, with a fixed probability of generating `true`.
 ///
-/// The relative probabilities of generating `true` and `false` are specified by a weight $w$ =
-/// `w_numerator` / `w_denominator`, with `true` being $w$ times more likely to appear than `false`.
-/// So when $w=1$ the probabilities are equal, when $w>1$ `true` is more likely, and when $w<1$
-/// `false` is more likely.
+/// The probability of generating `true` is $p$ = `w_numerator` / `w_denominator`.
 ///
-/// $P(\text{true}) = \frac{w}{w+1}$
+/// $P(\text{true}) = p$
 ///
-/// $P(\text{false}) = \frac{1}{w+1}$
+/// $P(\text{false}) = 1-p$
 ///
 /// The output length is infinite.
+///
+/// # Panics
+/// Panics if `p_denominator` is 0 or `p_numerator` > `p_denominator`.
 ///
 /// # Expected complexity per iteration
 /// Constant time and additional memory.
@@ -112,21 +112,19 @@ impl Iterator for WeightedRandomBools {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     weighted_random_bools(EXAMPLE_SEED, 3, 1).take(10).collect_vec(),
+///     weighted_random_bools(EXAMPLE_SEED, 3, 4).take(10).collect_vec(),
 ///     &[true, true, false, true, false, false, true, false, true, true]
 /// )
 /// ```
 pub fn weighted_random_bools(
     seed: Seed,
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
 ) -> WeightedRandomBools {
-    let w = SimpleRational::new(w_numerator, w_denominator)
-        .inverse()
-        .add_u64(1)
-        .inverse();
+    assert!(p_numerator <= p_denominator);
+    let p = SimpleRational::new(p_numerator, p_denominator);
     WeightedRandomBools {
-        numerator: w.n,
-        xs: random_unsigneds_less_than(seed, w.d),
+        numerator: p.n,
+        xs: random_unsigneds_less_than(seed, p.d),
     }
 }

@@ -583,6 +583,30 @@ pub mod eq_mod;
 /// ```
 pub mod eq_mod_power_of_2;
 pub mod is_power_of_2;
+/// This module contains functions for adding two numbers, mod another number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_add
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModAdd;
+///
+/// assert_eq!(0u8.mod_add(3, 5), 3);
+/// assert_eq!(7u32.mod_add(5, 10), 2);
+/// ```
+///
+/// # mod_add_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModAddAssign;
+///
+/// let mut n = 0u8;
+/// n.mod_add_assign(3, 5);
+/// assert_eq!(n, 3);
+///
+/// let mut n = 7u32;
+/// n.mod_add_assign(5, 10);
+/// assert_eq!(n, 2);
+/// ```
 pub mod mod_add;
 /// This module contains functions for checking whether a number is reduced mod another number.
 ///
@@ -597,6 +621,98 @@ pub mod mod_add;
 /// assert_eq!(100u16.mod_is_reduced(&101), true);
 /// ```
 pub mod mod_is_reduced;
+/// This module contains functions for multiplying two numbers, mod another number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModMul;
+///
+/// assert_eq!(2u8.mod_mul(3, 7), 6);
+/// assert_eq!(7u32.mod_mul(3, 10), 1);
+/// ```
+///
+/// # mod_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModMulAssign;
+///
+/// let mut n = 2u8;
+/// n.mod_mul_assign(3, 7);
+/// assert_eq!(n, 6);
+///
+/// let mut n = 7u32;
+/// n.mod_mul_assign(3, 10);
+/// assert_eq!(n, 1);
+/// ```
+///
+/// # mod_mul_precomputed
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
+///
+/// let data = u32::precompute_mod_mul_data(&7);
+/// assert_eq!(2u32.mod_mul_precomputed(3, 7, &data), 6);
+/// assert_eq!(5u32.mod_mul_precomputed(3, 7, &data), 1);
+/// assert_eq!(4u32.mod_mul_precomputed(4, 7, &data), 2);
+///
+/// let data = u64::precompute_mod_mul_data(&10);
+/// assert_eq!(7u64.mod_mul_precomputed(3, 10, &data), 1);
+/// assert_eq!(4u64.mod_mul_precomputed(9, 10, &data), 6);
+/// assert_eq!(5u64.mod_mul_precomputed(8, 10, &data), 0);
+///
+/// let data = u8::precompute_mod_mul_data(&7);
+/// assert_eq!(2u8.mod_mul_precomputed(3, 7, &data), 6);
+/// assert_eq!(5u8.mod_mul_precomputed(3, 7, &data), 1);
+/// assert_eq!(4u8.mod_mul_precomputed(4, 7, &data), 2);
+///
+/// let data = u16::precompute_mod_mul_data(&10);
+/// assert_eq!(7u16.mod_mul_precomputed(3, 10, &data), 1);
+/// assert_eq!(4u16.mod_mul_precomputed(9, 10, &data), 6);
+/// assert_eq!(5u16.mod_mul_precomputed(8, 10, &data), 0);
+///
+/// let data = u128::precompute_mod_mul_data(&7);
+/// assert_eq!(2u128.mod_mul_precomputed(3, 7, &data), 6);
+/// assert_eq!(5u128.mod_mul_precomputed(3, 7, &data), 1);
+/// assert_eq!(4u128.mod_mul_precomputed(4, 7, &data), 2);
+///
+/// let data = u128::precompute_mod_mul_data(&10);
+/// assert_eq!(7u128.mod_mul_precomputed(3, 10, &data), 1);
+/// assert_eq!(4u128.mod_mul_precomputed(9, 10, &data), 6);
+/// assert_eq!(5u128.mod_mul_precomputed(8, 10, &data), 0);
+/// ```
+///
+/// # mod_mul_precomputed_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::{ModMulPrecomputed, ModMulPrecomputedAssign};
+///
+/// let data = u8::precompute_mod_mul_data(&7);
+///
+/// let mut x = 2u8;
+/// x.mod_mul_precomputed_assign(3, 7, &data);
+/// assert_eq!(x, 6);
+///
+/// let mut x = 5u8;
+/// x.mod_mul_precomputed_assign(3, 7, &data);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 4u8;
+/// x.mod_mul_precomputed_assign(4, 7, &data);
+/// assert_eq!(x, 2);
+///
+/// let data = u32::precompute_mod_mul_data(&10);
+///
+/// let mut x = 7u32;
+/// x.mod_mul_precomputed_assign(3, 10, &data);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 4u32;
+/// x.mod_mul_precomputed_assign(9, 10, &data);
+/// assert_eq!(x, 6);
+///
+/// let mut x = 5u32;
+/// x.mod_mul_precomputed_assign(8, 10, &data);
+/// assert_eq!(x, 0);
+/// ```
 pub mod mod_mul;
 /// This module contains functions for negating a number, mod another number.
 ///
@@ -631,6 +747,30 @@ pub mod mod_neg;
 pub mod mod_op;
 pub mod mod_pow;
 pub mod mod_power_of_2;
+/// This module contains functions for adding two numbers, mod a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_power_of_2_add
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Add;
+///
+/// assert_eq!(0u8.mod_power_of_2_add(2, 5), 2);
+/// assert_eq!(10u32.mod_power_of_2_add(14, 4), 8);
+/// ```
+///
+/// # mod_power_of_2_add_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2AddAssign;
+///
+/// let mut n = 0u8;
+/// n.mod_power_of_2_add_assign(2, 5);
+/// assert_eq!(n, 2);
+///
+/// let mut n = 10u32;
+/// n.mod_power_of_2_add_assign(14, 4);
+/// assert_eq!(n, 8);
+/// ```
 pub mod mod_power_of_2_add;
 /// This module contains functions for checking whether a number is reduced mod a power of 2.
 ///
@@ -645,6 +785,30 @@ pub mod mod_power_of_2_add;
 /// assert_eq!(100u16.mod_power_of_2_is_reduced(8), true);
 /// ```
 pub mod mod_power_of_2_is_reduced;
+/// This module contains functions for multiplying two numbers, mod a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_power_of_2_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
+///
+/// assert_eq!(3u8.mod_power_of_2_mul(2, 5), 6);
+/// assert_eq!(10u32.mod_power_of_2_mul(14, 4), 12);
+/// ```
+///
+/// # mod_power_of_2_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign;
+///
+/// let mut n = 3u8;
+/// n.mod_power_of_2_mul_assign(2, 5);
+/// assert_eq!(n, 6);
+///
+/// let mut n = 10u32;
+/// n.mod_power_of_2_mul_assign(14, 4);
+/// assert_eq!(n, 12);
+/// ```
 pub mod mod_power_of_2_mul;
 /// This module contains functions for negating a number, mod a power of 2.
 ///
@@ -680,10 +844,58 @@ pub mod mod_power_of_2_pow;
 pub mod mod_power_of_2_shl;
 pub mod mod_power_of_2_shr;
 pub mod mod_power_of_2_square;
+/// This module contains functions for subtracting one number by another, mod a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_power_of_2_sub
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Sub;
+///
+/// assert_eq!(5u8.mod_power_of_2_sub(2, 5), 3);
+/// assert_eq!(10u32.mod_power_of_2_sub(14, 4), 12);
+/// ```
+///
+/// # mod_power_of_2_sub_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2SubAssign;
+///
+/// let mut n = 5u8;
+/// n.mod_power_of_2_sub_assign(2, 5);
+/// assert_eq!(n, 3);
+///
+/// let mut n = 10u32;
+/// n.mod_power_of_2_sub_assign(14, 4);
+/// assert_eq!(n, 12);
+/// ```
 pub mod mod_power_of_2_sub;
 pub mod mod_shl;
 pub mod mod_shr;
 pub mod mod_square;
+/// This module contains functions for subtracting one number by another, mod a third number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_sub
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSub;
+///
+/// assert_eq!(4u8.mod_sub(3, 5), 1);
+/// assert_eq!(7u32.mod_sub(9, 10), 8);
+/// ```
+///
+/// # mod_sub_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModSubAssign;
+///
+/// let mut n = 4u8;
+/// n.mod_sub_assign(3, 5);
+/// assert_eq!(n, 1);
+///
+/// let mut n = 7u32;
+/// n.mod_sub_assign(9, 10);
+/// assert_eq!(n, 8);
+/// ```
 pub mod mod_sub;
 pub mod neg;
 pub mod next_power_of_2;

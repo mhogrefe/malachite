@@ -4,13 +4,13 @@ use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 
 fn graphic_weighted_random_ascii_chars_helper(
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
     expected_values: &str,
     expected_common_values: &[(char, usize)],
     expected_median: (char, Option<char>),
 ) {
-    let xs = graphic_weighted_random_ascii_chars(EXAMPLE_SEED, w_numerator, w_denominator);
+    let xs = graphic_weighted_random_ascii_chars(EXAMPLE_SEED, p_numerator, p_denominator);
     let values = xs.clone().take(200).collect::<String>();
     let common_values = common_values_map_debug(1000000, 10, xs.clone());
     let median = median(xs.take(1000000));
@@ -20,13 +20,12 @@ fn graphic_weighted_random_ascii_chars_helper(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_graphic_weighted_random_ascii_chars() {
-    // w = 1
+    // p = 1/2
     graphic_weighted_random_ascii_chars_helper(
         1,
-        1,
+        2,
         "\u{1b}x\u{8}1\r4\u{2}N\u{11}\u{11}(\u{13}bcXr$g)\t7/E\u{11}+fY\u{10}Po\u{1}\u{17}\u{17}\
         \u{13}o\u{1}.\u{0}\u{b}\u{3}$\u{6}\nV2R.\u{f}\u{5}\u{19}$\u{1f}V=\u{1c}\u{6}\u{15}\u{6}\
         \u{11}\r\u{19}6\u{2}\u{19}=\u{12}\u{18}Dq\u{6}S<\u{6}\u{1d}C\u{b}M\u{8}\u{15}\u{16}\u{f}W_\
@@ -49,10 +48,10 @@ fn test_graphic_weighted_random_ascii_chars() {
         ],
         ('\"', None),
     );
-    // w = 1/50
+    // p = 1/51
     graphic_weighted_random_ascii_chars_helper(
         1,
-        50,
+        51,
         "\u{1b}\u{8}x\r\u{2}\u{11}\u{11}\u{13}\t\u{11}\u{10}\u{1}\u{17}\u{17}\u{13}\u{1}\u{0}\u{b}\
         \u{3}\u{6}\n\u{f}\u{5}\u{19}\u{1f}\u{1c}\u{6}\u{15}\u{6}\u{11}\r\u{19}\u{2}\u{19}\u{12}\
         \u{18}\u{6}\u{6}1\u{1d}\u{b}\u{8}\u{15}\u{16}\u{f}\u{0}\u{12}\u{18}\u{10}\u{10}\u{1f}\u{12}\
@@ -79,10 +78,10 @@ fn test_graphic_weighted_random_ascii_chars() {
         ],
         ('\u{10}', None),
     );
-    // w = 50
+    // p = 50/51
     graphic_weighted_random_ascii_chars_helper(
         50,
-        1,
+        51,
         "x14N(bcXr$g)7/E+fYPoo.$V2R.$V=6=DqS<CMW_%OX?b}rJaD`o635Q:w3mY=8nq\u{1b}fR:/26zr<<aAZ<$2/2)\
         jCz!r{%(rN?X< !:z*KWArQ1-#AJCW-/}v,m`xKpzt5?u\u{8}IJN\'wYe9f\".RmqMxz7l7qOjs`$-%s5LO`L{G5y\
         \r8%7/J ZD!4!Gq.kQb>pr\u{2}+UFFc;8P:",
@@ -91,27 +90,14 @@ fn test_graphic_weighted_random_ascii_chars() {
         ('N', None)
     );
 }
-
 #[test]
 #[should_panic]
 fn graphic_weighted_random_ascii_chars_fail_1() {
-    graphic_weighted_random_ascii_chars(EXAMPLE_SEED, 0, 1);
-}
-
-#[test]
-#[should_panic]
-fn graphic_weighted_random_ascii_chars_fail_2() {
     graphic_weighted_random_ascii_chars(EXAMPLE_SEED, 1, 0);
 }
 
 #[test]
 #[should_panic]
-fn graphic_weighted_random_ascii_chars_fail_3() {
-    graphic_weighted_random_ascii_chars(EXAMPLE_SEED, 1, u64::MAX);
-}
-
-#[test]
-#[should_panic]
-fn graphic_weighted_random_ascii_chars_fail_4() {
-    graphic_weighted_random_ascii_chars(EXAMPLE_SEED, u64::MAX, 1);
+fn graphic_weighted_random_ascii_chars_fail_2() {
+    graphic_weighted_random_ascii_chars(EXAMPLE_SEED, 2, 1);
 }

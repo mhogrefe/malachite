@@ -1,7 +1,6 @@
 #![allow(unstable_name_collisions)]
 
 extern crate itertools;
-#[macro_use]
 extern crate malachite_base;
 extern crate malachite_base_test_util;
 extern crate malachite_nz;
@@ -15,22 +14,16 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod mod_add;
-            pub mod mod_mul;
             pub mod mod_op;
             pub mod mod_pow;
             pub mod mod_power_of_2;
-            pub mod mod_power_of_2_add;
-            pub mod mod_power_of_2_mul;
             pub mod mod_power_of_2_pow;
             pub mod mod_power_of_2_shl;
             pub mod mod_power_of_2_shr;
             pub mod mod_power_of_2_square;
-            pub mod mod_power_of_2_sub;
             pub mod mod_shl;
             pub mod mod_shr;
             pub mod mod_square;
-            pub mod mod_sub;
             pub mod neg;
             pub mod next_power_of_2;
             pub mod overflowing_abs;
@@ -229,11 +222,6 @@ pub mod natural {
 
     pub mod conversion {
         pub mod clone;
-        pub mod digits {
-            pub mod from_power_of_2_digits;
-            pub mod power_of_2_digits;
-            pub mod to_power_of_2_digits;
-        }
         pub mod floating_point_from_natural;
         pub mod from_floating_point;
         pub mod from_limbs;

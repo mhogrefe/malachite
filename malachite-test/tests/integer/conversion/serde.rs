@@ -12,6 +12,6 @@ fn serde_properties() {
     test_properties(integers, |x| {
         let s = serde_json::to_string(&x).unwrap();
         assert_eq!(serde_json::from_str::<Integer>(&s).unwrap(), *x);
-        assert!(string_is_subset(&s, r#"",0123456789:LS[]abefgilmnrstu{}"#));
+        assert!(string_is_subset(&s, "\"-0123456789abcdefx"));
     });
 }

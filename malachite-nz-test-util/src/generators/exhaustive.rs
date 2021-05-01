@@ -1,5 +1,6 @@
+use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, PowerOf2};
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -7,15 +8,20 @@ use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom, Wrappin
 use malachite_base::num::exhaustive::{
     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
     primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
+    PrimitiveIntIncreasingRange,
 };
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_triples_from_single, lex_pairs, ExhaustiveDependentPairsYsGenerator,
+    exhaustive_triples_custom_output, exhaustive_triples_from_single, lex_pairs,
+    ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, exhaustive_vecs_length_range,
-    exhaustive_vecs_min_length,
+    exhaustive_vecs_min_length, lex_fixed_length_vecs_from_single, ExhaustiveVecs,
+    LexFixedLengthVecsFromSingle,
 };
 use malachite_base_test_util::generators::common::{
     permute_1_3_2, permute_2_1, reshape_2_1_to_3, It,
@@ -47,6 +53,7 @@ use malachite_nz::natural::conversion::digits::general_digits::{
 };
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
+    ExhaustiveNaturalRange,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -143,6 +150,29 @@ pub fn exhaustive_natural_primitive_int_pair_gen_var_2<T: PrimitiveInt>() -> It<
     ))
 }
 
+pub fn exhaustive_natural_primitive_int_pair_gen_var_3<T: PrimitiveInt>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+// -- (Natural, PrimitiveInt, PrimitiveUnsigned) --
+
+pub fn exhaustive_natural_primitive_int_unsigned_triple_gen_var_3<
+    T: PrimitiveInt,
+    U: PrimitiveUnsigned,
+>() -> It<(Natural, T, U)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_naturals(),
+        exhaustive_positive_primitive_ints(),
+        exhaustive_unsigneds(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
 // -- (Natural, PrimitiveUnsigned) --
 
 pub fn exhaustive_natural_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
@@ -167,6 +197,13 @@ pub fn exhaustive_natural_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> It<
     ))
 }
 
+pub fn exhaustive_natural_unsigned_pair_gen_var_4<T: PrimitiveInt>() -> It<(Natural, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        primitive_int_increasing_inclusive_range(1, T::WIDTH),
+    ))
+}
+
 // -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_1<
@@ -177,6 +214,62 @@ pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_1<
         exhaustive_pairs_big_tiny(exhaustive_naturals(), exhaustive_unsigneds()),
         primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
     ))))
+}
+
+pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+    U: PrimitiveInt,
+>() -> It<(Natural, u64, T)> {
+    permute_1_3_2(reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs_big_tiny(exhaustive_naturals(), exhaustive_unsigneds()),
+        primitive_int_increasing_inclusive_range(1, U::WIDTH),
+    ))))
+}
+
+// -- (Natural, PrimitiveUnsigned, Vec<bool>) --
+
+struct NaturalUnsignedBoolVecPairGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        (Natural, u64),
+        Vec<bool>,
+        LexFixedLengthVecsFromSingle<ExhaustiveBools>,
+    > for NaturalUnsignedBoolVecPairGenerator
+{
+    #[inline]
+    fn get_ys(&self, p: &(Natural, u64)) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
+        lex_fixed_length_vecs_from_single(
+            p.0.significant_bits().div_round(p.1, RoundingMode::Up),
+            exhaustive_bools(),
+        )
+    }
+}
+
+pub fn exhaustive_natural_unsigned_bool_vec_triple_gen_var_1() -> It<(Natural, u64, Vec<bool>)> {
+    reshape_2_1_to_3(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_pairs_big_tiny(exhaustive_naturals(), exhaustive_positive_primitive_ints()),
+        NaturalUnsignedBoolVecPairGenerator,
+    )))
+}
+
+pub fn exhaustive_natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>(
+) -> It<(Natural, u64, Vec<bool>)> {
+    reshape_2_1_to_3(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        lex_pairs(
+            exhaustive_naturals(),
+            primitive_int_increasing_inclusive_range(1, T::WIDTH),
+        ),
+        NaturalUnsignedBoolVecPairGenerator,
+    )))
 }
 
 // -- (Vec<Natural>, Natural)
@@ -214,6 +307,64 @@ pub fn exhaustive_natural_vec_natural_pair_gen_var_2() -> It<(Vec<Natural>, Natu
         ),
         exhaustive_natural_range_to_infinity(Natural::TWO),
         ValidDigitsGenerator,
+    )))
+}
+
+pub fn exhaustive_natural_vec_natural_pair_gen_var_3() -> It<(Vec<Natural>, Natural)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_vecs(exhaustive_naturals()),
+        exhaustive_natural_range_to_infinity(Natural::power_of_2(Limb::WIDTH)),
+    ))
+}
+
+pub fn exhaustive_natural_vec_natural_pair_gen_var_4() -> It<(Vec<Natural>, Natural)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_vecs(exhaustive_naturals()),
+        exhaustive_natural_range_to_infinity(Natural::TWO),
+    ))
+}
+
+// -- (Vec<Natural>, PrimitiveInt) --
+
+pub fn exhaustive_natural_vec_primitive_int_pair_gen_var_1<T: PrimitiveInt>(
+) -> It<(Vec<Natural>, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_vecs(exhaustive_naturals()),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+// -- (Vec<Natural>, u64) --
+
+struct PowerOfTwoDigitsGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        u64,
+        Vec<Natural>,
+        ExhaustiveVecs<Natural, PrimitiveIntIncreasingRange<u64>, ExhaustiveNaturalRange>,
+    > for PowerOfTwoDigitsGenerator
+{
+    #[inline]
+    fn get_ys(
+        &self,
+        &log_base: &u64,
+    ) -> ExhaustiveVecs<Natural, PrimitiveIntIncreasingRange<u64>, ExhaustiveNaturalRange> {
+        exhaustive_vecs(exhaustive_natural_range(
+            Natural::ZERO,
+            Natural::power_of_2(log_base),
+        ))
+    }
+}
+
+pub fn exhaustive_natural_vec_unsigned_pair_gen_var_1() -> It<(Vec<Natural>, u64)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        primitive_int_increasing_inclusive_range(1, u64::MAX),
+        PowerOfTwoDigitsGenerator,
     )))
 }
 
@@ -368,6 +519,50 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2<
                 exhaustive_positive_primitive_ints(),
             ),
             ValidDigitsGenerator1 {
+                phantom_t: PhantomData,
+                phantom_u: PhantomData,
+            },
+        )
+        .map(|((base, _), (xs, out))| (out, xs, base)),
+    )
+}
+
+struct ValidDigitsGenerator2<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+    phantom_t: PhantomData<*const T>,
+    phantom_u: PhantomData<*const U>,
+}
+
+impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
+    ExhaustiveDependentPairsYsGenerator<(u64, usize), (Vec<T>, Vec<U>), It<(Vec<T>, Vec<U>)>>
+    for ValidDigitsGenerator2<T, U>
+{
+    #[inline]
+    fn get_ys(&self, p: &(u64, usize)) -> It<(Vec<T>, Vec<U>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_fixed_length_vecs_from_single(
+                u64::wrapping_from(p.1),
+                exhaustive_unsigneds(),
+            ),
+            exhaustive_vecs_min_length(limbs_per_digit_in_base(p.1, p.0), exhaustive_unsigneds()),
+        ))
+    }
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Vec<U>, Vec<T>, u64)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_pairs_big_tiny(
+                (3u64..256).filter(|&b| !b.is_power_of_two()),
+                exhaustive_positive_primitive_ints(),
+            ),
+            ValidDigitsGenerator2 {
                 phantom_t: PhantomData,
                 phantom_u: PhantomData,
             },

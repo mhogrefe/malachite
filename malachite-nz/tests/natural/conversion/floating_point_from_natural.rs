@@ -9,7 +9,6 @@ use std::str::FromStr;
 
 //TODO move
 #[test]
-#[allow(clippy::decimal_literal_representation)]
 fn test_f32() {
     let test = |f: f32, out| {
         assert_eq!(f.to_bits(), out);
@@ -33,7 +32,6 @@ fn test_f32() {
 }
 
 #[test]
-#[allow(clippy::decimal_literal_representation)]
 fn test_f64() {
     let test = |f: f64, out| {
         assert_eq!(f.to_bits(), out);

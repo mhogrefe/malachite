@@ -192,19 +192,19 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 ///
 /// See `char_is_graphic` for the definition of a graphic `char`.
 ///
-/// Given a weight $w$ = `w_numerator` / `w_denominator`, the set of graphic `char`s is selected
-/// with probability $\frac{w}{w+1}$ and the set of non-graphic `chars` with probability
-/// $\frac{1}{w+1}$. Then, a `char` is selected uniformly from the appropriate set. There are
-/// 141,798 graphic `char`s out of 1,112,064, so we have
+/// The set of graphic `char`s in the specified range is selected with probability $p$, or
+/// `p_numerator` / `p_denominator`, and the set of non-graphic `chars` with probability $1-p$.
+/// Then, a `char` is selected uniformly from the appropriate set. There are 141,798 graphic `char`s
+/// out of 1,112,064, so we have
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{w}{141798(w+1)} & x \\ \\text{is} \\ \\text{graphic} \\\\
-///     \frac{1}{970266w} & \\text{otherwise.}
+///     \frac{p}{141798} & x \\ \\text{is} \\ \\text{graphic} \\\\
+///     \frac{1-p}{970266} & \\text{otherwise.}
 /// \\end{cases}
 /// $$
 ///
-/// To recover the uniform distribution, use $w = 23633/161711$, which is roughly $1/7$.
+/// To recover the uniform distribution, use $p = 23633/185344$, which is roughly $1/8$.
 ///
 /// The output length is infinite.
 ///
@@ -212,7 +212,7 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `w_numerator` or `w_denominator` are zero.
+/// Panics if `p_denominator` is zero or `p_denominator` > `p_denominator`.
 ///
 /// # Examples
 /// ```
@@ -220,22 +220,22 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     graphic_weighted_random_chars(EXAMPLE_SEED, 10, 1).take(20).collect::<String>().as_str(),
+///     graphic_weighted_random_chars(EXAMPLE_SEED, 10, 11).take(20).collect::<String>().as_str(),
 ///     "𘓸𰫖祝껆ꆍ枽쮱𬭊▟𣡌⢻𱉳灋\u{8c401}ՠ𦷆𪑘\u{369b5}\u{d5da0}𧎊"
 /// )
 /// ```
 #[inline]
 pub fn graphic_weighted_random_chars(
     seed: Seed,
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
 ) -> WeightedGraphicRandomCharRange {
     graphic_weighted_random_char_inclusive_range(
         seed,
         char::MIN,
         char::MAX,
-        w_numerator,
-        w_denominator,
+        p_numerator,
+        p_denominator,
     )
 }
 
@@ -243,22 +243,22 @@ pub fn graphic_weighted_random_chars(
 ///
 /// See `char_is_graphic` for the definition of a graphic `char`.
 ///
-/// Given a weight $w$ = `w_numerator` / `w_denominator`, the set of graphic ASCII `char`s is
-/// selected with probability $\frac{w}{w+1}$ and the set of non-graphic ASCII `chars` with
-/// probability $\frac{1}{w+1}$. Then, a `char` is selected uniformly from the appropriate set.
-/// There are 95 graphic ASCII `char`s out of 128, so we have
+/// The set of graphic `char`s in the specified range is selected with probability $p$, or
+/// `p_numerator` / `p_denominator`, and the set of non-graphic ASCII `chars` with probability
+/// $1-p$. Then, a `char` is selected uniformly from the appropriate set. There are 95 graphic ASCII
+/// `char`s out of 128, so we have
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{w}{95(w+1)} &
+///     \frac{p}{95} &
 ///     x < \\backslash\\text{u\\{0x80\\}} \\ \\text{and} \\ x \\ \\text{is graphic} \\\\
-///     \frac{1}{33w} &
+///     \frac{1-p}{33} &
 ///     x < \\backslash\\text{u\\{0x80\\}} \\ \\text{and} \\ x \\ \\text{is not graphic} \\\\
 ///     0 & \\text{otherwise.}
 /// \\end{cases}
 /// $$
 ///
-/// To recover the uniform distribution, use $w = 95/33$.
+/// To recover the uniform distribution, use $p = 95/128$.
 ///
 /// The output length is infinite.
 ///
@@ -266,7 +266,7 @@ pub fn graphic_weighted_random_chars(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `w_numerator` or `w_denominator` are zero.
+/// Panics if `p_denominator` is zero or `p_denominator` > `p_denominator`.
 ///
 /// # Examples
 /// ```
@@ -274,7 +274,7 @@ pub fn graphic_weighted_random_chars(
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     graphic_weighted_random_ascii_chars(EXAMPLE_SEED, 10, 1)
+///     graphic_weighted_random_ascii_chars(EXAMPLE_SEED, 10, 11)
 ///         .take(40).collect::<String>().as_str(),
 ///     "x14N(bcXr$g)7\u{1b}/E+\u{8}\rf\u{2}\u{11}Y\u{11}Poo.$V2R.$V=6\u{13}\t\u{11}"
 /// )
@@ -282,15 +282,15 @@ pub fn graphic_weighted_random_chars(
 #[inline]
 pub fn graphic_weighted_random_ascii_chars(
     seed: Seed,
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
 ) -> WeightedGraphicRandomCharRange {
     graphic_weighted_random_char_inclusive_range(
         seed,
         char::MIN,
         '\u{7f}',
-        w_numerator,
-        w_denominator,
+        p_numerator,
+        p_denominator,
     )
 }
 
@@ -303,22 +303,21 @@ pub fn graphic_weighted_random_ascii_chars(
 /// `char`s. This function cannot create a range that includes `char::MAX`; for that, use
 /// `graphic_weighted_random_char_inclusive_range`.
 ///
-/// Given a weight $w$ = `w_numerator` / `w_denominator`, the set of graphic `char`s in the
-/// specified range is selected with probability $\frac{w}{w+1}$ and the set of non-graphic `chars`
-/// in the range with probability $\frac{1}{w+1}$. Then, a `char` is selected uniformly from the
-/// appropriate set.
+/// The set of graphic `char`s in the specified range is selected with probability $p$, or
+/// `p_numerator` / `p_denominator`, and the set of non-graphic `chars` in the range with
+/// probability $1-p$. Then, a `char` is selected uniformly from the appropriate set.
 ///
 /// Let $g$ be the number of graphic `char`s in $[a, b)$. Then we have
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{w}{g(w+1)} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is graphic} \\\\
-///     \frac{1}{(b-a-g)w} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is not graphic} \\\\
+///     \frac{p}{g} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is graphic} \\\\
+///     \frac{1-p}{b-a-g} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is not graphic} \\\\
 ///     0 & \\text{otherwise.}
 /// \\end{cases}
 /// $$
 ///
-/// To recover the uniform distribution, use $w = g/(b-a-g)$.
+/// To recover the uniform distribution, use $p = g/(b-a)$.
 ///
 /// The output length is infinite.
 ///
@@ -326,8 +325,8 @@ pub fn graphic_weighted_random_ascii_chars(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `w_numerator` or `w_denominator` are zero, if $a \geq b$, if $[a, b)$ contains no
-/// graphic `char`s, or if $[a, b)$ contains only graphic `char`s.
+/// Panics if `p_denominator` is zero or `p_denominator` > `p_denominator`, if $a \geq b$, if
+/// $[a, b)$ contains no graphic `char`s, or if $[a, b)$ contains only graphic `char`s.
 ///
 /// # Examples
 /// ```
@@ -335,7 +334,7 @@ pub fn graphic_weighted_random_ascii_chars(
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     graphic_weighted_random_char_range(EXAMPLE_SEED, '\u{100}', '\u{400}', 10, 1)
+///     graphic_weighted_random_char_range(EXAMPLE_SEED, '\u{100}', '\u{400}', 10, 11)
 ///         .take(30).collect::<String>().as_str(),
 ///     "ǘɂŜȢΙƘƣʅΰǟ˳ˊȇ\u{31b}ʰɥΈ\u{324}\u{35a}Ϟ\u{367}\u{337}ƃ\u{342}ʌμƢϳϪǰ"
 /// )
@@ -345,14 +344,14 @@ pub fn graphic_weighted_random_char_range(
     seed: Seed,
     a: char,
     mut b: char,
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
 ) -> WeightedGraphicRandomCharRange {
     if a >= b {
         panic!("a must be less than b. a: {}, b: {}", a, b);
     }
     decrement_char(&mut b);
-    graphic_weighted_random_char_inclusive_range(seed, a, b, w_numerator, w_denominator)
+    graphic_weighted_random_char_inclusive_range(seed, a, b, p_numerator, p_denominator)
 }
 
 /// Generates random `char`s in the closed interval $[a, b]$, weighting graphic and non-graphic
@@ -363,22 +362,21 @@ pub fn graphic_weighted_random_char_range(
 /// `a` must be less than or equal to `b`. Furthermore, $[a, b]$ must contain both graphic and non-
 /// graphic `char`s.
 ///
-/// Given a weight $w$ = `w_numerator` / `w_denominator`, the set of graphic `char`s in the
-/// specified range is selected with probability $\frac{w}{w+1}$ and the set of non-graphic `chars`
-/// in the range with probability $\frac{1}{w+1}$. Then, a `char` is selected uniformly from the
-/// appropriate set.
+/// The set of graphic `char`s in the specified range is selected with probability $p$, or
+/// `p_numerator` / `p_denominator`, and the set of non-graphic `chars` in the range with
+/// probability $1-p$. Then, a `char` is selected uniformly from the appropriate set.
 ///
 /// Let $g$ be the number of graphic `char`s in $[a, b]$. Then we have
 ///
 /// $$
 /// P(x) = \\begin{cases}
-///     \frac{w}{g(w+1)} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is graphic} \\\\
-///     \frac{1}{(b-a-g+1)w} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is not graphic} \\\\
+///     \frac{p}{g} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is graphic} \\\\
+///     \frac{1-p}{b-a-g+1} & a \leq x < b \\ \\text{and} \\ x \\ \\text{is not graphic} \\\\
 ///     0 & \\text{otherwise.}
 /// \\end{cases}
 /// $$
 ///
-/// To recover the uniform distribution, use $w = g/(b-a-g+1)$.
+/// To recover the uniform distribution, use $p = g/(b-a+1)$.
 ///
 /// The output length is infinite.
 ///
@@ -386,8 +384,8 @@ pub fn graphic_weighted_random_char_range(
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if `w_numerator` or `w_denominator` are zero, if $a > b$, if $[a, b]$ contains no graphic
-/// `char`s, or if $[a, b]$ contains only graphic `char`s.
+/// Panics if `p_denominator` is zero or `p_denominator` > `p_denominator`, if $a > b$, if $[a, b]$
+/// contains no graphic `char`s, or if $[a, b]$ contains only graphic `char`s.
 ///
 /// # Examples
 /// ```
@@ -395,7 +393,7 @@ pub fn graphic_weighted_random_char_range(
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, '\u{100}', '\u{3ff}', 10, 1)
+///     graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, '\u{100}', '\u{3ff}', 10, 11)
 ///         .take(30).collect::<String>().as_str(),
 ///     "ǘɂŜȢΙƘƣʅΰǟ˳ˊȇ\u{31b}ʰɥΈ\u{324}\u{35a}Ϟ\u{367}\u{337}ƃ\u{342}ʌμƢϳϪǰ"
 /// )
@@ -404,8 +402,8 @@ pub fn graphic_weighted_random_char_inclusive_range(
     seed: Seed,
     a: char,
     b: char,
-    w_numerator: u64,
-    w_denominator: u64,
+    p_numerator: u64,
+    p_denominator: u64,
 ) -> WeightedGraphicRandomCharRange {
     if a > b {
         panic!("a must be less than or equal to b. a: {}, b: {}", a, b);
@@ -419,7 +417,7 @@ pub fn graphic_weighted_random_char_inclusive_range(
         panic!("The range {:?}..={:?} only contains graphic chars", a, b);
     }
     WeightedGraphicRandomCharRange {
-        xs: weighted_random_bools(seed.fork("xs"), w_numerator, w_denominator),
+        xs: weighted_random_bools(seed.fork("xs"), p_numerator, p_denominator),
         graphic: random_values_from_vec(seed.fork("graphic"), graphic_chars),
         non_graphic: random_values_from_vec(seed.fork("non_graphic"), non_graphic_chars),
     }

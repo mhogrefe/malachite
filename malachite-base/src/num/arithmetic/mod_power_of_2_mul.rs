@@ -18,20 +18,15 @@ macro_rules! impl_mod_power_of_2_mul {
         impl ModPowerOf2Mul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self * other` mod 2<sup>`pow`</sup>. Assumes the inputs are already
-            /// reduced mod 2<sup>`pow`</sup>.
+            /// Computes `self * other` mod $2^p$. Assumes the inputs are already reduced mod $2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $f(x, y, p) = z$, where $x, y, z < 2^p$ and $xy \equiv z \mod 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2Mul;
-            ///
-            /// assert_eq!(3u8.mod_power_of_2_mul(2, 5), 6);
-            /// assert_eq!(10u32.mod_power_of_2_mul(14, 4), 12);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2_mul` module.
             #[inline]
             fn mod_power_of_2_mul(self, other: $t, pow: u64) -> $t {
                 _mod_power_of_2_mul(self, other, pow)
@@ -39,25 +34,16 @@ macro_rules! impl_mod_power_of_2_mul {
         }
 
         impl ModPowerOf2MulAssign<$t> for $t {
-            /// Replaces `self` with `self * other` mod 2<sup>`pow`</sup>. Assumes the inputs are
-            /// already reduced mod 2<sup>`pow`</sup>.
+            /// Replaces `self` with `self * other` mod $2^p$. Assumes the inputs are already
+            /// reduced mod $2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets z$, where $x, y, z < 2^p$ and $xy \equiv z \mod 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2MulAssign;
-            ///
-            /// let mut n = 3u8;
-            /// n.mod_power_of_2_mul_assign(2, 5);
-            /// assert_eq!(n, 6);
-            ///
-            /// let mut n = 10u32;
-            /// n.mod_power_of_2_mul_assign(14, 4);
-            /// assert_eq!(n, 12);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2_mul` module.
             #[inline]
             fn mod_power_of_2_mul_assign(&mut self, other: $t, pow: u64) {
                 _mod_power_of_2_mul_assign(self, other, pow)

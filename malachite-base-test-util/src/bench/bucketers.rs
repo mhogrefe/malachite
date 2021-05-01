@@ -3,7 +3,8 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom, WrappingInto};
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use std::cmp::max;
 
@@ -16,6 +17,21 @@ pub fn char_bucketer<'a>() -> Bucketer<'a, char> {
     Bucketer {
         bucketing_function: &|&c| usize::exact_from(char_to_contiguous_range(c)),
         bucketing_label: "char_to_contiguous_range(c)".to_string(),
+    }
+}
+
+pub fn primitive_float_bucketer<'a, T: PrimitiveFloat>(var_name: &str) -> Bucketer<'a, T> {
+    Bucketer {
+        bucketing_function: &|&f| {
+            if f == T::ZERO || !f.is_finite() || f.is_nan() {
+                0
+            } else {
+                let (m, e) = f.adjusted_mantissa_and_exponent();
+                <T::UnsignedOfEqualWidth as WrappingInto<usize>>::wrapping_into(m)
+                    + usize::wrapping_from(e.abs())
+            }
+        },
+        bucketing_label: format!("precision({}) + |exponent({})|", var_name, var_name),
     }
 }
 
@@ -67,6 +83,23 @@ pub fn unsigned_bit_bucketer<'a, T: PrimitiveUnsigned>() -> Bucketer<'a, T> {
 
 pub fn signed_bit_bucketer<'a, T: PrimitiveSigned>() -> Bucketer<'a, T> {
     bit_bucketer("i")
+}
+
+pub fn ignore_highest_bit_unsigned_bit_bucketer<'a, T: PrimitiveUnsigned>(
+    var_name: &str,
+) -> Bucketer<'a, T> {
+    Bucketer {
+        bucketing_function: &|&x| {
+            let mut x = x;
+            x.clear_bit(T::WIDTH - 1);
+            usize::exact_from(x.significant_bits())
+        },
+        bucketing_label: format!(
+            "({} - (1 << {})).significant_bits()",
+            var_name,
+            T::WIDTH - 1
+        ),
+    }
 }
 
 pub fn string_len_bucketer<'a>() -> Bucketer<'a, String> {
@@ -182,6 +215,16 @@ where
     }
 }
 
+pub fn triple_3_bucketer<T, U, V: Copy>(z_name: &str) -> Bucketer<(T, U, V)>
+where
+    usize: ExactFrom<V>,
+{
+    Bucketer {
+        bucketing_function: &|&(_, _, z)| usize::exact_from(z),
+        bucketing_label: z_name.to_string(),
+    }
+}
+
 pub fn pair_1_bit_bucketer<T: Copy + SignificantBits, U>(x_name: &str) -> Bucketer<(T, U)> {
     Bucketer {
         bucketing_function: &|&(x, _)| usize::exact_from(x.significant_bits()),
@@ -200,6 +243,28 @@ pub fn triple_1_bit_bucketer<T: Copy + SignificantBits, U, V>(x_name: &str) -> B
     Bucketer {
         bucketing_function: &|&(x, _, _)| usize::exact_from(x.significant_bits()),
         bucketing_label: format!("{}.significant_bits()", x_name),
+    }
+}
+
+pub fn triple_3_bit_bucketer<T, U, V: Copy + SignificantBits>(z_name: &str) -> Bucketer<(T, U, V)> {
+    Bucketer {
+        bucketing_function: &|&(_, _, z)| usize::exact_from(z.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", z_name),
+    }
+}
+
+pub fn quadruple_1_2_bit_bucketer<T: PrimitiveUnsigned, U, V>(
+    combined_name: &str,
+) -> Bucketer<(T, T, U, V)> {
+    Bucketer {
+        bucketing_function: &|&(x_1, x_0, _, _)| {
+            usize::exact_from(if x_1 == T::ZERO {
+                x_0.significant_bits()
+            } else {
+                x_1.significant_bits() + T::WIDTH
+            })
+        },
+        bucketing_label: format!("{}.significant_bits()", combined_name),
     }
 }
 

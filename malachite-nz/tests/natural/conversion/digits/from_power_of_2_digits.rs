@@ -1,7 +1,24 @@
+use itertools::repeat_n;
+use itertools::Itertools;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::PowerOf2Digits;
+use malachite_base::num::conversion::traits::{CheckedFrom, PowerOf2Digits};
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
 use malachite_base::vecs::vec_from_str;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_pair_gen_var_18, unsigned_pair_gen_var_5, unsigned_vec_gen,
+    unsigned_vec_unsigned_pair_gen_var_10, unsigned_vec_unsigned_pair_gen_var_11,
+    unsigned_vec_unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_3,
+};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    natural_vec_unsigned_pair_gen_var_1, natural_vec_unsigned_pair_gen_var_2,
+};
 use std::panic::catch_unwind;
 
 #[test]
@@ -260,4 +277,272 @@ fn test_from_power_of_2_digits_desc_natural() {
 fn from_power_of_2_digits_desc_natural_fail() {
     let digits: Vec<Natural> = vec_from_str("[0, 0, 0]").unwrap();
     Natural::from_power_of_2_digits_desc(0, digits.iter().cloned());
+}
+
+fn from_power_of_2_digits_asc_properties_helper<T: PrimitiveUnsigned>()
+where
+    Natural: From<T> + PowerOf2Digits<T>,
+    Limb: PowerOf2Digits<T>,
+{
+    let mut config = GenConfig::new();
+    config.insert("mean_log_base_n", T::WIDTH >> 1);
+    config.insert("mean_stripe_n", 64);
+    config.insert("mean_digit_count_n", 32);
+    unsigned_vec_unsigned_pair_gen_var_11().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned());
+            assert_eq!(
+                n.is_some(),
+                digits.iter().all(|x| x.significant_bits() <= log_base),
+            );
+        },
+    );
+
+    unsigned_vec_unsigned_pair_gen_var_10().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
+            assert_eq!(
+                Natural::_from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned())
+                    .unwrap(),
+                n
+            );
+            assert_eq!(
+                Natural::from_power_of_2_digits_desc(log_base, digits.iter().rev().cloned())
+                    .unwrap(),
+                n
+            );
+            let trailing_zeros = slice_trailing_zeros(&digits);
+            let trimmed_digits = digits[..digits.len() - trailing_zeros].to_vec();
+            assert_eq!(
+                PowerOf2Digits::<T>::to_power_of_2_digits_asc(&n, log_base),
+                trimmed_digits
+            );
+        },
+    );
+
+    unsigned_pair_gen_var_5::<usize, T>().test_properties(|(u, log_base)| {
+        assert_eq!(
+            Natural::from_power_of_2_digits_asc(log_base, repeat_n(T::ZERO, u)).unwrap(),
+            0
+        );
+    });
+
+    unsigned_vec_unsigned_pair_gen_var_2::<Limb, T>().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Limb::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
+            assert_eq!(
+                Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
+                Natural::checked_from(Integer::from(n)).unwrap()
+            );
+        },
+    );
+}
+
+#[test]
+fn from_power_of_2_digits_asc_properties() {
+    apply_fn_to_unsigneds!(from_power_of_2_digits_asc_properties_helper);
+
+    let mut config = GenConfig::new();
+    config.insert("mean_stripe_n", 64);
+    config.insert("mean_length_n", 32);
+    unsigned_vec_gen().test_properties_with_config(&config, |xs| {
+        assert_eq!(
+            Natural::from_power_of_2_digits_asc(Limb::WIDTH, xs.iter().cloned()).unwrap(),
+            Natural::from_limbs_asc(&xs)
+        );
+    });
+}
+
+fn from_power_of_2_digits_desc_properties_helper<T: PrimitiveUnsigned>()
+where
+    Natural: From<T> + PowerOf2Digits<T>,
+    Limb: PowerOf2Digits<T>,
+{
+    let mut config = GenConfig::new();
+    config.insert("mean_log_base_n", T::WIDTH >> 1);
+    config.insert("mean_stripe_n", 64);
+    config.insert("mean_digit_count_n", 32);
+    unsigned_vec_unsigned_pair_gen_var_11().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned());
+            assert_eq!(
+                n.is_some(),
+                digits.iter().all(|x| x.significant_bits() <= log_base)
+            );
+        },
+    );
+
+    unsigned_vec_unsigned_pair_gen_var_10().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap();
+            assert_eq!(
+                Natural::from_power_of_2_digits_asc(log_base, digits.iter().rev().cloned())
+                    .unwrap(),
+                n
+            );
+            let leading_zeros = slice_leading_zeros(&digits);
+            let trimmed_digits = digits[leading_zeros..].to_vec();
+            assert_eq!(
+                PowerOf2Digits::<T>::to_power_of_2_digits_desc(&n, log_base),
+                trimmed_digits
+            );
+        },
+    );
+
+    unsigned_pair_gen_var_5::<usize, T>().test_properties(|(u, log_base)| {
+        assert_eq!(
+            Natural::from_power_of_2_digits_desc(log_base, repeat_n(T::ZERO, u)),
+            Some(Natural::ZERO)
+        );
+    });
+
+    unsigned_vec_unsigned_pair_gen_var_3::<Limb, T>().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Limb::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap();
+            let natural_n: Natural = From::<Limb>::from(n);
+            assert_eq!(
+                Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
+                natural_n
+            );
+        },
+    );
+}
+
+#[test]
+fn from_power_of_2_digits_desc_properties() {
+    apply_fn_to_unsigneds!(from_power_of_2_digits_desc_properties_helper);
+
+    let mut config = GenConfig::new();
+    config.insert("mean_stripe_n", 64);
+    config.insert("mean_length_n", 32);
+    unsigned_vec_gen().test_properties_with_config(&config, |xs| {
+        assert_eq!(
+            Natural::from_power_of_2_digits_desc(Limb::WIDTH, xs.iter().cloned()).unwrap(),
+            Natural::from_limbs_desc(&xs)
+        );
+    });
+}
+
+#[test]
+fn from_power_of_2_digits_asc_natural_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_log_base_n", 16);
+    config.insert("mean_stripe_n", 64);
+    config.insert("mean_digit_count_n", 32);
+    natural_vec_unsigned_pair_gen_var_2().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned());
+            assert_eq!(
+                n.is_some(),
+                digits.iter().all(|x| x.significant_bits() <= log_base),
+            );
+        },
+    );
+
+    natural_vec_unsigned_pair_gen_var_1().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
+            assert_eq!(
+                Natural::_from_power_of_2_digits_asc_natural_naive(
+                    log_base,
+                    digits.iter().cloned()
+                )
+                .unwrap(),
+                n
+            );
+            assert_eq!(
+                Natural::from_power_of_2_digits_desc(log_base, digits.iter().rev().cloned())
+                    .unwrap(),
+                n
+            );
+            let trailing_zeros = slice_trailing_zeros(&digits);
+            let trimmed_digits = digits[..digits.len() - trailing_zeros].to_vec();
+            assert_eq!(
+                PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(&n, log_base),
+                trimmed_digits
+            );
+        },
+    );
+
+    unsigned_pair_gen_var_18().test_properties(|(u, log_base)| {
+        assert_eq!(
+            Natural::from_power_of_2_digits_asc(log_base, repeat_n(Natural::ZERO, u)),
+            Some(Natural::ZERO)
+        );
+    });
+
+    unsigned_vec_unsigned_pair_gen_var_10::<Limb>().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned());
+            let digits = digits.iter().cloned().map(Natural::from).collect_vec();
+            assert_eq!(
+                Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()),
+                n
+            );
+        },
+    );
+}
+
+#[test]
+fn from_power_of_2_digits_desc_natural_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_log_base_n", 16);
+    config.insert("mean_stripe_n", 64);
+    config.insert("mean_digit_count_n", 32);
+    natural_vec_unsigned_pair_gen_var_2().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned());
+            assert_eq!(
+                n.is_some(),
+                digits.iter().all(|x| x.significant_bits() <= log_base)
+            );
+        },
+    );
+
+    natural_vec_unsigned_pair_gen_var_1().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap();
+            assert_eq!(
+                Natural::from_power_of_2_digits_asc(log_base, digits.iter().rev().cloned())
+                    .unwrap(),
+                n
+            );
+            let leading_zeros = slice_leading_zeros(&digits);
+            let trimmed_digits = digits[leading_zeros..].to_vec();
+            assert_eq!(
+                PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&n, log_base),
+                trimmed_digits
+            );
+        },
+    );
+
+    unsigned_pair_gen_var_18().test_properties(|(u, log_base)| {
+        assert_eq!(
+            Natural::from_power_of_2_digits_desc(log_base, repeat_n(Natural::ZERO, u)),
+            Some(Natural::ZERO)
+        );
+    });
+
+    unsigned_vec_unsigned_pair_gen_var_10::<Limb>().test_properties_with_config(
+        &config,
+        |(digits, log_base)| {
+            let n = Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap();
+            let digits = digits.iter().cloned().map(Natural::from).collect_vec();
+            assert_eq!(
+                Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).unwrap(),
+                n
+            );
+        },
+    );
 }

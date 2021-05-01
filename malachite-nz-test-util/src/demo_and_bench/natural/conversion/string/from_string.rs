@@ -3,7 +3,8 @@ use malachite_base_test_util::bench::bucketers::{pair_2_string_len_bucketer, str
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{
-    string_gen, string_gen_var_3, unsigned_string_pair_gen_var_1, unsigned_string_pair_gen_var_2,
+    string_gen, string_gen_var_3, string_gen_var_5, string_gen_var_6, string_gen_var_7,
+    unsigned_string_pair_gen_var_1, unsigned_string_pair_gen_var_2,
 };
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
@@ -21,6 +22,18 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(
         runner,
         benchmark_natural_from_string_base_library_comparison
+    );
+    register_bench!(
+        runner,
+        benchmark_natural_from_string_base_binary_library_comparison
+    );
+    register_bench!(
+        runner,
+        benchmark_natural_from_string_base_octal_library_comparison
+    );
+    register_bench!(
+        runner,
+        benchmark_natural_from_string_base_hex_library_comparison
     );
     register_bench!(runner, benchmark_natural_from_string_base_algorithms);
 }
@@ -140,6 +153,90 @@ fn benchmark_natural_from_string_base_library_comparison(
             }),
             ("rug", &mut |(base, s)| {
                 no_out!(rug::Integer::from_str_radix(&s, i32::wrapping_from(base)).unwrap())
+            }),
+        ],
+    );
+}
+
+fn benchmark_natural_from_string_base_binary_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural::from_string_base(2, &str)",
+        BenchmarkType::LibraryComparison,
+        string_gen_var_5().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &string_len_bucketer(),
+        &mut [
+            ("Malachite", &mut |s| {
+                no_out!(Natural::from_string_base(2, &s).unwrap())
+            }),
+            ("num", &mut |s| {
+                no_out!(BigUint::from_str_radix(&s, 2).unwrap())
+            }),
+            ("rug", &mut |s| {
+                no_out!(rug::Integer::from_str_radix(&s, 2).unwrap())
+            }),
+        ],
+    );
+}
+
+fn benchmark_natural_from_string_base_octal_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural::from_string_base(8, &str)",
+        BenchmarkType::LibraryComparison,
+        string_gen_var_6().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &string_len_bucketer(),
+        &mut [
+            ("Malachite", &mut |s| {
+                no_out!(Natural::from_string_base(8, &s).unwrap())
+            }),
+            ("num", &mut |s| {
+                no_out!(BigUint::from_str_radix(&s, 8).unwrap())
+            }),
+            ("rug", &mut |s| {
+                no_out!(rug::Integer::from_str_radix(&s, 8).unwrap())
+            }),
+        ],
+    );
+}
+
+fn benchmark_natural_from_string_base_hex_library_comparison(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural::from_string_base(16, &str)",
+        BenchmarkType::LibraryComparison,
+        string_gen_var_7().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &string_len_bucketer(),
+        &mut [
+            ("Malachite", &mut |s| {
+                no_out!(Natural::from_string_base(16, &s).unwrap())
+            }),
+            ("num", &mut |s| {
+                no_out!(BigUint::from_str_radix(&s, 16).unwrap())
+            }),
+            ("rug", &mut |s| {
+                no_out!(rug::Integer::from_str_radix(&s, 16).unwrap())
             }),
         ],
     );

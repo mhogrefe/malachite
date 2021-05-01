@@ -85,7 +85,7 @@ impl StripedBitSource {
             first_bit_of_block: true,
             previous_bit: false,
             bs: random_bools(seed.fork("bs")),
-            xs: weighted_random_bools(seed.fork("xs"), numerator, denominator),
+            xs: weighted_random_bools(seed.fork("xs"), numerator, numerator + denominator),
         }
     }
 

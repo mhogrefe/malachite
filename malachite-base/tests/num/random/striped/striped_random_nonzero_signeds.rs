@@ -48,7 +48,6 @@ fn striped_random_nonzero_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_striped_random_nonzero_signeds() {
     // i8, m = 4

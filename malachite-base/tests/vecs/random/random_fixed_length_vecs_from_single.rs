@@ -27,7 +27,6 @@ fn random_fixed_length_vecs_from_single_helper<I: Clone + Iterator>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_random_fixed_length_vecs_from_single() {
     random_fixed_length_vecs_from_single_helper(

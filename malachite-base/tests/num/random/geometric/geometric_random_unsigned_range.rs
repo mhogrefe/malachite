@@ -34,7 +34,6 @@ fn geometric_random_unsigned_range_helper<T: CheckedToF64 + PrimitiveUnsigned>(
     );
 }
 
-#[allow(clippy::decimal_literal_representation)]
 #[test]
 fn test_geometric_random_unsigned_range() {
     // u8, 5, 6, um = 10 (um is irrelevant here)
