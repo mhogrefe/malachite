@@ -19,16 +19,12 @@ fn test_limbs_count_zeros_neg() {
 
 #[test]
 fn test_checked_count_zeros() {
-    let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().checked_count_zeros(), out);
-        assert_eq!(
-            integer_checked_count_zeros_alt_1(&Integer::from_str(n).unwrap()),
-            out
-        );
-        assert_eq!(
-            integer_checked_count_zeros_alt_2(&Integer::from_str(n).unwrap()),
-            out
-        );
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u.checked_count_zeros(), out);
+        assert_eq!(integer_checked_count_zeros_alt_1(&u), out);
+        assert_eq!(integer_checked_count_zeros_alt_2(&u), out);
     };
     test("0", None);
     test("105", None);

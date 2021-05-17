@@ -179,7 +179,7 @@ fn test_geometric_random_nonzero_signeds() {
         (-4, 8430),
         (6, 8385),
     ];
-    let abs_mean = NiceFloat(43.84694299999843);
+    let abs_mean = NiceFloat(44.16314300000121);
     let pop_median = (-1, None);
     let sample_median = (-1, None);
     let pop_moment_stats = MomentStats {
@@ -222,7 +222,7 @@ fn test_geometric_random_nonzero_signeds() {
         (-7, 4198),
         (-19, 4196),
     ];
-    let abs_mean = NiceFloat(61.923105999999095);
+    let abs_mean = NiceFloat(62.86584099999888);
     let pop_median = (-1, None);
     let sample_median = (-1, None);
     let pop_moment_stats = MomentStats {

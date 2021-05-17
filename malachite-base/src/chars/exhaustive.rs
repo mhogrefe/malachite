@@ -1,6 +1,6 @@
 use chars::crement::increment_char;
 use chars::CharType;
-use comparison::traits::{Max, Min};
+use comparison::traits::Min;
 use std::ops::RangeInclusive;
 
 /// Generates all ASCII `char`s, in ascending order.

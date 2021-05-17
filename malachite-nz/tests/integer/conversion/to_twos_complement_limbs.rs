@@ -17,8 +17,6 @@ use malachite_nz::natural::logic::not::limbs_not_in_place;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
-//TODO clean from_str
-
 #[cfg(feature = "32_bit_limbs")]
 fn limbs_twos_complement_in_place_alt_1(xs: &mut [Limb]) -> bool {
     let i = xs.iter().cloned().take_while(|&x| x == 0).count();
@@ -110,11 +108,12 @@ fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place_fail() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_twos_complement_limbs_asc() {
-    let test = |n, out| {
-        let n = Integer::from_str(n).unwrap();
-        assert_eq!(n.twos_complement_limbs().collect_vec(), out);
-        assert_eq!(n.to_twos_complement_limbs_asc(), out);
-        assert_eq!(n.into_twos_complement_limbs_asc(), out);
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u.twos_complement_limbs().collect_vec(), out);
+        assert_eq!(u.to_twos_complement_limbs_asc(), out);
+        assert_eq!(u.into_twos_complement_limbs_asc(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);
@@ -174,19 +173,11 @@ fn test_twos_complement_limbs_asc() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_twos_complement_limbs_desc() {
-    let test = |n, out| {
-        assert_eq!(
-            Integer::from_str(n)
-                .unwrap()
-                .to_twos_complement_limbs_desc(),
-            out
-        );
-        assert_eq!(
-            Integer::from_str(n)
-                .unwrap()
-                .into_twos_complement_limbs_desc(),
-            out
-        );
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u.to_twos_complement_limbs_desc(), out);
+        assert_eq!(u.into_twos_complement_limbs_desc(), out);
     };
     test("0", vec![]);
     test("123", vec![123]);

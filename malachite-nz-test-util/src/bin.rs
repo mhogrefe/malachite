@@ -2,6 +2,9 @@
 extern crate malachite_base_test_util;
 extern crate malachite_nz;
 extern crate malachite_nz_test_util;
+extern crate serde;
+extern crate serde_json;
+
 use crate::generate::tuning_dependency_info::{
     print_constants_with_unfinished_deps, print_undefined_constants, print_undefined_functions,
     read_and_print,

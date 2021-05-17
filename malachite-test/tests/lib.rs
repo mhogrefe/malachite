@@ -14,9 +14,7 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod mod_op;
             pub mod mod_pow;
-            pub mod mod_power_of_2;
             pub mod mod_power_of_2_pow;
             pub mod mod_power_of_2_shl;
             pub mod mod_power_of_2_shr;
@@ -120,14 +118,11 @@ pub mod integer {
 
     pub mod conversion {
         pub mod clone;
-        pub mod floating_point_from_integer;
-        pub mod from_floating_point;
         pub mod from_natural;
         pub mod from_primitive_int;
         pub mod from_twos_complement_limbs;
         pub mod natural_from_integer;
         pub mod primitive_int_from_integer;
-        pub mod serde;
         pub mod to_twos_complement_limbs;
     }
 
@@ -172,7 +167,6 @@ pub mod natural {
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
         pub mod is_power_of_2;
-        pub mod log_base_2;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_mul;
@@ -222,11 +216,8 @@ pub mod natural {
 
     pub mod conversion {
         pub mod clone;
-        pub mod floating_point_from_natural;
-        pub mod from_floating_point;
         pub mod from_limbs;
         pub mod primitive_int_from_natural;
-        pub mod serde;
         pub mod to_limbs;
     }
 

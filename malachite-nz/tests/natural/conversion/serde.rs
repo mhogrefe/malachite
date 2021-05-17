@@ -1,6 +1,8 @@
-extern crate serde;
-extern crate serde_json;
+use malachite_base::strings::string_is_subset;
+use malachite_base_test_util::generators::{string_gen, string_gen_var_8};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::generators::natural_gen;
 use std::str::FromStr;
 
 #[test]
@@ -28,4 +30,23 @@ fn test_serde() {
         "340282366920938463463374607431768211456",
         "\"0x100000000000000000000000000000000\"",
     );
+}
+
+#[test]
+fn serde_properties() {
+    natural_gen().test_properties(|x| {
+        let s = serde_json::to_string(&x).unwrap();
+        assert_eq!(serde_json::from_str::<Natural>(&s).unwrap(), x);
+        assert_eq!(serde_json::from_str::<Integer>(&s).unwrap(), x);
+        assert!(string_is_subset(&s, "\"0123456789abcdefx"));
+    });
+
+    string_gen().test_properties(|s| {
+        let _n: Result<Natural, _> = serde_json::from_str(&s);
+    });
+
+    string_gen_var_8().test_properties(|s| {
+        let _n: Natural = serde_json::from_str(&s).unwrap();
+        let _n: Integer = serde_json::from_str(&s).unwrap();
+    });
 }

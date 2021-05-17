@@ -13,7 +13,6 @@ pub mod divisible_by_power_of_2;
 pub mod eq_mod;
 pub mod eq_mod_power_of_2;
 pub mod is_power_of_2;
-pub mod log_base_2;
 pub mod mod_add;
 pub mod mod_is_reduced;
 pub mod mod_mul;
@@ -65,7 +64,6 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     eq_mod::register(registry);
     eq_mod_power_of_2::register(registry);
     is_power_of_2::register(registry);
-    log_base_2::register(registry);
     mod_add::register(registry);
     mod_is_reduced::register(registry);
     mod_mul::register(registry);

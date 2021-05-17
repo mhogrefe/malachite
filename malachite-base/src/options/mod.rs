@@ -54,11 +54,7 @@ pub fn option_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Op
     if src == "None" {
         Some(None)
     } else if src.starts_with("Some(") && src.ends_with(')') {
-        if let Some(x) = f(&src[5..src.len() - 1]) {
-            Some(Some(x))
-        } else {
-            None
-        }
+        f(&src[5..src.len() - 1]).map(Some)
     } else {
         None
     }

@@ -14,12 +14,11 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
-    exhaustive_finite_primitive_floats, exhaustive_natural_signeds, exhaustive_negative_signeds,
-    exhaustive_nonzero_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
-    exhaustive_signeds, exhaustive_unsigneds,
+    exhaustive_natural_signeds, exhaustive_negative_signeds, exhaustive_nonzero_signeds,
+    exhaustive_positive_primitive_ints, exhaustive_signeds, exhaustive_unsigneds,
 };
 use malachite_base::num::exhaustive::{
     exhaustive_signed_range, primitive_int_increasing_inclusive_range,
@@ -28,7 +27,7 @@ use malachite_base::num::exhaustive::{
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible, BitIterable, LeadingZeros};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base::slices::{slice_test_zero, slice_trailing_zeros};
+use malachite_base::slices::slice_test_zero;
 use malachite_base::tuples::exhaustive::{
     exhaustive_octuples_from_single, exhaustive_pairs, exhaustive_pairs_from_single,
     exhaustive_quadruples, exhaustive_quadruples_from_single, exhaustive_quintuples,
@@ -40,7 +39,6 @@ use malachite_base::vecs::exhaustive::{
 };
 use malachite_base_test_util::generators::common::{reshape_1_2_to_3, It};
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
-use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::add::{
@@ -77,16 +75,10 @@ use rand::distributions::range::SampleRange;
 use rand::distributions::{IndependentSample, Range};
 use rand::{IsaacRng, Rand, Rng, SeedableRng};
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
-use rust_wheels::iterators::dependent_pairs::{
-    dependent_pairs, exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
-};
+use rust_wheels::iterators::dependent_pairs::{dependent_pairs, random_dependent_pairs};
 use rust_wheels::iterators::general::{random, random_from_vector};
 use rust_wheels::iterators::integers_geometric::{
-    i32s_geometric, positive_u32s_geometric, range_up_geometric_u32, u32s_geometric,
-};
-use rust_wheels::iterators::primitive_floats::{
-    random_finite_primitive_floats, random_primitive_floats, special_random_f32s,
-    special_random_f64s, special_random_finite_f32s, special_random_finite_f64s,
+    i32s_geometric, range_up_geometric_u32, u32s_geometric,
 };
 use rust_wheels::iterators::primitive_ints::{
     random_natural_signed, random_negative_signed, random_nonzero_signed, random_positive_signed,
@@ -106,7 +98,6 @@ use rust_wheels::iterators::vecs::{
     special_random_unsigned_vecs_min_length,
 };
 use std::cmp::max;
-use std::iter::repeat;
 use std::ops::{Shl, Shr};
 
 //TODO replace with unsigned_gen in Malachite
@@ -237,121 +228,6 @@ pub fn signeds_var_2<T: PrimitiveSigned + Rand + SampleRange>(
     };
     Box::new(xs.filter(|&x| x.checked_square().is_some()))
 }
-
-macro_rules! float_gen {
-    (
-        $f: ident,
-        $special_random: ident,
-        $special_random_finite: ident,
-        $floats: ident,
-        $finite_floats: ident,
-        $floats_var_1: ident,
-        $pairs_of_finite_float_and_rounding_mode: ident,
-        $pairs_of_finite_float_and_rounding_mode_var_1: ident,
-        $pairs_of_finite_float_and_rounding_mode_var_2: ident
-    ) => {
-        pub fn $floats(gm: GenerationMode) -> It<$f> {
-            match gm {
-                GenerationMode::Exhaustive => Box::new(exhaustive_primitive_floats()),
-                GenerationMode::Random(_) => Box::new(random_primitive_floats(&EXAMPLE_SEED)),
-                GenerationMode::SpecialRandom(scale) => {
-                    Box::new($special_random(&EXAMPLE_SEED, scale))
-                }
-            }
-        }
-
-        pub fn $finite_floats(gm: GenerationMode) -> It<$f> {
-            match gm {
-                GenerationMode::Exhaustive => Box::new(exhaustive_finite_primitive_floats()),
-                GenerationMode::Random(_) => {
-                    Box::new(random_finite_primitive_floats(&EXAMPLE_SEED))
-                }
-                GenerationMode::SpecialRandom(scale) => {
-                    Box::new($special_random_finite(&EXAMPLE_SEED, scale))
-                }
-            }
-        }
-
-        // All floats that are not NaN, not infinite, and are greater than or equal to -0.5.
-        pub fn $floats_var_1(gm: GenerationMode) -> It<$f> {
-            Box::new($floats(gm).filter(|&f| !f.is_nan() && !f.is_infinite() && f >= -0.5))
-        }
-
-        fn $pairs_of_finite_float_and_rounding_mode(gm: GenerationMode) -> It<($f, RoundingMode)> {
-            match gm {
-                GenerationMode::Exhaustive => Box::new(lex_pairs(
-                    exhaustive_finite_primitive_floats(),
-                    exhaustive_rounding_modes(),
-                )),
-                GenerationMode::Random(_) => Box::new(random_pairs(
-                    &EXAMPLE_SEED,
-                    &random_finite_primitive_floats,
-                    &random_rounding_modes,
-                )),
-                GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-                    &EXAMPLE_SEED,
-                    &(|seed| $special_random_finite(seed, scale)),
-                    &random_rounding_modes,
-                )),
-            }
-        }
-
-        // All pairs of finite float and `RoundingMode` that are acceptable to pass into
-        // `Natural::rounding_from`.
-        pub fn $pairs_of_finite_float_and_rounding_mode_var_1(
-            gm: GenerationMode,
-        ) -> It<($f, RoundingMode)> {
-            Box::new(
-                $pairs_of_finite_float_and_rounding_mode(gm).filter(|&(f, rm)| {
-                    if rm == RoundingMode::Exact {
-                        return Natural::convertible_from(f);
-                    }
-                    match rm {
-                        RoundingMode::Floor | RoundingMode::Up => f >= 0.0,
-                        RoundingMode::Down | RoundingMode::Ceiling => f > -1.0,
-                        RoundingMode::Nearest => f >= -0.5,
-                        _ => unreachable!(),
-                    }
-                }),
-            )
-        }
-
-        // All pairs of finite float and `RoundingMode` that are acceptable to pass into
-        // `Integer::rounding_from`.
-        pub fn $pairs_of_finite_float_and_rounding_mode_var_2(
-            gm: GenerationMode,
-        ) -> It<($f, RoundingMode)> {
-            Box::new(
-                $pairs_of_finite_float_and_rounding_mode(gm).filter(|&(f, rm)| {
-                    rm != RoundingMode::Exact || Natural::checked_from(f).is_some()
-                }),
-            )
-        }
-    };
-}
-
-float_gen!(
-    f32,
-    special_random_f32s,
-    special_random_finite_f32s,
-    f32s,
-    finite_f32s,
-    f32s_var_1,
-    pairs_of_finite_f32_and_rounding_mode,
-    pairs_of_finite_f32_and_rounding_mode_var_1,
-    pairs_of_finite_f32_and_rounding_mode_var_2
-);
-float_gen!(
-    f64,
-    special_random_f64s,
-    special_random_finite_f64s,
-    f64s,
-    finite_f64s,
-    f64s_var_1,
-    pairs_of_finite_f64_and_rounding_mode,
-    pairs_of_finite_f64_and_rounding_mode_var_1,
-    pairs_of_finite_f64_and_rounding_mode_var_2
-);
 
 fn pairs_of_unsigneds_with_seed<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
@@ -995,25 +871,6 @@ pub fn small_unsigneds<T: PrimitiveUnsigned>(gm: NoSpecialGenerationMode) -> It<
     }
 }
 
-pub fn small_positive_unsigneds<T: PrimitiveInt + Rand>(gm: NoSpecialGenerationMode) -> It<T> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_positive_primitive_ints()),
-        NoSpecialGenerationMode::Random(scale) => {
-            Box::new(positive_u32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from))
-        }
-    }
-}
-
-// All `u64`s where the `u64` is between 1 and T::WIDTH, inclusive.
-pub fn small_u64s_var_1<T: PrimitiveInt>(gm: NoSpecialGenerationMode) -> It<u64> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => {
-            Box::new(primitive_int_increasing_inclusive_range(1, T::WIDTH))
-        }
-        NoSpecialGenerationMode::Random(_) => Box::new(random_range(&EXAMPLE_SEED, 1, T::WIDTH)),
-    }
-}
-
 // All `u64`s where the `u64` is between 0 and T::WIDTH - 1, inclusive.
 pub fn small_u64s_var_2<T: PrimitiveInt>(gm: NoSpecialGenerationMode) -> It<u64> {
     match gm {
@@ -1116,44 +973,6 @@ pub fn pairs_of_unsigned_and_small_unsigned_var_1<
     )
 }
 
-fn random_pairs_of_primitive_and_small_unsigned_var_1_with_seed<
-    T: PrimitiveInt + Rand,
-    U: PrimitiveUnsigned,
->(
-    seed: &[u32],
-) -> It<(T, u64)> {
-    Box::new(random_pairs(
-        seed,
-        &random,
-        &(|seed_2| random_range(seed_2, 1, U::WIDTH)),
-    ))
-}
-
-fn random_pairs_of_primitive_and_small_unsigned_var_1<
-    T: PrimitiveInt + Rand,
-    U: PrimitiveUnsigned,
->() -> It<(T, u64)> {
-    random_pairs_of_primitive_and_small_unsigned_var_1_with_seed::<T, U>(&EXAMPLE_SEED)
-}
-
-// All pairs of unsigned `T` and `u64`, where the `u64` is between 1 and `U::WIDTH`, inclusive.
-pub fn pairs_of_unsigned_and_small_u64_var_1<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned>(
-    gm: GenerationMode,
-) -> It<(T, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(lex_pairs(
-            exhaustive_unsigneds(),
-            primitive_int_increasing_inclusive_range(1, U::WIDTH),
-        )),
-        GenerationMode::Random(_) => random_pairs_of_primitive_and_small_unsigned_var_1::<T, U>(),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &special_random_unsigned,
-            &(|seed| random_range(seed, 1, U::WIDTH)),
-        )),
-    }
-}
-
 // All pairs of unsigned `T` and `u64`, where the `u64` is between the number of significant bits of
 // the `T` and `T::WIDTH`, inclusive.
 pub fn pairs_of_unsigned_and_small_u64_var_2<T: PrimitiveUnsigned + Rand + SampleRange>(
@@ -1229,26 +1048,6 @@ pub fn pairs_of_unsigned_and_small_u64_var_4<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-fn pairs_of_small_unsigneds_single<T: PrimitiveUnsigned + Rand>(
-    gm: NoSpecialGenerationMode,
-) -> It<(T, T)> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds()))
-        }
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs_from_single(
-            u32s_geometric(&EXAMPLE_SEED, scale).flat_map(T::checked_from),
-        )),
-    }
-}
-
-// All pairs of small `T`s, where `T` is unsigned and the first `T` is positive.
-pub fn pairs_of_small_unsigneds_single_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: NoSpecialGenerationMode,
-) -> It<(T, T)> {
-    Box::new(pairs_of_small_unsigneds_single(gm).filter(|&(x, _)| x != T::ZERO))
-}
-
 pub fn pairs_of_small_unsigneds<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned + Rand>(
     gm: NoSpecialGenerationMode,
 ) -> It<(T, U)> {
@@ -1292,24 +1091,6 @@ pub fn pairs_of_small_signed_and_small_unsigned<
     }
 }
 
-// All pairs of u64 and small `U`, where `U` is unsigned and the `u64` is between 1 and `T::WIDTH`,
-// inclusive.
-pub fn pairs_of_u64_and_small_unsigned_var_1<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
-    gm: NoSpecialGenerationMode,
-) -> It<(u64, U)> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            primitive_int_increasing_inclusive_range(1, T::WIDTH),
-            exhaustive_unsigneds(),
-        )),
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_range(seed, 1, T::WIDTH)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-        )),
-    }
-}
-
 // All pairs of small signed `T` and small `u64` such that the `T` raised to the `u64` doesn't
 // overflow.
 pub fn pairs_of_small_signed_and_small_u64_var_2<T: PrimitiveSigned + Rand>(
@@ -1319,21 +1100,6 @@ pub fn pairs_of_small_signed_and_small_u64_var_2<T: PrimitiveSigned + Rand>(
         pairs_of_small_signed_and_small_unsigned::<T, u64>(gm)
             .filter(|&(x, y)| x.checked_pow(y).is_some()),
     )
-}
-
-// All pairs of u64 and `usize`, where the `u64` is positive.
-pub fn pairs_of_small_u64_and_small_usize_var_2(gm: NoSpecialGenerationMode) -> It<(u64, usize)> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_positive_primitive_ints(),
-            exhaustive_unsigneds(),
-        )),
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
-            &(|seed| u32s_geometric(seed, scale).map(usize::wrapping_from)),
-        )),
-    }
 }
 
 fn sqrt_pairs_of_positive_primitive_and_unsigned<T: PrimitiveInt, U: PrimitiveUnsigned + Rand>(
@@ -3416,34 +3182,6 @@ pub fn quadruples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
     }
 }
 
-// All quadruples of unsigned `T` where the first three `T`s are smaller than the fourth.
-pub fn quadruples_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, T, T, T)> {
-    Box::new(quadruples_of_unsigneds(gm).filter(|&(x, y, z, m)| x < m && y < m && z < m))
-}
-
-// All quadruples of unsigned `T` that are valid inputs to _limbs_mod_preinverted.
-pub fn quadruples_of_unsigneds_var_2<
-    T: PrimitiveUnsigned + Rand,
-    DT: JoinHalves + PrimitiveUnsigned + SplitInHalf,
->(
-    gm: GenerationMode,
-) -> It<(T, T, T, T)>
-where
-    DT: From<T> + HasHalf<Half = T>,
-    T: CheckedFrom<DT>,
-{
-    Box::new(
-        triples_of_unsigneds(gm)
-            .filter(|&(_, _, d)| d != T::ZERO)
-            .map(|(x_1, x_0, d)| {
-                let inv = limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
-                (x_1, x_0, d, inv)
-            }),
-    )
-}
-
 // All triples of `T`, `T`, `u64`, and `u64`, where the `T`s are unsigned and the second `u64` is
 // between n and `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the two
 // `T`s.
@@ -5474,43 +5212,6 @@ pub fn triples_of_limb_vec_limb_and_limb_vec_var_5(
     )
 }
 
-// All quadruples of `T`, `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between n and
-// `T::WIDTH`, inclusive, where n is the maximum number of significant bits of the three `T`s.
-pub fn quadruples_of_three_unsigneds_and_small_u64_var_1<
-    T: PrimitiveUnsigned + Rand + SampleRange,
->(
-    gm: NoSpecialGenerationMode,
-) -> It<(T, T, T, u64)> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => reshape_3_1_to_4(Box::new(dependent_pairs(
-            exhaustive_triples_from_single(exhaustive_unsigneds()),
-            |&(x, y, z): &(T, T, T)| {
-                Box::new(primitive_int_increasing_inclusive_range(
-                    max!(
-                        x.significant_bits(),
-                        y.significant_bits(),
-                        z.significant_bits()
-                    ),
-                    T::WIDTH,
-                ))
-            },
-        ))),
-        NoSpecialGenerationMode::Random(_) => {
-            reshape_3_1_to_4(permute_2_1(Box::new(random_dependent_pairs(
-                (),
-                random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
-                |_, &pow| {
-                    random_triples_from_single(random_range::<T>(
-                        &scramble(&EXAMPLE_SEED, "u"),
-                        T::ZERO,
-                        T::low_mask(pow),
-                    ))
-                },
-            ))))
-        }
-    }
-}
-
 fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
@@ -5560,185 +5261,6 @@ pub fn quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec
     Box::new(
         quadruples_of_unsigned_vec_small_unsigned_small_unsigned_and_unsigned_vec(gm)
             .filter(|&(ref limbs, start, end, _)| start < end && !slice_test_zero(limbs)),
-    )
-}
-
-fn digits_valid<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(log_base: u64, digits: &[U]) -> bool {
-    let digits = &digits[..digits.len() - slice_trailing_zeros(&digits)];
-    if digits.is_empty() {
-        return true;
-    }
-    let significant_bits = ((u64::wrapping_from(digits.len()) - 1) * log_base)
-        + digits.last().unwrap().significant_bits();
-    significant_bits <= T::WIDTH
-}
-
-fn pairs_of_u64_and_unsigned_vec_var_1_helper<
-    T: PrimitiveUnsigned,
-    U: PrimitiveUnsigned + Rand + SampleRange,
->(
-    &scale: &u32,
-    &log_base: &u64,
-) -> It<Vec<U>> {
-    Box::new(
-        random_vecs(
-            &EXAMPLE_SEED,
-            scale,
-            &(|seed| random_range_down(seed, U::low_mask(log_base))),
-        )
-        .map(move |digits| (log_base, digits))
-        .filter_map(|(log_base, digits)| {
-            if digits_valid::<T, U>(log_base, &digits) {
-                Some(digits)
-            } else {
-                None
-            }
-        }),
-    )
-}
-
-fn pairs_of_u64_and_unsigned_vec_var_3_helper<T: PrimitiveUnsigned + Rand + SampleRange>(
-    &scale: &u32,
-    &log_base: &u64,
-) -> It<Vec<T>> {
-    Box::new(random_vecs(
-        &EXAMPLE_SEED,
-        scale,
-        &(|seed| random_range_down(seed, T::low_mask(log_base))),
-    ))
-}
-
-// All pairs of `u64` and `Vec<U>`, where each pair is a valid input to
-// `from_power_of_2_digits_asc<T, U>`.
-pub fn pairs_of_u64_and_unsigned_vec_var_1<
-    T: PrimitiveUnsigned,
-    U: PrimitiveUnsigned + Rand + SampleRange,
->(
-    gm: NoSpecialGenerationMode,
-) -> It<(u64, Vec<U>)> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => {
-            let f = |_: &(), &log_base: &u64| -> It<Option<Vec<U>>> {
-                if log_base > U::WIDTH {
-                    Box::new(repeat(None))
-                } else {
-                    let digit_vecs: It<Vec<U>> = if log_base == 1 {
-                        Box::new(shortlex_vecs(primitive_int_increasing_range(
-                            U::ZERO,
-                            U::TWO,
-                        )))
-                    } else if log_base == U::WIDTH {
-                        Box::new(exhaustive_vecs(exhaustive_unsigneds()))
-                    } else {
-                        Box::new(exhaustive_vecs(primitive_int_increasing_range(
-                            U::ZERO,
-                            U::power_of_2(log_base),
-                        )))
-                    };
-                    Box::new(digit_vecs.filter_map(move |digits| {
-                        Some(if digits_valid::<T, U>(log_base, &digits) {
-                            Some(digits)
-                        } else {
-                            None
-                        })
-                    }))
-                }
-            };
-            Box::new(
-                exhaustive_dependent_pairs_infinite_sqrt(
-                    (),
-                    exhaustive_positive_primitive_ints(),
-                    f,
-                )
-                .filter_map(|(log_base, digits)| {
-                    if let Some(digits) = digits {
-                        Some((log_base, digits))
-                    } else {
-                        None
-                    }
-                }),
-            )
-        }
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_dependent_pairs(
-            scale,
-            random_range(&EXAMPLE_SEED, 1, U::WIDTH),
-            pairs_of_u64_and_unsigned_vec_var_1_helper::<T, U>,
-        )),
-    }
-}
-
-// All pairs of `u64` and `Vec<U>`, where each pair is a valid input to
-// `from_power_of_2_digits_desc<T, U>`.
-pub fn pairs_of_u64_and_unsigned_vec_var_2<
-    T: PrimitiveUnsigned,
-    U: PrimitiveUnsigned + Rand + SampleRange,
->(
-    gm: NoSpecialGenerationMode,
-) -> It<(u64, Vec<U>)> {
-    Box::new(
-        pairs_of_u64_and_unsigned_vec_var_1::<T, U>(gm)
-            .map(|(log_base, digits)| (log_base, digits.iter().rev().cloned().collect())),
-    )
-}
-
-// All pairs of `u64` and `Vec<T>`, where each pair is a valid input to
-// `from_power_of_2_digits_asc<Natural, T>`.
-pub fn pairs_of_u64_and_unsigned_vec_var_3<T: PrimitiveUnsigned + Rand + SampleRange>(
-    gm: NoSpecialGenerationMode,
-) -> It<(u64, Vec<T>)> {
-    match gm {
-        NoSpecialGenerationMode::Exhaustive => {
-            let f = |_: &(), &log_base: &u64| -> It<Option<Vec<T>>> {
-                if log_base > T::WIDTH {
-                    Box::new(repeat(None))
-                } else {
-                    let digit_vecs: It<Vec<T>> = if log_base == 1 {
-                        Box::new(shortlex_vecs(primitive_int_increasing_range(
-                            T::ZERO,
-                            T::TWO,
-                        )))
-                    } else if log_base == T::WIDTH {
-                        Box::new(exhaustive_vecs(exhaustive_unsigneds()))
-                    } else {
-                        Box::new(exhaustive_vecs(primitive_int_increasing_range(
-                            T::ZERO,
-                            T::power_of_2(log_base),
-                        )))
-                    };
-                    Box::new(digit_vecs.map(Option::Some))
-                }
-            };
-            Box::new(
-                exhaustive_dependent_pairs_infinite_sqrt(
-                    (),
-                    exhaustive_positive_primitive_ints(),
-                    f,
-                )
-                .filter_map(|(log_base, digits)| {
-                    if let Some(digits) = digits {
-                        Some((log_base, digits))
-                    } else {
-                        None
-                    }
-                }),
-            )
-        }
-        NoSpecialGenerationMode::Random(scale) => Box::new(random_dependent_pairs(
-            scale,
-            random_range(&EXAMPLE_SEED, 1, T::WIDTH),
-            pairs_of_u64_and_unsigned_vec_var_3_helper::<T>,
-        )),
-    }
-}
-
-// All pairs of `u64` and `Vec<T>`, where each pair is a valid input to
-// `from_power_of_2_digits_asc<Natural, T>`.
-pub fn pairs_of_u64_and_unsigned_vec_var_4<T: PrimitiveUnsigned + Rand + SampleRange>(
-    gm: NoSpecialGenerationMode,
-) -> It<(u64, Vec<T>)> {
-    Box::new(
-        pairs_of_u64_and_unsigned_vec_var_3::<T>(gm)
-            .map(|(log_base, digits)| (log_base, digits.iter().rev().cloned().collect())),
     )
 }
 

@@ -3,6 +3,7 @@ use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::FromStringBase;
 use natural::InnerNatural::Small;
 use natural::Natural;
+use std::convert::TryFrom;
 use std::str::FromStr;
 
 /// An integer.
@@ -13,7 +14,10 @@ use std::str::FromStr;
 /// On a 64-bit system, an `Integer` takes up 40 bytes of space on the stack.
 #[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(from = "SerdeInteger", into = "SerdeInteger"))]
+#[cfg_attr(
+    feature = "serde",
+    serde(try_from = "SerdeInteger", into = "SerdeInteger")
+)]
 pub struct Integer {
     // whether the `Integer` is non-negative
     pub(crate) sign: bool,
@@ -31,15 +35,34 @@ impl From<Integer> for SerdeInteger {
     }
 }
 
-impl From<SerdeInteger> for Integer {
+impl TryFrom<SerdeInteger> for Integer {
+    type Error = String;
+
     #[inline]
-    fn from(s: SerdeInteger) -> Integer {
+    fn try_from(s: SerdeInteger) -> Result<Integer, String> {
         if s.0.starts_with('-') {
-            assert!(s.0.starts_with("-0x"));
-            Integer::from_sign_and_abs(false, Natural::from_string_base(16, &s.0[3..]).unwrap())
+            if s.0.starts_with("-0x") {
+                Ok(Integer::from_sign_and_abs(
+                    false,
+                    Natural::from_string_base(16, &s.0[3..])
+                        .ok_or_else(|| format!("Unrecognized digits in {}", s.0))?,
+                ))
+            } else {
+                Err(format!(
+                    "String '{}' starts with '-' but not with '-0x'",
+                    s.0
+                ))
+            }
+        } else if s.0.starts_with("0x") {
+            Ok(Integer::from(
+                Natural::from_string_base(16, &s.0[2..])
+                    .ok_or_else(|| format!("Unrecognized digits in {}", s.0))?,
+            ))
         } else {
-            assert!(s.0.starts_with("0x"));
-            Integer::from(Natural::from_string_base(16, &s.0[2..]).unwrap())
+            Err(format!(
+                "String '{}' does not start with '0x' or '-0x'",
+                s.0
+            ))
         }
     }
 }

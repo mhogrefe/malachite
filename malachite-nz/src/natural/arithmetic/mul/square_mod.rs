@@ -80,7 +80,6 @@ fn _limbs_square_mod_base_pow_n_minus_1_basecase(
 fn _limbs_square_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], n: usize) {
     assert_ne!(n, 0);
     limbs_square_to_out(out, &xs[..n + 1]);
-    split_into_chunks_mut!(out, n, [out_0, out_1], out_2);
     _limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out, n);
 }
 

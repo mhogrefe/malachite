@@ -1,0 +1,160 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "malachite-base: check",
+            "type": "shell",
+            "command": "cargo check --all-targets",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-base"
+            }
+        },
+        {
+            "label": "malachite-base: clippy",
+            "type": "shell",
+            "command": "cargo clippy --all-targets",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-base"
+            }
+        },
+        {
+            "label": "malachite-base: fmt",
+            "type": "shell",
+            "command": "cargo fmt",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-base"
+            }
+        },
+        {
+            "label": "malachite-base: doc",
+            "type": "shell",
+            "command": "cargo doc --no-deps",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-base",
+                "env": {
+                    "RUSTDOCFLAGS": "--html-in-header katex-header.html"
+                }
+            }
+        },
+        {
+            "label": "malachite-base: open docs",
+            "type": "shell",
+            "command": "open target/doc/malachite_base/index.html",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-base",
+            }
+        },
+
+        {
+            "label": "malachite-base-test-util: check",
+            "type": "shell",
+            "command": "cargo check --all-targets",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-base-test-util"
+            }
+        },
+        {
+            "label": "malachite-base-test-util: clippy",
+            "type": "shell",
+            "command": "cargo clippy --all-targets",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-base-test-util"
+            }
+        },
+        {
+            "label": "malachite-base-test-util: fmt",
+            "type": "shell",
+            "command": "cargo fmt",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-base-test-util"
+            }
+        },
+
+        {
+            "label": "malachite-nz 32: check",
+            "type": "shell",
+            "command": "cargo check --all-targets --features 32_bit_limbs",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz"
+            }
+        },
+        {
+            "label": "malachite-nz 32: clippy",
+            "type": "shell",
+            "command": "cargo clippy --all-targets --features 32_bit_limbs",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz"
+            }
+        },
+        {
+            "label": "malachite-nz 64: check",
+            "type": "shell",
+            "command": "cargo check --all-targets",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz"
+            }
+        },
+        {
+            "label": "malachite-nz 64: clippy",
+            "type": "shell",
+            "command": "cargo clippy --all-targets",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz"
+            }
+        },
+        {
+            "label": "malachite-nz: fmt",
+            "type": "shell",
+            "command": "cargo fmt",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz"
+            }
+        },
+        {
+            "label": "malachite-nz: doc",
+            "type": "shell",
+            "command": "cargo doc --no-deps",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz",
+                "env": {
+                    "RUSTDOCFLAGS": "--html-in-header katex-header.html"
+                }
+            }
+        },
+        {
+            "label": "malachite-nz: open docs",
+            "type": "shell",
+            "command": "open target/doc/malachite_nz/index.html",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz",
+            }
+        },
+
+        {
+            "label": "malachite-nz-test-util: check",
+            "type": "shell",
+            "command": "cargo check --all-targets",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz-test-util"
+            }
+        },
+        {
+            "label": "malachite-nz-test-util: clippy",
+            "type": "shell",
+            "command": "cargo clippy --all-targets",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz-test-util"
+            }
+        },
+        {
+            "label": "malachite-nz-test-util: fmt",
+            "type": "shell",
+            "command": "cargo fmt",
+            "options": {
+                "cwd": "${workspaceFolder}/malachite-nz-test-util"
+            }
+        },
+    ]
+}

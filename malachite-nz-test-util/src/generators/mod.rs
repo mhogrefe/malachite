@@ -7,7 +7,9 @@ use crate::generators::random::*;
 use crate::generators::special_random::*;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::SaturatingFrom;
+use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
+use malachite_base::num::float::PrimitiveFloat;
+use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::common::Generator;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -29,6 +31,39 @@ pub fn integer_gen_nrm() -> Generator<(BigInt, rug::Integer, Integer)> {
         &|| integer_nrm(exhaustive_integer_gen()),
         &|config| integer_nrm(random_integer_gen(config)),
         &|config| integer_nrm(special_random_integer_gen(config)),
+    )
+}
+
+// All `Integer`s that are exactly equal to a floating point value of type `T`.
+pub fn integer_gen_var_1<T: PrimitiveFloat>() -> Generator<Integer>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Generator::new(
+        &exhaustive_integer_gen_var_1::<T>,
+        &random_integer_gen_var_1::<T>,
+        &special_random_integer_gen_var_1::<T>,
+    )
+}
+
+// All `Integer`s that are not equal to any floating point value of type `T`.
+pub fn integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat>(
+) -> Generator<Integer> {
+    Generator::new_no_special(
+        &exhaustive_integer_gen_var_2::<T>,
+        &random_integer_gen_var_2::<T>,
+    )
+}
+
+// All `Integer`s that are exactly between two adjacent floats of type `T`.
+pub fn integer_gen_var_3<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>() -> Generator<Integer>
+where
+    Natural: ExactFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Generator::new(
+        &exhaustive_integer_gen_var_3::<T>,
+        &random_integer_gen_var_3::<T>,
+        &special_random_integer_gen_var_2::<T>,
     )
 }
 
@@ -75,6 +110,19 @@ pub fn integer_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: Primi
     )
 }
 
+// -- (Integer, RoundingMode) --
+
+// All `(Integer, RoundingMode)` pairs that are valid inputs to `T::rounding_from`.
+pub fn integer_rounding_mode_pair_gen_var_1<
+    T: for<'a> ConvertibleFrom<&'a Integer> + PrimitiveFloat,
+>() -> Generator<(Integer, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_rounding_mode_pair_gen_var_1::<T>,
+        &random_integer_rounding_mode_pair_gen_var_1::<T>,
+        &special_random_integer_rounding_mode_pair_gen_var_1::<T>,
+    )
+}
+
 // -- Natural --
 
 pub fn natural_gen() -> Generator<Natural> {
@@ -96,6 +144,50 @@ pub fn natural_gen_nrm() -> Generator<(BigUint, rug::Integer, Natural)> {
 // All `Natural`s greater than or equal to 2.
 pub fn natural_gen_var_1() -> Generator<Natural> {
     Generator::new_no_special(&exhaustive_natural_gen_var_1, &random_natural_gen_var_1)
+}
+
+// All positive `Natural`s.
+pub fn natural_gen_var_2() -> Generator<Natural> {
+    Generator::new(
+        &exhaustive_natural_gen_var_2,
+        &random_natural_gen_var_2,
+        &special_random_natural_gen_var_1,
+    )
+}
+
+// All `Natural`s that are exactly equal to a floating point value of type `T`.
+pub fn natural_gen_var_3<T: PrimitiveFloat>() -> Generator<Natural>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Generator::new(
+        &exhaustive_natural_gen_var_3::<T>,
+        &random_natural_gen_var_3::<T>,
+        &special_random_natural_gen_var_2::<T>,
+    )
+}
+
+// All `Natural`s that are not equal to any floating point value of type `T`.
+pub fn natural_gen_var_4<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat>(
+) -> Generator<Natural> {
+    Generator::new_no_special(
+        &exhaustive_natural_gen_var_4::<T>,
+        &random_natural_gen_var_4::<T>,
+    )
+}
+
+type GN = Generator<Natural>;
+
+// All `Natural`s that are exactly between two adjacent floats of type `T`.
+pub fn natural_gen_var_5<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>() -> GN
+where
+    Natural: ExactFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Generator::new(
+        &exhaustive_natural_gen_var_5::<T>,
+        &random_natural_gen_var_5::<T>,
+        &special_random_natural_gen_var_3::<T>,
+    )
 }
 
 // -- (Natural, Natural) --
@@ -290,6 +382,43 @@ pub fn natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>(
         &exhaustive_natural_unsigned_bool_vec_triple_gen_var_2::<T>,
         &random_natural_unsigned_bool_vec_triple_gen_var_2::<T>,
         &special_random_natural_unsigned_bool_vec_triple_gen_var_2::<T>,
+    )
+}
+
+// -- (Natural, RoundingMode) --
+
+// All `(Natural, RoundingMode)` pairs that are valid inputs to `T::rounding_from`.
+pub fn natural_rounding_mode_pair_gen_var_1<
+    T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
+>() -> Generator<(Natural, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_rounding_mode_pair_gen_var_1::<T>,
+        &random_natural_rounding_mode_pair_gen_var_1::<T>,
+        &special_random_natural_rounding_mode_pair_gen_var_1::<T>,
+    )
+}
+
+// -- (String, String, String) --
+
+// All triples of `String`s corresponding to the serialization of a `num::BigUint`, a
+// `rug::Integer`, and a `Natural`, respectively, into a string. The three numbers have the same
+// value.
+pub fn string_triple_gen_var_1() -> Generator<(String, String, String)> {
+    Generator::new(
+        &exhaustive_string_triple_gen_var_1,
+        &random_string_triple_gen_var_1,
+        &special_random_string_triple_gen_var_1,
+    )
+}
+
+// All triples of `String`s corresponding to the serialization of a `num::BigInt`, a
+// `rug::Integer`, and an `Integer`, respectively, into a string. The three numbers have the same
+// value.
+pub fn string_triple_gen_var_2() -> Generator<(String, String, String)> {
+    Generator::new(
+        &exhaustive_string_triple_gen_var_2,
+        &random_string_triple_gen_var_2,
+        &special_random_string_triple_gen_var_2,
     )
 }
 

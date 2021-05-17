@@ -1,7 +1,10 @@
+use bools::random::{weighted_random_bools, WeightedRandomBools};
 use itertools::Itertools;
 use num::basic::traits::Zero;
-use std::collections::HashSet;
+use random::Seed;
+use std::collections::{HashSet, VecDeque};
 use std::hash::Hash;
+use vecs::{random_values_from_vec, RandomValuesFromVec};
 
 /// Generates all the nonzero values of a provided iterator.
 ///
@@ -273,6 +276,237 @@ where
         .into_iter()
         .filter_map(|(b, mut group)| if b { first_and_last(&mut group) } else { None })
         .collect()
+}
+
+/// An iterator that randomly produces another iterator's values, or produces a special value.
+///
+/// This `struct` is created by the `with_special_value` function. See its documentation for more.
+#[derive(Clone, Debug)]
+pub struct WithSpecialValue<I: Iterator>
+where
+    I::Item: Clone,
+{
+    bs: WeightedRandomBools,
+    special_value: I::Item,
+    xs: I,
+}
+
+impl<I: Iterator> Iterator for WithSpecialValue<I>
+where
+    I::Item: Clone,
+{
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<I::Item> {
+        if self.bs.next().unwrap() {
+            Some(self.special_value.clone())
+        } else {
+            self.xs.next()
+        }
+    }
+}
+
+/// An iterator that randomly produces another iterator's values, or produces a special value.
+///
+/// Every time a value is to be generated, the iterator returns the special value with probability
+/// $P$, or else returns a value from the inner iterator.
+///
+/// If $P$ > 0, the output length is infinite. Otherwise, it is the same as the length of `xs`.
+///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `p_denominator` is 0 or `p_numerator` is greater than `p_denominator`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+/// use malachite_base::iterators::with_special_value;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+///
+/// assert_eq!(
+///     with_special_value(EXAMPLE_SEED, -1i16, 1, 2, &random_primitive_ints::<i16>).take(20)
+///         .collect_vec(),
+///     &[
+///         -1, -1, -1, 2901, -1, -14200, -1, -1, -1, -30997, -8245, -5338, -1, -1, -20007, -1, -1,
+///         -1, -1, -1
+///     ]
+/// );
+/// ```
+pub fn with_special_value<I: Iterator>(
+    seed: Seed,
+    special_value: I::Item,
+    p_numerator: u64,
+    p_denominator: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+) -> WithSpecialValue<I>
+where
+    I::Item: Clone,
+{
+    WithSpecialValue {
+        bs: weighted_random_bools(seed.fork("bs"), p_numerator, p_denominator),
+        special_value,
+        xs: xs_gen(seed.fork("xs")),
+    }
+}
+
+/// An iterator that randomly produces another iterator's values, or samples a special value from a
+/// `Vec`.
+///
+/// This `struct` is created by the `with_special_values` function. See its documentation for more.
+#[derive(Clone, Debug)]
+pub struct WithSpecialValues<I: Iterator>
+where
+    I::Item: Clone,
+{
+    bs: WeightedRandomBools,
+    special_values: RandomValuesFromVec<I::Item>,
+    xs: I,
+}
+
+impl<I: Iterator> Iterator for WithSpecialValues<I>
+where
+    I::Item: Clone,
+{
+    type Item = I::Item;
+
+    fn next(&mut self) -> Option<I::Item> {
+        if self.bs.next().unwrap() {
+            self.special_values.next()
+        } else {
+            self.xs.next()
+        }
+    }
+}
+
+/// An iterator that randomly produces another iterator's values, or produces a random special
+/// value from a `Vec`.
+///
+/// Every time a value is to be generated, the iterator uniformly samples the special values `Vec`
+/// with probability $P$, or else returns a value from the inner iterator.
+///
+/// If $P$ > 0, the output length is infinite. Otherwise, it is the same as the length of `xs`.
+///
+/// # Worst-case complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `special_values` is empty, `p_denominator` is 0, or if `p_numerator` is greater than
+/// `p_denominator`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+/// use malachite_base::iterators::with_special_values;
+/// use malachite_base::num::random::random_primitive_ints;
+/// use malachite_base::random::EXAMPLE_SEED;
+///
+/// assert_eq!(
+///     with_special_values(EXAMPLE_SEED, vec![1, 2, 3], 1, 2, &random_primitive_ints::<i16>)
+///         .take(20) .collect_vec(),
+///     &[3, 1, 3, 2901, 1, -14200, 2, 3, 1, -30997, -8245, -5338, 1, 1, -20007, 3, 1, 1, 1, 1]
+/// );
+/// ```
+pub fn with_special_values<I: Iterator>(
+    seed: Seed,
+    special_values: Vec<I::Item>,
+    p_numerator: u64,
+    p_denominator: u64,
+    xs_gen: &dyn Fn(Seed) -> I,
+) -> WithSpecialValues<I>
+where
+    I::Item: Clone,
+{
+    WithSpecialValues {
+        bs: weighted_random_bools(seed.fork("bs"), p_numerator, p_denominator),
+        special_values: random_values_from_vec(seed.fork("special_values"), special_values),
+        xs: xs_gen(seed.fork("xs")),
+    }
+}
+
+/// Generates sliding windows of elements from an iterator.
+///
+/// This `struct` is created by the `iter_windows` function. See its documentation for more.
+#[derive(Clone, Debug)]
+pub struct IterWindows<I: Iterator>
+where
+    I::Item: Clone,
+{
+    xs: I,
+    window: VecDeque<I::Item>,
+    window_size: usize,
+}
+
+impl<I: Iterator> Iterator for IterWindows<I>
+where
+    I::Item: Clone,
+{
+    type Item = VecDeque<I::Item>;
+
+    fn next(&mut self) -> Option<VecDeque<I::Item>> {
+        if self.window.len() < self.window_size {
+            self.window = (&mut self.xs).take(self.window_size).collect();
+            if self.window.len() < self.window_size {
+                None
+            } else {
+                Some(self.window.clone())
+            }
+        } else {
+            let x = self.xs.next()?;
+            self.window.pop_front();
+            self.window.push_back(x);
+            Some(self.window.clone())
+        }
+    }
+}
+
+/// Returns windows of $n$ adjacent elements of an iterator, advancing the window by 1 in each
+/// iteration. The values are cloned each time a new window is generated.
+///
+/// The output length is $n - k + 1$, where $n$ is `xs.count()` and $k$ is `window_size`.
+///
+/// # Worst-case complexity per iteration
+/// $T(i, k) = T^\prime(i) + O(k)$
+///
+/// $M(i, k) = M^\prime(i) + O(k)$
+///
+/// where $T$ is time, $M$ is additional memory, $k$ is the window size, $i$ is the iteration
+/// index, $T^\prime$ and $M^\prime$ are the time and memory functions, respectively, of the inner
+/// iterator.
+///
+/// # Panics
+/// Panics if `window_size` is 0.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+/// use malachite_base::iterators::iter_windows;
+///
+/// let xs = 0..=5;
+/// let windows = iter_windows(3, xs).map(|ws| ws.iter().cloned().collect_vec()).collect_vec();
+/// assert_eq!(
+///     windows.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[0, 1, 2], &[1, 2, 3], &[2, 3, 4], &[3, 4, 5]]
+/// );
+/// ```
+pub fn iter_windows<I: Iterator>(window_size: usize, xs: I) -> IterWindows<I>
+where
+    I::Item: Clone,
+{
+    assert_ne!(window_size, 0);
+    IterWindows {
+        xs,
+        window: VecDeque::with_capacity(window_size),
+        window_size,
+    }
 }
 
 /// This module contains `BitDistributor`, which helps generate tuples exhaustively.

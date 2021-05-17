@@ -116,19 +116,13 @@ fn limbs_vec_neg_get_bits_fail() {
 
 #[test]
 fn test_get_bits() {
-    let test = |n, start, end, out| {
-        assert_eq!(
-            Integer::from_str(n).unwrap().get_bits(start, end),
-            Natural::from_str(out).unwrap()
-        );
-        assert_eq!(
-            Integer::from_str(n).unwrap().get_bits_owned(start, end),
-            Natural::from_str(out).unwrap()
-        );
-        assert_eq!(
-            get_bits_naive::<Integer, Natural>(&Integer::from_str(n).unwrap(), start, end),
-            Natural::from_str(out).unwrap()
-        );
+    let test = |s, start, end, out| {
+        let u = Integer::from_str(s).unwrap();
+        let out = Natural::from_str(out).unwrap();
+
+        assert_eq!(u.get_bits(start, end), out);
+        assert_eq!(u.clone().get_bits_owned(start, end), out);
+        assert_eq!(get_bits_naive::<Integer, Natural>(&u, start, end), out);
     };
     test("12379813738590787192", 16, 48, "4009824820");
     test("12379813738590787192", 4, 16, "1383");

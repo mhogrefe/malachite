@@ -1,22 +1,20 @@
-use std::iter::repeat;
-use std::ops::{Shl, Shr};
-
+use common::GenerationMode;
+use inputs::base::{natural_signeds, unsigneds, RandomValueAndVecOfBool};
+use inputs::common::{
+    permute_1_3_4_2, permute_2_1, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
+};
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::arithmetic::traits::{
-    DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, PowerOf2,
+    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
-};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::exhaustive::{
-    exhaustive_natural_signeds, exhaustive_positive_primitive_ints, exhaustive_signeds,
-    exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
+    exhaustive_natural_signeds, exhaustive_signeds, exhaustive_unsigneds,
 };
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::{LowMask, SignificantBits};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
@@ -26,14 +24,11 @@ use malachite_base::tuples::exhaustive::{
     exhaustive_triples_xxy, exhaustive_triples_xyy, lex_pairs, lex_pairs_from_single,
     lex_triples_from_single,
 };
-use malachite_base::vecs::exhaustive::{
-    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, shortlex_vecs,
-};
+use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
 use malachite_base_test_util::generators::common::{reshape_1_2_to_3, It};
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_nz::natural::exhaustive::{
-    exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
-    exhaustive_positive_naturals,
+    exhaustive_natural_range, exhaustive_naturals, exhaustive_positive_naturals,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
@@ -43,19 +38,16 @@ use rug;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::{
     dependent_pairs, exhaustive_dependent_pairs_infinite, exhaustive_dependent_pairs_infinite_log,
-    exhaustive_dependent_pairs_infinite_sqrt, random_dependent_pairs,
+    random_dependent_pairs,
 };
 use rust_wheels::iterators::general::random;
-use rust_wheels::iterators::integers_geometric::{
-    i32s_geometric, range_up_geometric_u32, u32s_geometric,
-};
+use rust_wheels::iterators::integers_geometric::{i32s_geometric, u32s_geometric};
 use rust_wheels::iterators::naturals::{
-    random_naturals, random_positive_naturals, random_range_natural, random_range_up_natural,
-    special_random_naturals, special_random_positive_naturals, special_random_range_natural,
-    special_random_range_up_natural,
+    random_naturals, random_positive_naturals, random_range_natural, special_random_naturals,
+    special_random_positive_naturals, special_random_range_natural,
 };
 use rust_wheels::iterators::primitive_ints::{
-    random_natural_signed, random_range, special_random_natural_signed, special_random_signed,
+    random_natural_signed, special_random_natural_signed, special_random_signed,
     special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::random_rounding_modes;
@@ -63,13 +55,8 @@ use rust_wheels::iterators::tuples::{
     random_pairs, random_pairs_from_single, random_quadruples, random_quadruples_from_single,
     random_triples, random_triples_from_single,
 };
-use rust_wheels::iterators::vecs::random_vecs;
-
-use common::GenerationMode;
-use inputs::base::{finite_f32s, finite_f64s, natural_signeds, unsigneds, RandomValueAndVecOfBool};
-use inputs::common::{
-    permute_1_3_4_2, permute_2_1, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
-};
+use std::iter::repeat;
+use std::ops::{Shl, Shr};
 
 pub fn naturals(gm: GenerationMode) -> It<Natural> {
     match gm {
@@ -669,35 +656,6 @@ pub fn pairs_of_natural_and_small_unsigned_var_2<T: PrimitiveUnsigned + Rand>(
     )
 }
 
-// All pairs of `Natural` and positive small unsigned.
-pub fn pairs_of_natural_and_small_unsigned_var_3<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Natural, T)> {
-    Box::new(pairs_of_natural_and_small_unsigned(gm).filter(|&(_, u)| u != T::ZERO))
-}
-
-// All pairs of `Natural` and `u64`, where the `u64` is between 1 and `T::WIDTH`, inclusive.
-pub fn pairs_of_natural_and_small_u64_var_3<T: PrimitiveUnsigned>(
-    gm: GenerationMode,
-) -> It<(Natural, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(lex_pairs(
-            exhaustive_naturals(),
-            primitive_int_increasing_inclusive_range(1, T::WIDTH),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_naturals(seed, scale)),
-            &(|seed| random_range(seed, 1, T::WIDTH)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| random_range(seed, 1, T::WIDTH)),
-        )),
-    }
-}
-
 pub fn pairs_of_positive_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Natural, T)> {
@@ -805,57 +763,6 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned_var_1<T: PrimitiveUn
         triples_of_natural_small_unsigned_and_small_unsigned(gm)
             .filter(|&(_, start, end)| start <= end),
     )
-}
-
-// All triples of `Natural`, `u64`, and small `u64`, where the first `u64` is between 1 and
-// `T::WIDTH`, inclusive.
-pub fn triples_of_natural_small_u64_and_small_u64_var_2<T: PrimitiveUnsigned>(
-    gm: GenerationMode,
-) -> It<(Natural, u64, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_naturals(),
-            primitive_int_increasing_inclusive_range(1, T::WIDTH),
-            exhaustive_unsigneds(),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_naturals(seed, scale)),
-            &(|seed| random_range(seed, 1, T::WIDTH)),
-            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| random_range(seed, 1, T::WIDTH)),
-            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
-        )),
-    }
-}
-
-// All triples of `Natural`, `u64`, and small `u64`, where the first `u64` is positive.
-pub fn triples_of_natural_small_u64_and_small_u64_var_3(
-    gm: GenerationMode,
-) -> It<(Natural, u64, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_triples(
-            exhaustive_naturals(),
-            exhaustive_positive_primitive_ints(),
-            exhaustive_unsigneds(),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| random_naturals(seed, scale)),
-            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
-            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
-            &(|seed| u32s_geometric(seed, scale).map(u64::from)),
-        )),
-    }
 }
 
 fn random_triples_of_natural_primitive_and_natural<T: PrimitiveInt + Rand>(
@@ -1347,116 +1254,6 @@ pub fn pairs_of_positive_natural_and_rounding_mode(
         )),
     }
 }
-
-macro_rules! float_gen {
-    (
-        $f: ident,
-        $finite_floats: ident,
-        $pairs_of_natural_and_rounding_mode_var_1: ident,
-        $naturals_exactly_equal_to_float: ident,
-        $floats_exactly_equal_to_natural: ident,
-        $naturals_not_exactly_equal_to_float: ident,
-        $floats_var_2: ident,
-        $floats_var_3: ident,
-        $naturals_var_2: ident
-    ) => {
-        pub fn $pairs_of_natural_and_rounding_mode_var_1(
-            gm: GenerationMode,
-        ) -> It<(Natural, RoundingMode)> {
-            Box::new(
-                pairs_of_natural_and_rounding_mode(gm)
-                    .filter(|&(ref n, rm)| rm != RoundingMode::Exact || $f::convertible_from(n)),
-            )
-        }
-
-        //TODO limit output length
-        pub fn $naturals_exactly_equal_to_float(gm: GenerationMode) -> It<Natural> {
-            Box::new(naturals(gm).filter(|n| $f::convertible_from(n)))
-        }
-
-        //TODO limit output length
-        pub fn $floats_exactly_equal_to_natural(gm: GenerationMode) -> It<$f> {
-            Box::new(naturals(gm).flat_map($f::checked_from))
-        }
-
-        pub fn $naturals_not_exactly_equal_to_float(gm: GenerationMode) -> It<Natural> {
-            let n = Natural::from($f::SMALLEST_UNREPRESENTABLE_UINT);
-            let xs: It<Natural> = match gm {
-                GenerationMode::Exhaustive => Box::new(exhaustive_natural_range_to_infinity(n)),
-                GenerationMode::Random(scale) => {
-                    Box::new(random_range_up_natural(&EXAMPLE_SEED, scale, n))
-                }
-                GenerationMode::SpecialRandom(scale) => {
-                    Box::new(special_random_range_up_natural(&EXAMPLE_SEED, scale, n))
-                }
-            };
-            Box::new(xs.filter(|n| !$f::convertible_from(n)))
-        }
-
-        // floats that are positive, not infinite, not NaN, and not exactly equal to a Natural.
-        pub fn $floats_var_2(gm: GenerationMode) -> It<$f> {
-            Box::new($finite_floats(gm).filter(|&f| f > 0.0 && !Natural::convertible_from(f)))
-        }
-
-        // positive floats exactly in between two adjacent Naturals.
-        pub fn $floats_var_3(gm: GenerationMode) -> It<$f> {
-            Box::new($floats_exactly_equal_to_natural(gm).flat_map(|f| {
-                let f_plus_half = f + 0.5;
-                if Natural::checked_from(f_plus_half).is_some() {
-                    None
-                } else {
-                    Some(f_plus_half)
-                }
-            }))
-        }
-
-        // Naturals exactly in between two adjacent floats.
-        pub fn $naturals_var_2(gm: GenerationMode) -> It<Natural> {
-            Box::new($naturals_not_exactly_equal_to_float(gm).flat_map(|n| {
-                let f_below = $f::rounding_from(&n, RoundingMode::Floor);
-                let on_below = Natural::checked_from(f_below);
-                if on_below.is_none() {
-                    return None;
-                }
-                let n_below = on_below.unwrap();
-                let f_above = f_below.next_higher();
-                let on_above = Natural::checked_from(f_above);
-                if on_above.is_none() {
-                    return None;
-                }
-                let n_above = on_above.unwrap();
-                if n_above - &n == &n - n_below {
-                    Some(n)
-                } else {
-                    None
-                }
-            }))
-        }
-    };
-}
-
-float_gen!(
-    f32,
-    finite_f32s,
-    pairs_of_natural_and_rounding_mode_var_1_f32,
-    naturals_exactly_equal_to_f32,
-    f32s_exactly_equal_to_natural,
-    naturals_not_exactly_equal_to_f32,
-    f32s_var_2,
-    f32s_var_3,
-    naturals_var_2_f32
-);
-float_gen!(
-    f64,
-    finite_f64s,
-    pairs_of_natural_and_rounding_mode_var_1_f64,
-    naturals_exactly_equal_to_f64,
-    f64s_exactly_equal_to_natural,
-    naturals_not_exactly_equal_to_f64,
-    f64s_var_2,
-    f64s_var_3,
-    naturals_var_2_f64
-);
 
 fn triples_of_natural_positive_natural_and_rounding_mode(
     gm: GenerationMode,
@@ -1980,201 +1777,4 @@ pub fn quadruples_of_natural_small_unsigned_small_unsigned_and_natural_var_1<
         quadruples_of_natural_small_unsigned_small_unsigned_and_natural(gm)
             .filter(|&(_, start, end, _)| start < end),
     )
-}
-
-fn pairs_of_u64_and_natural_vec_var_1_random_helper(
-    &scale: &u32,
-    &log_base: &u64,
-) -> It<Vec<Natural>> {
-    Box::new(random_vecs(
-        &EXAMPLE_SEED,
-        scale,
-        &(|seed| special_random_range_natural(seed, Natural::ZERO, Natural::low_mask(log_base))),
-    ))
-}
-
-fn pairs_of_u64_and_natural_vec_var_1_special_random_helper(
-    &scale: &u32,
-    &log_base: &u64,
-) -> It<Vec<Natural>> {
-    Box::new(random_vecs(
-        &EXAMPLE_SEED,
-        scale,
-        &(|seed| special_random_range_natural(seed, Natural::ZERO, Natural::low_mask(log_base))),
-    ))
-}
-
-// All pairs of `u64` and `Vec<Natural>`, where each pair is a valid input to
-// `from_power_of_2_digits_asc<Natural, Natural>`.
-pub fn pairs_of_u64_and_natural_vec_var_1(gm: GenerationMode) -> It<(u64, Vec<Natural>)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            let f = |_: &(), &log_base: &u64| -> It<Vec<Natural>> {
-                let digits = exhaustive_natural_range(Natural::ZERO, Natural::power_of_2(log_base));
-                if log_base == 1 {
-                    Box::new(shortlex_vecs(digits))
-                } else {
-                    Box::new(exhaustive_vecs(digits))
-                }
-            };
-            Box::new(exhaustive_dependent_pairs_infinite_sqrt(
-                (),
-                exhaustive_positive_primitive_ints(),
-                f,
-            ))
-        }
-        GenerationMode::Random(scale) => Box::new(random_dependent_pairs(
-            scale,
-            range_up_geometric_u32(&EXAMPLE_SEED, scale, 1).map(u64::from),
-            pairs_of_u64_and_natural_vec_var_1_random_helper,
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_dependent_pairs(
-            scale,
-            range_up_geometric_u32(&EXAMPLE_SEED, scale, 1).map(u64::from),
-            pairs_of_u64_and_natural_vec_var_1_special_random_helper,
-        )),
-    }
-}
-
-struct RandomNaturalSmallU64AndVecOfBool {
-    pub(crate) ps: It<(Natural, u64)>,
-    pub(crate) rng: Box<IsaacRng>,
-}
-
-impl Iterator for RandomNaturalSmallU64AndVecOfBool {
-    type Item = (Natural, u64, Vec<bool>);
-
-    fn next(&mut self) -> Option<(Natural, u64, Vec<bool>)> {
-        let (n, log_base) = self.ps.next().unwrap();
-        let mut bools = Vec::new();
-        for _ in 0..n
-            .significant_bits()
-            .div_round(log_base, RoundingMode::Ceiling)
-        {
-            bools.push(self.rng.gen::<bool>());
-        }
-        Some((n, log_base, bools))
-    }
-}
-
-fn random_triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
-    seed: &[u32],
-    scale: u32,
-) -> RandomNaturalSmallU64AndVecOfBool {
-    RandomNaturalSmallU64AndVecOfBool {
-        ps: Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_naturals(seed, scale)),
-            &(|seed| random_range(seed, 1, T::WIDTH)),
-        )),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-fn special_random_triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
-    seed: &[u32],
-    scale: u32,
-) -> RandomNaturalSmallU64AndVecOfBool {
-    RandomNaturalSmallU64AndVecOfBool {
-        ps: Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| random_range(seed, 1, T::WIDTH)),
-        )),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-// All pairs of `Natural`, `u64` and `Vec<bool>`, where `T` is unsigned, the length of the `Vec` is
-// equal to the significant base-2<sup>`log_base`</sup>-digit count of the `Natural`, and the `u64`
-// is between 1 and `T::WIDTH`, inclusive.
-pub fn triples_of_natural_small_u64_and_vec_of_bool_var_1<T: PrimitiveUnsigned>(
-    gm: GenerationMode,
-) -> It<(Natural, u64, Vec<bool>)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            let f = move |(n, log_base): &(Natural, u64)| {
-                exhaustive_fixed_length_vecs_from_single(
-                    n.significant_bits()
-                        .div_round(*log_base, RoundingMode::Ceiling),
-                    exhaustive_bools(),
-                )
-            };
-            reshape_2_1_to_3(Box::new(dependent_pairs(
-                lex_pairs(
-                    exhaustive_naturals(),
-                    primitive_int_increasing_inclusive_range(1, T::WIDTH),
-                ),
-                f,
-            )))
-        }
-        GenerationMode::Random(scale) => Box::new(
-            random_triples_of_natural_small_u64_and_vec_of_bool_var_1::<T>(&EXAMPLE_SEED, scale),
-        ),
-        GenerationMode::SpecialRandom(scale) => Box::new(
-            special_random_triples_of_natural_small_u64_and_vec_of_bool_var_1::<T>(
-                &EXAMPLE_SEED,
-                scale,
-            ),
-        ),
-    }
-}
-
-fn random_triples_of_natural_small_u64_and_vec_of_bool_var_2(
-    seed: &[u32],
-    scale: u32,
-) -> RandomNaturalSmallU64AndVecOfBool {
-    RandomNaturalSmallU64AndVecOfBool {
-        ps: Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_naturals(seed, scale)),
-            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
-        )),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-fn special_random_triples_of_natural_small_u64_and_vec_of_bool_var_2(
-    seed: &[u32],
-    scale: u32,
-) -> RandomNaturalSmallU64AndVecOfBool {
-    RandomNaturalSmallU64AndVecOfBool {
-        ps: Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_naturals(seed, scale)),
-            &(|seed| range_up_geometric_u32(seed, scale, 1).map(u64::from)),
-        )),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-// All pairs of `Natural`, `u64` and `Vec<bool>`, where the length of the `Vec` is equal to the
-// significant base-2<sup>`log_base`</sup>-digit count of the `Natural`.
-pub fn triples_of_natural_small_u64_and_vec_of_bool_var_2(
-    gm: GenerationMode,
-) -> It<(Natural, u64, Vec<bool>)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            let f = move |(n, log_base): &(Natural, u64)| {
-                exhaustive_fixed_length_vecs_from_single(
-                    n.significant_bits()
-                        .div_round(*log_base, RoundingMode::Ceiling),
-                    exhaustive_bools(),
-                )
-            };
-            reshape_2_1_to_3(Box::new(dependent_pairs(
-                exhaustive_pairs_big_tiny(
-                    exhaustive_naturals(),
-                    exhaustive_positive_primitive_ints(),
-                ),
-                f,
-            )))
-        }
-        GenerationMode::Random(scale) => Box::new(
-            random_triples_of_natural_small_u64_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
-        ),
-        GenerationMode::SpecialRandom(scale) => Box::new(
-            special_random_triples_of_natural_small_u64_and_vec_of_bool_var_2(&EXAMPLE_SEED, scale),
-        ),
-    }
 }

@@ -103,12 +103,15 @@ fn limbs_neg_assign_bits_fail_3() {
 
 #[test]
 fn test_assign_bits() {
-    let test = |u, start, end, v, out| {
-        let mut n = Integer::from_str(u).unwrap();
-        n.assign_bits(start, end, &Natural::from_str(v).unwrap());
+    let test = |s, start, end, t, out| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut n = u.clone();
+        n.assign_bits(start, end, &v);
         assert_eq!(n, Integer::from_str(out).unwrap());
-        let mut n = Integer::from_str(u).unwrap();
-        assign_bits_naive(&mut n, start, end, &Natural::from_str(v).unwrap());
+        let mut n = u;
+        assign_bits_naive(&mut n, start, end, &v);
         assert_eq!(n, Integer::from_str(out).unwrap());
     };
     test("123", 10, 10, "456", "123");

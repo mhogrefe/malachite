@@ -1,6 +1,10 @@
-use bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
-use iterators::{nonzero_values, NonzeroValues};
-use num::arithmetic::traits::PowerOf2;
+use bools::random::{random_bools, RandomBools};
+use iterators::{
+    nonzero_values, with_special_value, with_special_values, NonzeroValues, WithSpecialValue,
+    WithSpecialValues,
+};
+use itertools::Itertools;
+use num::arithmetic::traits::{Parity, PowerOf2, ShrRound};
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::traits::{One, Zero};
@@ -9,14 +13,15 @@ use num::conversion::traits::WrappingFrom;
 use num::float::nice_float::NiceFloat;
 use num::float::PrimitiveFloat;
 use num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
-use num::logic::traits::BitAccess;
+use num::logic::traits::{BitAccess, SignificantBits};
 use num::random::geometric::{
     geometric_random_signed_inclusive_range, geometric_random_unsigned_inclusive_range,
-    GeometricRandomNaturalValues, GeometricRandomSignedRange,
+    geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
 };
 use rand::Rng;
 use rand_chacha::ChaCha20Rng;
 use random::{Seed, EXAMPLE_SEED};
+use rounding_modes::RoundingMode;
 use std::collections::HashMap;
 use std::convert::identity;
 use std::fmt::Debug;
@@ -1430,6 +1435,7 @@ pub fn random_primitive_floats<T: PrimitiveFloat>(seed: Seed) -> RandomPrimitive
 /// its documentation for more.
 #[derive(Clone, Debug)]
 pub struct SpecialRandomPositiveFiniteFloats<T: PrimitiveFloat> {
+    seed: Seed,
     exponents: GeometricRandomSignedRange<i64>,
     range_map: HashMap<i64, GeometricRandomNaturalValues<u64>>,
     ranges: VariableRangeGenerator,
@@ -1445,9 +1451,10 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
         let exponent = self.exponents.next().unwrap();
         let mean_precision_n = self.mean_precision_n;
         let mean_precision_d = self.mean_precision_d;
+        let seed = self.seed;
         let precisions = self.range_map.entry(exponent).or_insert_with(move || {
             geometric_random_unsigned_inclusive_range(
-                EXAMPLE_SEED.fork(&exponent.to_string()),
+                seed.fork(&exponent.to_string()),
                 1,
                 T::max_precision_for_exponent(exponent),
                 mean_precision_n,
@@ -1476,7 +1483,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
 ///
 /// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
 /// You can specify the mean absolute exponent and precision by passing the numerators and
-/// denominators of their means. This is the preferred way to generate floats.
+/// denominators of their means.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -1508,9 +1515,9 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
 ///     special_random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
 ///         .map(NiceFloat).take(20).collect_vec(),
 ///     [
-///         0.86257935, 0.00000166893, 0.015594482, 0.75, 70336.0, 0.012937546, 0.021591187,
-///         3.03125, 7.4140625, 0.00004196167, 0.30628967, 22528.0, 36864.0, 1.0625, 46.0,
-///         0.3203125, 0.0018615723, 1637.875, 0.15625, 0.0010681152
+///         0.80126953, 0.0000013709068, 0.015609741, 0.98552704, 65536.0, 0.008257866,
+///         0.017333984, 2.25, 7.7089844, 0.00004425831, 0.40625, 24576.0, 37249.0, 1.1991882,
+///         32.085938, 0.4375, 0.0012359619, 1536.0, 0.22912993, 0.0015716553
 ///     ].iter().cloned().map(NiceFloat).collect_vec()
 /// );
 /// ```
@@ -1524,6 +1531,7 @@ pub fn special_random_positive_finite_primitive_floats<T: PrimitiveFloat>(
     assert_ne!(mean_precision_denominator, 0);
     assert!(mean_precision_numerator > mean_precision_denominator);
     SpecialRandomPositiveFiniteFloats {
+        seed: seed.fork("precisions"),
         exponents: geometric_random_signed_inclusive_range(
             EXAMPLE_SEED.fork("exponents"),
             T::MIN_EXPONENT,
@@ -1561,7 +1569,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
 ///
 /// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
 /// You can specify the mean absolute exponent and precision by passing the numerators and
-/// denominators of their means. This is the preferred way to generate floats.
+/// denominators of their means.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -1593,9 +1601,9 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
 ///     special_random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
 ///         .map(NiceFloat).take(20).collect_vec(),
 ///     [
-///         -0.86257935, -0.00000166893, -0.015594482, -0.75, -70336.0, -0.012937546, -0.021591187,
-///         -3.03125, -7.4140625, -0.00004196167, -0.30628967, -22528.0, -36864.0, -1.0625, -46.0,
-///         -0.3203125, -0.0018615723, -1637.875, -0.15625, -0.0010681152
+///         -0.80126953, -0.0000013709068, -0.015609741, -0.98552704, -65536.0, -0.008257866,
+///         -0.017333984, -2.25, -7.7089844, -0.00004425831, -0.40625, -24576.0, -37249.0,
+///         -1.1991882, -32.085938, -0.4375, -0.0012359619, -1536.0, -0.22912993, -0.0015716553
 ///     ].iter().cloned().map(NiceFloat).collect_vec()
 /// );
 /// ```
@@ -1640,7 +1648,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
 ///
 /// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
 /// You can specify the mean absolute exponent and precision by passing the numerators and
-/// denominators of their means. This is the preferred way to generate floats.
+/// denominators of their means.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -1672,9 +1680,9 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
 ///     special_random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
 ///         .map(NiceFloat).take(20).collect_vec(),
 ///     [
-///         -0.5688782, -0.00000166893, -0.015167236, 0.75, -92864.0, 0.012998581, -0.02949524,
-///         -3.28125, -7.5703125, 0.00005722046, 0.33540344, 18432.0, -61440.0, -1.4375, 50.0,
-///         -0.4140625, -0.001739502, -1388.125, -0.15625, -0.001373291
+///         -0.6328125, -9.536743e-7, -0.013671875, 0.6875, -70208.0, 0.01550293, -0.028625488,
+///         -3.3095703, -5.775879, 0.000034958124, 0.4375, 31678.0, -49152.0, -1.0, 49.885254,
+///         -0.40625, -0.0015869141, -1889.5625, -0.14140439, -0.001449585
 ///     ].iter().cloned().map(NiceFloat).collect_vec()
 /// );
 /// ```
@@ -1698,55 +1706,12 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
     }
 }
 
-/// Generates floats that contain special values (infinities, zeros, or NaN).
-#[derive(Clone, Debug)]
-pub struct WithSpecialValues<I: Iterator>
-where
-    I::Item: Clone,
-{
-    bs: WeightedRandomBools,
-    special_values: RandomValuesFromVec<I::Item>,
-    xs: I,
-}
-
-impl<I: Iterator> Iterator for WithSpecialValues<I>
-where
-    I::Item: Clone,
-{
-    type Item = I::Item;
-
-    fn next(&mut self) -> Option<I::Item> {
-        if self.bs.next().unwrap() {
-            self.special_values.next()
-        } else {
-            self.xs.next()
-        }
-    }
-}
-
-fn with_special_values<I: Iterator>(
-    seed: Seed,
-    special_values: Vec<I::Item>,
-    p_numerator: u64,
-    p_denominator: u64,
-    xs_gen: &dyn Fn(Seed) -> I,
-) -> WithSpecialValues<I>
-where
-    I::Item: Clone,
-{
-    WithSpecialValues {
-        bs: weighted_random_bools(seed.fork("bs"), p_numerator, p_denominator),
-        special_values: random_values_from_vec(seed.fork("special_values"), special_values),
-        xs: xs_gen(seed.fork("xs")),
-    }
-}
-
 /// Generates finite primitive floats.
 ///
 /// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
 /// You can specify the numerator and denominator of the probability that a zero will be generated.
 /// You can also specify the mean absolute exponent and precision by passing the numerators and
-/// denominators of their means of the nonzero floats. This is the preferred way to generate floats.
+/// denominators of their means of the nonzero floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -1779,9 +1744,9 @@ where
 ///     special_random_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .map(NiceFloat).take(20).collect_vec(),
 ///     [
-///         0.9171448, 0.00000166893, 0.013153076, 0.0, -0.75, -102720.0, -0.012674332,
-///         -0.022476196, 2.65625, 4.2109375, -0.000049591064, -0.3943634, -18432.0, -0.0, -45056.0,
-///         -1.4375, -58.0, 0.0, 0.3046875, -0.0018005371
+///         0.65625, 0.0000014255784, 0.013183594, 0.0, -0.8125, -74240.0, -0.0078125, -0.03060913,
+///         3.331552, 4.75, -0.000038146973, -0.3125, -27136.0, -0.0, -59392.0, -1.75, -41.1875,
+///         0.0, 0.30940247, -0.0009765625
 ///     ].iter().cloned().map(NiceFloat).collect_vec()
 /// );
 /// ```
@@ -1817,8 +1782,7 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 /// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
 /// You can specify the numerator and denominator of the probability that positive infinity will be
 /// generated. You can also specify the mean absolute exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats. This is the preferred way to
-/// generate floats.
+/// numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -1851,10 +1815,10 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 ///     special_random_positive_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .map(NiceFloat).take(20).collect_vec(),
 ///     [
-///         0.5688782, 0.00000166893, 0.015167236, f32::POSITIVE_INFINITY, 0.75, 92864.0,
-///         0.012998581, 0.02949524, 3.28125, 7.5703125, 0.00005722046, 0.33540344, 18432.0,
-///         f32::POSITIVE_INFINITY, 61440.0, 1.4375, 50.0, f32::POSITIVE_INFINITY, 0.4140625,
-///         0.001739502
+///         0.6328125, 9.536743e-7, 0.013671875, f32::POSITIVE_INFINITY, 0.6875, 70208.0,
+///         0.01550293, 0.028625488, 3.3095703, 5.775879, 0.000034958124, 0.4375, 31678.0,
+///         f32::POSITIVE_INFINITY, 49152.0, 1.0, 49.885254, f32::POSITIVE_INFINITY, 0.40625,
+///         0.0015869141
 ///     ].iter().cloned().map(NiceFloat).collect_vec()
 /// );
 /// ```
@@ -1867,10 +1831,10 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
     mean_precision_denominator: u64,
     mean_special_p_numerator: u64,
     mean_special_p_denominator: u64,
-) -> WithSpecialValues<SpecialRandomPositiveFiniteFloats<T>> {
-    with_special_values(
+) -> WithSpecialValue<SpecialRandomPositiveFiniteFloats<T>> {
+    with_special_value(
         seed,
-        vec![T::POSITIVE_INFINITY],
+        T::POSITIVE_INFINITY,
         mean_special_p_numerator,
         mean_special_p_denominator,
         &|seed_2| {
@@ -1890,8 +1854,7 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 /// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
 /// You can specify the numerator and denominator of the probability that negative infinity will be
 /// generated. You can also specify the mean absolute exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats. This is the preferred way to
-/// generate floats.
+/// numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -1924,10 +1887,10 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 ///     special_random_negative_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .map(NiceFloat).take(20).collect_vec(),
 ///     [
-///         -0.5688782, -0.00000166893, -0.015167236, f32::NEGATIVE_INFINITY, -0.75, -92864.0,
-///         -0.012998581, -0.02949524, -3.28125, -7.5703125, -0.00005722046, -0.33540344, -18432.0,
-///         f32::NEGATIVE_INFINITY, -61440.0, -1.4375, -50.0, f32::NEGATIVE_INFINITY, -0.4140625,
-///         -0.001739502
+///         -0.6328125, -9.536743e-7, -0.013671875, f32::NEGATIVE_INFINITY, -0.6875, -70208.0,
+///         -0.01550293, -0.028625488, -3.3095703, -5.775879, -0.000034958124, -0.4375, -31678.0,
+///         f32::NEGATIVE_INFINITY, -49152.0, -1.0, -49.885254, f32::NEGATIVE_INFINITY, -0.40625,
+///         -0.0015869141
 ///     ].iter().cloned().map(NiceFloat).collect_vec()
 /// );
 /// ```
@@ -1940,10 +1903,10 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
     mean_precision_denominator: u64,
     mean_special_p_numerator: u64,
     mean_special_p_denominator: u64,
-) -> WithSpecialValues<SpecialRandomNegativeFiniteFloats<T>> {
-    with_special_values(
+) -> WithSpecialValue<SpecialRandomNegativeFiniteFloats<T>> {
+    with_special_value(
         seed,
-        vec![T::NEGATIVE_INFINITY],
+        T::NEGATIVE_INFINITY,
         mean_special_p_numerator,
         mean_special_p_denominator,
         &|seed_2| {
@@ -1963,8 +1926,7 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 /// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
 /// You can specify the numerator and denominator of the probability that an infinity will be
 /// generated. You can also specify the mean absolute exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats. This is the preferred way to
-/// generate floats.
+/// numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -1997,10 +1959,10 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 ///     special_random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .map(NiceFloat).take(20).collect_vec(),
 ///     [
-///         0.9171448, 0.00000166893, 0.013153076, f32::POSITIVE_INFINITY, -0.75, -102720.0,
-///         -0.012674332, -0.022476196, 2.65625, 4.2109375, -0.000049591064, -0.3943634, -18432.0,
-///         f32::NEGATIVE_INFINITY, -45056.0, -1.4375, -58.0, f32::POSITIVE_INFINITY, 0.3046875,
-///         -0.0018005371
+///         0.65625, 0.0000014255784, 0.013183594, f32::POSITIVE_INFINITY, -0.8125, -74240.0,
+///         -0.0078125, -0.03060913, 3.331552, 4.75, -0.000038146973, -0.3125, -27136.0,
+///         f32::NEGATIVE_INFINITY, -59392.0, -1.75, -41.1875, f32::POSITIVE_INFINITY, 0.30940247,
+///         -0.0009765625
 ///     ].iter().cloned().map(NiceFloat).collect_vec()
 /// );
 /// ```
@@ -2036,8 +1998,7 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 /// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
 /// You can specify the numerator and denominator of the probability that zero, infinity, or NaN
 /// will be generated. You can also specify the mean absolute exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats. This is the preferred way to
-/// generate floats.
+/// numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
@@ -2068,10 +2029,10 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 ///     special_random_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
 ///         .map(NiceFloat).take(20).collect_vec(),
 ///     [
-///         0.9171448, 0.00000166893, 0.013153076, f32::POSITIVE_INFINITY, -0.75, -102720.0,
-///         -0.012674332, -0.022476196, 2.65625, 4.2109375, -0.000049591064, -0.3943634, -18432.0,
-///         f32::POSITIVE_INFINITY, -45056.0, -1.4375, -58.0, f32::POSITIVE_INFINITY, 0.3046875,
-///         -0.0018005371
+///         0.65625, 0.0000014255784, 0.013183594, f32::POSITIVE_INFINITY, -0.8125, -74240.0,
+///         -0.0078125, -0.03060913, 3.331552, 4.75, -0.000038146973, -0.3125, -27136.0,
+///         f32::POSITIVE_INFINITY, -59392.0, -1.75, -41.1875, f32::POSITIVE_INFINITY, 0.30940247,
+///         -0.0009765625
 ///     ].iter().cloned().map(NiceFloat).collect_vec()
 /// );
 /// ```
@@ -2106,6 +2067,487 @@ pub fn special_random_primitive_floats<T: PrimitiveFloat>(
             )
         },
     )
+}
+
+// normalized exponent and raw mantissas in input, adjusted exponent and mantissas in output
+fn mantissas_inclusive<T: PrimitiveFloat>(
+    mut exponent: i64,
+    mut am: T::UnsignedOfEqualWidth,
+    mut bm: T::UnsignedOfEqualWidth,
+    precision: u64,
+) -> Option<(i64, T::UnsignedOfEqualWidth, T::UnsignedOfEqualWidth)>
+where
+    T::UnsignedOfEqualWidth: ShrRound<u64, Output = T::UnsignedOfEqualWidth>,
+{
+    assert_ne!(precision, 0);
+    let p: u64 = if exponent < T::MIN_NORMAL_EXPONENT {
+        let ab = am.significant_bits();
+        let bb = bm.significant_bits();
+        assert_eq!(ab, bb);
+        ab - precision
+    } else {
+        am.set_bit(T::MANTISSA_WIDTH);
+        bm.set_bit(T::MANTISSA_WIDTH);
+        T::MANTISSA_WIDTH + 1 - precision
+    };
+    let mut lo = am.shr_round(p, RoundingMode::Up);
+    if lo.even() {
+        lo += T::UnsignedOfEqualWidth::ONE;
+    }
+    let mut hi = bm.shr_round(p, RoundingMode::Down);
+    if hi == T::UnsignedOfEqualWidth::ZERO {
+        return None;
+    } else if hi.even() {
+        hi -= T::UnsignedOfEqualWidth::ONE;
+    }
+    if exponent >= T::MIN_NORMAL_EXPONENT {
+        exponent -= i64::wrapping_from(T::MANTISSA_WIDTH);
+    }
+    exponent += i64::wrapping_from(p);
+    if lo > hi {
+        None
+    } else {
+        Some((exponent, lo >> 1, hi >> 1))
+    }
+}
+
+#[allow(clippy::type_complexity)]
+#[derive(Clone, Debug)]
+pub struct SpecialRandomPositiveFiniteFloatInclusiveRange<T: PrimitiveFloat> {
+    am: T::UnsignedOfEqualWidth, // raw mantissa
+    bm: T::UnsignedOfEqualWidth,
+    ae: i64, // normalized exponent
+    be: i64,
+    exponents: GeometricRandomSignedRange<i64>,
+    precision_range_map: HashMap<i64, Vec<(i64, T::UnsignedOfEqualWidth, T::UnsignedOfEqualWidth)>>,
+    precision_indices: GeometricRandomNaturalValues<usize>,
+    ranges: VariableRangeGenerator,
+}
+
+impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloatInclusiveRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        let exponent = self.exponents.next().unwrap();
+        let ae = self.ae;
+        let be = self.be;
+        let am = self.am;
+        let bm = self.bm;
+        let precision_ranges = self.precision_range_map.entry(exponent).or_insert_with(|| {
+            let am = if exponent == ae {
+                am
+            } else {
+                T::from_adjusted_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, exponent)
+                    .unwrap()
+                    .raw_mantissa_and_exponent()
+                    .0
+            };
+            let bm = if exponent == be {
+                bm
+            } else {
+                T::from_adjusted_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, exponent + 1)
+                    .unwrap()
+                    .next_lower()
+                    .raw_mantissa_and_exponent()
+                    .0
+            };
+            (1..=T::max_precision_for_exponent(exponent))
+                .filter_map(|p| mantissas_inclusive::<T>(exponent, am, bm, p))
+                .collect_vec()
+        });
+        assert!(!precision_ranges.is_empty());
+        let i = self.precision_indices.next().unwrap() % precision_ranges.len();
+        let t = precision_ranges[i];
+        let mantissa =
+            (self.ranges.next_in_inclusive_range(t.1, t.2) << 1) | T::UnsignedOfEqualWidth::ONE;
+        Some(T::from_adjusted_mantissa_and_exponent(mantissa, t.0).unwrap())
+    }
+}
+
+fn special_random_positive_finite_float_inclusive_range<T: PrimitiveFloat>(
+    seed: Seed,
+    a: T,
+    b: T,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> SpecialRandomPositiveFiniteFloatInclusiveRange<T> {
+    assert!(a.is_finite());
+    assert!(b.is_finite());
+    assert!(a > T::ZERO);
+    assert!(a <= b);
+    let (am, ae) = a.raw_mantissa_and_exponent();
+    let (bm, be) = b.raw_mantissa_and_exponent();
+    let ae = if ae == 0 {
+        i64::wrapping_from(am.significant_bits()) + T::MIN_EXPONENT - 1
+    } else {
+        i64::wrapping_from(ae) - T::MAX_EXPONENT
+    };
+    let be = if be == 0 {
+        i64::wrapping_from(bm.significant_bits()) + T::MIN_EXPONENT - 1
+    } else {
+        i64::wrapping_from(be) - T::MAX_EXPONENT
+    };
+    SpecialRandomPositiveFiniteFloatInclusiveRange {
+        am,
+        bm,
+        ae,
+        be,
+        exponents: geometric_random_signed_inclusive_range(
+            seed.fork("exponents"),
+            ae,
+            be,
+            mean_exponent_numerator,
+            mean_exponent_denominator,
+        ),
+        precision_range_map: HashMap::new(),
+        precision_indices: geometric_random_unsigneds(
+            seed.fork("precisions"),
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ),
+        ranges: variable_range_generator(seed.fork("ranges")),
+    }
+}
+
+#[allow(clippy::large_enum_variant)]
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub enum SpecialRandomFiniteFloatInclusiveRange<T: PrimitiveFloat> {
+    AllPositive(SpecialRandomPositiveFiniteFloatInclusiveRange<T>),
+    AllNegative(SpecialRandomPositiveFiniteFloatInclusiveRange<T>),
+    PositiveAndNegative(
+        RandomBools,
+        SpecialRandomPositiveFiniteFloatInclusiveRange<T>,
+        SpecialRandomPositiveFiniteFloatInclusiveRange<T>,
+    ),
+}
+
+impl<T: PrimitiveFloat> Iterator for SpecialRandomFiniteFloatInclusiveRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        match self {
+            SpecialRandomFiniteFloatInclusiveRange::AllPositive(ref mut xs) => xs.next(),
+            SpecialRandomFiniteFloatInclusiveRange::AllNegative(ref mut xs) => {
+                xs.next().map(|x| -x)
+            }
+            SpecialRandomFiniteFloatInclusiveRange::PositiveAndNegative(
+                ref mut bs,
+                ref mut xs,
+                ref mut ys,
+            ) => {
+                if bs.next().unwrap() {
+                    xs.next()
+                } else {
+                    ys.next().map(|x| -x)
+                }
+            }
+        }
+    }
+}
+
+fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
+    seed: Seed,
+    a: T,
+    b: T,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+) -> SpecialRandomFiniteFloatInclusiveRange<T> {
+    assert!(a.is_finite());
+    assert!(b.is_finite());
+    assert_ne!(a, T::ZERO);
+    assert_ne!(b, T::ZERO);
+    assert!(a <= b);
+    if a > T::ZERO {
+        SpecialRandomFiniteFloatInclusiveRange::AllPositive(
+            special_random_positive_finite_float_inclusive_range(
+                seed,
+                a,
+                b,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            ),
+        )
+    } else if b < T::ZERO {
+        SpecialRandomFiniteFloatInclusiveRange::AllNegative(
+            special_random_positive_finite_float_inclusive_range(
+                seed,
+                -b,
+                -a,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            ),
+        )
+    } else {
+        SpecialRandomFiniteFloatInclusiveRange::PositiveAndNegative(
+            random_bools(seed.fork("bs")),
+            special_random_positive_finite_float_inclusive_range(
+                seed,
+                T::MIN_POSITIVE_SUBNORMAL,
+                b,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            ),
+            special_random_positive_finite_float_inclusive_range(
+                seed,
+                T::MIN_POSITIVE_SUBNORMAL,
+                -a,
+                mean_exponent_numerator,
+                mean_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            ),
+        )
+    }
+}
+
+/// Generates random primitive floats in a range.
+#[derive(Clone, Debug)]
+pub enum SpecialRandomFloatInclusiveRange<T: PrimitiveFloat> {
+    OnlySpecial(RandomValuesFromVec<T>),
+    NoSpecial(SpecialRandomFiniteFloatInclusiveRange<T>),
+    Special(WithSpecialValues<SpecialRandomFiniteFloatInclusiveRange<T>>),
+}
+
+impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        match self {
+            SpecialRandomFloatInclusiveRange::OnlySpecial(ref mut xs) => xs.next(),
+            SpecialRandomFloatInclusiveRange::NoSpecial(ref mut xs) => xs.next(),
+            SpecialRandomFloatInclusiveRange::Special(ref mut xs) => xs.next(),
+        }
+    }
+}
+
+/// Generates random primitive floats in the half-open interval $[a, b)$.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that any special
+/// values (positive or negative zero or infinity) are generated, provided that they are in the
+/// range. You can also specify the mean absolute exponent and precision by passing the numerators
+/// and denominators of their means of the finite floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater the smallest absolute of any exponent of a float
+///   in the range, and the precision mean greater than 2, but they may be as high as you like.
+///
+/// `NaN` is never generated.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `a` or `b` are `NaN`, if `a` is greater than or equal to `b` in the `NiceFloat`
+/// ordering, if any of the denominators are zero, if the special probability is greater than 1, if
+/// the mean precision is less than 2, or if the mean exponent is less than or equal to the minimum
+/// absolute value of any exponent in the range.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::random::special_random_primitive_float_range;
+///
+/// assert_eq!(
+///     special_random_primitive_float_range::<f32>(
+///         EXAMPLE_SEED,
+///         core::f32::consts::E,
+///         core::f32::consts::PI,
+///         10,
+///         1,
+///         10,
+///         1,
+///         1,
+///         100
+///     ).map(NiceFloat).take(20).collect_vec(),
+///     [
+///         2.9238281, 2.953125, 3.0, 2.8671875, 2.8125, 3.125, 3.015625, 2.8462658, 3.140625,
+///         2.875, 3.0, 2.75, 3.0, 2.71875, 2.75, 3.0214844, 2.970642, 3.0179443, 2.968872, 2.75
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
+    seed: Seed,
+    a: T,
+    b: T,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_special_p_numerator: u64,
+    mean_special_p_denominator: u64,
+) -> SpecialRandomFloatInclusiveRange<T> {
+    assert!(!a.is_nan());
+    assert!(!b.is_nan());
+    assert!(NiceFloat(a) < NiceFloat(b));
+    special_random_primitive_float_inclusive_range(
+        seed,
+        a,
+        b.next_lower(),
+        mean_exponent_numerator,
+        mean_exponent_denominator,
+        mean_precision_numerator,
+        mean_precision_denominator,
+        mean_special_p_numerator,
+        mean_special_p_denominator,
+    )
+}
+
+/// Generates random primitive floats in the closed interval $[a, b]$.
+///
+/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that any special
+/// values (positive or negative zero or infinity) are generated, provided that they are in the
+/// range. You can also specify the mean absolute exponent and precision by passing the numerators
+/// and denominators of their means of the finite floats.
+///
+/// But note that the means are only approximate, since the distributions we are sampling are
+/// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
+/// implications are that
+/// - The actual mean is lower than the specified means.
+/// - However, increasing the approximate mean increases the actual means, so this still works as a
+///   mechanism for controlling the exponent and precision.
+/// - The specified exponent mean must be greater the smallest absolute of any exponent of a float
+///   in the range, and the precision mean greater than 2, but they may be as high as you like.
+///
+/// `NaN` is never generated.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `a` or `b` are `NaN`, if `a` is greater than `b` in the `NiceFloat` ordering, if any
+/// of the denominators are zero, if the special probability is greater than 1, if the mean
+/// precision is less than 2, or if the mean exponent is less than or equal to the minimum absolute
+/// value of any exponent in the range.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::num::float::nice_float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::random::special_random_primitive_float_inclusive_range;
+///
+/// assert_eq!(
+///     special_random_primitive_float_inclusive_range::<f32>(
+///         EXAMPLE_SEED,
+///         core::f32::consts::E,
+///         core::f32::consts::PI,
+///         10,
+///         1,
+///         10,
+///         1,
+///         1,
+///         100
+///     ).map(NiceFloat).take(20).collect_vec(),
+///     [
+///         2.9238281, 2.953125, 3.0, 2.8671875, 2.8125, 3.125, 3.015625, 2.8462658, 3.140625,
+///         2.875, 3.0, 2.75, 3.0, 2.71875, 2.75, 3.0214844, 2.970642, 3.0179443, 2.968872, 2.75
+///     ].iter().cloned().map(NiceFloat).collect_vec()
+/// );
+/// ```
+pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
+    seed: Seed,
+    mut a: T,
+    mut b: T,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_precision_numerator: u64,
+    mean_precision_denominator: u64,
+    mean_special_p_numerator: u64,
+    mean_special_p_denominator: u64,
+) -> SpecialRandomFloatInclusiveRange<T> {
+    assert!(!a.is_nan());
+    assert!(!b.is_nan());
+    assert!(NiceFloat(a) <= NiceFloat(b));
+    assert_ne!(mean_special_p_denominator, 0);
+    assert!(mean_special_p_numerator <= mean_special_p_denominator);
+    assert_ne!(mean_precision_denominator, 0);
+    assert!(mean_precision_numerator > mean_precision_denominator);
+    let only_special =
+        a == T::POSITIVE_INFINITY || b == T::NEGATIVE_INFINITY || a == T::ZERO && b == T::ZERO;
+    let mut special_values = Vec::new();
+    if a == T::NEGATIVE_INFINITY {
+        special_values.push(a);
+        a = -T::MAX_FINITE;
+    }
+    if b == T::POSITIVE_INFINITY {
+        special_values.push(b);
+        b = T::MAX_FINITE;
+    }
+    if NiceFloat(a) <= NiceFloat(T::NEGATIVE_ZERO) && NiceFloat(b) >= NiceFloat(T::NEGATIVE_ZERO) {
+        special_values.push(T::NEGATIVE_ZERO);
+    }
+    if NiceFloat(a) <= NiceFloat(T::ZERO) && NiceFloat(b) >= NiceFloat(T::ZERO) {
+        special_values.push(T::ZERO);
+    }
+    if a == T::ZERO {
+        a = T::MIN_POSITIVE_SUBNORMAL;
+    }
+    if b == T::ZERO {
+        b = -T::MIN_POSITIVE_SUBNORMAL;
+    }
+    if only_special {
+        SpecialRandomFloatInclusiveRange::OnlySpecial(random_values_from_vec(seed, special_values))
+    } else if special_values.is_empty() {
+        SpecialRandomFloatInclusiveRange::NoSpecial(special_random_finite_float_inclusive_range(
+            seed,
+            a,
+            b,
+            mean_exponent_numerator,
+            mean_exponent_denominator,
+            mean_precision_numerator,
+            mean_precision_denominator,
+        ))
+    } else {
+        SpecialRandomFloatInclusiveRange::Special(with_special_values(
+            seed,
+            special_values,
+            mean_special_p_numerator,
+            mean_special_p_denominator,
+            &|seed| {
+                special_random_finite_float_inclusive_range(
+                    seed,
+                    a,
+                    b,
+                    mean_exponent_numerator,
+                    mean_exponent_denominator,
+                    mean_precision_numerator,
+                    mean_precision_denominator,
+                )
+            },
+        ))
+    }
 }
 
 /// Generates ranges of unsigneds. A single generator can generate many different ranges.

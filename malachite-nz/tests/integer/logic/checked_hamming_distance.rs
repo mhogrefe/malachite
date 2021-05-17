@@ -59,31 +59,17 @@ fn limbs_hamming_distance_neg_fail_2() {
 
 #[test]
 fn test_checked_hamming_distance() {
-    let test = |x, y, out| {
-        assert_eq!(
-            Integer::from_str(x)
-                .unwrap()
-                .checked_hamming_distance(&Integer::from_str(y).unwrap()),
-            out
-        );
-        assert_eq!(
-            integer_checked_hamming_distance_alt_1(
-                &Integer::from_str(x).unwrap(),
-                &Integer::from_str(y).unwrap(),
-            ),
-            out
-        );
-        assert_eq!(
-            integer_checked_hamming_distance_alt_2(
-                &Integer::from_str(x).unwrap(),
-                &Integer::from_str(y).unwrap(),
-            ),
-            out
-        );
+    let test = |s, t, out| {
+        let u = Integer::from_str(s).unwrap();
+        let v = Integer::from_str(t).unwrap();
+
+        assert_eq!(u.checked_hamming_distance(&v), out);
+        assert_eq!(integer_checked_hamming_distance_alt_1(&u, &v,), out);
+        assert_eq!(integer_checked_hamming_distance_alt_2(&u, &v,), out);
         assert_eq!(
             rug_checked_hamming_distance(
-                &rug::Integer::from_str(x).unwrap(),
-                &rug::Integer::from_str(y).unwrap(),
+                &rug::Integer::from_str(s).unwrap(),
+                &rug::Integer::from_str(t).unwrap(),
             ),
             out
         );

@@ -10,21 +10,25 @@ use itertools::{repeat_n, Itertools};
 use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
 use malachite_base::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars};
-use malachite_base::comparison::traits::{Max, Min};
+use malachite_base::comparison::traits::Min;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, DivRound, PowerOf2, UnsignedAbs,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom, SplitInHalf, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
-    exhaustive_natural_signeds, exhaustive_negative_signeds, exhaustive_nonzero_signeds,
-    exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
-    exhaustive_signed_inclusive_range, exhaustive_signeds, exhaustive_unsigneds,
-    primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
-    PrimitiveIntIncreasingRange,
+    exhaustive_finite_primitive_floats, exhaustive_natural_signeds, exhaustive_negative_signeds,
+    exhaustive_nonzero_signeds, exhaustive_positive_finite_primitive_floats,
+    exhaustive_positive_primitive_ints, exhaustive_primitive_float_range,
+    exhaustive_primitive_floats, exhaustive_signed_inclusive_range, exhaustive_signed_range,
+    exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
+    primitive_int_increasing_range, PrimitiveIntIncreasingRange,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
@@ -100,6 +104,142 @@ pub fn exhaustive_char_pair_gen() -> It<(char, char)> {
 
 pub fn exhaustive_primitive_float_gen<T: PrimitiveFloat>() -> It<T> {
     Box::new(exhaustive_primitive_floats())
+}
+
+pub fn exhaustive_primitive_float_gen_var_1<T: PrimitiveFloat>() -> It<T> {
+    Box::new(exhaustive_primitive_float_range(
+        T::NEGATIVE_ONE / T::TWO,
+        T::POSITIVE_INFINITY,
+    ))
+}
+
+struct ExhaustivePositiveNaturalFloats<T: PrimitiveFloat> {
+    done: bool,
+    exponent: i64,
+    limit: T::UnsignedOfEqualWidth,
+    mantissa: T::UnsignedOfEqualWidth,
+}
+
+impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveNaturalFloats<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        if self.done {
+            None
+        } else {
+            let f = T::from_adjusted_mantissa_and_exponent(self.mantissa, self.exponent).unwrap();
+            if f == T::MAX_FINITE {
+                self.done = true;
+            } else {
+                self.mantissa += T::UnsignedOfEqualWidth::ONE;
+                if self.mantissa == self.limit {
+                    self.mantissa >>= 1;
+                    self.exponent += 1;
+                    self.limit = T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1);
+                }
+            }
+            Some(f)
+        }
+    }
+}
+
+fn exhaustive_positive_natural_floats<T: PrimitiveFloat>() -> ExhaustivePositiveNaturalFloats<T> {
+    ExhaustivePositiveNaturalFloats {
+        done: false,
+        exponent: 0,
+        limit: T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1),
+        mantissa: T::UnsignedOfEqualWidth::ONE,
+    }
+}
+
+pub fn exhaustive_primitive_float_gen_var_2<T: PrimitiveFloat>() -> It<T> {
+    Box::new(once(T::ZERO).chain(exhaustive_positive_natural_floats()))
+}
+
+pub fn exhaustive_primitive_float_gen_var_3<T: PrimitiveFloat>() -> It<T> {
+    Box::new(exhaustive_positive_finite_primitive_floats::<T>().filter(|f| !f.is_integer()))
+}
+
+pub fn exhaustive_primitive_float_gen_var_4<T: PrimitiveFloat>() -> It<T> {
+    let limit = T::from_adjusted_mantissa_and_exponent(
+        T::UnsignedOfEqualWidth::ONE,
+        i64::wrapping_from(T::MANTISSA_WIDTH),
+    )
+    .unwrap();
+    Box::new(
+        exhaustive_positive_natural_floats::<T>()
+            .take_while(move |&f| f <= limit)
+            .map(|f| f - T::ONE / T::TWO),
+    )
+}
+
+pub fn exhaustive_primitive_float_gen_var_5<T: PrimitiveFloat>() -> It<T> {
+    Box::new(
+        lex_pairs(
+            exhaustive_primitive_float_gen_var_2::<T>(),
+            exhaustive_bools(),
+        )
+        .map(|(f, b)| if b { f } else { -f }),
+    )
+}
+
+pub fn exhaustive_primitive_float_gen_var_6<T: PrimitiveFloat>() -> It<T> {
+    Box::new(
+        lex_pairs(
+            exhaustive_primitive_float_gen_var_3::<T>(),
+            exhaustive_bools(),
+        )
+        .map(|(f, b)| if b { f } else { -f }),
+    )
+}
+
+pub fn exhaustive_primitive_float_gen_var_7<T: PrimitiveFloat>() -> It<T> {
+    Box::new(
+        lex_pairs(
+            exhaustive_primitive_float_gen_var_4::<T>(),
+            exhaustive_bools(),
+        )
+        .map(|(f, b)| if b { f } else { -f }),
+    )
+}
+
+pub fn exhaustive_primitive_float_gen_var_8<T: PrimitiveFloat>() -> It<T> {
+    Box::new(exhaustive_finite_primitive_floats())
+}
+
+// -- (PrimitiveFloat, RoundingMode) --
+
+pub(crate) fn float_rounding_mode_filter_var_1<T: PrimitiveFloat>(p: &(T, RoundingMode)) -> bool {
+    let &(f, rm) = p;
+    match rm {
+        RoundingMode::Floor | RoundingMode::Up => f >= T::ZERO,
+        RoundingMode::Ceiling | RoundingMode::Down => f > T::NEGATIVE_ONE,
+        RoundingMode::Nearest => f >= T::NEGATIVE_ONE / T::TWO,
+        RoundingMode::Exact => f >= T::ZERO && f.is_integer(),
+    }
+}
+
+pub fn exhaustive_primitive_float_rounding_mode_pair_gen_var_1<T: PrimitiveFloat>(
+) -> It<(T, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_finite_primitive_floats(),
+            exhaustive_rounding_modes(),
+        )
+        .filter(float_rounding_mode_filter_var_1),
+    )
+}
+
+//TODO
+pub fn exhaustive_primitive_float_rounding_mode_pair_gen_var_2<T: PrimitiveFloat>(
+) -> It<(T, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_finite_primitive_floats::<T>(),
+            exhaustive_rounding_modes(),
+        )
+        .filter(|&(f, rm)| rm != RoundingMode::Exact || f.is_integer()),
+    )
 }
 
 // -- PrimitiveInt --
@@ -275,6 +415,13 @@ pub fn exhaustive_signed_pair_gen_var_6<T: PrimitiveSigned>() -> It<(T, T)> {
         exhaustive_pairs(exhaustive_signeds::<T>(), exhaustive_nonzero_signeds::<T>())
             .filter(|&(x, y)| !x.divisible_by(y)),
     )
+}
+
+pub fn exhaustive_signed_pair_gen_var_7<T: PrimitiveSigned>() -> It<(T, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_signeds(),
+        exhaustive_nonzero_signeds(),
+    ))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
@@ -622,6 +769,30 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_10<T: PrimitiveSigned>() -> It<(T
             phantom: PhantomData,
         },
     )))
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_11<T: PrimitiveSigned>() -> It<(T, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_natural_signeds(), exhaustive_unsigneds()).interleave(
+            exhaustive_pairs_big_tiny(
+                exhaustive_signeds(),
+                primitive_int_increasing_inclusive_range(0, T::WIDTH),
+            ),
+        ),
+    )
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_12<T: PrimitiveSigned>() -> It<(T, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_signed_range(T::MIN + T::ONE, T::ONE),
+            exhaustive_unsigneds(),
+        )
+        .interleave(exhaustive_pairs_big_tiny(
+            exhaustive_signeds(),
+            primitive_int_increasing_range(0, T::WIDTH),
+        )),
+    )
 }
 
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
@@ -1077,6 +1248,17 @@ pub fn exhaustive_unsigned_pair_gen_var_14<T: PrimitiveUnsigned>() -> It<(T, u64
     )))
 }
 
+pub fn exhaustive_unsigned_pair_gen_var_15<T: PrimitiveUnsigned>() -> It<(T, u64)> {
+    Box::new(
+        exhaustive_unsigneds()
+            .map(|x| (T::ZERO, x))
+            .interleave(exhaustive_pairs_big_tiny(
+                exhaustive_positive_primitive_ints(),
+                primitive_int_increasing_range(0, T::WIDTH),
+            )),
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -1342,6 +1524,17 @@ pub fn exhaustive_unsigned_triple_gen_var_11<T: PrimitiveUnsigned>() -> It<(T, T
         exhaustive_triples_from_single(exhaustive_unsigneds::<T>())
             .flat_map(|(x, y, z)| Some((x, y, max(x, y).checked_add(z)?.checked_add(T::ONE)?))),
     )
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_12<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(T, U, U)> {
+    Box::new(exhaustive_triples_xyy_custom_output(
+        exhaustive_unsigneds(),
+        exhaustive_unsigneds(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -1655,13 +1848,13 @@ pub fn exhaustive_string_gen_var_3() -> It<String> {
     )))
 }
 
-struct TargetedIntegerFromStrStrings {
+struct TargetedIntegerFromStrStringsVar1 {
     neg: bool,
     s: String,
     ss: It<String>,
 }
 
-impl Iterator for TargetedIntegerFromStrStrings {
+impl Iterator for TargetedIntegerFromStrStringsVar1 {
     type Item = String;
 
     fn next(&mut self) -> Option<String> {
@@ -1671,15 +1864,13 @@ impl Iterator for TargetedIntegerFromStrStrings {
             self.s.clone()
         } else {
             self.neg = true;
-            let mut out = '-'.to_string();
-            out.push_str(&self.s);
-            out
+            format!("-{}", self.s)
         })
     }
 }
 
 pub fn exhaustive_string_gen_var_4() -> It<String> {
-    Box::new(TargetedIntegerFromStrStrings {
+    Box::new(TargetedIntegerFromStrStringsVar1 {
         neg: true,
         s: String::new(),
         ss: exhaustive_string_gen_var_3(),
@@ -1705,6 +1896,45 @@ pub fn exhaustive_string_gen_var_7() -> It<String> {
         1,
         lex_union3s('0'..='9', 'a'..='f', 'A'..='F').map(Union3::unwrap),
     )))
+}
+
+pub fn exhaustive_string_gen_var_8() -> It<String> {
+    Box::new(
+        strings_from_char_vecs(exhaustive_vecs_min_length(
+            1,
+            lex_union3s('0'..='9', 'a'..='f', 'A'..='F').map(Union3::unwrap),
+        ))
+        .map(|s| format!("\"0x{}\"", s)),
+    )
+}
+
+struct TargetedIntegerFromStrStringsVar2 {
+    neg: bool,
+    s: String,
+    ss: It<String>,
+}
+
+impl Iterator for TargetedIntegerFromStrStringsVar2 {
+    type Item = String;
+
+    fn next(&mut self) -> Option<String> {
+        Some(if self.neg {
+            self.neg = false;
+            self.s = self.ss.next().unwrap();
+            format!("\"0x{}\"", self.s)
+        } else {
+            self.neg = true;
+            format!("\"-0x{}\"", self.s)
+        })
+    }
+}
+
+pub fn exhaustive_string_gen_var_9() -> It<String> {
+    Box::new(TargetedIntegerFromStrStringsVar2 {
+        neg: true,
+        s: String::new(),
+        ss: exhaustive_string_gen_var_7(),
+    })
 }
 
 // -- (String, String) --
@@ -1781,6 +2011,13 @@ pub fn exhaustive_bool_vec_gen_var_4<T: PrimitiveSigned>() -> It<Vec<bool>> {
 
 pub fn exhaustive_unsigned_vec_gen<T: PrimitiveUnsigned>() -> It<Vec<T>> {
     Box::new(exhaustive_vecs(exhaustive_unsigneds()))
+}
+
+pub fn exhaustive_unsigned_vec_gen_var_1<T: PrimitiveUnsigned>() -> It<Vec<T>> {
+    Box::new(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds())
+            .filter(|xs| *xs.last().unwrap() != T::ZERO),
+    )
 }
 
 // --(Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --

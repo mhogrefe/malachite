@@ -582,7 +582,37 @@ pub mod eq_mod;
 /// assert_eq!((-0b1101i64).eq_mod_power_of_2(0b11011, 4), false);
 /// ```
 pub mod eq_mod_power_of_2;
+/// This module wraps the `is_power_of_two` function into an implementation of `IsPowerOf2`.
 pub mod is_power_of_2;
+/// This module contains functions for taking the base-2 logarithm of a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # floor_log_base_2
+/// ```
+/// use malachite_base::num::arithmetic::traits::FloorLogBase2;
+///
+/// assert_eq!(1u8.floor_log_base_2(), 0);
+/// assert_eq!(100u64.floor_log_base_2(), 6);
+/// ```
+///
+/// # ceiling_log_base_2
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingLogBase2;
+///
+/// assert_eq!(1u8.ceiling_log_base_2(), 0);
+/// assert_eq!(100u64.ceiling_log_base_2(), 7);
+/// ```
+///
+/// # checked_log_base_2
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedLogBase2;
+///
+/// assert_eq!(1u8.checked_log_base_2(), Some(0));
+/// assert_eq!(100u64.checked_log_base_2(), None);
+/// assert_eq!(128u64.checked_log_base_2(), Some(7));
+/// ```
+pub mod log_base_2;
 /// This module contains functions for adding two numbers, mod another number.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -929,7 +959,6 @@ pub mod sign;
 pub mod square;
 pub mod sub_mul;
 pub mod traits;
-pub mod unsigneds;
 pub mod wrapping_abs;
 pub mod wrapping_add;
 pub mod wrapping_add_mul;

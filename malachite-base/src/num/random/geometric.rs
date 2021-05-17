@@ -73,7 +73,7 @@ impl SimpleRational {
         }
     }
 
-    pub(crate) fn inverse(self) -> SimpleRational {
+    fn inverse(self) -> SimpleRational {
         assert_ne!(self.n, 0);
         SimpleRational {
             n: self.d,
@@ -155,7 +155,7 @@ fn geometric_random_negative_signeds_range<T: PrimitiveSigned>(
     abs_um_numerator: u64,
     abs_um_denominator: u64,
 ) -> GeometricRandomNegativeSigneds<T> {
-    assert!(abs_min > abs_max);
+    assert!(abs_min >= abs_max);
     assert_ne!(abs_um_denominator, 0);
     let (numerator, denominator) = mean_to_p_with_min(
         abs_min.checked_neg().unwrap(),

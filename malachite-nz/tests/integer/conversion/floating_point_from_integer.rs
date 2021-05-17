@@ -1,9 +1,16 @@
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
+use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_gen_var_1, integer_gen_var_2, integer_gen_var_3,
+    integer_rounding_mode_pair_gen_var_1,
+};
 use std::str::FromStr;
 
 #[test]
@@ -1398,4 +1405,300 @@ fn test_f64_convertible_from_integer() {
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
         38177180919299881250404026184124858369", false);
+}
+
+fn float_rounding_from_integer_properties_helper<
+    T: for<'a> CheckedFrom<&'a Natural>
+        + for<'a> ConvertibleFrom<&'a Integer>
+        + for<'a> ConvertibleFrom<&'a Natural>
+        + PrimitiveFloat
+        + RoundingFrom<Integer>
+        + for<'a> RoundingFrom<&'a Integer>,
+>()
+where
+    Integer: From<T> + RoundingFrom<T>,
+    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    integer_rounding_mode_pair_gen_var_1::<T>().test_properties(|(n, rm)| {
+        let f = T::rounding_from(&n, rm);
+        assert_eq!(NiceFloat(T::rounding_from(n.clone(), rm)), NiceFloat(f));
+        assert_eq!(
+            NiceFloat(T::rounding_from(-n, -rm)),
+            NiceFloat((-f).abs_negative_zeros())
+        );
+    });
+
+    integer_gen_var_1::<T>().test_properties(|n| {
+        let f = T::rounding_from(n.clone(), RoundingMode::Exact);
+        assert_eq!(
+            NiceFloat(T::rounding_from(&n, RoundingMode::Exact)),
+            NiceFloat(f)
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(&n, RoundingMode::Floor))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(&n, RoundingMode::Ceiling))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(&n, RoundingMode::Down))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(&n, RoundingMode::Up))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Ceiling))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Down))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Up))
+        );
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Nearest))
+        );
+        assert_eq!(Integer::rounding_from(f, RoundingMode::Exact), n);
+    });
+
+    integer_gen_var_2::<T>().test_properties(|n| {
+        let f_below = T::rounding_from(&n, RoundingMode::Floor);
+        assert_eq!(
+            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor)),
+            NiceFloat(f_below)
+        );
+        let f_above = f_below.next_higher();
+        assert_eq!(
+            NiceFloat(f_above),
+            NiceFloat(T::rounding_from(&n, RoundingMode::Ceiling))
+        );
+        assert_eq!(
+            NiceFloat(f_above),
+            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Ceiling))
+        );
+        if n >= 0 {
+            assert_eq!(
+                NiceFloat(f_below),
+                NiceFloat(T::rounding_from(&n, RoundingMode::Down))
+            );
+            assert_eq!(
+                NiceFloat(f_below),
+                NiceFloat(T::rounding_from(n.clone(), RoundingMode::Down))
+            );
+            assert_eq!(
+                NiceFloat(f_above),
+                NiceFloat(T::rounding_from(&n, RoundingMode::Up))
+            );
+            assert_eq!(
+                NiceFloat(f_above),
+                NiceFloat(T::rounding_from(n.clone(), RoundingMode::Up))
+            );
+        } else {
+            assert_eq!(
+                NiceFloat(f_above),
+                NiceFloat(T::rounding_from(&n, RoundingMode::Down))
+            );
+            assert_eq!(
+                NiceFloat(f_above),
+                NiceFloat(T::rounding_from(n.clone(), RoundingMode::Down))
+            );
+            assert_eq!(
+                NiceFloat(f_below),
+                NiceFloat(T::rounding_from(&n, RoundingMode::Up))
+            );
+            assert_eq!(
+                NiceFloat(f_below),
+                NiceFloat(T::rounding_from(n.clone(), RoundingMode::Up))
+            );
+        }
+        let f_nearest = T::rounding_from(&n, RoundingMode::Nearest);
+        assert_eq!(
+            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
+            NiceFloat(f_nearest)
+        );
+        assert!(
+            NiceFloat(f_nearest) == NiceFloat(f_below)
+                || NiceFloat(f_nearest) == NiceFloat(f_above)
+        );
+        assert_ne!(Integer::from(f_nearest), n);
+    });
+
+    integer_gen_var_3::<T>().test_properties(|n| {
+        let floor = T::rounding_from(&n, RoundingMode::Floor);
+        let ceiling = floor.next_higher();
+        let nearest = T::rounding_from(n, RoundingMode::Nearest);
+        assert_eq!(
+            NiceFloat(nearest),
+            NiceFloat(if floor.to_bits().even() {
+                floor
+            } else {
+                ceiling
+            })
+        );
+    });
+}
+
+#[test]
+fn float_rounding_from_integer_properties() {
+    apply_fn_to_primitive_floats!(float_rounding_from_integer_properties_helper);
+}
+
+fn float_from_integer_properties_helper<
+    T: CheckedFrom<Natural>
+        + for<'a> CheckedFrom<&'a Natural>
+        + for<'a> ConvertibleFrom<&'a Natural>
+        + From<Integer>
+        + for<'a> From<&'a Integer>
+        + PrimitiveFloat
+        + RoundingFrom<Integer>
+        + for<'a> RoundingFrom<&'a Integer>,
+>()
+where
+    Integer: From<T>,
+    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    integer_gen().test_properties(|n| {
+        let f = T::from(&n);
+        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f));
+        assert_eq!(
+            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
+            NiceFloat(f)
+        );
+        assert_eq!(NiceFloat(T::from(-n)), NiceFloat((-f).abs_negative_zeros()));
+    });
+
+    integer_gen_var_1::<T>().test_properties(|n| {
+        let f = T::from(&n);
+        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f));
+        assert_eq!(Integer::from(f), n);
+    });
+
+    integer_gen_var_2::<T>().test_properties(|n| {
+        let f_below = T::rounding_from(&n, RoundingMode::Floor);
+        assert_eq!(
+            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor)),
+            NiceFloat(f_below)
+        );
+        let f_above = f_below.next_higher();
+        let f_nearest = T::from(&n);
+        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f_nearest));
+        assert!(
+            NiceFloat(f_nearest) == NiceFloat(f_below)
+                || NiceFloat(f_nearest) == NiceFloat(f_above)
+        );
+        assert_ne!(Integer::from(f_nearest), n);
+    });
+
+    integer_gen_var_3::<T>().test_properties(|n| {
+        let floor = T::rounding_from(&n, RoundingMode::Floor);
+        let ceiling = floor.next_higher();
+        let nearest = T::from(n);
+        assert_eq!(
+            NiceFloat(nearest),
+            NiceFloat(if floor.to_bits().even() {
+                floor
+            } else {
+                ceiling
+            })
+        );
+    });
+}
+
+#[test]
+fn float_from_integer_properties() {
+    apply_fn_to_primitive_floats!(float_from_integer_properties_helper);
+}
+
+fn float_checked_from_integer_properties_helper<
+    T: CheckedFrom<Integer>
+        + for<'a> CheckedFrom<&'a Integer>
+        + for<'a> CheckedFrom<&'a Natural>
+        + for<'a> ConvertibleFrom<&'a Natural>
+        + PrimitiveFloat
+        + for<'a> RoundingFrom<&'a Integer>,
+>()
+where
+    Integer: RoundingFrom<T>,
+    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    integer_gen().test_properties(|n| {
+        let of = T::checked_from(&n);
+        assert_eq!(T::checked_from(n.clone()).map(NiceFloat), of.map(NiceFloat));
+        assert_eq!(
+            T::checked_from(-n).map(NiceFloat),
+            of.map(|f| NiceFloat((-f).abs_negative_zeros()))
+        );
+    });
+
+    integer_gen_var_1::<T>().test_properties(|n| {
+        let f = T::exact_from(&n);
+        assert_eq!(NiceFloat(T::exact_from(n.clone())), NiceFloat(f));
+        assert_eq!(
+            NiceFloat(f),
+            NiceFloat(T::rounding_from(&n, RoundingMode::Exact))
+        );
+        assert_eq!(Integer::rounding_from(f, RoundingMode::Exact), n);
+    });
+
+    integer_gen_var_2::<T>().test_properties(|n| {
+        assert!(T::checked_from(n).is_none());
+    });
+
+    integer_gen_var_3::<T>().test_properties(|n| {
+        assert!(T::checked_from(n).is_none());
+    });
+}
+
+#[test]
+fn float_checked_from_integer_properties() {
+    apply_fn_to_primitive_floats!(float_checked_from_integer_properties_helper);
+}
+
+fn float_convertible_from_integer_properties_helper<
+    T: for<'a> CheckedFrom<&'a Natural>
+        + ConvertibleFrom<Integer>
+        + for<'a> ConvertibleFrom<&'a Integer>
+        + for<'a> ConvertibleFrom<&'a Natural>
+        + PrimitiveFloat,
+>()
+where
+    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    integer_gen().test_properties(|n| {
+        assert_eq!(T::convertible_from(&n), T::convertible_from(n.clone()));
+        assert_eq!(T::convertible_from(&n), T::convertible_from(-n));
+    });
+
+    integer_gen_var_1::<T>().test_properties(|n| {
+        assert!(T::convertible_from(n));
+    });
+
+    integer_gen_var_2::<T>().test_properties(|n| {
+        assert!(!T::convertible_from(n));
+    });
+
+    integer_gen_var_3::<T>().test_properties(|n| {
+        assert!(!T::convertible_from(n));
+    });
+}
+
+#[test]
+fn float_convertible_from_integer_properties() {
+    apply_fn_to_primitive_floats!(float_convertible_from_integer_properties_helper);
 }

@@ -1,7 +1,7 @@
 use itertools::repeat_n;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::string::BaseFmtWrapper as BaseBaseFmtWrapper;
-use malachite_base::num::conversion::traits::ToStringBase;
+use malachite_base::num::conversion::traits::{FromStringBase, ToStringBase};
 use malachite_base::strings::{
     string_is_subset, ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString,
     ToUpperHexString,
@@ -750,7 +750,7 @@ fn to_string_base_properties() {
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(&x, base)), s);
         assert_eq!(format!("{:00?}", BaseFmtWrapper::new(&x, base)), s);
         assert_eq!(x.to_string_base_upper(base), s.to_uppercase());
-        //TODO from_string_base
+        assert_eq!(Natural::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(&s, "0123456789abcdefghijklmnopqrstuvwxyz"));
         if x != 0 {
             assert!(!s.starts_with('0'));
@@ -775,7 +775,7 @@ fn to_string_base_properties() {
         let s = x.to_string_base(base);
         let s_padded = format!("{:0width$}", fx, width = width);
         assert_eq!(format!("{:0width$?}", fx, width = width), s_padded);
-        //TODO from_string_base
+        assert_eq!(Natural::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(
             &s_padded,
             "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -930,7 +930,7 @@ fn to_string_base_upper_properties() {
         assert_eq!(format!("{:#?}", BaseFmtWrapper::new(&x, base)), s);
         assert_eq!(format!("{:#00}", BaseFmtWrapper::new(&x, base)), s);
         assert_eq!(x.to_string_base(base), s.to_lowercase());
-        //TODO from_string_base
+        assert_eq!(Natural::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(&s, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
         if x != 0 {
             assert!(!s.starts_with('0'));
@@ -955,7 +955,7 @@ fn to_string_base_upper_properties() {
         let s = x.to_string_base_upper(base);
         let s_padded = format!("{:#0width$}", fx, width = width);
         assert_eq!(format!("{:#0width$?}", fx, width = width), s_padded);
-        //TODO from_string_base
+        assert_eq!(Natural::from_string_base(base, &s).unwrap(), x);
         assert!(string_is_subset(
             &s_padded,
             "01234567890123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"

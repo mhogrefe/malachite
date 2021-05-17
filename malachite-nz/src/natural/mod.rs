@@ -5,6 +5,7 @@ use malachite_base::num::conversion::traits::FromStringBase;
 use malachite_base::slices::slice_trailing_zeros;
 use natural::InnerNatural::{Large, Small};
 use platform::Limb;
+use std::convert::TryFrom;
 use std::str::FromStr;
 
 /// A natural (non-negative) integer.
@@ -15,7 +16,10 @@ use std::str::FromStr;
 /// On a 64-bit system, a `Natural` takes up 32 bytes of space on the stack.
 #[derive(Clone, Eq, Hash, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
-#[cfg_attr(feature = "serde", serde(from = "SerdeNatural", into = "SerdeNatural"))]
+#[cfg_attr(
+    feature = "serde",
+    serde(try_from = "SerdeNatural", into = "SerdeNatural")
+)]
 pub struct Natural(pub(crate) InnerNatural);
 
 /// We want to limit the visibility of the `Small` and `Large` constructors to within this crate. To
@@ -25,6 +29,7 @@ pub(crate) enum InnerNatural {
     Small(Limb),
     Large(Vec<Limb>),
 }
+
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "serde", serde(transparent))]
 struct SerdeNatural(String);
@@ -36,11 +41,17 @@ impl From<Natural> for SerdeNatural {
     }
 }
 
-impl From<SerdeNatural> for Natural {
+impl TryFrom<SerdeNatural> for Natural {
+    type Error = String;
+
     #[inline]
-    fn from(s: SerdeNatural) -> Natural {
-        assert!(s.0.starts_with("0x"));
-        Natural::from_string_base(16, &s.0[2..]).unwrap()
+    fn try_from(s: SerdeNatural) -> Result<Natural, String> {
+        if s.0.starts_with("0x") {
+            Natural::from_string_base(16, &s.0[2..])
+                .ok_or_else(|| format!("Unrecognized digits in {}", s.0))
+        } else {
+            Err(format!("String '{}' does not start with '0x'", s.0))
+        }
     }
 }
 

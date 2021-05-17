@@ -352,8 +352,8 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
     power_indices.push(PowerTableIndicesRow {
         start,
         len,
-        digits_in_base,
         shift,
+        digits_in_base,
     });
     let start_index;
     start_index = if exponents[0] == digits_per_limb << power_len {
@@ -382,8 +382,8 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
             power_indices.push(PowerTableIndicesRow {
                 start,
                 len,
-                digits_in_base,
                 shift,
+                digits_in_base,
             });
             let (power, next_remainder) = remainder[start - 3..].split_at_mut(7 - start);
             remainder = next_remainder;
@@ -550,8 +550,8 @@ pub fn _limbs_compute_power_table_using_div<'a>(
         } else {
             PowerTableRow {
                 power,
-                digits_in_base,
                 shift,
+                digits_in_base,
             }
         });
     }

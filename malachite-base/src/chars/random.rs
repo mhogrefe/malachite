@@ -1,7 +1,7 @@
 use bools::random::{weighted_random_bools, WeightedRandomBools};
 use chars::char_is_graphic;
 use chars::crement::{char_to_contiguous_range, contiguous_range_to_char, decrement_char};
-use comparison::traits::{Max, Min};
+use comparison::traits::Min;
 use num::random::{random_unsigned_inclusive_range, RandomUnsignedInclusiveRange};
 use random::Seed;
 use vecs::{random_values_from_vec, RandomValuesFromVec};

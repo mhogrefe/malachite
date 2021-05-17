@@ -1,21 +1,31 @@
+use crate::common::{
+    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
+};
 use malachite_base::bools::random::{random_bools, RandomBools};
+use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, CeilingLogBase2, DivRound, PowerOf2,
+    ArithmeticCheckedShl, CeilingLogBase2, DivRound, Parity, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Two;
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
+use malachite_base::num::conversion::traits::{
+    ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
+};
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
-    geometric_random_positive_unsigneds, geometric_random_unsigneds, GeometricRandomNaturalValues,
+    geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_unsigneds,
+    GeometricRandomNaturalValues, GeometricRandomSignedRange,
 };
 use malachite_base::num::random::{
     random_primitive_ints, random_unsigned_inclusive_range, random_unsigneds_less_than,
-    RandomPrimitiveInts, RandomUnsignedRange, RandomUnsignedsLessThan,
+    variable_range_generator, RandomPrimitiveInts, RandomUnsignedRange, RandomUnsignedsLessThan,
+    VariableRangeGenerator,
 };
 use malachite_base::options::random::{random_options, RandomOptions};
-use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::random::{Seed, EXAMPLE_SEED};
+use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
     random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
@@ -51,7 +61,7 @@ use malachite_nz::natural::conversion::digits::general_digits::{
 };
 use malachite_nz::natural::random::{
     get_random_natural_with_up_to_bits, random_natural_range_to_infinity, random_naturals,
-    RandomNaturalRangeToInfinity, RandomNaturals,
+    random_positive_naturals, RandomNaturalRangeToInfinity, RandomNaturals,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -66,6 +76,88 @@ pub fn random_integer_gen(config: &GenConfig) -> It<Integer> {
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     ))
+}
+
+pub fn random_integer_gen_var_1<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(with_special_value(
+        EXAMPLE_SEED,
+        Integer::ZERO,
+        1,
+        100,
+        &|seed| {
+            random_pairs(
+                seed,
+                &|seed_2| {
+                    random_positive_float_naturals::<T>(
+                        seed_2,
+                        0,
+                        config.get_or("exponent_mean_n", 8),
+                        config.get_or("exponent_mean_d", 1),
+                    )
+                },
+                &random_bools,
+            )
+            .map(|(n, b)| Integer::from_sign_and_abs(b, n))
+        },
+    ))
+}
+
+pub fn random_integer_gen_var_2<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer>
+where
+    for<'a> T: ConvertibleFrom<&'a Natural>,
+{
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_natural_range_to_infinity(
+                    seed,
+                    Natural::power_of_2(T::MANTISSA_WIDTH + 1) | Natural::ONE,
+                    config.get_or("mean_bits_n", Limb::WIDTH << 1),
+                    config.get_or("mean_bits_d", 1),
+                )
+                .filter(|n| !T::convertible_from(n))
+            },
+            &random_bools,
+        )
+        .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
+    )
+}
+
+pub fn random_integer_gen_var_3<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<Integer>
+where
+    Natural: ExactFrom<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_positive_float_naturals::<T>(
+                    seed,
+                    1,
+                    config.get_or("exponent_mean_n", 8),
+                    config.get_or("exponent_mean_d", 1),
+                )
+                .filter_map(|a| {
+                    let b = Natural::exact_from(T::exact_from(&a).next_higher());
+                    let diff = b - &a;
+                    if diff.even() {
+                        // This happens almost always
+                        Some(a + (diff >> 1))
+                    } else {
+                        None
+                    }
+                })
+            },
+            &random_bools,
+        )
+        .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned) --
@@ -136,6 +228,29 @@ pub fn random_integer_unsigned_unsigned_triple_gen_var_1<
     ))
 }
 
+// -- (Integer, RoundingMode) --
+
+pub fn random_integer_rounding_mode_pair_gen_var_1<
+    T: for<'a> ConvertibleFrom<&'a Integer> + PrimitiveFloat,
+>(
+    config: &GenConfig,
+) -> It<(Integer, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_integers(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+    )
+}
+
 // -- Natural --
 
 pub fn random_natural_gen(config: &GenConfig) -> It<Natural> {
@@ -153,6 +268,127 @@ pub fn random_natural_gen_var_1(config: &GenConfig) -> It<Natural> {
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     ))
+}
+
+pub fn random_natural_gen_var_2(config: &GenConfig) -> It<Natural> {
+    Box::new(random_positive_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+struct RandomPositiveFloatNaturals<T: PrimitiveFloat>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    exponents: GeometricRandomSignedRange<i64>,
+    ranges: VariableRangeGenerator,
+    phantom: PhantomData<T>,
+}
+
+impl<T: PrimitiveFloat> Iterator for RandomPositiveFloatNaturals<T>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        let exponent = self.exponents.next().unwrap();
+        let a = if exponent == 0 {
+            T::UnsignedOfEqualWidth::ONE
+        } else {
+            T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH)
+        };
+        let mantissa = self.ranges.next_in_range(
+            a,
+            T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1),
+        );
+        Some(Natural::from(mantissa) << exponent)
+    }
+}
+
+fn random_positive_float_naturals<T: PrimitiveFloat>(
+    seed: Seed,
+    start_exponent: i64,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+) -> RandomPositiveFloatNaturals<T>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    RandomPositiveFloatNaturals {
+        exponents: geometric_random_signed_range(
+            seed.fork("exponents"),
+            start_exponent,
+            i64::power_of_2(T::EXPONENT_WIDTH - 1) - i64::wrapping_from(T::MANTISSA_WIDTH) - 1,
+            mean_exponent_numerator,
+            mean_exponent_denominator,
+        ),
+        ranges: variable_range_generator(seed.fork("mantissas")),
+        phantom: PhantomData,
+    }
+}
+
+pub fn random_natural_gen_var_3<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(with_special_value(
+        EXAMPLE_SEED,
+        Natural::ZERO,
+        1,
+        100,
+        &|seed| {
+            random_positive_float_naturals::<T>(
+                seed,
+                0,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_natural_gen_var_4<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural>
+where
+    for<'a> T: ConvertibleFrom<&'a Natural>,
+{
+    Box::new(
+        random_natural_range_to_infinity(
+            EXAMPLE_SEED,
+            Natural::power_of_2(T::MANTISSA_WIDTH + 1) | Natural::ONE,
+            config.get_or("mean_bits_n", Limb::WIDTH << 1),
+            config.get_or("mean_bits_d", 1),
+        )
+        .filter(|n| !T::convertible_from(n)),
+    )
+}
+
+pub fn random_natural_gen_var_5<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<Natural>
+where
+    Natural: ExactFrom<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        random_positive_float_naturals::<T>(
+            EXAMPLE_SEED,
+            1,
+            config.get_or("exponent_mean_n", 8),
+            config.get_or("exponent_mean_d", 1),
+        )
+        .filter_map(|a| {
+            let b = Natural::exact_from(T::exact_from(&a).next_higher());
+            let diff = b - &a;
+            if diff.even() {
+                // This happens almost always
+                Some(a + (diff >> 1))
+            } else {
+                None
+            }
+        }),
+    )
 }
 
 // -- (Natural, Natural) --
@@ -495,6 +731,65 @@ pub fn random_natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>(
         )),
         bs: random_bools(EXAMPLE_SEED.fork("bs")),
     })
+}
+
+// -- (Natural, RoundingMode) --
+
+pub fn random_natural_rounding_mode_pair_gen_var_1<
+    T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
+>(
+    config: &GenConfig,
+) -> It<(Natural, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+    )
+}
+
+// -- (String, String, String) --
+
+pub fn random_string_triple_gen_var_1(config: &GenConfig) -> It<(String, String, String)> {
+    Box::new(
+        random_naturals(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|x| {
+            (
+                serde_json::to_string(&natural_to_biguint(&x)).unwrap(),
+                serde_json::to_string(&natural_to_rug_integer(&x)).unwrap(),
+                serde_json::to_string(&x).unwrap(),
+            )
+        }),
+    )
+}
+
+pub fn random_string_triple_gen_var_2(config: &GenConfig) -> It<(String, String, String)> {
+    Box::new(
+        random_integers(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|x| {
+            (
+                serde_json::to_string(&integer_to_bigint(&x)).unwrap(),
+                serde_json::to_string(&integer_to_rug_integer(&x)).unwrap(),
+                serde_json::to_string(&x).unwrap(),
+            )
+        }),
+    )
 }
 
 // -- (Vec<Natural>, Natural> --

@@ -2,7 +2,6 @@ use malachite_base::chars::constants::{
     CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES, NUMBER_OF_CHARS,
 };
 use malachite_base::chars::crement::{char_to_contiguous_range, contiguous_range_to_char};
-use malachite_base::comparison::traits::Max;
 use malachite_base_test_util::generators::{
     unsigned_gen, unsigned_gen_var_2, unsigned_pair_gen_var_1,
 };

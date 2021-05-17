@@ -74,6 +74,16 @@ macro_rules! float_traits {
             fn from_bits(v: $u) -> $t {
                 $t::from_bits(v)
             }
+
+            #[inline]
+            fn floor(self) -> Self {
+                $t::floor(self)
+            }
+
+            #[inline]
+            fn ceil(self) -> Self {
+                $t::ceil(self)
+            }
         }
 
         impl_named!($t);

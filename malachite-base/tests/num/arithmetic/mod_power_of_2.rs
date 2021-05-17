@@ -1,6 +1,15 @@
-use malachite_base::num::arithmetic::traits::ModPowerOf2;
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2IsReduced};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::generators::{
+    signed_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_10,
+    signed_unsigned_pair_gen_var_11, signed_unsigned_pair_gen_var_4, unsigned_gen,
+    unsigned_pair_gen_var_2, unsigned_pair_gen_var_20, unsigned_triple_gen_var_13,
+    unsigned_triple_gen_var_4,
+};
+use std::cmp::min;
 use std::fmt::Debug;
 use std::panic::catch_unwind;
 
@@ -425,4 +434,186 @@ fn ceiling_mod_power_of_2_fail_helper<T: PrimitiveSigned>() {
 #[test]
 fn ceiling_mod_power_of_2_fail() {
     apply_fn_to_signeds!(ceiling_mod_power_of_2_fail_helper);
+}
+
+fn mod_power_of_2_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_2::<T, u64>().test_properties(|(n, pow)| {
+        let mut mut_n = n;
+        mut_n.mod_power_of_2_assign(pow);
+        let result = mut_n;
+        assert!(result.mod_power_of_2_is_reduced(pow));
+        assert_eq!(n.mod_power_of_2(pow), result);
+
+        let mut mut_n = n;
+        mut_n.rem_power_of_2_assign(pow);
+        assert_eq!(mut_n, result);
+        assert_eq!(n.rem_power_of_2(pow), result);
+
+        assert!(result <= n);
+        assert_eq!(result == T::ZERO, n.divisible_by_power_of_2(pow));
+        assert_eq!(result.mod_power_of_2(pow), result);
+    });
+
+    unsigned_triple_gen_var_4::<T, u64>().test_properties(|(x, y, pow)| {
+        assert_eq!(
+            x.wrapping_add(y).mod_power_of_2(pow),
+            x.mod_power_of_2(pow)
+                .wrapping_add(y.mod_power_of_2(pow))
+                .mod_power_of_2(pow)
+        );
+        assert_eq!(
+            x.wrapping_mul(y).mod_power_of_2(pow),
+            x.mod_power_of_2(pow)
+                .wrapping_mul(y.mod_power_of_2(pow))
+                .mod_power_of_2(pow)
+        );
+    });
+
+    unsigned_triple_gen_var_13::<T, u64>().test_properties(|(n, u, v)| {
+        assert_eq!(
+            n.mod_power_of_2(u).mod_power_of_2(v),
+            n.mod_power_of_2(min(u, v))
+        );
+    });
+
+    unsigned_gen::<T>().test_properties(|n| {
+        assert_eq!(n.mod_power_of_2(0), T::ZERO);
+    });
+
+    unsigned_gen().test_properties(|pow| {
+        assert_eq!(T::ZERO.mod_power_of_2(pow), T::ZERO);
+    });
+}
+
+fn mod_power_of_2_properties_helper_signed<T: PrimitiveSigned>()
+where
+    <T as ModPowerOf2>::Output: ExactFrom<T> + PrimitiveUnsigned,
+{
+    signed_unsigned_pair_gen_var_10::<T>().test_properties(|(n, pow)| {
+        let result = n.mod_power_of_2(pow);
+        assert!(result.mod_power_of_2_is_reduced(pow));
+        assert_eq!(
+            result == <T as ModPowerOf2>::Output::ZERO,
+            n.divisible_by_power_of_2(pow)
+        );
+        assert_eq!(result.mod_power_of_2(pow), result);
+    });
+
+    signed_unsigned_pair_gen_var_4::<T>().test_properties(|(n, pow)| {
+        let mut mut_n = n;
+        mut_n.mod_power_of_2_assign(pow);
+        let result = mut_n;
+        assert_eq!(
+            n.mod_power_of_2(pow),
+            <T as ModPowerOf2>::Output::exact_from(result)
+        );
+
+        assert!(result >= T::ZERO);
+        assert_eq!(result == T::ZERO, n.divisible_by_power_of_2(pow));
+        assert_eq!(
+            result.mod_power_of_2(pow),
+            <T as ModPowerOf2>::Output::exact_from(result)
+        );
+    });
+
+    signed_gen::<T>().test_properties(|n| {
+        assert_eq!(n.mod_power_of_2(0), <T as ModPowerOf2>::Output::ZERO);
+    });
+
+    unsigned_gen().test_properties(|pow| {
+        assert_eq!(
+            T::ZERO.mod_power_of_2(pow),
+            <T as ModPowerOf2>::Output::ZERO
+        );
+    });
+}
+
+#[test]
+fn mod_power_of_2_properties() {
+    apply_fn_to_unsigneds!(mod_power_of_2_properties_helper_unsigned);
+    apply_fn_to_signeds!(mod_power_of_2_properties_helper_signed);
+}
+
+fn rem_power_of_2_properties_helper<T: PrimitiveSigned>() {
+    signed_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(n, pow)| {
+        let mut mut_n = n;
+        mut_n.rem_power_of_2_assign(pow);
+        let result = mut_n;
+        assert_eq!(n.rem_power_of_2(pow), result);
+
+        if n != T::MIN {
+            assert_eq!((-n).rem_power_of_2(pow), -result);
+        }
+        assert!(result.le_abs(&n));
+        assert_eq!(result == T::ZERO, n.divisible_by_power_of_2(pow));
+        assert_eq!(result.rem_power_of_2(pow), result);
+        assert!(result == T::ZERO || (result > T::ZERO) == (n > T::ZERO));
+    });
+
+    signed_gen::<T>().test_properties(|n| {
+        assert_eq!(n.rem_power_of_2(0), T::ZERO);
+    });
+
+    unsigned_gen().test_properties(|pow| {
+        assert_eq!(T::ZERO.rem_power_of_2(pow), T::ZERO);
+    });
+}
+
+#[test]
+fn rem_power_of_2_properties() {
+    apply_fn_to_signeds!(rem_power_of_2_properties_helper);
+}
+
+fn neg_mod_power_of_2_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_20::<T>().test_properties(|(n, pow)| {
+        let mut mut_n = n;
+        mut_n.neg_mod_power_of_2_assign(pow);
+        let result = mut_n;
+        assert!(result.mod_power_of_2_is_reduced(pow));
+        assert_eq!(n.neg_mod_power_of_2(pow), result);
+
+        assert_eq!(result == T::ZERO, n.divisible_by_power_of_2(pow));
+        assert!(result
+            .wrapping_add(n.mod_power_of_2(pow))
+            .divisible_by_power_of_2(pow));
+        assert_eq!(result.neg_mod_power_of_2(pow), n.mod_power_of_2(pow));
+    });
+
+    unsigned_gen::<T>().test_properties(|n| {
+        assert_eq!(n.neg_mod_power_of_2(0), T::ZERO);
+    });
+
+    unsigned_gen().test_properties(|pow| {
+        assert_eq!(T::ZERO.neg_mod_power_of_2(pow), T::ZERO);
+    });
+}
+
+#[test]
+fn neg_mod_power_of_2_properties() {
+    apply_fn_to_unsigneds!(neg_mod_power_of_2_properties_helper);
+}
+
+fn ceiling_mod_power_of_2_properties_helper<T: PrimitiveSigned>() {
+    signed_unsigned_pair_gen_var_11::<T>().test_properties(|(n, pow)| {
+        let mut mut_n = n;
+        mut_n.ceiling_mod_power_of_2_assign(pow);
+        let result = mut_n;
+        assert_eq!(n.ceiling_mod_power_of_2(pow), result);
+
+        assert!(result <= T::ZERO);
+        assert_eq!(result == T::ZERO, n.divisible_by_power_of_2(pow));
+    });
+
+    signed_gen::<T>().test_properties(|n| {
+        assert_eq!(n.ceiling_mod_power_of_2(0), T::ZERO);
+    });
+
+    unsigned_gen().test_properties(|pow| {
+        assert_eq!(T::ZERO.ceiling_mod_power_of_2(pow), T::ZERO);
+    });
+}
+
+#[test]
+fn ceiling_mod_power_of_2_properties() {
+    apply_fn_to_signeds!(ceiling_mod_power_of_2_properties_helper);
 }

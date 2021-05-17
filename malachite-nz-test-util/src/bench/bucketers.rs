@@ -165,3 +165,23 @@ where
         bucketing_label: format!("{}.len() * {}", xs_name, y_name),
     }
 }
+
+pub fn natural_deserialize_bucketer<'a>() -> Bucketer<'a, (String, String, String)> {
+    Bucketer {
+        bucketing_function: &|&(_, _, ref s)| {
+            let n: Natural = serde_json::from_str(&s).unwrap();
+            usize::exact_from(n.significant_bits())
+        },
+        bucketing_label: "n.significant_bits()".to_string(),
+    }
+}
+
+pub fn integer_deserialize_bucketer<'a>() -> Bucketer<'a, (String, String, String)> {
+    Bucketer {
+        bucketing_function: &|&(_, _, ref s)| {
+            let n: Integer = serde_json::from_str(&s).unwrap();
+            usize::exact_from(n.significant_bits())
+        },
+        bucketing_label: "n.significant_bits()".to_string(),
+    }
+}

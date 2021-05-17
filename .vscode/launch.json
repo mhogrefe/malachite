@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "malachite-nz-test-util",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceRoot}/malachite-nz-test-util/target/debug/malachite_nz_test_util_main",
+            "args": ["-l 10000 -m exhaustive -d demo_natural_mul"],
+            "cwd": "${workspaceRoot}",
+            "stopOnEntry": false,
+        }
+    ]
+}

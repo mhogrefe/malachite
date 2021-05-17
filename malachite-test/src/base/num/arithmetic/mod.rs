@@ -1,9 +1,6 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod log_base_2;
-pub mod mod_op;
 pub mod mod_pow;
-pub mod mod_power_of_2;
 pub mod mod_power_of_2_pow;
 pub mod mod_power_of_2_shl;
 pub mod mod_power_of_2_shr;
@@ -59,10 +56,7 @@ pub mod xxx_sub_yyy_is_zzz;
 pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    log_base_2::register(registry);
-    mod_op::register(registry);
     mod_pow::register(registry);
-    mod_power_of_2::register(registry);
     mod_power_of_2_pow::register(registry);
     mod_power_of_2_shl::register(registry);
     mod_power_of_2_shr::register(registry);

@@ -8,8 +8,8 @@ name = "malachite_base_test_util"
 path = "src/lib.rs"
 
 [[bin]]
- name = "malachite_base_test_util_main"
- path = "src/bin.rs"
+name = "malachite_base_test_util_main"
+path = "src/bin.rs"
 
 [dependencies]
 clap = "2.33.1"

@@ -6,16 +6,12 @@ use std::str::FromStr;
 
 #[test]
 fn test_checked_count_ones() {
-    let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().checked_count_ones(), out);
-        assert_eq!(
-            integer_checked_count_ones_alt_1(&Integer::from_str(n).unwrap()),
-            out
-        );
-        assert_eq!(
-            integer_checked_count_ones_alt_2(&Integer::from_str(n).unwrap()),
-            out
-        );
+    let test = |s, out| {
+        let u = Integer::from_str(s).unwrap();
+
+        assert_eq!(u.checked_count_ones(), out);
+        assert_eq!(integer_checked_count_ones_alt_1(&u), out);
+        assert_eq!(integer_checked_count_ones_alt_2(&u), out);
     };
     test("0", Some(0));
     test("105", Some(4));

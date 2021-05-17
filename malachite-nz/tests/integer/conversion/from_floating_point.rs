@@ -1,9 +1,16 @@
+use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
+use malachite_base_test_util::generators::{
+    primitive_float_gen, primitive_float_gen_var_5, primitive_float_gen_var_6,
+    primitive_float_gen_var_7, primitive_float_gen_var_8,
+    primitive_float_rounding_mode_pair_gen_var_2,
+};
 use malachite_nz::integer::Integer;
 
 #[test]
@@ -860,4 +867,152 @@ fn test_convertible_from_f64() {
     test(-f64::MIN_POSITIVE_NORMAL, false);
     test(f64::MAX_FINITE, true);
     test(-f64::MAX_FINITE, true);
+}
+
+fn rounding_from_float_properties_helper<
+    T: From<Integer> + PrimitiveFloat + RoundingFrom<Integer>,
+>()
+where
+    Integer: RoundingFrom<T>,
+{
+    primitive_float_rounding_mode_pair_gen_var_2::<T>().test_properties(|(f, rm)| {
+        let n = Integer::rounding_from(f, rm);
+        assert!(n.is_valid());
+        assert_eq!(Integer::rounding_from(-f, -rm), -n);
+    });
+
+    primitive_float_gen_var_5::<T>().test_properties(|f| {
+        let n = Integer::rounding_from(f, RoundingMode::Exact);
+        assert!(n.is_valid());
+        assert_eq!(n, Integer::rounding_from(f, RoundingMode::Floor));
+        assert_eq!(n, Integer::rounding_from(f, RoundingMode::Ceiling));
+        assert_eq!(n, Integer::rounding_from(f, RoundingMode::Down));
+        assert_eq!(n, Integer::rounding_from(f, RoundingMode::Up));
+        assert_eq!(n, Integer::rounding_from(f, RoundingMode::Nearest));
+        assert_eq!(T::rounding_from(n, RoundingMode::Exact), f);
+    });
+
+    primitive_float_gen_var_6::<T>().test_properties(|f| {
+        let n_floor = Integer::rounding_from(f, RoundingMode::Floor);
+        assert!(n_floor.is_valid());
+        let n_ceiling = &n_floor + Integer::ONE;
+        assert_eq!(n_ceiling, Integer::rounding_from(f, RoundingMode::Ceiling));
+        if f >= T::ZERO {
+            assert_eq!(n_floor, Integer::rounding_from(f, RoundingMode::Down));
+            assert_eq!(n_ceiling, Integer::rounding_from(f, RoundingMode::Up));
+        } else {
+            assert_eq!(n_ceiling, Integer::rounding_from(f, RoundingMode::Down));
+            assert_eq!(n_floor, Integer::rounding_from(f, RoundingMode::Up));
+        }
+        let n_nearest = Integer::rounding_from(f, RoundingMode::Nearest);
+        assert!(n_nearest == n_floor || n_nearest == n_ceiling);
+        assert_ne!(T::from(n_nearest), f);
+    });
+
+    primitive_float_gen_var_7::<T>().test_properties(|f| {
+        let floor = Integer::rounding_from(f, RoundingMode::Floor);
+        let ceiling = &floor + Integer::ONE;
+        let nearest = Integer::rounding_from(f, RoundingMode::Nearest);
+        assert_eq!(nearest, if floor.even() { floor } else { ceiling });
+    });
+}
+
+#[test]
+fn rounding_from_float_properties() {
+    apply_fn_to_primitive_floats!(rounding_from_float_properties_helper);
+}
+
+fn from_float_properties_helper<T: From<Integer> + PrimitiveFloat>()
+where
+    Integer: From<T> + RoundingFrom<T>,
+{
+    primitive_float_gen_var_8::<T>().test_properties(|f| {
+        let n = Integer::from(f);
+        assert!(n.is_valid());
+        assert_eq!(n, Integer::rounding_from(f, RoundingMode::Nearest));
+        assert_eq!(Integer::from(-f), -n);
+    });
+
+    primitive_float_gen_var_5::<T>().test_properties(|f| {
+        let n = Integer::from(f);
+        assert!(n.is_valid());
+        assert_eq!(T::from(n), f);
+    });
+
+    primitive_float_gen_var_6::<T>().test_properties(|f| {
+        let n_floor = Integer::rounding_from(f, RoundingMode::Floor);
+        assert!(n_floor.is_valid());
+        let n_ceiling = &n_floor + Integer::ONE;
+        let n_nearest = Integer::from(f);
+        assert!(n_nearest == n_floor || n_nearest == n_ceiling);
+    });
+
+    primitive_float_gen_var_7::<T>().test_properties(|f| {
+        let floor = Integer::rounding_from(f, RoundingMode::Floor);
+        let ceiling = &floor + Integer::ONE;
+        let nearest = Integer::from(f);
+        assert_eq!(nearest, if floor.even() { floor } else { ceiling });
+    });
+}
+
+#[test]
+fn from_float_properties() {
+    apply_fn_to_primitive_floats!(from_float_properties_helper);
+}
+
+fn checked_from_float_properties_helper<T: PrimitiveFloat + RoundingFrom<Integer>>()
+where
+    Integer: CheckedFrom<T> + RoundingFrom<T>,
+{
+    primitive_float_gen::<T>().test_properties(|f| {
+        let on = Integer::checked_from(f);
+        assert!(on.as_ref().map_or(true, Integer::is_valid));
+        assert_eq!(Integer::checked_from(-f), on.map(|n| -n));
+    });
+
+    primitive_float_gen_var_5::<T>().test_properties(|f| {
+        let n = Integer::exact_from(f);
+        assert!(n.is_valid());
+        assert_eq!(n, Integer::rounding_from(f, RoundingMode::Exact));
+        assert_eq!(T::rounding_from(n, RoundingMode::Exact), f);
+    });
+
+    primitive_float_gen_var_6::<T>().test_properties(|f| {
+        assert!(Integer::checked_from(f).is_none());
+    });
+
+    primitive_float_gen_var_7::<T>().test_properties(|f| {
+        assert!(Integer::checked_from(f).is_none());
+    });
+}
+
+#[test]
+fn checked_from_float_properties() {
+    apply_fn_to_primitive_floats!(checked_from_float_properties_helper);
+}
+
+fn convertible_from_float_properties_helper<T: PrimitiveFloat>()
+where
+    Integer: ConvertibleFrom<T>,
+{
+    primitive_float_gen::<T>().test_properties(|f| {
+        Integer::convertible_from(f);
+    });
+
+    primitive_float_gen_var_5::<T>().test_properties(|f| {
+        assert!(Integer::convertible_from(f));
+    });
+
+    primitive_float_gen_var_6::<T>().test_properties(|f| {
+        assert!(!Integer::convertible_from(f));
+    });
+
+    primitive_float_gen_var_7::<T>().test_properties(|f| {
+        assert!(!Integer::convertible_from(f));
+    });
+}
+
+#[test]
+fn convertible_from_float_properties() {
+    apply_fn_to_primitive_floats!(convertible_from_float_properties_helper);
 }

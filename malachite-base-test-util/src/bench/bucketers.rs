@@ -35,6 +35,23 @@ pub fn primitive_float_bucketer<'a, T: PrimitiveFloat>(var_name: &str) -> Bucket
     }
 }
 
+pub fn pair_1_primitive_float_bucketer<'a, T: PrimitiveFloat, U>(
+    var_name: &str,
+) -> Bucketer<'a, (T, U)> {
+    Bucketer {
+        bucketing_function: &|&(f, _)| {
+            if f == T::ZERO || !f.is_finite() || f.is_nan() {
+                0
+            } else {
+                let (m, e) = f.adjusted_mantissa_and_exponent();
+                <T::UnsignedOfEqualWidth as WrappingInto<usize>>::wrapping_into(m)
+                    + usize::wrapping_from(e.abs())
+            }
+        },
+        bucketing_label: format!("precision({}) + |exponent({})|", var_name, var_name),
+    }
+}
+
 pub fn usize_convertible_direct_bucketer<T: Copy>(var_name: &str) -> Bucketer<T>
 where
     usize: ExactFrom<T>,

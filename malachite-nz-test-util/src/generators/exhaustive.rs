@@ -1,17 +1,25 @@
+use crate::common::{
+    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
+};
 use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, PowerOf2};
+use malachite_base::iterators::iter_windows;
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, Parity, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::{
+    ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
+};
 use malachite_base::num::exhaustive::{
     exhaustive_positive_primitive_ints, exhaustive_unsigneds,
     primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
     PrimitiveIntIncreasingRange,
 };
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
@@ -53,7 +61,7 @@ use malachite_nz::natural::conversion::digits::general_digits::{
 };
 use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
-    ExhaustiveNaturalRange,
+    exhaustive_positive_naturals, ExhaustiveNaturalRange,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -64,6 +72,39 @@ use std::marker::PhantomData;
 
 pub fn exhaustive_integer_gen() -> It<Integer> {
     Box::new(exhaustive_integers())
+}
+
+pub fn exhaustive_integer_gen_var_1<T: PrimitiveFloat>() -> It<Integer>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        once(Integer::ZERO).chain(
+            lex_pairs(
+                exhaustive_positive_float_naturals::<T>(0),
+                exhaustive_bools(),
+            )
+            .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
+        ),
+    )
+}
+
+pub fn exhaustive_integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat>(
+) -> It<Integer> {
+    Box::new(
+        lex_pairs(exhaustive_natural_gen_var_4::<T>(), exhaustive_bools())
+            .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
+    )
+}
+
+pub fn exhaustive_integer_gen_var_3<T: PrimitiveFloat>() -> It<Integer>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        lex_pairs(exhaustive_natural_gen_var_5::<T>(), exhaustive_bools())
+            .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned) --
@@ -95,6 +136,17 @@ pub fn exhaustive_integer_unsigned_unsigned_triple_gen_var_1<
     ))))
 }
 
+// -- (Integer, RoundingMode) --
+
+pub fn exhaustive_integer_rounding_mode_pair_gen_var_1<
+    T: for<'a> ConvertibleFrom<&'a Integer> + PrimitiveFloat,
+>() -> It<(Integer, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_integers(), exhaustive_rounding_modes())
+            .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+    )
+}
+
 // -- Natural --
 
 pub fn exhaustive_natural_gen() -> It<Natural> {
@@ -103,6 +155,102 @@ pub fn exhaustive_natural_gen() -> It<Natural> {
 
 pub fn exhaustive_natural_gen_var_1() -> It<Natural> {
     Box::new(exhaustive_natural_range_to_infinity(Natural::TWO))
+}
+
+pub fn exhaustive_natural_gen_var_2() -> It<Natural> {
+    Box::new(exhaustive_positive_naturals())
+}
+
+struct ExhaustivePositiveFloatNaturals<T: PrimitiveFloat>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    done: bool,
+    exponent: i64,
+    limit: T::UnsignedOfEqualWidth,
+    mantissa: T::UnsignedOfEqualWidth,
+    max_finite: Natural,
+}
+
+impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFloatNaturals<T>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        if self.done {
+            None
+        } else {
+            let n = Natural::from(self.mantissa) << self.exponent;
+            if n == self.max_finite {
+                self.done = true;
+            } else {
+                self.mantissa += T::UnsignedOfEqualWidth::ONE;
+                if self.mantissa == self.limit {
+                    self.mantissa >>= 1;
+                    self.exponent += 1;
+                    self.limit = T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1);
+                }
+            }
+            Some(n)
+        }
+    }
+}
+
+fn exhaustive_positive_float_naturals<T: PrimitiveFloat>(
+    start_exponent: i64,
+) -> ExhaustivePositiveFloatNaturals<T>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    ExhaustivePositiveFloatNaturals {
+        done: false,
+        exponent: start_exponent,
+        limit: T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1),
+        mantissa: if start_exponent == 0 {
+            T::UnsignedOfEqualWidth::ONE
+        } else {
+            T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH)
+        },
+        max_finite: Natural::from(T::MAX_FINITE),
+    }
+}
+
+pub fn exhaustive_natural_gen_var_3<T: PrimitiveFloat>() -> It<Natural>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(once(Natural::ZERO).chain(exhaustive_positive_float_naturals::<T>(0)))
+}
+
+pub fn exhaustive_natural_gen_var_4<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat>(
+) -> It<Natural> {
+    Box::new(
+        exhaustive_natural_range_to_infinity(
+            Natural::power_of_2(T::MANTISSA_WIDTH + 1) | Natural::ONE,
+        )
+        .filter(|n| !T::convertible_from(n)),
+    )
+}
+
+pub fn exhaustive_natural_gen_var_5<T: PrimitiveFloat>() -> It<Natural>
+where
+    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        iter_windows(2, exhaustive_positive_float_naturals::<T>(1)).filter_map(|xs| {
+            let mut xs = xs.into_iter();
+            let a = xs.next().unwrap();
+            let diff = xs.next().unwrap() - &a;
+            if diff.even() {
+                // This happens almost always
+                Some(a + (diff >> 1))
+            } else {
+                None
+            }
+        }),
+    )
 }
 
 // -- (Natural, Natural) --
@@ -270,6 +418,39 @@ pub fn exhaustive_natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>(
         ),
         NaturalUnsignedBoolVecPairGenerator,
     )))
+}
+
+// -- (Natural, RoundingMode) --
+
+pub fn exhaustive_natural_rounding_mode_pair_gen_var_1<
+    T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
+>() -> It<(Natural, RoundingMode)> {
+    Box::new(
+        lex_pairs(exhaustive_naturals(), exhaustive_rounding_modes())
+            .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+    )
+}
+
+// -- (String, String, String) --
+
+pub fn exhaustive_string_triple_gen_var_1() -> It<(String, String, String)> {
+    Box::new(exhaustive_naturals().map(|x| {
+        (
+            serde_json::to_string(&natural_to_biguint(&x)).unwrap(),
+            serde_json::to_string(&natural_to_rug_integer(&x)).unwrap(),
+            serde_json::to_string(&x).unwrap(),
+        )
+    }))
+}
+
+pub fn exhaustive_string_triple_gen_var_2() -> It<(String, String, String)> {
+    Box::new(exhaustive_integers().map(|x| {
+        (
+            serde_json::to_string(&integer_to_bigint(&x)).unwrap(),
+            serde_json::to_string(&integer_to_rug_integer(&x)).unwrap(),
+            serde_json::to_string(&x).unwrap(),
+        )
+    }))
 }
 
 // -- (Vec<Natural>, Natural)

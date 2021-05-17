@@ -161,9 +161,12 @@ pub mod iterators {
     pub mod first_and_last;
     pub mod is_constant;
     pub mod is_unique;
+    pub mod iter_windows;
     pub mod iterator_cache;
     pub mod matching_intervals_in_iterator;
     pub mod nonzero_values;
+    pub mod with_special_value;
+    pub mod with_special_values;
 }
 pub mod named;
 pub mod nevers {
@@ -435,6 +438,8 @@ pub mod num {
         pub mod special_random_nonzero_primitive_floats;
         pub mod special_random_positive_finite_primitive_floats;
         pub mod special_random_positive_primitive_floats;
+        pub mod special_random_primitive_float_inclusive_range;
+        pub mod special_random_primitive_float_range;
         pub mod special_random_primitive_floats;
         pub mod striped {
             pub mod get_striped_bool_vec;

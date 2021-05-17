@@ -1275,18 +1275,18 @@ pub trait ModSquarePrecomputedAssign<RHS = Self, M = Self>: ModPowPrecomputed<RH
     fn mod_square_precomputed_assign(&mut self, m: M, data: &Self::Data);
 }
 
+/// Provides a function to get the base-2 logarithm of `self`, or return `None` if `self` is not a
+/// power of 2.
 pub trait CheckedLogBase2 {
     fn checked_log_base_2(self) -> Option<u64>;
 }
 
 /// Provides a function to get the floor of the base-2 logarithm of `self`.
 pub trait FloorLogBase2 {
-    /// floor(log<sub>2</sub>(`self`))
     fn floor_log_base_2(self) -> u64;
 }
 
 /// Provides a function to get the ceiling of the base-2 logarithm of `self`.
 pub trait CeilingLogBase2 {
-    /// ceiling(log<sub>2</sub>(`self`))
     fn ceiling_log_base_2(self) -> u64;
 }

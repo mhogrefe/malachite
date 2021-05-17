@@ -1,9 +1,16 @@
+use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
+use malachite_base_test_util::generators::{
+    primitive_float_gen, primitive_float_gen_var_1, primitive_float_gen_var_2,
+    primitive_float_gen_var_3, primitive_float_gen_var_4,
+    primitive_float_rounding_mode_pair_gen_var_1,
+};
 use malachite_nz::natural::Natural;
 
 #[test]
@@ -695,4 +702,156 @@ fn test_convertible_from_f64() {
     test(f64::MAX_SUBNORMAL, false);
     test(f64::MIN_POSITIVE_NORMAL, false);
     test(f64::MAX_FINITE, true);
+}
+
+#[test]
+fn test_convertible_from_i64() {
+    let test = |i: i64, out| {
+        assert_eq!(Natural::convertible_from(i), out);
+    };
+    test(0, true);
+    test(123, true);
+    test(-123, false);
+    test(i64::MAX, true);
+    test(i64::MIN, false);
+}
+
+fn rounding_from_float_properties_helper<
+    T: From<Natural> + PrimitiveFloat + RoundingFrom<Natural>,
+>()
+where
+    Natural: RoundingFrom<T>,
+{
+    primitive_float_rounding_mode_pair_gen_var_1::<T>().test_properties(|(f, rm)| {
+        let n = Natural::rounding_from(f, rm);
+        assert!(n.is_valid());
+    });
+
+    primitive_float_gen_var_2::<T>().test_properties(|f| {
+        let n = Natural::rounding_from(f, RoundingMode::Exact);
+        assert!(n.is_valid());
+        assert_eq!(n, Natural::rounding_from(f, RoundingMode::Floor));
+        assert_eq!(n, Natural::rounding_from(f, RoundingMode::Ceiling));
+        assert_eq!(n, Natural::rounding_from(f, RoundingMode::Down));
+        assert_eq!(n, Natural::rounding_from(f, RoundingMode::Up));
+        assert_eq!(n, Natural::rounding_from(f, RoundingMode::Nearest));
+        assert_eq!(T::rounding_from(n, RoundingMode::Exact), f);
+    });
+
+    primitive_float_gen_var_3::<T>().test_properties(|f| {
+        let n_floor = Natural::rounding_from(f, RoundingMode::Floor);
+        assert!(n_floor.is_valid());
+        let n_ceiling = &n_floor + Natural::ONE;
+        assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Ceiling));
+        assert_eq!(n_floor, Natural::rounding_from(f, RoundingMode::Down));
+        assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Up));
+        let n_nearest = Natural::rounding_from(f, RoundingMode::Nearest);
+        assert!(n_nearest == n_floor || n_nearest == n_ceiling);
+        assert_ne!(T::from(n_nearest), f);
+    });
+
+    primitive_float_gen_var_4::<T>().test_properties(|f| {
+        let floor = Natural::rounding_from(f, RoundingMode::Floor);
+        let ceiling = &floor + Natural::ONE;
+        let nearest = Natural::rounding_from(f, RoundingMode::Nearest);
+        assert_eq!(nearest, if floor.even() { floor } else { ceiling });
+    });
+}
+
+#[test]
+fn rounding_from_float_properties() {
+    apply_fn_to_primitive_floats!(rounding_from_float_properties_helper);
+}
+
+fn from_float_properties_helper<T: From<Natural> + PrimitiveFloat>()
+where
+    Natural: From<T> + RoundingFrom<T>,
+{
+    primitive_float_gen_var_1::<T>().test_properties(|f| {
+        let n = Natural::from(f);
+        assert!(n.is_valid());
+        assert_eq!(n, Natural::rounding_from(f, RoundingMode::Nearest));
+    });
+
+    primitive_float_gen_var_2::<T>().test_properties(|f| {
+        let n = Natural::from(f);
+        assert!(n.is_valid());
+        assert_eq!(T::from(n), f);
+    });
+
+    primitive_float_gen_var_3::<T>().test_properties(|f| {
+        let n_floor = Natural::rounding_from(f, RoundingMode::Floor);
+        assert!(n_floor.is_valid());
+        let n_ceiling = &n_floor + Natural::ONE;
+        let n_nearest = Natural::from(f);
+        assert!(n_nearest == n_floor || n_nearest == n_ceiling);
+    });
+
+    primitive_float_gen_var_4::<T>().test_properties(|f| {
+        let floor = Natural::rounding_from(f, RoundingMode::Floor);
+        let ceiling = &floor + Natural::ONE;
+        let nearest = Natural::from(f);
+        assert_eq!(nearest, if floor.even() { floor } else { ceiling });
+    });
+}
+
+#[test]
+fn from_float_properties() {
+    apply_fn_to_primitive_floats!(from_float_properties_helper);
+}
+
+fn checked_from_float_properties_helper<T: PrimitiveFloat + RoundingFrom<Natural>>()
+where
+    Natural: CheckedFrom<T> + RoundingFrom<T>,
+{
+    primitive_float_gen::<T>().test_properties(|f| {
+        let on = Natural::checked_from(f);
+        assert!(on.map_or(true, |n| n.is_valid()));
+    });
+
+    primitive_float_gen_var_2::<T>().test_properties(|f| {
+        let n = Natural::exact_from(f);
+        assert!(n.is_valid());
+        assert_eq!(n, Natural::rounding_from(f, RoundingMode::Exact));
+        assert_eq!(T::rounding_from(n, RoundingMode::Exact), f);
+    });
+
+    primitive_float_gen_var_3::<T>().test_properties(|f| {
+        assert!(Natural::checked_from(f).is_none());
+    });
+
+    primitive_float_gen_var_4::<T>().test_properties(|f| {
+        assert!(Natural::checked_from(f).is_none());
+    });
+}
+
+#[test]
+fn checked_from_float_properties() {
+    apply_fn_to_primitive_floats!(checked_from_float_properties_helper);
+}
+
+fn convertible_from_float_properties_helper<T: PrimitiveFloat>()
+where
+    Natural: ConvertibleFrom<T>,
+{
+    primitive_float_gen::<T>().test_properties(|f| {
+        Natural::convertible_from(f);
+    });
+
+    primitive_float_gen_var_2::<T>().test_properties(|f| {
+        assert!(Natural::convertible_from(f));
+    });
+
+    primitive_float_gen_var_3::<T>().test_properties(|f| {
+        assert!(!Natural::convertible_from(f));
+    });
+
+    primitive_float_gen_var_4::<T>().test_properties(|f| {
+        assert!(!Natural::convertible_from(f));
+    });
+}
+
+#[test]
+fn convertible_from_float_properties() {
+    apply_fn_to_primitive_floats!(convertible_from_float_properties_helper);
 }

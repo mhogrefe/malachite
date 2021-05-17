@@ -1,24 +1,34 @@
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, PowerOf2};
+use crate::common::{
+    integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
+};
+use malachite_base::bools::random::random_bools;
+use malachite_base::iterators::with_special_value;
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, Parity, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::Two;
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ExactFrom, SaturatingFrom};
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::conversion::traits::{
+    ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
+};
+use malachite_base::num::float::PrimitiveFloat;
+use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::num::random::geometric::{
-    geometric_random_positive_unsigneds, geometric_random_unsigneds, GeometricRandomNaturalValues,
+    geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_unsigneds,
+    GeometricRandomNaturalValues, GeometricRandomSignedRange,
 };
 use malachite_base::num::random::striped::{
-    get_striped_bool_vec, get_striped_unsigned_vec, striped_random_unsigned_vecs,
-    striped_random_unsigned_vecs_length_range, striped_random_unsigned_vecs_min_length,
-    striped_random_unsigneds, StripedBitSource, StripedRandomUnsignedBitChunks,
-    StripedRandomUnsignedVecs,
+    get_striped_bool_vec, get_striped_unsigned_vec, striped_random_unsigned_bit_chunks,
+    striped_random_unsigned_vecs, striped_random_unsigned_vecs_length_range,
+    striped_random_unsigned_vecs_min_length, striped_random_unsigneds, StripedBitSource,
+    StripedRandomUnsignedBitChunks, StripedRandomUnsignedVecs,
 };
 use malachite_base::num::random::{
     random_unsigned_inclusive_range, random_unsigneds_less_than, RandomUnsignedRange,
     RandomUnsignedsLessThan,
 };
 use malachite_base::options::random::{random_options, RandomOptions};
-use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::random::{Seed, EXAMPLE_SEED};
+use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
     random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
@@ -52,7 +62,7 @@ use malachite_nz::natural::conversion::digits::general_digits::{
 };
 use malachite_nz::natural::random::{
     get_striped_random_natural_with_up_to_bits, random_natural_range_to_infinity,
-    striped_random_naturals, StripedRandomNaturals,
+    striped_random_naturals, striped_random_positive_naturals, StripedRandomNaturals,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -69,6 +79,70 @@ pub fn special_random_integer_gen(config: &GenConfig) -> It<Integer> {
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     ))
+}
+
+pub fn special_random_integer_gen_var_1<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(with_special_value(
+        EXAMPLE_SEED,
+        Integer::ZERO,
+        1,
+        100,
+        &|seed| {
+            random_pairs(
+                seed,
+                &|seed_2| {
+                    special_random_positive_float_naturals::<T>(
+                        seed_2,
+                        0,
+                        config.get_or("exponent_mean_n", 8),
+                        config.get_or("exponent_mean_d", 1),
+                        config.get_or("mean_stripe_n", 16),
+                        config.get_or("mean_stripe_d", 1),
+                    )
+                },
+                &random_bools,
+            )
+            .map(|(n, b)| Integer::from_sign_and_abs(b, n))
+        },
+    ))
+}
+
+pub fn special_random_integer_gen_var_2<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<Integer>
+where
+    Natural: ExactFrom<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                special_random_positive_float_naturals::<T>(
+                    seed,
+                    1,
+                    config.get_or("exponent_mean_n", 8),
+                    config.get_or("exponent_mean_d", 1),
+                    config.get_or("mean_stripe_n", 16),
+                    config.get_or("mean_stripe_d", 1),
+                )
+                .filter_map(|a| {
+                    let b = Natural::exact_from(T::exact_from(&a).next_higher());
+                    let diff = b - &a;
+                    if diff.even() {
+                        // This happens almost always
+                        Some(a + (diff >> 1))
+                    } else {
+                        None
+                    }
+                })
+            },
+            &random_bools,
+        )
+        .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned) --
@@ -145,6 +219,31 @@ pub fn special_random_integer_unsigned_unsigned_triple_gen_var_1<
     ))
 }
 
+// -- (Integer, RoundingMode) --
+
+pub fn special_random_integer_rounding_mode_pair_gen_var_1<
+    T: for<'a> ConvertibleFrom<&'a Integer> + PrimitiveFloat,
+>(
+    config: &GenConfig,
+) -> It<(Integer, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed.fork("xs"),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+    )
+}
+
 // -- Natural --
 
 pub fn special_random_natural_gen(config: &GenConfig) -> It<Natural> {
@@ -155,6 +254,122 @@ pub fn special_random_natural_gen(config: &GenConfig) -> It<Natural> {
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     ))
+}
+
+pub fn special_random_natural_gen_var_1(config: &GenConfig) -> It<Natural> {
+    Box::new(striped_random_positive_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
+struct SpecialRandomPositiveFloatNaturals<T: PrimitiveFloat>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    exponents: GeometricRandomSignedRange<i64>,
+    mantissas: StripedRandomUnsignedBitChunks<T::UnsignedOfEqualWidth>,
+    phantom: PhantomData<T>,
+}
+
+impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFloatNaturals<T>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        let exponent = self.exponents.next().unwrap();
+        let mut mantissa = self.mantissas.next().unwrap();
+        if exponent != 0 {
+            mantissa.set_bit(T::MANTISSA_WIDTH);
+        } else if mantissa == T::UnsignedOfEqualWidth::ZERO {
+            mantissa = T::UnsignedOfEqualWidth::ONE;
+        }
+        Some(Natural::from(mantissa) << exponent)
+    }
+}
+
+fn special_random_positive_float_naturals<T: PrimitiveFloat>(
+    seed: Seed,
+    start_exponent: i64,
+    mean_exponent_numerator: u64,
+    mean_exponent_denominator: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> SpecialRandomPositiveFloatNaturals<T>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    SpecialRandomPositiveFloatNaturals {
+        exponents: geometric_random_signed_range(
+            seed.fork("exponents"),
+            start_exponent,
+            i64::power_of_2(T::EXPONENT_WIDTH - 1) - i64::wrapping_from(T::MANTISSA_WIDTH) - 1,
+            mean_exponent_numerator,
+            mean_exponent_denominator,
+        ),
+        mantissas: striped_random_unsigned_bit_chunks(
+            seed.fork("mantissas"),
+            T::MANTISSA_WIDTH + 1,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
+        phantom: PhantomData,
+    }
+}
+
+pub fn special_random_natural_gen_var_2<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural>
+where
+    Natural: From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(with_special_value(
+        EXAMPLE_SEED,
+        Natural::ZERO,
+        1,
+        100,
+        &|seed| {
+            special_random_positive_float_naturals::<T>(
+                seed,
+                0,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("mean_stripe_n", 16),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_gen_var_3<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<Natural>
+where
+    Natural: ExactFrom<T> + From<T::UnsignedOfEqualWidth>,
+{
+    Box::new(
+        special_random_positive_float_naturals::<T>(
+            EXAMPLE_SEED,
+            1,
+            config.get_or("exponent_mean_n", 8),
+            config.get_or("exponent_mean_d", 1),
+            config.get_or("mean_stripe_n", 16),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .filter_map(|a| {
+            let b = Natural::exact_from(T::exact_from(&a).next_higher());
+            let diff = b - &a;
+            if diff.even() {
+                // This happens almost always
+                Some(a + (diff >> 1))
+            } else {
+                None
+            }
+        }),
+    )
 }
 
 // -- (Natural, Natural) --
@@ -490,6 +705,71 @@ pub fn special_random_natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt
             config.get_or("mean_stripe_d", 1),
         ),
     })
+}
+
+// -- (Natural, RoundingMode) --
+
+pub fn special_random_natural_rounding_mode_pair_gen_var_1<
+    T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
+>(
+    config: &GenConfig,
+) -> It<(Natural, RoundingMode)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed.fork("xs"),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
+    )
+}
+
+// -- (String, String, String) --
+
+pub fn special_random_string_triple_gen_var_1(config: &GenConfig) -> It<(String, String, String)> {
+    Box::new(
+        striped_random_naturals(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|x| {
+            (
+                serde_json::to_string(&natural_to_biguint(&x)).unwrap(),
+                serde_json::to_string(&natural_to_rug_integer(&x)).unwrap(),
+                serde_json::to_string(&x).unwrap(),
+            )
+        }),
+    )
+}
+
+pub fn special_random_string_triple_gen_var_2(config: &GenConfig) -> It<(String, String, String)> {
+    Box::new(
+        striped_random_integers(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        )
+        .map(|x| {
+            (
+                serde_json::to_string(&integer_to_bigint(&x)).unwrap(),
+                serde_json::to_string(&integer_to_rug_integer(&x)).unwrap(),
+                serde_json::to_string(&x).unwrap(),
+            )
+        }),
+    )
 }
 
 // -- (Vec<Natural>, Natural) --

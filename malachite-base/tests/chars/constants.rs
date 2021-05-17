@@ -1,4 +1,4 @@
-use malachite_base::comparison::traits::{Max, Min};
+use malachite_base::comparison::traits::Min;
 use malachite_base::named::Named;
 
 #[test]

@@ -124,6 +124,10 @@ pub trait PrimitiveFloat:
 
     fn from_bits(v: Self::UnsignedOfEqualWidth) -> Self;
 
+    fn floor(self) -> Self;
+
+    fn ceil(self) -> Self;
+
     //TODO test
     #[inline]
     fn is_negative_zero(self) -> bool {
@@ -300,6 +304,11 @@ pub trait PrimitiveFloat:
         } else {
             u64::wrapping_from(exponent - Self::MIN_EXPONENT) + 1
         }
+    }
+
+    fn is_integer(self) -> bool {
+        !self.is_nan() && self.is_finite() && self == Self::ZERO
+            || self.adjusted_mantissa_and_exponent().1 >= 0
     }
 }
 

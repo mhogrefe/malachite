@@ -53,6 +53,9 @@ pub fn random_somes<I: Iterator>(xs: I) -> RandomSomes<I> {
 
 /// Generates random `Option`s with values from a given random iterator.
 ///
+/// We don't use `WithSpecialValue` here because that requires `I::Item` to be cloneable. The
+/// "special value" in this case, `None`, can be produced on demand without any cloning.
+///
 /// This `struct` is created by the `random_options` function. See its documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomOptions<I: Iterator> {

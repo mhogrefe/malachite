@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{SaturatingAbs, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
@@ -630,7 +630,7 @@ pub fn double_nonzero_truncated_geometric_dist_assertions<I: Clone + Iterator>(
     let unadjusted_mean = um_numerator as f64 / um_denominator as f64;
     let actual_values = xs.clone().take(20).collect_vec();
     let actual_common_values = common_values_map(1000000, 10, xs.clone());
-    let actual_abs_mean = mean(xs.clone().map(Abs::abs).take(1000000));
+    let actual_abs_mean = mean(xs.clone().map(SaturatingAbs::saturating_abs).take(1000000));
     let actual_sample_median = median(xs.clone().take(1000000));
     let actual_sample_moment_stats = moment_stats(xs.take(1000000));
     assert_eq!(
