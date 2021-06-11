@@ -1,16 +1,16 @@
 use itertools::Itertools;
-use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_exponent_in_range;
+use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_sci_exponent_in_range;
 use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use std::panic::catch_unwind;
 
-fn exhaustive_primitive_floats_with_exponent_in_range_helper<T: PrimitiveFloat>(
+fn exhaustive_primitive_floats_with_sci_exponent_in_range_helper<T: PrimitiveFloat>(
     a: T,
     b: T,
-    exponent: i64,
+    sci_exponent: i64,
     out: &[T],
 ) {
-    let xs = exhaustive_primitive_floats_with_exponent_in_range::<T>(a, b, exponent);
+    let xs = exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(a, b, sci_exponent);
     assert_eq!(
         xs.take(50).map(NiceFloat).collect_vec(),
         out.iter().copied().map(NiceFloat).collect_vec()
@@ -18,8 +18,8 @@ fn exhaustive_primitive_floats_with_exponent_in_range_helper<T: PrimitiveFloat>(
 }
 
 #[test]
-fn test_exhaustive_primitive_floats_with_exponent_in_range() {
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f32>(
+fn test_exhaustive_primitive_floats_with_sci_exponent_in_range() {
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f32>(
         core::f32::consts::E,
         core::f32::consts::PI,
         1,
@@ -32,7 +32,7 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             2.9765625, 2.9921875, 3.0078125, 3.0234375, 3.0390625, 3.0546875,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f32>(
         1900.0,
         2000.0,
         10,
@@ -44,13 +44,13 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             1974.0, 1978.0, 1982.0, 1986.0, 1990.0, 1994.0,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f32>(
         7.0e-45,
         1.0e-44,
         -147,
         &[8.0e-45, 7.0e-45, 1.0e-44],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f32>(
         1000000.0,
         1000001.0,
         19,
@@ -60,7 +60,7 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             1000000.7, 1000000.8, 1000000.94,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f32>(
         1.0,
         1.99,
         0,
@@ -73,9 +73,9 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             1.484375, 1.515625, 1.546875,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f32>(5.0, 5.0, 2, &[5.0]);
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f32>(5.0, 5.0, 2, &[5.0]);
 
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f64>(
         core::f64::consts::E,
         core::f64::consts::PI,
         1,
@@ -88,7 +88,7 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             2.9765625, 2.9921875, 3.0078125, 3.0234375, 3.0390625, 3.0546875,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f64>(
         1900.0,
         2000.0,
         10,
@@ -100,7 +100,7 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             1974.0, 1978.0, 1982.0, 1986.0, 1990.0, 1994.0,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f64>(
         7.0e-45,
         1.0e-44,
         -147,
@@ -157,7 +157,7 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             8.276419054918451e-45,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f64>(
         1000000.0,
         1000001.0,
         19,
@@ -214,7 +214,7 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             1000000.515625,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f64>(
         1.0,
         1.99,
         0,
@@ -227,49 +227,49 @@ fn test_exhaustive_primitive_floats_with_exponent_in_range() {
             1.484375, 1.515625, 1.546875,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_in_range_helper::<f64>(5.0, 5.0, 2, &[5.0]);
+    exhaustive_primitive_floats_with_sci_exponent_in_range_helper::<f64>(5.0, 5.0, 2, &[5.0]);
 }
 
-fn exhaustive_primitive_floats_with_exponent_in_range_fail_helper<T: PrimitiveFloat>() {
-    assert_panic!(exhaustive_primitive_floats_with_exponent_in_range::<T>(
+fn exhaustive_primitive_floats_with_sci_exponent_in_range_fail_helper<T: PrimitiveFloat>() {
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
         T::from(1.1),
         T::from(1.2),
         10000,
     ));
-    assert_panic!(exhaustive_primitive_floats_with_exponent_in_range::<T>(
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
         T::from(1.1),
         T::from(1.2),
         -10000,
     ));
-    assert_panic!(exhaustive_primitive_floats_with_exponent_in_range::<T>(
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
         T::from(-1.2),
         T::from(1.1),
         0,
     )
     .for_each(|_| {}));
-    assert_panic!(exhaustive_primitive_floats_with_exponent_in_range::<T>(
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
         T::ONE,
         T::POSITIVE_INFINITY,
         0,
     )
     .for_each(|_| {}));
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_in_range::<T>(T::ONE, T::NAN, 0,)
+        exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(T::ONE, T::NAN, 0,)
             .for_each(|_| {})
     );
-    assert_panic!(exhaustive_primitive_floats_with_exponent_in_range::<T>(
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
         T::from(1.2),
         T::from(1.1),
         0,
     )
     .for_each(|_| {}));
-    assert_panic!(exhaustive_primitive_floats_with_exponent_in_range::<T>(
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
         T::from(1.1),
         T::from(1.2),
         1,
     )
     .for_each(|_| {}));
-    assert_panic!(exhaustive_primitive_floats_with_exponent_in_range::<T>(
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(
         T::from(0.1),
         T::from(1.2),
         1,
@@ -278,6 +278,8 @@ fn exhaustive_primitive_floats_with_exponent_in_range_fail_helper<T: PrimitiveFl
 }
 
 #[test]
-fn exhaustive_primitive_floats_with_exponent_in_range_fail() {
-    apply_fn_to_primitive_floats!(exhaustive_primitive_floats_with_exponent_in_range_fail_helper);
+fn exhaustive_primitive_floats_with_sci_exponent_in_range_fail() {
+    apply_fn_to_primitive_floats!(
+        exhaustive_primitive_floats_with_sci_exponent_in_range_fail_helper
+    );
 }

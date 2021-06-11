@@ -192,6 +192,7 @@ pub mod num {
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
         pub mod log_base_2;
+        pub mod log_base_power_of_2;
         pub mod mod_add;
         pub mod mod_is_reduced;
         pub mod mod_mul;
@@ -322,10 +323,10 @@ pub mod num {
         pub mod exhaustive_primitive_float_inclusive_range;
         pub mod exhaustive_primitive_float_range;
         pub mod exhaustive_primitive_floats;
-        pub mod exhaustive_primitive_floats_with_exponent;
-        pub mod exhaustive_primitive_floats_with_exponent_and_precision;
-        pub mod exhaustive_primitive_floats_with_exponent_and_precision_in_range;
-        pub mod exhaustive_primitive_floats_with_exponent_in_range;
+        pub mod exhaustive_primitive_floats_with_sci_exponent;
+        pub mod exhaustive_primitive_floats_with_sci_exponent_and_precision;
+        pub mod exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range;
+        pub mod exhaustive_primitive_floats_with_sci_exponent_in_range;
         pub mod exhaustive_signed_inclusive_range;
         pub mod exhaustive_signed_range;
         pub mod exhaustive_signeds;
@@ -345,20 +346,24 @@ pub mod num {
     }
     pub mod float {
         pub mod basic {
-            pub mod abs_negative_zeros;
+            pub mod abs_negative_zero;
             pub mod constants;
-            pub mod exponent;
+            // pub mod exponent;
             pub mod from_mantissa_and_exponent;
             pub mod from_ordered_representation;
+            pub mod is_negative_zero;
             pub mod mantissa_and_exponent;
             pub mod next_higher;
             pub mod next_lower;
             pub mod to_ordered_representation;
         }
         pub mod nice_float {
+            pub mod cmp;
+            pub mod eq;
+            pub mod from_str;
+            pub mod hash;
             pub mod to_string;
         }
-        pub mod nice_float_old;
     }
     pub mod iterators {
         pub mod bit_distributor_sequence;
@@ -498,12 +503,12 @@ pub mod random {
 }
 pub mod rounding_modes {
     pub mod clone;
+    pub mod cmp;
     pub mod eq;
     pub mod exhaustive;
     pub mod from_str;
     pub mod hash;
     pub mod neg;
-    pub mod ord;
     pub mod random;
     pub mod size;
     pub mod to_string;

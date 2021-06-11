@@ -15,7 +15,64 @@ use std::ops::{
 };
 use std::str::FromStr;
 
-//TODO docs
+/// This trait defines functions on primitive float types: `f32` and `f64`.
+///
+/// Many of the functions here concern exponents and mantissas. We define three ways to express a
+/// float, each with its own exponent and mantissa. In the following, let $x$ be an arbitrary
+/// positive, finite, non-zero, non-NaN float. Let $M$ and $E$ be the mantissa width and exponent
+/// width of the floating point type; for `f32`s, this is 23 and 8, and for `f64`s it's 52 and 11.
+///
+/// These mantissas and exponents are defined for negative numbers too; just work with the absolute
+/// value.
+///
+/// # raw form
+/// The raw exponent and raw mantissa are the actual bit patterns used to represent the components
+/// of $x$. The raw exponent $e_r$ is an integer in $[0, 2^E-2]$ and the raw mantissa $m_r$ is an
+/// integer in $[0, 2^M-1]$. Since we are dealing with a nonzero $x$, we forbid $e_r$ and $m_r$
+/// from both being zero. We have
+/// $$
+/// x = \\begin{cases}
+///     2^{2-2^{E-1}-M}m_r & e_r = 0 \\\\
+///     2^{e_r-2^{E-1}+1}(2^{-M}m_r+1) & \textrm{otherwise},
+/// \\end{cases}
+/// $$
+/// $$
+/// e_r = \\begin{cases}
+///     0 & x < 2^{2-2^{E-1}} \\\\
+///     \lfloor \log_2 x \rfloor + 2^{E-1} - 1 & \textrm{otherwise},
+/// \\end{cases}
+/// $$
+/// $$
+/// m_r = \\begin{cases}
+///     2^{M+2^{E-1}-2}x & x < 2^{2-2^{E-1}} \\\\
+///     2^M \left ( \frac{x}{2^{\lfloor \log_2 x \rfloor}}-1\right ) & \textrm{otherwise}.
+/// \\end{cases}
+/// $$
+///
+/// # scientific form
+/// We can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is a rational number with
+/// $1 \leq m_s < 2$. If $x$ is a valid float, the scientific mantissa $m_s$ is always exactly
+/// representable as a float of the same type. We have
+/// $$
+/// x = 2^{e_s}m_s,
+/// $$
+/// $$
+/// e_s = \lfloor \log_2 x \rfloor,
+/// $$
+/// $$
+/// m_s = \frac{x}{2^{\lfloor \log_2 x \rfloor}}.
+/// $$
+///
+/// # integer form
+/// We can also write $x = 2^{e_i}m_i$, where $e_i$ is an integer and $m_i$ is an odd integer. We
+/// have
+/// $$
+/// x = 2^{e_i}m_i,
+/// $$
+/// $e_i$ is the unique integer such that $x/2^{e_i}$is an odd integer, and
+/// $$
+/// m_i = \frac{x}{2^{e_i}}.
+/// $$
 pub trait PrimitiveFloat:
     'static
     + Add<Output = Self>
@@ -30,6 +87,7 @@ pub trait PrimitiveFloat:
     + FmtRyuString
     + From<f32>
     + FromStr
+    + Into<f64>
     + LowerExp
     + Min
     + Max
@@ -128,13 +186,43 @@ pub trait PrimitiveFloat:
 
     fn ceil(self) -> Self;
 
-    //TODO test
+    /// Tests whether `self` is negative zero.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// assert!((-0.0).is_negative_zero());
+    /// assert!(!0.0.is_negative_zero());
+    /// assert!(!1.0.is_negative_zero());
+    /// assert!(!f32::NAN.is_negative_zero());
+    /// assert!(!f32::POSITIVE_INFINITY.is_negative_zero());
+    /// ```
     #[inline]
     fn is_negative_zero(self) -> bool {
         self.is_sign_negative() && self == Self::ZERO
     }
 
-    fn abs_negative_zeros(self) -> Self {
+    /// If `self` is negative zero, returns positive zero; otherwise, returns `self`.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::nice_float::NiceFloat;
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// assert_eq!(NiceFloat((-0.0).abs_negative_zero()), NiceFloat(0.0));
+    /// assert_eq!(NiceFloat(0.0.abs_negative_zero()), NiceFloat(0.0));
+    /// assert_eq!(NiceFloat(1.0.abs_negative_zero()), NiceFloat(1.0));
+    /// assert_eq!(NiceFloat((-1.0).abs_negative_zero()), NiceFloat(-1.0));
+    /// assert_eq!(NiceFloat(f32::NAN.abs_negative_zero()), NiceFloat(f32::NAN));
+    /// ```
+    fn abs_negative_zero(self) -> Self {
         if self == Self::ZERO {
             Self::ZERO
         } else {
@@ -142,10 +230,188 @@ pub trait PrimitiveFloat:
         }
     }
 
-    fn abs_negative_zeros_assign(&mut self) {
+    /// If `self` is negative zero, replaces it with positive zero; otherwise, leaves `self`
+    /// unchanged.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::nice_float::NiceFloat;
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// let mut f = -0.0;
+    /// f.abs_negative_zero_assign();
+    /// assert_eq!(NiceFloat(f), NiceFloat(0.0));
+    ///
+    /// let mut f = 0.0;
+    /// f.abs_negative_zero_assign();
+    /// assert_eq!(NiceFloat(f), NiceFloat(0.0));
+    ///
+    /// let mut f = 1.0;
+    /// f.abs_negative_zero_assign();
+    /// assert_eq!(NiceFloat(f), NiceFloat(1.0));
+    ///
+    /// let mut f = -1.0;
+    /// f.abs_negative_zero_assign();
+    /// assert_eq!(NiceFloat(f), NiceFloat(-1.0));
+    ///
+    /// let mut f = f32::NAN;
+    /// f.abs_negative_zero_assign();
+    /// assert_eq!(NiceFloat(f), NiceFloat(f32::NAN));
+    /// ```
+    fn abs_negative_zero_assign(&mut self) {
         if *self == Self::ZERO {
             *self = Self::ZERO;
         }
+    }
+
+    /// Returns the smallest float larger than `self`.
+    ///
+    /// Passing `-0.0` returns `0.0`; passing `NaN` or positive infinity panics.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `self` is `NaN` or positive infinity.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::nice_float::NiceFloat;
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// assert_eq!(NiceFloat((-0.0f32).next_higher()), NiceFloat(0.0));
+    /// assert_eq!(NiceFloat(0.0f32.next_higher()), NiceFloat(1.0e-45));
+    /// assert_eq!(NiceFloat(1.0f32.next_higher()), NiceFloat(1.0000001));
+    /// assert_eq!(NiceFloat((-1.0f32).next_higher()), NiceFloat(-0.99999994));
+    /// ```
+    fn next_higher(self) -> Self {
+        assert!(!self.is_nan());
+        if self.is_sign_positive() {
+            assert_ne!(self, Self::POSITIVE_INFINITY);
+            Self::from_bits(self.to_bits() + Self::UnsignedOfEqualWidth::ONE)
+        } else if self == Self::ZERO {
+            // negative zero -> positive zero
+            Self::ZERO
+        } else {
+            Self::from_bits(self.to_bits() - Self::UnsignedOfEqualWidth::ONE)
+        }
+    }
+
+    /// Returns the largest float smaller than `self`.
+    ///
+    /// Passing `0.0` returns `-0.0`; passing `NaN` or negative infinity panics.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `self` is `NaN` or negative infinity.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::nice_float::NiceFloat;
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// assert_eq!(NiceFloat(0.0f32.next_lower()), NiceFloat(-0.0));
+    /// assert_eq!(NiceFloat((-0.0f32).next_lower()), NiceFloat(-1.0e-45));
+    /// assert_eq!(NiceFloat(1.0f32.next_lower()), NiceFloat(0.99999994));
+    /// assert_eq!(NiceFloat((-1.0f32).next_lower()), NiceFloat(-1.0000001));
+    /// ```
+    fn next_lower(self) -> Self {
+        assert!(!self.is_nan());
+        if self.is_sign_negative() {
+            assert_ne!(self, Self::NEGATIVE_INFINITY);
+            Self::from_bits(self.to_bits() + Self::UnsignedOfEqualWidth::ONE)
+        } else if self == Self::ZERO {
+            // positive zero -> negative zero
+            Self::NEGATIVE_ZERO
+        } else {
+            Self::from_bits(self.to_bits() - Self::UnsignedOfEqualWidth::ONE)
+        }
+    }
+
+    /// Maps `self` to an integer. The map preserves ordering, and adjacent floats are mapped to
+    /// adjacent integers.
+    ///
+    /// Negative infinity is mapped to 0, and positive infinity is mapped to the largest value,
+    /// `LARGEST_ORDERED_REPRESENTATION`. Negative and positive zero are mapped to distinct
+    /// adjacent values. Passing in `NaN` panics.
+    ///
+    /// The inverse operation is `from_ordered_representation`.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `self` is `NaN`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// assert_eq!(f32::NEGATIVE_INFINITY.to_ordered_representation(), 0);
+    /// assert_eq!((-0.0f32).to_ordered_representation(), 2139095040);
+    /// assert_eq!(0.0f32.to_ordered_representation(), 2139095041);
+    /// assert_eq!(1.0f32.to_ordered_representation(), 3204448257);
+    /// assert_eq!(f32::POSITIVE_INFINITY.to_ordered_representation(), 4278190081);
+    /// ```
+    fn to_ordered_representation(self) -> Self::UnsignedOfEqualWidth {
+        assert!(!self.is_nan());
+        let bits = self.to_bits();
+        if self.is_sign_positive() {
+            (Self::UnsignedOfEqualWidth::low_mask(Self::EXPONENT_WIDTH) << Self::MANTISSA_WIDTH)
+                + bits
+                + Self::UnsignedOfEqualWidth::ONE
+        } else {
+            (Self::UnsignedOfEqualWidth::low_mask(Self::EXPONENT_WIDTH + 1) << Self::MANTISSA_WIDTH)
+                - bits
+        }
+    }
+
+    /// Maps a non-negative integer, less than or equal to `LARGEST_ORDERED_REPRESENTATION`, to a
+    /// float. The map preserves ordering, and adjacent integers are mapped to adjacent floats.
+    ///
+    /// Zero is mapped to negative infinity, and `LARGEST_ORDERED_REPRESENTATION` is mapped to
+    /// positive infinity. Negative and positive zero are produced by two distinct adjacent
+    /// integers. `NaN` is never produced.
+    ///
+    /// The inverse operation is `to_ordered_representation`.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Panics
+    /// Panics if `self` is greater than `LARGEST_ORDERED_REPRESENTATION`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// assert_eq!(f32::from_ordered_representation(0), f32::NEGATIVE_INFINITY);
+    /// assert_eq!(f32::from_ordered_representation(2139095040), -0.0f32);
+    /// assert_eq!(f32::from_ordered_representation(2139095041), 0.0f32);
+    /// assert_eq!(f32::from_ordered_representation(3204448257), 1.0f32);
+    /// assert_eq!(f32::from_ordered_representation(4278190081), f32::POSITIVE_INFINITY);
+    /// ```
+    fn from_ordered_representation(n: Self::UnsignedOfEqualWidth) -> Self {
+        let offset =
+            Self::UnsignedOfEqualWidth::low_mask(Self::EXPONENT_WIDTH) << Self::MANTISSA_WIDTH;
+        let f = if n <= offset {
+            Self::from_bits(
+                (Self::UnsignedOfEqualWidth::low_mask(Self::EXPONENT_WIDTH + 1)
+                    << Self::MANTISSA_WIDTH)
+                    - n,
+            )
+        } else {
+            let f = Self::from_bits(n - offset - Self::UnsignedOfEqualWidth::ONE);
+            assert!(f.is_sign_positive());
+            f
+        };
+        assert!(!f.is_nan());
+        f
     }
 
     fn raw_exponent(self) -> u64 {
@@ -153,7 +419,7 @@ pub trait PrimitiveFloat:
         exponent.mod_power_of_2(Self::EXPONENT_WIDTH)
     }
 
-    fn exponent(self) -> i64 {
+    fn exponentz(self) -> i64 {
         assert!(self.is_finite());
         assert!(self != Self::ZERO);
         i64::exact_from(self.raw_exponent()) - Self::MAX_EXPONENT
@@ -167,7 +433,7 @@ pub trait PrimitiveFloat:
         (mantissa, exponent)
     }
 
-    fn adjusted_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, i64) {
+    fn integer_mantissa_and_exponent(self) -> (Self::UnsignedOfEqualWidth, i64) {
         assert!(self.is_finite());
         assert!(self != Self::ZERO);
         let (raw_mantissa, raw_exponent) = self.raw_mantissa_and_exponent();
@@ -190,47 +456,51 @@ pub trait PrimitiveFloat:
         (mantissa, exponent)
     }
 
-    fn from_raw_mantissa_and_exponent(mantissa: Self::UnsignedOfEqualWidth, exponent: u64) -> Self {
-        assert!(mantissa.significant_bits() <= Self::MANTISSA_WIDTH);
-        assert!(exponent.significant_bits() <= Self::EXPONENT_WIDTH);
+    fn from_raw_mantissa_and_exponent(
+        raw_mantissa: Self::UnsignedOfEqualWidth,
+        raw_exponent: u64,
+    ) -> Self {
+        assert!(raw_mantissa.significant_bits() <= Self::MANTISSA_WIDTH);
+        assert!(raw_exponent.significant_bits() <= Self::EXPONENT_WIDTH);
         Self::from_bits(
-            (Self::UnsignedOfEqualWidth::exact_from(exponent) << Self::MANTISSA_WIDTH) | mantissa,
+            (Self::UnsignedOfEqualWidth::exact_from(raw_exponent) << Self::MANTISSA_WIDTH)
+                | raw_mantissa,
         )
     }
 
-    fn from_adjusted_mantissa_and_exponent(
-        mantissa: Self::UnsignedOfEqualWidth,
-        exponent: i64,
+    fn from_integer_mantissa_and_exponent(
+        integer_mantissa: Self::UnsignedOfEqualWidth,
+        integer_exponent: i64,
     ) -> Option<Self> {
-        if mantissa == Self::UnsignedOfEqualWidth::ZERO {
+        if integer_mantissa == Self::UnsignedOfEqualWidth::ZERO {
             return Some(Self::ZERO);
         }
-        let trailing_zeros = mantissa.trailing_zeros();
-        let (mantissa, adjusted_exponent) = (
-            mantissa >> trailing_zeros,
-            exponent + i64::wrapping_from(trailing_zeros),
+        let trailing_zeros = integer_mantissa.trailing_zeros();
+        let (integer_mantissa, adjusted_exponent) = (
+            integer_mantissa >> trailing_zeros,
+            integer_exponent + i64::wrapping_from(trailing_zeros),
         );
-        let mantissa_bits = mantissa.significant_bits();
-        let exponent = adjusted_exponent
+        let mantissa_bits = integer_mantissa.significant_bits();
+        let sci_exponent = adjusted_exponent
             .checked_add(i64::exact_from(mantissa_bits))
             .unwrap()
             - 1;
         let mut raw_mantissa;
         let raw_exponent;
-        if exponent < Self::MIN_EXPONENT || exponent > Self::MAX_EXPONENT {
+        if sci_exponent < Self::MIN_EXPONENT || sci_exponent > Self::MAX_EXPONENT {
             return None;
-        } else if exponent < Self::MIN_NORMAL_EXPONENT {
+        } else if sci_exponent < Self::MIN_NORMAL_EXPONENT {
             if adjusted_exponent < Self::MIN_EXPONENT {
                 return None;
             } else {
                 raw_exponent = 0;
-                raw_mantissa = mantissa << (adjusted_exponent - Self::MIN_EXPONENT);
+                raw_mantissa = integer_mantissa << (adjusted_exponent - Self::MIN_EXPONENT);
             }
         } else if mantissa_bits > Self::MANTISSA_WIDTH + 1 {
             return None;
         } else {
-            raw_exponent = u64::exact_from(exponent + i64::low_mask(Self::EXPONENT_WIDTH - 1));
-            raw_mantissa = mantissa << (Self::MANTISSA_WIDTH + 1 - mantissa_bits);
+            raw_exponent = u64::exact_from(sci_exponent + i64::low_mask(Self::EXPONENT_WIDTH - 1));
+            raw_mantissa = integer_mantissa << (Self::MANTISSA_WIDTH + 1 - mantissa_bits);
             raw_mantissa.clear_bit(Self::MANTISSA_WIDTH);
         }
         Some(Self::from_raw_mantissa_and_exponent(
@@ -239,64 +509,7 @@ pub trait PrimitiveFloat:
         ))
     }
 
-    fn to_ordered_representation(self) -> Self::UnsignedOfEqualWidth {
-        assert!(!self.is_nan());
-        let bits = self.to_bits();
-        if self.is_sign_positive() {
-            (Self::UnsignedOfEqualWidth::low_mask(Self::EXPONENT_WIDTH) << Self::MANTISSA_WIDTH)
-                + bits
-                + Self::UnsignedOfEqualWidth::ONE
-        } else {
-            (Self::UnsignedOfEqualWidth::low_mask(Self::EXPONENT_WIDTH + 1) << Self::MANTISSA_WIDTH)
-                - bits
-        }
-    }
-
-    fn from_ordered_representation(n: Self::UnsignedOfEqualWidth) -> Self {
-        let offset =
-            Self::UnsignedOfEqualWidth::low_mask(Self::EXPONENT_WIDTH) << Self::MANTISSA_WIDTH;
-        let f = if n <= offset {
-            Self::from_bits(
-                (Self::UnsignedOfEqualWidth::low_mask(Self::EXPONENT_WIDTH + 1)
-                    << Self::MANTISSA_WIDTH)
-                    - n,
-            )
-        } else {
-            let f = Self::from_bits(n - offset - Self::UnsignedOfEqualWidth::ONE);
-            assert!(f.is_sign_positive());
-            f
-        };
-        assert!(!f.is_nan());
-        f
-    }
-
-    fn next_higher(self) -> Self {
-        assert!(!self.is_nan());
-        if self.is_sign_positive() {
-            assert_ne!(self, Self::POSITIVE_INFINITY);
-            Self::from_bits(self.to_bits() + Self::UnsignedOfEqualWidth::ONE)
-        } else if self == Self::ZERO {
-            // negative zero -> positive zero
-            Self::ZERO
-        } else {
-            Self::from_bits(self.to_bits() - Self::UnsignedOfEqualWidth::ONE)
-        }
-    }
-
-    fn next_lower(self) -> Self {
-        assert!(!self.is_nan());
-        if self.is_sign_negative() {
-            assert_ne!(self, Self::NEGATIVE_INFINITY);
-            Self::from_bits(self.to_bits() + Self::UnsignedOfEqualWidth::ONE)
-        } else if self == Self::ZERO {
-            // positive zero -> negative zero
-            Self::NEGATIVE_ZERO
-        } else {
-            Self::from_bits(self.to_bits() - Self::UnsignedOfEqualWidth::ONE)
-        }
-    }
-
-    fn max_precision_for_exponent(exponent: i64) -> u64 {
+    fn max_precision_for_sci_exponent(exponent: i64) -> u64 {
         assert!(exponent >= Self::MIN_EXPONENT);
         assert!(exponent <= Self::MAX_EXPONENT);
         if exponent >= Self::MIN_NORMAL_EXPONENT {
@@ -308,9 +521,11 @@ pub trait PrimitiveFloat:
 
     fn is_integer(self) -> bool {
         !self.is_nan() && self.is_finite() && self == Self::ZERO
-            || self.adjusted_mantissa_and_exponent().1 >= 0
+            || self.integer_mantissa_and_exponent().1 >= 0
     }
 }
 
 pub mod basic;
+/// This module contains `NiceFloat`, a wrapper around primitive float types that provides nicer
+/// `Eq`, `Ord`, `Hash`, `Display`, and `FromStr` instances.
 pub mod nice_float;

@@ -6,20 +6,20 @@ use malachite_base_test_util::stats::median;
 use num::random::striped::get_striped_bool_vec::bool_slice_to_string;
 
 fn striped_random_bool_vecs_length_range_helper(
-    mean_stripe_numerator: u64,
-    mean_stripe_denominator: u64,
     a: u64,
     b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
     expected_values: &[&str],
     expected_common_values: &[(&str, usize)],
     expected_median: (&str, Option<&str>),
 ) {
     let xs = striped_random_bool_vecs_length_range(
         EXAMPLE_SEED,
-        mean_stripe_numerator,
-        mean_stripe_denominator,
         a,
         b,
+        mean_stripe_numerator,
+        mean_stripe_denominator,
     );
     let values = xs
         .clone()
@@ -50,10 +50,10 @@ fn striped_random_bool_vecs_length_range_helper(
 #[test]
 fn test_striped_random_bool_vecs_length_range() {
     striped_random_bool_vecs_length_range_helper(
-        2,
-        1,
         3,
         10,
+        2,
+        1,
         &[
             "00110011",
             "01110011",
@@ -91,10 +91,10 @@ fn test_striped_random_bool_vecs_length_range() {
         ("100", None),
     );
     striped_random_bool_vecs_length_range_helper(
-        10,
-        1,
         3,
         10,
+        10,
+        1,
         &[
             "00000000",
             "00000000",
@@ -132,9 +132,9 @@ fn test_striped_random_bool_vecs_length_range() {
         ("100", None),
     );
     striped_random_bool_vecs_length_range_helper(
-        11,
-        10,
         3,
+        10,
+        11,
         10,
         &[
             "01011010",
@@ -177,17 +177,17 @@ fn test_striped_random_bool_vecs_length_range() {
 #[test]
 #[should_panic]
 fn striped_random_bool_vecs_length_range_fail_1() {
-    striped_random_bool_vecs_length_range(EXAMPLE_SEED, 1, 0, 3, 10);
+    striped_random_bool_vecs_length_range(EXAMPLE_SEED, 3, 10, 1, 0);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_bool_vecs_length_range_fail_2() {
-    striped_random_bool_vecs_length_range(EXAMPLE_SEED, 2, 3, 3, 10);
+    striped_random_bool_vecs_length_range(EXAMPLE_SEED, 3, 10, 2, 3);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_bool_vecs_length_range_fail_3() {
-    striped_random_bool_vecs_length_range(EXAMPLE_SEED, 4, 1, 1, 1);
+    striped_random_bool_vecs_length_range(EXAMPLE_SEED, 1, 1, 4, 1);
 }

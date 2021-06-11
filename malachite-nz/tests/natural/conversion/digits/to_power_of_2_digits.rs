@@ -1,11 +1,10 @@
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::DivRound;
+use malachite_base::num::arithmetic::traits::FloorLogBasePowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
-use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
 use malachite_base_test_util::generators::{
     unsigned_gen_var_11, unsigned_gen_var_3, unsigned_pair_gen_var_4,
@@ -266,13 +265,12 @@ where
             digits.iter().cloned().rev().collect_vec(),
             n.to_power_of_2_digits_desc(log_base)
         );
-        assert_eq!(
-            digits.len(),
-            usize::exact_from(
-                n.significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling)
-            )
-        );
+        if *n != Natural::ZERO {
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                n.floor_log_base_power_of_2(log_base) + 1
+            );
+        }
         assert!(digits
             .iter()
             .all(|digit| digit.significant_bits() <= log_base));
@@ -336,13 +334,12 @@ where
             digits.iter().cloned().rev().collect_vec(),
             n.to_power_of_2_digits_asc(log_base)
         );
-        assert_eq!(
-            digits.len(),
-            usize::exact_from(
-                n.significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling)
-            )
-        );
+        if *n != Natural::ZERO {
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                n.floor_log_base_power_of_2(log_base) + 1
+            );
+        }
         assert!(digits
             .iter()
             .all(|digit| digit.significant_bits() <= log_base));
@@ -406,13 +403,12 @@ fn to_power_of_2_digits_asc_natural_properties() {
             digits.iter().cloned().rev().collect_vec(),
             PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(n, log_base)
         );
-        assert_eq!(
-            digits.len(),
-            usize::exact_from(
-                n.significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling)
-            )
-        );
+        if *n != Natural::ZERO {
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                n.floor_log_base_power_of_2(log_base) + 1
+            );
+        }
         assert!(digits
             .iter()
             .all(|digit| digit.significant_bits() <= log_base));
@@ -451,13 +447,12 @@ fn to_power_of_2_digits_desc_natural_properties() {
             digits.iter().cloned().rev().collect_vec(),
             PowerOf2Digits::<Natural>::to_power_of_2_digits_asc(n, log_base)
         );
-        assert_eq!(
-            digits.len(),
-            usize::exact_from(
-                n.significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling)
-            )
-        );
+        if *n != Natural::ZERO {
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                n.floor_log_base_power_of_2(log_base) + 1
+            );
+        }
         assert!(digits
             .iter()
             .all(|digit| digit.significant_bits() <= log_base));

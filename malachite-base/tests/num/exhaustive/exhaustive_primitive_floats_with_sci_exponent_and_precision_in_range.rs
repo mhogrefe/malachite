@@ -4,15 +4,20 @@ use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use std::panic::catch_unwind;
 
-fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper<T: PrimitiveFloat>(
+fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper<
+    T: PrimitiveFloat,
+>(
     a: T,
     b: T,
-    exponent: i64,
+    sci_exponent: i64,
     precision: u64,
     out: &[T],
 ) {
-    let xs = exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
-        a, b, exponent, precision,
+    let xs = exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
+        a,
+        b,
+        sci_exponent,
+        precision,
     );
     assert_eq!(
         xs.take(20).map(NiceFloat).collect_vec(),
@@ -21,50 +26,50 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper<T: Pr
 }
 
 #[test]
-fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+fn test_exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range() {
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         core::f32::consts::E,
         core::f32::consts::PI,
         1,
         1,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         core::f32::consts::E,
         core::f32::consts::PI,
         1,
         2,
         &[3.0],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         core::f32::consts::E,
         core::f32::consts::PI,
         1,
         3,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         core::f32::consts::E,
         core::f32::consts::PI,
         1,
         4,
         &[2.75],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         core::f32::consts::E,
         core::f32::consts::PI,
         1,
         5,
         &[2.875, 3.125],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         core::f32::consts::E,
         core::f32::consts::PI,
         1,
         6,
         &[2.8125, 2.9375, 3.0625],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         core::f32::consts::E,
         core::f32::consts::PI,
         1,
@@ -74,49 +79,49 @@ fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
         ],
     );
 
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1900.0,
         2000.0,
         10,
         1,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1900.0,
         2000.0,
         10,
         2,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1900.0,
         2000.0,
         10,
         3,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1900.0,
         2000.0,
         10,
         4,
         &[1920.0],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1900.0,
         2000.0,
         10,
         5,
         &[1984.0],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1900.0,
         2000.0,
         10,
         6,
         &[1952.0],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1900.0,
         2000.0,
         10,
@@ -124,21 +129,21 @@ fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
         &[1904.0, 1936.0, 1968.0, 2000.0],
     );
 
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         7.0e-45,
         1.0e-44,
         -147,
         1,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         7.0e-45,
         1.0e-44,
         -147,
         2,
         &[8.0e-45],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         7.0e-45,
         1.0e-44,
         -147,
@@ -146,7 +151,7 @@ fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
         &[7.0e-45, 1.0e-44],
     );
 
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1.0,
         1.99,
         0,
@@ -154,49 +159,49 @@ fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
         &[1.0],
     );
 
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         core::f64::consts::E,
         core::f64::consts::PI,
         1,
         1,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         core::f64::consts::E,
         core::f64::consts::PI,
         1,
         2,
         &[3.0],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         core::f64::consts::E,
         core::f64::consts::PI,
         1,
         3,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         core::f64::consts::E,
         core::f64::consts::PI,
         1,
         4,
         &[2.75],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         core::f64::consts::E,
         core::f64::consts::PI,
         1,
         5,
         &[2.875, 3.125],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         core::f64::consts::E,
         core::f64::consts::PI,
         1,
         6,
         &[2.8125, 2.9375, 3.0625],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         core::f64::consts::E,
         core::f64::consts::PI,
         1,
@@ -206,49 +211,49 @@ fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
         ],
     );
 
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         1900.0,
         2000.0,
         10,
         1,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         1900.0,
         2000.0,
         10,
         2,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         1900.0,
         2000.0,
         10,
         3,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         1900.0,
         2000.0,
         10,
         4,
         &[1920.0],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         1900.0,
         2000.0,
         10,
         5,
         &[1984.0],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         1900.0,
         2000.0,
         10,
         6,
         &[1952.0],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         1900.0,
         2000.0,
         10,
@@ -256,21 +261,21 @@ fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
         &[1904.0, 1936.0, 1968.0, 2000.0],
     );
 
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         7.0e-45,
         1.0e-44,
         -147,
         1,
         &[],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         7.0e-45,
         1.0e-44,
         -147,
         2,
         &[8.407790785948902e-45],
     );
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(
         7.0e-45,
         1.0e-44,
         -147,
@@ -278,7 +283,7 @@ fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
         &[7.006492321624085e-45, 9.80908925027372e-45],
     );
 
-    exhaustive_primitive_floats_with_exponent_and_precision_in_range_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
         1.0,
         1.99,
         0,
@@ -287,11 +292,11 @@ fn test_exhaustive_primitive_floats_with_exponent_and_precision_in_range() {
     );
 }
 
-fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
+fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_fail_helper<
     T: PrimitiveFloat,
 >() {
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::from(1.1),
             T::from(1.2),
             0,
@@ -299,7 +304,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::from(1.1),
             T::from(1.2),
             0,
@@ -307,7 +312,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::from(1.1),
             T::from(1.2),
             10000,
@@ -315,7 +320,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::from(1.1),
             T::from(1.2),
             -10000,
@@ -323,7 +328,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::MIN_POSITIVE_SUBNORMAL,
             T::MIN_POSITIVE_SUBNORMAL,
             T::MIN_EXPONENT,
@@ -332,7 +337,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
     );
 
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::from(1.2),
             T::from(1.1),
             0,
@@ -340,7 +345,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::from(1.1),
             T::from(1.2),
             1,
@@ -348,7 +353,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::from(0.1),
             T::from(1.2),
             1,
@@ -356,7 +361,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::from(-1.2),
             T::from(1.1),
             0,
@@ -364,7 +369,7 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
             T::ONE,
             T::POSITIVE_INFINITY,
             0,
@@ -372,13 +377,18 @@ fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper<
         )
     );
     assert_panic!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range::<T>(T::ONE, T::NAN, 0, 1)
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range::<T>(
+            T::ONE,
+            T::NAN,
+            0,
+            1
+        )
     );
 }
 
 #[test]
-fn exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail() {
+fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_fail() {
     apply_fn_to_primitive_floats!(
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range_fail_helper
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_fail_helper
     );
 }

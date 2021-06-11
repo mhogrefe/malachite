@@ -7,20 +7,20 @@ use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 
 fn striped_random_unsigned_vecs_length_inclusive_range_helper<T: PrimitiveUnsigned>(
-    mean_stripe_numerator: u64,
-    mean_stripe_denominator: u64,
     a: u64,
     b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
     expected_values: &[&[&str]],
     expected_common_values: &[(&[&str], usize)],
     expected_median: (&[&str], Option<&[&str]>),
 ) {
     let xss = striped_random_unsigned_vecs_length_inclusive_range::<T>(
         EXAMPLE_SEED,
-        mean_stripe_numerator,
-        mean_stripe_denominator,
         a,
         b,
+        mean_stripe_numerator,
+        mean_stripe_denominator,
     );
     let values = xss
         .clone()
@@ -82,10 +82,10 @@ fn striped_random_unsigned_vecs_length_inclusive_range_helper<T: PrimitiveUnsign
 #[test]
 fn test_striped_random_unsigned_vecs_length_inclusive_range() {
     striped_random_unsigned_vecs_length_inclusive_range_helper::<u8>(
-        2,
-        1,
         3,
         5,
+        2,
+        1,
         &[
             &["11001100", "11000", "11001", "10111101"],
             &["10000010", "10011110", "1011001", "11111000", "10011"],
@@ -126,10 +126,10 @@ fn test_striped_random_unsigned_vecs_length_inclusive_range() {
         ),
     );
     striped_random_unsigned_vecs_length_inclusive_range_helper::<u8>(
-        10,
-        1,
         3,
         5,
+        10,
+        1,
         &[
             &["0", "0", "111000", "0"],
             &["11111100", "11", "11111111", "111", "0"],
@@ -170,10 +170,10 @@ fn test_striped_random_unsigned_vecs_length_inclusive_range() {
         (&["10000000", "0", "0"], None),
     );
     striped_random_unsigned_vecs_length_inclusive_range_helper::<u8>(
-        11,
-        10,
         3,
         5,
+        11,
+        10,
         &[
             &["1011010", "11010101", "1001010", "10110101"],
             &["1010010", "10101010", "10101010", "101010", "10110101"],
@@ -224,17 +224,17 @@ fn test_striped_random_unsigned_vecs_length_inclusive_range() {
 #[test]
 #[should_panic]
 fn striped_random_unsigned_vecs_length_inclusive_range_fail_1() {
-    striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 1, 0, 3, 10);
+    striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 3, 10, 1, 0);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_unsigned_vecs_length_inclusive_range_fail_2() {
-    striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 2, 3, 3, 10);
+    striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 3, 10, 2, 3);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_unsigned_vecs_length_inclusive_range_fail_3() {
-    striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 4, 1, 2, 1);
+    striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 2, 1, 4, 1);
 }

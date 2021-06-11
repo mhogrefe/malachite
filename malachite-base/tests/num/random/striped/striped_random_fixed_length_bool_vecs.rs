@@ -6,18 +6,18 @@ use malachite_base_test_util::stats::median;
 use num::random::striped::get_striped_bool_vec::bool_slice_to_string;
 
 fn striped_random_fixed_length_bool_vecs_helper(
+    len: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-    len: u64,
     expected_values: &[&str],
     expected_common_values: &[(&str, usize)],
     expected_median: (&str, Option<&str>),
 ) {
     let xs = striped_random_fixed_length_bool_vecs(
         EXAMPLE_SEED,
+        len,
         mean_stripe_numerator,
         mean_stripe_denominator,
-        len,
     );
     let values = xs
         .clone()
@@ -47,10 +47,10 @@ fn striped_random_fixed_length_bool_vecs_helper(
 
 #[test]
 fn test_striped_random_fixed_length_bool_vecs() {
-    striped_random_fixed_length_bool_vecs_helper(10, 1, 0, &[""; 20], &[("", 1000000)], ("", None));
+    striped_random_fixed_length_bool_vecs_helper(0, 10, 1, &[""; 20], &[("", 1000000)], ("", None));
     striped_random_fixed_length_bool_vecs_helper(
-        10,
         1,
+        10,
         1,
         &[
             "0", "0", "0", "0", "0", "1", "0", "1", "0", "1", "1", "0", "0", "0", "1", "0", "1",
@@ -60,9 +60,9 @@ fn test_striped_random_fixed_length_bool_vecs() {
         ("1", None),
     );
     striped_random_fixed_length_bool_vecs_helper(
+        2,
         10,
         1,
-        2,
         &[
             "00", "00", "00", "00", "00", "11", "00", "11", "00", "11", "11", "00", "00", "00",
             "11", "00", "11", "00", "01", "11",
@@ -71,9 +71,9 @@ fn test_striped_random_fixed_length_bool_vecs() {
         ("10", None),
     );
     striped_random_fixed_length_bool_vecs_helper(
+        5,
         10,
         1,
-        5,
         &[
             "00000", "00000", "00000", "00000", "00011", "11000", "00000", "11111", "01111",
             "11111", "10000", "00011", "00000", "00000", "11000", "00000", "11111", "00000",
@@ -98,11 +98,11 @@ fn test_striped_random_fixed_length_bool_vecs() {
 #[test]
 #[should_panic]
 fn striped_random_fixed_length_bool_vecs_fail_1() {
-    striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 1, 0, 5);
+    striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 5, 1, 0);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_fixed_length_bool_vecs_fail_2() {
-    striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 2, 3, 5);
+    striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 5, 2, 3);
 }

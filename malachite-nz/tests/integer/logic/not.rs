@@ -6,17 +6,19 @@ use std::str::FromStr;
 #[test]
 fn test_not() {
     let test = |s, out| {
-        let not = !Integer::from_str(s).unwrap();
+        let n = Integer::from_str(s).unwrap();
+
+        let not = !n.clone();
         assert!(not.is_valid());
         assert_eq!(not.to_string(), out);
 
-        let not = !(&Integer::from_str(s).unwrap());
+        let not = !&n;
         assert!(not.is_valid());
         assert_eq!(not.to_string(), out);
 
         assert_eq!((!rug::Integer::from_str(s).unwrap()).to_string(), out);
 
-        let mut x = Integer::from_str(s).unwrap();
+        let mut x = n;
         x.not_assign();
         assert!(x.is_valid());
         assert_eq!(x.to_string(), out);

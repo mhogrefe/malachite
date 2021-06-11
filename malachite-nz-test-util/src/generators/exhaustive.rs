@@ -305,6 +305,13 @@ pub fn exhaustive_natural_primitive_int_pair_gen_var_3<T: PrimitiveInt>() -> It<
     ))
 }
 
+pub fn exhaustive_natural_primitive_int_pair_gen_var_4<T: PrimitiveInt>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_positive_naturals(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
 // -- (Natural, PrimitiveInt, PrimitiveUnsigned) --
 
 pub fn exhaustive_natural_primitive_int_unsigned_triple_gen_var_3<

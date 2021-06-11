@@ -317,12 +317,21 @@ pub fn natural_unsigned_pair_gen_var_6<T: PrimitiveInt>() -> Generator<(Natural,
     )
 }
 
-// All `(Natural, T)` where `T` is unsigned, positive, and small.
+// All `(Natural, T)` where the `T` is unsigned, positive, and small.
 pub fn natural_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
     Generator::new(
         &exhaustive_natural_primitive_int_pair_gen_var_3,
         &random_natural_unsigned_pair_gen_var_7,
         &special_random_natural_unsigned_pair_gen_var_6,
+    )
+}
+
+// All `(Natural, T)` where the `Natural` is positive and the `T` is unsigned, positive, and small.
+pub fn natural_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_primitive_int_pair_gen_var_4,
+        &random_natural_unsigned_pair_gen_var_8,
+        &special_random_natural_unsigned_pair_gen_var_7,
     )
 }
 
@@ -472,7 +481,7 @@ pub fn natural_vec_unsigned_pair_gen_var_1() -> Generator<(Vec<Natural>, u64)> {
     )
 }
 
-// All `(Vec<Natural>, T)`, where the `T` is positive.
+// All `(Vec<Natural>, T)`, where the `T` is small and positive.
 pub fn natural_vec_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Vec<Natural>, T)> {
     Generator::new(
         &exhaustive_natural_vec_primitive_int_pair_gen_var_1,

@@ -23,8 +23,6 @@ pub trait NegativeOne {
 }
 
 /// The Iverson bracket: converts a `bool` to 0 or 1.
-///
-/// It should be used sparingly, but sometimes it is the cleanest option.
 pub trait Iverson {
     fn iverson(b: bool) -> Self;
 }

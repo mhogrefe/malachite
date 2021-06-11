@@ -1022,7 +1022,7 @@ fn div_round_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert!(q <= x);
     });
 
-    unsigned_pair_gen_var_12::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_12::<T, T>().test_properties(|(x, y)| {
         assert_eq!(
             x.ceiling_div_neg_mod(y).0,
             x.div_round(y, RoundingMode::Ceiling)

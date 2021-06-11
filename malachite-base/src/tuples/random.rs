@@ -344,6 +344,20 @@ random_custom_tuples!(
     [Y, J, ys, ys_gen, [y_3, y_3]]
 );
 random_custom_tuples!(
+    RandomQuadruplesXXYX,
+    (X, X, Y, X),
+    random_quadruples_xxyx,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1], [x_3, y_2]],
+    [Y, J, ys, ys_gen, [y_2, x_3]]
+);
+random_custom_tuples!(
+    RandomQuadruplesXYYX,
+    (X, Y, Y, X),
+    random_quadruples_xyyx,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_3, y_1]],
+    [Y, J, ys, ys_gen, [y_1, y_2], [y_2, x_3]]
+);
+random_custom_tuples!(
     RandomQuadruplesXYYZ,
     (X, Y, Y, Z),
     random_quadruples_xyyz,

@@ -34,21 +34,14 @@ fn test_limbs_index_of_next_false_bit_neg() {
     test(&[0, 0, 0b101, 0b101], 97, Some(98));
 }
 
-//TODO clean from_str
-
 #[test]
 fn test_index_of_next_false_bit() {
-    let test = |n, u, out| {
+    let test = |s, u, out| {
+        let n = Integer::from_str(s).unwrap();
+        assert_eq!(n.index_of_next_false_bit(u), out);
+        assert_eq!(integer_index_of_next_false_bit_alt(&n, u), out);
         assert_eq!(
-            Integer::from_str(n).unwrap().index_of_next_false_bit(u),
-            out
-        );
-        assert_eq!(
-            integer_index_of_next_false_bit_alt(&Integer::from_str(n).unwrap(), u),
-            out
-        );
-        assert_eq!(
-            rug::Integer::from_str(n)
+            rug::Integer::from_str(s)
                 .unwrap()
                 .find_zero(u32::exact_from(u))
                 .map(u64::from),

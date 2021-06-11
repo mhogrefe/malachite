@@ -22,18 +22,19 @@ macro_rules! impl_mod_power_of_2_pow {
         impl ModPowerOf2Pow<u64> for $t {
             type Output = $t;
 
-            /// Computes `self.pow(exp)` mod 2<sup>`pow`</sup>. Assumes the input is already reduced
-            /// mod 2<sup>`pow`</sup>.
+            /// Computes `self.pow(exp)` mod $2^p$. Assumes the input is already reduced mod $2^p$.
             ///
-            /// //TODO complexity
+            /// $f(x, n, p) = y$, where $x, y < 2^p$ and $x^n \equiv y \mod 2^p$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2Pow;
-            ///
-            /// assert_eq!(5u8.mod_power_of_2_pow(13, 3), 5);
-            /// assert_eq!(7u32.mod_power_of_2_pow(1000, 6), 1);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2_pow` module.
             #[inline]
             fn mod_power_of_2_pow(self, exp: u64, pow: u64) -> $t {
                 _mod_power_of_2_pow(self, exp, pow)
@@ -41,23 +42,20 @@ macro_rules! impl_mod_power_of_2_pow {
         }
 
         impl ModPowerOf2PowAssign<u64> for $t {
-            /// Replaces `self` with `self.pow(exp)` mod 2<sup>`pow`</sup>. Assumes the input is
-            /// already reduced mod 2<sup>`pow`</sup>.
+            /// Replaces `self` with `self.pow(exp)` mod $2^p$. Assumes the input is already
+            /// reduced mod $2^p$.
             ///
-            /// //TODO complexity
+            /// $x \gets y$, where $x, y < 2^p$ and $x^n \equiv y \mod 2^p$.
+            ///
+            /// # Worst-case complexity
+            /// $T(n) = O(n)$
+            ///
+            /// $M(n) = O(1)$
+            ///
+            /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2PowAssign;
-            ///
-            /// let mut n = 5u8;
-            /// n.mod_power_of_2_pow_assign(13, 3);
-            /// assert_eq!(n, 5);
-            ///
-            /// let mut n = 7u32;
-            /// n.mod_power_of_2_pow_assign(1000, 6);
-            /// assert_eq!(n, 1);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2_pow` module.
             #[inline]
             fn mod_power_of_2_pow_assign(&mut self, exp: u64, pow: u64) {
                 *self = self.mod_power_of_2_pow(exp, pow);

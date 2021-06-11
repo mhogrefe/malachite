@@ -35,23 +35,20 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl ModPowerOf2 for $s {
             type Output = $s;
 
-            /// Calculates `self` mod a power of 2. In other words, returns r, where
-            /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
+            /// Divides a value by a power of 2, returning just the remainder.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, p) = x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
-            ///
-            /// // 1 * 2^8 + 4 = 260
-            /// assert_eq!(260u16.mod_power_of_2(8), 4);
-            ///
-            /// // 100 * 2^4 + 11 = 1611
-            /// assert_eq!(1611u32.mod_power_of_2(4), 11);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn mod_power_of_2(self, pow: u64) -> $s {
                 _mod_power_of_2_unsigned(self, pow)
@@ -59,27 +56,20 @@ macro_rules! impl_mod_power_of_2_unsigned {
         }
 
         impl ModPowerOf2Assign for $s {
-            /// Reduces `self` mod a power of 2. In other words, replaces `self` with r, where
-            /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
+            /// Divides a value by a power of 2, replacing the first value by the remainder.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// x \gets x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
-            ///
-            /// // 1 * 2^8 + 4 = 260
-            /// let mut x = 260u16;
-            /// x.mod_power_of_2_assign(8);
-            /// assert_eq!(x, 4);
-            ///
-            /// // 100 * 2^4 + 11 = 1611
-            /// let mut x = 1611u32;
-            /// x.mod_power_of_2_assign(4);
-            /// assert_eq!(x, 11);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn mod_power_of_2_assign(&mut self, pow: u64) {
                 _mod_power_of_2_assign_unsigned(self, pow);
@@ -89,22 +79,21 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl RemPowerOf2 for $s {
             type Output = $s;
 
-            /// Calculates `self` rem a power of 2. For unsigned integers, rem is equivalent to mod.
+            /// Divides a value by a power of 2, returning just the remainder. For unsigned
+            /// integers, rem is equivalent to mod.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, p) = x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RemPowerOf2;
-            ///
-            /// // 1 * 2^8 + 4 = 260
-            /// assert_eq!(260u16.rem_power_of_2(8), 4);
-            ///
-            /// // 100 * 2^4 + 11 = 1611
-            /// assert_eq!(1611u32.rem_power_of_2(4), 11);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn rem_power_of_2(self, pow: u64) -> $s {
                 self.mod_power_of_2(pow)
@@ -112,26 +101,21 @@ macro_rules! impl_mod_power_of_2_unsigned {
         }
 
         impl RemPowerOf2Assign for $s {
-            /// Reduces `self` rem a power of 2. For unsigned integers, rem is equivalent to mod.
+            /// Divides a value by a power of 2, replacing the first value by the remainder. For
+            /// unsigned integers, rem is equivalent to mod.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// x \gets x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RemPowerOf2Assign;
-            ///
-            /// // 1 * 2^8 + 4 = 260
-            /// let mut x = 260u16;
-            /// x.rem_power_of_2_assign(8);
-            /// assert_eq!(x, 4);
-            ///
-            /// // 100 * 2^4 + 11 = 1611
-            /// let mut x = 1611u32;
-            /// x.rem_power_of_2_assign(4);
-            /// assert_eq!(x, 11);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn rem_power_of_2_assign(&mut self, pow: u64) {
                 self.mod_power_of_2_assign(pow)
@@ -141,26 +125,23 @@ macro_rules! impl_mod_power_of_2_unsigned {
         impl NegModPowerOf2 for $s {
             type Output = $s;
 
-            /// Calculates `-self` mod a power of 2. In other words, returns r, where
-            /// `self` = q * 2<sup>`pow`</sup> - r and 0 <= r < 2<sup>`pow`</sup>.
+            /// Divides the negative of a value by a power of 2, returning just the remainder.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p - r$ and $0 \leq r < 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, p) = 2^p\left \lceil \frac{x}{2^p} \right \rceil - x.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `self` is nonzero and `pow` is greater than `$s::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::NegModPowerOf2;
-            ///
-            /// // 2 * 2^8 - 252 = 260
-            /// assert_eq!(260u16.neg_mod_power_of_2(8), 252);
-            ///
-            /// // 101 * 2^4 - 5 = 1611
-            /// assert_eq!(1611u32.neg_mod_power_of_2(4), 5);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn neg_mod_power_of_2(self, pow: u64) -> $s {
                 _neg_mod_power_of_2_unsigned(self, pow)
@@ -168,30 +149,23 @@ macro_rules! impl_mod_power_of_2_unsigned {
         }
 
         impl NegModPowerOf2Assign for $s {
-            /// Reduces `-self` mod a power of 2. In other words, replaces `self` with r, where
-            /// `self` = q * 2<sup>`pow`</sup> - r and 0 <= r < 2<sup>`pow`</sup>.
+            /// Divides the negative of a value by a power of 2, returning just the remainder.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p - r$ and $0 \leq r < 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// x \gets 2^p\left \lceil \frac{x}{2^p} \right \rceil - x.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `self` is nonzero and `pow` is greater than `$s::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::NegModPowerOf2Assign;
-            ///
-            /// // 2 * 2^8 - 252 = 260
-            /// let mut x = 260u16;
-            /// x.neg_mod_power_of_2_assign(8);
-            /// assert_eq!(x, 252);
-            ///
-            /// // 101 * 2^4 - 5 = 1611
-            /// let mut x = 1611u32;
-            /// x.neg_mod_power_of_2_assign(4);
-            /// assert_eq!(x, 5);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn neg_mod_power_of_2_assign(&mut self, pow: u64) {
                 *self = self.neg_mod_power_of_2(pow)
@@ -255,28 +229,24 @@ macro_rules! impl_mod_power_of_2_signed {
         impl ModPowerOf2 for $s {
             type Output = $u;
 
-            /// Calculates `self` mod a power of 2. In other words, returns r, where
-            /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
+            /// Divides a value by a power of 2, returning just the remainder. The remainder is
+            /// non-negative.
             ///
-            /// Unlike rem_power_of_2, this function always returns a non-negative number.
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x, p) = x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `self` is negative and `pow` is greater than `$s::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2;
-            ///
-            /// // 1 * 2^8 + 4 = 260
-            /// assert_eq!(260i16.mod_power_of_2(8), 4);
-            ///
-            /// // -101 * 2^4 + 5 = -1611
-            /// assert_eq!((-1611i32).mod_power_of_2(4), 5);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn mod_power_of_2(self, pow: u64) -> $u {
                 _mod_power_of_2_signed(self, pow)
@@ -284,32 +254,24 @@ macro_rules! impl_mod_power_of_2_signed {
         }
 
         impl ModPowerOf2Assign for $s {
-            /// Reduces `self` mod a power of 2. In other words, replsces `self` with r, where
-            /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= r < 2<sup>`pow`</sup>.
+            /// Divides a value by a power of 2, replacing the first value by the remainder. The
+            /// remainder is non-negative.
             ///
-            /// Unlike rem_power_of_2, this function always assigns a non-negative number.
+            /// If the quotient were computed, he quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets x - 2^p\left \lfloor \frac{x}{2^p} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `self` is negative and `pow` is greater than or equal to `$s::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2Assign;
-            ///
-            /// // 1 * 2^8 + 4 = 260
-            /// let mut x = 260i16;
-            /// x.mod_power_of_2_assign(8);
-            /// assert_eq!(x, 4);
-            ///
-            /// // -101 * 2^4 + 5 = -1611
-            /// let mut x = -1611i32;
-            /// x.mod_power_of_2_assign(4);
-            /// assert_eq!(x, 5);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn mod_power_of_2_assign(&mut self, pow: u64) {
                 _mod_power_of_2_assign_signed(self, pow);
@@ -319,27 +281,21 @@ macro_rules! impl_mod_power_of_2_signed {
         impl RemPowerOf2 for $s {
             type Output = $s;
 
-            /// Calculates `self` rem a power of 2. In other words, returns r, where
-            /// `self` = q * 2<sup>`pow`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
-            /// 0 <= |r| < 2<sup>`pow`</sup>.
+            /// Divides a value by a power of 2, returning just the remainder. The remainder has
+            /// the same sign as the first value.
             ///
-            /// Unlike `mod_power_of_2`, this function always returns zero or a number with the
-            /// same sign as `self`.
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq |r| < 2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x, p) = x - 2^p\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^p} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RemPowerOf2;
-            ///
-            /// // 1 * 2^8 + 4 = 260
-            /// assert_eq!(260i16.rem_power_of_2(8), 4);
-            ///
-            /// // -100 * 2^4 + -11 = -1611
-            /// assert_eq!((-1611i32).rem_power_of_2(4), -11);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn rem_power_of_2(self, pow: u64) -> $s {
                 _rem_power_of_2_signed::<$u, $s>(self, pow)
@@ -347,31 +303,21 @@ macro_rules! impl_mod_power_of_2_signed {
         }
 
         impl RemPowerOf2Assign for $s {
-            /// Reduces `self` rem a power of 2. In other words, replaces `self` with r, where
-            /// `self` = q * 2<sup>`pow`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
-            /// 0 <= |r| < 2<sup>`pow`</sup>.
+            /// Divides a value by a power of 2, replacing the first value by the remainder. The
+            /// remainder has the same sign as the first value.
             ///
-            /// Unlike `mod_power_of_2`, this function always assigns zero or a number with the
-            /// same sign as `self`.
+            /// If the quotient were computed, he quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq r < 2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets x - 2^p\operatorname{sgn}(x)\left \lfloor \frac{|x|}{2^p} \right \rfloor.
+            /// $$
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RemPowerOf2Assign;
-            ///
-            /// // 1 * 2^8 + 4 = 260
-            /// let mut x = 260i16;
-            /// x.rem_power_of_2_assign(8);
-            /// assert_eq!(x, 4);
-            ///
-            /// // -100 * 2^4 + -11 = -1611
-            /// let mut x = -1611i32;
-            /// x.rem_power_of_2_assign(4);
-            /// assert_eq!(x, -11);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn rem_power_of_2_assign(&mut self, pow: u64) {
                 *self = self.rem_power_of_2(pow)
@@ -381,27 +327,25 @@ macro_rules! impl_mod_power_of_2_signed {
         impl CeilingModPowerOf2 for $s {
             type Output = $s;
 
-            /// Calculates `self` ceiling-mod a power of 2. In other words, returns r, where
-            /// `self` = q * 2<sup>`pow`</sup> + r and 0 <= -r < 2<sup>`pow`</sup>.
+            /// Divides a value by a power of 2, returning just the remainder. The remainder is
+            /// non-positive.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq -r < 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, y) =  x - 2^p\left \lceil \frac{x}{2^p} \right \rceil.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `self` is positive or `$s::MIN`, and `pow` is greater than or equal to
             /// `$s::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CeilingModPowerOf2;
-            ///
-            /// // 2 * 2^8 + -252 = 260
-            /// assert_eq!(260i16.ceiling_mod_power_of_2(8), -252);
-            ///
-            /// // -100 * 2^4 + -11 = -1611
-            /// assert_eq!((-1611i32).ceiling_mod_power_of_2(4), -11);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn ceiling_mod_power_of_2(self, pow: u64) -> $s {
                 _ceiling_mod_power_of_2_signed::<$u, $s>(self, pow)
@@ -409,31 +353,25 @@ macro_rules! impl_mod_power_of_2_signed {
         }
 
         impl CeilingModPowerOf2Assign for $s {
-            /// Reduces `self` ceiling-mod a power of 2. In other words, replaces `self` with r,
-            /// where `self` = q * 2<sup>`pow`</sup> + r and 0 <= -r < 2<sup>`pow`</sup>.
+            /// Divides a value by a power of 2, replacing the first value by the remainder. The
+            /// remainder has the opposite sign of the second value.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = q2^p + r$ and $0 \leq -r < 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// x \gets x - 2^p\left \lceil\frac{x}{2^p} \right \rceil.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `self` is positive or `$s::MIN`, and `pow` is greater than or equal to
             /// `$s::WIDTH`.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CeilingModPowerOf2Assign;
-            ///
-            /// // 2 * 2^8 + -252 = 260
-            /// let mut x = 260i16;
-            /// x.ceiling_mod_power_of_2_assign(8);
-            /// assert_eq!(x, -252);
-            ///
-            /// // -100 * 2^4 + -11 = -1611
-            /// let mut x = -1611i32;
-            /// x.ceiling_mod_power_of_2_assign(4);
-            /// assert_eq!(x, -11);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn ceiling_mod_power_of_2_assign(&mut self, pow: u64) {
                 *self = self.ceiling_mod_power_of_2(pow)

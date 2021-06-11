@@ -7,18 +7,18 @@ use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 
 fn striped_random_fixed_length_unsigned_vecs_helper<T: PrimitiveUnsigned>(
+    len: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-    len: u64,
     expected_values: &[&[&str]],
     expected_common_values: &[(&[&str], usize)],
     expected_median: (&[&str], Option<&[&str]>),
 ) {
     let xss = striped_random_fixed_length_unsigned_vecs::<T>(
         EXAMPLE_SEED,
+        len,
         mean_stripe_numerator,
         mean_stripe_denominator,
-        len,
     );
     let values = xss
         .clone()
@@ -80,16 +80,16 @@ fn striped_random_fixed_length_unsigned_vecs_helper<T: PrimitiveUnsigned>(
 #[test]
 fn test_striped_random_fixed_length_unsigned_vecs() {
     striped_random_fixed_length_unsigned_vecs_helper::<u8>(
+        0,
         10,
         1,
-        0,
         &[&[][..]; 20],
         &[(&[], 1000000)],
         (&[], None),
     );
     striped_random_fixed_length_unsigned_vecs_helper::<u8>(
-        10,
         1,
+        10,
         1,
         &[
             &["0"],
@@ -128,9 +128,9 @@ fn test_striped_random_fixed_length_unsigned_vecs() {
         (&["1111111"], None),
     );
     striped_random_fixed_length_unsigned_vecs_helper::<u8>(
+        2,
         10,
         1,
-        2,
         &[
             &["0", "0"],
             &["1110000", "0"],
@@ -168,9 +168,9 @@ fn test_striped_random_fixed_length_unsigned_vecs() {
         (&["1111111", "11111111"], None),
     );
     striped_random_fixed_length_unsigned_vecs_helper::<u8>(
+        5,
         10,
         1,
-        5,
         &[
             &["0", "0", "111000", "0", "11111110"],
             &["11111100", "0", "11111000", "11111111", "11111111"],
@@ -221,11 +221,11 @@ fn test_striped_random_fixed_length_unsigned_vecs() {
 #[test]
 #[should_panic]
 fn striped_random_fixed_length_unsigned_vecs_fail_1() {
-    striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 1, 0, 5);
+    striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 5, 1, 0);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_fixed_length_unsigned_vecs_fail_2() {
-    striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 2, 3, 5);
+    striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 5, 2, 3);
 }

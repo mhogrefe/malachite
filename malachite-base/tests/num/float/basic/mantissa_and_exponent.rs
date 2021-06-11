@@ -38,9 +38,9 @@ pub fn test_raw_mantissa_and_exponent() {
 }
 
 #[test]
-pub fn test_adjusted_mantissa_and_exponent() {
+pub fn test_integer_mantissa_and_exponent() {
     fn test<T: PrimitiveFloat>(x: T, mantissa: T::UnsignedOfEqualWidth, exponent: i64) {
-        let (actual_mantissa, actual_exponent) = x.adjusted_mantissa_and_exponent();
+        let (actual_mantissa, actual_exponent) = x.integer_mantissa_and_exponent();
         assert_eq!(actual_mantissa, mantissa);
         assert_eq!(actual_exponent, exponent);
     }
@@ -63,15 +63,15 @@ pub fn test_adjusted_mantissa_and_exponent() {
     test::<f64>(f64::MAX_FINITE, 0x1fffffffffffff, 971);
 }
 
-fn adjusted_mantissa_and_exponent_fail_helper<T: PrimitiveFloat>() {
-    assert_panic!(T::NAN.adjusted_mantissa_and_exponent());
-    assert_panic!(T::POSITIVE_INFINITY.adjusted_mantissa_and_exponent());
-    assert_panic!(T::NEGATIVE_INFINITY.adjusted_mantissa_and_exponent());
-    assert_panic!(T::ZERO.adjusted_mantissa_and_exponent());
-    assert_panic!(T::NEGATIVE_ZERO.adjusted_mantissa_and_exponent());
+fn integer_mantissa_and_exponent_fail_helper<T: PrimitiveFloat>() {
+    assert_panic!(T::NAN.integer_mantissa_and_exponent());
+    assert_panic!(T::POSITIVE_INFINITY.integer_mantissa_and_exponent());
+    assert_panic!(T::NEGATIVE_INFINITY.integer_mantissa_and_exponent());
+    assert_panic!(T::ZERO.integer_mantissa_and_exponent());
+    assert_panic!(T::NEGATIVE_ZERO.integer_mantissa_and_exponent());
 }
 
 #[test]
-pub fn adjusted_mantissa_and_exponent_fail() {
-    apply_fn_to_primitive_floats!(adjusted_mantissa_and_exponent_fail_helper);
+pub fn integer_mantissa_and_exponent_fail() {
+    apply_fn_to_primitive_floats!(integer_mantissa_and_exponent_fail_helper);
 }

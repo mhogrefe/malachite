@@ -1,6 +1,11 @@
 use malachite_base::num::arithmetic::mod_pow::_simple_binary_mod_pow;
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    unsigned_pair_gen_var_12, unsigned_pair_gen_var_16, unsigned_quadruple_gen_var_6,
+    unsigned_quadruple_gen_var_7, unsigned_triple_gen_var_14, unsigned_triple_gen_var_15,
+};
 use malachite_base_test_util::num::arithmetic::mod_pow::_naive_mod_pow;
 
 fn mod_pow_helper<T: PrimitiveUnsigned>() {
@@ -50,4 +55,80 @@ fn mod_pow_helper<T: PrimitiveUnsigned>() {
 #[test]
 fn test_mod_pow() {
     apply_fn_to_unsigneds!(mod_pow_helper);
+}
+
+fn mod_pow_properties_helper_helper<T: PrimitiveUnsigned, F: Fn(T, u64, T) -> T>(
+    x: T,
+    exp: u64,
+    m: T,
+    f: F,
+) {
+    assert!(x.mod_is_reduced(&m));
+    let power = x.mod_pow(exp, m);
+    assert!(power.mod_is_reduced(&m));
+
+    let mut x_alt = x;
+    x_alt.mod_pow_assign(exp, m);
+    assert_eq!(x_alt, power);
+
+    let data = T::precompute_mod_pow_data(&m);
+
+    assert_eq!(x.mod_pow_precomputed(exp, m, &data), power);
+
+    let mut x_alt = x;
+    x_alt.mod_pow_precomputed_assign(exp, m, &data);
+    assert_eq!(x_alt, power);
+
+    assert_eq!(f(x, exp, m), power);
+    if exp.even() {
+        assert_eq!(x.mod_neg(m).mod_pow(exp, m), power);
+    } else {
+        assert_eq!(x.mod_neg(m).mod_pow(exp, m), power.mod_neg(m));
+    }
+}
+
+fn mod_pow_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_triple_gen_var_15::<T, u64>().test_properties(|(x, exp, m)| {
+        mod_pow_properties_helper_helper(x, exp, m, _simple_binary_mod_pow)
+    });
+
+    unsigned_triple_gen_var_14::<T, u64>()
+        .test_properties(|(x, exp, m)| mod_pow_properties_helper_helper(x, exp, m, _naive_mod_pow));
+
+    unsigned_pair_gen_var_12::<u64, T>().test_properties(|(exp, m)| {
+        assert_eq!(T::ZERO.mod_pow(exp, m), T::iverson(exp == 0 && m != T::ONE));
+        if m != T::ONE {
+            assert_eq!(T::ONE.mod_pow(exp, m), T::ONE);
+        }
+    });
+
+    unsigned_pair_gen_var_16::<T>().test_properties(|(x, m)| {
+        assert_eq!(x.mod_pow(0, m), T::iverson(m != T::ONE));
+        assert_eq!(x.mod_pow(1, m), x);
+        assert_eq!(x.mod_pow(2, m), x.mod_mul(x, m));
+    });
+
+    unsigned_quadruple_gen_var_6::<T, u64>().test_properties(|(x, y, exp, m)| {
+        assert_eq!(
+            x.mod_mul(y, m).mod_pow(exp, m),
+            x.mod_pow(exp, m).mod_mul(y.mod_pow(exp, m), m)
+        );
+    });
+
+    unsigned_quadruple_gen_var_7::<T, u64>().test_properties(|(x, e, f, m)| {
+        if let Some(sum) = e.checked_add(f) {
+            assert_eq!(
+                x.mod_pow(sum, m),
+                x.mod_pow(e, m).mod_mul(x.mod_pow(f, m), m)
+            );
+        }
+        if let Some(product) = e.checked_mul(f) {
+            assert_eq!(x.mod_pow(product, m), x.mod_pow(e, m).mod_pow(f, m));
+        }
+    });
+}
+
+#[test]
+fn mod_pow_properties() {
+    apply_fn_to_unsigneds!(mod_pow_properties_helper);
 }

@@ -475,7 +475,7 @@ pub fn ceiling_mod_fail() {
 }
 
 fn mod_properties_helper_unsigned<T: PrimitiveUnsigned>() {
-    unsigned_pair_gen_var_12::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_12::<T, T>().test_properties(|(x, y)| {
         let mut mut_x = x;
         mut_x.mod_assign(y);
         let r = mut_x;
@@ -552,7 +552,7 @@ fn mod_properties() {
 }
 
 fn neg_mod_properties_helper<T: PrimitiveUnsigned>() {
-    unsigned_pair_gen_var_12::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_12::<T, T>().test_properties(|(x, y)| {
         let mut mut_x = x;
         mut_x.neg_mod_assign(y);
         let r = mut_x;

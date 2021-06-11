@@ -65,6 +65,16 @@ pub fn limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
 impl PartialOrd for Natural {
     /// Compares a `Natural` to another `Natural`.
     ///
+    /// See the documentation for the `Ord` implementation.
+    #[inline]
+    fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Natural {
+    /// Compares a `Natural` to another `Natural`.
+    ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
@@ -80,14 +90,6 @@ impl PartialOrd for Natural {
     /// assert!(Natural::from(123u32) < Natural::from(124u32));
     /// assert!(Natural::from(123u32) <= Natural::from(124u32));
     /// ```
-    #[inline]
-    fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-/// Asserts that `Natural` ordering is a total order.
-impl Ord for Natural {
     fn cmp(&self, other: &Natural) -> Ordering {
         if std::ptr::eq(self, other) {
             return Ordering::Equal;

@@ -1,4 +1,8 @@
+use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
+use malachite_base_test_util::generators::{
+    primitive_float_gen_var_11, primitive_float_pair_gen_var_1,
+};
 use std::panic::catch_unwind;
 
 #[allow(clippy::approx_constant)]
@@ -67,4 +71,25 @@ fn to_ordered_representation_fail_helper<T: PrimitiveFloat>() {
 #[test]
 pub fn to_ordered_representation_fail() {
     apply_fn_to_primitive_floats!(to_ordered_representation_fail_helper);
+}
+
+fn to_ordered_representation_properties_helper<T: PrimitiveFloat>() {
+    primitive_float_gen_var_11::<T>().test_properties(|x| {
+        let i = x.to_ordered_representation();
+        assert!(i <= T::LARGEST_ORDERED_REPRESENTATION);
+        assert_eq!(NiceFloat(T::from_ordered_representation(i)), NiceFloat(x));
+    });
+
+    primitive_float_pair_gen_var_1::<T>().test_properties(|(x, y)| {
+        assert_eq!(
+            NiceFloat(x).cmp(&NiceFloat(y)),
+            x.to_ordered_representation()
+                .cmp(&y.to_ordered_representation())
+        );
+    });
+}
+
+#[test]
+fn to_ordered_representation_properties() {
+    apply_fn_to_primitive_floats!(to_ordered_representation_properties_helper);
 }

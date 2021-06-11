@@ -590,6 +590,28 @@ pub fn random_natural_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn random_natural_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_positive_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn random_natural_unsigned_unsigned_triple_gen_var_1<

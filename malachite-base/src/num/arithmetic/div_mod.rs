@@ -331,7 +331,7 @@ macro_rules! impl_div_mod_signed {
 
             /// Divides a value by another value, returning the quotient and remainder. The quotient
             /// is rounded towards negative infinity, and the remainder has the same sign as the
-            /// divisor.
+            /// second value.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -359,7 +359,7 @@ macro_rules! impl_div_mod_signed {
 
             /// Divides a value by another value in place, returning the remainder. The quotient is
             /// rounded towards negative infinity, and the remainder has the same sign as the
-            /// divisor.
+            /// second value.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -453,7 +453,7 @@ macro_rules! impl_div_mod_signed {
 
             /// Divides a value by another value, returning the quotient and remainder. The quotient
             /// is rounded towards positive infinity and the remainder has the opposite sign of the
-            /// divisor.
+            /// second value.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
@@ -479,9 +479,9 @@ macro_rules! impl_div_mod_signed {
         impl CeilingDivAssignMod<$t> for $t {
             type ModOutput = $t;
 
-            /// Divides a value by another value in place, taking the second `Integer` by value,
-            /// returning the remainder. The quotient is rounded towards positive infinity and the
-            /// remainder has the opposite sign of the divisor.
+            /// Divides a value by another value in place, returning the remainder. The quotient
+            /// is rounded towards positive infinity and the remainder has the opposite sign of the
+            /// second value.
             ///
             /// The quotient and remainder satisfy $x = qy + r$ and $0 \leq |r| < |y|$.
             ///

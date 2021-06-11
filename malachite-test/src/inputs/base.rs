@@ -1233,20 +1233,6 @@ where
     )
 }
 
-// All pairs of signed `T` and `u64`, where the `T` is non-negative or the `u64` is between 0 and
-// `T::WIDTH - 1`, inclusive.
-pub fn pairs_of_signed_and_small_u64_var_3<T: PrimitiveSigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, u64)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(
-        pairs_of_signed_and_small_unsigned_var_1(gm).filter(|&(x, y)| x >= T::ZERO || y < T::WIDTH),
-    )
-}
-
 /// All pairs of signed `T` and `u64`, where the `T` is non-positive and not `$t::MIN`, or the `u64`
 /// is between 0 and `T::WIDTH - 1`, inclusive.
 pub fn pairs_of_signed_and_small_u64_var_4<T: PrimitiveSigned + Rand>(
@@ -1262,7 +1248,7 @@ where
     )
 }
 
-pub fn triples_of_unsigned_small_unsigned_and_small_unsigned<
+fn triples_of_unsigned_small_unsigned_and_small_unsigned<
     T: PrimitiveUnsigned + Rand,
     U: PrimitiveUnsigned + Rand,
 >(
@@ -4571,34 +4557,6 @@ pub fn triples_of_limb_limb_vec_and_u64_var_1(gm: GenerationMode) -> It<(Limb, V
     permute_2_1_3(Box::new(
         triples_of_limb_vec_limb_and_u64_var_1(gm).filter(|&(_, _, pow)| pow != 0),
     ))
-}
-
-pub fn triples_of_unsigned_unsigned_and_small_unsigned<
-    T: PrimitiveUnsigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    gm: GenerationMode,
-) -> It<(T, T, U)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(reshape_2_1_to_3(Box::new(exhaustive_pairs_big_small(
-                exhaustive_pairs_from_single(exhaustive_unsigneds()),
-                exhaustive_unsigneds(),
-            ))))
-        }
-        GenerationMode::Random(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &random,
-            &random,
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_triples(
-            &EXAMPLE_SEED,
-            &special_random_unsigned,
-            &special_random_unsigned,
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-        )),
-    }
 }
 
 // All triples of `T`, `T` and `u64`, where `T` is unsigned and the `u64` is between n and

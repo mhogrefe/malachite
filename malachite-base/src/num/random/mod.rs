@@ -1436,7 +1436,7 @@ pub fn random_primitive_floats<T: PrimitiveFloat>(seed: Seed) -> RandomPrimitive
 #[derive(Clone, Debug)]
 pub struct SpecialRandomPositiveFiniteFloats<T: PrimitiveFloat> {
     seed: Seed,
-    exponents: GeometricRandomSignedRange<i64>,
+    sci_exponents: GeometricRandomSignedRange<i64>,
     range_map: HashMap<i64, GeometricRandomNaturalValues<u64>>,
     ranges: VariableRangeGenerator,
     mean_precision_n: u64,
@@ -1448,15 +1448,15 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        let exponent = self.exponents.next().unwrap();
+        let sci_exponent = self.sci_exponents.next().unwrap();
         let mean_precision_n = self.mean_precision_n;
         let mean_precision_d = self.mean_precision_d;
         let seed = self.seed;
-        let precisions = self.range_map.entry(exponent).or_insert_with(move || {
+        let precisions = self.range_map.entry(sci_exponent).or_insert_with(move || {
             geometric_random_unsigned_inclusive_range(
-                seed.fork(&exponent.to_string()),
+                seed.fork(&sci_exponent.to_string()),
                 1,
-                T::max_precision_for_exponent(exponent),
+                T::max_precision_for_sci_exponent(sci_exponent),
                 mean_precision_n,
                 mean_precision_d,
             )
@@ -1472,27 +1472,27 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
             );
             (x << 1) | T::UnsignedOfEqualWidth::ONE
         };
-        T::from_adjusted_mantissa_and_exponent(
+        T::from_integer_mantissa_and_exponent(
             mantissa,
-            exponent - i64::wrapping_from(precision) + 1,
+            sci_exponent - i64::wrapping_from(precision) + 1,
         )
     }
 }
 
 /// Generates finite positive primitive floats.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
-/// You can specify the mean absolute exponent and precision by passing the numerators and
-/// denominators of their means.
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
+/// and denominators of their means.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
-///   they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
 ///
 /// Positive zero is generated; negative zero is not. `NaN` is not generated either.
 ///
@@ -1523,8 +1523,8 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
 /// ```
 pub fn special_random_positive_finite_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
 ) -> SpecialRandomPositiveFiniteFloats<T> {
@@ -1532,12 +1532,12 @@ pub fn special_random_positive_finite_primitive_floats<T: PrimitiveFloat>(
     assert!(mean_precision_numerator > mean_precision_denominator);
     SpecialRandomPositiveFiniteFloats {
         seed: seed.fork("precisions"),
-        exponents: geometric_random_signed_inclusive_range(
+        sci_exponents: geometric_random_signed_inclusive_range(
             EXAMPLE_SEED.fork("exponents"),
             T::MIN_EXPONENT,
             T::MAX_EXPONENT,
-            mean_exponent_numerator,
-            mean_exponent_denominator,
+            mean_sci_exponent_numerator,
+            mean_sci_exponent_denominator,
         ),
         range_map: HashMap::new(),
         ranges: variable_range_generator(seed.fork("ranges")),
@@ -1567,18 +1567,18 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
 
 /// Generates finite negative primitive floats.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
-/// You can specify the mean absolute exponent and precision by passing the numerators and
-/// denominators of their means.
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
+/// and denominators of their means.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
-///   they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
 ///
 /// Negative zero is generated; positive zero is not. `NaN` is not generated either.
 ///
@@ -1610,15 +1610,15 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
 #[inline]
 pub fn special_random_negative_finite_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
 ) -> SpecialRandomNegativeFiniteFloats<T> {
     SpecialRandomNegativeFiniteFloats(special_random_positive_finite_primitive_floats(
         seed,
-        mean_exponent_numerator,
-        mean_exponent_denominator,
+        mean_sci_exponent_numerator,
+        mean_sci_exponent_denominator,
         mean_precision_numerator,
         mean_precision_denominator,
     ))
@@ -1646,18 +1646,18 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
 
 /// Generates finite nonzero primitive floats.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
-/// You can specify the mean absolute exponent and precision by passing the numerators and
-/// denominators of their means.
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the mean absolute sci-exponent and precision by passing the numerators
+/// and denominators of their means.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
-///   they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
 ///
 /// Neither positive not negative zero is generated. `NaN` is not generated either.
 ///
@@ -1689,8 +1689,8 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
 #[inline]
 pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
 ) -> SpecialRandomNonzeroFiniteFloats<T> {
@@ -1698,8 +1698,8 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
         bs: random_bools(seed.fork("bs")),
         xs: special_random_positive_finite_primitive_floats(
             seed.fork("xs"),
-            mean_exponent_numerator,
-            mean_exponent_denominator,
+            mean_sci_exponent_numerator,
+            mean_sci_exponent_denominator,
             mean_precision_numerator,
             mean_precision_denominator,
         ),
@@ -1708,19 +1708,19 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates finite primitive floats.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
-/// You can specify the numerator and denominator of the probability that a zero will be generated.
-/// You can also specify the mean absolute exponent and precision by passing the numerators and
-/// denominators of their means of the nonzero floats.
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that a zero will be
+/// generated. You can also specify the mean absolute sci-exponent and precision by passing the
+/// numerators and denominators of their means of the nonzero floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
-///   they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
 ///
 /// Positive and negative zero are both generated. `NaN` is not.
 ///
@@ -1753,8 +1753,8 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
     mean_zero_p_numerator: u64,
@@ -1768,8 +1768,8 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
         &|seed_2| {
             special_random_nonzero_finite_primitive_floats(
                 seed_2,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             )
@@ -1779,19 +1779,19 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates positive primitive floats.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
-/// You can specify the numerator and denominator of the probability that positive infinity will be
-/// generated. You can also specify the mean absolute exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats.
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that positive infinity
+/// will be generated. You can also specify the mean absolute sci-exponent and precision by passing
+/// the numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
-///   they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
 ///
 /// Positive zero is generated; negative zero is not. `NaN` is not generated either.
 ///
@@ -1825,8 +1825,8 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
     mean_special_p_numerator: u64,
@@ -1840,8 +1840,8 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
         &|seed_2| {
             special_random_positive_finite_primitive_floats(
                 seed_2,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             )
@@ -1851,19 +1851,19 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates negative primitive floats.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
-/// You can specify the numerator and denominator of the probability that negative infinity will be
-/// generated. You can also specify the mean absolute exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats.
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that negative infinity
+/// will be generated. You can also specify the mean absolute sci-exponent and precision by passing
+/// the numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
-///   they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
 ///
 /// Negative zero is generated; positive zero is not. `NaN` is not generated either.
 ///
@@ -1897,8 +1897,8 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
     mean_special_p_numerator: u64,
@@ -1912,8 +1912,8 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
         &|seed_2| {
             special_random_negative_finite_primitive_floats(
                 seed_2,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             )
@@ -1923,9 +1923,9 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates nonzero primitive floats.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
-/// You can specify the numerator and denominator of the probability that an infinity will be
-/// generated. You can also specify the mean absolute exponent and precision by passing the
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that an infinity will
+/// be generated. You can also specify the mean absolute sci-exponent and precision by passing the
 /// numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
@@ -1933,9 +1933,9 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
-///   they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
 ///
 /// Neither negative not positive zero is generated. `NaN` is not generated either.
 ///
@@ -1969,8 +1969,8 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
     mean_special_p_numerator: u64,
@@ -1984,8 +1984,8 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
         &|seed_2| {
             special_random_nonzero_finite_primitive_floats(
                 seed_2,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             )
@@ -1995,19 +1995,19 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 
 /// Generates primitive floats.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be chosen.
-/// You can specify the numerator and denominator of the probability that zero, infinity, or NaN
-/// will be generated. You can also specify the mean absolute exponent and precision by passing the
-/// numerators and denominators of their means of the finite floats.
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
+/// chosen. You can specify the numerator and denominator of the probability that zero, infinity,
+/// or NaN will be generated. You can also specify the mean absolute sci-exponent and precision by
+/// passing the numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater than 0 and the precision mean greater than 2, but
-///   they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater than 0 and the precision mean greater than 2,
+///   but they may be as high as you like.
 ///
 /// The output length is infinite.
 ///
@@ -2039,8 +2039,8 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 #[inline]
 pub fn special_random_primitive_floats<T: PrimitiveFloat>(
     seed: Seed,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
     mean_special_p_numerator: u64,
@@ -2060,8 +2060,8 @@ pub fn special_random_primitive_floats<T: PrimitiveFloat>(
         &|seed_2| {
             special_random_nonzero_finite_primitive_floats(
                 seed_2,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             )
@@ -2069,9 +2069,9 @@ pub fn special_random_primitive_floats<T: PrimitiveFloat>(
     )
 }
 
-// normalized exponent and raw mantissas in input, adjusted exponent and mantissas in output
+// normalized sci_exponent and raw mantissas in input, adjusted sci_exponent and mantissas in output
 fn mantissas_inclusive<T: PrimitiveFloat>(
-    mut exponent: i64,
+    mut sci_exponent: i64,
     mut am: T::UnsignedOfEqualWidth,
     mut bm: T::UnsignedOfEqualWidth,
     precision: u64,
@@ -2080,7 +2080,7 @@ where
     T::UnsignedOfEqualWidth: ShrRound<u64, Output = T::UnsignedOfEqualWidth>,
 {
     assert_ne!(precision, 0);
-    let p: u64 = if exponent < T::MIN_NORMAL_EXPONENT {
+    let p: u64 = if sci_exponent < T::MIN_NORMAL_EXPONENT {
         let ab = am.significant_bits();
         let bb = bm.significant_bits();
         assert_eq!(ab, bb);
@@ -2100,14 +2100,14 @@ where
     } else if hi.even() {
         hi -= T::UnsignedOfEqualWidth::ONE;
     }
-    if exponent >= T::MIN_NORMAL_EXPONENT {
-        exponent -= i64::wrapping_from(T::MANTISSA_WIDTH);
+    if sci_exponent >= T::MIN_NORMAL_EXPONENT {
+        sci_exponent -= i64::wrapping_from(T::MANTISSA_WIDTH);
     }
-    exponent += i64::wrapping_from(p);
+    sci_exponent += i64::wrapping_from(p);
     if lo > hi {
         None
     } else {
-        Some((exponent, lo >> 1, hi >> 1))
+        Some((sci_exponent, lo >> 1, hi >> 1))
     }
 }
 
@@ -2116,9 +2116,9 @@ where
 pub struct SpecialRandomPositiveFiniteFloatInclusiveRange<T: PrimitiveFloat> {
     am: T::UnsignedOfEqualWidth, // raw mantissa
     bm: T::UnsignedOfEqualWidth,
-    ae: i64, // normalized exponent
+    ae: i64, // normalized sci_exponent
     be: i64,
-    exponents: GeometricRandomSignedRange<i64>,
+    sci_exponents: GeometricRandomSignedRange<i64>,
     precision_range_map: HashMap<i64, Vec<(i64, T::UnsignedOfEqualWidth, T::UnsignedOfEqualWidth)>>,
     precision_indices: GeometricRandomNaturalValues<usize>,
     ranges: VariableRangeGenerator,
@@ -2128,39 +2128,48 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloatInclusiveRa
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        let exponent = self.exponents.next().unwrap();
+        let sci_exponent = self.sci_exponents.next().unwrap();
         let ae = self.ae;
         let be = self.be;
         let am = self.am;
         let bm = self.bm;
-        let precision_ranges = self.precision_range_map.entry(exponent).or_insert_with(|| {
-            let am = if exponent == ae {
-                am
-            } else {
-                T::from_adjusted_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, exponent)
+        let precision_ranges = self
+            .precision_range_map
+            .entry(sci_exponent)
+            .or_insert_with(|| {
+                let am = if sci_exponent == ae {
+                    am
+                } else {
+                    T::from_integer_mantissa_and_exponent(
+                        T::UnsignedOfEqualWidth::ONE,
+                        sci_exponent,
+                    )
                     .unwrap()
                     .raw_mantissa_and_exponent()
                     .0
-            };
-            let bm = if exponent == be {
-                bm
-            } else {
-                T::from_adjusted_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, exponent + 1)
+                };
+                let bm = if sci_exponent == be {
+                    bm
+                } else {
+                    T::from_integer_mantissa_and_exponent(
+                        T::UnsignedOfEqualWidth::ONE,
+                        sci_exponent + 1,
+                    )
                     .unwrap()
                     .next_lower()
                     .raw_mantissa_and_exponent()
                     .0
-            };
-            (1..=T::max_precision_for_exponent(exponent))
-                .filter_map(|p| mantissas_inclusive::<T>(exponent, am, bm, p))
-                .collect_vec()
-        });
+                };
+                (1..=T::max_precision_for_sci_exponent(sci_exponent))
+                    .filter_map(|p| mantissas_inclusive::<T>(sci_exponent, am, bm, p))
+                    .collect_vec()
+            });
         assert!(!precision_ranges.is_empty());
         let i = self.precision_indices.next().unwrap() % precision_ranges.len();
         let t = precision_ranges[i];
         let mantissa =
             (self.ranges.next_in_inclusive_range(t.1, t.2) << 1) | T::UnsignedOfEqualWidth::ONE;
-        Some(T::from_adjusted_mantissa_and_exponent(mantissa, t.0).unwrap())
+        Some(T::from_integer_mantissa_and_exponent(mantissa, t.0).unwrap())
     }
 }
 
@@ -2168,8 +2177,8 @@ fn special_random_positive_finite_float_inclusive_range<T: PrimitiveFloat>(
     seed: Seed,
     a: T,
     b: T,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
 ) -> SpecialRandomPositiveFiniteFloatInclusiveRange<T> {
@@ -2194,12 +2203,12 @@ fn special_random_positive_finite_float_inclusive_range<T: PrimitiveFloat>(
         bm,
         ae,
         be,
-        exponents: geometric_random_signed_inclusive_range(
+        sci_exponents: geometric_random_signed_inclusive_range(
             seed.fork("exponents"),
             ae,
             be,
-            mean_exponent_numerator,
-            mean_exponent_denominator,
+            mean_sci_exponent_numerator,
+            mean_sci_exponent_denominator,
         ),
         precision_range_map: HashMap::new(),
         precision_indices: geometric_random_unsigneds(
@@ -2252,8 +2261,8 @@ fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
     seed: Seed,
     a: T,
     b: T,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
 ) -> SpecialRandomFiniteFloatInclusiveRange<T> {
@@ -2268,8 +2277,8 @@ fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
                 seed,
                 a,
                 b,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             ),
@@ -2280,8 +2289,8 @@ fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
                 seed,
                 -b,
                 -a,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             ),
@@ -2293,8 +2302,8 @@ fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
                 seed,
                 T::MIN_POSITIVE_SUBNORMAL,
                 b,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             ),
@@ -2302,8 +2311,8 @@ fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
                 seed,
                 T::MIN_POSITIVE_SUBNORMAL,
                 -a,
-                mean_exponent_numerator,
-                mean_exponent_denominator,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
                 mean_precision_numerator,
                 mean_precision_denominator,
             ),
@@ -2333,20 +2342,21 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 
 /// Generates random primitive floats in the half-open interval $[a, b)$.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
 /// chosen. You can specify the numerator and denominator of the probability that any special
 /// values (positive or negative zero or infinity) are generated, provided that they are in the
-/// range. You can also specify the mean absolute exponent and precision by passing the numerators
-/// and denominators of their means of the finite floats.
+/// range. You can also specify the mean absolute sci-exponent and precision by passing the
+/// numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater the smallest absolute of any exponent of a float
-///   in the range, and the precision mean greater than 2, but they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater the smallest absolute of any sci-exponent of
+///   a float in the range, and the precision mean greater than 2, but they may be as high as you
+/// like.
 ///
 /// `NaN` is never generated.
 ///
@@ -2358,8 +2368,8 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 /// # Panics
 /// Panics if `a` or `b` are `NaN`, if `a` is greater than or equal to `b` in the `NiceFloat`
 /// ordering, if any of the denominators are zero, if the special probability is greater than 1, if
-/// the mean precision is less than 2, or if the mean exponent is less than or equal to the minimum
-/// absolute value of any exponent in the range.
+/// the mean precision is less than 2, or if the mean sci-exponent is less than or equal to the
+/// minimum absolute value of any sci-exponent in the range.
 ///
 /// # Examples
 /// ```
@@ -2394,8 +2404,8 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
     seed: Seed,
     a: T,
     b: T,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
     mean_special_p_numerator: u64,
@@ -2408,8 +2418,8 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
         seed,
         a,
         b.next_lower(),
-        mean_exponent_numerator,
-        mean_exponent_denominator,
+        mean_sci_exponent_numerator,
+        mean_sci_exponent_denominator,
         mean_precision_numerator,
         mean_precision_denominator,
         mean_special_p_numerator,
@@ -2419,20 +2429,21 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
 
 /// Generates random primitive floats in the closed interval $[a, b]$.
 ///
-/// Simpler floats (those with a lower absolute exponent or precision) are more likely to be
+/// Simpler floats (those with a lower absolute sci-exponent or precision) are more likely to be
 /// chosen. You can specify the numerator and denominator of the probability that any special
 /// values (positive or negative zero or infinity) are generated, provided that they are in the
-/// range. You can also specify the mean absolute exponent and precision by passing the numerators
-/// and denominators of their means of the finite floats.
+/// range. You can also specify the mean absolute sci-exponent and precision by passing the
+/// numerators and denominators of their means of the finite floats.
 ///
 /// But note that the means are only approximate, since the distributions we are sampling are
 /// truncated geometric, and their exact means are somewhat annoying to deal with. The practical
 /// implications are that
 /// - The actual mean is lower than the specified means.
 /// - However, increasing the approximate mean increases the actual means, so this still works as a
-///   mechanism for controlling the exponent and precision.
-/// - The specified exponent mean must be greater the smallest absolute of any exponent of a float
-///   in the range, and the precision mean greater than 2, but they may be as high as you like.
+///   mechanism for controlling the sci-exponent and precision.
+/// - The specified sci-exponent mean must be greater the smallest absolute of any sci-exponent of
+///   a float in the range, and the precision mean greater than 2, but they may be as high as you
+///   like.
 ///
 /// `NaN` is never generated.
 ///
@@ -2444,8 +2455,8 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
 /// # Panics
 /// Panics if `a` or `b` are `NaN`, if `a` is greater than `b` in the `NiceFloat` ordering, if any
 /// of the denominators are zero, if the special probability is greater than 1, if the mean
-/// precision is less than 2, or if the mean exponent is less than or equal to the minimum absolute
-/// value of any exponent in the range.
+/// precision is less than 2, or if the mean sci-exponent is less than or equal to the minimum
+/// absolute value of any sci-exponent in the range.
 ///
 /// # Examples
 /// ```
@@ -2480,8 +2491,8 @@ pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
     seed: Seed,
     mut a: T,
     mut b: T,
-    mean_exponent_numerator: u64,
-    mean_exponent_denominator: u64,
+    mean_sci_exponent_numerator: u64,
+    mean_sci_exponent_denominator: u64,
     mean_precision_numerator: u64,
     mean_precision_denominator: u64,
     mean_special_p_numerator: u64,
@@ -2524,8 +2535,8 @@ pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
             seed,
             a,
             b,
-            mean_exponent_numerator,
-            mean_exponent_denominator,
+            mean_sci_exponent_numerator,
+            mean_sci_exponent_denominator,
             mean_precision_numerator,
             mean_precision_denominator,
         ))
@@ -2540,8 +2551,8 @@ pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
                     seed,
                     a,
                     b,
-                    mean_exponent_numerator,
-                    mean_exponent_denominator,
+                    mean_sci_exponent_numerator,
+                    mean_sci_exponent_denominator,
                     mean_precision_numerator,
                     mean_precision_denominator,
                 )

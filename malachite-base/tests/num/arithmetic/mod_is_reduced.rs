@@ -29,7 +29,7 @@ fn mod_is_reduced_fail() {
 }
 
 fn mod_is_reduced_properties_helper<T: PrimitiveUnsigned>() {
-    unsigned_pair_gen_var_12::<T>().test_properties(|(n, m)| {
+    unsigned_pair_gen_var_12::<T, T>().test_properties(|(n, m)| {
         assert_eq!(n.mod_is_reduced(&m), n % m == n);
     });
 }

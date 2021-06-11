@@ -32,27 +32,23 @@ macro_rules! impl_mod_unsigned {
         impl Mod<$t> for $t {
             type Output = $t;
 
-            /// Divides a value by another value, returning the remainder. The quotient and
-            /// remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
+            /// Divides a value by another value, returning just the remainder.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = qy + r$ and $0 \leq r < y$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::Mod;
-            ///
-            /// // 2 * 10 + 3 = 23
-            /// assert_eq!(23u8.mod_op(10), 3);
-            ///
-            ///
-            /// // 9 * 5 + 0 = 45
-            /// assert_eq!(45u32.mod_op(5), 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn mod_op(self, other: $t) -> $t {
                 self % other
@@ -60,30 +56,23 @@ macro_rules! impl_mod_unsigned {
         }
 
         impl ModAssign<$t> for $t {
-            /// Divides a value by another value in place, replacing `self` with the remainder. The
-            /// quotient and remainder satisfy `self` = q * `other` + r and 0 <= r < `other`.
+            /// Divides a value by another value, replacing the first value by the remainder.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
+            /// and $0 \leq r < y$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModAssign;
-            ///
-            /// // 2 * 10 + 3 = 23
-            /// let mut x = 23u8;
-            /// x.mod_assign(10);
-            /// assert_eq!(x, 3);
-            ///
-            /// // 9 * 5 + 0 = 45
-            /// let mut x = 45u32;
-            /// x.mod_assign(5);
-            /// assert_eq!(x, 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn mod_assign(&mut self, other: $t) {
                 *self %= other;
@@ -93,27 +82,23 @@ macro_rules! impl_mod_unsigned {
         impl NegMod<$t> for $t {
             type Output = $t;
 
-            /// Divides a value by another value, returning the remainder of the negative of the
-            /// first value divided by the second. The quotient and remainder satisfy
-            /// `self` = q * `other` - r and 0 <= r < `other`.
+            /// Divides the negative of a value by another value, returning just the remainder.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = qy - r$ and $0 \leq r < y$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, y) = y\left \lceil \frac{x}{y} \right \rceil - x.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::NegMod;
-            ///
-            /// // 3 * 10 - 7 = 23
-            /// assert_eq!(23u8.neg_mod(10), 7);
-            ///
-            /// // 9 * 5 + 0 = 45
-            /// assert_eq!(45u32.neg_mod(5), 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn neg_mod(self, other: $t) -> $t {
                 _neg_mod_unsigned(self, other)
@@ -121,31 +106,23 @@ macro_rules! impl_mod_unsigned {
         }
 
         impl NegModAssign<$t> for $t {
-            /// Divides a value by another value in place, replacing `self` with the remainder of
-            /// the negative of the first value divided by the second. The quotient and remainder
-            /// satisfy `self` = q * `other` - r and 0 <= r < `other`.
+            /// Divides the negative of a value by another value, returning just the remainder.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = qy - r$ and $0 \leq r < y$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// x \gets y\left \lceil \frac{x}{y} \right \rceil - x.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::NegModAssign;
-            ///
-            /// // 3 * 10 - 7 = 23
-            /// let mut x = 23u8;
-            /// x.neg_mod_assign(10);
-            /// assert_eq!(x, 7);
-            ///
-            /// // 9 * 5 + 0 = 45
-            /// let mut x = 45u32;
-            /// x.neg_mod_assign(5);
-            /// assert_eq!(x, 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn neg_mod_assign(&mut self, other: $t) {
                 _neg_mod_assign_unsigned(self, other);
@@ -198,33 +175,24 @@ macro_rules! impl_mod_signed {
         impl Mod<$t> for $t {
             type Output = $t;
 
-            /// Divides a value by another value, returning the remainder. The remainder has the
-            /// same sign as the divisor. The quotient and remainder satisfy
-            /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
+            /// Divides a value by another value, returning just the remainder. The remainder has
+            /// the same sign as the second value.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = qy + r$ and $0 \leq |r| < y$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, y) = x - y\left \lfloor \frac{x}{y} \right \rfloor.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::Mod;
-            ///
-            /// // 2 * 10 + 3 = 23
-            /// assert_eq!(23i8.mod_op(10), 3);
-            ///
-            /// // -3 * -10 + -7 = 23
-            /// assert_eq!(23i16.mod_op(-10), -7);
-            ///
-            /// // -3 * 10 + 7 = -23
-            /// assert_eq!((-23i32).mod_op(10), 7);
-            ///
-            /// // 2 * -10 + -3 = -23
-            /// assert_eq!((-23i64).mod_op(-10), -3);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn mod_op(self, other: $t) -> $t {
                 _mod_op_signed(self, other)
@@ -232,41 +200,24 @@ macro_rules! impl_mod_signed {
         }
 
         impl ModAssign<$t> for $t {
-            /// Divides a value by another value in place, replacing `self` with the remainder. The
-            /// remainder has the same sign as the divisor. The quotient and remainder satisfy
-            /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
+            /// Divides a value by another value, replacing the first value by the remainder. The
+            /// remainder has the same sign as the second value.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, he quotient and remainder would satisfy $x = qy + r$
+            /// and $0 \leq |r| < y$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// x \gets x - y\left \lfloor \frac{x}{y} \right \rfloor.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModAssign;
-            ///
-            /// // 2 * 10 + 3 = 23
-            /// let mut x = 23i8;
-            /// x.mod_assign(10);
-            /// assert_eq!(x, 3);
-            ///
-            /// // -3 * -10 + -7 = 23
-            /// let mut x = 23i16;
-            /// x.mod_assign(-10);
-            /// assert_eq!(x, -7);
-            ///
-            /// // -3 * 10 + 7 = -23
-            /// let mut x = -23i32;
-            /// x.mod_assign(10);
-            /// assert_eq!(x, 7);
-            ///
-            /// // 2 * -10 + -3 = -23
-            /// let mut x = -23i64;
-            /// x.mod_assign(-10);
-            /// assert_eq!(x, -3);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn mod_assign(&mut self, other: $t) {
                 *self = self.mod_op(other);
@@ -276,33 +227,24 @@ macro_rules! impl_mod_signed {
         impl CeilingMod<$t> for $t {
             type Output = $t;
 
-            /// Divides a value by another value, returning the remainder. The remainder has the
-            /// opposite sign of the divisor. The quotient and remainder satisfy
-            /// `self` = q * `other` + r and 0 <= |r| < |`other`|.
+            /// Divides a value by another value, returning just the remainder. The remainder has
+            /// the opposite sign of the second value.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, y) =  x - y\left \lceil \frac{x}{y} \right \rceil.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CeilingMod;
-            ///
-            /// // 3 * 10 + -7 = 23
-            /// assert_eq!(23i8.ceiling_mod(10), -7);
-            ///
-            /// // -2 * -10 + 3 = 23
-            /// assert_eq!(23i16.ceiling_mod(-10), 3);
-            ///
-            /// // -2 * 10 + -3 = -23
-            /// assert_eq!((-23i32).ceiling_mod(10), -3);
-            ///
-            /// // 3 * -10 + 7 = -23
-            /// assert_eq!((-23i64).ceiling_mod(-10), 7);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn ceiling_mod(self, other: $t) -> $t {
                 _ceiling_mod_signed(self, other)
@@ -310,42 +252,24 @@ macro_rules! impl_mod_signed {
         }
 
         impl CeilingModAssign<$t> for $t {
-            /// Divides a value by another value in place, taking the second `Integer` by value,
-            /// replacing `self` with the remainder. The remainder has the opposite sign of the
-            /// divisor. The quotient and remainder satisfy `self` = q * `other` + r and
-            /// 0 <= |r| < |`other`|.
+            /// Divides a value by another value, replacing the first value by the remainder. The
+            /// remainder has the opposite sign of the second value.
             ///
-            /// Time: worst case O(1)
+            /// If the quotient were computed, the quotient and remainder would satisfy
+            /// $x = qy + r$ and $0 \leq |r| < |y|$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// x \gets x - y\left \lceil\frac{x}{y} \right \rceil.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if `other` is 0.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::CeilingModAssign;
-            ///
-            /// // 3 * 10 + -7 = 23
-            /// let mut x = 23i8;
-            /// x.ceiling_mod_assign(10);
-            /// assert_eq!(x, -7);
-            ///
-            /// // -2 * -10 + 3 = 23
-            /// let mut x = 23i16;
-            /// x.ceiling_mod_assign(-10);
-            /// assert_eq!(x, 3);
-            ///
-            /// // -2 * 10 + -3 = -23
-            /// let mut x = -23i32;
-            /// x.ceiling_mod_assign(10);
-            /// assert_eq!(x, -3);
-            ///
-            /// // 3 * -10 + 7 = -23
-            /// let mut x = -23i64;
-            /// x.ceiling_mod_assign(-10);
-            /// assert_eq!(x, 7);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn ceiling_mod_assign(&mut self, other: $t) {
                 *self = self.ceiling_mod(other);

@@ -759,60 +759,76 @@ pub trait OverflowingDivAssign<RHS = Self> {
     fn overflowing_div_assign(&mut self, other: RHS) -> bool;
 }
 
-/// Calculates `self` mod a power of 2. In other words, returns r, where
-/// `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
+/// Divides a value by a power of 2, returning just the remainder.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^p + r$ and
+/// $0 \leq r < 2^p$.
 pub trait ModPowerOf2 {
     type Output;
 
     fn mod_power_of_2(self, other: u64) -> Self::Output;
 }
 
-/// Reduces `self` mod a power of 2. In other words, replaces `self` with r, where
-/// `self` = q * 2<sup>`other`</sup> + r and 0 <= r < 2<sup>`other`</sup>.
+/// Divides a value by a power of 2, replacing the value by the remainder.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^p + r$ and
+/// $0 \leq r < 2^p$.
 pub trait ModPowerOf2Assign {
     fn mod_power_of_2_assign(&mut self, other: u64);
 }
-
-/// Calculates `self` rem a power of 2. In other words, returns r, where
-/// `self` = q * 2<sup>`other`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
-/// 0 <= |r| < 2<sup>`other`</sup>.
+/// Divides a value by a power of 2, returning just the remainder. The remainder has the same sign
+/// as the value.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^p + r$ and
+/// $0 \leq |r| < 2^p$.
 pub trait RemPowerOf2 {
     type Output;
 
     fn rem_power_of_2(self, other: u64) -> Self::Output;
 }
 
-/// Reduces `self` rem a power of 2. In other words, replaces `self` with r, where
-/// `self` = q * 2<sup>`other`</sup> + r, r == 0 or (sgn(r) == sgn(`self`)), and
-/// 0 <= |r| < 2<sup>`other`</sup>.
+/// Divides a value by a power of 2, replacing the value by the remainder. The remainder has the
+/// same sign as the value.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^p + r$ and
+/// $0 \leq |r| < 2^p$.
 pub trait RemPowerOf2Assign {
     fn rem_power_of_2_assign(&mut self, other: u64);
 }
 
-/// Calculates `-self` mod a power of 2. In other words, returns r, where
-/// `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
+/// Divides the negative of a value by a power of 2, returning the remainder.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^p - r$ and
+/// $0 \leq r < 2^p$.
 pub trait NegModPowerOf2 {
     type Output;
 
     fn neg_mod_power_of_2(self, other: u64) -> Self::Output;
 }
 
-/// Reduces `-self` mod a power of 2. In other words, replaces `self` with r, where
-/// `self` = q * 2<sup>`other`</sup> - r and 0 <= r < 2<sup>`other`</sup>.
+/// Divides the negative of a value by a power of 2, replacing the value by the remainder.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^p - r$ and
+/// $0 \leq r < 2^p$.
 pub trait NegModPowerOf2Assign {
     fn neg_mod_power_of_2_assign(&mut self, other: u64);
 }
 
-/// Calculates `self` ceiling-mod a power of 2. In other words, returns r, where
-/// `self` = q * 2<sup>`other`</sup> + r and 0 <= -r < 2<sup>`other`</sup>.
+/// Divides a value by another value, returning just the remainder. The remainder is non-positive.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^p + r$ and
+/// $0 \leq -r < 2^p$.
 pub trait CeilingModPowerOf2 {
     type Output;
 
     fn ceiling_mod_power_of_2(self, other: u64) -> Self::Output;
 }
 
-/// Reduces `self` ceiling-mod a power of 2. In other words, replaces `self` with r, where
-/// `self` = q * 2<sup>`other`</sup> + r and 0 <= -r < 2<sup>`other`</sup>.
+/// Divides a value by another value, replacing the value by the remainder. The remainder is
+/// non-positive.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = q2^p + r$ and
+/// $0 \leq -r < 2^p$.
 pub trait CeilingModPowerOf2Assign {
     fn ceiling_mod_power_of_2_assign(&mut self, other: u64);
 }
@@ -921,50 +937,61 @@ pub trait CeilingDivAssignMod<RHS = Self> {
     fn ceiling_div_assign_mod(&mut self, other: RHS) -> Self::ModOutput;
 }
 
-/// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
-/// towards negative infinity, and the remainder has the same sign as the divisor. The quotient and
-/// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// Divides a value by another value, returning just the remainder. The remainder has the same
+/// sign as the second value.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and
+/// $0 \leq |r| < |y|$.
 pub trait Mod<RHS = Self> {
     type Output;
 
     fn mod_op(self, other: RHS) -> Self::Output;
 }
 
-/// Divides a value by another value in place, returning the remainder. The quotient is rounded
-/// towards negative infinity, and the remainder has the same sign as the divisor. The quotient and
-/// remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// Divides a value by another value, replacing the first value by the remainder. The remainder has
+/// the same sign as the second value.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and
+/// $0 \leq |r| < |y|$.
 pub trait ModAssign<RHS = Self> {
     fn mod_assign(&mut self, other: RHS);
 }
 
-/// Divides a value by another value, returning the ceiling of the quotient and the remainder of the
-/// negative of the first value divided by the second. The quotient and remainder satisfy
-/// `self` = q * `other` - r and 0 <= r < `other`.
+/// Divides the negative of a value by another value, returning the remainder.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and
+/// $0 \leq r < y$.
 pub trait NegMod<RHS = Self> {
     type Output;
 
     fn neg_mod(self, other: RHS) -> Self::Output;
 }
 
-/// Divides a value by another value in place, taking the ceiling of the quotient and returning the
-/// remainder of the negative of the first value divided by the second. The quotient and remainder
-/// satisfy `self` = q * `other` - r and 0 <= r < `other`.
+/// Divides the negative of a value by another value, replacing the first value by the remainder.
+/// The remainder has the same sign as the second value.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy - r$ and
+/// $0 \leq r < y$.
 pub trait NegModAssign<RHS = Self> {
     fn neg_mod_assign(&mut self, other: RHS);
 }
 
-/// Divides a value by another value, returning the quotient and remainder. The quotient is rounded
-/// towards positive infinity and the remainder has the opposite sign of the divisor. The quotient
-/// and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// Divides a value by another value, returning just the remainder. The remainder has the opposite
+/// sign as the second value.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and
+/// $0 \leq |r| < |y|$.
 pub trait CeilingMod<RHS = Self> {
     type Output;
 
     fn ceiling_mod(self, other: RHS) -> Self::Output;
 }
 
-/// Divides a value by another value in place, taking the quotient and returning the remainder. The
-/// quotient is rounded towards positive infinity and the remainder has the opposite sign of the
-/// divisor. The quotient and remainder satisfy `self` = q * `other` + r and 0 <= |r| < |`other`|.
+/// Divides a value by another value, replacing the first value by the remainder. The remainder has
+/// the same sign as the second value.
+///
+/// If the quotient were computed, the quotient and remainder would satisfy $x = qy + r$ and
+/// $0 \leq |r| < |y|$.
 pub trait CeilingModAssign<RHS = Self> {
     fn ceiling_mod_assign(&mut self, other: RHS);
 }
@@ -1289,4 +1316,22 @@ pub trait FloorLogBase2 {
 /// Provides a function to get the ceiling of the base-2 logarithm of `self`.
 pub trait CeilingLogBase2 {
     fn ceiling_log_base_2(self) -> u64;
+}
+
+/// Provides a function to get the base-`p` logarithm of `self`. where `p` is a power of 2, or
+/// return `None` if the result is not exact.
+pub trait CheckedLogBasePowerOf2 {
+    fn checked_log_base_power_of_2(self, pow: u64) -> Option<u64>;
+}
+
+/// Provides a function to get the floor of the base-`p` logarithm of `self`, where `p` is a power
+/// of 2.
+pub trait FloorLogBasePowerOf2 {
+    fn floor_log_base_power_of_2(self, pow: u64) -> u64;
+}
+
+/// Provides a function to get the ceiling of the base-`p` logarithm of `self`, where `p` is a
+/// power of 2.
+pub trait CeilingLogBasePowerOf2 {
+    fn ceiling_log_base_power_of_2(self, pow: u64) -> u64;
 }

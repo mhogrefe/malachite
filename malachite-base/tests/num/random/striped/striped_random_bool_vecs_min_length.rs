@@ -6,9 +6,9 @@ use malachite_base_test_util::stats::median;
 use num::random::striped::get_striped_bool_vec::bool_slice_to_string;
 
 fn striped_random_bool_vecs_min_length_helper(
+    min_length: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-    min_length: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
     expected_values: &[&str],
@@ -17,9 +17,9 @@ fn striped_random_bool_vecs_min_length_helper(
 ) {
     let xs = striped_random_bool_vecs_min_length(
         EXAMPLE_SEED,
+        min_length,
         mean_stripe_numerator,
         mean_stripe_denominator,
-        min_length,
         mean_length_numerator,
         mean_length_denominator,
     );
@@ -52,9 +52,9 @@ fn striped_random_bool_vecs_min_length_helper(
 #[test]
 fn test_striped_random_bool_vecs_min_length() {
     striped_random_bool_vecs_min_length_helper(
+        0,
         2,
         1,
-        0,
         4,
         1,
         &[
@@ -94,9 +94,9 @@ fn test_striped_random_bool_vecs_min_length() {
         ("0100011111011", None),
     );
     striped_random_bool_vecs_min_length_helper(
+        3,
         10,
         1,
-        3,
         4,
         1,
         &[
@@ -118,9 +118,9 @@ fn test_striped_random_bool_vecs_min_length() {
         ("100", None),
     );
     striped_random_bool_vecs_min_length_helper(
+        0,
         11,
         10,
-        0,
         4,
         1,
         &[
@@ -160,9 +160,9 @@ fn test_striped_random_bool_vecs_min_length() {
         ("010101", None),
     );
     striped_random_bool_vecs_min_length_helper(
+        3,
         2,
         1,
-        3,
         10,
         1,
         &[
@@ -202,9 +202,9 @@ fn test_striped_random_bool_vecs_min_length() {
         ("100", None),
     );
     striped_random_bool_vecs_min_length_helper(
+        0,
         10,
         1,
-        0,
         10,
         1,
         &[
@@ -247,9 +247,9 @@ fn test_striped_random_bool_vecs_min_length() {
         ),
     );
     striped_random_bool_vecs_min_length_helper(
+        3,
         11,
         10,
-        3,
         10,
         1,
         &[
@@ -293,29 +293,29 @@ fn test_striped_random_bool_vecs_min_length() {
 #[test]
 #[should_panic]
 fn striped_random_bool_vecs_min_length_fail_1() {
-    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 1, 0, 3, 4, 1);
+    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 3, 1, 0, 4, 1);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_bool_vecs_min_length_fail_2() {
-    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 2, 3, 3, 4, 1);
+    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 3, 2, 3, 4, 1);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_bool_vecs_min_length_fail_3() {
-    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 4, 1, 3, 3, 1);
+    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 3, 4, 1, 3, 1);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_bool_vecs_min_length_fail_4() {
-    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 4, 1, 1, 1, 0);
+    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 1, 4, 1, 1, 0);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_bool_vecs_min_length_fail_5() {
-    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 4, 1, 0, u64::MAX, u64::MAX - 1);
+    striped_random_bool_vecs_min_length(EXAMPLE_SEED, 0, 4, 1, u64::MAX, u64::MAX - 1);
 }

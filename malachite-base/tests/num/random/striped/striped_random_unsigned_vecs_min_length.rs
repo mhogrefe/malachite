@@ -7,9 +7,9 @@ use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
 use malachite_base_test_util::stats::median;
 
 fn striped_random_unsigned_vecs_min_length_helper<T: PrimitiveUnsigned>(
+    min_length: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-    min_length: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
     expected_values: &[&[&str]],
@@ -18,9 +18,9 @@ fn striped_random_unsigned_vecs_min_length_helper<T: PrimitiveUnsigned>(
 ) {
     let xss = striped_random_unsigned_vecs_min_length::<T>(
         EXAMPLE_SEED,
+        min_length,
         mean_stripe_numerator,
         mean_stripe_denominator,
-        min_length,
         mean_length_numerator,
         mean_length_denominator,
     );
@@ -84,9 +84,9 @@ fn striped_random_unsigned_vecs_min_length_helper<T: PrimitiveUnsigned>(
 #[test]
 fn test_striped_random_unsigned_vecs() {
     striped_random_unsigned_vecs_min_length_helper::<u8>(
+        0,
         2,
         1,
-        0,
         4,
         1,
         &[
@@ -138,9 +138,9 @@ fn test_striped_random_unsigned_vecs() {
         (&["1100000"], None),
     );
     striped_random_unsigned_vecs_min_length_helper::<u8>(
+        3,
         2,
         1,
-        3,
         4,
         1,
         &[
@@ -188,9 +188,9 @@ fn test_striped_random_unsigned_vecs() {
         ),
     );
     striped_random_unsigned_vecs_min_length_helper::<u8>(
+        0,
         10,
         1,
-        0,
         4,
         1,
         &[
@@ -241,9 +241,9 @@ fn test_striped_random_unsigned_vecs() {
         (&["11100", "11111110", "111111", "0"], None),
     );
     striped_random_unsigned_vecs_min_length_helper::<u8>(
+        3,
         10,
         1,
-        3,
         4,
         1,
         &[
@@ -292,9 +292,9 @@ fn test_striped_random_unsigned_vecs() {
         ),
     );
     striped_random_unsigned_vecs_min_length_helper::<u8>(
+        0,
         11,
         10,
-        0,
         4,
         1,
         &[
@@ -348,9 +348,9 @@ fn test_striped_random_unsigned_vecs() {
         (&["1010101", "10110101"], None),
     );
     striped_random_unsigned_vecs_min_length_helper::<u8>(
+        3,
         11,
         10,
-        3,
         4,
         1,
         &[
@@ -402,29 +402,29 @@ fn test_striped_random_unsigned_vecs() {
 #[test]
 #[should_panic]
 fn striped_random_unsigned_vecs_min_length_fail_1() {
-    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 1, 0, 3, 4, 1);
+    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 3, 1, 0, 4, 1);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_unsigned_vecs_min_length_fail_2() {
-    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 2, 3, 3, 4, 1);
+    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 3, 2, 3, 4, 1);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_unsigned_vecs_min_length_fail_3() {
-    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 4, 1, 3, 3, 1);
+    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 3, 4, 1, 3, 1);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_unsigned_vecs_min_length_fail_4() {
-    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 4, 1, 1, 1, 0);
+    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 1, 4, 1, 1, 0);
 }
 
 #[test]
 #[should_panic]
 fn striped_random_unsigned_vecs_min_length_fail_5() {
-    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 4, 1, 0, u64::MAX, u64::MAX - 1);
+    striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 0, 4, 1, u64::MAX, u64::MAX - 1);
 }

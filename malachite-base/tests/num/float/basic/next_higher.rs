@@ -1,5 +1,7 @@
+use malachite_base::num::basic::traits::One;
 use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
+use malachite_base_test_util::generators::primitive_float_gen_var_9;
 use std::panic::catch_unwind;
 
 #[allow(clippy::approx_constant)]
@@ -67,4 +69,20 @@ fn next_higher_fail_helper<T: PrimitiveFloat>() {
 #[test]
 pub fn next_higher_fail() {
     apply_fn_to_primitive_floats!(next_higher_fail_helper);
+}
+
+fn next_higher_properties_helper<T: PrimitiveFloat>() {
+    primitive_float_gen_var_9::<T>().test_properties(|x| {
+        let y = x.next_higher();
+        assert_eq!(
+            x.to_ordered_representation() + T::UnsignedOfEqualWidth::ONE,
+            y.to_ordered_representation()
+        );
+        assert_eq!(NiceFloat(y.next_lower()), NiceFloat(x));
+    });
+}
+
+#[test]
+fn next_higher_properties() {
+    apply_fn_to_primitive_floats!(next_higher_properties_helper);
 }

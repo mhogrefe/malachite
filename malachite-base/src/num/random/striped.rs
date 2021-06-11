@@ -723,7 +723,7 @@ pub fn striped_random_bool_vecs_from_length_iterator<I: Iterator<Item = u64>>(
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 10, 1, 5)
+/// let bss = striped_random_fixed_length_bool_vecs(EXAMPLE_SEED, 5, 10, 1)
 ///     .take(20)
 ///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
 ///     .collect_vec();
@@ -738,9 +738,9 @@ pub fn striped_random_bool_vecs_from_length_iterator<I: Iterator<Item = u64>>(
 /// ```
 pub fn striped_random_fixed_length_bool_vecs(
     seed: Seed,
+    len: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-    len: u64,
 ) -> StripedRandomBoolVecs<Repeat<u64>> {
     striped_random_bool_vecs_from_length_iterator(
         seed,
@@ -845,7 +845,7 @@ pub fn striped_random_bool_vecs(
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_bool_vecs_min_length(EXAMPLE_SEED, 10, 1, 3, 5, 1)
+/// let bss = striped_random_bool_vecs_min_length(EXAMPLE_SEED, 3, 10, 1, 5, 1)
 ///     .take(20)
 ///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
 ///     .collect_vec();
@@ -861,9 +861,9 @@ pub fn striped_random_bool_vecs(
 #[inline]
 pub fn striped_random_bool_vecs_min_length(
     seed: Seed,
+    min_length: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-    min_length: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
 ) -> StripedRandomBoolVecs<GeometricRandomNaturalValues<u64>> {
@@ -919,7 +919,7 @@ pub fn striped_random_bool_vecs_min_length(
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_bool_vecs_length_range(EXAMPLE_SEED, 10, 1, 4, 10)
+/// let bss = striped_random_bool_vecs_length_range(EXAMPLE_SEED, 4, 10, 10, 1)
 ///     .take(20)
 ///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
 ///     .collect_vec();
@@ -935,10 +935,10 @@ pub fn striped_random_bool_vecs_min_length(
 #[inline]
 pub fn striped_random_bool_vecs_length_range(
     seed: Seed,
-    mean_stripe_numerator: u64,
-    mean_stripe_denominator: u64,
     a: u64,
     b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
 ) -> StripedRandomBoolVecs<RandomUnsignedRange<u64>> {
     striped_random_bool_vecs_from_length_iterator(
         seed,
@@ -984,7 +984,7 @@ pub fn striped_random_bool_vecs_length_range(
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let bss = striped_random_bool_vecs_length_inclusive_range(EXAMPLE_SEED, 10, 1, 4, 9)
+/// let bss = striped_random_bool_vecs_length_inclusive_range(EXAMPLE_SEED, 4, 9, 10, 1)
 ///     .take(20)
 ///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
 ///     .collect_vec();
@@ -1000,10 +1000,10 @@ pub fn striped_random_bool_vecs_length_range(
 #[inline]
 pub fn striped_random_bool_vecs_length_inclusive_range(
     seed: Seed,
-    mean_stripe_numerator: u64,
-    mean_stripe_denominator: u64,
     a: u64,
     b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
 ) -> StripedRandomBoolVecs<RandomUnsignedInclusiveRange<u64>> {
     striped_random_bool_vecs_from_length_iterator(
         seed,
@@ -1166,7 +1166,7 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 10, 1, 3)
+/// let xss = striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 3, 10, 1)
 ///     .take(10)
 ///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
 ///     .collect_vec();
@@ -1187,9 +1187,9 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
 #[inline]
 pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
     seed: Seed,
+    len: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-    len: u64,
 ) -> StripedRandomUnsignedVecs<T, Repeat<u64>> {
     striped_random_unsigned_vecs_from_length_iterator(
         seed,
@@ -1316,7 +1316,7 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 10, 1, 2, 3, 1)
+/// let xss = striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 2, 10, 1, 3, 1)
 ///     .take(10)
 ///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
 ///     .collect_vec();
@@ -1338,9 +1338,9 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
 #[inline]
 pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
     seed: Seed,
+    min_length: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-    min_length: u64,
     mean_length_numerator: u64,
     mean_length_denominator: u64,
 ) -> StripedRandomUnsignedVecs<T, GeometricRandomNaturalValues<u64>> {
@@ -1396,7 +1396,7 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_unsigned_vecs_length_range::<u8>(EXAMPLE_SEED, 10, 1, 2, 4)
+/// let xss = striped_random_unsigned_vecs_length_range::<u8>(EXAMPLE_SEED, 2, 4, 10, 1)
 ///     .take(10)
 ///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
 ///     .collect_vec();
@@ -1418,10 +1418,10 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
 #[inline]
 pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
     seed: Seed,
-    mean_stripe_numerator: u64,
-    mean_stripe_denominator: u64,
     a: u64,
     b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
 ) -> StripedRandomUnsignedVecs<T, RandomUnsignedRange<u64>> {
     striped_random_unsigned_vecs_from_length_iterator(
         seed,
@@ -1467,7 +1467,7 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
-/// let xss = striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 10, 1, 2, 3)
+/// let xss = striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 2, 3, 10, 1)
 ///     .take(10)
 ///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
 ///     .collect_vec();
@@ -1489,10 +1489,10 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
 #[inline]
 pub fn striped_random_unsigned_vecs_length_inclusive_range<T: PrimitiveUnsigned>(
     seed: Seed,
-    mean_stripe_numerator: u64,
-    mean_stripe_denominator: u64,
     a: u64,
     b: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
 ) -> StripedRandomUnsignedVecs<T, RandomUnsignedInclusiveRange<u64>> {
     striped_random_unsigned_vecs_from_length_iterator(
         seed,

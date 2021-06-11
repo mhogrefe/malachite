@@ -36,7 +36,10 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_div_mod_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_12::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
         println!("{}.div_mod({}) = {:?}", x, y, x.div_mod(y));
     }
 }
@@ -52,7 +55,10 @@ fn demo_div_assign_mod_unsigned<T: PrimitiveUnsigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in unsigned_pair_gen_var_12::<T>().get(gm, &config).take(limit) {
+    for (mut x, y) in unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
         let old_x = x;
         let r = x.div_assign_mod(y);
         println!("x := {}; x.div_assign_mod({}) = {}; x = {}", old_x, y, r, x);
@@ -68,7 +74,10 @@ fn demo_div_assign_mod_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig
 }
 
 fn demo_div_rem_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_12::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
         println!("{}.div_rem({}) = {:?}", x, y, x.div_rem(y));
     }
 }
@@ -84,7 +93,10 @@ fn demo_div_assign_rem_unsigned<T: PrimitiveUnsigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in unsigned_pair_gen_var_12::<T>().get(gm, &config).take(limit) {
+    for (mut x, y) in unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
         let old_x = x;
         let r = x.div_assign_rem(y);
         println!("x := {}; x.div_assign_rem({}) = {}; x = {}", old_x, y, r, x);
@@ -100,7 +112,10 @@ fn demo_div_assign_rem_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig
 }
 
 fn demo_ceiling_div_neg_mod<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen_var_12::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
         println!(
             "{}.ceiling_div_neg_mod({}) = {:?}",
             x,
@@ -115,7 +130,10 @@ fn demo_ceiling_div_assign_neg_mod<T: PrimitiveUnsigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut x, y) in unsigned_pair_gen_var_12::<T>().get(gm, &config).take(limit) {
+    for (mut x, y) in unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
         let old_x = x;
         let r = x.ceiling_div_assign_neg_mod(y);
         println!(
@@ -157,7 +175,7 @@ fn benchmark_div_mod_unsigned_algorithms<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.div_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_12::<T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -202,7 +220,7 @@ fn benchmark_div_assign_mod_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.div_assign_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12::<T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -239,7 +257,7 @@ fn benchmark_div_rem_unsigned_algorithms<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.div_rem({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_12::<T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -282,7 +300,7 @@ fn benchmark_div_assign_rem_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.div_assign_rem({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12::<T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -319,7 +337,7 @@ fn benchmark_ceiling_div_neg_mod_algorithms<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.ceiling_div_neg_mod({})", T::NAME, T::NAME),
         BenchmarkType::Algorithms,
-        unsigned_pair_gen_var_12::<T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -372,7 +390,7 @@ fn benchmark_ceiling_div_assign_neg_mod<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.ceiling_div_assign_neg_mod({})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen_var_12::<T>().get(gm, &config),
+        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

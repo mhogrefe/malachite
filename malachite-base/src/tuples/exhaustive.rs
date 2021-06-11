@@ -1385,6 +1385,48 @@ custom_tuples!(
     ],
     [Z, K, zs, zs_done, [3, output_type_zs_3]]
 );
+custom_tuples!(
+    ExhaustiveQuadruplesXXYX,
+    (X, X, Y, X),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xxyx,
+    exhaustive_quadruples_xxyx_custom_output,
+    [
+        X,
+        I,
+        xs,
+        xs_done,
+        [0, output_type_xs_0],
+        [1, output_type_xs_1],
+        [3, output_type_xs_3]
+    ],
+    [Y, J, ys, ys_done, [2, output_type_ys_2]]
+);
+custom_tuples!(
+    ExhaustiveQuadruplesXYYX,
+    (X, Y, Y, X),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xyyx,
+    exhaustive_quadruples_xyyx_custom_output,
+    [
+        X,
+        I,
+        xs,
+        xs_done,
+        [0, output_type_xs_0],
+        [3, output_type_xs_3]
+    ],
+    [
+        Y,
+        J,
+        ys,
+        ys_done,
+        [1, output_type_ys_1],
+        [2, output_type_ys_2]
+    ]
+);
 
 /// A trait used by dependent-pairs structs.
 ///

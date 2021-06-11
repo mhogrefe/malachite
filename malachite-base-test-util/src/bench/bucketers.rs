@@ -20,17 +20,19 @@ pub fn char_bucketer<'a>() -> Bucketer<'a, char> {
     }
 }
 
+fn float_size<T: PrimitiveFloat>(f: T) -> usize {
+    if f == T::ZERO || !f.is_finite() || f.is_nan() {
+        0
+    } else {
+        let (m, e) = f.integer_mantissa_and_exponent();
+        <T::UnsignedOfEqualWidth as WrappingInto<usize>>::wrapping_into(m)
+            + usize::wrapping_from(e.abs())
+    }
+}
+
 pub fn primitive_float_bucketer<'a, T: PrimitiveFloat>(var_name: &str) -> Bucketer<'a, T> {
     Bucketer {
-        bucketing_function: &|&f| {
-            if f == T::ZERO || !f.is_finite() || f.is_nan() {
-                0
-            } else {
-                let (m, e) = f.adjusted_mantissa_and_exponent();
-                <T::UnsignedOfEqualWidth as WrappingInto<usize>>::wrapping_into(m)
-                    + usize::wrapping_from(e.abs())
-            }
-        },
+        bucketing_function: &|&f| float_size(f),
         bucketing_label: format!("precision({}) + |exponent({})|", var_name, var_name),
     }
 }
@@ -39,16 +41,21 @@ pub fn pair_1_primitive_float_bucketer<'a, T: PrimitiveFloat, U>(
     var_name: &str,
 ) -> Bucketer<'a, (T, U)> {
     Bucketer {
-        bucketing_function: &|&(f, _)| {
-            if f == T::ZERO || !f.is_finite() || f.is_nan() {
-                0
-            } else {
-                let (m, e) = f.adjusted_mantissa_and_exponent();
-                <T::UnsignedOfEqualWidth as WrappingInto<usize>>::wrapping_into(m)
-                    + usize::wrapping_from(e.abs())
-            }
-        },
+        bucketing_function: &|&(f, _)| float_size(f),
         bucketing_label: format!("precision({}) + |exponent({})|", var_name, var_name),
+    }
+}
+
+pub fn pair_max_primitive_float_bucketer<'a, T: PrimitiveFloat>(
+    x_name: &str,
+    y_name: &str,
+) -> Bucketer<'a, (T, T)> {
+    Bucketer {
+        bucketing_function: &|&(f, g)| max(float_size(f), float_size(g)),
+        bucketing_label: format!(
+            "max(precision({}) + |exponent({})|, precision({}) + |exponent({})|)",
+            x_name, x_name, y_name, y_name
+        ),
     }
 }
 
@@ -197,6 +204,30 @@ pub fn triple_1_2_max_bit_bucketer<'a, T: Copy + SignificantBits, U: Copy + Sign
         },
         bucketing_label: format!(
             "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn triple_2_3_product_bit_bucketer<
+    'a,
+    T,
+    U: Copy + SignificantBits,
+    V: Copy + SignificantBits,
+>(
+    x_name: &str,
+    y_name: &str,
+) -> Bucketer<'a, (T, U, V)> {
+    Bucketer {
+        bucketing_function: &|&(_, y, z)| {
+            usize::exact_from(
+                y.significant_bits()
+                    .checked_mul(z.significant_bits())
+                    .unwrap(),
+            )
+        },
+        bucketing_label: format!(
+            "{}.significant_bits() * {}.significant_bits()",
             x_name, y_name
         ),
     }

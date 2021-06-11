@@ -14,7 +14,6 @@ macro_rules! float_traits {
         $max_subnormal: expr,
         $min_positive_normal: expr
     ) => {
-        //TODO docs
         impl PrimitiveFloat for $t {
             type UnsignedOfEqualWidth = $u;
             const MANTISSA_WIDTH: u64 = (std::$t::MANTISSA_DIGITS as u64) - 1;
@@ -118,36 +117,32 @@ macro_rules! impl01float {
     ($t:ty) => {
         /// The constant 0.0 for primitive floating-point types.
         ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
+        /// # Worst-case complexity
+        /// Constant time and additional memory.
         impl Zero for $t {
             const ZERO: $t = 0.0;
         }
 
         /// The constant 1.0 for primitive floating-point types.
         ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
+        /// # Worst-case complexity
+        /// Constant time and additional memory.
         impl One for $t {
             const ONE: $t = 1.0;
         }
 
         /// The constant 2.0 for primitive floating-point types.
         ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
+        /// # Worst-case complexity
+        /// Constant time and additional memory.
         impl Two for $t {
             const TWO: $t = 2.0;
         }
 
         /// The constant -1.0 for primitive floating-point types.
         ///
-        /// Time: worst case O(1)
-        ///
-        /// Additional memory: worst case O(1)
+        /// # Worst-case complexity
+        /// Constant time and additional memory.
         impl NegativeOne for $t {
             const NEGATIVE_ONE: $t = -1.0;
         }

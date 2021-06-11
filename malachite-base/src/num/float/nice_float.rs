@@ -31,7 +31,7 @@ use std::str::FromStr;
 ///   - Positive infinity, negative infinity, and NaN are converted to the strings `"Infinity"`,
 ///     `"-Infinity"`, and "`NaN`", respectively. This is just a personal preference.
 /// - `FromStr` accepts these strings.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct NiceFloat<T: PrimitiveFloat>(pub T);
 
 #[derive(Eq, Ord, PartialEq, PartialOrd)]
@@ -69,6 +69,33 @@ impl<T: PrimitiveFloat> NiceFloat<T> {
 }
 
 impl<T: PrimitiveFloat> PartialEq<NiceFloat<T>> for NiceFloat<T> {
+    /// Compares two `NiceFloat`s for equality.
+    ///
+    /// This implementation ignores the IEEE 754 standard in favor of a comparison operation that
+    /// respects the expected properties of antisymmetry, reflexivity, and transitivity. Using
+    /// `NiceFloat`, there is a somewhat-arbitrary total order on floats. These are the classes
+    ///   of floats, in ascending order:
+    ///   - Negative infinity
+    ///   - Negative nonzero finite floats
+    ///   - Negative zero
+    ///   - NaN
+    ///   - Positive zero
+    ///   - Positive nonzero finite floats
+    ///   - Positive floats
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::nice_float::NiceFloat;
+    ///
+    /// assert_eq!(NiceFloat(0.0), NiceFloat(0.0));
+    /// assert_eq!(NiceFloat(f32::NAN), NiceFloat(f32::NAN));
+    /// assert_ne!(NiceFloat(f32::NAN), NiceFloat(0.0));
+    /// assert_ne!(NiceFloat(0.0), NiceFloat(-0.0));
+    /// assert_eq!(NiceFloat(1.0), NiceFloat(1.0));
+    /// ```
     #[inline]
     fn eq(&self, other: &NiceFloat<T>) -> bool {
         let f = self.0;
@@ -80,6 +107,12 @@ impl<T: PrimitiveFloat> PartialEq<NiceFloat<T>> for NiceFloat<T> {
 impl<T: PrimitiveFloat> Eq for NiceFloat<T> {}
 
 impl<T: PrimitiveFloat> Hash for NiceFloat<T> {
+    /// Computes a hash of a `NiceFloat`.
+    ///
+    /// The hash is compatible with `NiceFloat` equality: all `NaN`s hash to the same value.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn hash<H: Hasher>(&self, state: &mut H) {
         let f = self.0;
         if f.is_nan() {
@@ -91,6 +124,28 @@ impl<T: PrimitiveFloat> Hash for NiceFloat<T> {
 }
 
 impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
+    /// Compares two `NiceFloat`s.
+    ///
+    /// This implementation ignores the IEEE 754 standard in favor of an equality operation that
+    /// respects the expected properties of symmetry, reflexivity, and transitivity. Using
+    /// `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
+    /// concept of signalling `NaN`s. Positive and negative zero are two distinct values, not equal
+    /// to each other.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::nice_float::NiceFloat;
+    /// use malachite_base::num::float::PrimitiveFloat;
+    ///
+    /// assert!(NiceFloat(0.0) > NiceFloat(-0.0));
+    /// assert!(NiceFloat(f32::NAN) < NiceFloat(0.0));
+    /// assert!(NiceFloat(f32::NAN) > NiceFloat(-0.0));
+    /// assert!(NiceFloat(f32::POSITIVE_INFINITY) > NiceFloat(f32::NAN));
+    /// assert!(NiceFloat(f32::NAN) < NiceFloat(1.0));
+    /// ```
     fn cmp(&self, other: &NiceFloat<T>) -> Ordering {
         let self_type = self.float_type();
         let other_type = other.float_type();
@@ -105,6 +160,9 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
 }
 
 impl<T: PrimitiveFloat> PartialOrd<NiceFloat<T>> for NiceFloat<T> {
+    /// Compares a `NiceFloat` to another `NiceFloat`.
+    ///
+    /// See the documentation for the `Ord` implementation.
     #[inline]
     fn partial_cmp(&self, other: &NiceFloat<T>) -> Option<Ordering> {
         Some(self.cmp(other))
@@ -211,6 +269,9 @@ impl<T: PrimitiveFloat> Display for NiceFloat<T> {
 }
 
 impl<T: PrimitiveFloat> Debug for NiceFloat<T> {
+    /// Converts a `NiceFloat` to a `String`.
+    ///
+    /// This is identical to the `Display::fmt` implementation.
     #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         Display::fmt(self, f)
@@ -220,6 +281,26 @@ impl<T: PrimitiveFloat> Debug for NiceFloat<T> {
 impl<T: PrimitiveFloat> FromStr for NiceFloat<T> {
     type Err = <T as FromStr>::Err;
 
+    /// Converts a `&str` to a `NiceFloat`.
+    ///
+    /// If the `&str` does not represent a valid `NiceFloat`, an `Err` is returned.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ = `src.len()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::float::nice_float::NiceFloat;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!(NiceFloat::from_str("NaN").unwrap(), NiceFloat(f32::NAN));
+    /// assert_eq!(NiceFloat::from_str("-0.00").unwrap(), NiceFloat(-0.0f64));
+    /// assert_eq!(NiceFloat::from_str(".123").unwrap(), NiceFloat(0.123f32));
+    /// ```
     #[inline]
     fn from_str(src: &str) -> Result<NiceFloat<T>, <T as FromStr>::Err> {
         match src {

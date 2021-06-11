@@ -544,6 +544,30 @@ pub fn special_random_natural_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn special_random_natural_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_positive_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn special_random_natural_unsigned_unsigned_triple_gen_var_1<
@@ -931,9 +955,9 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_4<
         &|seed| {
             striped_random_unsigned_vecs_min_length(
                 seed,
+                2,
                 config.get_or("mean_stripe_n", 32),
                 config.get_or("mean_stripe_d", 1),
-                2,
                 config.get_or("mean_length_n", 6),
                 config.get_or("mean_length_d", 1),
             )
@@ -1036,10 +1060,10 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_
         ),
         xss: striped_random_unsigned_vecs_length_range(
             EXAMPLE_SEED.fork("xss"),
-            config.get_or("mean_stripe_n", 32),
-            config.get_or("mean_stripe_d", 1),
             0,
             u64::exact_from(GET_STR_PRECOMPUTE_THRESHOLD),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
         ),
         excess_lens: random_options(
             EXAMPLE_SEED.fork("excess_lens"),

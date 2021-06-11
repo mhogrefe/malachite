@@ -103,13 +103,12 @@ fn to_power_of_2_digits_asc_helper<
             digits.iter().cloned().rev().collect_vec(),
             u.to_power_of_2_digits_desc(log_base)
         );
-        assert_eq!(
-            digits.len(),
-            usize::exact_from(
-                u.significant_bits()
-                    .div_round(log_base, RoundingMode::Ceiling)
-            )
-        );
+        if u != T::ZERO {
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                u.floor_log_base_power_of_2(log_base) + 1
+            );
+        }
         assert!(digits
             .iter()
             .all(|digit| digit.significant_bits() <= log_base));
@@ -148,10 +147,12 @@ fn to_power_of_2_digits_desc_helper<
         if u != T::ZERO {
             assert_ne!(digits[0], U::ZERO);
         }
-        assert_eq!(
-            digits.iter().cloned().rev().collect_vec(),
-            u.to_power_of_2_digits_asc(log_base)
-        );
+        if u != T::ZERO {
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                u.floor_log_base_power_of_2(log_base) + 1
+            );
+        }
         assert_eq!(
             digits.len(),
             usize::exact_from(

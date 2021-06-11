@@ -37,14 +37,12 @@ fn test_limbs_index_of_next_true_bit_neg() {
 
 #[test]
 fn test_index_of_next_true_bit() {
-    let test = |n, u, out| {
-        assert_eq!(Integer::from_str(n).unwrap().index_of_next_true_bit(u), out);
+    let test = |s, u, out| {
+        let n = Integer::from_str(s).unwrap();
+        assert_eq!(n.index_of_next_true_bit(u), out);
+        assert_eq!(integer_index_of_next_true_bit_alt(&n, u), out);
         assert_eq!(
-            integer_index_of_next_true_bit_alt(&Integer::from_str(n).unwrap(), u),
-            out
-        );
-        assert_eq!(
-            rug::Integer::from_str(n)
+            rug::Integer::from_str(s)
                 .unwrap()
                 .find_one(u32::exact_from(u))
                 .map(u64::from),

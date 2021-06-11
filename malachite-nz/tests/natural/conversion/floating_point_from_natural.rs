@@ -1,5 +1,4 @@
 use malachite_base::num::arithmetic::traits::Parity;
-use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
@@ -12,53 +11,6 @@ use malachite_nz_test_util::generators::{
     natural_rounding_mode_pair_gen_var_1,
 };
 use std::str::FromStr;
-
-//TODO move
-#[test]
-fn test_f32() {
-    let test = |f: f32, out| {
-        assert_eq!(f.to_bits(), out);
-    };
-    test(f32::NAN, 0x7fc00000);
-    test(f32::ZERO, 0);
-    test(f32::NEGATIVE_ZERO, 0x80000000);
-    test(f32::MIN_POSITIVE_SUBNORMAL, 1);
-    test(f32::MAX_SUBNORMAL, 0x7fffff);
-    test(f32::MIN_POSITIVE_NORMAL, 0x800000);
-    test(f32::ONE, 0x3f800000);
-    test(f32::NEGATIVE_ONE, 0xbf800000);
-    test(f32::TWO, 0x40000000);
-    test(f32::MAX_FINITE, 0x7f7fffff);
-    test(-f32::MAX_FINITE, 0xff7fffff);
-    test(f32::POSITIVE_INFINITY, 0x7f800000);
-    test(f32::NEGATIVE_INFINITY, 0xff800000);
-
-    assert_eq!(f32::SMALLEST_UNREPRESENTABLE_UINT, 0x1000001);
-    assert_eq!(f32::SMALLEST_UNREPRESENTABLE_UINT, 16777217);
-}
-
-#[test]
-fn test_f64() {
-    let test = |f: f64, out| {
-        assert_eq!(f.to_bits(), out);
-    };
-    test(f64::NAN, 0x7ff8000000000000);
-    test(f64::ZERO, 0);
-    test(f64::NEGATIVE_ZERO, 0x8000000000000000);
-    test(f64::MIN_POSITIVE_SUBNORMAL, 1);
-    test(f64::MAX_SUBNORMAL, 0xfffffffffffff);
-    test(f64::MIN_POSITIVE_NORMAL, 0x10000000000000);
-    test(f64::ONE, 0x3ff0000000000000);
-    test(f64::NEGATIVE_ONE, 0xbff0000000000000);
-    test(f64::TWO, 0x4000000000000000);
-    test(f64::MAX_FINITE, 0x7fefffffffffffff);
-    test(-f64::MAX_FINITE, 0xffefffffffffffff);
-    test(f64::POSITIVE_INFINITY, 0x7ff0000000000000);
-    test(f64::NEGATIVE_INFINITY, 0xfff0000000000000);
-
-    assert_eq!(f64::SMALLEST_UNREPRESENTABLE_UINT, 0x20000000000001);
-    assert_eq!(f64::SMALLEST_UNREPRESENTABLE_UINT, 9007199254740993);
-}
 
 #[test]
 fn test_f32_rounding_from_natural() {

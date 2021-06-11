@@ -25,6 +25,16 @@ use malachite_test::inputs::natural::{
     triples_of_natural_natural_and_u64_var_2,
 };
 
+// TODO...
+// pairs_of_unsigned_vec_var_28 -> unsigned_vec_pair_gen_var_3
+// triples_of_unsigned_unsigned_and_small_u64_var_2
+// triples_of_unsigned_vec_unsigned_vec_and_unsigned_var_17
+// pairs_of_natural_and_u64_var_1
+// pairs_of_natural_and_unsigned
+// quadruples_of_three_naturals_and_u64_var_2
+// quadruples_of_three_naturals_and_u64_var_3
+// triples_of_natural_natural_and_u64_var_2
+
 fn verify_limbs_pow_low(xs: &[Limb], es: &[Limb], out: &[Limb]) {
     let exp = Natural::from_limbs_asc(es);
     let n = xs.len();

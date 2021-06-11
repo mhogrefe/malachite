@@ -1063,7 +1063,7 @@ pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreas
     primitive_float_increasing_inclusive_range(T::NEGATIVE_INFINITY, T::POSITIVE_INFINITY)
 }
 
-/// Generates all finite positive primitive floats with a specified exponent and precision.
+/// Generates all finite positive primitive floats with a specified sci_exponent and precision.
 #[derive(Clone, Debug, Default)]
 pub struct ConstantPrecisionPrimitiveFloats<T: PrimitiveFloat> {
     n: T::UnsignedOfEqualWidth,
@@ -1089,21 +1089,21 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
     }
 }
 
-/// Generates all finite positive primitive floats with a specified exponent and precision.
+/// Generates all finite positive primitive floats with a specified sci_exponent and precision.
 ///
 /// Positive and negative zero are both excluded.
 ///
-/// A finite positive primitive float may be uniquely expressed as $x = m2^e$, where $1 \leq m < 2$
-/// and $e$ is an integer; then $e$ is the exponent. An integer $e$ occurs as the exponent of a
-/// float iff $2-2^{E-1}-M \leq e < 2^{E-1}$.
+/// A finite positive primitive float may be uniquely expressed as $x = m_s2^e_s$, where
+/// $1 \leq m_s < 2$ and $e_s$ is an integer; then $e_s$ is the sci-exponent. An integer $e_s$
+/// occurs as the sci-exponent of a float iff $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
 ///
 /// In the above equation, $m$ is a dyadic rational. Let $p$ be the smallest integer such that
 /// $m2^{p-1}$ is an integer. Then $p$ is the float's precision. It is also the number of
 /// significant bits.
 ///
 /// For example, consider the float $100.0$. It may be written as $\frac{25}{16}2^6$, so
-/// $m=\frac{25}{16}$ and $e=6$. We can write $m$ in binary as $1.1001_2$. Thus, the exponent is 6
-/// and the precision is 5.
+/// $m=\frac{25}{16}$ and $e=6$. We can write $m$ in binary as $1.1001_2$. Thus, the sci-exponent
+/// is 6 and the precision is 5.
 ///
 /// If $p$ is 1, the output length is 1; otherwise, it is $2^{p-2}$.
 ///
@@ -1111,9 +1111,9 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if the exponent is less than `T::MIN_EXPONENT` or greater than `T::MAX_EXPONENT`, or if
-/// the precision is zero or too large for the given exponent (this can be checked using
-/// `T::max_precision_for_exponent`).
+/// Panics if the sci-exponent is less than `T::MIN_EXPONENT` or greater than `T::MAX_EXPONENT`,
+/// or if the precision is zero or too large for the given sci-exponent (this can be checked using
+/// `T::max_precision_for_sci_exponent`).
 ///
 /// # Examples
 /// ```
@@ -1121,35 +1121,35 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_exponent_and_precision;
+/// use malachite_base::num::exhaustive::*;
 /// use malachite_base::num::float::nice_float::NiceFloat;
 ///
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(0, 3).map(NiceFloat)
+///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(0, 3).map(NiceFloat)
 ///         .collect_vec(),
 ///     [1.25, 1.75].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(0, 5).map(NiceFloat)
+///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(0, 5).map(NiceFloat)
 ///         .collect_vec(),
 ///     [1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375].iter().copied()
 ///         .map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_exponent_and_precision::<f32>(6, 5).map(NiceFloat)
+///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(6, 5).map(NiceFloat)
 ///         .collect_vec(),
 ///     [68.0, 76.0, 84.0, 92.0, 100.0, 108.0, 116.0, 124.0].iter().copied().map(NiceFloat)
 ///         .collect_vec()
 /// );
 /// ```
-pub fn exhaustive_primitive_floats_with_exponent_and_precision<T: PrimitiveFloat>(
-    exponent: i64,
+pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision<T: PrimitiveFloat>(
+    sci_exponent: i64,
     precision: u64,
 ) -> ConstantPrecisionPrimitiveFloats<T> {
-    assert!(exponent >= T::MIN_EXPONENT);
-    assert!(exponent <= T::MAX_EXPONENT);
+    assert!(sci_exponent >= T::MIN_EXPONENT);
+    assert!(sci_exponent <= T::MAX_EXPONENT);
     assert_ne!(precision, 0);
-    let max_precision = T::max_precision_for_exponent(exponent);
+    let max_precision = T::max_precision_for_sci_exponent(sci_exponent);
     assert!(precision <= max_precision);
     let increment = T::UnsignedOfEqualWidth::power_of_2(max_precision - precision + 1);
     let first_mantissa = if precision == 1 {
@@ -1157,9 +1157,9 @@ pub fn exhaustive_primitive_floats_with_exponent_and_precision<T: PrimitiveFloat
     } else {
         T::UnsignedOfEqualWidth::power_of_2(precision - 1) | T::UnsignedOfEqualWidth::ONE
     };
-    let first = T::from_adjusted_mantissa_and_exponent(
+    let first = T::from_integer_mantissa_and_exponent(
         first_mantissa,
-        exponent - i64::exact_from(precision) + 1,
+        sci_exponent - i64::exact_from(precision) + 1,
     )
     .unwrap()
     .to_bits();
@@ -1180,7 +1180,7 @@ pub fn exhaustive_primitive_floats_with_exponent_and_precision<T: PrimitiveFloat
 #[derive(Clone, Debug)]
 struct PrimitiveFloatsWithExponentGenerator<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,
-    exponent: i64,
+    sci_exponent: i64,
 }
 
 impl<T: PrimitiveFloat>
@@ -1189,13 +1189,13 @@ impl<T: PrimitiveFloat>
 {
     #[inline]
     fn get_ys(&self, &precision: &u64) -> ConstantPrecisionPrimitiveFloats<T> {
-        exhaustive_primitive_floats_with_exponent_and_precision(self.exponent, precision)
+        exhaustive_primitive_floats_with_sci_exponent_and_precision(self.sci_exponent, precision)
     }
 }
 
 #[inline]
-fn exhaustive_primitive_floats_with_exponent_helper<T: PrimitiveFloat>(
-    exponent: i64,
+fn exhaustive_primitive_floats_with_sci_exponent_helper<T: PrimitiveFloat>(
+    sci_exponent: i64,
 ) -> LexDependentPairs<
     u64,
     T,
@@ -1204,15 +1204,18 @@ fn exhaustive_primitive_floats_with_exponent_helper<T: PrimitiveFloat>(
     ConstantPrecisionPrimitiveFloats<T>,
 > {
     lex_dependent_pairs(
-        primitive_int_increasing_inclusive_range(1, T::max_precision_for_exponent(exponent)),
+        primitive_int_increasing_inclusive_range(
+            1,
+            T::max_precision_for_sci_exponent(sci_exponent),
+        ),
         PrimitiveFloatsWithExponentGenerator {
             phantom: PhantomData,
-            exponent,
+            sci_exponent,
         },
     )
 }
 
-/// Generates all finite positive primitive floats with a specified exponent.
+/// Generates all finite positive primitive floats with a specified sci_exponent.
 #[derive(Clone, Debug)]
 pub struct ExhaustivePrimitiveFloatsWithExponent<T: PrimitiveFloat>(
     LexDependentPairs<
@@ -1233,27 +1236,27 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
     }
 }
 
-/// Generates all finite positive primitive floats with a specified exponent.
+/// Generates all finite positive primitive floats with a specified sci-exponent.
 ///
 /// Positive and negative zero are both excluded.
 ///
-/// A finite positive primitive float may be uniquely expressed as $x = m2^e$, where $1 \leq m < 2$
-/// and $e$ is an integer; then $e$ is the exponent. An integer $e$ occurs as the exponent of a
-/// float iff $2-2^{E-1}-M \leq e < 2^{E-1}$.
+/// A finite positive primitive float may be uniquely expressed as $x = m_s2^e_s$, where
+/// $1 \leq m_s < 2$ and $e_s$ is an integer; then $e$ is the sci-exponent. An integer $e_s$ occurs
+/// as the sci-exponent of a float iff $2-2^{E-1}-M \leq e_s < 2^{E-1}$.
 ///
-/// If $e \geq 2-2^{E-1}$ (the float is normal), the output length is $2^M$.
+/// If $e_s \geq 2-2^{E-1}$ (the float is normal), the output length is $2^M$.
 /// - For `f32`, this is $2^{23}$, or 8388608.
 /// - For `f64`, this is $2^{52}$, or 4503599627370496.
 ///
-/// If $e < 2-2^{E-1}$ (the float is subnormal), the output length is $2^{e+2^{E-1}+M-2}$.
-/// - For `f32`, this is $2^{e+149}$.
-/// - For `f64`, this is $2^{e+1074}$.
+/// If $e_s < 2-2^{E-1}$ (the float is subnormal), the output length is $2^{e_s+2^{E-1}+M-2}$.
+/// - For `f32`, this is $2^{e_s+149}$.
+/// - For `f64`, this is $2^{e_s+1074}$.
 ///
 /// # Complexity per iteration
 /// Constant time and additional memory.
 ///
 /// # Panics
-/// Panics if the exponent is less than `T::MIN_EXPONENT` or greater than `T::MAX_EXPONENT`.
+/// Panics if the sci-exponent is less than `T::MIN_EXPONENT` or greater than `T::MAX_EXPONENT`.
 ///
 /// # Examples
 /// ```
@@ -1261,34 +1264,36 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_exponent;
+/// use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_sci_exponent;
 /// use malachite_base::num::float::nice_float::NiceFloat;
 ///
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_exponent::<f32>(0).take(20).map(NiceFloat).collect_vec(),
+///     exhaustive_primitive_floats_with_sci_exponent::<f32>(0).take(20).map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         1.0, 1.5, 1.25, 1.75, 1.125, 1.375, 1.625, 1.875, 1.0625, 1.1875, 1.3125, 1.4375,
 ///         1.5625, 1.6875, 1.8125, 1.9375, 1.03125, 1.09375, 1.15625, 1.21875
 ///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_exponent::<f32>(4).take(20).map(NiceFloat).collect_vec(),
+///     exhaustive_primitive_floats_with_sci_exponent::<f32>(4).take(20).map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         16.0, 24.0, 20.0, 28.0, 18.0, 22.0, 26.0, 30.0, 17.0, 19.0, 21.0, 23.0, 25.0, 27.0,
 ///         29.0, 31.0, 16.5, 17.5, 18.5, 19.5
 ///     ].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_exponent::<f32>(-147).map(NiceFloat).collect_vec(),
+///     exhaustive_primitive_floats_with_sci_exponent::<f32>(-147).map(NiceFloat).collect_vec(),
 ///     [6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_primitive_floats_with_exponent<T: PrimitiveFloat>(
-    exponent: i64,
+pub fn exhaustive_primitive_floats_with_sci_exponent<T: PrimitiveFloat>(
+    sci_exponent: i64,
 ) -> ExhaustivePrimitiveFloatsWithExponent<T> {
-    ExhaustivePrimitiveFloatsWithExponent(exhaustive_primitive_floats_with_exponent_helper(
-        exponent,
+    ExhaustivePrimitiveFloatsWithExponent(exhaustive_primitive_floats_with_sci_exponent_helper(
+        sci_exponent,
     ))
 }
 
@@ -1303,8 +1308,8 @@ impl<T: PrimitiveFloat>
     for ExhaustivePositiveFinitePrimitiveFloatsGenerator<T>
 {
     #[inline]
-    fn get_ys(&self, &exponent: &i64) -> ExhaustivePrimitiveFloatsWithExponent<T> {
-        exhaustive_primitive_floats_with_exponent(exponent)
+    fn get_ys(&self, &sci_exponent: &i64) -> ExhaustivePrimitiveFloatsWithExponent<T> {
+        exhaustive_primitive_floats_with_sci_exponent(sci_exponent)
     }
 }
 
@@ -1726,35 +1731,35 @@ pub fn exhaustive_primitive_floats<T: PrimitiveFloat>(
 }
 
 #[doc(hidden)]
-pub fn exhaustive_primitive_floats_with_exponent_and_precision_in_range<T: PrimitiveFloat>(
+pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<T: PrimitiveFloat>(
     a: T,
     b: T,
-    exponent: i64,
+    sci_exponent: i64,
     precision: u64,
 ) -> ConstantPrecisionPrimitiveFloats<T> {
     assert!(a.is_finite());
     assert!(b.is_finite());
     assert!(a > T::ZERO);
     assert!(b > T::ZERO);
-    assert!(exponent >= T::MIN_EXPONENT);
-    assert!(exponent <= T::MAX_EXPONENT);
+    assert!(sci_exponent >= T::MIN_EXPONENT);
+    assert!(sci_exponent <= T::MAX_EXPONENT);
     let (am, ae) = a.raw_mantissa_and_exponent();
     let (bm, be) = b.raw_mantissa_and_exponent();
-    let ae_actual_exponent = if ae == 0 {
+    let ae_actual_sci_exponent = if ae == 0 {
         i64::wrapping_from(am.significant_bits()) + T::MIN_EXPONENT - 1
     } else {
         i64::wrapping_from(ae) - T::MAX_EXPONENT
     };
-    let be_actual_exponent = if be == 0 {
+    let be_actual_sci_exponent = if be == 0 {
         i64::wrapping_from(bm.significant_bits()) + T::MIN_EXPONENT - 1
     } else {
         i64::wrapping_from(be) - T::MAX_EXPONENT
     };
-    assert_eq!(ae_actual_exponent, exponent);
-    assert_eq!(be_actual_exponent, exponent);
+    assert_eq!(ae_actual_sci_exponent, sci_exponent);
+    assert_eq!(be_actual_sci_exponent, sci_exponent);
     assert!(am <= bm);
     assert_ne!(precision, 0);
-    let max_precision = T::max_precision_for_exponent(exponent);
+    let max_precision = T::max_precision_for_sci_exponent(sci_exponent);
     assert!(precision <= max_precision);
     if precision == 1 && am == T::UnsignedOfEqualWidth::ZERO {
         return ConstantPrecisionPrimitiveFloats {
@@ -1798,7 +1803,7 @@ pub fn exhaustive_primitive_floats_with_exponent_and_precision_in_range<T: Primi
 struct PrimitiveFloatsWithExponentInRangeGenerator<T: PrimitiveFloat> {
     a: T,
     b: T,
-    exponent: i64,
+    sci_exponent: i64,
     phantom: PhantomData<*const T>,
 }
 
@@ -1808,20 +1813,20 @@ impl<T: PrimitiveFloat>
 {
     #[inline]
     fn get_ys(&self, &precision: &u64) -> ConstantPrecisionPrimitiveFloats<T> {
-        exhaustive_primitive_floats_with_exponent_and_precision_in_range(
+        exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range(
             self.a,
             self.b,
-            self.exponent,
+            self.sci_exponent,
             precision,
         )
     }
 }
 
 #[inline]
-fn exhaustive_primitive_floats_with_exponent_in_range_helper<T: PrimitiveFloat>(
+fn exhaustive_primitive_floats_with_sci_exponent_in_range_helper<T: PrimitiveFloat>(
     a: T,
     b: T,
-    exponent: i64,
+    sci_exponent: i64,
 ) -> LexDependentPairs<
     u64,
     T,
@@ -1830,11 +1835,14 @@ fn exhaustive_primitive_floats_with_exponent_in_range_helper<T: PrimitiveFloat>(
     ConstantPrecisionPrimitiveFloats<T>,
 > {
     lex_dependent_pairs(
-        primitive_int_increasing_inclusive_range(1, T::max_precision_for_exponent(exponent)),
+        primitive_int_increasing_inclusive_range(
+            1,
+            T::max_precision_for_sci_exponent(sci_exponent),
+        ),
         PrimitiveFloatsWithExponentInRangeGenerator {
             a,
             b,
-            exponent,
+            sci_exponent,
             phantom: PhantomData,
         },
     )
@@ -1863,13 +1871,13 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponentInRang
 
 #[doc(hidden)]
 #[inline]
-pub fn exhaustive_primitive_floats_with_exponent_in_range<T: PrimitiveFloat>(
+pub fn exhaustive_primitive_floats_with_sci_exponent_in_range<T: PrimitiveFloat>(
     a: T,
     b: T,
-    exponent: i64,
+    sci_exponent: i64,
 ) -> ExhaustivePrimitiveFloatsWithExponentInRange<T> {
     ExhaustivePrimitiveFloatsWithExponentInRange(
-        exhaustive_primitive_floats_with_exponent_in_range_helper(a, b, exponent),
+        exhaustive_primitive_floats_with_sci_exponent_in_range_helper(a, b, sci_exponent),
     )
 }
 
@@ -1877,8 +1885,8 @@ pub fn exhaustive_primitive_floats_with_exponent_in_range<T: PrimitiveFloat>(
 struct ExhaustivePositiveFinitePrimitiveFloatsInRangeGenerator<T: PrimitiveFloat> {
     a: T,
     b: T,
-    a_exponent: i64,
-    b_exponent: i64,
+    a_sci_exponent: i64,
+    b_sci_exponent: i64,
     phantom: PhantomData<*const T>,
 }
 
@@ -1887,20 +1895,21 @@ impl<T: PrimitiveFloat>
     for ExhaustivePositiveFinitePrimitiveFloatsInRangeGenerator<T>
 {
     #[inline]
-    fn get_ys(&self, &exponent: &i64) -> ExhaustivePrimitiveFloatsWithExponentInRange<T> {
-        let a = if exponent == self.a_exponent {
+    fn get_ys(&self, &sci_exponent: &i64) -> ExhaustivePrimitiveFloatsWithExponentInRange<T> {
+        let a = if sci_exponent == self.a_sci_exponent {
             self.a
         } else {
-            T::from_adjusted_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, exponent).unwrap()
+            T::from_integer_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, sci_exponent)
+                .unwrap()
         };
-        let b = if exponent == self.b_exponent {
+        let b = if sci_exponent == self.b_sci_exponent {
             self.b
         } else {
-            T::from_adjusted_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, exponent + 1)
+            T::from_integer_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, sci_exponent + 1)
                 .unwrap()
                 .next_lower()
         };
-        exhaustive_primitive_floats_with_exponent_in_range(a, b, exponent)
+        exhaustive_primitive_floats_with_sci_exponent_in_range(a, b, sci_exponent)
     }
 }
 
@@ -1922,24 +1931,24 @@ fn exhaustive_positive_finite_primitive_floats_in_range_helper<T: PrimitiveFloat
     assert!(a <= b);
     let (am, ae) = a.raw_mantissa_and_exponent();
     let (bm, be) = b.raw_mantissa_and_exponent();
-    let a_exponent = if ae == 0 {
+    let a_sci_exponent = if ae == 0 {
         i64::wrapping_from(am.significant_bits()) + T::MIN_EXPONENT - 1
     } else {
         i64::wrapping_from(ae) - T::MAX_EXPONENT
     };
-    let b_exponent = if be == 0 {
+    let b_sci_exponent = if be == 0 {
         i64::wrapping_from(bm.significant_bits()) + T::MIN_EXPONENT - 1
     } else {
         i64::wrapping_from(be) - T::MAX_EXPONENT
     };
     exhaustive_dependent_pairs(
         ruler_sequence(),
-        exhaustive_signed_inclusive_range(a_exponent, b_exponent),
+        exhaustive_signed_inclusive_range(a_sci_exponent, b_sci_exponent),
         ExhaustivePositiveFinitePrimitiveFloatsInRangeGenerator {
             a,
             b,
-            a_exponent,
-            b_exponent,
+            a_sci_exponent,
+            b_sci_exponent,
             phantom: PhantomData,
         },
     )

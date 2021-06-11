@@ -7,18 +7,15 @@ macro_rules! impl_mod_power_of_2_square {
         impl ModPowerOf2Square for $t {
             type Output = $t;
 
-            /// Computes `self.square()` mod 2<sup>`pow`</sup>. Assumes the input is already reduced
-            /// mod 2<sup>`pow`</sup>.
+            /// Computes `self.square()` mod $2^p$. Assumes the input is already reduced mod $2^p$.
             ///
-            /// //TODO complexity
+            /// $f(x, p) = y$, where $x, y < 2^p$ and $x^2 \equiv y \mod 2^p$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2Square;
-            ///
-            /// assert_eq!(5u8.mod_power_of_2_square(3), 1);
-            /// assert_eq!(100u32.mod_power_of_2_square(8), 16);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2_square` module.
             #[inline]
             fn mod_power_of_2_square(self, pow: u64) -> $t {
                 self.mod_power_of_2_mul(self, pow)
@@ -26,23 +23,16 @@ macro_rules! impl_mod_power_of_2_square {
         }
 
         impl ModPowerOf2SquareAssign for $t {
-            /// Replaces `self` with `self.square()` mod 2<sup>`pow`</sup>. Assumes the input is
-            /// already reduced mod 2<sup>`pow`</sup>.
+            /// Replaces `self` with `self.square()` mod $2^p$. Assumes the input is already
+            /// reduced mod $2^p$.
             ///
-            /// //TODO complexity
+            /// $x \gets y$, where $x, y < 2^p$ and $x^2 \equiv y \mod 2^p$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::ModPowerOf2SquareAssign;
-            ///
-            /// let mut n = 5u8;
-            /// n.mod_power_of_2_square_assign(3);
-            /// assert_eq!(n, 1);
-            ///
-            /// let mut n = 100u32;
-            /// n.mod_power_of_2_square_assign(8);
-            /// assert_eq!(n, 16);
-            /// ```
+            /// See the documentation of the `num::arithmetic::mod_power_of_2_square` module.
             #[inline]
             fn mod_power_of_2_square_assign(&mut self, pow: u64) {
                 self.mod_power_of_2_mul_assign(*self, pow);

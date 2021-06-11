@@ -1424,7 +1424,7 @@ where
         assert_eq!(NiceFloat(T::rounding_from(n.clone(), rm)), NiceFloat(f));
         assert_eq!(
             NiceFloat(T::rounding_from(-n, -rm)),
-            NiceFloat((-f).abs_negative_zeros())
+            NiceFloat((-f).abs_negative_zero())
         );
     });
 
@@ -1580,7 +1580,7 @@ where
             NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
             NiceFloat(f)
         );
-        assert_eq!(NiceFloat(T::from(-n)), NiceFloat((-f).abs_negative_zeros()));
+        assert_eq!(NiceFloat(T::from(-n)), NiceFloat((-f).abs_negative_zero()));
     });
 
     integer_gen_var_1::<T>().test_properties(|n| {
@@ -1642,7 +1642,7 @@ where
         assert_eq!(T::checked_from(n.clone()).map(NiceFloat), of.map(NiceFloat));
         assert_eq!(
             T::checked_from(-n).map(NiceFloat),
-            of.map(|f| NiceFloat((-f).abs_negative_zeros()))
+            of.map(|f| NiceFloat((-f).abs_negative_zero()))
         );
     });
 

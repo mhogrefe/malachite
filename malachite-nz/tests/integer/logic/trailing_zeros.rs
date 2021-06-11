@@ -4,12 +4,10 @@ use std::str::FromStr;
 
 #[test]
 fn test_trailing_zeros() {
-    let test = |n, out| {
-        assert_eq!(Integer::from_str(n).unwrap().trailing_zeros(), out);
-        assert_eq!(
-            integer_trailing_zeros_alt(&Integer::from_str(n).unwrap()),
-            out
-        );
+    let test = |s, out| {
+        let n = Integer::from_str(s).unwrap();
+        assert_eq!(n.trailing_zeros(), out);
+        assert_eq!(integer_trailing_zeros_alt(&n), out);
     };
     test("0", None);
     test("123", Some(0));

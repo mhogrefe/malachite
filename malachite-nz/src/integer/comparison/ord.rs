@@ -4,6 +4,16 @@ use std::cmp::Ordering;
 impl PartialOrd for Integer {
     /// Compares an `Integer` to another `Integer`.
     ///
+    /// See the documentation for the `Ord` implementation.
+    #[inline]
+    fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Integer {
+    /// Compares an `Integer` to another `Integer`.
+    ///
     /// Time: worst case O(n)
     ///
     /// Additional memory: worst case O(1)
@@ -19,14 +29,6 @@ impl PartialOrd for Integer {
     /// assert!(Integer::from(-123) > Integer::from(-124));
     /// assert!(Integer::from(-123) >= Integer::from(-124));
     /// ```
-    #[inline]
-    fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-/// Asserts that `Integer` ordering is a total order.
-impl Ord for Integer {
     fn cmp(&self, other: &Integer) -> Ordering {
         if std::ptr::eq(self, other) {
             Ordering::Equal

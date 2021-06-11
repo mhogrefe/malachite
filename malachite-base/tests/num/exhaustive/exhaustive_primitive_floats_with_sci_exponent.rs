@@ -1,11 +1,14 @@
 use itertools::Itertools;
-use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_exponent;
+use malachite_base::num::exhaustive::exhaustive_primitive_floats_with_sci_exponent;
 use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use std::panic::catch_unwind;
 
-fn exhaustive_primitive_floats_with_exponent_helper<T: PrimitiveFloat>(exponent: i64, out: &[T]) {
-    let xs = exhaustive_primitive_floats_with_exponent::<T>(exponent);
+fn exhaustive_primitive_floats_with_sci_exponent_helper<T: PrimitiveFloat>(
+    sci_exponent: i64,
+    out: &[T],
+) {
+    let xs = exhaustive_primitive_floats_with_sci_exponent::<T>(sci_exponent);
     assert_eq!(
         xs.take(20).map(NiceFloat).collect_vec(),
         out.iter().copied().map(NiceFloat).collect_vec()
@@ -13,22 +16,22 @@ fn exhaustive_primitive_floats_with_exponent_helper<T: PrimitiveFloat>(exponent:
 }
 
 #[test]
-fn test_exhaustive_primitive_floats_with_exponent() {
-    exhaustive_primitive_floats_with_exponent_helper::<f32>(
+fn test_exhaustive_primitive_floats_with_sci_exponent() {
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f32>(
         0,
         &[
             1.0, 1.5, 1.25, 1.75, 1.125, 1.375, 1.625, 1.875, 1.0625, 1.1875, 1.3125, 1.4375,
             1.5625, 1.6875, 1.8125, 1.9375, 1.03125, 1.09375, 1.15625, 1.21875,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f32>(
         4,
         &[
             16.0, 24.0, 20.0, 28.0, 18.0, 22.0, 26.0, 30.0, 17.0, 19.0, 21.0, 23.0, 25.0, 27.0,
             29.0, 31.0, 16.5, 17.5, 18.5, 19.5,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f32>(
         -4,
         &[
             0.0625,
@@ -54,13 +57,13 @@ fn test_exhaustive_primitive_floats_with_exponent() {
         ],
     );
 
-    exhaustive_primitive_floats_with_exponent_helper::<f32>(-149, &[1.0e-45]);
-    exhaustive_primitive_floats_with_exponent_helper::<f32>(-148, &[3.0e-45, 4.0e-45]);
-    exhaustive_primitive_floats_with_exponent_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f32>(-149, &[1.0e-45]);
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f32>(-148, &[3.0e-45, 4.0e-45]);
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f32>(
         -147,
         &[6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44],
     );
-    exhaustive_primitive_floats_with_exponent_helper::<f32>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f32>(
         127,
         &[
             1.7014118e38,
@@ -86,21 +89,21 @@ fn test_exhaustive_primitive_floats_with_exponent() {
         ],
     );
 
-    exhaustive_primitive_floats_with_exponent_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f64>(
         0,
         &[
             1.0, 1.5, 1.25, 1.75, 1.125, 1.375, 1.625, 1.875, 1.0625, 1.1875, 1.3125, 1.4375,
             1.5625, 1.6875, 1.8125, 1.9375, 1.03125, 1.09375, 1.15625, 1.21875,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f64>(
         4,
         &[
             16.0, 24.0, 20.0, 28.0, 18.0, 22.0, 26.0, 30.0, 17.0, 19.0, 21.0, 23.0, 25.0, 27.0,
             29.0, 31.0, 16.5, 17.5, 18.5, 19.5,
         ],
     );
-    exhaustive_primitive_floats_with_exponent_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f64>(
         -4,
         &[
             0.0625,
@@ -126,13 +129,13 @@ fn test_exhaustive_primitive_floats_with_exponent() {
         ],
     );
 
-    exhaustive_primitive_floats_with_exponent_helper::<f64>(-1074, &[5.0e-324]);
-    exhaustive_primitive_floats_with_exponent_helper::<f64>(-1073, &[1.0e-323, 1.5e-323]);
-    exhaustive_primitive_floats_with_exponent_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f64>(-1074, &[5.0e-324]);
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f64>(-1073, &[1.0e-323, 1.5e-323]);
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f64>(
         -1072,
         &[2.0e-323, 3.0e-323, 2.5e-323, 3.5e-323],
     );
-    exhaustive_primitive_floats_with_exponent_helper::<f64>(
+    exhaustive_primitive_floats_with_sci_exponent_helper::<f64>(
         1023,
         &[
             8.98846567431158e307,
@@ -159,12 +162,12 @@ fn test_exhaustive_primitive_floats_with_exponent() {
     );
 }
 
-fn exhaustive_primitive_floats_with_exponent_fail_helper<T: PrimitiveFloat>() {
-    assert_panic!(exhaustive_primitive_floats_with_exponent::<T>(10000));
-    assert_panic!(exhaustive_primitive_floats_with_exponent::<T>(-10000));
+fn exhaustive_primitive_floats_with_sci_exponent_fail_helper<T: PrimitiveFloat>() {
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent::<T>(10000));
+    assert_panic!(exhaustive_primitive_floats_with_sci_exponent::<T>(-10000));
 }
 
 #[test]
-fn exhaustive_primitive_floats_with_exponent_fail() {
-    apply_fn_to_primitive_floats!(exhaustive_primitive_floats_with_exponent_fail_helper);
+fn exhaustive_primitive_floats_with_sci_exponent_fail() {
+    apply_fn_to_primitive_floats!(exhaustive_primitive_floats_with_sci_exponent_fail_helper);
 }

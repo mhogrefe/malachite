@@ -36,10 +36,10 @@ pub fn test_from_raw_mantissa_and_exponent() {
 //TODO failure tests
 
 #[test]
-pub fn test_from_adjusted_mantissa_and_exponent() {
+pub fn test_from_integer_mantissa_and_exponent() {
     fn test<T: PrimitiveFloat>(mantissa: T::UnsignedOfEqualWidth, exponent: i64, x: Option<T>) {
         assert_eq!(
-            T::from_adjusted_mantissa_and_exponent(mantissa, exponent).map(NiceFloat),
+            T::from_integer_mantissa_and_exponent(mantissa, exponent).map(NiceFloat),
             x.map(NiceFloat)
         );
     }
