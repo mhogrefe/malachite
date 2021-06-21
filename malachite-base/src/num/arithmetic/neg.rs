@@ -3,28 +3,17 @@ use num::arithmetic::traits::NegAssign;
 macro_rules! impl_neg {
     ($t:ident) => {
         impl NegAssign for $t {
-            /// Replaces `self` with its negative. Assumes that `self` can be negated.
+            /// Replaces `self` with its negative.
             ///
-            /// Time: worst case O(1)
+            /// Assumes that `self` can be negated.
             ///
-            /// Additional memory: worst case O(1)
+            /// $x \gets -x$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::NegAssign;
-            ///
-            /// let mut x = 0i8;
-            /// x.neg_assign();
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = 100i64;
-            /// x.neg_assign();
-            /// assert_eq!(x, -100);
-            ///
-            /// let mut x = -100i64;
-            /// x.neg_assign();
-            /// assert_eq!(x, 100);
-            /// ```
+            /// See the documentation of the `num::arithmetic::neg` module.
             #[inline]
             fn neg_assign(&mut self) {
                 *self = -*self;

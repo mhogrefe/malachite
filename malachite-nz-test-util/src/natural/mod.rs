@@ -1,5 +1,6 @@
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::stats::moments::CheckedToF64;
-use malachite_nz::natural::conversion::floating_point_from_natural::gt_max_finite_f64;
 use malachite_nz::natural::Natural;
 
 pub struct NaturalCheckedToF64Wrapper(pub Natural);
@@ -7,8 +8,12 @@ pub struct NaturalCheckedToF64Wrapper(pub Natural);
 impl CheckedToF64 for NaturalCheckedToF64Wrapper {
     #[inline]
     fn checked_to_f64(&self) -> f64 {
-        assert!(!gt_max_finite_f64(&self.0));
-        f64::from(&self.0)
+        if self.0 == 0 {
+            0.0
+        } else {
+            let (mantissa, exponent) = self.0.sci_mantissa_and_exponent();
+            f64::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent)).unwrap()
+        }
     }
 }
 

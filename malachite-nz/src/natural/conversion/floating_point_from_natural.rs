@@ -1,111 +1,13 @@
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{
-    DivisibleByPowerOf2, FloorLogBase2, ShrRound, ShrRoundAssign,
-};
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::float::PrimitiveFloat;
-use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
-use natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
-use natural::logic::bit_scan::limbs_index_of_next_false_bit;
-use natural::logic::significant_bits::limbs_significant_bits;
-use natural::InnerNatural::{Large, Small};
 use natural::Natural;
-use std::cmp::Ordering;
 
 macro_rules! float_impls {
-    ($f: ident, $gt_max_finite_float: ident) => {
-        // Returns whether `n` > `$f::MAX_FINITE`.
-        //TODO test
-        pub fn $gt_max_finite_float(n: &Natural) -> bool {
-            match *n {
-                Natural(Small(_)) => false,
-                Natural(Large(ref limbs)) => {
-                    const MAX_WIDTH: u64 = $f::MAX_EXPONENT as u64 + 1;
-                    match limbs_significant_bits(limbs).cmp(&MAX_WIDTH) {
-                        Ordering::Less => false,
-                        Ordering::Greater => true,
-                        Ordering::Equal => {
-                            const TRAILING_ZEROS_OF_MAX: u64 =
-                                ($f::MAX_EXPONENT as u64) - $f::MANTISSA_WIDTH;
-                            limbs_index_of_next_false_bit(limbs, TRAILING_ZEROS_OF_MAX) >= MAX_WIDTH
-                                && !limbs_divisible_by_power_of_2(limbs, TRAILING_ZEROS_OF_MAX)
-                        }
-                    }
-                }
-            }
-        }
-
-        impl RoundingFrom<Natural> for $f {
-            /// Converts a `Natural` to an `f32` or an `f64`, using the specified rounding mode. The
-            /// `Natural` is taken by value. If the input is larger than the maximum finite value
-            /// representable by the floating-point type, the result depends on the rounding mode.
-            /// If the rounding mode is `Ceiling` or `Up`, the result is positive infinity; if it is
-            /// `Exact`, the function panics; otherwise, the result is the maximum finite float.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Panics
-            /// Panics if the rounding mode is `Exact` and `value` cannot be represented exactly.
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::RoundingFrom;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            /// use malachite_nz::natural::Natural;
-            /// use std::str::FromStr;
-            ///
-            /// assert_eq!(f32::rounding_from(Natural::from_str("123").unwrap(),
-            ///     RoundingMode::Exact), 123.0);
-            /// assert_eq!(f32::rounding_from(Natural::from_str("1000000001").unwrap(),
-            ///     RoundingMode::Floor), 1.0e9);
-            /// assert_eq!(f32::rounding_from(Natural::from_str("1000000001").unwrap(),
-            ///     RoundingMode::Ceiling), 1.00000006e9);
-            /// assert_eq!(
-            ///     f32::rounding_from(
-            ///         Natural::from_str("10000000000000000000000000000000000000000000000000000")
-            ///             .unwrap(),
-            ///         RoundingMode::Nearest
-            ///     ),
-            ///     3.4028235e38
-            /// );
-            /// ```
-            fn rounding_from(mut value: Natural, rm: RoundingMode) -> $f {
-                if value == 0 {
-                    return 0.0;
-                }
-                if $gt_max_finite_float(&value) {
-                    return match rm {
-                        RoundingMode::Exact => {
-                            panic!("Value cannot be represented exactly as an {}", $f::NAME)
-                        }
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            $f::MAX_FINITE
-                        }
-                        _ => $f::POSITIVE_INFINITY,
-                    };
-                }
-                let mut exponent = value.floor_log_base_2();
-                let shift = i64::exact_from(exponent) - i64::exact_from($f::MANTISSA_WIDTH);
-                value.shr_round_assign(shift, rm);
-                let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::exact_from(value);
-                if mantissa.get_bit($f::MANTISSA_WIDTH + 1) {
-                    exponent += 1;
-                    mantissa >>= 1;
-                }
-                mantissa.clear_bit($f::MANTISSA_WIDTH);
-                let exponent = exponent + u64::wrapping_from($f::MAX_EXPONENT);
-                $f::from_raw_mantissa_and_exponent(mantissa, exponent)
-            }
-        }
-
+    ($f: ident) => {
         impl<'a> RoundingFrom<&'a Natural> for $f {
             /// Converts a `Natural` to an `f32` or an `f64`, using the specified rounding mode. The
             /// `Natural` is taken by reference. If the input is larger than the maximum finite
@@ -114,9 +16,9 @@ macro_rules! float_impls {
             /// it is `Exact`, the function panics; otherwise, the result is the maximum finite
             /// float.
             ///
-            /// Time: worst case O(1)
+            /// Time: worst case O(n)
             ///
-            /// Additional memory: worst case O(1)
+            /// Additional memory: worst case O(n)
             ///
             /// # Panics
             /// Panics if the rounding mode is `Exact` and `value` cannot be represented exactly.
@@ -143,60 +45,27 @@ macro_rules! float_impls {
             /// ```
             fn rounding_from(value: &'a Natural, rm: RoundingMode) -> $f {
                 if *value == 0 {
-                    return 0.0;
-                }
-                if $gt_max_finite_float(value) {
-                    return match rm {
-                        RoundingMode::Exact => {
-                            panic!("Value cannot be represented exactly as an {}", $f::NAME)
+                    0.0
+                } else {
+                    let (mantissa, exponent) = value
+                        .sci_mantissa_and_exponent_with_rounding(rm)
+                        .expect("Value cannot be represented exactly as a float");
+                    if let Some(f) =
+                        $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
+                    {
+                        f
+                    } else {
+                        match rm {
+                            RoundingMode::Exact => {
+                                panic!("Value cannot be represented exactly as an {}", $f::NAME)
+                            }
+                            RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
+                                $f::MAX_FINITE
+                            }
+                            _ => $f::POSITIVE_INFINITY,
                         }
-                        RoundingMode::Floor | RoundingMode::Down | RoundingMode::Nearest => {
-                            $f::MAX_FINITE
-                        }
-                        _ => $f::POSITIVE_INFINITY,
-                    };
+                    }
                 }
-                let mut exponent = value.floor_log_base_2();
-                let shift = i64::exact_from(exponent) - i64::exact_from($f::MANTISSA_WIDTH);
-                let mut mantissa = <$f as PrimitiveFloat>::UnsignedOfEqualWidth::exact_from(
-                    value.shr_round(shift, rm),
-                );
-                if mantissa.get_bit($f::MANTISSA_WIDTH + 1) {
-                    exponent += 1;
-                    mantissa >>= 1;
-                }
-                mantissa.clear_bit($f::MANTISSA_WIDTH);
-                let exponent = exponent + u64::wrapping_from($f::MAX_EXPONENT);
-                $f::from_raw_mantissa_and_exponent(mantissa, exponent)
-            }
-        }
-
-        impl From<Natural> for $f {
-            /// Converts a `Natural` to the nearest `f32` or an `f64`. The `Natural` is taken by
-            /// value. If there are two nearest floats, the one whose least-significant bit is zero
-            /// is chosen. If the input is larger than the maximum finite value representable by the
-            /// floating-point type, the result is the maximum finite float.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_nz::natural::Natural;
-            /// use std::str::FromStr;
-            ///
-            /// assert_eq!(f32::from(Natural::from_str("123").unwrap()), 123.0);
-            /// assert_eq!(f32::from(Natural::from_str("1000000001").unwrap()), 1.0e9);
-            /// assert_eq!(f32::from(
-            ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
-            ///     .unwrap()), 3.4028235e38);
-            /// ```
-            #[inline]
-            fn from(value: Natural) -> $f {
-                $f::rounding_from(value, RoundingMode::Nearest)
             }
         }
 
@@ -206,9 +75,9 @@ macro_rules! float_impls {
             /// zero is chosen. If the input is larger than the maximum finite value representable
             /// by the floating-point type, the result is the maximum finite float.
             ///
-            /// Time: worst case O(1)
+            /// Time: worst case O(n)
             ///
-            /// Additional memory: worst case O(1)
+            /// Additional memory: worst case O(n)
             ///
             /// # Examples
             /// ```
@@ -229,61 +98,13 @@ macro_rules! float_impls {
             }
         }
 
-        impl CheckedFrom<Natural> for $f {
-            /// Converts a `Natural` to an `f32` or an `f64`. The `Natural` is taken by value. If
-            /// the input isn't exactly equal to some float, `None` is returned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::natural::Natural;
-            /// use std::str::FromStr;
-            ///
-            /// assert_eq!(f32::checked_from(Natural::from_str("123").unwrap()), Some(123.0));
-            /// assert_eq!(f32::checked_from(Natural::from_str("1000000000").unwrap()),
-            ///     Some(1.0e9));
-            /// assert_eq!(f32::checked_from(Natural::from_str("1000000001").unwrap()), None);
-            /// assert_eq!(f32::checked_from(
-            ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
-            ///     .unwrap()), None);
-            /// ```
-            fn checked_from(mut value: Natural) -> Option<$f> {
-                if value == 0 {
-                    return Some(0.0);
-                }
-                if $gt_max_finite_float(&value) {
-                    return None;
-                }
-                let exponent = value.floor_log_base_2();
-                let shift = i64::exact_from(exponent) - i64::exact_from($f::MANTISSA_WIDTH);
-                if shift >= 0 && !value.divisible_by_power_of_2(u64::wrapping_from(shift)) {
-                    return None;
-                }
-                value >>= shift;
-                let mut mantissa =
-                    <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(value);
-                mantissa.clear_bit($f::MANTISSA_WIDTH);
-                Some($f::from_raw_mantissa_and_exponent(
-                    mantissa,
-                    exponent + u64::wrapping_from($f::MAX_EXPONENT),
-                ))
-            }
-        }
-
         impl<'a> CheckedFrom<&'a Natural> for $f {
             /// Converts a `Natural` to an `f32` or an `f64`. The `Natural` is taken by value. If
             /// the input isn't exactly equal to some float, `None` is returned.
             ///
-            /// Time: worst case O(1)
+            /// Time: worst case O(n)
             ///
-            /// Additional memory: worst case O(1)
+            /// Additional memory: worst case O(n)
             ///
             /// # Examples
             /// ```
@@ -304,51 +125,12 @@ macro_rules! float_impls {
             /// ```
             fn checked_from(value: &'a Natural) -> Option<$f> {
                 if *value == 0 {
-                    return Some(0.0);
+                    Some(0.0)
+                } else {
+                    let (mantissa, exponent) =
+                        value.sci_mantissa_and_exponent_with_rounding(RoundingMode::Exact)?;
+                    $f::from_sci_mantissa_and_exponent(mantissa, i64::exact_from(exponent))
                 }
-                if $gt_max_finite_float(value) {
-                    return None;
-                }
-                let exponent = value.floor_log_base_2();
-                let shift = i64::exact_from(exponent) - i64::exact_from($f::MANTISSA_WIDTH);
-                if shift >= 0 && !value.divisible_by_power_of_2(u64::wrapping_from(shift)) {
-                    return None;
-                }
-                let mut mantissa =
-                    <$f as PrimitiveFloat>::UnsignedOfEqualWidth::wrapping_from(value >> shift);
-                mantissa.clear_bit($f::MANTISSA_WIDTH);
-                let exponent = exponent + u64::wrapping_from($f::MAX_EXPONENT);
-                Some($f::from_raw_mantissa_and_exponent(mantissa, exponent))
-            }
-        }
-
-        impl ConvertibleFrom<Natural> for $f {
-            /// Determines whether a `Natural` can be exactly converted to an `f32` or `f64`. The
-            /// `Natural` is taken by value.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::natural::Natural;
-            /// use std::str::FromStr;
-            ///
-            /// assert_eq!(f32::convertible_from(Natural::from_str("123").unwrap()), true);
-            /// assert_eq!(f32::convertible_from(Natural::from_str("1000000000").unwrap()), true);
-            /// assert_eq!(f32::convertible_from(Natural::from_str("1000000001").unwrap()), false);
-            /// assert_eq!(f32::convertible_from(
-            ///     Natural::from_str("10000000000000000000000000000000000000000000000000000")
-            ///     .unwrap()), false);
-            /// ```
-            #[inline]
-            fn convertible_from(value: Natural) -> bool {
-                $f::convertible_from(&value)
             }
         }
 
@@ -377,15 +159,11 @@ macro_rules! float_impls {
             ///     .unwrap()), false);
             /// ```
             fn convertible_from(value: &'a Natural) -> bool {
-                *value == 0
-                    || !$gt_max_finite_float(&value) && {
-                        let shift = i64::exact_from(value.floor_log_base_2())
-                            - i64::exact_from($f::MANTISSA_WIDTH);
-                        shift < 0 || value.divisible_by_power_of_2(u64::wrapping_from(shift))
-                    }
+                //TODO
+                $f::checked_from(value).is_some()
             }
         }
     };
 }
-float_impls!(f32, gt_max_finite_f32);
-float_impls!(f64, gt_max_finite_f64);
+float_impls!(f32);
+float_impls!(f64);

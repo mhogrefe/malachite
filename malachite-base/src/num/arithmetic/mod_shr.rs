@@ -58,17 +58,19 @@ macro_rules! impl_mod_shr_signed {
                     /// Computes `self >> other` mod `m`. Assumes the input is already reduced mod
                     /// `m`.
                     ///
-                    /// Time: worst case O(1)
+                    /// $f(x, n, m) = y$, where $x, y < m$ and
+                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// $T(n) = O(n)$
+                    ///
+                    /// $M(n) = O(1)$
+                    ///
+                    /// where $T$ is time, $M$ is additional memory, and $n$ is
+                    /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModShr;
-                    ///
-                    /// assert_eq!(10u8.mod_shr(2i64, 15), 2);
-                    /// assert_eq!(8u32.mod_shr(-2i8, 10), 2);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_shr` module.
                     #[inline]
                     fn mod_shr(self, other: $u, m: $t) -> $t {
                         _mod_shr_signed(self, other, m)
@@ -79,22 +81,19 @@ macro_rules! impl_mod_shr_signed {
                     /// Replaces `self` with `self >> other` mod `m`. Assumes the input is already
                     /// reduced mod `m`.
                     ///
-                    /// Time: worst case O(1)
+                    /// $x \gets y$, where $x, y < m$ and
+                    /// $\lfloor 2^{-n}x \rfloor \equiv y \mod m$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// $T(n) = O(n)$
+                    ///
+                    /// $M(n) = O(1)$
+                    ///
+                    /// where $T$ is time, $M$ is additional memory, and $n$ is
+                    /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModShrAssign;
-                    ///
-                    /// let mut n = 10u8;
-                    /// n.mod_shr_assign(2i64, 15);
-                    /// assert_eq!(n, 2);
-                    ///
-                    /// let mut n = 8u32;
-                    /// n.mod_shr_assign(-2i8, 10);
-                    /// assert_eq!(n, 2);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_shr` module.
                     #[inline]
                     fn mod_shr_assign(&mut self, other: $u, m: $t) {
                         _mod_shr_assign_signed(self, other, m)

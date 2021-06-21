@@ -78,10 +78,7 @@ pub fn random_integer_gen(config: &GenConfig) -> It<Integer> {
     ))
 }
 
-pub fn random_integer_gen_var_1<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+pub fn random_integer_gen_var_1<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer> {
     Box::new(with_special_value(
         EXAMPLE_SEED,
         Integer::ZERO,
@@ -131,7 +128,7 @@ pub fn random_integer_gen_var_3<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFlo
     config: &GenConfig,
 ) -> It<Integer>
 where
-    Natural: ExactFrom<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: ExactFrom<T>,
 {
     Box::new(
         random_pairs(
@@ -278,32 +275,25 @@ pub fn random_natural_gen_var_2(config: &GenConfig) -> It<Natural> {
     ))
 }
 
-struct RandomPositiveFloatNaturals<T: PrimitiveFloat>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+struct RandomPositiveFloatNaturals<T: PrimitiveFloat> {
     exponents: GeometricRandomSignedRange<i64>,
     ranges: VariableRangeGenerator,
     phantom: PhantomData<T>,
 }
 
-impl<T: PrimitiveFloat> Iterator for RandomPositiveFloatNaturals<T>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+impl<T: PrimitiveFloat> Iterator for RandomPositiveFloatNaturals<T> {
     type Item = Natural;
 
     fn next(&mut self) -> Option<Natural> {
         let exponent = self.exponents.next().unwrap();
         let a = if exponent == 0 {
-            T::UnsignedOfEqualWidth::ONE
+            1
         } else {
-            T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH)
+            u64::power_of_2(T::MANTISSA_WIDTH)
         };
-        let mantissa = self.ranges.next_in_range(
-            a,
-            T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1),
-        );
+        let mantissa = self
+            .ranges
+            .next_in_range(a, u64::power_of_2(T::MANTISSA_WIDTH + 1));
         Some(Natural::from(mantissa) << exponent)
     }
 }
@@ -313,10 +303,7 @@ fn random_positive_float_naturals<T: PrimitiveFloat>(
     start_exponent: i64,
     mean_exponent_numerator: u64,
     mean_exponent_denominator: u64,
-) -> RandomPositiveFloatNaturals<T>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+) -> RandomPositiveFloatNaturals<T> {
     RandomPositiveFloatNaturals {
         exponents: geometric_random_signed_range(
             seed.fork("exponents"),
@@ -330,10 +317,7 @@ where
     }
 }
 
-pub fn random_natural_gen_var_3<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+pub fn random_natural_gen_var_3<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural> {
     Box::new(with_special_value(
         EXAMPLE_SEED,
         Natural::ZERO,
@@ -369,7 +353,7 @@ pub fn random_natural_gen_var_5<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFlo
     config: &GenConfig,
 ) -> It<Natural>
 where
-    Natural: ExactFrom<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: ExactFrom<T>,
 {
     Box::new(
         random_positive_float_naturals::<T>(
@@ -428,6 +412,27 @@ pub fn random_natural_pair_gen_var_2(config: &GenConfig) -> It<(Natural, Natural
         EXAMPLE_SEED,
         &|seed| {
             random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_natural_range_to_infinity(
+                seed,
+                Natural::TWO,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_natural_pair_gen_var_3(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_positive_naturals(
                 seed,
                 config.get_or("mean_bits_n", 64),
                 config.get_or("mean_bits_d", 1),

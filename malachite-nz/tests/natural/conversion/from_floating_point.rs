@@ -717,7 +717,7 @@ fn test_convertible_from_i64() {
 }
 
 fn rounding_from_float_properties_helper<
-    T: From<Natural> + PrimitiveFloat + RoundingFrom<Natural>,
+    T: for<'a> From<&'a Natural> + PrimitiveFloat + for<'a> RoundingFrom<&'a Natural>,
 >()
 where
     Natural: RoundingFrom<T>,
@@ -735,7 +735,7 @@ where
         assert_eq!(n, Natural::rounding_from(f, RoundingMode::Down));
         assert_eq!(n, Natural::rounding_from(f, RoundingMode::Up));
         assert_eq!(n, Natural::rounding_from(f, RoundingMode::Nearest));
-        assert_eq!(T::rounding_from(n, RoundingMode::Exact), f);
+        assert_eq!(T::rounding_from(&n, RoundingMode::Exact), f);
     });
 
     primitive_float_gen_var_3::<T>().test_properties(|f| {
@@ -747,7 +747,7 @@ where
         assert_eq!(n_ceiling, Natural::rounding_from(f, RoundingMode::Up));
         let n_nearest = Natural::rounding_from(f, RoundingMode::Nearest);
         assert!(n_nearest == n_floor || n_nearest == n_ceiling);
-        assert_ne!(T::from(n_nearest), f);
+        assert_ne!(T::from(&n_nearest), f);
     });
 
     primitive_float_gen_var_4::<T>().test_properties(|f| {
@@ -763,7 +763,7 @@ fn rounding_from_float_properties() {
     apply_fn_to_primitive_floats!(rounding_from_float_properties_helper);
 }
 
-fn from_float_properties_helper<T: From<Natural> + PrimitiveFloat>()
+fn from_float_properties_helper<T: for<'a> From<&'a Natural> + PrimitiveFloat>()
 where
     Natural: From<T> + RoundingFrom<T>,
 {
@@ -776,7 +776,7 @@ where
     primitive_float_gen_var_2::<T>().test_properties(|f| {
         let n = Natural::from(f);
         assert!(n.is_valid());
-        assert_eq!(T::from(n), f);
+        assert_eq!(T::from(&n), f);
     });
 
     primitive_float_gen_var_3::<T>().test_properties(|f| {
@@ -800,7 +800,7 @@ fn from_float_properties() {
     apply_fn_to_primitive_floats!(from_float_properties_helper);
 }
 
-fn checked_from_float_properties_helper<T: PrimitiveFloat + RoundingFrom<Natural>>()
+fn checked_from_float_properties_helper<T: PrimitiveFloat + for<'a> RoundingFrom<&'a Natural>>()
 where
     Natural: CheckedFrom<T> + RoundingFrom<T>,
 {
@@ -813,7 +813,7 @@ where
         let n = Natural::exact_from(f);
         assert!(n.is_valid());
         assert_eq!(n, Natural::rounding_from(f, RoundingMode::Exact));
-        assert_eq!(T::rounding_from(n, RoundingMode::Exact), f);
+        assert_eq!(T::rounding_from(&n, RoundingMode::Exact), f);
     });
 
     primitive_float_gen_var_3::<T>().test_properties(|f| {

@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use malachite_base::num::arithmetic::traits::FloorLogBase;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -1134,6 +1135,10 @@ where
         assert_eq!(digits_alt, digits);
         if x != 0 {
             assert_ne!(*digits.last().unwrap(), T::ZERO);
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                x.floor_log_base(&Natural::from(base)) + 1
+            );
         }
         assert_eq!(
             digits.iter().cloned().rev().collect_vec(),
@@ -1254,6 +1259,10 @@ where
         let digits = x.to_digits_desc(&base);
         if x != 0 {
             assert_ne!(digits[0], T::ZERO);
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                x.floor_log_base(&Natural::from(base)) + 1
+            );
         }
         assert_eq!(
             digits.iter().cloned().rev().collect_vec(),
@@ -1454,6 +1463,7 @@ fn to_digits_asc_natural_properties() {
         assert_eq!(digits_alt, digits);
         if x != 0 {
             assert_ne!(*digits.last().unwrap(), 0);
+            assert_eq!(u64::exact_from(digits.len()), x.floor_log_base(&base) + 1);
         }
         assert_eq!(
             digits.iter().cloned().rev().collect_vec(),
@@ -1632,6 +1642,7 @@ fn to_digits_desc_natural_properties() {
         let digits = x.to_digits_desc(&base);
         if x != 0 {
             assert_ne!(digits[0], 0);
+            assert_eq!(u64::exact_from(digits.len()), x.floor_log_base(&base) + 1);
         }
         assert_eq!(
             digits.iter().cloned().rev().collect_vec(),

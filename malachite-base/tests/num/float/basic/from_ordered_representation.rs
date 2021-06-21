@@ -6,7 +6,7 @@ use std::panic::catch_unwind;
 #[allow(clippy::approx_constant)]
 #[test]
 pub fn test_from_ordered_representation() {
-    fn test<T: PrimitiveFloat>(n: T::UnsignedOfEqualWidth, out: T) {
+    fn test<T: PrimitiveFloat>(n: u64, out: T) {
         assert_eq!(NiceFloat(T::from_ordered_representation(n)), NiceFloat(out));
     }
     test::<f32>(0, f32::NEGATIVE_INFINITY);
@@ -65,7 +65,7 @@ pub fn test_from_ordered_representation() {
 #[test]
 pub fn from_ordered_representation_fail() {
     assert_panic!(f32::from_ordered_representation(4278190082));
-    assert_panic!(f32::from_ordered_representation(u32::MAX));
+    assert_panic!(f32::from_ordered_representation(u64::MAX));
     assert_panic!(f64::from_ordered_representation(18437736874454810626));
     assert_panic!(f64::from_ordered_representation(u64::MAX));
 }

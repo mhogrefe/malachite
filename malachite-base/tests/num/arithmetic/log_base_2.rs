@@ -94,7 +94,7 @@ fn floor_log_base_2_properties_helper<T: PrimitiveUnsigned>() {
         assert_eq!(floor_log_base_2 == 0, n == T::ONE);
         assert!(T::power_of_2(floor_log_base_2) <= n);
         if floor_log_base_2 < T::WIDTH - 1 {
-            assert!(T::power_of_2(floor_log_base_2 + 1) >= n);
+            assert!(T::power_of_2(floor_log_base_2 + 1) > n);
         }
 
         let ceiling_log_base_2 = n.ceiling_log_base_2();
@@ -120,7 +120,7 @@ fn ceiling_log_base_2_properties_helper<T: PrimitiveUnsigned>() {
             assert!(T::power_of_2(ceiling_log_base_2) >= n);
         }
         if ceiling_log_base_2 != 0 {
-            assert!(T::power_of_2(ceiling_log_base_2 - 1) <= n);
+            assert!(T::power_of_2(ceiling_log_base_2 - 1) < n);
         }
 
         let floor_log_base_2 = n.floor_log_base_2();

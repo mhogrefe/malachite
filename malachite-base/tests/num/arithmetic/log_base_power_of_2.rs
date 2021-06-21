@@ -144,6 +144,9 @@ fn floor_log_base_power_of_2_properties_helper<T: PrimitiveUnsigned>() {
         let floor_log = n.floor_log_base_power_of_2(pow);
         assert!(floor_log < T::WIDTH);
         assert_eq!(floor_log == 0, n.significant_bits() - 1 < pow);
+        if pow < T::WIDTH {
+            assert_eq!(n.floor_log_base(T::power_of_2(pow)), floor_log);
+        }
 
         let product = floor_log * pow;
         if product < T::WIDTH {
@@ -151,7 +154,7 @@ fn floor_log_base_power_of_2_properties_helper<T: PrimitiveUnsigned>() {
         }
         let product_2 = product + pow;
         if product_2 < T::WIDTH {
-            assert!(T::power_of_2(product_2) >= n);
+            assert!(T::power_of_2(product_2) > n);
         }
 
         let ceiling_log = n.ceiling_log_base_power_of_2(pow);
@@ -186,13 +189,16 @@ fn ceiling_log_base_power_of_2_properties_helper<T: PrimitiveUnsigned>() {
         assert!(ceiling_log <= T::WIDTH);
         assert_eq!(ceiling_log, _ceiling_log_base_power_of_2_naive(n, pow));
         assert_eq!(ceiling_log == 0, n == T::ONE);
+        if pow < T::WIDTH {
+            assert_eq!(n.ceiling_log_base(T::power_of_2(pow)), ceiling_log);
+        }
 
         let product = ceiling_log * pow;
         if product < T::WIDTH {
             assert!(T::power_of_2(product) >= n);
         }
         if product != 0 {
-            assert!(T::power_of_2(product - pow) <= n);
+            assert!(T::power_of_2(product - pow) < n);
         }
 
         let floor_log = n.floor_log_base_power_of_2(pow);
@@ -231,6 +237,9 @@ fn checked_log_base_power_of_2_properties_helper<T: PrimitiveUnsigned>() {
             checked_log.is_some(),
             n.is_power_of_2() && (n.significant_bits() - 1).divisible_by(pow)
         );
+        if pow < T::WIDTH {
+            assert_eq!(n.checked_log_base(T::power_of_2(pow)), checked_log);
+        }
         if let Some(log) = checked_log {
             assert_eq!(T::power_of_2(log * pow), n);
             assert!(log <= T::WIDTH);

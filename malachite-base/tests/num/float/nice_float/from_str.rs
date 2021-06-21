@@ -79,7 +79,6 @@ fn test_from_str() {
     test_err("e");
     test_err("z");
     test_err("0x01");
-    test_err("NAN");
     test_err(" 0 ");
 }
 

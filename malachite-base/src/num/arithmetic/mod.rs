@@ -584,6 +584,43 @@ pub mod eq_mod;
 pub mod eq_mod_power_of_2;
 /// This module wraps the `is_power_of_two` function into an implementation of `IsPowerOf2`.
 pub mod is_power_of_2;
+/// This module contains functions for taking the base-$b$ logarithm of a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # floor_log_base
+/// ```
+/// use malachite_base::num::arithmetic::traits::FloorLogBase;
+///
+/// assert_eq!(1u8.floor_log_base(5), 0);
+/// assert_eq!(125u8.floor_log_base(5), 3);
+/// assert_eq!(99u64.floor_log_base(10), 1);
+/// assert_eq!(100u64.floor_log_base(10), 2);
+/// assert_eq!(101u64.floor_log_base(10), 2);
+/// ```
+///
+/// # ceiling_log_base
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingLogBase;
+///
+/// assert_eq!(1u8.ceiling_log_base(5), 0);
+/// assert_eq!(125u8.ceiling_log_base(5), 3);
+/// assert_eq!(99u64.ceiling_log_base(10), 2);
+/// assert_eq!(100u64.ceiling_log_base(10), 2);
+/// assert_eq!(101u64.ceiling_log_base(10), 3);
+/// ```
+///
+/// # checked_log_base
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedLogBase;
+///
+/// assert_eq!(1u8.checked_log_base(5), Some(0));
+/// assert_eq!(125u8.checked_log_base(5), Some(3));
+/// assert_eq!(99u64.checked_log_base(10), None);
+/// assert_eq!(100u64.checked_log_base(10), Some(2));
+/// assert_eq!(101u64.checked_log_base(10), None);
+/// ```
+pub mod log_base;
 /// This module contains functions for taking the base-2 logarithm of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -1290,7 +1327,66 @@ pub mod mod_power_of_2_neg;
 /// assert_eq!(n, 1);
 /// ```
 pub mod mod_power_of_2_pow;
+/// This module contains functions for left-shifting a number mod a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_power_of_2_shl
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
+///
+/// assert_eq!(12u32.mod_power_of_2_shl(2u8, 5), 16);
+/// assert_eq!(10u8.mod_power_of_2_shl(100u64, 4), 0);
+///
+/// assert_eq!(12u32.mod_power_of_2_shl(2i8, 5), 16);
+/// assert_eq!(10u8.mod_power_of_2_shl(-2i64, 4), 2);
+/// ```
+///
+/// # mod_power_of_2_shl_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
+///
+/// let mut n = 12u32;
+/// n.mod_power_of_2_shl_assign(2u8, 5);
+/// assert_eq!(n, 16);
+///
+/// let mut n = 10u8;
+/// n.mod_power_of_2_shl_assign(100u64, 4);
+/// assert_eq!(n, 0);
+///
+/// let mut n = 12u32;
+/// n.mod_power_of_2_shl_assign(2i8, 5);
+/// assert_eq!(n, 16);
+///
+/// let mut n = 10u8;
+/// n.mod_power_of_2_shl_assign(-2i64, 4);
+/// assert_eq!(n, 2);
+/// ```
 pub mod mod_power_of_2_shl;
+/// This module contains functions for right-shifting a number mod a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_power_of_2_shr
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2Shr;
+///
+/// assert_eq!(10u8.mod_power_of_2_shr(2i64, 4), 2);
+/// assert_eq!(12u32.mod_power_of_2_shr(-2i8, 5), 16);
+/// ```
+///
+/// # mod_power_of_2_shr_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModPowerOf2ShrAssign;
+///
+/// let mut n = 10u8;
+/// n.mod_power_of_2_shr_assign(2i64, 4);
+/// assert_eq!(n, 2);
+///
+/// let mut n = 12u32;
+/// n.mod_power_of_2_shr_assign(-2i8, 5);
+/// assert_eq!(n, 16);
+/// ```
 pub mod mod_power_of_2_shr;
 /// This module contains functions for squaring a number mod a power of 2.
 ///
@@ -1342,7 +1438,66 @@ pub mod mod_power_of_2_square;
 /// assert_eq!(n, 12);
 /// ```
 pub mod mod_power_of_2_sub;
+/// This module contains functions for left-shifting a number mod another number
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_shl
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModShl;
+///
+/// assert_eq!(8u32.mod_shl(2u8, 10), 2);
+/// assert_eq!(10u8.mod_shl(100u64, 17), 7);
+///
+/// assert_eq!(8u32.mod_shl(2i8, 10), 2);
+/// assert_eq!(10u8.mod_shl(-2i64, 15), 2);
+/// ```
+///
+/// # mod_shl_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModShlAssign;
+///
+/// let mut n = 8u32;
+/// n.mod_shl_assign(2u8, 10);
+/// assert_eq!(n, 2);
+///
+/// let mut n = 10u8;
+/// n.mod_shl_assign(100u64, 17);
+/// assert_eq!(n, 7);
+///
+/// let mut n = 8u32;
+/// n.mod_shl_assign(2i8, 10);
+/// assert_eq!(n, 2);
+///
+/// let mut n = 10u8;
+/// n.mod_shl_assign(-2i64, 15);
+/// assert_eq!(n, 2);
+/// ```
 pub mod mod_shl;
+/// This module contains functions for right-shifting a number mod another number
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # mod_shr
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModShr;
+///
+/// assert_eq!(10u8.mod_shr(2i64, 15), 2);
+/// assert_eq!(8u32.mod_shr(-2i8, 10), 2);
+/// ```
+///
+/// # mod_shr_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::ModShrAssign;
+///
+/// let mut n = 10u8;
+/// n.mod_shr_assign(2i64, 15);
+/// assert_eq!(n, 2);
+///
+/// let mut n = 8u32;
+/// n.mod_shr_assign(-2i8, 10);
+/// assert_eq!(n, 2);
+/// ```
 pub mod mod_shr;
 /// This module contains functions for squaring a number mod another number.
 ///
@@ -1427,7 +1582,51 @@ pub mod mod_square;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_sub;
+/// This module contains functions for negating a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # neg_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::AbsAssign;
+///
+/// let mut x = 0i8;
+/// x.abs_assign();
+/// assert_eq!(x, 0i8);
+///
+/// let mut x = 100i64;
+/// x.abs_assign();
+/// assert_eq!(x, 100i64);
+///
+/// let mut x = -100i64;
+/// x.abs_assign();
+/// assert_eq!(x, 100i64);
+/// ```
 pub mod neg;
+/// This module contains functions for getting the next-highest power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # next_power_of_2_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::NextPowerOf2Assign;
+///
+/// let mut x = 0u8;
+/// x.next_power_of_2_assign();
+/// assert_eq!(x, 1);
+///
+/// let mut x = 4u16;
+/// x.next_power_of_2_assign();
+/// assert_eq!(x, 4);
+///
+/// let mut x = 10u32;
+/// x.next_power_of_2_assign();
+/// assert_eq!(x, 16);
+///
+/// let mut x = (1u64 << 40) - 5;
+/// x.next_power_of_2_assign();
+/// assert_eq!(x, 1 << 40);
+/// ```
 pub mod next_power_of_2;
 pub mod overflowing_abs;
 pub mod overflowing_add;

@@ -34,7 +34,7 @@ macro_rules! impl_mod_add {
             /// # Examples
             /// See the documentation of the `num::arithmetic::mod_add` module.
             ///
-            /// This is nmod_add from nmod_vec.h, FLINT Dev 1.
+            /// This is nmod_add from nmod_vec.h, FLINT 2.7.1.
             #[inline]
             fn mod_add(self, other: $t, m: $t) -> $t {
                 _mod_add(self, other, m)
@@ -53,7 +53,7 @@ macro_rules! impl_mod_add {
             /// # Examples
             /// See the documentation of the `num::arithmetic::mod_add` module.
             ///
-            /// This is nmod_add from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
+            /// This is nmod_add from nmod_vec.h, FLINT 2.7.1, where the result is assigned to a.
             #[inline]
             fn mod_add_assign(&mut self, other: $t, m: $t) {
                 _mod_add_assign(self, other, m);

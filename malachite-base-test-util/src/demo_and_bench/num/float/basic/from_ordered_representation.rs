@@ -1,4 +1,3 @@
-use malachite_base::named::Named;
 use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::bench::bucketers::unsigned_bit_bucketer;
@@ -33,11 +32,7 @@ fn benchmark_from_ordered_representation<T: PrimitiveFloat>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!(
-            "{}::from_ordered_representation({})",
-            T::NAME,
-            T::UnsignedOfEqualWidth::NAME
-        ),
+        &format!("{}::from_ordered_representation(u64)", T::NAME,),
         BenchmarkType::Single,
         unsigned_gen_var_13::<T>().get(gm, &config),
         gm.name(),

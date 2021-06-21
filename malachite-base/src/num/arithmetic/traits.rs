@@ -1051,21 +1051,23 @@ pub trait PowerOf2 {
     fn power_of_2(pow: u64) -> Self;
 }
 
-/// Determines whether `self` == 2<pow>k</pow> for some integer k.
+/// Determines whether `self` == $2^k$ for some integer k.
 pub trait IsPowerOf2 {
     fn is_power_of_2(&self) -> bool;
 }
 
-/// Returns the smallest power of 2 greater than or equal to `self`. If the next power of 2 is
-/// greater than the type's maximum value, panics.
+/// Returns the smallest power of 2 greater than or equal to `self`.
+///
+/// If the next power of 2 is greater than the type's maximum value, panics.
 pub trait NextPowerOf2 {
     type Output;
 
     fn next_power_of_2(self) -> Self::Output;
 }
 
-/// Replaces `self` with the smallest power of 2 greater than or equal to `self`. If the next
-/// power of 2 is greater than the type's maximum value, panics.
+/// Replaces `self` with the smallest power of 2 greater than or equal to `self`.
+///
+/// If the next power of 2 is greater than the type's maximum value, panics.
 pub trait NextPowerOf2Assign {
     fn next_power_of_2_assign(&mut self);
 }
@@ -1334,4 +1336,20 @@ pub trait FloorLogBasePowerOf2 {
 /// power of 2.
 pub trait CeilingLogBasePowerOf2 {
     fn ceiling_log_base_power_of_2(self, pow: u64) -> u64;
+}
+
+/// Provides a function to get the base-`b` logarithm of `self`, or return `None` if the result is
+/// not exact.
+pub trait CheckedLogBase<B = Self> {
+    fn checked_log_base(self, base: B) -> Option<u64>;
+}
+
+/// Provides a function to get the floor of the base-`b` logarithm of `self`.
+pub trait FloorLogBase<B = Self> {
+    fn floor_log_base(self, base: B) -> u64;
+}
+
+/// Provides a function to get the ceiling of the base-`b` logarithm of `self`.
+pub trait CeilingLogBase<B = Self> {
+    fn ceiling_log_base(self, base: B) -> u64;
 }

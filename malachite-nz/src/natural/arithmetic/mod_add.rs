@@ -32,7 +32,7 @@ impl ModAdd<Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b, c, and m are taken by
     /// value.
     #[inline]
     fn mod_add(mut self, other: Natural, m: Natural) -> Natural {
@@ -72,7 +72,7 @@ impl<'a> ModAdd<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b and c are taken by value
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and c are taken by value
     /// and m is taken by reference.
     #[inline]
     fn mod_add(mut self, other: Natural, m: &'a Natural) -> Natural {
@@ -112,7 +112,7 @@ impl<'a> ModAdd<&'a Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b and m are taken by value
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and m are taken by value
     /// and c is taken by reference.
     #[inline]
     fn mod_add(mut self, other: &'a Natural, m: Natural) -> Natural {
@@ -152,7 +152,7 @@ impl<'a, 'b> ModAdd<&'a Natural, &'b Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b is taken by value and c and
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b is taken by value and c and
     /// m are taken by reference.
     #[inline]
     fn mod_add(mut self, other: &'a Natural, m: &'b Natural) -> Natural {
@@ -192,7 +192,7 @@ impl<'a> ModAdd<Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b is taken by reference and c
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b is taken by reference and c
     /// and m are taken by value.
     #[inline]
     fn mod_add(self, mut other: Natural, m: Natural) -> Natural {
@@ -232,7 +232,7 @@ impl<'a, 'b> ModAdd<Natural, &'b Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b and m are taken by
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and m are taken by
     /// reference and c is taken by value.
     #[inline]
     fn mod_add(self, mut other: Natural, m: &'b Natural) -> Natural {
@@ -272,7 +272,7 @@ impl<'a, 'b> ModAdd<&'b Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b and c are taken by
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and c are taken by
     /// reference and m is taken by value.
     fn mod_add(self, other: &'b Natural, m: Natural) -> Natural {
         let sum = self + other;
@@ -315,7 +315,7 @@ impl<'a, 'b, 'c> ModAdd<&'b Natural, &'c Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b, c, and m are taken by
     /// reference.
     fn mod_add(self, other: &'b Natural, m: &'c Natural) -> Natural {
         let sum = self + other;
@@ -355,7 +355,7 @@ impl ModAddAssign<Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "2");
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b, c, and m are taken by
     /// value and a == b.
     fn mod_add_assign(&mut self, other: Natural, m: Natural) {
         *self += other;
@@ -393,7 +393,7 @@ impl<'a> ModAddAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "2");
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b and c are taken by value,
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and c are taken by value,
     /// m is taken by reference, and a == b.
     fn mod_add_assign(&mut self, other: Natural, m: &'a Natural) {
         *self += other;
@@ -431,7 +431,7 @@ impl<'a> ModAddAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "2");
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b and m are taken by value,
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b and m are taken by value,
     /// c is taken by reference, and a == b.
     fn mod_add_assign(&mut self, other: &'a Natural, m: Natural) {
         *self += other;
@@ -469,7 +469,7 @@ impl<'a, 'b> ModAddAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x.to_string(), "2");
     /// ```
     ///
-    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT Dev 1, where b is taken by value, c and m
+    /// This is _fmpz_mod_addN from fmpz_mod/add.c, FLINT 2.7.1, where b is taken by value, c and m
     /// are taken by reference, and a == b.
     fn mod_add_assign(&mut self, other: &'a Natural, m: &'b Natural) {
         *self += other;

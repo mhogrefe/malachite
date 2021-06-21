@@ -43,17 +43,18 @@ macro_rules! impl_mod_shl_unsigned {
                     /// Computes `self << other` mod `m`. Assumes the input is already reduced mod
                     /// `m`.
                     ///
-                    /// Time: worst case O(1)
+                    /// $f(x, n, m) = y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// $T(n) = O(n)$
+                    ///
+                    /// $M(n) = O(1)$
+                    ///
+                    /// where $T$ is time, $M$ is additional memory, and $n$ is
+                    /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModShl;
-                    ///
-                    /// assert_eq!(8u32.mod_shl(2u8, 10), 2);
-                    /// assert_eq!(10u8.mod_shl(100u64, 17), 7);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_shl` module.
                     #[inline]
                     fn mod_shl(self, other: $u, m: $t) -> $t {
                         _mod_shl_unsigned(self, other, m)
@@ -64,22 +65,18 @@ macro_rules! impl_mod_shl_unsigned {
                     /// Replaces `self` with `self << other` mod `m`. Assumes the input is already
                     /// reduced mod `m`.
                     ///
-                    /// Time: worst case O(1)
+                    /// $x \gets y$, where $x, y < m$ and $2^nx \equiv y \mod m$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// $T(n) = O(n)$
+                    ///
+                    /// $M(n) = O(1)$
+                    ///
+                    /// where $T$ is time, $M$ is additional memory, and $n$ is
+                    /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModShlAssign;
-                    ///
-                    /// let mut n = 8u32;
-                    /// n.mod_shl_assign(2u8, 10);
-                    /// assert_eq!(n, 2);
-                    ///
-                    /// let mut n = 10u8;
-                    /// n.mod_shl_assign(100u64, 17);
-                    /// assert_eq!(n, 7);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_shl` module.
                     #[inline]
                     fn mod_shl_assign(&mut self, other: $u, m: $t) {
                         _mod_shl_assign_unsigned(self, other, m);
@@ -146,17 +143,19 @@ macro_rules! impl_mod_shl_signed {
                     /// Computes `self << other` mod `m`. Assumes the input is already reduced mod
                     /// `m`.
                     ///
-                    /// Time: worst case O(1)
+                    /// $f(x, n, m) = y$, where $x, y < m$ and
+                    /// $\lfloor 2^nx \rfloor \equiv y \mod m$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// $T(n) = O(n)$
+                    ///
+                    /// $M(n) = O(1)$
+                    ///
+                    /// where $T$ is time, $M$ is additional memory, and $n$ is
+                    /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModShl;
-                    ///
-                    /// assert_eq!(8u32.mod_shl(2i8, 10), 2);
-                    /// assert_eq!(10u8.mod_shl(-2i64, 15), 2);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_shl` module.
                     #[inline]
                     fn mod_shl(self, other: $u, m: $t) -> $t {
                         _mod_shl_signed(self, other, m)
@@ -167,22 +166,19 @@ macro_rules! impl_mod_shl_signed {
                     /// Replaces `self` with `self << other` mod `m`. Assumes the input is already
                     /// reduced mod `m`.
                     ///
-                    /// Time: worst case O(1)
+                    /// $x \gets y$, where $x, y < m$ and
+                    /// $\lfloor 2^nx \rfloor \equiv y \mod m$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// $T(n) = O(n)$
+                    ///
+                    /// $M(n) = O(1)$
+                    ///
+                    /// where $T$ is time, $M$ is additional memory, and $n$ is
+                    /// `other.significant_bits()`.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModShlAssign;
-                    ///
-                    /// let mut n = 8u32;
-                    /// n.mod_shl_assign(2i8, 10);
-                    /// assert_eq!(n, 2);
-                    ///
-                    /// let mut n = 10u8;
-                    /// n.mod_shl_assign(-2i64, 15);
-                    /// assert_eq!(n, 2);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_shl` module.
                     #[inline]
                     fn mod_shl_assign(&mut self, other: $u, m: $t) {
                         _mod_shl_assign_signed(self, other, m);

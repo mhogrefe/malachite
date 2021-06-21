@@ -13,7 +13,7 @@ use platform::{DoubleLimb, Limb};
 
 /// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0.
 ///
-/// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+/// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
 pub fn _limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
     let xs = &mut [0; 5];
     let out = &mut [0; 3];
@@ -48,7 +48,7 @@ pub fn _limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb,
 /// at this point the canonical reduction in the range [0, m) is one of a = w, a = w - n, or
 /// a = w - 2 * m
 ///
-/// This is _fmpz_mod_mul2 from fmpz_mod/mul.c, FLINT Dev 1.
+/// This is _fmpz_mod_mul2 from fmpz_mod/mul.c, FLINT 2.7.1.
 pub fn _limbs_mod_mul_two_limbs(
     x_1: Limb,
     x_0: Limb,
@@ -219,7 +219,7 @@ impl ModMulPrecomputed<Natural, Natural> for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
     #[inline]
     fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
         precompute_mod_mul_data_helper(m)
@@ -271,7 +271,7 @@ impl ModMulPrecomputed<Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b, c, and m are taken by
     /// value.
     fn mod_mul_precomputed(mut self, other: Natural, m: Natural, data: &ModMulData) -> Natural {
         self.mod_mul_precomputed_assign(other, m, data);
@@ -290,7 +290,7 @@ impl<'a> ModMulPrecomputed<Natural, &'a Natural> for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
     #[inline]
     fn precompute_mod_mul_data(m: &&Natural) -> ModMulData {
         precompute_mod_mul_data_helper(m)
@@ -343,7 +343,7 @@ impl<'a> ModMulPrecomputed<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by value
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and c are taken by value
     /// and m is taken by reference.
     fn mod_mul_precomputed(mut self, other: Natural, m: &'a Natural, data: &ModMulData) -> Natural {
         self.mod_mul_precomputed_assign(other, m, data);
@@ -362,7 +362,7 @@ impl<'a> ModMulPrecomputed<&'a Natural, Natural> for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
     #[inline]
     fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
         precompute_mod_mul_data_helper(m)
@@ -415,7 +415,7 @@ impl<'a> ModMulPrecomputed<&'a Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by value
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and m are taken by value
     /// and c is taken by reference.
     fn mod_mul_precomputed(mut self, other: &'a Natural, m: Natural, data: &ModMulData) -> Natural {
         self.mod_mul_precomputed_assign(other, m, data);
@@ -434,7 +434,7 @@ impl<'a, 'b> ModMulPrecomputed<&'a Natural, &'b Natural> for Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
     #[inline]
     fn precompute_mod_mul_data(m: &&Natural) -> ModMulData {
         precompute_mod_mul_data_helper(m)
@@ -487,7 +487,7 @@ impl<'a, 'b> ModMulPrecomputed<&'a Natural, &'b Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by value and c and
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b is taken by value and c and
     /// m are taken by reference.
     fn mod_mul_precomputed(
         mut self,
@@ -511,7 +511,7 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
     #[inline]
     fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
         precompute_mod_mul_data_helper(m)
@@ -564,7 +564,7 @@ impl<'a> ModMulPrecomputed<Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by reference and c
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b is taken by reference and c
     /// and m are taken by value.
     fn mod_mul_precomputed(self, other: Natural, m: Natural, data: &ModMulData) -> Natural {
         match (self, other, m, data) {
@@ -597,7 +597,7 @@ impl<'a, 'b> ModMulPrecomputed<Natural, &'b Natural> for &'a Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
     #[inline]
     fn precompute_mod_mul_data(m: &&Natural) -> ModMulData {
         precompute_mod_mul_data_helper(m)
@@ -650,7 +650,7 @@ impl<'a, 'b> ModMulPrecomputed<Natural, &'b Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and m are taken by
     /// reference and c is taken by value.
     #[inline]
     fn mod_mul_precomputed(self, other: Natural, m: &'b Natural, data: &ModMulData) -> Natural {
@@ -669,7 +669,7 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
     #[inline]
     fn precompute_mod_mul_data(m: &Natural) -> ModMulData {
         precompute_mod_mul_data_helper(m)
@@ -722,7 +722,7 @@ impl<'a, 'b> ModMulPrecomputed<&'b Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and c are taken by
     /// reference and m is taken by value.
     fn mod_mul_precomputed(self, other: &'b Natural, m: Natural, data: &ModMulData) -> Natural {
         match (self, other, m, data) {
@@ -755,7 +755,7 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT Dev 1.
+    /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
     #[inline]
     fn precompute_mod_mul_data(m: &&Natural) -> ModMulData {
         precompute_mod_mul_data_helper(m)
@@ -807,7 +807,7 @@ impl<'a, 'b, 'c> ModMulPrecomputed<&'b Natural, &'c Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b, c, and m are taken by
     /// reference.
     fn mod_mul_precomputed(self, other: &'b Natural, m: &'c Natural, data: &ModMulData) -> Natural {
         match (self, other, m, data) {
@@ -864,7 +864,7 @@ impl ModMulPrecomputedAssign<Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b, c, and m are taken by
     /// value and a == b.
     fn mod_mul_precomputed_assign(&mut self, other: Natural, m: Natural, data: &ModMulData) {
         match (&mut *self, other, m, data) {
@@ -925,7 +925,7 @@ impl<'a> ModMulPrecomputedAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by value,
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and c are taken by value,
     /// m is taken by reference, and a == b.
     fn mod_mul_precomputed_assign(&mut self, other: Natural, m: &'a Natural, data: &ModMulData) {
         match (&mut *self, other, m, data) {
@@ -986,7 +986,7 @@ impl<'a> ModMulPrecomputedAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by value,
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and m are taken by value,
     /// c is taken by reference, and a == b.
     fn mod_mul_precomputed_assign(&mut self, other: &'a Natural, m: Natural, data: &ModMulData) {
         match (&mut *self, other, m, data) {
@@ -1046,7 +1046,7 @@ impl<'a, 'b> ModMulPrecomputedAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x.to_string(), "8");
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by value, c and m
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b is taken by value, c and m
     /// are taken by reference, and a == b.
     fn mod_mul_precomputed_assign(
         &mut self,
@@ -1106,7 +1106,7 @@ impl ModMul<Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b, c, and m are taken by
     /// value.
     #[inline]
     fn mod_mul(self, other: Natural, m: Natural) -> Natural {
@@ -1145,7 +1145,7 @@ impl<'a> ModMul<Natural, &'a Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by value
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and c are taken by value
     /// and m is taken by reference.
     #[inline]
     fn mod_mul(self, other: Natural, m: &'a Natural) -> Natural {
@@ -1183,7 +1183,7 @@ impl<'a> ModMul<&'a Natural, Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by value
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and m are taken by value
     /// and c is taken by reference.
     #[inline]
     fn mod_mul(self, other: &'a Natural, m: Natural) -> Natural {
@@ -1222,7 +1222,7 @@ impl<'a, 'b> ModMul<&'a Natural, &'b Natural> for Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by value and c and
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b is taken by value and c and
     /// m are taken by reference.
     #[inline]
     fn mod_mul(self, other: &'a Natural, m: &'b Natural) -> Natural {
@@ -1260,7 +1260,7 @@ impl<'a> ModMul<Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by reference and c
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b is taken by reference and c
     /// and m are taken by value.
     #[inline]
     fn mod_mul(self, other: Natural, m: Natural) -> Natural {
@@ -1300,7 +1300,7 @@ impl<'a, 'b> ModMul<Natural, &'b Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and m are taken by
     /// reference and c is taken by value.
     #[inline]
     fn mod_mul(self, other: Natural, m: &'b Natural) -> Natural {
@@ -1338,7 +1338,7 @@ impl<'a, 'b> ModMul<&'b Natural, Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and c are taken by
     /// reference and m is taken by value.
     #[inline]
     fn mod_mul(self, other: &'b Natural, m: Natural) -> Natural {
@@ -1377,7 +1377,7 @@ impl<'a, 'b, 'c> ModMul<&'b Natural, &'c Natural> for &'a Natural {
     /// );
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b, c, and m are taken by
     /// reference.
     #[inline]
     fn mod_mul(self, other: &'b Natural, m: &'c Natural) -> Natural {
@@ -1412,7 +1412,7 @@ impl ModMulAssign<Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "2");
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b, c, and m are taken by
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b, c, and m are taken by
     /// value and a == b.
     #[inline]
     fn mod_mul_assign(&mut self, other: Natural, m: Natural) {
@@ -1448,7 +1448,7 @@ impl<'a> ModMulAssign<Natural, &'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "2");
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and c are taken by value,
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and c are taken by value,
     /// m is taken by reference, and a == b.
     #[inline]
     fn mod_mul_assign(&mut self, other: Natural, m: &'a Natural) {
@@ -1483,7 +1483,7 @@ impl<'a> ModMulAssign<&'a Natural, Natural> for Natural {
     /// assert_eq!(x.to_string(), "2");
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b and m are taken by value,
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b and m are taken by value,
     /// c is taken by reference, and a == b.
     #[inline]
     fn mod_mul_assign(&mut self, other: &'a Natural, m: Natural) {
@@ -1519,7 +1519,7 @@ impl<'a, 'b> ModMulAssign<&'a Natural, &'b Natural> for Natural {
     /// assert_eq!(x.to_string(), "2");
     /// ```
     ///
-    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT Dev 1, where b is taken by value, c and m
+    /// This is _fmpz_mod_mulN from fmpz_mod/mul.c, FLINT 2.7.1, where b is taken by value, c and m
     /// are taken by reference, and a == b.
     #[inline]
     fn mod_mul_assign(&mut self, other: &'a Natural, m: &'b Natural) {

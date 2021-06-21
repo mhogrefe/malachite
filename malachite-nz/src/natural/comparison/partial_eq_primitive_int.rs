@@ -67,6 +67,7 @@ macro_rules! impl_partial_eq_smaller_than_limb {
             /// assert!(Natural::from(123u32) == 123u8);
             /// assert!(Natural::from(123u32) != 5u8);
             /// ```
+            #[allow(clippy::cmp_owned)]
             #[inline]
             fn eq(&self, other: &$u) -> bool {
                 *self == Limb::from(*other)
@@ -88,6 +89,7 @@ macro_rules! impl_partial_eq_smaller_than_limb {
             /// assert!(123u8 == Natural::from(123u32));
             /// assert!(5u8 != Natural::from(123u32));
             /// ```
+            #[allow(clippy::cmp_owned)]
             #[inline]
             fn eq(&self, other: &Natural) -> bool {
                 Limb::from(*self) == *other

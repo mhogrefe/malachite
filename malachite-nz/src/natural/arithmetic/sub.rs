@@ -130,11 +130,10 @@ pub fn limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
 
 fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
     let (mut diff, overflow) = x.overflowing_sub(y);
-    if *borrow {
-        *borrow = overflow;
+    let b = *borrow;
+    *borrow = overflow;
+    if b {
         *borrow |= diff.overflowing_sub_assign(1);
-    } else {
-        *borrow = overflow;
     }
     diff
 }

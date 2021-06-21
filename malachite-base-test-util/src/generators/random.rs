@@ -14,7 +14,6 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom, SplitInHalf, WrappingFrom,
@@ -23,9 +22,11 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::num::random::geometric::{
-    geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
+    geometric_random_natural_signeds, geometric_random_nonzero_signeds,
+    geometric_random_positive_unsigneds, geometric_random_signed_inclusive_range,
     geometric_random_signed_range, geometric_random_signeds, geometric_random_unsigned_range,
     geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
+    GeometricRandomSigneds,
 };
 use malachite_base::num::random::{
     random_highest_bit_set_unsigneds, random_natural_signeds, random_negative_signeds,
@@ -33,10 +34,12 @@ use malachite_base::num::random::{
     random_primitive_ints, random_signed_inclusive_range, random_signed_range,
     random_unsigned_bit_chunks, random_unsigned_inclusive_range, random_unsigned_range,
     random_unsigneds_less_than, special_random_finite_primitive_floats,
+    special_random_nonzero_finite_primitive_floats,
     special_random_positive_finite_primitive_floats,
     special_random_primitive_float_inclusive_range, special_random_primitive_float_range,
     special_random_primitive_floats, variable_range_generator, RandomPrimitiveInts,
-    RandomUnsignedBitChunks, RandomUnsignedInclusiveRange, VariableRangeGenerator,
+    RandomUnsignedBitChunks, RandomUnsignedInclusiveRange, SpecialRandomNonzeroFiniteFloats,
+    VariableRangeGenerator,
 };
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
@@ -135,14 +138,13 @@ impl<T: PrimitiveFloat> Iterator for RandomPositiveNaturalFloats<T> {
     fn next(&mut self) -> Option<T> {
         let exponent = self.exponents.next().unwrap();
         let a = if exponent == 0 {
-            T::UnsignedOfEqualWidth::ONE
+            1
         } else {
-            T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH)
+            u64::power_of_2(T::MANTISSA_WIDTH)
         };
-        let mantissa = self.ranges.next_in_range(
-            a,
-            T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1),
-        );
+        let mantissa = self
+            .ranges
+            .next_in_range(a, u64::power_of_2(T::MANTISSA_WIDTH + 1));
         Some(T::from_integer_mantissa_and_exponent(mantissa, exponent).unwrap())
     }
 }
@@ -193,11 +195,8 @@ pub fn random_primitive_float_gen_var_4<T: PrimitiveFloat>(config: &GenConfig) -
         special_random_primitive_float_inclusive_range::<T>(
             EXAMPLE_SEED,
             T::ONE,
-            T::from_integer_mantissa_and_exponent(
-                T::UnsignedOfEqualWidth::ONE,
-                i64::wrapping_from(T::MANTISSA_WIDTH),
-            )
-            .unwrap(),
+            T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH))
+                .unwrap(),
             config.get_or("exponent_mean_n", 8),
             config.get_or("exponent_mean_d", 1),
             config.get_or("precision_mean_n", 8),
@@ -256,11 +255,8 @@ pub fn random_primitive_float_gen_var_7<T: PrimitiveFloat>(config: &GenConfig) -
                 special_random_primitive_float_inclusive_range::<T>(
                     seed,
                     T::ONE,
-                    T::from_integer_mantissa_and_exponent(
-                        T::UnsignedOfEqualWidth::ONE,
-                        i64::wrapping_from(T::MANTISSA_WIDTH),
-                    )
-                    .unwrap(),
+                    T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH))
+                        .unwrap(),
                     config.get_or("exponent_mean_n", 8),
                     config.get_or("exponent_mean_d", 1),
                     config.get_or("precision_mean_n", 8),
@@ -333,6 +329,16 @@ pub fn random_primitive_float_gen_var_11<T: PrimitiveFloat>(config: &GenConfig) 
     )
 }
 
+pub fn random_primitive_float_gen_var_12<T: PrimitiveFloat>(config: &GenConfig) -> It<T> {
+    Box::new(special_random_nonzero_finite_primitive_floats(
+        EXAMPLE_SEED,
+        config.get_or("exponent_mean_n", 8),
+        config.get_or("exponent_mean_d", 1),
+        config.get_or("precision_mean_n", 8),
+        config.get_or("precision_mean_d", 1),
+    ))
+}
+
 // -- (PrimitiveFloat, PrimitiveFloat) --
 
 pub fn random_primitive_float_pair_gen<T: PrimitiveFloat>(config: &GenConfig) -> It<(T, T)> {
@@ -374,6 +380,65 @@ pub fn random_primitive_float_triple_gen<T: PrimitiveFloat>(config: &GenConfig) 
         config.get_or("special_p_mean_n", 1),
         config.get_or("special_p_mean_d", 64),
     )))
+}
+
+// -- (PrimitiveFloat, PrimitiveSigned) --
+
+pub fn random_primitive_float_signed_pair_gen_var_1<T: PrimitiveFloat, U: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            special_random_positive_finite_primitive_floats(
+                seed,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(T, i64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                special_random_primitive_float_range(
+                    seed,
+                    T::ONE,
+                    T::TWO,
+                    config.get_or("exponent_mean_n", 8),
+                    config.get_or("exponent_mean_d", 1),
+                    config.get_or("precision_mean_n", 8),
+                    config.get_or("precision_mean_d", 1),
+                    config.get_or("special_p_mean_n", 1),
+                    config.get_or("special_p_mean_d", 64),
+                )
+            },
+            &|seed| {
+                geometric_random_signed_inclusive_range(
+                    seed,
+                    T::MIN_EXPONENT,
+                    T::MAX_EXPONENT,
+                    config.get_or("small_signed_mean_n", 32),
+                    config.get_or("small_signed_mean_d", 1),
+                )
+            },
+        )
+        .filter(|&(m, e)| m.precision() <= T::max_precision_for_sci_exponent(e)),
+    )
 }
 
 // -- (PrimitiveFloat, RoundingMode) --
@@ -432,14 +497,24 @@ pub fn random_primitive_int_gen<T: PrimitiveInt>(_config: &GenConfig) -> It<T> {
 
 // -- (PrimitiveInt, PrimitiveInt) --
 
-pub fn random_primitive_int_pair_gen<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T)> {
+pub fn random_primitive_int_pair_gen<T: PrimitiveInt, U: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &random_primitive_ints,
+    ))
+}
+
+pub fn random_primitive_int_pair_gen_var_1<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T)> {
     Box::new(random_pairs_from_single(random_primitive_ints(
         EXAMPLE_SEED,
     )))
 }
 
 //TODO make better
-pub fn random_primitive_int_pair_gen_var_1<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T)> {
+pub fn random_primitive_int_pair_gen_var_2<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T)> {
     Box::new(
         random_pairs_from_single(random_primitive_ints(EXAMPLE_SEED)).map(|(x, y)| {
             if x <= y {
@@ -452,7 +527,7 @@ pub fn random_primitive_int_pair_gen_var_1<T: PrimitiveInt>(_config: &GenConfig)
 }
 
 //TODO make better
-pub fn random_primitive_int_pair_gen_var_2<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T)> {
+pub fn random_primitive_int_pair_gen_var_3<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T)> {
     Box::new(
         random_pairs_from_single(random_primitive_ints::<T>(EXAMPLE_SEED)).flat_map(
             |(x, y)| match x.cmp(&y) {
@@ -708,6 +783,34 @@ pub fn random_primitive_int_signed_pair_gen_var_1<T: PrimitiveInt, U: PrimitiveS
     ))
 }
 
+// -- (PrimitiveInt, PrimitiveSigned, PrimitiveInt) --
+
+pub fn random_primitive_int_signed_primitive_int_triple_gen_var_1<
+    T: PrimitiveInt,
+    U: PrimitiveSigned,
+>(
+    _config: &GenConfig,
+) -> It<(T, U, T)> {
+    Box::new(
+        random_triples_xyx(EXAMPLE_SEED, &random_primitive_ints, &|seed| {
+            random_signed_inclusive_range(
+                seed,
+                if U::WIDTH <= u64::WIDTH {
+                    U::MIN
+                } else {
+                    -U::exact_from(u64::MAX)
+                },
+                U::saturating_from(u64::MAX),
+            )
+        })
+        .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
+            Ordering::Equal => None,
+            Ordering::Less => Some((x, y, z)),
+            Ordering::Greater => Some((z, y, x)),
+        }),
+    )
+}
+
 // -- (PrimitiveInt, PrimitiveUnsigned) --
 
 pub fn random_primitive_int_unsigned_pair_gen_var_1<T: PrimitiveInt, U: PrimitiveUnsigned>(
@@ -868,6 +971,48 @@ pub fn random_primitive_int_unsigned_bool_triple_gen_var_2<T: PrimitiveInt>(
     )
 }
 
+// -- (PrimitiveInt, PrimitiveUnsigned, PrimitiveInt) --
+
+pub fn random_primitive_int_unsigned_primitive_int_triple_gen_var_1<
+    T: PrimitiveInt,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, T)> {
+    Box::new(
+        random_triples_xyx(EXAMPLE_SEED, &random_primitive_ints, &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        })
+        .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
+            Ordering::Equal => None,
+            Ordering::Less => Some((x, y, z)),
+            Ordering::Greater => Some((z, y, x)),
+        }),
+    )
+}
+
+pub fn random_primitive_int_unsigned_primitive_int_triple_gen_var_2<
+    T: PrimitiveInt,
+    U: PrimitiveUnsigned,
+>(
+    _config: &GenConfig,
+) -> It<(T, U, T)> {
+    Box::new(
+        random_triples_xyx(EXAMPLE_SEED, &random_primitive_ints, &|seed| {
+            random_unsigned_inclusive_range(seed, U::ZERO, U::saturating_from(u64::MAX))
+        })
+        .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
+            Ordering::Equal => None,
+            Ordering::Less => Some((x, y, z)),
+            Ordering::Greater => Some((z, y, x)),
+        }),
+    )
+}
+
 // -- (PrimitiveInt, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn random_primitive_int_unsigned_unsigned_triple_gen_var_1<
@@ -947,30 +1092,6 @@ pub fn random_primitive_int_unsigned_unsigned_triple_gen_var_4<
             )
         },
     ))
-}
-
-// --(PrimitiveInt, PrimitiveUnsigned, PrimitiveInt) --
-
-pub fn random_primitive_int_unsigned_primitive_int_triple_gen_var_1<
-    T: PrimitiveInt,
-    U: PrimitiveUnsigned,
->(
-    config: &GenConfig,
-) -> It<(T, U, T)> {
-    Box::new(
-        random_triples_xyx(EXAMPLE_SEED, &random_primitive_ints, &|seed| {
-            geometric_random_unsigneds(
-                seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
-            )
-        })
-        .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
-            Ordering::Equal => None,
-            Ordering::Less => Some((x, y, z)),
-            Ordering::Greater => Some((z, y, x)),
-        }),
-    )
 }
 
 // --(PrimitiveInt, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -1444,6 +1565,26 @@ pub fn random_signed_unsigned_pair_gen_var_6<T: PrimitiveSigned>(
     )
 }
 
+pub fn random_signed_unsigned_pair_gen_var_7<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_signed_inclusive_range(
+                seed,
+                if T::WIDTH <= u64::WIDTH {
+                    T::MIN
+                } else {
+                    -T::exact_from(u64::MAX)
+                },
+                T::saturating_from(u64::MAX),
+            )
+        },
+        &random_positive_unsigneds,
+    ))
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn random_signed_unsigned_unsigned_triple_gen_var_1<
@@ -1657,25 +1798,33 @@ pub fn random_unsigned_gen_var_12<T: PrimitiveUnsigned>(_config: &GenConfig) -> 
     Box::new(random_highest_bit_set_unsigneds(EXAMPLE_SEED))
 }
 
-pub fn random_unsigned_gen_var_13<T: PrimitiveFloat>(
-    _config: &GenConfig,
-) -> It<T::UnsignedOfEqualWidth> {
+pub fn random_unsigned_gen_var_13<T: PrimitiveFloat>(_config: &GenConfig) -> It<u64> {
     Box::new(random_unsigneds_less_than(
         EXAMPLE_SEED,
         T::LARGEST_ORDERED_REPRESENTATION,
     ))
 }
 
+pub fn random_unsigned_gen_var_14<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<T> {
+    Box::new(random_unsigneds_less_than(
+        EXAMPLE_SEED,
+        T::power_of_2(T::WIDTH - 1) + T::ONE,
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt, PrimitiveInt, PrimitiveUnsigned) --
 
-struct ModPowerOfTwoQuadrupleWithTwoExtraGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
+struct ModPowerOfTwoQuadrupleWithTwoExtraPrimitiveIntsGenerator<
+    T: PrimitiveUnsigned,
+    U: PrimitiveInt,
+> {
     ms: GeometricRandomNaturalValues<u64>,
     us: RandomPrimitiveInts<U>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveInt> Iterator
-    for ModPowerOfTwoQuadrupleWithTwoExtraGenerator<T, U>
+    for ModPowerOfTwoQuadrupleWithTwoExtraPrimitiveIntsGenerator<T, U>
 {
     type Item = (T, U, U, u64);
 
@@ -1703,7 +1852,7 @@ pub fn random_unsigned_primitive_int_primitive_int_unsigned_quadruple_gen_var_1<
 >(
     config: &GenConfig,
 ) -> It<(T, U, U, u64)> {
-    Box::new(ModPowerOfTwoQuadrupleWithTwoExtraGenerator {
+    Box::new(ModPowerOfTwoQuadrupleWithTwoExtraPrimitiveIntsGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -1718,15 +1867,14 @@ pub fn random_unsigned_primitive_int_primitive_int_unsigned_quadruple_gen_var_1<
 
 // -- (PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
 
-//TODO
-struct ModPowerOfTwoTripleWithExtraGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
+struct ModPowerOfTwoTripleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
     ms: GeometricRandomNaturalValues<u64>,
     us: RandomPrimitiveInts<U>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveInt> Iterator
-    for ModPowerOfTwoTripleWithExtraGenerator<T, U>
+    for ModPowerOfTwoTripleWithExtraPrimitiveIntGenerator<T, U>
 {
     type Item = (T, U, u64);
 
@@ -1754,7 +1902,7 @@ pub fn random_unsigned_primitive_int_unsigned_triple_gen_var_1<
 >(
     config: &GenConfig,
 ) -> It<(T, U, u64)> {
-    Box::new(ModPowerOfTwoTripleWithExtraGenerator {
+    Box::new(ModPowerOfTwoTripleWithExtraPrimitiveIntGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -1763,6 +1911,113 @@ pub fn random_unsigned_primitive_int_unsigned_triple_gen_var_1<
             config.get_or("mean_pow_d", 1),
         ),
         us: random_primitive_ints(EXAMPLE_SEED.fork("us")),
+        xss: vec![None; usize::wrapping_from(T::WIDTH) + 1],
+    })
+}
+
+// -- (PrimitiveUnsigned, PrimitiveSigned) --
+
+struct IntegerMantissaAndExponentGenerator<T: PrimitiveFloat> {
+    xs: SpecialRandomNonzeroFiniteFloats<T>,
+    shifts: GeometricRandomNaturalValues<i64>,
+}
+
+#[inline]
+pub(crate) fn shift_integer_mantissa_and_exponent<T: PrimitiveFloat>(
+    mantissa: u64,
+    exponent: i64,
+    shift: i64,
+) -> Option<(u64, i64)> {
+    Some((
+        mantissa.arithmetic_checked_shl(shift)?,
+        exponent.checked_sub(shift)?,
+    ))
+}
+
+impl<T: PrimitiveFloat> Iterator for IntegerMantissaAndExponentGenerator<T> {
+    type Item = (u64, i64);
+
+    fn next(&mut self) -> Option<(u64, i64)> {
+        loop {
+            let (mantissa, exponent) = self.xs.next().unwrap().integer_mantissa_and_exponent();
+            let shift = self.shifts.next().unwrap();
+            let out = shift_integer_mantissa_and_exponent::<T>(mantissa, exponent, shift);
+            if out.is_some() {
+                return out;
+            }
+        }
+    }
+}
+
+pub fn random_unsigned_signed_pair_gen_var_1<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(u64, i64)> {
+    Box::new(IntegerMantissaAndExponentGenerator::<T> {
+        xs: special_random_nonzero_finite_primitive_floats(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("exponent_mean_n", 8),
+            config.get_or("exponent_mean_d", 1),
+            config.get_or("precision_mean_n", 8),
+            config.get_or("precision_mean_d", 1),
+        ),
+        shifts: geometric_random_natural_signeds(
+            EXAMPLE_SEED.fork("shifts"),
+            config.get_or("shift_mean_n", 4),
+            config.get_or("shift_mean_d", 1),
+        ),
+    })
+}
+
+// -- (PrimitiveUnsigned, PrimitiveSigned, PrimitiveUnsigned) --
+
+struct ModPowerOfTwoTripleWithExtraSmallSignedGenerator<T: PrimitiveUnsigned, U: PrimitiveSigned> {
+    ms: GeometricRandomNaturalValues<u64>,
+    us: GeometricRandomSigneds<U>,
+    xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
+}
+
+impl<T: PrimitiveUnsigned, U: PrimitiveSigned> Iterator
+    for ModPowerOfTwoTripleWithExtraSmallSignedGenerator<T, U>
+{
+    type Item = (T, U, u64);
+
+    fn next(&mut self) -> Option<(T, U, u64)> {
+        let pow = self.ms.next().unwrap();
+        let x = if pow == 0 {
+            T::ZERO
+        } else {
+            let xs = &mut self.xss[usize::wrapping_from(pow)];
+            if xs.is_none() {
+                *xs = Some(random_unsigned_bit_chunks(
+                    EXAMPLE_SEED.fork(&pow.to_string()),
+                    pow,
+                ));
+            }
+            xs.as_mut().unwrap().next().unwrap()
+        };
+        Some((x, self.us.next().unwrap(), pow))
+    }
+}
+
+pub fn random_unsigned_signed_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveSigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, u64)> {
+    Box::new(ModPowerOfTwoTripleWithExtraSmallSignedGenerator {
+        ms: geometric_random_unsigned_range(
+            EXAMPLE_SEED.fork("ms"),
+            0,
+            T::WIDTH,
+            config.get_or("mean_pow_n", T::WIDTH >> 1),
+            config.get_or("mean_pow_d", 1),
+        ),
+        us: geometric_random_signeds(
+            EXAMPLE_SEED.fork("us"),
+            config.get_or("mean_pow_n", T::WIDTH >> 1),
+            config.get_or("mean_pow_d", 1),
+        ),
         xss: vec![None; usize::wrapping_from(T::WIDTH) + 1],
     })
 }
@@ -1981,25 +2236,59 @@ pub fn random_unsigned_pair_gen_var_12<T: PrimitiveUnsigned, U: PrimitiveUnsigne
     ))
 }
 
-pub fn random_unsigned_pair_gen_var_13<T: PrimitiveFloat>(
-    _config: &GenConfig,
-) -> It<(T::UnsignedOfEqualWidth, T::UnsignedOfEqualWidth)> {
+pub fn random_unsigned_pair_gen_var_13<T: PrimitiveFloat>(_config: &GenConfig) -> It<(u64, u64)> {
     Box::new(random_pairs_from_single(random_unsigneds_less_than(
         EXAMPLE_SEED,
         T::LARGEST_ORDERED_REPRESENTATION,
     )))
 }
 
+pub fn random_unsigned_pair_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| random_positive_unsigneds(seed),
+        &|seed| {
+            geometric_random_unsigned_range(
+                seed,
+                U::TWO,
+                U::MAX,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_unsigned_pair_gen_var_15<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| random_unsigned_inclusive_range(seed, T::ZERO, T::saturating_from(u64::MAX)),
+        &random_positive_unsigneds::<U>,
+    ))
+}
+
+pub fn random_unsigned_pair_gen_var_16<T: PrimitiveFloat>(_config: &GenConfig) -> It<(u64, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| random_unsigned_bit_chunks(seed, T::MANTISSA_WIDTH),
+        &|seed| random_unsigned_bit_chunks(seed, T::EXPONENT_WIDTH),
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
 
-struct ModPowerOfTwoQuadrupleWithExtraGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
+struct ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
     ms: GeometricRandomNaturalValues<u64>,
     us: RandomPrimitiveInts<U>,
     xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
 }
 
 impl<T: PrimitiveUnsigned, U: PrimitiveInt> Iterator
-    for ModPowerOfTwoQuadrupleWithExtraGenerator<T, U>
+    for ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator<T, U>
 {
     type Item = (T, T, U, u64);
 
@@ -2028,7 +2317,7 @@ pub fn random_unsigned_unsigned_primitive_int_unsigned_quadruple_gen_var_1<
 >(
     config: &GenConfig,
 ) -> It<(T, T, U, u64)> {
-    Box::new(ModPowerOfTwoQuadrupleWithExtraGenerator {
+    Box::new(ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator {
         ms: geometric_random_unsigned_range(
             EXAMPLE_SEED.fork("ms"),
             0,
@@ -2182,6 +2471,58 @@ pub fn random_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
             EXAMPLE_SEED.fork("ms"),
             0,
             T::WIDTH,
+            config.get_or("mean_pow_n", T::WIDTH >> 1),
+            config.get_or("mean_pow_d", 1),
+        ),
+        xss: vec![None; usize::wrapping_from(T::WIDTH) + 1],
+    })
+}
+
+struct ModPowerOfTwoTripleWithExtraSmallUnsignedGenerator<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+> {
+    ms: GeometricRandomNaturalValues<u64>,
+    us: GeometricRandomNaturalValues<U>,
+    xss: Vec<Option<RandomUnsignedBitChunks<T>>>,
+}
+
+impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned> Iterator
+    for ModPowerOfTwoTripleWithExtraSmallUnsignedGenerator<T, U>
+{
+    type Item = (T, U, u64);
+
+    fn next(&mut self) -> Option<(T, U, u64)> {
+        let pow = self.ms.next().unwrap();
+        let x = if pow == 0 {
+            T::ZERO
+        } else {
+            let xs = &mut self.xss[usize::wrapping_from(pow)];
+            if xs.is_none() {
+                *xs = Some(random_unsigned_bit_chunks(
+                    EXAMPLE_SEED.fork(&pow.to_string()),
+                    pow,
+                ));
+            }
+            xs.as_mut().unwrap().next().unwrap()
+        };
+        Some((x, self.us.next().unwrap(), pow))
+    }
+}
+
+pub fn random_unsigned_triple_gen_var_6<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U, u64)> {
+    Box::new(ModPowerOfTwoTripleWithExtraSmallUnsignedGenerator {
+        ms: geometric_random_unsigned_range(
+            EXAMPLE_SEED.fork("ms"),
+            0,
+            T::WIDTH,
+            config.get_or("mean_pow_n", T::WIDTH >> 1),
+            config.get_or("mean_pow_d", 1),
+        ),
+        us: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("us"),
             config.get_or("mean_pow_n", T::WIDTH >> 1),
             config.get_or("mean_pow_d", 1),
         ),

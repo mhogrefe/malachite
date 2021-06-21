@@ -5,7 +5,7 @@ use malachite_base::bools::random::random_bools;
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, Parity, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{One, Two, Zero};
+use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
@@ -81,10 +81,7 @@ pub fn special_random_integer_gen(config: &GenConfig) -> It<Integer> {
     ))
 }
 
-pub fn special_random_integer_gen_var_1<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+pub fn special_random_integer_gen_var_1<T: PrimitiveFloat>(config: &GenConfig) -> It<Integer> {
     Box::new(with_special_value(
         EXAMPLE_SEED,
         Integer::ZERO,
@@ -114,7 +111,7 @@ pub fn special_random_integer_gen_var_2<T: for<'a> ExactFrom<&'a Natural> + Prim
     config: &GenConfig,
 ) -> It<Integer>
 where
-    Natural: ExactFrom<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: ExactFrom<T>,
 {
     Box::new(
         random_pairs(
@@ -266,19 +263,13 @@ pub fn special_random_natural_gen_var_1(config: &GenConfig) -> It<Natural> {
     ))
 }
 
-struct SpecialRandomPositiveFloatNaturals<T: PrimitiveFloat>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+struct SpecialRandomPositiveFloatNaturals<T: PrimitiveFloat> {
     exponents: GeometricRandomSignedRange<i64>,
-    mantissas: StripedRandomUnsignedBitChunks<T::UnsignedOfEqualWidth>,
+    mantissas: StripedRandomUnsignedBitChunks<u64>,
     phantom: PhantomData<T>,
 }
 
-impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFloatNaturals<T>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFloatNaturals<T> {
     type Item = Natural;
 
     fn next(&mut self) -> Option<Natural> {
@@ -286,8 +277,8 @@ where
         let mut mantissa = self.mantissas.next().unwrap();
         if exponent != 0 {
             mantissa.set_bit(T::MANTISSA_WIDTH);
-        } else if mantissa == T::UnsignedOfEqualWidth::ZERO {
-            mantissa = T::UnsignedOfEqualWidth::ONE;
+        } else if mantissa == 0 {
+            mantissa = 1;
         }
         Some(Natural::from(mantissa) << exponent)
     }
@@ -300,10 +291,7 @@ fn special_random_positive_float_naturals<T: PrimitiveFloat>(
     mean_exponent_denominator: u64,
     mean_stripe_numerator: u64,
     mean_stripe_denominator: u64,
-) -> SpecialRandomPositiveFloatNaturals<T>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+) -> SpecialRandomPositiveFloatNaturals<T> {
     SpecialRandomPositiveFloatNaturals {
         exponents: geometric_random_signed_range(
             seed.fork("exponents"),
@@ -322,10 +310,7 @@ where
     }
 }
 
-pub fn special_random_natural_gen_var_2<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural>
-where
-    Natural: From<T::UnsignedOfEqualWidth>,
-{
+pub fn special_random_natural_gen_var_2<T: PrimitiveFloat>(config: &GenConfig) -> It<Natural> {
     Box::new(with_special_value(
         EXAMPLE_SEED,
         Natural::ZERO,
@@ -348,7 +333,7 @@ pub fn special_random_natural_gen_var_3<T: for<'a> ExactFrom<&'a Natural> + Prim
     config: &GenConfig,
 ) -> It<Natural>
 where
-    Natural: ExactFrom<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: ExactFrom<T>,
 {
     Box::new(
         special_random_positive_float_naturals::<T>(
@@ -389,6 +374,29 @@ pub fn special_random_natural_pair_gen_var_1(config: &GenConfig) -> It<(Natural,
         EXAMPLE_SEED,
         &|seed| {
             striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_natural_range_to_infinity(
+                seed,
+                Natural::TWO,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_pair_gen_var_2(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_positive_naturals(
                 seed,
                 config.get_or("mean_stripe_n", 32),
                 config.get_or("mean_stripe_d", 1),

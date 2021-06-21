@@ -1,16 +1,17 @@
 use num::arithmetic::traits::{
-    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase2, CeilingLogBasePowerOf2,
-    CheckedLogBase2, CheckedLogBasePowerOf2, CheckedNextPowerOf2, FloorLogBase2,
-    FloorLogBasePowerOf2, IsPowerOf2, ModAdd, ModAddAssign, ModIsReduced, ModMul, ModMulAssign,
-    ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow, ModPowAssign,
-    ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign,
-    ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign, ModPowerOf2Neg,
-    ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
-    ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Square,
-    ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
-    ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
-    NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, XMulYIsZZ, XXAddYYIsZZ,
-    XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase, CeilingLogBase2,
+    CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2,
+    CheckedNextPowerOf2, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, ModAdd,
+    ModAddAssign, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
+    ModNeg, ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
+    ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2IsReduced, ModPowerOf2Mul,
+    ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
+    ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
+    ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
+    ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
+    ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOf2,
+    NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR,
+    XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -22,13 +23,16 @@ use num::logic::traits::HammingDistance;
 
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:
-    CeilingLogBase2
+    CeilingLogBase
+    + CeilingLogBase2
     + CeilingLogBasePowerOf2
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
     + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
+    + CheckedLogBase
     + CheckedLogBase2
     + CheckedLogBasePowerOf2
     + CheckedNextPowerOf2<Output = Self>
+    + FloorLogBase
     + FloorLogBase2
     + FloorLogBasePowerOf2
     + From<u8>

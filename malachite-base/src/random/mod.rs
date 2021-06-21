@@ -103,7 +103,7 @@ impl Seed {
     /// );
     /// ```
     pub fn fork(&self, key: &str) -> Seed {
-        let mut seed = self.clone().next();
+        let mut seed = self.next();
         let forked_seed = &mut seed.bytes;
         let hash = Sha3_256::digest(key.as_bytes());
         for i in 0..32 {

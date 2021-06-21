@@ -82,6 +82,7 @@ pub fn limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_slice_next_power_of_2_in_place(&mut xs), true);
 /// assert_eq!(xs, &[0, 0, 0]);
 /// ```
+#[allow(clippy::branches_sharing_code)]
 pub fn limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
     if let Some(x) = xs_last.checked_next_power_of_two() {

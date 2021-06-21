@@ -91,6 +91,12 @@ fn to_digits_asc_helper<
             digits.iter().cloned().rev().collect_vec(),
             u.to_digits_desc(&base)
         );
+        if u != T::ZERO {
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                u.floor_log_base(T::exact_from(base)) + 1
+            );
+        }
         assert!(digits.iter().all(|&digit| digit <= base));
     });
 
@@ -115,7 +121,7 @@ fn to_digits_asc_properties() {
 }
 
 fn to_digits_desc_helper<
-    T: Digits<U> + PrimitiveUnsigned,
+    T: Digits<U> + ExactFrom<U> + PrimitiveUnsigned,
     U: PrimitiveUnsigned + SaturatingFrom<T>,
 >() {
     unsigned_pair_gen_var_6::<T, U>().test_properties(|(u, base)| {
@@ -131,6 +137,12 @@ fn to_digits_desc_helper<
             digits.iter().cloned().rev().collect_vec(),
             u.to_digits_asc(&base)
         );
+        if u != T::ZERO {
+            assert_eq!(
+                u64::exact_from(digits.len()),
+                u.floor_log_base(T::exact_from(base)) + 1
+            );
+        }
         assert!(digits.iter().all(|&digit| digit <= base));
     });
 

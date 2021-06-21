@@ -76,7 +76,7 @@ pub fn exhaustive_integer_gen() -> It<Integer> {
 
 pub fn exhaustive_integer_gen_var_1<T: PrimitiveFloat>() -> It<Integer>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     Box::new(
         once(Integer::ZERO).chain(
@@ -99,7 +99,7 @@ pub fn exhaustive_integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + Pr
 
 pub fn exhaustive_integer_gen_var_3<T: PrimitiveFloat>() -> It<Integer>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     Box::new(
         lex_pairs(exhaustive_natural_gen_var_5::<T>(), exhaustive_bools())
@@ -163,18 +163,19 @@ pub fn exhaustive_natural_gen_var_2() -> It<Natural> {
 
 struct ExhaustivePositiveFloatNaturals<T: PrimitiveFloat>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
+    phantom: PhantomData<*const T>,
     done: bool,
     exponent: i64,
-    limit: T::UnsignedOfEqualWidth,
-    mantissa: T::UnsignedOfEqualWidth,
+    limit: u64,
+    mantissa: u64,
     max_finite: Natural,
 }
 
 impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFloatNaturals<T>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     type Item = Natural;
 
@@ -182,15 +183,16 @@ where
         if self.done {
             None
         } else {
-            let n = Natural::from(self.mantissa) << self.exponent;
+            let n: Natural = From::from(self.mantissa);
+            let n = n << self.exponent;
             if n == self.max_finite {
                 self.done = true;
             } else {
-                self.mantissa += T::UnsignedOfEqualWidth::ONE;
+                self.mantissa += 1;
                 if self.mantissa == self.limit {
                     self.mantissa >>= 1;
                     self.exponent += 1;
-                    self.limit = T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1);
+                    self.limit = u64::power_of_2(T::MANTISSA_WIDTH + 1);
                 }
             }
             Some(n)
@@ -202,16 +204,17 @@ fn exhaustive_positive_float_naturals<T: PrimitiveFloat>(
     start_exponent: i64,
 ) -> ExhaustivePositiveFloatNaturals<T>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     ExhaustivePositiveFloatNaturals {
+        phantom: PhantomData,
         done: false,
         exponent: start_exponent,
-        limit: T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1),
+        limit: u64::power_of_2(T::MANTISSA_WIDTH + 1),
         mantissa: if start_exponent == 0 {
-            T::UnsignedOfEqualWidth::ONE
+            1
         } else {
-            T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH)
+            u64::power_of_2(T::MANTISSA_WIDTH)
         },
         max_finite: Natural::from(T::MAX_FINITE),
     }
@@ -219,7 +222,7 @@ where
 
 pub fn exhaustive_natural_gen_var_3<T: PrimitiveFloat>() -> It<Natural>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     Box::new(once(Natural::ZERO).chain(exhaustive_positive_float_naturals::<T>(0)))
 }
@@ -236,7 +239,7 @@ pub fn exhaustive_natural_gen_var_4<T: for<'a> ConvertibleFrom<&'a Natural> + Pr
 
 pub fn exhaustive_natural_gen_var_5<T: PrimitiveFloat>() -> It<Natural>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     Box::new(
         iter_windows(2, exhaustive_positive_float_naturals::<T>(1)).filter_map(|xs| {
@@ -269,6 +272,13 @@ pub fn exhaustive_natural_pair_gen_var_1() -> It<(Natural, Natural)> {
 pub fn exhaustive_natural_pair_gen_var_2() -> It<(Natural, Natural)> {
     Box::new(exhaustive_pairs(
         exhaustive_naturals(),
+        exhaustive_natural_range_to_infinity(Natural::TWO),
+    ))
+}
+
+pub fn exhaustive_natural_pair_gen_var_3() -> It<(Natural, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_positive_naturals(),
         exhaustive_natural_range_to_infinity(Natural::TWO),
     ))
 }

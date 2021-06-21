@@ -184,6 +184,7 @@ pub mod arithmetic {
     pub mod eq_mod;
     pub mod eq_mod_power_of_2;
     pub mod is_power_of_2;
+    pub mod log_base;
     pub mod log_base_2;
     pub mod log_base_power_of_2;
     pub mod mod_add;

@@ -56,9 +56,9 @@ macro_rules! float_impls {
             /// ```
             fn rounding_from(value: Integer, rm: RoundingMode) -> $f {
                 if value.sign {
-                    $f::rounding_from(value.abs, rm)
+                    $f::rounding_from(&value.abs, rm)
                 } else {
-                    -$f::rounding_from(value.abs, -rm)
+                    -$f::rounding_from(&value.abs, -rm)
                 }
             }
         }
@@ -147,7 +147,7 @@ macro_rules! float_impls {
             /// );
             /// ```
             fn from(value: Integer) -> $f {
-                let abs = $f::from(value.abs);
+                let abs = $f::from(&value.abs);
                 if value.sign {
                     abs
                 } else {
@@ -228,7 +228,7 @@ macro_rules! float_impls {
             /// ```
             fn checked_from(value: Integer) -> Option<$f> {
                 let sign = value.sign;
-                $f::checked_from(value.abs).map(|f| if sign { f } else { -f })
+                $f::checked_from(&value.abs).map(|f| if sign { f } else { -f })
             }
         }
 

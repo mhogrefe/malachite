@@ -1,4 +1,3 @@
-use malachite_base::num::basic::traits::One;
 use malachite_base::num::float::nice_float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::generators::primitive_float_gen_var_9;
@@ -75,7 +74,7 @@ fn next_higher_properties_helper<T: PrimitiveFloat>() {
     primitive_float_gen_var_9::<T>().test_properties(|x| {
         let y = x.next_higher();
         assert_eq!(
-            x.to_ordered_representation() + T::UnsignedOfEqualWidth::ONE,
+            x.to_ordered_representation() + 1,
             y.to_ordered_representation()
         );
         assert_eq!(NiceFloat(y.next_lower()), NiceFloat(x));

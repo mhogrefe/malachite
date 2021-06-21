@@ -28,7 +28,7 @@ macro_rules! impl_mod_sub {
             /// # Examples
             /// See the documentation of the `num::arithmetic::mod_sub` module.
             ///
-            /// This is nmod_sub from nmod_vec.h, FLINT Dev 1.
+            /// This is nmod_sub from nmod_vec.h, FLINT 2.7.1.
             #[inline]
             fn mod_sub(self, other: $t, m: $t) -> $t {
                 _mod_sub(self, other, m)
@@ -47,7 +47,7 @@ macro_rules! impl_mod_sub {
             /// # Examples
             /// See the documentation of the `num::arithmetic::mod_sub` module.
             ///
-            /// This is nmod_sub from nmod_vec.h, FLINT Dev 1, where the result is assigned to a.
+            /// This is nmod_sub from nmod_vec.h, FLINT 2.7.1, where the result is assigned to a.
             #[inline]
             fn mod_sub_assign(&mut self, other: $t, m: $t) {
                 *self = self.mod_sub(other, m);

@@ -41,20 +41,16 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                 impl ModPowerOf2Shl<$u> for $t {
                     type Output = $t;
 
-                    /// Computes `self << other` mod 2<sup>`pow`</sup>. Assumes the input is already
-                    /// reduced mod 2<sup>`pow`</sup>.
+                    /// Computes `self << other` mod $2^p$. Assumes the input is already reduced
+                    /// mod $2^p$.
                     ///
-                    /// Time: worst case O(1)
+                    /// $f(x, n, p) = y$, where $x, y < 2^p$ and $2^nx \equiv y \mod 2^p$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
-                    ///
-                    /// assert_eq!(12u32.mod_power_of_2_shl(2u8, 5), 16);
-                    /// assert_eq!(10u8.mod_power_of_2_shl(100u64, 4), 0);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
                     #[inline]
                     fn mod_power_of_2_shl(self, other: $u, pow: u64) -> $t {
                         _mod_power_of_2_shl_unsigned(self, other, pow)
@@ -62,25 +58,16 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                 }
 
                 impl ModPowerOf2ShlAssign<$u> for $t {
-                    /// Replaces `self` with `self << other` mod 2<sup>`pow`</sup>. Assumes the
-                    /// input is already reduced mod 2<sup>`pow`</sup>.
+                    /// Replaces `self` with `self << other` mod $2^p$. Assumes the input is
+                    /// already reduced mod $2^p$.
                     ///
-                    /// Time: worst case O(1)
+                    /// $x \gets y$, where $x, y < 2^p$ and $2^nx \equiv y \mod 2^p$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
-                    ///
-                    /// let mut n = 12u32;
-                    /// n.mod_power_of_2_shl_assign(2u8, 5);
-                    /// assert_eq!(n, 16);
-                    ///
-                    /// let mut n = 10u8;
-                    /// n.mod_power_of_2_shl_assign(100u64, 4);
-                    /// assert_eq!(n, 0);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
                     #[inline]
                     fn mod_power_of_2_shl_assign(&mut self, other: $u, pow: u64) {
                         _mod_power_of_2_shl_assign_unsigned(self, other, pow);
@@ -146,20 +133,17 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                 impl ModPowerOf2Shl<$u> for $t {
                     type Output = $t;
 
-                    /// Computes `self << other` mod 2<sup>`pow`</sup>. Assumes the input is already
-                    /// reduced mod 2<sup>`pow`</sup>.
+                    /// Computes `self << other` mod $2^p$. Assumes the input is already reduced
+                    /// mod $2^p$.
                     ///
-                    /// Time: worst case O(1)
+                    /// $f(x, n, p) = y$, where $x, y < 2^p$ and
+                    /// $\lfloor 2^nx \rfloor \equiv y \mod 2^p$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModPowerOf2Shl;
-                    ///
-                    /// assert_eq!(12u32.mod_power_of_2_shl(2i8, 5), 16);
-                    /// assert_eq!(10u8.mod_power_of_2_shl(-2i64, 4), 2);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
                     #[inline]
                     fn mod_power_of_2_shl(self, other: $u, pow: u64) -> $t {
                         _mod_power_of_2_shl_signed(self, other, pow)
@@ -167,25 +151,17 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                 }
 
                 impl ModPowerOf2ShlAssign<$u> for $t {
-                    /// Replaces `self` with `self << other` mod 2<sup>`pow`</sup>. Assumes the
-                    /// input is already reduced mod 2<sup>`pow`</sup>.
+                    /// Replaces `self` with `self << other` mod $2^p$. Assumes the input is
+                    /// already reduced mod $2^p$.
                     ///
-                    /// Time: worst case O(1)
+                    /// $x \gets y$, where $x, y < 2^p$ and
+                    /// $\lfloor 2^nx \rfloor \equiv y \mod 2^p$.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::num::arithmetic::traits::ModPowerOf2ShlAssign;
-                    ///
-                    /// let mut n = 12u32;
-                    /// n.mod_power_of_2_shl_assign(2i8, 5);
-                    /// assert_eq!(n, 16);
-                    ///
-                    /// let mut n = 10u8;
-                    /// n.mod_power_of_2_shl_assign(-2i64, 4);
-                    /// assert_eq!(n, 2);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
                     #[inline]
                     fn mod_power_of_2_shl_assign(&mut self, other: $u, pow: u64) {
                         _mod_power_of_2_shl_assign_signed(self, other, pow);

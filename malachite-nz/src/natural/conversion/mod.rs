@@ -5,5 +5,6 @@ pub mod from_limbs;
 pub mod from_primitive_int;
 pub mod limb_count;
 pub mod primitive_int_from_natural;
+pub mod sci_mantissa_and_exponent;
 pub mod string;
 pub mod to_limbs;

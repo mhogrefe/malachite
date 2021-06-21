@@ -1417,7 +1417,7 @@ fn float_rounding_from_integer_properties_helper<
 >()
 where
     Integer: From<T> + RoundingFrom<T>,
-    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: CheckedFrom<T> + From<T>,
 {
     integer_rounding_mode_pair_gen_var_1::<T>().test_properties(|(n, rm)| {
         let f = T::rounding_from(&n, rm);
@@ -1560,8 +1560,7 @@ fn float_rounding_from_integer_properties() {
 }
 
 fn float_from_integer_properties_helper<
-    T: CheckedFrom<Natural>
-        + for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> CheckedFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
         + From<Integer>
         + for<'a> From<&'a Integer>
@@ -1571,7 +1570,7 @@ fn float_from_integer_properties_helper<
 >()
 where
     Integer: From<T>,
-    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: CheckedFrom<T> + From<T>,
 {
     integer_gen().test_properties(|n| {
         let f = T::from(&n);
@@ -1635,7 +1634,7 @@ fn float_checked_from_integer_properties_helper<
 >()
 where
     Integer: RoundingFrom<T>,
-    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: CheckedFrom<T> + From<T>,
 {
     integer_gen().test_properties(|n| {
         let of = T::checked_from(&n);
@@ -1678,7 +1677,7 @@ fn float_convertible_from_integer_properties_helper<
         + PrimitiveFloat,
 >()
 where
-    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: CheckedFrom<T> + From<T>,
 {
     integer_gen().test_properties(|n| {
         assert_eq!(T::convertible_from(&n), T::convertible_from(n.clone()));

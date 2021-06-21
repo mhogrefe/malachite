@@ -7,7 +7,6 @@ use itertools::Itertools;
 use num::arithmetic::traits::{Parity, PowerOf2, ShrRound};
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
-use num::basic::traits::{One, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 use num::float::nice_float::NiceFloat;
@@ -929,7 +928,8 @@ pub fn random_highest_bit_set_unsigneds<T: PrimitiveUnsigned>(
 /// for more.
 #[derive(Clone, Debug)]
 pub struct RandomPrimitiveFloatRange<T: PrimitiveFloat> {
-    xs: RandomUnsignedRange<T::UnsignedOfEqualWidth>,
+    phantom: PhantomData<*const T>,
+    xs: RandomUnsignedRange<u64>,
 }
 
 impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatRange<T> {
@@ -946,7 +946,8 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatRange<T> {
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomPrimitiveFloatInclusiveRange<T: PrimitiveFloat> {
-    xs: RandomUnsignedInclusiveRange<T::UnsignedOfEqualWidth>,
+    phantom: PhantomData<*const T>,
+    xs: RandomUnsignedInclusiveRange<u64>,
 }
 
 impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
@@ -1015,6 +1016,7 @@ pub fn random_primitive_float_range<T: PrimitiveFloat>(
         );
     }
     RandomPrimitiveFloatRange {
+        phantom: PhantomData,
         xs: random_unsigned_range(
             seed,
             a.to_ordered_representation(),
@@ -1080,6 +1082,7 @@ pub fn random_primitive_float_inclusive_range<T: PrimitiveFloat>(
         );
     }
     RandomPrimitiveFloatInclusiveRange {
+        phantom: PhantomData,
         xs: random_unsigned_inclusive_range(
             seed,
             a.to_ordered_representation(),
@@ -1370,8 +1373,9 @@ pub fn random_nonzero_primitive_floats<T: PrimitiveFloat>(
 /// more.
 #[derive(Clone, Debug)]
 pub struct RandomPrimitiveFloats<T: PrimitiveFloat> {
-    pub(crate) xs: RandomUnsignedInclusiveRange<T::UnsignedOfEqualWidth>,
-    nan: T::UnsignedOfEqualWidth,
+    phantom: PhantomData<*const T>,
+    pub(crate) xs: RandomUnsignedInclusiveRange<u64>,
+    nan: u64,
 }
 
 impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloats<T> {
@@ -1422,9 +1426,10 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloats<T> {
 /// ```
 #[inline]
 pub fn random_primitive_floats<T: PrimitiveFloat>(seed: Seed) -> RandomPrimitiveFloats<T> {
-    let nan = T::POSITIVE_INFINITY.to_ordered_representation() + T::UnsignedOfEqualWidth::ONE;
+    let nan = T::POSITIVE_INFINITY.to_ordered_representation() + 1;
     RandomPrimitiveFloats {
-        xs: random_unsigned_inclusive_range(seed, T::UnsignedOfEqualWidth::ZERO, nan),
+        phantom: PhantomData,
+        xs: random_unsigned_inclusive_range(seed, 0, nan),
         nan,
     }
 }
@@ -1463,14 +1468,14 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
         });
         let precision = precisions.next().unwrap();
         let mantissa = if precision == 1 {
-            T::UnsignedOfEqualWidth::ONE
+            1
         } else {
             // e.g. if precision is 4, generate odd values from 1001 through 1111, inclusive
             let x = self.ranges.next_in_range(
-                T::UnsignedOfEqualWidth::power_of_2(precision - 2),
-                T::UnsignedOfEqualWidth::power_of_2(precision - 1),
+                u64::power_of_2(precision - 2),
+                u64::power_of_2(precision - 1),
             );
-            (x << 1) | T::UnsignedOfEqualWidth::ONE
+            (x << 1) | 1
         };
         T::from_integer_mantissa_and_exponent(
             mantissa,
@@ -2072,13 +2077,10 @@ pub fn special_random_primitive_floats<T: PrimitiveFloat>(
 // normalized sci_exponent and raw mantissas in input, adjusted sci_exponent and mantissas in output
 fn mantissas_inclusive<T: PrimitiveFloat>(
     mut sci_exponent: i64,
-    mut am: T::UnsignedOfEqualWidth,
-    mut bm: T::UnsignedOfEqualWidth,
+    mut am: u64,
+    mut bm: u64,
     precision: u64,
-) -> Option<(i64, T::UnsignedOfEqualWidth, T::UnsignedOfEqualWidth)>
-where
-    T::UnsignedOfEqualWidth: ShrRound<u64, Output = T::UnsignedOfEqualWidth>,
-{
+) -> Option<(i64, u64, u64)> {
     assert_ne!(precision, 0);
     let p: u64 = if sci_exponent < T::MIN_NORMAL_EXPONENT {
         let ab = am.significant_bits();
@@ -2092,13 +2094,13 @@ where
     };
     let mut lo = am.shr_round(p, RoundingMode::Up);
     if lo.even() {
-        lo += T::UnsignedOfEqualWidth::ONE;
+        lo += 1;
     }
     let mut hi = bm.shr_round(p, RoundingMode::Down);
-    if hi == T::UnsignedOfEqualWidth::ZERO {
+    if hi == 0 {
         return None;
     } else if hi.even() {
-        hi -= T::UnsignedOfEqualWidth::ONE;
+        hi -= 1;
     }
     if sci_exponent >= T::MIN_NORMAL_EXPONENT {
         sci_exponent -= i64::wrapping_from(T::MANTISSA_WIDTH);
@@ -2114,12 +2116,13 @@ where
 #[allow(clippy::type_complexity)]
 #[derive(Clone, Debug)]
 pub struct SpecialRandomPositiveFiniteFloatInclusiveRange<T: PrimitiveFloat> {
-    am: T::UnsignedOfEqualWidth, // raw mantissa
-    bm: T::UnsignedOfEqualWidth,
-    ae: i64, // normalized sci_exponent
+    phantom: PhantomData<*const T>,
+    am: u64, // raw mantissa
+    bm: u64,
+    ae: i64, // sci_exponent
     be: i64,
     sci_exponents: GeometricRandomSignedRange<i64>,
-    precision_range_map: HashMap<i64, Vec<(i64, T::UnsignedOfEqualWidth, T::UnsignedOfEqualWidth)>>,
+    precision_range_map: HashMap<i64, Vec<(i64, u64, u64)>>,
     precision_indices: GeometricRandomNaturalValues<usize>,
     ranges: VariableRangeGenerator,
 }
@@ -2140,25 +2143,17 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloatInclusiveRa
                 let am = if sci_exponent == ae {
                     am
                 } else {
-                    T::from_integer_mantissa_and_exponent(
-                        T::UnsignedOfEqualWidth::ONE,
-                        sci_exponent,
-                    )
-                    .unwrap()
-                    .raw_mantissa_and_exponent()
-                    .0
+                    T::from_integer_mantissa_and_exponent(1, sci_exponent)
+                        .unwrap()
+                        .raw_mantissa()
                 };
                 let bm = if sci_exponent == be {
                     bm
                 } else {
-                    T::from_integer_mantissa_and_exponent(
-                        T::UnsignedOfEqualWidth::ONE,
-                        sci_exponent + 1,
-                    )
-                    .unwrap()
-                    .next_lower()
-                    .raw_mantissa_and_exponent()
-                    .0
+                    T::from_integer_mantissa_and_exponent(1, sci_exponent + 1)
+                        .unwrap()
+                        .next_lower()
+                        .raw_mantissa()
                 };
                 (1..=T::max_precision_for_sci_exponent(sci_exponent))
                     .filter_map(|p| mantissas_inclusive::<T>(sci_exponent, am, bm, p))
@@ -2167,8 +2162,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloatInclusiveRa
         assert!(!precision_ranges.is_empty());
         let i = self.precision_indices.next().unwrap() % precision_ranges.len();
         let t = precision_ranges[i];
-        let mantissa =
-            (self.ranges.next_in_inclusive_range(t.1, t.2) << 1) | T::UnsignedOfEqualWidth::ONE;
+        let mantissa = (self.ranges.next_in_inclusive_range(t.1, t.2) << 1) | 1;
         Some(T::from_integer_mantissa_and_exponent(mantissa, t.0).unwrap())
     }
 }
@@ -2199,6 +2193,7 @@ fn special_random_positive_finite_float_inclusive_range<T: PrimitiveFloat>(
         i64::wrapping_from(be) - T::MAX_EXPONENT
     };
     SpecialRandomPositiveFiniteFloatInclusiveRange {
+        phantom: PhantomData,
         am,
         bm,
         ae,
@@ -2324,8 +2319,8 @@ fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
 #[derive(Clone, Debug)]
 pub enum SpecialRandomFloatInclusiveRange<T: PrimitiveFloat> {
     OnlySpecial(RandomValuesFromVec<T>),
-    NoSpecial(SpecialRandomFiniteFloatInclusiveRange<T>),
-    Special(WithSpecialValues<SpecialRandomFiniteFloatInclusiveRange<T>>),
+    NoSpecial(Box<SpecialRandomFiniteFloatInclusiveRange<T>>),
+    Special(Box<WithSpecialValues<SpecialRandomFiniteFloatInclusiveRange<T>>>),
 }
 
 impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
@@ -2531,17 +2526,19 @@ pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
     if only_special {
         SpecialRandomFloatInclusiveRange::OnlySpecial(random_values_from_vec(seed, special_values))
     } else if special_values.is_empty() {
-        SpecialRandomFloatInclusiveRange::NoSpecial(special_random_finite_float_inclusive_range(
-            seed,
-            a,
-            b,
-            mean_sci_exponent_numerator,
-            mean_sci_exponent_denominator,
-            mean_precision_numerator,
-            mean_precision_denominator,
+        SpecialRandomFloatInclusiveRange::NoSpecial(Box::new(
+            special_random_finite_float_inclusive_range(
+                seed,
+                a,
+                b,
+                mean_sci_exponent_numerator,
+                mean_sci_exponent_denominator,
+                mean_precision_numerator,
+                mean_precision_denominator,
+            ),
         ))
     } else {
-        SpecialRandomFloatInclusiveRange::Special(with_special_values(
+        SpecialRandomFloatInclusiveRange::Special(Box::new(with_special_values(
             seed,
             special_values,
             mean_special_p_numerator,
@@ -2557,7 +2554,7 @@ pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
                     mean_precision_denominator,
                 )
             },
-        ))
+        )))
     }
 }
 

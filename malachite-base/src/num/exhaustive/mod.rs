@@ -3,7 +3,6 @@ use itertools::{Interleave, Itertools};
 use num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2};
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
-use num::basic::traits::{One, Zero};
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::float::nice_float::NiceFloat;
@@ -450,7 +449,8 @@ pub fn exhaustive_signed_inclusive_range<T: PrimitiveSigned>(
 /// positive zero.
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct PrimitiveFloatIncreasingRange<T: PrimitiveFloat> {
-    xs: PrimitiveIntIncreasingRange<T::UnsignedOfEqualWidth>,
+    phantom: PhantomData<*const T>,
+    xs: PrimitiveIntIncreasingRange<u64>,
 }
 
 impl<T: PrimitiveFloat> Iterator for PrimitiveFloatIncreasingRange<T> {
@@ -534,6 +534,7 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
         );
     }
     PrimitiveFloatIncreasingRange {
+        phantom: PhantomData,
         xs: primitive_int_increasing_range(
             a.to_ordered_representation(),
             b.to_ordered_representation(),
@@ -606,6 +607,7 @@ pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
         );
     }
     PrimitiveFloatIncreasingRange {
+        phantom: PhantomData,
         xs: primitive_int_increasing_inclusive_range(
             a.to_ordered_representation(),
             b.to_ordered_representation(),
@@ -1066,10 +1068,11 @@ pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreas
 /// Generates all finite positive primitive floats with a specified sci_exponent and precision.
 #[derive(Clone, Debug, Default)]
 pub struct ConstantPrecisionPrimitiveFloats<T: PrimitiveFloat> {
-    n: T::UnsignedOfEqualWidth,
-    increment: T::UnsignedOfEqualWidth,
-    i: T::UnsignedOfEqualWidth,
-    count: T::UnsignedOfEqualWidth,
+    phantom: PhantomData<*const T>,
+    n: u64,
+    increment: u64,
+    i: u64,
+    count: u64,
 }
 
 impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
@@ -1080,7 +1083,7 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
             None
         } else {
             let out = T::from_bits(self.n);
-            self.i += T::UnsignedOfEqualWidth::ONE;
+            self.i += 1;
             if self.i < self.count {
                 self.n += self.increment;
             }
@@ -1151,11 +1154,11 @@ pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision<T: PrimitiveF
     assert_ne!(precision, 0);
     let max_precision = T::max_precision_for_sci_exponent(sci_exponent);
     assert!(precision <= max_precision);
-    let increment = T::UnsignedOfEqualWidth::power_of_2(max_precision - precision + 1);
+    let increment = u64::power_of_2(max_precision - precision + 1);
     let first_mantissa = if precision == 1 {
-        T::UnsignedOfEqualWidth::ONE
+        1
     } else {
-        T::UnsignedOfEqualWidth::power_of_2(precision - 1) | T::UnsignedOfEqualWidth::ONE
+        u64::power_of_2(precision - 1) | 1
     };
     let first = T::from_integer_mantissa_and_exponent(
         first_mantissa,
@@ -1164,14 +1167,15 @@ pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision<T: PrimitiveF
     .unwrap()
     .to_bits();
     let count = if precision == 1 {
-        T::UnsignedOfEqualWidth::ONE
+        1
     } else {
-        T::UnsignedOfEqualWidth::power_of_2(precision - 2)
+        u64::power_of_2(precision - 2)
     };
     ConstantPrecisionPrimitiveFloats {
+        phantom: PhantomData,
         n: first,
         increment,
-        i: T::UnsignedOfEqualWidth::ZERO,
+        i: 0,
         count,
     }
 }
@@ -1761,16 +1765,17 @@ pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<T: P
     assert_ne!(precision, 0);
     let max_precision = T::max_precision_for_sci_exponent(sci_exponent);
     assert!(precision <= max_precision);
-    if precision == 1 && am == T::UnsignedOfEqualWidth::ZERO {
+    if precision == 1 && am == 0 {
         return ConstantPrecisionPrimitiveFloats {
+            phantom: PhantomData,
             n: a.to_bits(),
-            increment: T::UnsignedOfEqualWidth::ZERO,
-            i: T::UnsignedOfEqualWidth::ZERO,
-            count: T::UnsignedOfEqualWidth::ONE,
+            increment: 0,
+            i: 0,
+            count: 1,
         };
     }
     let trailing_zeros = max_precision - precision;
-    let increment = T::UnsignedOfEqualWidth::power_of_2(trailing_zeros + 1);
+    let increment = u64::power_of_2(trailing_zeros + 1);
     let mut start_mantissa = am.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Up);
     if !start_mantissa.get_bit(trailing_zeros) {
         start_mantissa.set_bit(trailing_zeros);
@@ -1780,20 +1785,20 @@ pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<T: P
     }
     let mut end_mantissa = bm.round_to_multiple_of_power_of_2(trailing_zeros, RoundingMode::Down);
     if !end_mantissa.get_bit(trailing_zeros) {
-        let adjust = T::UnsignedOfEqualWidth::power_of_2(trailing_zeros);
+        let adjust = u64::power_of_2(trailing_zeros);
         if adjust > end_mantissa {
             return ConstantPrecisionPrimitiveFloats::default();
         }
         end_mantissa -= adjust;
     }
     assert!(start_mantissa <= end_mantissa);
-    let count =
-        ((end_mantissa - start_mantissa) >> (trailing_zeros + 1)) + T::UnsignedOfEqualWidth::ONE;
+    let count = ((end_mantissa - start_mantissa) >> (trailing_zeros + 1)) + 1;
     let first = T::from_raw_mantissa_and_exponent(start_mantissa, ae).to_bits();
     ConstantPrecisionPrimitiveFloats {
+        phantom: PhantomData,
         n: first,
         increment,
-        i: T::UnsignedOfEqualWidth::ZERO,
+        i: 0,
         count,
     }
 }
@@ -1899,13 +1904,12 @@ impl<T: PrimitiveFloat>
         let a = if sci_exponent == self.a_sci_exponent {
             self.a
         } else {
-            T::from_integer_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, sci_exponent)
-                .unwrap()
+            T::from_integer_mantissa_and_exponent(1, sci_exponent).unwrap()
         };
         let b = if sci_exponent == self.b_sci_exponent {
             self.b
         } else {
-            T::from_integer_mantissa_and_exponent(T::UnsignedOfEqualWidth::ONE, sci_exponent + 1)
+            T::from_integer_mantissa_and_exponent(1, sci_exponent + 1)
                 .unwrap()
                 .next_lower()
         };

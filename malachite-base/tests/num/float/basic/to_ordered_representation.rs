@@ -8,7 +8,7 @@ use std::panic::catch_unwind;
 #[allow(clippy::approx_constant)]
 #[test]
 pub fn test_to_ordered_representation() {
-    fn test<T: PrimitiveFloat>(x: T, out: T::UnsignedOfEqualWidth) {
+    fn test<T: PrimitiveFloat>(x: T, out: u64) {
         assert_eq!(x.to_ordered_representation(), out);
     }
     test::<f32>(f32::NEGATIVE_INFINITY, 0);

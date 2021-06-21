@@ -323,8 +323,8 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                     assert!(!limbs_slice_add_limb_in_place(scratch_3, 1));
                 }
                 let limit_2 = half_n + usize::exact_from(*scratch_3.last_mut().unwrap());
+                let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
                 if k >= FFT_FIRST_K {
-                    let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
                     scratch_lo[half_n] = Limb::iverson(_limbs_mul_fft(
                         scratch_lo,
                         half_n,
@@ -333,7 +333,6 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                         k,
                     ));
                 } else {
-                    let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
                     _limbs_mul_mod_base_pow_n_plus_1_basecase(
                         scratch_lo,
                         scratch_hi,

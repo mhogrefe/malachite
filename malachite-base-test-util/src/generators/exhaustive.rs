@@ -17,19 +17,18 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::One;
-use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom, SplitInHalf, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
     exhaustive_finite_primitive_floats, exhaustive_natural_signeds, exhaustive_negative_signeds,
-    exhaustive_nonzero_signeds, exhaustive_positive_finite_primitive_floats,
-    exhaustive_positive_primitive_ints, exhaustive_primitive_float_range,
-    exhaustive_primitive_floats, exhaustive_signed_inclusive_range, exhaustive_signed_range,
-    exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
-    primitive_int_increasing_range, PrimitiveIntIncreasingRange,
+    exhaustive_nonzero_finite_primitive_floats, exhaustive_nonzero_signeds,
+    exhaustive_positive_finite_primitive_floats, exhaustive_positive_primitive_ints,
+    exhaustive_primitive_float_range, exhaustive_primitive_floats,
+    exhaustive_signed_inclusive_range, exhaustive_signed_range, exhaustive_signeds,
+    exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
+    PrimitiveIntIncreasingRange, PrimitiveIntUpDown,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
@@ -62,7 +61,7 @@ use num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use num::float::PRIMITIVE_FLOAT_CHARS;
 use rounding_modes::ROUNDING_MODE_CHARS;
 use std::cmp::{max, min};
-use std::iter::once;
+use std::iter::{once, Chain, Once};
 use std::marker::PhantomData;
 use std::vec::IntoIter;
 
@@ -118,10 +117,11 @@ pub fn exhaustive_primitive_float_gen_var_1<T: PrimitiveFloat>() -> It<T> {
 }
 
 struct ExhaustivePositiveNaturalFloats<T: PrimitiveFloat> {
+    phantom: PhantomData<*const T>,
     done: bool,
     exponent: i64,
-    limit: T::UnsignedOfEqualWidth,
-    mantissa: T::UnsignedOfEqualWidth,
+    limit: u64,
+    mantissa: u64,
 }
 
 impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveNaturalFloats<T> {
@@ -135,11 +135,11 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveNaturalFloats<T> {
             if f == T::MAX_FINITE {
                 self.done = true;
             } else {
-                self.mantissa += T::UnsignedOfEqualWidth::ONE;
+                self.mantissa += 1;
                 if self.mantissa == self.limit {
                     self.mantissa >>= 1;
                     self.exponent += 1;
-                    self.limit = T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1);
+                    self.limit = u64::power_of_2(T::MANTISSA_WIDTH + 1);
                 }
             }
             Some(f)
@@ -149,10 +149,11 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveNaturalFloats<T> {
 
 fn exhaustive_positive_natural_floats<T: PrimitiveFloat>() -> ExhaustivePositiveNaturalFloats<T> {
     ExhaustivePositiveNaturalFloats {
+        phantom: PhantomData,
         done: false,
         exponent: 0,
-        limit: T::UnsignedOfEqualWidth::power_of_2(T::MANTISSA_WIDTH + 1),
-        mantissa: T::UnsignedOfEqualWidth::ONE,
+        limit: u64::power_of_2(T::MANTISSA_WIDTH + 1),
+        mantissa: 1,
     }
 }
 
@@ -165,11 +166,8 @@ pub fn exhaustive_primitive_float_gen_var_3<T: PrimitiveFloat>() -> It<T> {
 }
 
 pub fn exhaustive_primitive_float_gen_var_4<T: PrimitiveFloat>() -> It<T> {
-    let limit = T::from_integer_mantissa_and_exponent(
-        T::UnsignedOfEqualWidth::ONE,
-        i64::wrapping_from(T::MANTISSA_WIDTH),
-    )
-    .unwrap();
+    let limit =
+        T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH)).unwrap();
     Box::new(
         exhaustive_positive_natural_floats::<T>()
             .take_while(move |&f| f <= limit)
@@ -227,6 +225,10 @@ pub fn exhaustive_primitive_float_gen_var_11<T: PrimitiveFloat>() -> It<T> {
     Box::new(exhaustive_primitive_floats::<T>().filter(|&f| !f.is_nan()))
 }
 
+pub fn exhaustive_primitive_float_gen_var_12<T: PrimitiveFloat>() -> It<T> {
+    Box::new(exhaustive_nonzero_finite_primitive_floats())
+}
+
 // -- (PrimitiveFloat, PrimitiveFloat) --
 
 pub fn exhaustive_primitive_float_pair_gen<T: PrimitiveFloat>() -> It<(T, T)> {
@@ -243,6 +245,26 @@ pub fn exhaustive_primitive_float_pair_gen_var_1<T: PrimitiveFloat>() -> It<(T, 
 
 pub fn exhaustive_primitive_float_triple_gen<T: PrimitiveFloat>() -> It<(T, T, T)> {
     Box::new(exhaustive_triples_from_single(exhaustive_primitive_floats()))
+}
+
+// -- (PrimitiveFloat, PrimitiveSigned) --
+
+pub fn exhaustive_primitive_float_signed_pair_gen_var_1<T: PrimitiveFloat, U: PrimitiveSigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_positive_finite_primitive_floats(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>() -> It<(T, i64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_primitive_float_range(T::ONE, T::TWO),
+            exhaustive_signed_inclusive_range(T::MIN_EXPONENT, T::MAX_EXPONENT),
+        )
+        .filter(|&(m, e)| m.precision() <= T::max_precision_for_sci_exponent(e)),
+    )
 }
 
 // -- (PrimitiveFloat, RoundingMode) --
@@ -268,7 +290,6 @@ pub fn exhaustive_primitive_float_rounding_mode_pair_gen_var_1<T: PrimitiveFloat
     )
 }
 
-//TODO
 pub fn exhaustive_primitive_float_rounding_mode_pair_gen_var_2<T: PrimitiveFloat>(
 ) -> It<(T, RoundingMode)> {
     Box::new(
@@ -315,6 +336,13 @@ pub fn exhaustive_primitive_int_pair_gen_var_2<T: PrimitiveInt, U: PrimitiveInt>
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_positive_primitive_ints(),
         exhaustive_positive_primitive_ints(),
+    ))
+}
+
+pub fn exhaustive_primitive_int_pair_gen_var_3<T: PrimitiveInt, U: PrimitiveInt>() -> T1<T, U> {
+    Box::new(exhaustive_pairs_big_small(
+        exhaustive_positive_primitive_ints(),
+        primitive_int_increasing_inclusive_range(U::TWO, U::MAX),
     ))
 }
 
@@ -840,6 +868,29 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_12<T: PrimitiveSigned>() -> It<(T
     )
 }
 
+pub fn exhaustive_signed_unsigned_pair_gen_var_13<T: PrimitiveSigned, U: PrimitiveInt>(
+) -> It<(T, u64)> {
+    Box::new(lex_pairs(
+        exhaustive_signeds(),
+        primitive_int_increasing_inclusive_range(0, U::WIDTH),
+    ))
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_14<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_signed_inclusive_range(
+            if T::WIDTH <= u64::WIDTH {
+                T::MIN
+            } else {
+                -T::exact_from(u64::MAX)
+            },
+            T::saturating_from(u64::MAX),
+        ),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>() -> It<(T, u64, bool)>
@@ -1067,10 +1118,17 @@ pub fn exhaustive_unsigned_gen_var_7<T: PrimitiveUnsigned>() -> It<T> {
     ))
 }
 
-pub fn exhaustive_unsigned_gen_var_8<T: PrimitiveFloat>() -> It<T::UnsignedOfEqualWidth> {
+pub fn exhaustive_unsigned_gen_var_8<T: PrimitiveFloat>() -> It<u64> {
     Box::new(primitive_int_increasing_inclusive_range(
-        T::UnsignedOfEqualWidth::ZERO,
+        0,
         T::LARGEST_ORDERED_REPRESENTATION,
+    ))
+}
+
+pub fn exhaustive_unsigned_gen_var_9<T: PrimitiveUnsigned>() -> It<T> {
+    Box::new(primitive_int_increasing_inclusive_range(
+        T::ZERO,
+        T::power_of_2(T::WIDTH - 1),
     ))
 }
 
@@ -1110,12 +1168,120 @@ pub fn exhaustive_unsigned_primitive_int_unsigned_triple_gen_var_3<
 
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
-pub fn exhaustive_unsigned_signed_pair_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveSigned>(
+pub fn exhaustive_unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> It<(T, U)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigneds(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_unsigned_signed_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveSigned>(
 ) -> It<(T, U)> {
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_unsigneds(),
         exhaustive_signeds(),
     ))
+}
+
+struct IntegerMantissaAndExponentGenerator<T: PrimitiveFloat> {
+    phantom: PhantomData<*const T>,
+}
+
+impl<T: PrimitiveFloat> ExhaustiveDependentPairsYsGenerator<(u64, i64), (u64, i64), It<(u64, i64)>>
+    for IntegerMantissaAndExponentGenerator<T>
+{
+    #[inline]
+    fn get_ys(&self, p: &(u64, i64)) -> It<(u64, i64)> {
+        let &(mantissa, exponent) = p;
+        Box::new(exhaustive_natural_signeds().flat_map(move |i| {
+            Some((
+                mantissa.arithmetic_checked_shl(i)?,
+                exponent.checked_sub(i)?,
+            ))
+        }))
+    }
+}
+
+pub fn exhaustive_unsigned_signed_pair_gen_var_2<T: PrimitiveFloat>() -> It<(u64, i64)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::tiny(),
+            ),
+            exhaustive_positive_finite_primitive_floats().map(T::integer_mantissa_and_exponent),
+            IntegerMantissaAndExponentGenerator::<T> {
+                phantom: PhantomData,
+            },
+        )
+        .map(|p| p.1),
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveSigned, PrimitiveUnsigned) --
+
+struct ModPowerOfTwoPairWithExtraSignedGenerator<T: PrimitiveUnsigned, U: PrimitiveSigned> {
+    phantom_t: PhantomData<*const T>,
+    phantom_u: PhantomData<*const U>,
+}
+
+type LongType<T, U> =
+    ExhaustivePairs<T, PrimitiveIntIncreasingRange<T>, U, Chain<Once<U>, PrimitiveIntUpDown<U>>>;
+
+impl<T: PrimitiveUnsigned, U: PrimitiveSigned>
+    ExhaustiveDependentPairsYsGenerator<
+        u64,
+        (T, U),
+        ExhaustivePairs<
+            T,
+            PrimitiveIntIncreasingRange<T>,
+            U,
+            Chain<Once<U>, PrimitiveIntUpDown<U>>,
+        >,
+    > for ModPowerOfTwoPairWithExtraSignedGenerator<T, U>
+{
+    #[inline]
+    fn get_ys(&self, &pow: &u64) -> LongType<T, U> {
+        exhaustive_pairs(
+            primitive_int_increasing_inclusive_range(T::ZERO, T::low_mask(pow)),
+            exhaustive_signeds(),
+        )
+    }
+}
+
+pub fn exhaustive_unsigned_signed_unsigned_triple_gen_var_1<
+    T: PrimitiveUnsigned,
+    U: PrimitiveSigned,
+>() -> It<(T, U, u64)> {
+    reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        primitive_int_increasing_inclusive_range(0, T::WIDTH),
+        ModPowerOfTwoPairWithExtraSignedGenerator::<T, U> {
+            phantom_t: PhantomData,
+            phantom_u: PhantomData,
+        },
+    ))))
+}
+
+pub fn exhaustive_unsigned_signed_unsigned_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+    U: PrimitiveSigned,
+>() -> It<(T, U, T)> {
+    Box::new(
+        exhaustive_triples_xyx(
+            exhaustive_unsigneds(),
+            exhaustive_signed_inclusive_range(
+                if U::WIDTH <= u64::WIDTH {
+                    U::MIN
+                } else {
+                    -U::exact_from(u64::MAX)
+                },
+                U::saturating_from(u64::MAX),
+            ),
+        )
+        .filter_map(|(x, y, z): (T, U, T)| Some((x, y, x.checked_add(z)?.checked_add(T::ONE)?))),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -1312,13 +1478,9 @@ pub fn exhaustive_unsigned_pair_gen_var_15<T: PrimitiveUnsigned>() -> It<(T, u64
     )
 }
 
-pub fn exhaustive_unsigned_pair_gen_var_16<T: PrimitiveFloat>(
-) -> It<(T::UnsignedOfEqualWidth, T::UnsignedOfEqualWidth)> {
+pub fn exhaustive_unsigned_pair_gen_var_16<T: PrimitiveFloat>() -> It<(u64, u64)> {
     Box::new(exhaustive_pairs_from_single(
-        primitive_int_increasing_inclusive_range(
-            T::UnsignedOfEqualWidth::ZERO,
-            T::LARGEST_ORDERED_REPRESENTATION,
-        ),
+        primitive_int_increasing_inclusive_range(0, T::LARGEST_ORDERED_REPRESENTATION),
     ))
 }
 
@@ -1327,6 +1489,21 @@ pub fn exhaustive_unsigned_pair_gen_var_17<T: PrimitiveUnsigned, U: PrimitiveInt
     Box::new(lex_pairs(
         exhaustive_unsigneds(),
         primitive_int_increasing_inclusive_range(0, U::WIDTH),
+    ))
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_18<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs(
+        primitive_int_increasing_inclusive_range(T::ZERO, T::saturating_from(u64::MAX)),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_19<T: PrimitiveFloat>() -> It<(u64, u64)> {
+    Box::new(exhaustive_pairs(
+        primitive_int_increasing_range(0, u64::power_of_2(T::MANTISSA_WIDTH)),
+        primitive_int_increasing_range(0, u64::power_of_2(T::EXPONENT_WIDTH)),
     ))
 }
 
@@ -1631,7 +1808,7 @@ pub fn exhaustive_unsigned_triple_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveU
     )
 }
 
-struct ModPowerOfTwoPairWithExtraGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+struct ModPowerOfTwoPairWithExtraUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     phantom_t: PhantomData<*const T>,
     phantom_u: PhantomData<*const U>,
 }
@@ -1641,7 +1818,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         u64,
         (T, U),
         ExhaustivePairs<T, PrimitiveIntIncreasingRange<T>, U, PrimitiveIntIncreasingRange<U>>,
-    > for ModPowerOfTwoPairWithExtraGenerator<T, U>
+    > for ModPowerOfTwoPairWithExtraUnsignedGenerator<T, U>
 {
     #[inline]
     fn get_ys(
@@ -1660,11 +1837,22 @@ pub fn exhaustive_unsigned_triple_gen_var_15<T: PrimitiveUnsigned, U: PrimitiveU
     reshape_2_1_to_3(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoPairWithExtraGenerator::<T, U> {
+        ModPowerOfTwoPairWithExtraUnsignedGenerator::<T, U> {
             phantom_t: PhantomData,
             phantom_u: PhantomData,
         },
     ))))
+}
+
+pub fn exhaustive_unsigned_triple_gen_var_16<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(T, U, T)> {
+    Box::new(
+        exhaustive_triples_xyx(
+            exhaustive_unsigneds(),
+            primitive_int_increasing_inclusive_range(U::ZERO, U::saturating_from(u64::MAX)),
+        )
+        .filter_map(|(x, y, z): (T, U, T)| Some((x, y, x.checked_add(z)?.checked_add(T::ONE)?))),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -1779,7 +1967,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_7<T: PrimitiveUnsigned, U: Primitiv
     )
 }
 
-struct ModPowerOfTwoTripleWithExtraGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+struct ModPowerOfTwoTripleWithExtraUnsignedGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
     phantom_t: PhantomData<*const T>,
     phantom_u: PhantomData<*const U>,
 }
@@ -1789,7 +1977,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         u64,
         (T, T, U),
         ExhaustiveTriplesXXY<T, PrimitiveIntIncreasingRange<T>, U, PrimitiveIntIncreasingRange<U>>,
-    > for ModPowerOfTwoTripleWithExtraGenerator<T, U>
+    > for ModPowerOfTwoTripleWithExtraUnsignedGenerator<T, U>
 {
     #[inline]
     fn get_ys(
@@ -1809,14 +1997,17 @@ pub fn exhaustive_unsigned_quadruple_gen_var_8<T: PrimitiveUnsigned, U: Primitiv
     reshape_3_1_to_4(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoTripleWithExtraGenerator::<T, U> {
+        ModPowerOfTwoTripleWithExtraUnsignedGenerator::<T, U> {
             phantom_t: PhantomData,
             phantom_u: PhantomData,
         },
     ))))
 }
 
-struct ModPowerOfTwoQuadrupleWithTwoExtraGenerator<T: PrimitiveUnsigned, U: PrimitiveUnsigned> {
+struct ModPowerOfTwoQuadrupleWithTwoExtraUnsignedsGenerator<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+> {
     phantom_t: PhantomData<*const T>,
     phantom_u: PhantomData<*const U>,
 }
@@ -1826,7 +2017,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
         u64,
         (T, U, U),
         ExhaustiveTriplesXYY<T, PrimitiveIntIncreasingRange<T>, U, PrimitiveIntIncreasingRange<U>>,
-    > for ModPowerOfTwoQuadrupleWithTwoExtraGenerator<T, U>
+    > for ModPowerOfTwoQuadrupleWithTwoExtraUnsignedsGenerator<T, U>
 {
     #[inline]
     fn get_ys(
@@ -1846,7 +2037,7 @@ pub fn exhaustive_unsigned_quadruple_gen_var_9<T: PrimitiveUnsigned, U: Primitiv
     reshape_3_1_to_4(permute_2_1(Box::new(exhaustive_dependent_pairs(
         ruler_sequence(),
         primitive_int_increasing_inclusive_range(0, T::WIDTH),
-        ModPowerOfTwoQuadrupleWithTwoExtraGenerator::<T, U> {
+        ModPowerOfTwoQuadrupleWithTwoExtraUnsignedsGenerator::<T, U> {
             phantom_t: PhantomData,
             phantom_u: PhantomData,
         },

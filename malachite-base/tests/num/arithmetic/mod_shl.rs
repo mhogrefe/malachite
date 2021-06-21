@@ -1,6 +1,12 @@
-use malachite_base::num::arithmetic::traits::{ModShl, ModShlAssign};
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, ModShl, ModShlAssign, ModShr};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_gen_var_5, signed_unsigned_pair_gen_var_13, unsigned_gen_var_5,
+    unsigned_pair_gen_var_16, unsigned_pair_gen_var_25, unsigned_signed_unsigned_triple_gen_var_2,
+    unsigned_triple_gen_var_18,
+};
 
 #[test]
 fn test_mod_shl() {
@@ -27,4 +33,83 @@ fn test_mod_shl() {
     test::<u8, i64>(10, -2, 15, 2);
     test::<u8, i64>(10, -100, 19, 0);
     test::<u128, i8>(10, -100, 19, 0);
+}
+
+fn mod_shl_properties_unsigned_unsigned_helper<
+    T: ArithmeticCheckedShl<U, Output = T>
+        + ModShl<U, Output = T>
+        + ModShlAssign<U>
+        + PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() {
+    unsigned_triple_gen_var_18::<T, U>().test_properties(|(n, u, m)| {
+        assert!(n.mod_is_reduced(&m));
+        let shifted = n.mod_shl(u, m);
+        assert!(shifted.mod_is_reduced(&m));
+
+        let mut shifted_alt = n;
+        shifted_alt.mod_shl_assign(u, m);
+        assert_eq!(shifted_alt, shifted);
+
+        if let Some(shifted_alt) = n.arithmetic_checked_shl(u) {
+            assert_eq!(shifted_alt % m, shifted);
+        }
+    });
+
+    unsigned_pair_gen_var_16::<T>().test_properties(|(n, m)| {
+        assert_eq!(n.mod_shl(U::ZERO, m), n);
+    });
+
+    unsigned_pair_gen_var_25::<U, T>().test_properties(|(u, m)| {
+        assert_eq!(T::ZERO.mod_shl(u, m), T::ZERO);
+    });
+
+    unsigned_gen_var_5::<U>().test_properties(|u| {
+        assert_eq!(T::ZERO.mod_shl(u, T::ONE), T::ZERO);
+    });
+}
+
+fn mod_shl_properties_unsigned_signed_helper<
+    T: ArithmeticCheckedShl<U, Output = T>
+        + ModShl<U, Output = T>
+        + ModShr<U, Output = T>
+        + ModShlAssign<U>
+        + PrimitiveUnsigned,
+    U: PrimitiveSigned,
+>() {
+    unsigned_signed_unsigned_triple_gen_var_2::<T, U>().test_properties(|(n, i, m)| {
+        assert!(n.mod_is_reduced(&m));
+        let shifted = n.mod_shl(i, m);
+        assert!(shifted.mod_is_reduced(&m));
+
+        let mut shifted_alt = n;
+        shifted_alt.mod_shl_assign(i, m);
+        assert_eq!(shifted_alt, shifted);
+
+        if let Some(shifted_alt) = n.arithmetic_checked_shl(i) {
+            assert_eq!(shifted_alt % m, shifted);
+        }
+
+        if i != U::MIN {
+            assert_eq!(n.mod_shr(-i, m), shifted);
+        }
+    });
+
+    unsigned_pair_gen_var_16::<T>().test_properties(|(n, m)| {
+        assert_eq!(n.mod_shl(U::ZERO, m), n);
+    });
+
+    signed_unsigned_pair_gen_var_13::<U, T>().test_properties(|(i, m)| {
+        assert_eq!(T::ZERO.mod_shl(i, m), T::ZERO);
+    });
+
+    signed_gen_var_5::<U>().test_properties(|i| {
+        assert_eq!(T::ZERO.mod_shl(i, T::ONE), T::ZERO);
+    });
+}
+
+#[test]
+fn mod_shl_properties() {
+    apply_fn_to_unsigneds_and_unsigneds!(mod_shl_properties_unsigned_unsigned_helper);
+    apply_fn_to_unsigneds_and_signeds!(mod_shl_properties_unsigned_signed_helper);
 }

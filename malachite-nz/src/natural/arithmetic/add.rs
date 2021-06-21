@@ -160,11 +160,10 @@ pub fn limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     let (mut sum, overflow) = x.overflowing_add(y);
-    if *carry {
-        *carry = overflow;
+    let c = *carry;
+    *carry = overflow;
+    if c {
         *carry |= sum.overflowing_add_assign(1);
-    } else {
-        *carry = overflow;
     }
     sum
 }

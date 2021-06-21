@@ -31,7 +31,7 @@ macro_rules! impl_mod_neg {
             /// # Examples
             /// See the documentation of the `num::arithmetic::mod_neg` module.
             ///
-            /// This is nmod_neg from nmod_vec.h, FLINT Dev 1.
+            /// This is nmod_neg from nmod_vec.h, FLINT 2.7.1.
             #[inline]
             fn mod_neg(self, m: $t) -> $t {
                 _mod_neg(self, m)
@@ -49,7 +49,7 @@ macro_rules! impl_mod_neg {
             /// # Examples
             /// See the documentation of the `num::arithmetic::mod_neg` module.
             ///
-            /// This is nmod_neg from nmod_vec.h, FLINT Dev 1, where the output is assigned to a.
+            /// This is nmod_neg from nmod_vec.h, FLINT 2.7.1, where the output is assigned to a.
             #[inline]
             fn mod_neg_assign(&mut self, m: $t) {
                 _mod_neg_assign(self, m)

@@ -37,7 +37,7 @@ pub fn integer_gen_nrm() -> Generator<(BigInt, rug::Integer, Integer)> {
 // All `Integer`s that are exactly equal to a floating point value of type `T`.
 pub fn integer_gen_var_1<T: PrimitiveFloat>() -> Generator<Integer>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     Generator::new(
         &exhaustive_integer_gen_var_1::<T>,
@@ -58,7 +58,7 @@ pub fn integer_gen_var_2<T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloa
 // All `Integer`s that are exactly between two adjacent floats of type `T`.
 pub fn integer_gen_var_3<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>() -> Generator<Integer>
 where
-    Natural: ExactFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: ExactFrom<T> + From<T>,
 {
     Generator::new(
         &exhaustive_integer_gen_var_3::<T>,
@@ -158,7 +158,7 @@ pub fn natural_gen_var_2() -> Generator<Natural> {
 // All `Natural`s that are exactly equal to a floating point value of type `T`.
 pub fn natural_gen_var_3<T: PrimitiveFloat>() -> Generator<Natural>
 where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     Generator::new(
         &exhaustive_natural_gen_var_3::<T>,
@@ -181,7 +181,7 @@ type GN = Generator<Natural>;
 // All `Natural`s that are exactly between two adjacent floats of type `T`.
 pub fn natural_gen_var_5<T: for<'a> ExactFrom<&'a Natural> + PrimitiveFloat>() -> GN
 where
-    Natural: ExactFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: ExactFrom<T> + From<T>,
 {
     Generator::new(
         &exhaustive_natural_gen_var_5::<T>,
@@ -236,6 +236,15 @@ pub fn natural_pair_gen_var_2() -> Generator<(Natural, Natural)> {
         &exhaustive_natural_pair_gen_var_2,
         &random_natural_pair_gen_var_2,
         &special_random_natural_pair_gen_var_1,
+    )
+}
+
+// All pairs of `Natural`s where the first `Natural` is positive and the second is at least 2.
+pub fn natural_pair_gen_var_3() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_3,
+        &random_natural_pair_gen_var_3,
+        &special_random_natural_pair_gen_var_2,
     )
 }
 

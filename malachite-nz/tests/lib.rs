@@ -1,5 +1,6 @@
 #![allow(
     unstable_name_collisions,
+    clippy::bool_assert_comparison,
     clippy::assertions_on_constants,
     clippy::cognitive_complexity,
     clippy::excessive_precision,
@@ -14,9 +15,9 @@
     clippy::cast_lossless,
     clippy::explicit_into_iter_loop,
     clippy::explicit_iter_loop,
-    clippy::filter_map,
     clippy::filter_map_next,
     clippy::large_digit_groups,
+    clippy::manual_filter_map,
     clippy::manual_find_map,
     clippy::map_flatten,
     clippy::map_unwrap_or,
@@ -181,6 +182,7 @@ pub mod natural {
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
         pub mod is_power_of_2;
+        pub mod log_base;
         pub mod log_base_2;
         pub mod log_base_power_of_2;
         pub mod mod_add;
@@ -247,6 +249,7 @@ pub mod natural {
         pub mod from_limbs;
         pub mod from_primitive_int;
         pub mod primitive_int_from_natural;
+        pub mod sci_mantissa_and_exponent;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {

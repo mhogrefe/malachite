@@ -94,16 +94,15 @@ fn _shr_round_assign_unsigned_unsigned<
         RoundingMode::Nearest => {
             let original = *x;
             *x >>= bits - U::ONE;
-            if x.even() {
+            let old_x = *x;
+            *x >>= 1;
+            if old_x.even() {
                 // round down
-                *x >>= 1;
-            } else if *x << (bits - U::ONE) != original {
+            } else if old_x << (bits - U::ONE) != original {
                 // round up
-                *x >>= 1;
                 *x += T::ONE;
             } else {
                 // result is half-integer; round to even
-                *x >>= 1;
                 if x.odd() {
                     *x += T::ONE;
                 }

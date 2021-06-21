@@ -48,7 +48,7 @@ macro_rules! impl_xxx_sub_yyy_is_zzz {
             /// );
             /// ```
             ///
-            /// This is sub_dddmmmsss from longlong.h, FLINT Dev 1, where (dh, dm, dl) is returned.
+            /// This is sub_dddmmmsss from longlong.h, FLINT 2.7.1, where (dh, dm, dl) is returned.
             #[inline]
             fn xxx_sub_yyy_is_zzz(
                 x_2: $t,
@@ -79,7 +79,7 @@ impl XXXSubYYYIsZZZ for usize {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is sub_dddmmmsss from longlong.h, FLINT Dev 1, where (dh, dm, dl) is returned.
+    /// This is sub_dddmmmsss from longlong.h, FLINT 2.7.1, where (dh, dm, dl) is returned.
     fn xxx_sub_yyy_is_zzz(
         x_2: usize,
         x_1: usize,

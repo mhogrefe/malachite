@@ -14,33 +14,16 @@ macro_rules! impl_next_power_of_2 {
         impl NextPowerOf2Assign for $t {
             /// Replaces `self` with the smallest power of 2 greater than or equal to `self`.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets 2^{\lceil \log_2 x \rceil}$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// Panics if the next power of 2 is greater than the type's maximum value.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::NextPowerOf2Assign;
-            ///
-            /// let mut x = 0u8;
-            /// x.next_power_of_2_assign();
-            /// assert_eq!(x, 1);
-            ///
-            /// let mut x = 4u16;
-            /// x.next_power_of_2_assign();
-            /// assert_eq!(x, 4);
-            ///
-            /// let mut x = 10u32;
-            /// x.next_power_of_2_assign();
-            /// assert_eq!(x, 16);
-            ///
-            /// let mut x = (1u64 << 40) - 5;
-            /// x.next_power_of_2_assign();
-            /// assert_eq!(x, 1 << 40);
-            /// ```
+            /// See the documentation of the `num::arithmetic::next_power_of_2` module.
             #[inline]
             fn next_power_of_2_assign(&mut self) {
                 *self = $t::next_power_of_2(*self);

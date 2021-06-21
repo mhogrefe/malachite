@@ -55,7 +55,7 @@ macro_rules! impl_xxxx_add_yyyy_is_zzzz {
             /// );
             /// ```
             ///
-            /// This is add_ssssaaaaaaaa from longlong.h, FLINT Dev 1, where (s3, s2, s1, s0) is
+            /// This is add_ssssaaaaaaaa from longlong.h, FLINT 2.7.1, where (s3, s2, s1, s0) is
             /// returned.
             #[inline]
             fn xxxx_add_yyyy_is_zzzz(
@@ -89,7 +89,7 @@ impl XXXXAddYYYYIsZZZZ for usize {
     ///
     /// Additional memory: worst case O(1)
     ///
-    /// This is add_ssssaaaaaaaa from longlong.h, FLINT Dev 1, where (s3, s2, s1, s0) is returned.
+    /// This is add_ssssaaaaaaaa from longlong.h, FLINT 2.7.1, where (s3, s2, s1, s0) is returned.
     fn xxxx_add_yyyy_is_zzzz(
         x_3: usize,
         x_2: usize,

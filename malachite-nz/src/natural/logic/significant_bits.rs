@@ -14,8 +14,6 @@ use natural::Natural;
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpz_sizeinbase from mpz/sizeinbase.c, GMP 6.1.2, where base == 2.
-///
 /// # Panics
 /// Panics if `xs` is empty.
 ///

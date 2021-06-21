@@ -26,7 +26,6 @@ cargo update &&
 cargo fmt &&
 cargo clippy --tests &&
 cargo test --release &&
-cargo doc &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps &&
 cargo build --release --target wasm32-unknown-unknown &&
 cd ../malachite-base-test-util &&
@@ -41,7 +40,6 @@ cargo test --release --features 32_bit_limbs --features fail_on_untested_path --
 cargo test --release --test lib --features fail_on_untested_path --features serde && # Skip doctests when in 64-bit mode
 python extra-tests.py &&
 cargo clippy --tests --features serde &&
-cargo doc &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps &&
 cargo build --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
 cargo build --release --target wasm32-unknown-unknown &&

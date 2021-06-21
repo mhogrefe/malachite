@@ -2,9 +2,9 @@
     clippy::cast_lossless,
     clippy::explicit_into_iter_loop,
     clippy::explicit_iter_loop,
-    clippy::filter_map,
     clippy::filter_map_next,
     clippy::large_digit_groups,
+    clippy::manual_filter_map,
     clippy::manual_find_map,
     clippy::map_flatten,
     clippy::map_unwrap_or,
@@ -22,6 +22,8 @@
     clippy::unused_self
 )]
 #![allow(
+    clippy::assertions_on_constants, // Compile-time asserts still useful
+    clippy::bool_assert_comparison, // Often clearer than using !
     clippy::cognitive_complexity,
     clippy::excessive_precision,
     clippy::too_many_arguments,
@@ -191,6 +193,7 @@ pub mod num {
         pub mod divisible_by_power_of_2;
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
+        pub mod log_base;
         pub mod log_base_2;
         pub mod log_base_power_of_2;
         pub mod mod_add;
@@ -348,13 +351,16 @@ pub mod num {
         pub mod basic {
             pub mod abs_negative_zero;
             pub mod constants;
-            // pub mod exponent;
-            pub mod from_mantissa_and_exponent;
+            pub mod from_integer_mantissa_and_exponent;
             pub mod from_ordered_representation;
+            pub mod from_raw_mantissa_and_exponent;
+            pub mod from_sci_mantissa_and_exponent;
+            pub mod integer_mantissa_and_exponent;
             pub mod is_negative_zero;
-            pub mod mantissa_and_exponent;
             pub mod next_higher;
             pub mod next_lower;
+            pub mod raw_mantissa_and_exponent;
+            pub mod sci_mantissa_and_exponent;
             pub mod to_ordered_representation;
         }
         pub mod nice_float {

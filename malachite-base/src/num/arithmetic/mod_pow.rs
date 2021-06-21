@@ -24,7 +24,7 @@ pub fn _simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
 
 // m.get_highest_bit(), x < m, y < m
 //
-// This is n_mulmod_preinv from ulong_extras/mulmod_preinv.c, FLINT Dev 1.
+// This is n_mulmod_preinv from ulong_extras/mulmod_preinv.c, FLINT 2.7.1.
 fn mul_mod_helper<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
@@ -54,7 +54,7 @@ fn mul_mod_helper<
 
 // m.get_highest_bit(), x < m
 //
-// This is n_powmod_ui_preinv from ulong_extras/powmod_ui_preinv.c, FLINT Dev 1.
+// This is n_powmod_ui_preinv from ulong_extras/powmod_ui_preinv.c, FLINT 2.7.1.
 fn _fast_pow_mod<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
@@ -236,15 +236,14 @@ impl ModPowPrecomputed<u64, usize> for usize {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `exp.significant_bits()`.
     fn mod_pow_precomputed(self, exp: u64, m: usize, data: &(usize, u64)) -> usize {
+        let (inverse, shift) = *data;
         if usize::WIDTH == u32::WIDTH {
-            let (inverse, shift) = *data;
             usize::wrapping_from(u32::wrapping_from(self).mod_pow_precomputed(
                 exp,
                 u32::wrapping_from(m),
                 &(u32::wrapping_from(inverse), shift),
             ))
         } else {
-            let (inverse, shift) = *data;
             usize::wrapping_from(u64::wrapping_from(self).mod_pow_precomputed(
                 exp,
                 u64::wrapping_from(m),

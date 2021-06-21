@@ -15,7 +15,6 @@ use std::str::FromStr;
 #[test]
 fn test_f32_rounding_from_natural() {
     let test = |n: &str, rm: RoundingMode, out| {
-        assert_eq!(f32::rounding_from(Natural::from_str(n).unwrap(), rm), out);
         assert_eq!(f32::rounding_from(&Natural::from_str(n).unwrap(), rm), out);
     };
     test("3", RoundingMode::Exact, 3.0);
@@ -129,7 +128,7 @@ fn test_f32_rounding_from_natural() {
 #[should_panic]
 fn f32_rounding_from_natural_fail_1() {
     f32::rounding_from(
-        Natural::from_str("340282346638528859811704183484516925439").unwrap(),
+        &Natural::from_str("340282346638528859811704183484516925439").unwrap(),
         RoundingMode::Exact,
     );
 }
@@ -138,39 +137,6 @@ fn f32_rounding_from_natural_fail_1() {
 #[should_panic]
 fn f32_rounding_from_natural_fail_2() {
     f32::rounding_from(
-        Natural::from_str("340282346638528859811704183484516925441").unwrap(),
-        RoundingMode::Exact,
-    );
-}
-
-#[test]
-#[should_panic]
-fn f32_rounding_from_natural_fail_3() {
-    f32::rounding_from(Natural::from_str("16777217").unwrap(), RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic]
-fn f32_rounding_from_natural_fail_4() {
-    f32::rounding_from(
-        Natural::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
-        RoundingMode::Exact,
-    );
-}
-
-#[test]
-#[should_panic]
-fn f32_rounding_from_natural_ref_fail_1() {
-    f32::rounding_from(
-        &Natural::from_str("340282346638528859811704183484516925439").unwrap(),
-        RoundingMode::Exact,
-    );
-}
-
-#[test]
-#[should_panic]
-fn f32_rounding_from_natural_ref_fail_2() {
-    f32::rounding_from(
         &Natural::from_str("340282346638528859811704183484516925441").unwrap(),
         RoundingMode::Exact,
     );
@@ -178,13 +144,13 @@ fn f32_rounding_from_natural_ref_fail_2() {
 
 #[test]
 #[should_panic]
-fn f32_rounding_from_natural_ref_fail_3() {
+fn f32_rounding_from_natural_fail_3() {
     f32::rounding_from(&Natural::from_str("16777217").unwrap(), RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic]
-fn f32_rounding_from_natural_ref_fail_4() {
+fn f32_rounding_from_natural_fail_4() {
     f32::rounding_from(
         &Natural::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
         RoundingMode::Exact,
@@ -194,7 +160,6 @@ fn f32_rounding_from_natural_ref_fail_4() {
 #[test]
 fn test_f64_rounding_from_natural() {
     let test = |n: &str, rm: RoundingMode, out| {
-        assert_eq!(f64::rounding_from(Natural::from_str(n).unwrap(), rm), out);
         assert_eq!(f64::rounding_from(&Natural::from_str(n).unwrap(), rm), out);
     };
     test("3", RoundingMode::Exact, 3.0);
@@ -329,7 +294,7 @@ fn test_f64_rounding_from_natural() {
 #[test]
 #[should_panic]
 fn f64_rounding_from_natural_fail_1() {
-    f64::rounding_from(Natural::from_str(
+    f64::rounding_from(&Natural::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
@@ -340,7 +305,7 @@ fn f64_rounding_from_natural_fail_1() {
 #[test]
 #[should_panic]
 fn f64_rounding_from_natural_fail_2() {
-    f64::rounding_from(Natural::from_str(
+    f64::rounding_from(&Natural::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
@@ -352,37 +317,6 @@ fn f64_rounding_from_natural_fail_2() {
 #[should_panic]
 fn f64_rounding_from_natural_fail_3() {
     f64::rounding_from(
-        Natural::from_str("9007199254740993").unwrap(),
-        RoundingMode::Exact,
-    );
-}
-
-#[test]
-#[should_panic]
-fn f64_rounding_from_natural_ref_fail_1() {
-    f64::rounding_from(&Natural::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367").unwrap(),
-                       RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic]
-fn f64_rounding_from_natural_ref_fail_2() {
-    f64::rounding_from(&Natural::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369").unwrap(),
-                       RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic]
-fn f64_rounding_from_natural_ref_fail_3() {
-    f64::rounding_from(
         &Natural::from_str("9007199254740993").unwrap(),
         RoundingMode::Exact,
     );
@@ -391,7 +325,6 @@ fn f64_rounding_from_natural_ref_fail_3() {
 #[test]
 fn test_f32_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f32::from(Natural::from_str(n).unwrap()), out);
         assert_eq!(f32::from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", 3.0);
@@ -418,7 +351,6 @@ fn test_f32_from_natural() {
 #[test]
 fn test_f64_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f64::from(Natural::from_str(n).unwrap()), out);
         assert_eq!(f64::from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", 3.0);
@@ -453,7 +385,6 @@ fn test_f64_from_natural() {
 #[test]
 fn test_f32_checked_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f32::checked_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(f32::checked_from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", Some(3.0));
@@ -483,7 +414,6 @@ fn test_f32_checked_from_natural() {
 #[test]
 fn test_f64_checked_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f64::checked_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(f64::checked_from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", Some(3.0));
@@ -518,7 +448,6 @@ fn test_f64_checked_from_natural() {
 #[test]
 fn test_f32_exact_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f32::exact_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(f32::exact_from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", 3.0);
@@ -535,74 +464,30 @@ fn test_f32_exact_from_natural() {
 #[test]
 #[should_panic]
 fn f32_exact_from_natural_fail_1() {
-    f32::exact_from(Natural::from_str("9007199254740993").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_natural_fail_2() {
-    f32::exact_from(Natural::from_str("18014398509481985").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_natural_fail_3() {
-    f32::exact_from(Natural::from_str("18014398509481986").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_natural_fail_4() {
-    f32::exact_from(Natural::from_str("18014398509481987").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_natural_fail_5() {
-    f32::exact_from(Natural::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_natural_fail_6() {
-    f32::exact_from(Natural::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_natural_ref_fail_1() {
     f32::exact_from(&Natural::from_str("9007199254740993").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_natural_ref_fail_2() {
+fn f32_exact_from_natural_fail_2() {
     f32::exact_from(&Natural::from_str("18014398509481985").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_natural_ref_fail_3() {
+fn f32_exact_from_natural_fail_3() {
     f32::exact_from(&Natural::from_str("18014398509481986").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_natural_ref_fail_4() {
+fn f32_exact_from_natural_fail_4() {
     f32::exact_from(&Natural::from_str("18014398509481987").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_natural_ref_fail_5() {
+fn f32_exact_from_natural_fail_5() {
     f32::exact_from(&Natural::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
@@ -612,7 +497,7 @@ fn f32_exact_from_natural_ref_fail_5() {
 
 #[test]
 #[should_panic]
-fn f32_exact_from_natural_ref_fail_6() {
+fn f32_exact_from_natural_fail_6() {
     f32::exact_from(&Natural::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
@@ -623,7 +508,7 @@ fn f32_exact_from_natural_ref_fail_6() {
 #[test]
 fn test_f64_exact_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f64::exact_from(Natural::from_str(n).unwrap()), out);
+        assert_eq!(f64::exact_from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", 3.0);
     test("123", 123.0);
@@ -643,74 +528,30 @@ fn test_f64_exact_from_natural() {
 #[test]
 #[should_panic]
 fn f64_exact_from_natural_fail_1() {
-    f64::exact_from(Natural::from_str("9007199254740993").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_natural_fail_2() {
-    f64::exact_from(Natural::from_str("18014398509481985").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_natural_fail_3() {
-    f64::exact_from(Natural::from_str("18014398509481986").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_natural_fail_4() {
-    f64::exact_from(Natural::from_str("18014398509481987").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_natural_fail_5() {
-    f64::exact_from(Natural::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_natural_fail_6() {
-    f64::exact_from(Natural::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_natural_ref_fail_1() {
     f64::exact_from(&Natural::from_str("9007199254740993").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f64_exact_from_natural_ref_fail_2() {
+fn f64_exact_from_natural_fail_2() {
     f64::exact_from(&Natural::from_str("18014398509481985").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f64_exact_from_natural_ref_fail_3() {
+fn f64_exact_from_natural_fail_3() {
     f64::exact_from(&Natural::from_str("18014398509481986").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f64_exact_from_natural_ref_fail_4() {
+fn f64_exact_from_natural_fail_4() {
     f64::exact_from(&Natural::from_str("18014398509481987").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f64_exact_from_natural_ref_fail_5() {
+fn f64_exact_from_natural_fail_5() {
     f64::exact_from(&Natural::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
@@ -720,7 +561,7 @@ fn f64_exact_from_natural_ref_fail_5() {
 
 #[test]
 #[should_panic]
-fn f64_exact_from_natural_ref_fail_6() {
+fn f64_exact_from_natural_fail_6() {
     f64::exact_from(&Natural::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
@@ -731,7 +572,6 @@ fn f64_exact_from_natural_ref_fail_6() {
 #[test]
 fn test_f32_convertible_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f32::convertible_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(f32::convertible_from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", true);
@@ -758,7 +598,6 @@ fn test_f32_convertible_from_natural() {
 #[test]
 fn test_f64_convertible_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f64::convertible_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(f64::convertible_from(&Natural::from_str(n).unwrap()), out);
     };
     test("3", true);
@@ -794,23 +633,17 @@ fn float_rounding_from_natural_properties_helper<
     T: for<'a> CheckedFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat
-        + RoundingFrom<Natural>
         + for<'a> RoundingFrom<&'a Natural>,
 >()
 where
-    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth> + RoundingFrom<T>,
+    Natural: CheckedFrom<T> + From<T> + RoundingFrom<T>,
 {
     natural_rounding_mode_pair_gen_var_1::<T>().test_properties(|(n, rm)| {
-        let f = T::rounding_from(&n, rm);
-        assert_eq!(NiceFloat(T::rounding_from(n, rm)), NiceFloat(f));
+        T::rounding_from(&n, rm);
     });
 
     natural_gen_var_3::<T>().test_properties(|n| {
-        let f = T::rounding_from(n.clone(), RoundingMode::Exact);
-        assert_eq!(
-            NiceFloat(T::rounding_from(&n, RoundingMode::Exact)),
-            NiceFloat(f)
-        );
+        let f = T::rounding_from(&n, RoundingMode::Exact);
         assert_eq!(
             NiceFloat(f),
             NiceFloat(T::rounding_from(&n, RoundingMode::Floor))
@@ -831,65 +664,25 @@ where
             NiceFloat(f),
             NiceFloat(T::rounding_from(&n, RoundingMode::Nearest))
         );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor))
-        );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Ceiling))
-        );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Down))
-        );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Up))
-        );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Nearest))
-        );
         assert_eq!(Natural::rounding_from(f, RoundingMode::Exact), n);
     });
 
     natural_gen_var_4::<T>().test_properties(|n| {
         let f_below = T::rounding_from(&n, RoundingMode::Floor);
-        assert_eq!(
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor)),
-            NiceFloat(f_below)
-        );
         let f_above = f_below.next_higher();
         assert_eq!(
             NiceFloat(f_above),
             NiceFloat(T::rounding_from(&n, RoundingMode::Ceiling))
         );
         assert_eq!(
-            NiceFloat(f_above),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Ceiling))
-        );
-        assert_eq!(
             NiceFloat(f_below),
             NiceFloat(T::rounding_from(&n, RoundingMode::Down))
-        );
-        assert_eq!(
-            NiceFloat(f_below),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Down))
         );
         assert_eq!(
             NiceFloat(f_above),
             NiceFloat(T::rounding_from(&n, RoundingMode::Up))
         );
-        assert_eq!(
-            NiceFloat(f_above),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Up))
-        );
         let f_nearest = T::rounding_from(&n, RoundingMode::Nearest);
-        assert_eq!(
-            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
-            NiceFloat(f_nearest)
-        );
         assert!(
             NiceFloat(f_nearest) == NiceFloat(f_below)
                 || NiceFloat(f_nearest) == NiceFloat(f_above)
@@ -900,7 +693,7 @@ where
     natural_gen_var_5::<T>().test_properties(|n| {
         let floor = T::rounding_from(&n, RoundingMode::Floor);
         let ceiling = floor.next_higher();
-        let nearest = T::rounding_from(n, RoundingMode::Nearest);
+        let nearest = T::rounding_from(&n, RoundingMode::Nearest);
         assert_eq!(
             NiceFloat(nearest),
             NiceFloat(if floor.to_bits().even() {
@@ -918,42 +711,32 @@ fn float_rounding_from_natural_properties() {
 }
 
 fn float_from_natural_properties_helper<
-    T: CheckedFrom<Natural>
-        + for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> CheckedFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
-        + From<Natural>
         + for<'a> From<&'a Natural>
         + PrimitiveFloat
-        + RoundingFrom<Natural>
         + for<'a> RoundingFrom<&'a Natural>,
 >()
 where
-    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: CheckedFrom<T> + From<T>,
 {
     natural_gen().test_properties(|n| {
         let f = T::from(&n);
-        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f));
         assert_eq!(
-            NiceFloat(T::rounding_from(n, RoundingMode::Nearest)),
+            NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
             NiceFloat(f)
         );
     });
 
     natural_gen_var_3::<T>().test_properties(|n| {
         let f = T::from(&n);
-        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f));
         assert_eq!(Natural::from(f), n);
     });
 
     natural_gen_var_4::<T>().test_properties(|n| {
         let f_below = T::rounding_from(&n, RoundingMode::Floor);
-        assert_eq!(
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor)),
-            NiceFloat(f_below)
-        );
         let f_above = f_below.next_higher();
         let f_nearest = T::from(&n);
-        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f_nearest));
         assert!(
             NiceFloat(f_nearest) == NiceFloat(f_below)
                 || NiceFloat(f_nearest) == NiceFloat(f_above)
@@ -964,7 +747,7 @@ where
     natural_gen_var_5::<T>().test_properties(|n| {
         let floor = T::rounding_from(&n, RoundingMode::Floor);
         let ceiling = floor.next_higher();
-        let nearest = T::from(n);
+        let nearest = T::from(&n);
         assert_eq!(
             NiceFloat(nearest),
             NiceFloat(if floor.to_bits().even() {
@@ -982,23 +765,20 @@ fn float_from_natural_properties() {
 }
 
 fn float_checked_from_natural_properties_helper<
-    T: CheckedFrom<Natural>
-        + for<'a> CheckedFrom<&'a Natural>
+    T: for<'a> CheckedFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat
         + for<'a> RoundingFrom<&'a Natural>,
 >()
 where
-    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth> + RoundingFrom<T>,
+    Natural: CheckedFrom<T> + From<T> + RoundingFrom<T>,
 {
     natural_gen().test_properties(|n| {
-        let of = T::checked_from(&n);
-        assert_eq!(T::checked_from(n).map(NiceFloat), of.map(NiceFloat));
+        T::checked_from(&n);
     });
 
     natural_gen_var_3::<T>().test_properties(|n| {
         let f = T::exact_from(&n);
-        assert_eq!(NiceFloat(T::exact_from(n.clone())), NiceFloat(f));
         assert_eq!(
             NiceFloat(f),
             NiceFloat(T::rounding_from(&n, RoundingMode::Exact))
@@ -1007,11 +787,11 @@ where
     });
 
     natural_gen_var_4::<T>().test_properties(|n| {
-        assert!(T::checked_from(n).is_none());
+        assert!(T::checked_from(&n).is_none());
     });
 
     natural_gen_var_5::<T>().test_properties(|n| {
-        assert!(T::checked_from(n).is_none());
+        assert!(T::checked_from(&n).is_none());
     });
 }
 
@@ -1021,28 +801,25 @@ fn float_checked_from_natural_properties() {
 }
 
 fn float_convertible_from_natural_properties_helper<
-    T: for<'a> CheckedFrom<&'a Natural>
-        + ConvertibleFrom<Natural>
-        + for<'a> ConvertibleFrom<&'a Natural>
-        + PrimitiveFloat,
+    T: for<'a> CheckedFrom<&'a Natural> + for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
 >()
 where
-    Natural: CheckedFrom<T> + From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: CheckedFrom<T> + From<T>,
 {
     natural_gen().test_properties(|n| {
-        assert_eq!(T::convertible_from(&n), T::convertible_from(n));
+        T::convertible_from(&n);
     });
 
     natural_gen_var_3::<T>().test_properties(|n| {
-        assert!(T::convertible_from(n));
+        assert!(T::convertible_from(&n));
     });
 
     natural_gen_var_4::<T>().test_properties(|n| {
-        assert!(!T::convertible_from(n));
+        assert!(!T::convertible_from(&n));
     });
 
     natural_gen_var_5::<T>().test_properties(|n| {
-        assert!(!T::convertible_from(n));
+        assert!(!T::convertible_from(&n));
     });
 }
 

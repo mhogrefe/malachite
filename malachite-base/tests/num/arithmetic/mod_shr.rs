@@ -1,6 +1,11 @@
-use malachite_base::num::arithmetic::traits::{ModShr, ModShrAssign};
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShr, ModShl, ModShr, ModShrAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_gen_var_5, signed_unsigned_pair_gen_var_13, unsigned_pair_gen_var_16,
+    unsigned_signed_unsigned_triple_gen_var_2,
+};
 
 #[test]
 fn test_mod_shr() {
@@ -27,4 +32,48 @@ fn test_mod_shr() {
     test::<u8, i64>(10, 2, 15, 2);
     test::<u8, i64>(10, 100, 19, 0);
     test::<u128, i8>(10, 100, 19, 0);
+}
+
+fn mod_shr_properties_helper<
+    T: ArithmeticCheckedShr<U, Output = T>
+        + ModShl<U, Output = T>
+        + ModShr<U, Output = T>
+        + ModShrAssign<U>
+        + PrimitiveUnsigned,
+    U: PrimitiveSigned,
+>() {
+    unsigned_signed_unsigned_triple_gen_var_2::<T, U>().test_properties(|(n, i, m)| {
+        assert!(n.mod_is_reduced(&m));
+        let shifted = n.mod_shr(i, m);
+        assert!(shifted.mod_is_reduced(&m));
+
+        let mut shifted_alt = n;
+        shifted_alt.mod_shr_assign(i, m);
+        assert_eq!(shifted_alt, shifted);
+
+        if let Some(shifted_alt) = n.arithmetic_checked_shr(i) {
+            assert_eq!(shifted_alt % m, shifted);
+        }
+
+        if i != U::MIN {
+            assert_eq!(n.mod_shl(-i, m), shifted);
+        }
+    });
+
+    unsigned_pair_gen_var_16::<T>().test_properties(|(n, m)| {
+        assert_eq!(n.mod_shr(U::ZERO, m), n);
+    });
+
+    signed_unsigned_pair_gen_var_13::<U, T>().test_properties(|(i, m)| {
+        assert_eq!(T::ZERO.mod_shr(i, m), T::ZERO);
+    });
+
+    signed_gen_var_5::<U>().test_properties(|i| {
+        assert_eq!(T::ZERO.mod_shl(i, T::ONE), T::ZERO);
+    });
+}
+
+#[test]
+fn mod_shr_properties() {
+    apply_fn_to_unsigneds_and_signeds!(mod_shr_properties_helper);
 }

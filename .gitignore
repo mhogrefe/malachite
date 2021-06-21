@@ -4,4 +4,5 @@ target
 *.iml
 src/integer_old.rs
 *.DS_Store
+*/.vscode/*
 

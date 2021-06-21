@@ -1,11 +1,12 @@
 use num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, FloorLogBasePowerOf2, IsPowerOf2,
 };
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::{Iverson, Zero};
-use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::SignificantBits;
 
-pub fn _ceiling_log_base_power_of_2_naive<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
+#[doc(hidden)]
+pub fn _ceiling_log_base_power_of_2_naive<T: PrimitiveInt>(x: T, pow: u64) -> u64 {
     assert_ne!(x, T::ZERO);
     assert_ne!(pow, 0);
     if pow >= T::WIDTH {
@@ -70,7 +71,7 @@ macro_rules! impl_arithmetic_traits {
             /// Returns the floor of the base-$b$ logarithm of a positive integer, where $b$ is a
             /// power of 2.
             ///
-            /// $f(x) = \lfloor\log_{2^p} x\rfloor$.
+            /// $f(x, p) = \lfloor\log_{2^p} x\rfloor$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -90,7 +91,7 @@ macro_rules! impl_arithmetic_traits {
             /// Returns the ceiling of the base-$b$ logarithm of a positive integer, where $b$ is a
             /// power of 2.
             ///
-            /// $f(x) = \lceil\log_{2^p} x\rceil$.
+            /// $f(x, p) = \lceil\log_{2^p} x\rceil$.
             ///
             /// # Worst-case complexity
             /// Constant time and additional memory.
@@ -111,7 +112,7 @@ macro_rules! impl_arithmetic_traits {
             /// the integer is not a power of $b$, `None` is returned.
             ///
             /// $$
-            /// f(x) = \\begin{cases}
+            /// f(x, p) = \\begin{cases}
             ///     \operatorname{Some}(\log_{2^p} x) & \log_{2^p} x \in \Z \\\\
             ///     \operatorname{None} & \textrm{otherwise},
             /// \\end{cases}

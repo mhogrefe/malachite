@@ -151,7 +151,7 @@ fn demo_float_exact_from_integer<T: ExactFrom<Integer> + PrimitiveFloat>(
     config: GenConfig,
     limit: usize,
 ) where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     for n in integer_gen_var_1::<T>().get(gm, &config).take(limit) {
         println!(
@@ -168,7 +168,7 @@ fn demo_float_exact_from_integer_ref<T: for<'a> ExactFrom<&'a Integer> + Primiti
     config: GenConfig,
     limit: usize,
 ) where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     for n in integer_gen_var_1::<T>().get(gm, &config).take(limit) {
         println!(
@@ -304,7 +304,7 @@ fn benchmark_float_exact_from_integer_evaluation_strategy<
     limit: usize,
     file_name: &str,
 ) where
-    Natural: From<T> + From<T::UnsignedOfEqualWidth>,
+    Natural: From<T>,
 {
     run_benchmark(
         &format!("{}::exact_from(Integer)", T::NAME),

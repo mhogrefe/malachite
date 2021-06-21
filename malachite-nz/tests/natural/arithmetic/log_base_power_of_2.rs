@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingLogBase2, CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, DivisibleBy,
-    FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, PowerOf2,
+    CeilingLogBase, CeilingLogBase2, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
+    CheckedLogBasePowerOf2, DivisibleBy, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2,
+    IsPowerOf2, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
@@ -312,10 +313,11 @@ fn floor_log_base_power_of_2_properties() {
     natural_unsigned_pair_gen_var_8().test_properties(|(n, pow)| {
         let floor_log = n.floor_log_base_power_of_2(pow);
         assert_eq!(floor_log == 0, n.significant_bits() - 1 < pow);
+        assert_eq!(n.floor_log_base(&Natural::power_of_2(pow)), floor_log);
 
         let product = floor_log * pow;
         assert!(Natural::power_of_2(product) <= n);
-        assert!(Natural::power_of_2(product + pow) >= n);
+        assert!(Natural::power_of_2(product + pow) > n);
 
         let ceiling_log = n.ceiling_log_base_power_of_2(pow);
         if n.is_power_of_2() && (n.significant_bits() - 1).divisible_by(pow) {
@@ -340,11 +342,12 @@ fn ceiling_log_base_power_of_2_properties() {
         let ceiling_log = n.ceiling_log_base_power_of_2(pow);
         assert_eq!(ceiling_log, _ceiling_log_base_power_of_2_naive(&n, pow));
         assert_eq!(ceiling_log == 0, n == Natural::ONE);
+        assert_eq!(n.ceiling_log_base(&Natural::power_of_2(pow)), ceiling_log);
 
         let product = ceiling_log * pow;
         assert!(Natural::power_of_2(product) >= n);
         if product != 0 {
-            assert!(Natural::power_of_2(product - pow) <= n);
+            assert!(Natural::power_of_2(product - pow) < n);
         }
 
         let floor_log = n.floor_log_base_power_of_2(pow);
@@ -368,6 +371,7 @@ fn ceiling_log_base_power_of_2_properties() {
 fn checked_log_base_power_of_2_properties() {
     natural_unsigned_pair_gen_var_8().test_properties(|(n, pow)| {
         let checked_log = n.checked_log_base_power_of_2(pow);
+        assert_eq!(n.checked_log_base(&Natural::power_of_2(pow)), checked_log);
         assert_eq!(
             checked_log.is_some(),
             n.is_power_of_2() && (n.significant_bits() - 1).divisible_by(pow)

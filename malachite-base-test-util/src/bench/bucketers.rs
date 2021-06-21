@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom, WrappingInto};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use std::cmp::max;
@@ -25,8 +25,7 @@ fn float_size<T: PrimitiveFloat>(f: T) -> usize {
         0
     } else {
         let (m, e) = f.integer_mantissa_and_exponent();
-        <T::UnsignedOfEqualWidth as WrappingInto<usize>>::wrapping_into(m)
-            + usize::wrapping_from(e.abs())
+        usize::exact_from(m) + usize::wrapping_from(e.abs())
     }
 }
 
