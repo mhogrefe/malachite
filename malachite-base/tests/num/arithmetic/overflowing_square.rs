@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 
 #[test]
 fn test_overflowing_square() {
@@ -26,4 +29,38 @@ fn test_overflowing_square() {
 
     test::<u16>(1000, 16960, true);
     test::<i16>(-1000, 16960, true);
+}
+
+fn overflowing_square_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen::<T>().test_properties(|x| {
+        let mut square = x;
+        let overflow = square.overflowing_square_assign();
+        assert_eq!((square, overflow), x.overflowing_square());
+        assert_eq!((square, overflow), x.overflowing_pow(2));
+        assert_eq!(x.wrapping_square(), square);
+        assert_eq!(x.checked_square().is_none(), overflow);
+        if !overflow {
+            assert_eq!(square, x.square());
+        }
+    });
+}
+
+fn overflowing_square_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|x| {
+        let mut square = x;
+        let overflow = square.overflowing_square_assign();
+        assert_eq!((square, overflow), x.overflowing_square());
+        assert_eq!((square, overflow), x.overflowing_pow(2));
+        assert_eq!(x.wrapping_square(), square);
+        assert_eq!(x.checked_square().is_none(), overflow);
+        if !overflow {
+            assert_eq!(square, x.square());
+        }
+    });
+}
+
+#[test]
+fn overflowing_square_properties() {
+    apply_fn_to_unsigneds!(overflowing_square_properties_helper_unsigned);
+    apply_fn_to_signeds!(overflowing_square_properties_helper_signed);
 }

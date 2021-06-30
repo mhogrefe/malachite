@@ -1,3 +1,4 @@
+use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
     CheckedLogBasePowerOf2, DivExactAssign, FloorLogBase, FloorLogBasePowerOf2, Pow,
@@ -18,7 +19,7 @@ impl Natural {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::arithmetic::traits::Pow;
-    /// use malachite_base::num::float::nice_float::NiceFloat;
+    /// use malachite_base::num::float::NiceFloat;
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(NiceFloat(Natural::from(10u32).approx_log()), NiceFloat(2.3025850929940455));
@@ -31,7 +32,7 @@ impl Natural {
     /// This is fmpz_dlog from fmpz/dlog.c, Flint 2.7.1.
     pub fn approx_log(&self) -> f64 {
         assert_ne!(*self, 0);
-        let (mantissa, exponent) = self.sci_mantissa_and_exponent::<f64>();
+        let (mantissa, exponent): (f64, u64) = self.sci_mantissa_and_exponent();
         mantissa.ln() + (exponent as f64) * std::f64::consts::LN_2
     }
 }

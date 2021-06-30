@@ -13,24 +13,15 @@ macro_rules! impl_pow {
         }
 
         impl PowAssign<u64> for $t {
-            /// Replaces `self` with `self ^ exp`.
+            /// Replaces `self` with `self` raised to the power of `exp`.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets x^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::PowAssign;
-            ///
-            /// let mut x = 3u8;
-            /// x.pow_assign(3);
-            /// assert_eq!(x, 27);
-            ///
-            /// let mut x = -10i32;
-            /// x.pow_assign(9);
-            /// assert_eq!(x, -1000000000);
-            /// ```
+            /// See the documentation of the `num::arithmetic::pow` module.
             #[inline]
             fn pow_assign(&mut self, exp: u64) {
                 *self = $t::pow(*self, u32::exact_from(exp));

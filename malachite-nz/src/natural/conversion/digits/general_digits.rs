@@ -734,7 +734,7 @@ pub fn _limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     digits.truncate(digits.len() - trailing_zeros);
 }
 
-pub fn _to_digits_asc_naive_primitive<T: ExactFrom<Natural> + PrimitiveUnsigned>(
+pub fn _to_digits_asc_naive_primitive<T: for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned>(
     digits: &mut Vec<T>,
     x: &Natural,
     base: T,
@@ -745,7 +745,7 @@ pub fn _to_digits_asc_naive_primitive<T: ExactFrom<Natural> + PrimitiveUnsigned>
     let mut remainder = x.clone();
     let nat_base = Natural::from(base);
     while remainder != 0 {
-        digits.push(T::exact_from(remainder.div_assign_mod(&nat_base)));
+        digits.push(T::exact_from(&remainder.div_assign_mod(&nat_base)));
     }
 }
 
@@ -780,7 +780,7 @@ fn compute_powers_for_to_digits(base: &Natural, bits: u64) -> Vec<Natural> {
 }
 
 fn _to_digits_asc_divide_and_conquer_limb<
-    T: ConvertibleFrom<Limb> + ExactFrom<Natural> + PrimitiveUnsigned,
+    T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     digits: &mut Vec<T>,
     mut x: Natural,
@@ -839,7 +839,9 @@ fn _to_digits_asc_divide_and_conquer(
     }
 }
 
-pub fn _to_digits_asc_limb<T: ConvertibleFrom<Limb> + ExactFrom<Natural> + PrimitiveUnsigned>(
+pub fn _to_digits_asc_limb<
+    T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
+>(
     x: &Natural,
     base: Limb,
 ) -> Vec<T>
@@ -891,7 +893,9 @@ where
     }
 }
 
-pub fn _to_digits_desc_limb<T: ConvertibleFrom<Limb> + ExactFrom<Natural> + PrimitiveUnsigned>(
+pub fn _to_digits_desc_limb<
+    T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
+>(
     x: &Natural,
     base: Limb,
 ) -> Vec<T>
@@ -1418,7 +1422,7 @@ where
 
 fn _from_digits_asc_limb_from_natural<
     I: Iterator<Item = Natural>,
-    T: CheckedFrom<Limb> + CheckedFrom<Natural> + PrimitiveUnsigned,
+    T: CheckedFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     xs: I,
     base: Limb,
@@ -1435,7 +1439,7 @@ where
         let mut xs = Vec::new();
         T::checked_from(base)?;
         for x in large_xs {
-            xs.push(T::checked_from(x)?);
+            xs.push(T::checked_from(&x)?);
         }
         if xs.is_empty() {
             return Some(Natural::ZERO);
@@ -1498,7 +1502,7 @@ where
 
 fn _from_digits_desc_limb_from_natural<
     I: Iterator<Item = Natural>,
-    T: CheckedFrom<Limb> + CheckedFrom<Natural> + PrimitiveUnsigned,
+    T: CheckedFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     xs: I,
     base: Limb,
@@ -1515,7 +1519,7 @@ where
         let mut xs = Vec::new();
         T::checked_from(base)?;
         for x in large_xs {
-            xs.push(T::checked_from(x)?);
+            xs.push(T::checked_from(&x)?);
         }
         if xs.is_empty() {
             return Some(Natural::ZERO);
@@ -1725,7 +1729,10 @@ impl Digits<u8> for Natural {
 }
 
 fn _to_digits_asc_unsigned<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned + WrappingFrom<Natural>,
+    T: for<'a> CheckedFrom<&'a Natural>
+        + ConvertibleFrom<Limb>
+        + PrimitiveUnsigned
+        + for<'a> WrappingFrom<&'a Natural>,
 >(
     x: &Natural,
     base: &T,
@@ -1739,13 +1746,16 @@ where
     } else {
         _to_digits_asc_large(x, &Natural::from(*base))
             .into_iter()
-            .map(T::wrapping_from)
+            .map(|n| T::wrapping_from(&n))
             .collect()
     }
 }
 
 fn _to_digits_desc_unsigned<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned + WrappingFrom<Natural>,
+    T: for<'a> CheckedFrom<&'a Natural>
+        + ConvertibleFrom<Limb>
+        + PrimitiveUnsigned
+        + for<'a> WrappingFrom<&'a Natural>,
 >(
     x: &Natural,
     base: &T,
@@ -1759,7 +1769,7 @@ where
     } else {
         _to_digits_desc_large(x, &Natural::from(*base))
             .into_iter()
-            .map(T::wrapping_from)
+            .map(|n| T::wrapping_from(&n))
             .collect()
     }
 }

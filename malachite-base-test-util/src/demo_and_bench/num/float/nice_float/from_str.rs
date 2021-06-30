@@ -1,4 +1,4 @@
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::bench::bucketers::string_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};

@@ -23,9 +23,9 @@ pub fn limbs_mod_mul_two_limbs_naive(
     m_0: Limb,
 ) -> (Limb, Limb) {
     DoubleLimb::exact_from(
-        Natural::from(DoubleLimb::join_halves(x_1, x_0))
+        &(Natural::from(DoubleLimb::join_halves(x_1, x_0))
             * Natural::from(DoubleLimb::join_halves(y_1, y_0))
-            % Natural::from(DoubleLimb::join_halves(m_1, m_0)),
+            % Natural::from(DoubleLimb::join_halves(m_1, m_0))),
     )
     .split_in_half()
 }

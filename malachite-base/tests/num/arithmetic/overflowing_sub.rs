@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 
 #[test]
 fn test_overflowing_sub() {
@@ -14,4 +17,34 @@ fn test_overflowing_sub() {
     test::<i16>(123, -456, 579, false);
     test::<i8>(123, -45, -88, true);
     test::<i8>(-123, 45, 88, true);
+}
+
+fn overflowing_sub_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
+        let mut diff = x;
+        let overflow = diff.overflowing_sub_assign(y);
+        assert_eq!((diff, overflow), x.overflowing_sub(y));
+        assert_eq!(x.wrapping_sub(y), diff);
+        if !overflow {
+            assert_eq!(diff, x - y);
+        }
+    });
+}
+
+fn overflowing_sub_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen::<T>().test_properties(|(x, y)| {
+        let mut diff = x;
+        let overflow = diff.overflowing_sub_assign(y);
+        assert_eq!((diff, overflow), x.overflowing_sub(y));
+        assert_eq!(x.wrapping_sub(y), diff);
+        if !overflow {
+            assert_eq!(diff, x - y);
+        }
+    });
+}
+
+#[test]
+fn overflowing_sub_properties() {
+    apply_fn_to_unsigneds!(overflowing_sub_properties_helper_unsigned);
+    apply_fn_to_signeds!(overflowing_sub_properties_helper_signed);
 }

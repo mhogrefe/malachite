@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::OrdAbs;
 use malachite_base_test_util::generators::{
-    signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen,
+    signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen_var_27,
     unsigned_triple_gen,
 };
 use std::cmp::Ordering;
@@ -48,7 +48,7 @@ pub fn test_cmp_abs_partial_cmp_abs_and_comparators() {
 }
 
 fn properties_helper_unsigned<T: PrimitiveUnsigned>() {
-    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         let cmp = x.cmp_abs(&y);
         assert_eq!(x.cmp(&y), cmp);
         assert_eq!(x.partial_cmp_abs(&y), Some(cmp));

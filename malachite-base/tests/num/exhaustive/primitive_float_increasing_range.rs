@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use malachite_base::num::exhaustive::primitive_float_increasing_range;
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use std::panic::catch_unwind;
 

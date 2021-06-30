@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base_test_util::generators::{
-    signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen,
+    signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen_var_27,
     unsigned_triple_gen,
 };
 
@@ -31,7 +31,7 @@ pub fn test_eq_abs_partial_eq_abs_and_comparators() {
 }
 
 fn properties_helper_unsigned<T: PrimitiveUnsigned>() {
-    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         let eq = x.eq_abs(&y);
         assert_eq!(x == y, eq);
         assert_eq!(y.eq_abs(&x), eq);

@@ -13,31 +13,16 @@ macro_rules! impl_overflowing_pow {
         }
 
         impl OverflowingPowAssign<u64> for $t {
-            /// Replaces `self` with `self.pow(exp)`.
+            /// Replaces `self` with `self ^ exp`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
+            /// overflow would have occurred, then the wrapped value is assigned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingPowAssign;
-            ///
-            /// let mut x = 3u8;
-            /// assert_eq!(x.overflowing_pow_assign(3), false);
-            /// assert_eq!(x, 27);
-            ///
-            /// let mut x = -10i32;
-            /// assert_eq!(x.overflowing_pow_assign(9), false);
-            /// assert_eq!(x, -1000000000);
-            ///
-            /// let mut x = -10i16;
-            /// assert_eq!(x.overflowing_pow_assign(9), true);
-            /// assert_eq!(x, 13824);
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_pow` module.
             #[inline]
             fn overflowing_pow_assign(&mut self, exp: u64) -> bool {
                 let (pow, overflow) = OverflowingPow::overflowing_pow(*self, exp);

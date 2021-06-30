@@ -243,7 +243,9 @@ fn to_power_of_2_digits_desc_natural_fail() {
     PowerOf2Digits::<Natural>::to_power_of_2_digits_desc(&Natural::trillion(), 0);
 }
 
-fn to_power_of_2_digits_asc_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>()
+fn to_power_of_2_digits_asc_properties_helper<
+    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+>()
 where
     Limb: PowerOf2Digits<T>,
     Natural: From<T> + PowerOf2Digits<T>,
@@ -316,7 +318,9 @@ fn to_power_of_2_digits_asc_properties() {
     });
 }
 
-fn to_power_of_2_digits_desc_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>()
+fn to_power_of_2_digits_desc_properties_helper<
+    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+>()
 where
     Limb: PowerOf2Digits<T>,
     Natural: From<T> + PowerOf2Digits<T>,

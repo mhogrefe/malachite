@@ -248,8 +248,10 @@ pub mod natural {
         pub mod from_floating_point;
         pub mod from_limbs;
         pub mod from_primitive_int;
+        pub mod mantissa_and_exponent {
+            pub mod sci_mantissa_and_exponent;
+        }
         pub mod primitive_int_from_natural;
-        pub mod sci_mantissa_and_exponent;
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {

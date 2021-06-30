@@ -1,17 +1,18 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase, CeilingLogBase2,
-    CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2,
-    CheckedNextPowerOf2, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, ModAdd,
-    ModAddAssign, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
-    ModNeg, ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
-    ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2IsReduced, ModPowerOf2Mul,
+    CeilingLogBasePowerOf2, CeilingSqrt, CeilingSqrtAssign, CheckedLogBase, CheckedLogBase2,
+    CheckedLogBasePowerOf2, CheckedNextPowerOf2, CheckedSqrt, FloorLogBase, FloorLogBase2,
+    FloorLogBasePowerOf2, FloorSqrt, FloorSqrtAssign, IsPowerOf2, ModAdd, ModAddAssign,
+    ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg,
+    ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2,
+    ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2IsReduced, ModPowerOf2Mul,
     ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
     ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
     ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
     ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
     ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOf2,
-    NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR,
-    XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, SqrtRem, SqrtRemAssign, XMulYIsZZ,
+    XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -28,13 +29,18 @@ pub trait PrimitiveUnsigned:
     + CeilingLogBasePowerOf2
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
     + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
+    + CeilingSqrt<Output = Self>
+    + CeilingSqrtAssign
     + CheckedLogBase
     + CheckedLogBase2
     + CheckedLogBasePowerOf2
     + CheckedNextPowerOf2<Output = Self>
+    + CheckedSqrt<Output = Self>
     + FloorLogBase
     + FloorLogBase2
     + FloorLogBasePowerOf2
+    + FloorSqrt<Output = Self>
+    + FloorSqrtAssign
     + From<u8>
     + FromOtherTypeSlice<u8>
     + FromOtherTypeSlice<u16>
@@ -129,6 +135,8 @@ pub trait PrimitiveUnsigned:
     + PowerOf2DigitIterable<u128>
     + PowerOf2DigitIterable<usize>
     + PrimitiveInt
+    + SqrtRem<SqrtOutput = Self, RemOutput = Self>
+    + SqrtRemAssign<RemOutput = Self>
     + VecFromOtherType<u8>
     + VecFromOtherType<u16>
     + VecFromOtherType<u32>

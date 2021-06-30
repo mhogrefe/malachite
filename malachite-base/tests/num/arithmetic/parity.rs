@@ -1,5 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 
 fn even_primitive_helper<T: PrimitiveInt>() {
     let test = |n: T, out| {
@@ -55,4 +57,74 @@ fn odd_signed_helper<T: PrimitiveSigned>() {
 fn test_odd() {
     apply_fn_to_primitive_ints!(odd_primitive_helper);
     apply_fn_to_signeds!(odd_signed_helper);
+}
+
+fn even_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen::<T>().test_properties(|x| {
+        let even = x.even();
+        assert_eq!(x.divisible_by(T::TWO), even);
+        assert_eq!(!x.odd(), even);
+        if x != T::MAX {
+            assert_eq!((x + T::ONE).odd(), even);
+        }
+        if x != T::ZERO {
+            assert_eq!((x - T::ONE).odd(), even);
+        }
+    });
+}
+
+fn even_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|x| {
+        let even = x.even();
+        assert_eq!(x.divisible_by(T::TWO), even);
+        assert_eq!(!x.odd(), even);
+        if x != T::MAX {
+            assert_eq!((x + T::ONE).odd(), even);
+        }
+        if x != T::MIN {
+            assert_eq!((x - T::ONE).odd(), even);
+            assert_eq!((-x).even(), even);
+        }
+    });
+}
+
+#[test]
+fn even_properties() {
+    apply_fn_to_unsigneds!(even_properties_helper_unsigned);
+    apply_fn_to_signeds!(even_properties_helper_signed);
+}
+
+fn odd_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen::<T>().test_properties(|x| {
+        let odd = x.odd();
+        assert_ne!(x.divisible_by(T::TWO), odd);
+        assert_eq!(!x.even(), odd);
+        if x != T::MAX {
+            assert_eq!((x + T::ONE).even(), odd);
+        }
+        if x != T::ZERO {
+            assert_eq!((x - T::ONE).even(), odd);
+        }
+    });
+}
+
+fn odd_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|x| {
+        let odd = x.odd();
+        assert_ne!(x.divisible_by(T::TWO), odd);
+        assert_eq!(!x.even(), odd);
+        if x != T::MAX {
+            assert_eq!((x + T::ONE).even(), odd);
+        }
+        if x != T::MIN {
+            assert_eq!((x - T::ONE).even(), odd);
+            assert_eq!((-x).odd(), odd);
+        }
+    });
+}
+
+#[test]
+fn odd_properties() {
+    apply_fn_to_unsigneds!(odd_properties_helper_unsigned);
+    apply_fn_to_signeds!(odd_properties_helper_signed);
 }

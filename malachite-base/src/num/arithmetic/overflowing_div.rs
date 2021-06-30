@@ -15,26 +15,15 @@ macro_rules! impl_overflowing_div {
             /// Replaces `self` with `self / other`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned. Overflow only
+            /// overflow would have occurred, then the wrapped value is assigned. Overflow only
             /// occurs when `$t` is signed, `self` is `$t::MIN`, and `other` is -1. The "actual"
             /// result, -`$t::MIN`, can't be represented and is wrapped back to `$t::MIN`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Divitional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingDivAssign;
-            ///
-            /// let mut x = 100u16;
-            /// assert_eq!(x.overflowing_div_assign(3), false);
-            /// assert_eq!(x, 33);
-            ///
-            /// let mut x = -128i8;
-            /// assert_eq!(x.overflowing_div_assign(-1), true);
-            /// assert_eq!(x, -128);
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_div` module.
             #[inline]
             fn overflowing_div_assign(&mut self, other: $t) -> bool {
                 let (result, overflow) = self.overflowing_div(other);

@@ -114,15 +114,15 @@ fn header() {
     );
     println!(
         "pub const MP_BASES_BIG_BASE_10: Limb = {:#x};",
-        Limb::exact_from(data.big_base)
+        Limb::exact_from(&data.big_base)
     );
     println!(
         "pub const MP_BASES_BIG_BASE_INVERTED_10: Limb = {:#x};",
-        Limb::exact_from(data.big_base_inverted)
+        Limb::exact_from(&data.big_base_inverted)
     );
     println!(
         "pub const MP_BASES_BIG_BASE_BINVERTED_10: Limb = {:#x};",
-        Limb::exact_from(data.big_base_inverted_mod_b)
+        Limb::exact_from(&data.big_base_inverted_mod_b)
     );
     println!(
         "pub const MP_BASES_NORMALIZATION_STEPS_10: u64 = {};",
@@ -148,10 +148,10 @@ fn table() {
         println!(
             "    ({}, {:#x}, {:#x}, {:#x}, {:#x}), // {}",
             data.chars_per_limb,
-            Limb::exact_from(log_base_of_2),
-            Limb::exact_from(log_2_of_base),
-            Limb::exact_from(data.big_base),
-            Limb::exact_from(data.big_base_inverted),
+            Limb::exact_from(&log_base_of_2),
+            Limb::exact_from(&log_2_of_base),
+            Limb::exact_from(&data.big_base),
+            Limb::exact_from(&data.big_base_inverted),
             base
         );
     }

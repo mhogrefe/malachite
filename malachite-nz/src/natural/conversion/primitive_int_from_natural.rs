@@ -8,31 +8,6 @@ use platform::Limb;
 
 macro_rules! impl_from_limb {
     ($u: ident, $s: ident) => {
-        impl CheckedFrom<Natural> for $u {
-            /// Converts a `Natural` to a `Limb`, taking the `Natural` by value and returning `None`
-            /// if the `Natural` is too large.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u32::checked_from(Natural::from(123u32)), Some(123));
-            /// assert_eq!(u32::checked_from(Natural::trillion()), None);
-            /// ```
-            #[inline]
-            fn checked_from(value: Natural) -> Option<$u> {
-                $u::checked_from(&value)
-            }
-        }
-
         impl<'a> CheckedFrom<&'a Natural> for $u {
             /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference and returning
             /// `None` if the `Natural` is too large.
@@ -57,31 +32,6 @@ macro_rules! impl_from_limb {
                     Natural(Small(small)) => Some(small),
                     Natural(Large(_)) => None,
                 }
-            }
-        }
-
-        impl WrappingFrom<Natural> for $u {
-            /// Converts a `Natural` to a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`Limb::WIDTH`</sup>.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u32::wrapping_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u32::wrapping_from(Natural::trillion()), 3567587328);
-            /// ```
-            #[inline]
-            fn wrapping_from(value: Natural) -> $u {
-                $u::wrapping_from(&value)
             }
         }
 
@@ -112,31 +62,6 @@ macro_rules! impl_from_limb {
             }
         }
 
-        impl SaturatingFrom<Natural> for $u {
-            /// Converts a `Natural` to a `Limb`, taking the `Natural` by value. If the `Natural` is
-            /// too large to fit in a `Limb`, `Limb::MAX` is returned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u32::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u32::saturating_from(Natural::trillion()), u32::MAX);
-            /// ```
-            #[inline]
-            fn saturating_from(value: Natural) -> $u {
-                $u::saturating_from(&value)
-            }
-        }
-
         impl<'a> SaturatingFrom<&'a Natural> for $u {
             /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference. If the
             /// `Natural` is too large to fit in a `Limb`, `Limb::MAX` is returned.
@@ -161,32 +86,6 @@ macro_rules! impl_from_limb {
                     Natural(Small(small)) => small,
                     Natural(Large(_)) => $u::MAX,
                 }
-            }
-        }
-
-        impl OverflowingFrom<Natural> for $u {
-            /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference and wrapping mod
-            /// 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether wrapping
-            /// occurred.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u32::overflowing_from(Natural::from(123u32)), (123, false));
-            /// assert_eq!(u32::overflowing_from(Natural::trillion()), (3567587328, true));
-            /// ```
-            #[inline]
-            fn overflowing_from(value: Natural) -> ($u, bool) {
-                $u::overflowing_from(&value)
             }
         }
 
@@ -218,31 +117,6 @@ macro_rules! impl_from_limb {
             }
         }
 
-        impl ConvertibleFrom<Natural> for $u {
-            /// Determines whether a `Natural` can be converted to a `Limb`. Takes the `Natural` by
-            /// value.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u32::convertible_from(Natural::from(123u32)), true);
-            /// assert_eq!(u32::convertible_from(Natural::trillion()), false);
-            /// ```
-            #[inline]
-            fn convertible_from(value: Natural) -> bool {
-                $u::convertible_from(&value)
-            }
-        }
-
         impl<'a> ConvertibleFrom<&'a Natural> for $u {
             /// Determines whether a `Natural` can be converted to a `Limb`. Takes the `Natural` by
             /// reference.
@@ -267,31 +141,6 @@ macro_rules! impl_from_limb {
                     Natural(Small(_)) => true,
                     Natural(Large(_)) => false,
                 }
-            }
-        }
-
-        impl CheckedFrom<Natural> for $s {
-            /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by value and returning
-            /// `None` if the `Natural` is too large.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i32::checked_from(Natural::from(123u32)), Some(123));
-            /// assert_eq!(i32::checked_from(Natural::trillion()), None);
-            /// ```
-            #[inline]
-            fn checked_from(value: Natural) -> Option<$s> {
-                $s::checked_from(&value)
             }
         }
 
@@ -322,31 +171,6 @@ macro_rules! impl_from_limb {
             }
         }
 
-        impl WrappingFrom<Natural> for $s {
-            /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by value and wrapping
-            /// mod 2<sup>`Limb::WIDTH`</sup>.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i32::wrapping_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i32::wrapping_from(Natural::trillion()), -727379968);
-            /// ```
-            #[inline]
-            fn wrapping_from(value: Natural) -> $s {
-                $s::wrapping_from($u::wrapping_from(value))
-            }
-        }
-
         impl<'a> WrappingFrom<&'a Natural> for $s {
             /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by reference and
             /// wrapping mod 2<sup>`Limb::WIDTH`</sup>.
@@ -369,31 +193,6 @@ macro_rules! impl_from_limb {
             #[inline]
             fn wrapping_from(value: &Natural) -> $s {
                 $s::wrapping_from($u::wrapping_from(value))
-            }
-        }
-
-        impl SaturatingFrom<Natural> for $s {
-            /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by value. If the
-            /// `Natural` is too large to fit in a `SignedLimb`, `SignedLimb::MAX` is returned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i32::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i32::saturating_from(Natural::trillion()), 2147483647);
-            /// ```
-            #[inline]
-            fn saturating_from(value: Natural) -> $s {
-                $s::saturating_from($u::saturating_from(value))
             }
         }
 
@@ -422,32 +221,6 @@ macro_rules! impl_from_limb {
             }
         }
 
-        impl OverflowingFrom<Natural> for $s {
-            /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by reference and
-            /// wrapping mod 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether
-            /// wrapping occurred.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i32::overflowing_from(Natural::from(123u32)), (123, false));
-            /// assert_eq!(i32::overflowing_from(Natural::trillion()), (-727379968, true));
-            /// ```
-            #[inline]
-            fn overflowing_from(value: Natural) -> ($s, bool) {
-                $s::overflowing_from(&value)
-            }
-        }
-
         impl<'a> OverflowingFrom<&'a Natural> for $s {
             /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by reference and
             /// wrapping mod 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether
@@ -472,31 +245,6 @@ macro_rules! impl_from_limb {
                 let (result, overflow_1) = $u::overflowing_from(value);
                 let (result, overflow_2) = $s::overflowing_from(result);
                 (result, overflow_1 || overflow_2)
-            }
-        }
-
-        impl ConvertibleFrom<Natural> for $s {
-            /// Determines whether a `Natural` can be converted to a `SignedLimb`. Takes the
-            /// `Natural` by value.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i32::convertible_from(Natural::from(123u32)), true);
-            /// assert_eq!(i32::convertible_from(Natural::trillion()), false);
-            /// ```
-            #[inline]
-            fn convertible_from(value: Natural) -> bool {
-                $s::convertible_from(&value)
             }
         }
 
@@ -531,32 +279,6 @@ macro_rules! impl_from_limb {
 
 macro_rules! impl_from_smaller_than_limb {
     ($u: ident, $s: ident) => {
-        impl CheckedFrom<Natural> for $u {
-            /// Converts a `Natural` to a value of a primitive unsigned integer type that's smaller
-            /// than a `Limb`, taking the `Natural` by value and returning `None` if the `Natural`
-            /// is too large.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u8::checked_from(Natural::from(123u32)), Some(123));
-            /// assert_eq!(u8::checked_from(Natural::trillion()), None);
-            /// ```
-            #[inline]
-            fn checked_from(value: Natural) -> Option<$u> {
-                Limb::checked_from(value).and_then($u::checked_from)
-            }
-        }
-
         impl<'a> CheckedFrom<&'a Natural> for $u {
             /// Converts a `Natural` to a value of a primitive unsigned integer type that's smaller
             /// than a `Limb`, taking the `Natural` by reference and returning `None` if the
@@ -580,32 +302,6 @@ macro_rules! impl_from_smaller_than_limb {
             #[inline]
             fn checked_from(value: &Natural) -> Option<$u> {
                 Limb::checked_from(value).and_then($u::checked_from)
-            }
-        }
-
-        impl WrappingFrom<Natural> for $u {
-            /// Converts a `Natural` to a value of a primitive unsigned integer type that's smaller
-            /// than a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`$u::WIDTH`</sup>.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u8::wrapping_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u8::wrapping_from(Natural::trillion()), 0);
-            /// ```
-            #[inline]
-            fn wrapping_from(value: Natural) -> $u {
-                $u::wrapping_from(Limb::wrapping_from(value))
             }
         }
 
@@ -635,32 +331,6 @@ macro_rules! impl_from_smaller_than_limb {
             }
         }
 
-        impl SaturatingFrom<Natural> for $u {
-            /// Converts a `Natural` to a value of a primitive unsigned integer type that's smaller
-            /// than a `Limb`, taking the `Natural` by value. If the `Natural` is too large to fit
-            /// in `$u`, `$u::MAX` is returned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u8::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u8::saturating_from(Natural::trillion()), 255);
-            /// ```
-            #[inline]
-            fn saturating_from(value: Natural) -> $u {
-                $u::saturating_from(Limb::saturating_from(value))
-            }
-        }
-
         impl<'a> SaturatingFrom<&'a Natural> for $u {
             /// Converts a `Natural` to a value of a primitive unsigned integer type that's smaller
             /// than a `Limb`, taking the `Natural` by reference. If the `Natural` is too large to
@@ -684,35 +354,6 @@ macro_rules! impl_from_smaller_than_limb {
             #[inline]
             fn saturating_from(value: &Natural) -> $u {
                 $u::saturating_from(Limb::saturating_from(value))
-            }
-        }
-
-        impl OverflowingFrom<Natural> for $u {
-            /// Converts a `Natural` to a value of a primitive unsigned integer type that's smaller
-            /// than a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`$u::WIDTH`</sup>. The returned boolean value indicates whether wrapping
-            /// occurred.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u8::overflowing_from(Natural::from(123u32)), (123, false));
-            /// assert_eq!(u8::overflowing_from(Natural::trillion()), (0, true));
-            /// ```
-            #[inline]
-            fn overflowing_from(value: Natural) -> ($u, bool) {
-                let (result, overflow_1) = Limb::overflowing_from(value);
-                let (result, overflow_2) = $u::overflowing_from(result);
-                (result, overflow_1 || overflow_2)
             }
         }
 
@@ -745,31 +386,6 @@ macro_rules! impl_from_smaller_than_limb {
             }
         }
 
-        impl ConvertibleFrom<Natural> for $u {
-            /// Determines whether a `Natural` can be converted to a value of a primitive unsigned
-            /// integer type that's smaller than a `Limb`. Takes the `Natural` by value.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u8::convertible_from(Natural::from(123u32)), true);
-            /// assert_eq!(u8::convertible_from(Natural::trillion()), false);
-            /// ```
-            #[inline]
-            fn convertible_from(value: Natural) -> bool {
-                $u::convertible_from(&value)
-            }
-        }
-
         impl<'a> ConvertibleFrom<&'a Natural> for $u {
             /// Determines whether a `Natural` can be converted to a value of a primitive unsigned
             /// integer type that's smaller than a `Limb`. Takes the `Natural` by reference.
@@ -794,32 +410,6 @@ macro_rules! impl_from_smaller_than_limb {
                     Natural(Small(small)) => $u::convertible_from(small),
                     Natural(Large(_)) => false,
                 }
-            }
-        }
-
-        impl CheckedFrom<Natural> for $s {
-            /// Converts a `Natural` to a value of a primitive signed integer type that's smaller
-            /// than a `Limb`, taking the `Natural` by value and returning `None` if the `Natural`
-            /// is too large.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i8::checked_from(Natural::from(123u32)), Some(123));
-            /// assert_eq!(i8::checked_from(Natural::trillion()), None);
-            /// ```
-            #[inline]
-            fn checked_from(value: Natural) -> Option<$s> {
-                Limb::checked_from(value).and_then($s::checked_from)
             }
         }
 
@@ -849,32 +439,6 @@ macro_rules! impl_from_smaller_than_limb {
             }
         }
 
-        impl WrappingFrom<Natural> for $s {
-            /// Converts a `Natural` to a value of a primitive signed integer type that's smaller
-            /// than a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`$u::WIDTH`</sup>.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i8::wrapping_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i8::wrapping_from(Natural::trillion()), 0);
-            /// ```
-            #[inline]
-            fn wrapping_from(value: Natural) -> $s {
-                $s::wrapping_from(Limb::wrapping_from(value))
-            }
-        }
-
         impl<'a> WrappingFrom<&'a Natural> for $s {
             /// Converts a `Natural` to a value of a primitive signed integer type that's smaller
             /// than a `Limb`, taking the `Natural` by reference and wrapping mod
@@ -898,32 +462,6 @@ macro_rules! impl_from_smaller_than_limb {
             #[inline]
             fn wrapping_from(value: &Natural) -> $s {
                 $s::wrapping_from(Limb::wrapping_from(value))
-            }
-        }
-
-        impl SaturatingFrom<Natural> for $s {
-            /// Converts a `Natural` to a value of a primitive signed integer type that's smaller
-            /// than a `Limb`, taking the `Natural` by value. If the `Natural` is too large to fit
-            /// in `$u`, `$u::MAX` is returned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i8::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i8::saturating_from(Natural::trillion()), 127);
-            /// ```
-            #[inline]
-            fn saturating_from(value: Natural) -> $s {
-                $s::saturating_from(Limb::saturating_from(value))
             }
         }
 
@@ -953,35 +491,6 @@ macro_rules! impl_from_smaller_than_limb {
             }
         }
 
-        impl OverflowingFrom<Natural> for $s {
-            /// Converts a `Natural` to a value of a primitive signed integer type that's smaller
-            /// than a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`$u::WIDTH`</sup>. The returned boolean value indicates whether wrapping
-            /// occurred.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i8::overflowing_from(Natural::from(123u32)), (123, false));
-            /// assert_eq!(i8::overflowing_from(Natural::trillion()), (0, true));
-            /// ```
-            #[inline]
-            fn overflowing_from(value: Natural) -> ($s, bool) {
-                let (result, overflow_1) = Limb::overflowing_from(value);
-                let (result, overflow_2) = $s::overflowing_from(result);
-                (result, overflow_1 || overflow_2)
-            }
-        }
-
         impl<'a> OverflowingFrom<&'a Natural> for $s {
             /// Converts a `Natural` to a value of a primitive signed integer type that's smaller
             /// than a `Limb`, taking the `Natural` by reference and wrapping mod
@@ -1008,31 +517,6 @@ macro_rules! impl_from_smaller_than_limb {
                 let (result, overflow_1) = Limb::overflowing_from(value);
                 let (result, overflow_2) = $s::overflowing_from(result);
                 (result, overflow_1 || overflow_2)
-            }
-        }
-
-        impl ConvertibleFrom<Natural> for $s {
-            /// Determines whether a `Natural` can be converted to a value of a primitive signed
-            /// integer type that's smaller than a `Limb`. Takes the `Natural` by value.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i8::convertible_from(Natural::from(123u32)), true);
-            /// assert_eq!(i8::convertible_from(Natural::trillion()), false);
-            /// ```
-            #[inline]
-            fn convertible_from(value: Natural) -> bool {
-                $s::convertible_from(&value)
             }
         }
 
@@ -1067,60 +551,6 @@ macro_rules! impl_from_smaller_than_limb {
 
 macro_rules! impl_from_larger_than_limb_or_xsize {
     ($u: ident, $s: ident) => {
-        impl CheckedFrom<Natural> for $u {
-            /// Converts a `Natural` to a `usize` or a value of a primitive unsigned integer type
-            /// that's larger than a `Limb`, taking the `Natural` by value and returning `None` if
-            /// the `Natural` is too large.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u64::checked_from(Natural::from(123u32)), Some(123));
-            /// assert_eq!(u64::checked_from(Natural::ONE << 100), None);
-            /// ```
-            #[inline]
-            fn checked_from(value: Natural) -> Option<$u> {
-                $u::checked_from(&value)
-            }
-        }
-
-        impl WrappingFrom<Natural> for $u {
-            /// Converts a `Natural` to a `usize` or a value of a primitive unsigned integer type
-            /// that's larger than a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`$u::WIDTH`</sup>.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u64::wrapping_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u64::wrapping_from(Natural::ONE << 100), 0);
-            /// ```
-            #[inline]
-            fn wrapping_from(value: Natural) -> $u {
-                $u::wrapping_from(&value)
-            }
-        }
-
         impl<'a> WrappingFrom<&'a Natural> for $u {
             /// Converts a `Natural` to a `usize` or a value of a primitive unsigned integer type
             /// that's larger than a `Limb`, taking the `Natural` by reference and wrapping mod
@@ -1147,115 +577,6 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
                     Natural(Small(small)) => $u::wrapping_from(small),
                     Natural(Large(ref limbs)) => $u::from_other_type_slice(limbs),
                 }
-            }
-        }
-
-        impl SaturatingFrom<Natural> for $u {
-            /// Converts a `Natural` to a `usize` or a value of a primitive unsigned integer type
-            /// that's larger than a `Limb`, taking the `Natural` by value. If the `Natural` is too
-            /// large to fit in `$u`, `$u::MAX` is returned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u64::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(u64::saturating_from(Natural::ONE << 100), 18446744073709551615);
-            /// ```
-            #[inline]
-            fn saturating_from(value: Natural) -> $u {
-                $u::saturating_from(&value)
-            }
-        }
-
-        impl OverflowingFrom<Natural> for $u {
-            /// Converts a `Natural` to a `usize` or a value of a primitive unsigned integer type
-            /// that's larger than a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`$u::WIDTH`</sup>. The returned boolean value indicates whether wrapping
-            /// occurred.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u64::overflowing_from(Natural::from(123u32)), (123, false));
-            /// assert_eq!(u64::overflowing_from(Natural::ONE << 100), (0, true));
-            /// ```
-            #[inline]
-            fn overflowing_from(value: Natural) -> ($u, bool) {
-                $u::overflowing_from(&value)
-            }
-        }
-
-        impl ConvertibleFrom<Natural> for $u {
-            /// Determines whether a `Natural` can be converted to a `usize` or a value of a
-            /// primitive unsigned integer type that's larger than a `Limb`. Takes the `Natural` by
-            /// value.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(u64::convertible_from(Natural::from(123u32)), true);
-            /// assert_eq!(u64::convertible_from(Natural::ONE << 100), false);
-            /// ```
-            #[inline]
-            fn convertible_from(value: Natural) -> bool {
-                $u::convertible_from(&value)
-            }
-        }
-
-        impl CheckedFrom<Natural> for $s {
-            /// Converts a `Natural` to an `isize` or a value of a primitive signed integer type
-            /// that's larger than a `Limb`, taking the `Natural` by value and returning `None` if
-            /// the `Natural` is too large.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i64::checked_from(Natural::from(123u32)), Some(123));
-            /// assert_eq!(i64::checked_from(Natural::ONE << 100), None);
-            /// ```
-            #[inline]
-            fn checked_from(value: Natural) -> Option<$s> {
-                $u::checked_from(&value).and_then($s::checked_from)
             }
         }
 
@@ -1286,33 +607,6 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             }
         }
 
-        impl WrappingFrom<Natural> for $s {
-            /// Converts a `Natural` to an `isize` or a value of a primitive signed integer type
-            /// that's larger than a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`$u::WIDTH`</sup>.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::WrappingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i64::wrapping_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i64::wrapping_from(Natural::ONE << 100), 0);
-            /// ```
-            #[inline]
-            fn wrapping_from(value: Natural) -> $s {
-                $s::wrapping_from($u::wrapping_from(&value))
-            }
-        }
-
         impl<'a> WrappingFrom<&'a Natural> for $s {
             /// Converts a `Natural` to an `isize` or a value of a primitive signed integer type
             /// that's larger than a `Limb`, taking the `Natural` by reference and wrapping mod
@@ -1337,33 +631,6 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             #[inline]
             fn wrapping_from(value: &Natural) -> $s {
                 $s::wrapping_from($u::wrapping_from(value))
-            }
-        }
-
-        impl SaturatingFrom<Natural> for $s {
-            /// Converts a `Natural` to an `isize` or a value of a primitive signed integer type
-            /// that's larger than a `Limb`, taking the `Natural` by value. If the `Natural` is too
-            /// large to fit in `$s`, `$s::MAX` is returned.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::SaturatingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i64::saturating_from(Natural::from(123u32)), 123);
-            /// assert_eq!(i64::saturating_from(Natural::ONE << 100), 9223372036854775807);
-            /// ```
-            #[inline]
-            fn saturating_from(value: Natural) -> $s {
-                $s::saturating_from($u::saturating_from(&value))
             }
         }
 
@@ -1394,34 +661,6 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             }
         }
 
-        impl OverflowingFrom<Natural> for $s {
-            /// Converts a `Natural` to an `isize` or a value of a primitive signed integer type
-            /// that's larger than a `Limb`, taking the `Natural` by value and wrapping mod
-            /// 2<sup>`$u::WIDTH`</sup>. The returned boolean value indicates whether wrapping
-            /// occurred.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::OverflowingFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i64::overflowing_from(Natural::from(123u32)), (123, false));
-            /// assert_eq!(i64::overflowing_from(Natural::ONE << 100), (0, true));
-            /// ```
-            #[inline]
-            fn overflowing_from(value: Natural) -> ($s, bool) {
-                $s::overflowing_from(&value)
-            }
-        }
-
         impl<'a> OverflowingFrom<&'a Natural> for $s {
             /// Converts a `Natural` to an `isize` or a value of a primitive signed integer type
             /// that's larger than a `Limb`, taking the `Natural` by reference and wrapping mod
@@ -1448,33 +687,6 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
                 let (result, overflow_1) = $u::overflowing_from(value);
                 let (result, overflow_2) = $s::overflowing_from(result);
                 (result, overflow_1 || overflow_2)
-            }
-        }
-
-        impl ConvertibleFrom<Natural> for $s {
-            /// Determines whether a `Natural` can be converted to an `isize` or a value of a
-            /// primitive signed integer type that's larger than a `Limb`. Takes the `Natural` by
-            /// value.
-            ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
-            ///
-            /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            /// extern crate malachite_nz;
-            ///
-            /// use malachite_base::num::basic::traits::One;
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert_eq!(i64::convertible_from(Natural::from(123u32)), true);
-            /// assert_eq!(i64::convertible_from(Natural::ONE << 100), false);
-            /// ```
-            #[inline]
-            fn convertible_from(value: Natural) -> bool {
-                $s::convertible_from(&value)
             }
         }
     };

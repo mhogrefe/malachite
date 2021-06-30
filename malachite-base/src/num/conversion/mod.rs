@@ -125,6 +125,242 @@ pub mod from;
 /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
 /// ```
 pub mod half;
+/// This module provides traits for converting numbers to and from mantissa and exponent
+/// representations.
+///
+/// Here are some examples of the macro-generated functions:
+///
+/// # raw_mantissa_and_exponent
+/// ```
+/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(0.0f32.raw_mantissa_and_exponent(), (0, 0));
+/// assert_eq!((-0.0f32).raw_mantissa_and_exponent(), (0, 0));
+/// assert_eq!(f32::NAN.raw_mantissa_and_exponent(), (0x400000, 255));
+/// assert_eq!(f32::POSITIVE_INFINITY.raw_mantissa_and_exponent(), (0, 255));
+/// assert_eq!(f32::NEGATIVE_INFINITY.raw_mantissa_and_exponent(), (0, 255));
+/// assert_eq!(1.0f32.raw_mantissa_and_exponent(), (0, 127));
+/// assert_eq!(core::f32::consts::PI.raw_mantissa_and_exponent(), (4788187, 128));
+/// assert_eq!(0.1f32.raw_mantissa_and_exponent(), (5033165, 123));
+/// ```
+///
+/// # raw_mantissa
+/// ```
+/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(0.0f32.raw_mantissa(), 0);
+/// assert_eq!((-0.0f32).raw_mantissa(), 0);
+/// assert_eq!(f32::NAN.raw_mantissa(), 0x400000);
+/// assert_eq!(f32::POSITIVE_INFINITY.raw_mantissa(), 0);
+/// assert_eq!(f32::NEGATIVE_INFINITY.raw_mantissa(), 0);
+/// assert_eq!(1.0f32.raw_mantissa(), 0);
+/// assert_eq!(core::f32::consts::PI.raw_mantissa(), 4788187);
+/// assert_eq!(0.1f32.raw_mantissa(), 5033165);
+/// ```
+///
+/// # raw_exponent
+///
+/// ```
+/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(0.0f32.raw_exponent(), 0);
+/// assert_eq!((-0.0f32).raw_exponent(), 0);
+/// assert_eq!(f32::NAN.raw_exponent(), 255);
+/// assert_eq!(f32::POSITIVE_INFINITY.raw_exponent(), 255);
+/// assert_eq!(f32::NEGATIVE_INFINITY.raw_exponent(), 255);
+/// assert_eq!(1.0f32.raw_exponent(), 127);
+/// assert_eq!(core::f32::consts::PI.raw_exponent(), 128);
+/// assert_eq!(0.1f32.raw_exponent(), 123);
+/// ```
+///
+/// # from_raw_mantissa_and_exponent;
+/// ```
+/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
+///
+/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(0, 0)), NiceFloat(0.0));
+/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(0x400000, 255)), NiceFloat(f32::NAN));
+/// assert_eq!(
+///     NiceFloat(f32::from_raw_mantissa_and_exponent(0, 255)),
+///     NiceFloat(f32::POSITIVE_INFINITY)
+/// );
+/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(0, 127)), NiceFloat(1.0));
+/// assert_eq!(
+///     NiceFloat(f32::from_raw_mantissa_and_exponent(4788187, 128)),
+///     NiceFloat(core::f32::consts::PI)
+/// );
+/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(5033165, 123)), NiceFloat(0.1));
+/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(2097152, 130)), NiceFloat(10.0));
+/// ```
+///
+/// # integer_mantissa_and_exponent
+/// ```
+/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(1.0f32.integer_mantissa_and_exponent(), (1, 0));
+/// assert_eq!(core::f32::consts::PI.integer_mantissa_and_exponent(), (13176795, -22));
+/// assert_eq!(0.1f32.integer_mantissa_and_exponent(), (13421773, -27));
+/// assert_eq!(10.0f32.integer_mantissa_and_exponent(), (5, 1));
+/// assert_eq!(f32::MIN_POSITIVE_SUBNORMAL.integer_mantissa_and_exponent(), (1, -149));
+/// assert_eq!(f32::MAX_SUBNORMAL.integer_mantissa_and_exponent(), (0x7fffff, -149));
+/// assert_eq!(f32::MIN_POSITIVE_NORMAL.integer_mantissa_and_exponent(), (1, -126));
+/// assert_eq!(f32::MAX_FINITE.integer_mantissa_and_exponent(), (0xffffff, 104));
+/// ```
+///
+/// # integer_mantissa
+/// ```
+/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(1.0f32.integer_mantissa(), 1);
+/// assert_eq!(core::f32::consts::PI.integer_mantissa(), 13176795);
+/// assert_eq!(0.1f32.integer_mantissa(), 13421773);
+/// assert_eq!(10.0f32.integer_mantissa(), 5);
+/// assert_eq!(f32::MIN_POSITIVE_SUBNORMAL.integer_mantissa(), 1);
+/// assert_eq!(f32::MAX_SUBNORMAL.integer_mantissa(), 0x7fffff);
+/// assert_eq!(f32::MIN_POSITIVE_NORMAL.integer_mantissa(), 1);
+/// assert_eq!(f32::MAX_FINITE.integer_mantissa(), 0xffffff);
+/// ```
+///
+/// # integer_exponent
+///
+/// ```
+/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(1.0f32.integer_exponent(), 0);
+/// assert_eq!(core::f32::consts::PI.integer_exponent(), -22);
+/// assert_eq!(0.1f32.integer_exponent(), -27);
+/// assert_eq!(10.0f32.integer_exponent(), 1);
+/// assert_eq!(f32::MIN_POSITIVE_SUBNORMAL.integer_exponent(), -149);
+/// assert_eq!(f32::MAX_SUBNORMAL.integer_exponent(), -149);
+/// assert_eq!(f32::MIN_POSITIVE_NORMAL.integer_exponent(), -126);
+/// assert_eq!(f32::MAX_FINITE.integer_exponent(), 104);
+/// ```
+///
+/// # from_integer_mantissa_and_exponent;
+/// ```
+/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+/// use malachite_base::num::float::NiceFloat;
+///
+/// assert_eq!(f32::from_integer_mantissa_and_exponent(0, 5).map(NiceFloat), Some(NiceFloat(0.0)));
+/// assert_eq!(f32::from_integer_mantissa_and_exponent(1, 0).map(NiceFloat), Some(NiceFloat(1.0)));
+/// assert_eq!(
+///     f32::from_integer_mantissa_and_exponent(4, -2).map(NiceFloat),
+///     Some(NiceFloat(1.0))
+/// );
+/// assert_eq!(
+///     f32::from_integer_mantissa_and_exponent(13176795, -22).map(NiceFloat),
+///     Some(NiceFloat(core::f32::consts::PI))
+/// );
+/// assert_eq!(
+///     f32::from_integer_mantissa_and_exponent(13421773, -27).map(NiceFloat),
+///     Some(NiceFloat(0.1))
+/// );
+/// assert_eq!(
+///     f32::from_integer_mantissa_and_exponent(5, 1).map(NiceFloat),
+///     Some(NiceFloat(10.0))
+/// );
+///
+/// assert_eq!(f32::from_integer_mantissa_and_exponent(5, 10000), None);
+/// assert_eq!(f32::from_integer_mantissa_and_exponent(5, -10000), None);
+/// // In the next 3 examples, the precision is too high.
+/// assert_eq!(f32::from_integer_mantissa_and_exponent(u64::MAX, -32), None);
+/// assert_eq!(f32::from_integer_mantissa_and_exponent(3, -150), None);
+/// assert_eq!(f32::from_integer_mantissa_and_exponent(1, 128), None);
+/// ```
+///
+/// # sci_mantissa_and_exponent
+/// ```
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+/// use malachite_base::num::float::{NiceFloat, PrimitiveFloat};
+///
+/// fn test(x: f32, mantissa: f32, exponent: i64) {
+///     let (actual_mantissa, actual_exponent) = x.sci_mantissa_and_exponent();
+///     assert_eq!(NiceFloat(actual_mantissa), NiceFloat(mantissa));
+///     assert_eq!(actual_exponent, exponent);
+/// }
+///
+/// test(1.0, 1.0, 0);
+/// test(core::f32::consts::PI, 1.5707964, 1);
+/// test(0.1, 1.6, -4);
+/// test(10.0, 1.25, 3);
+/// test(f32::MIN_POSITIVE_SUBNORMAL, 1.0, -149);
+/// test(f32::MAX_SUBNORMAL, 1.9999998, -127);
+/// test(f32::MIN_POSITIVE_NORMAL, 1.0, -126);
+/// test(f32::MAX_FINITE, 1.9999999, 127);
+/// ```
+///
+/// # sci_mantissa
+/// ```
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+/// use malachite_base::num::float::{NiceFloat, PrimitiveFloat};
+///
+/// assert_eq!(NiceFloat(1.0f32.sci_mantissa()), NiceFloat(1.0));
+/// assert_eq!(NiceFloat(core::f32::consts::PI.sci_mantissa()), NiceFloat(1.5707964));
+/// assert_eq!(NiceFloat(0.1f32.sci_mantissa()), NiceFloat(1.6));
+/// assert_eq!(NiceFloat(10.0f32.sci_mantissa()), NiceFloat(1.25));
+/// assert_eq!(NiceFloat(f32::MIN_POSITIVE_SUBNORMAL.sci_mantissa()), NiceFloat(1.0));
+/// assert_eq!(NiceFloat(f32::MAX_SUBNORMAL.sci_mantissa()), NiceFloat(1.9999998));
+/// assert_eq!(NiceFloat(f32::MIN_POSITIVE_NORMAL.sci_mantissa()), NiceFloat(1.0));
+/// assert_eq!(NiceFloat(f32::MAX_FINITE.sci_mantissa()), NiceFloat(1.9999999));
+/// ```
+///
+/// # sci_exponent
+/// ```
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(1.0f32.sci_exponent(), 0);
+/// assert_eq!(core::f32::consts::PI.sci_exponent(), 1);
+/// assert_eq!(0.1f32.sci_exponent(), -4);
+/// assert_eq!(10.0f32.sci_exponent(), 3);
+/// assert_eq!(f32::MIN_POSITIVE_SUBNORMAL.sci_exponent(), -149);
+/// assert_eq!(f32::MAX_SUBNORMAL.sci_exponent(), -127);
+/// assert_eq!(f32::MIN_POSITIVE_NORMAL.sci_exponent(), -126);
+/// assert_eq!(f32::MAX_FINITE.sci_exponent(), 127);
+/// ```
+///
+/// # from_sci_mantissa_and_exponent;
+/// ```
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+/// use malachite_base::num::float::{NiceFloat, PrimitiveFloat};
+///
+/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.0, 0).map(NiceFloat), Some(NiceFloat(1.0)));
+/// assert_eq!(
+///     f32::from_sci_mantissa_and_exponent(1.5707964, 1).map(NiceFloat),
+///     Some(NiceFloat(core::f32::consts::PI))
+/// );
+/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.6, -4).map(NiceFloat), Some(NiceFloat(0.1)));
+/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.25, 3).map(NiceFloat), Some(NiceFloat(10.0)));
+/// assert_eq!(
+///     f32::from_sci_mantissa_and_exponent(1.0, -149).map(NiceFloat),
+///     Some(NiceFloat(f32::MIN_POSITIVE_SUBNORMAL))
+/// );
+/// assert_eq!(
+///     f32::from_sci_mantissa_and_exponent(1.9999998, -127).map(NiceFloat),
+///     Some(NiceFloat(f32::MAX_SUBNORMAL))
+/// );
+/// assert_eq!(
+///     f32::from_sci_mantissa_and_exponent(1.0, -126).map(NiceFloat),
+///     Some(NiceFloat(f32::MIN_POSITIVE_NORMAL))
+/// );
+/// assert_eq!(
+///     f32::from_sci_mantissa_and_exponent(1.9999999, 127).map(NiceFloat),
+///     Some(NiceFloat(f32::MAX_FINITE))
+/// );
+///
+/// assert_eq!(f32::from_sci_mantissa_and_exponent(2.0, 1), None);
+/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.1, -2000), None);
+/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.1, 2000), None);
+/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.999, -149), None);
+/// ```
+pub mod mantissa_and_exponent;
 /// This module provides traits converting numbers to `Vec`s of numbers, slices to numbers, or
 /// slices to `Vec`s.
 ///

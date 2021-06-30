@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::random::random_negative_primitive_floats;
 use malachite_base::random::EXAMPLE_SEED;

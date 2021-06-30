@@ -5,7 +5,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base_test_util::generators::{
     signed_pair_gen, signed_quadruple_gen, signed_triple_gen, signed_triple_gen_var_4,
-    signed_triple_gen_var_5, unsigned_pair_gen, unsigned_quadruple_gen, unsigned_triple_gen,
+    signed_triple_gen_var_5, unsigned_pair_gen_var_27, unsigned_quadruple_gen, unsigned_triple_gen,
     unsigned_triple_gen_var_7, unsigned_triple_gen_var_8,
 };
 
@@ -206,7 +206,7 @@ fn eq_mod_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert!(!y.eq_mod(x, m));
     });
 
-    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         assert!(x.eq_mod(y, T::ONE));
         assert_eq!(x.eq_mod(y, T::ZERO), x == y);
         assert_eq!(x.eq_mod(T::ZERO, y), x.divisible_by(y));

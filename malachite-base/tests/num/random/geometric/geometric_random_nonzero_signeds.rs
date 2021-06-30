@@ -1,5 +1,5 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::geometric::geometric_random_nonzero_signeds;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base_test_util::stats::moments::{

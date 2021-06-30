@@ -2,6 +2,25 @@ use num::basic::traits::Two;
 use rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 
+/// Computes the absolute value of `self`. The input is assumed to be valid.
+pub trait Abs {
+    type Output;
+
+    fn abs(self) -> Self::Output;
+}
+
+/// Replaces `self` with its absolute value. Assumes that `self` has a representable absolute value.
+pub trait AbsAssign {
+    fn abs_assign(&mut self);
+}
+
+/// Computes the absolute value of `self` and converts to the unsigned equivalent.
+pub trait UnsignedAbs {
+    type Output;
+
+    fn unsigned_abs(self) -> Self::Output;
+}
+
 /// Checks whether `self` is reduced mod $2^p$.
 pub trait ModPowerOf2IsReduced {
     fn mod_power_of_2_is_reduced(&self, pow: u64) -> bool;
@@ -59,7 +78,7 @@ pub trait WrappingNegAssign {
 /// Calculates -`self`.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingNeg {
     type Output;
 
@@ -69,28 +88,9 @@ pub trait OverflowingNeg {
 /// Replaces `self` with its negative.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingNegAssign {
     fn overflowing_neg_assign(&mut self) -> bool;
-}
-
-/// Computes the absolute value of `self`. The input is assumed to be valid.
-pub trait Abs {
-    type Output;
-
-    fn abs(self) -> Self::Output;
-}
-
-/// Replaces `self` with its absolute value. Assumes that `self` has a representable absolute value.
-pub trait AbsAssign {
-    fn abs_assign(&mut self);
-}
-
-/// Computes the absolute value of `self` and converts to the unsigned equivalent.
-pub trait UnsignedAbs {
-    type Output;
-
-    fn unsigned_abs(self) -> Self::Output;
 }
 
 /// Checked absolute value. Computes `self.abs()`, returning `None` if there is no valid result.
@@ -128,10 +128,10 @@ pub trait WrappingAbsAssign {
     fn wrapping_abs_assign(&mut self);
 }
 
-/// Calculates `self.abs()`.
+/// Calculates the absolute value of `self`.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingAbs {
     type Output;
 
@@ -141,7 +141,7 @@ pub trait OverflowingAbs {
 /// Replaces `self` with its absolute value.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingAbsAssign {
     fn overflowing_abs_assign(&mut self) -> bool;
 }
@@ -208,7 +208,7 @@ pub trait WrappingAddAssign<RHS = Self> {
 /// Calculates `self` + `other`.
 ///
 /// Returns a tuple of the sum along with a boolean indicating whether an arithmetic overflow would
-/// occur. If an overflow would have occurred then the wrapped value is returned.
+/// occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingAdd<RHS = Self> {
     type Output;
 
@@ -218,7 +218,7 @@ pub trait OverflowingAdd<RHS = Self> {
 /// Replaces `self` with `self` + `other`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingAddAssign<RHS = Self> {
     fn overflowing_add_assign(&mut self, other: RHS) -> bool;
 }
@@ -299,7 +299,7 @@ pub trait WrappingSubAssign<RHS = Self> {
 /// Calculates `self` - `other`.
 ///
 /// Returns a tuple of the difference along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingSub<RHS = Self> {
     type Output;
 
@@ -309,7 +309,7 @@ pub trait OverflowingSub<RHS = Self> {
 /// Replaces `self` with `self` - `other`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingSubAssign<RHS = Self> {
     fn overflowing_sub_assign(&mut self, other: RHS) -> bool;
 }
@@ -421,7 +421,7 @@ pub trait WrappingMulAssign<RHS = Self> {
 /// Calculates `self` * `other`.
 ///
 /// Returns a tuple of the product along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingMul<RHS = Self> {
     type Output;
 
@@ -431,7 +431,7 @@ pub trait OverflowingMul<RHS = Self> {
 /// Replaces `self` with `self` * `other`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingMulAssign<RHS = Self> {
     fn overflowing_mul_assign(&mut self, other: RHS) -> bool;
 }
@@ -536,7 +536,7 @@ pub trait WrappingAddMulAssign<Y = Self, Z = Self> {
 /// Calculates $x + yz$.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingAddMul<Y = Self, Z = Self> {
     type Output;
 
@@ -546,7 +546,7 @@ pub trait OverflowingAddMul<Y = Self, Z = Self> {
 /// Replaces $x$ with $x + yz$.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingAddMulAssign<Y = Self, Z = Self> {
     fn overflowing_add_mul_assign(&mut self, y: Y, z: Z) -> bool;
 }
@@ -597,7 +597,7 @@ pub trait WrappingSubMulAssign<Y = Self, Z = Self> {
 /// Calculates $x - yz$.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingSubMul<Y = Self, Z = Self> {
     type Output;
 
@@ -607,7 +607,7 @@ pub trait OverflowingSubMul<Y = Self, Z = Self> {
 /// Replaces $x$ with $x - yz$.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingSubMulAssign<Y = Self, Z = Self> {
     fn overflowing_sub_mul_assign(&mut self, y: Y, z: Z) -> bool;
 }
@@ -744,7 +744,7 @@ pub trait WrappingDivAssign<RHS = Self> {
 /// Calculates `self` / `other`.
 ///
 /// Returns a tuple of the quotient along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingDiv<RHS = Self> {
     type Output;
 
@@ -754,7 +754,7 @@ pub trait OverflowingDiv<RHS = Self> {
 /// Replaces `self` with `self` / `other`.
 ///
 /// Returns a tuple of the quotient along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingDivAssign<RHS = Self> {
     fn overflowing_div_assign(&mut self, other: RHS) -> bool;
 }
@@ -1130,7 +1130,7 @@ pub trait WrappingPowAssign<RHS = Self> {
 /// Calculates `self` ^ `exp`.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingPow<RHS> {
     type Output;
 
@@ -1140,7 +1140,7 @@ pub trait OverflowingPow<RHS> {
 /// Replaces `self` with `self` ^ `exp`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingPowAssign<RHS = Self> {
     fn overflowing_pow_assign(&mut self, exp: RHS) -> bool;
 }
@@ -1239,20 +1239,20 @@ pub trait WrappingSquareAssign {
     fn wrapping_square_assign(&mut self);
 }
 
-/// Calculates `self` ^ `exp`.
+/// Calculates `self ^ 2`.
 ///
 /// Returns a tuple of the result along with a boolean indicating whether an arithmetic overflow
-/// would occur. If an overflow would have occurred then the wrapped value is returned.
+/// would occur. If an overflow would have occurred, then the wrapped value is returned.
 pub trait OverflowingSquare {
     type Output;
 
     fn overflowing_square(self) -> (Self::Output, bool);
 }
 
-/// Replaces `self` with `self` ^ 2.
+/// Replaces `self` with `self ^ 2`.
 ///
 /// Returns a boolean indicating whether an arithmetic overflow would occur. If an overflow would
-/// have occurred then the wrapped value is assigned.
+/// have occurred, then the wrapped value is assigned.
 pub trait OverflowingSquareAssign {
     fn overflowing_square_assign(&mut self) -> bool;
 }
@@ -1352,4 +1352,51 @@ pub trait FloorLogBase<B = Self> {
 /// Provides a function to get the ceiling of the base-`b` logarithm of `self`.
 pub trait CeilingLogBase<B = Self> {
     fn ceiling_log_base(self, base: B) -> u64;
+}
+
+/// Provides a function to get the floor of the square root of `self`.
+pub trait FloorSqrt {
+    type Output;
+
+    fn floor_sqrt(self) -> Self::Output;
+}
+
+/// Replaces `self` with the floor of its square root.
+pub trait FloorSqrtAssign {
+    fn floor_sqrt_assign(&mut self);
+}
+
+/// Provides a function to get the ceiling of the square root of `self`.
+pub trait CeilingSqrt {
+    type Output;
+
+    fn ceiling_sqrt(self) -> Self::Output;
+}
+
+/// Replaces `self` with the ceiling of its square root.
+pub trait CeilingSqrtAssign {
+    fn ceiling_sqrt_assign(&mut self);
+}
+
+/// Provides a function to get the square root of `self`, returning `None` if `self` is not a
+/// perfect square.
+pub trait CheckedSqrt {
+    type Output;
+
+    fn checked_sqrt(self) -> Option<Self::Output>;
+}
+
+/// Provides a function to get the floor of the square root of `self` and the remainder.
+pub trait SqrtRem {
+    type SqrtOutput;
+    type RemOutput;
+
+    fn sqrt_rem(self) -> (Self::SqrtOutput, Self::RemOutput);
+}
+
+/// Replaces `self` with the floor of its square root and returns the remainder.
+pub trait SqrtRemAssign {
+    type RemOutput;
+
+    fn sqrt_rem_assign(&mut self) -> Self::RemOutput;
 }

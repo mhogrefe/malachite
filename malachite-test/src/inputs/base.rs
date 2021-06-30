@@ -169,15 +169,6 @@ where
     }
 }
 
-//TODO replace with signed_gen_var_1 in Malachite
-pub fn signeds_no_min<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<T>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(signeds(gm).filter(|&i| i != T::MIN))
-}
-
 // All `T`s, where `T` is unsigned and its most-significant bit is set.
 pub fn unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
     match gm {
@@ -196,11 +187,6 @@ pub fn unsigneds_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T>
             }))
         }
     }
-}
-
-// All unsigned `T`s that are less than or equal to the greatest power of 2 that fits in a `T`.
-pub fn unsigneds_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<T> {
-    Box::new(unsigneds(gm).filter(|&x| x <= T::power_of_2(T::WIDTH - 1)))
 }
 
 // All `T`s, where `T` is signed and the square of the `T` is representable.
@@ -755,34 +741,6 @@ pub fn pairs_of_unsigned_and_positive_unsigned<
     }
 }
 
-pub fn pairs_of_signed_and_positive_unsigned<
-    T: PrimitiveSigned + Rand,
-    U: PrimitiveUnsigned + Rand,
->(
-    gm: GenerationMode,
-) -> It<(T, U)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs(
-            exhaustive_signeds(),
-            exhaustive_positive_primitive_ints(),
-        )),
-        GenerationMode::Random(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &random,
-            &random_positive_unsigned,
-        )),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &special_random_signed,
-            &special_random_positive_unsigned,
-        )),
-    }
-}
-
 // All pairs of `T`s`, where `T` is unsigned, the second `T` is nonzero, and the first `T` is not
 // divisible by the second.
 pub fn pairs_of_unsigned_and_positive_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
@@ -948,28 +906,6 @@ pub fn pairs_of_unsigned_and_small_u64_var_2<T: PrimitiveUnsigned + Rand + Sampl
             random_range(&scramble(&EXAMPLE_SEED, "pow"), 0, T::WIDTH),
             |_, &pow| random_range::<T>(&scramble(&EXAMPLE_SEED, "u"), T::ZERO, T::low_mask(pow)),
         ))),
-    }
-}
-
-// All pairs of unsigned `T` and `u64`, where the `u64` is between 0 and `U::WIDTH`, inclusive.
-pub fn pairs_of_unsigned_and_small_u64_var_3<T: PrimitiveUnsigned + Rand, U: PrimitiveUnsigned>(
-    gm: GenerationMode,
-) -> It<(T, u64)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(lex_pairs(
-            exhaustive_unsigneds(),
-            primitive_int_increasing_inclusive_range(0, U::WIDTH),
-        )),
-        GenerationMode::Random(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &random,
-            &(|seed| random_range_down(seed, U::WIDTH)),
-        )),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &special_random_unsigned,
-            &(|seed| random_range_down(seed, U::WIDTH)),
-        )),
     }
 }
 
@@ -1146,32 +1082,6 @@ where
         pairs_of_signed_and_small_unsigned::<T, U>(gm)
             .filter(|&(ref n, u)| !n.divisible_by_power_of_2(u.exact_into())),
     )
-}
-
-// All pairs of signed `T` and `u64`, where the `u64` is between 0 and `U::WIDTH`, inclusive.
-pub fn pairs_of_signed_and_small_u64_var_1<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned>(
-    gm: GenerationMode,
-) -> It<(T, u64)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    match gm {
-        GenerationMode::Exhaustive => Box::new(lex_pairs(
-            exhaustive_signeds(),
-            primitive_int_increasing_inclusive_range(0, U::WIDTH),
-        )),
-        GenerationMode::Random(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &random,
-            &(|seed| random_range_down(seed, U::WIDTH)),
-        )),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &special_random_signed,
-            &(|seed| random_range_down(seed, U::WIDTH)),
-        )),
-    }
 }
 
 // All pairs of signed `T` and `u64`, where the `T` is non-negative or the `u64` is between 0 and

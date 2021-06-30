@@ -306,7 +306,7 @@ pub fn limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
 
 impl Natural {
     fn and_limb(self, other: Limb) -> Limb {
-        Limb::wrapping_from(self) & other
+        Limb::wrapping_from(&self) & other
     }
 
     fn and_limb_ref(&self, other: Limb) -> Limb {

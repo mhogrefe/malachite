@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 
 #[test]
 fn test_overflowing_add() {
@@ -14,4 +17,34 @@ fn test_overflowing_add() {
     test::<i16>(123, -456, -333, false);
     test::<i8>(123, 45, -88, true);
     test::<i8>(-123, -45, 88, true);
+}
+
+fn overflowing_add_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
+        let mut sum = x;
+        let overflow = sum.overflowing_add_assign(y);
+        assert_eq!((sum, overflow), x.overflowing_add(y));
+        assert_eq!(x.wrapping_add(y), sum);
+        if !overflow {
+            assert_eq!(sum, x + y);
+        }
+    });
+}
+
+fn overflowing_add_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen::<T>().test_properties(|(x, y)| {
+        let mut sum = x;
+        let overflow = sum.overflowing_add_assign(y);
+        assert_eq!((sum, overflow), x.overflowing_add(y));
+        assert_eq!(x.wrapping_add(y), sum);
+        if !overflow {
+            assert_eq!(sum, x + y);
+        }
+    });
+}
+
+#[test]
+fn overflowing_add_properties() {
+    apply_fn_to_unsigneds!(overflowing_add_properties_helper_unsigned);
+    apply_fn_to_signeds!(overflowing_add_properties_helper_signed);
 }

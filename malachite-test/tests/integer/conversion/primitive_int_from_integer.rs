@@ -16,7 +16,6 @@ macro_rules! unsigned_properties {
 
         test_properties(integers, |x| {
             let result = $t::checked_from(x);
-            assert_eq!($t::checked_from(x.clone()), result);
             if *x >= 0 && x.significant_bits() <= $t::WIDTH {
                 assert_eq!(Integer::from(result.unwrap()), *x);
                 assert_eq!(result, Some($t::wrapping_from(x)));
@@ -27,7 +26,7 @@ macro_rules! unsigned_properties {
             assert_eq!(result.is_none(), $t::overflowing_from(x).1);
 
             let result = $t::wrapping_from(x);
-            assert_eq!(result, $t::exact_from((&x).mod_power_of_2($t::WIDTH)));
+            assert_eq!(result, $t::exact_from(&(&x).mod_power_of_2($t::WIDTH)));
         });
     };
 }
@@ -38,7 +37,6 @@ macro_rules! signed_properties {
 
         test_properties(integers, |x| {
             let result = $t::checked_from(x);
-            assert_eq!($t::checked_from(x.clone()), result);
             //TODO if *x >= 0 && x.significant_bits() <= u64::from($t::WIDTH - 1) {
             //TODO     assert_eq!(Integer::from(result.unwrap()), *x);
             //TODO     assert_eq!(result, Some($t::wrapping_from(x)));
@@ -55,20 +53,16 @@ macro_rules! properties {
     ($t: ident) => {
         test_properties(integers, |x| {
             let result = $t::wrapping_from(x);
-            assert_eq!($t::wrapping_from(x.clone()), result);
             assert_eq!(result, $t::overflowing_from(x).0);
 
-            let result = $t::saturating_from(x);
-            assert_eq!($t::saturating_from(x.clone()), result);
+            let _result = $t::saturating_from(x);
             //TODO assert!(result <= *x);
             //TODO assert_eq!(result == *x, $t::convertible_from(x));
 
             let result = $t::overflowing_from(x);
-            assert_eq!($t::overflowing_from(x.clone()), result);
             assert_eq!(result, ($t::wrapping_from(x), !$t::convertible_from(x)));
 
-            let convertible = $t::convertible_from(x.clone());
-            assert_eq!($t::convertible_from(x), convertible);
+            let _convertible = $t::convertible_from(x);
             //TODO assert_eq!(convertible, *x >= $t::MIN && *x <= $t::MAX);
         });
     };

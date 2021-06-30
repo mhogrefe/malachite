@@ -314,6 +314,55 @@ pub fn primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>() -> Generator<(
     )
 }
 
+// -- (PrimitiveFloat, PrimitiveUnsigned) --
+
+// All `(T, U)` where `T` is a primitive float type, `U` is unsigned, the `T` is finite and
+// positive, and the `U` is small.
+pub fn primitive_float_unsigned_pair_gen_var_1<T: PrimitiveFloat, U: PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new(
+        &exhaustive_primitive_float_unsigned_pair_gen_var_1,
+        &random_primitive_float_unsigned_pair_gen_var_1,
+        &special_random_primitive_float_unsigned_pair_gen_var_1,
+    )
+}
+
+// All `(T, u64)` where `T` is a primitive float type, the `T` is greater than or equal to 1.0 and
+// less than 2.0, and the `u64` is small.
+pub fn primitive_float_unsigned_pair_gen_var_2<T: PrimitiveFloat>() -> Generator<(T, u64)> {
+    Generator::new(
+        &exhaustive_primitive_float_unsigned_pair_gen_var_2,
+        &random_primitive_float_unsigned_pair_gen_var_2,
+        &special_random_primitive_float_unsigned_pair_gen_var_2,
+    )
+}
+
+// -- (PrimitiveFloat, PrimitiveUnsigned, RoundingMode) --
+
+// All `(T, U, RoundingMode)` where `T` is a primitive float type, `U` is unsigned, the `T` is
+// finite and positive, and the `U` is small.
+pub fn primitive_float_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveFloat,
+    U: PrimitiveUnsigned,
+>() -> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_primitive_float_unsigned_rounding_mode_triple_gen_var_1,
+        &random_primitive_float_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_primitive_float_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(T, u64, RoundingMode)` where `T` is a primitive float type, the `T` is greater than or
+// equal to 1.0 and less than 2.0, and the `u64` is small.
+pub fn primitive_float_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveFloat>(
+) -> Generator<(T, u64, RoundingMode)> {
+    Generator::new(
+        &exhaustive_primitive_float_unsigned_rounding_mode_triple_gen_var_2,
+        &random_primitive_float_unsigned_rounding_mode_triple_gen_var_2,
+        &special_random_primitive_float_unsigned_rounding_mode_triple_gen_var_2,
+    )
+}
+
 // -- (PrimitiveFloat, RoundingMode) --
 
 // All `(T, RoundingMode)` where `T` is a primitive float and the values are valid inputs to
@@ -726,6 +775,24 @@ pub fn signed_unsigned_pair_gen_var_13<T: PrimitiveSigned, U: PrimitiveUnsigned>
     )
 }
 
+// All `(T, U)`s where `T` is signed, `U` is unsigned, and both `T` and `U` are small.
+pub fn signed_unsigned_pair_gen_var_14<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, U)> {
+    Generator::new_no_special(
+        &exhaustive_signed_unsigned_pair_gen,
+        &random_signed_unsigned_pair_gen_var_8,
+    )
+}
+
+// All `(T, u54)`s where `T` is signed, both the `T` and the `u64` are small, and the `T` raised to
+// the power of the `u64` does not overflow.
+pub fn signed_unsigned_pair_gen_var_15<T: PrimitiveSigned>() -> Generator<(T, u64)> {
+    Generator::new_no_special(
+        &exhaustive_signed_unsigned_pair_gen_var_15,
+        &random_signed_unsigned_pair_gen_var_9,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
 
 // All (`T`, `u64`, and `bool`) where `T` is signed and either the `u64` is smaller than `T::WIDTH`
@@ -963,6 +1030,22 @@ pub fn unsigned_gen_var_14<T: PrimitiveUnsigned>() -> Generator<T> {
     )
 }
 
+// All `u64`s between 0 and `T::WIDTH - 1`, inclusive, where `T` is a primitive integer.
+pub fn unsigned_gen_var_15<T: PrimitiveInt>() -> Generator<u64> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_gen_var_10::<T>,
+        &random_unsigned_gen_var_15::<T>,
+    )
+}
+
+// All `u64`s between 0 and `T::WIDTH - 2`, inclusive, where `T` is a primitive integer.
+pub fn unsigned_gen_var_16<T: PrimitiveInt>() -> Generator<u64> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_gen_var_11::<T>,
+        &random_unsigned_gen_var_16::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {
@@ -1018,14 +1101,6 @@ pub fn unsigned_signed_unsigned_triple_gen_var_2<T: PrimitiveUnsigned, U: Primit
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
-
-pub fn unsigned_pair_gen<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
-    Generator::new(
-        &exhaustive_unsigned_pair_gen,
-        &random_primitive_int_pair_gen_var_1,
-        &special_random_unsigned_pair_gen,
-    )
-}
 
 // All `(u32, u32)`s where each `u32` is smaller than `NUMBER_OF_CHARS`.
 pub fn unsigned_pair_gen_var_1() -> Generator<(u32, u32)> {
@@ -1197,7 +1272,7 @@ pub fn unsigned_pair_gen_var_17<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
 // positive.
 pub fn unsigned_pair_gen_var_18<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
     Generator::new_no_special(
-        &exhaustive_primitive_int_unsigned_gen_var_1,
+        &exhaustive_unsigned_primitive_int_gen_var_1,
         &random_unsigned_pair_gen_var_9,
     )
 }
@@ -1276,6 +1351,32 @@ pub fn unsigned_pair_gen_var_26<T: PrimitiveFloat>() -> Generator<(u64, u64)> {
         &exhaustive_unsigned_pair_gen_var_19::<T>,
         &random_unsigned_pair_gen_var_16::<T>,
         &special_random_unsigned_pair_gen_var_19::<T>,
+    )
+}
+
+// All pairs of unsigneds of the same type.
+pub fn unsigned_pair_gen_var_27<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_pair_gen_var_20,
+        &random_primitive_int_pair_gen_var_1,
+        &special_random_unsigned_pair_gen,
+    )
+}
+
+// All `(T, U)` where `T` and `U` are unsigned and both the `T` and the `U` are small.
+pub fn unsigned_pair_gen_var_28<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> Generator<(T, U)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen,
+        &random_unsigned_pair_gen_var_17,
+    )
+}
+
+// All `(T, u64)` where `T` is unsigned, both the `T` and the `u64` are small, and the `T` raised
+// the power of the `u64` does not overflow.
+pub fn unsigned_pair_gen_var_29<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_pair_gen_var_21,
+        &random_unsigned_pair_gen_var_18,
     )
 }
 

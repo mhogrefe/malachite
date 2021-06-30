@@ -245,6 +245,7 @@ pub mod num {
         pub mod shl_round;
         pub mod shr_round;
         pub mod sign;
+        pub mod sqrt;
         pub mod square;
         pub mod sub_mul;
         pub mod wrapping_abs;
@@ -299,6 +300,11 @@ pub mod num {
             pub mod split_in_half;
             pub mod upper_half;
         }
+        pub mod mantissa_and_exponent {
+            pub mod integer_mantissa_and_exponent;
+            pub mod raw_mantissa_and_exponent;
+            pub mod sci_mantissa_and_exponent;
+        }
         pub mod slice {
             pub mod from_other_type_slice;
             pub mod vec_from_other_type;
@@ -351,16 +357,10 @@ pub mod num {
         pub mod basic {
             pub mod abs_negative_zero;
             pub mod constants;
-            pub mod from_integer_mantissa_and_exponent;
             pub mod from_ordered_representation;
-            pub mod from_raw_mantissa_and_exponent;
-            pub mod from_sci_mantissa_and_exponent;
-            pub mod integer_mantissa_and_exponent;
             pub mod is_negative_zero;
             pub mod next_higher;
             pub mod next_lower;
-            pub mod raw_mantissa_and_exponent;
-            pub mod sci_mantissa_and_exponent;
             pub mod to_ordered_representation;
         }
         pub mod nice_float {

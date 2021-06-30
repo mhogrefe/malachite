@@ -783,6 +783,22 @@ pub fn random_natural_rounding_mode_pair_gen_var_1<
     )
 }
 
+pub fn random_natural_rounding_mode_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(Natural, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_positive_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
+
 // -- (String, String, String) --
 
 pub fn random_string_triple_gen_var_1(config: &GenConfig) -> It<(String, String, String)> {

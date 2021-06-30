@@ -3,7 +3,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::traits::{CountOnes, CountZeros};
 use malachite_base_test_util::generators::{
     signed_gen, signed_gen_var_2, signed_gen_var_4, signed_pair_gen, signed_pair_gen_var_1,
-    signed_triple_gen_var_3, unsigned_gen, unsigned_pair_gen, unsigned_triple_gen,
+    signed_triple_gen_var_3, unsigned_gen, unsigned_pair_gen_var_27, unsigned_triple_gen,
 };
 
 #[test]
@@ -36,7 +36,7 @@ pub fn test_checked_hamming_distance() {
 }
 
 fn hamming_distance_properties_helper<T: PrimitiveUnsigned>() {
-    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         let distance = x.hamming_distance(y);
         assert_eq!(y.hamming_distance(x), distance);
         assert_eq!(distance == 0, x == y);

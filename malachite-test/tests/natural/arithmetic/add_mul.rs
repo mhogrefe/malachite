@@ -229,7 +229,7 @@ fn add_mul_properties() {
             Limb::from(x)
                 .checked_add_mul(Limb::from(y), Limb::from(z))
                 .is_some(),
-            Limb::convertible_from(result)
+            Limb::convertible_from(&result)
         );
     });
 }

@@ -441,6 +441,119 @@ pub fn random_primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>(
     )
 }
 
+// -- (PrimitiveFloat, PrimitiveUnsigned) --
+
+pub fn random_primitive_float_unsigned_pair_gen_var_1<T: PrimitiveFloat, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            special_random_positive_finite_primitive_floats(
+                seed,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_primitive_float_unsigned_pair_gen_var_2<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(T, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            special_random_primitive_float_range(
+                seed,
+                T::ONE,
+                T::TWO,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+                config.get_or("special_p_mean_n", 1),
+                config.get_or("special_p_mean_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (PrimitiveFloat, PrimitiveUnsigned, RoundingMode) --
+
+pub fn random_primitive_float_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveFloat,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, RoundingMode)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            special_random_positive_finite_primitive_floats(
+                seed,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
+
+pub fn random_primitive_float_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(T, u64, RoundingMode)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            special_random_primitive_float_range(
+                seed,
+                T::ONE,
+                T::TWO,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+                config.get_or("special_p_mean_n", 1),
+                config.get_or("special_p_mean_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
+
 // -- (PrimitiveFloat, RoundingMode) --
 
 pub fn random_primitive_float_rounding_mode_pair_gen_var_1<T: PrimitiveFloat>(
@@ -1585,6 +1698,53 @@ pub fn random_signed_unsigned_pair_gen_var_7<T: PrimitiveSigned, U: PrimitiveUns
     ))
 }
 
+pub fn random_signed_unsigned_pair_gen_var_8<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_signed_unsigned_pair_gen_var_9<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_signeds::<T>(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 32),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 32),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .filter(|&(x, y)| x.checked_pow(y).is_some()),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn random_signed_unsigned_unsigned_triple_gen_var_1<
@@ -1810,6 +1970,14 @@ pub fn random_unsigned_gen_var_14<T: PrimitiveUnsigned>(_config: &GenConfig) -> 
         EXAMPLE_SEED,
         T::power_of_2(T::WIDTH - 1) + T::ONE,
     ))
+}
+
+pub fn random_unsigned_gen_var_15<T: PrimitiveInt>(_config: &GenConfig) -> It<u64> {
+    Box::new(random_unsigneds_less_than(EXAMPLE_SEED, T::WIDTH))
+}
+
+pub fn random_unsigned_gen_var_16<T: PrimitiveInt>(_config: &GenConfig) -> It<u64> {
+    Box::new(random_unsigneds_less_than(EXAMPLE_SEED, T::WIDTH - 1))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveInt, PrimitiveInt, PrimitiveUnsigned) --
@@ -2277,6 +2445,51 @@ pub fn random_unsigned_pair_gen_var_16<T: PrimitiveFloat>(_config: &GenConfig) -
         &|seed| random_unsigned_bit_chunks(seed, T::MANTISSA_WIDTH),
         &|seed| random_unsigned_bit_chunks(seed, T::EXPONENT_WIDTH),
     ))
+}
+
+pub fn random_unsigned_pair_gen_var_17<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_unsigned_pair_gen_var_18<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                geometric_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 32),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 32),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .filter(|&(x, y)| x.checked_pow(y).is_some()),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --

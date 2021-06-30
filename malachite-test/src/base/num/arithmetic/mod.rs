@@ -1,18 +1,5 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod overflowing_abs;
-pub mod overflowing_add;
-pub mod overflowing_add_mul;
-pub mod overflowing_div;
-pub mod overflowing_mul;
-pub mod overflowing_neg;
-pub mod overflowing_pow;
-pub mod overflowing_square;
-pub mod overflowing_sub;
-pub mod overflowing_sub_mul;
-pub mod parity;
-pub mod pow;
-pub mod power_of_2;
 pub mod round_to_multiple;
 pub mod round_to_multiple_of_power_of_2;
 pub mod saturating_abs;
@@ -46,19 +33,6 @@ pub mod xxx_sub_yyy_is_zzz;
 pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    overflowing_abs::register(registry);
-    overflowing_add::register(registry);
-    overflowing_add_mul::register(registry);
-    overflowing_div::register(registry);
-    overflowing_mul::register(registry);
-    overflowing_neg::register(registry);
-    overflowing_pow::register(registry);
-    overflowing_square::register(registry);
-    overflowing_sub::register(registry);
-    overflowing_sub_mul::register(registry);
-    parity::register(registry);
-    pow::register(registry);
-    power_of_2::register(registry);
     round_to_multiple::register(registry);
     round_to_multiple_of_power_of_2::register(registry);
     saturating_abs::register(registry);

@@ -6,7 +6,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
-    large_type_gen_var_1, unsigned_pair_gen, unsigned_vec_pair_gen_var_1,
+    large_type_gen_var_1, unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_1,
     unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2,
     unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_3,
     unsigned_vec_unsigned_pair_gen, unsigned_vec_unsigned_unsigned_triple_gen,
@@ -20366,7 +20366,7 @@ fn mul_properties() {
         }
     });
 
-    unsigned_pair_gen::<Limb>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_27::<Limb>().test_properties(|(x, y)| {
         assert_eq!(
             Natural::from(DoubleLimb::from(x) * DoubleLimb::from(y)),
             Natural::from(x) * Natural::from(y)

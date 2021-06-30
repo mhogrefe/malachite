@@ -448,6 +448,13 @@ pub fn exhaustive_natural_rounding_mode_pair_gen_var_1<
     )
 }
 
+pub fn exhaustive_natural_rounding_mode_pair_gen_var_2() -> It<(Natural, RoundingMode)> {
+    Box::new(lex_pairs(
+        exhaustive_positive_naturals(),
+        exhaustive_rounding_modes(),
+    ))
+}
+
 // -- (String, String, String) --
 
 pub fn exhaustive_string_triple_gen_var_1() -> It<(String, String, String)> {

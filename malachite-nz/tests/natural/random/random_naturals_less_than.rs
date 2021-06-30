@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base_test_util::stats::common_values_map::common_values_map;
 use malachite_base_test_util::stats::median;

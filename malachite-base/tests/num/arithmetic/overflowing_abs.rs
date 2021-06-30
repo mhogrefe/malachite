@@ -1,4 +1,5 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base_test_util::generators::signed_gen;
 
 fn overflowing_abs_helper<T: PrimitiveSigned>() {
     let test = |n: T, out, overflow| {
@@ -20,4 +21,23 @@ fn overflowing_abs_helper<T: PrimitiveSigned>() {
 #[test]
 fn test_overflowing_abs() {
     apply_fn_to_signeds!(overflowing_abs_helper);
+}
+
+fn overflowing_abs_properties_helper<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|n| {
+        let mut abs = n;
+        let overflow = abs.overflowing_abs_assign();
+        assert_eq!((abs, overflow), n.overflowing_abs());
+        assert_eq!(abs, n.wrapping_abs());
+        if n != T::MIN {
+            assert_eq!(n.abs(), abs);
+        }
+        assert_eq!(abs == n, n >= T::ZERO || n == T::MIN);
+        assert_eq!(n == T::MIN, overflow);
+    });
+}
+
+#[test]
+fn overflowing_abs_properties() {
+    apply_fn_to_signeds!(overflowing_abs_properties_helper);
 }

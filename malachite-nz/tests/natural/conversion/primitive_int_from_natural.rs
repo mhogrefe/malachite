@@ -8,7 +8,6 @@ use std::str::FromStr;
 #[test]
 fn test_u32_checked_from_natural() {
     let test = |n, out| {
-        assert_eq!(u32::checked_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u32::checked_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u32(), out);
     };
@@ -22,7 +21,6 @@ fn test_u32_checked_from_natural() {
 #[test]
 fn test_u32_exact_from_natural() {
     let test = |n, out| {
-        assert_eq!(u32::exact_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u32::exact_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u32().unwrap(), out);
     };
@@ -34,19 +32,18 @@ fn test_u32_exact_from_natural() {
 #[test]
 #[should_panic]
 fn u32_exact_from_natural_fail_1() {
-    u32::exact_from(Natural::from_str("1000000000000").unwrap());
+    u32::exact_from(&Natural::from_str("1000000000000").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn u32_exact_from_natural_fail_2() {
-    u32::exact_from(Natural::from_str("4294967296").unwrap());
+    u32::exact_from(&Natural::from_str("4294967296").unwrap());
 }
 
 #[test]
 fn test_u32_wrapping_from_natural() {
     let test = |n, out| {
-        assert_eq!(u32::wrapping_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u32::wrapping_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u32_wrapping(), out);
     };
@@ -60,7 +57,6 @@ fn test_u32_wrapping_from_natural() {
 #[test]
 fn test_u32_saturating_from_natural() {
     let test = |n, out| {
-        assert_eq!(u32::saturating_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u32::saturating_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", 0);
@@ -73,7 +69,6 @@ fn test_u32_saturating_from_natural() {
 #[test]
 fn test_u32_overflowing_from_natural() {
     let test = |n, out| {
-        assert_eq!(u32::overflowing_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u32::overflowing_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", (0, false));
@@ -86,7 +81,6 @@ fn test_u32_overflowing_from_natural() {
 #[test]
 fn test_u32_convertible_from_natural() {
     let test = |n, out| {
-        assert_eq!(u32::convertible_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u32::convertible_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", true);
@@ -99,7 +93,6 @@ fn test_u32_convertible_from_natural() {
 #[test]
 fn test_u64_checked_from_natural() {
     let test = |n, out| {
-        assert_eq!(u64::checked_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u64::checked_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u64(), out);
     };
@@ -114,7 +107,6 @@ fn test_u64_checked_from_natural() {
 #[test]
 fn test_u64_exact_from_natural() {
     let test = |n, out| {
-        assert_eq!(u64::exact_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u64::exact_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u64().unwrap(), out);
     };
@@ -127,19 +119,18 @@ fn test_u64_exact_from_natural() {
 #[test]
 #[should_panic]
 fn u64_exact_from_natural_fail_1() {
-    u64::exact_from(Natural::from_str("1000000000000000000000000").unwrap());
+    u64::exact_from(&Natural::from_str("1000000000000000000000000").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn u64_exact_from_natural_fail_2() {
-    u64::exact_from(Natural::from_str("18446744073709551616").unwrap());
+    u64::exact_from(&Natural::from_str("18446744073709551616").unwrap());
 }
 
 #[test]
 fn test_u64_wrapping_from_natural() {
     let test = |n, out| {
-        assert_eq!(u64::wrapping_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u64::wrapping_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_u64_wrapping(), out);
     };
@@ -153,7 +144,6 @@ fn test_u64_wrapping_from_natural() {
 #[test]
 fn test_u64_saturating_from_natural() {
     let test = |n, out| {
-        assert_eq!(u64::saturating_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u64::saturating_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", 0);
@@ -166,7 +156,6 @@ fn test_u64_saturating_from_natural() {
 #[test]
 fn test_u64_overflowing_from_natural() {
     let test = |n, out| {
-        assert_eq!(u64::overflowing_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u64::overflowing_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", (0, false));
@@ -179,7 +168,6 @@ fn test_u64_overflowing_from_natural() {
 #[test]
 fn test_u64_convertible_from_natural() {
     let test = |n, out| {
-        assert_eq!(u64::convertible_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(u64::convertible_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", true);
@@ -192,7 +180,6 @@ fn test_u64_convertible_from_natural() {
 #[test]
 fn test_i32_checked_from_natural() {
     let test = |n, out| {
-        assert_eq!(i32::checked_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i32::checked_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i32(), out);
     };
@@ -206,7 +193,6 @@ fn test_i32_checked_from_natural() {
 #[test]
 fn test_i32_exact_from_natural() {
     let test = |n, out| {
-        assert_eq!(i32::exact_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i32::exact_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i32().unwrap(), out);
     };
@@ -218,19 +204,18 @@ fn test_i32_exact_from_natural() {
 #[test]
 #[should_panic]
 fn i32_exact_from_natural_fail_1() {
-    i32::exact_from(Natural::from_str("1000000000000").unwrap());
+    i32::exact_from(&Natural::from_str("1000000000000").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn i32_exact_from_natural_fail_2() {
-    i32::exact_from(Natural::from_str("2147483648").unwrap());
+    i32::exact_from(&Natural::from_str("2147483648").unwrap());
 }
 
 #[test]
 fn test_i32_wrapping_from_natural() {
     let test = |n, out| {
-        assert_eq!(i32::wrapping_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i32::wrapping_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i32_wrapping(), out);
     };
@@ -244,7 +229,6 @@ fn test_i32_wrapping_from_natural() {
 #[test]
 fn test_i32_saturating_from_natural() {
     let test = |n, out| {
-        assert_eq!(i32::saturating_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i32::saturating_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", 0);
@@ -257,7 +241,6 @@ fn test_i32_saturating_from_natural() {
 #[test]
 fn test_i32_overflowing_from_natural() {
     let test = |n, out| {
-        assert_eq!(i32::overflowing_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i32::overflowing_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", (0, false));
@@ -270,7 +253,6 @@ fn test_i32_overflowing_from_natural() {
 #[test]
 fn test_i32_convertible_from_natural() {
     let test = |n, out| {
-        assert_eq!(i32::convertible_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i32::convertible_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", true);
@@ -283,7 +265,6 @@ fn test_i32_convertible_from_natural() {
 #[test]
 fn test_i64_checked_from_natural() {
     let test = |n, out| {
-        assert_eq!(i64::checked_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i64::checked_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i64(), out);
     };
@@ -297,7 +278,6 @@ fn test_i64_checked_from_natural() {
 #[test]
 fn test_i64_exact_from_natural() {
     let test = |n, out| {
-        assert_eq!(i64::exact_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i64::exact_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i64().unwrap(), out);
     };
@@ -309,19 +289,18 @@ fn test_i64_exact_from_natural() {
 #[test]
 #[should_panic]
 fn i64_exact_from_natural_fail_1() {
-    i64::exact_from(Natural::from_str("1000000000000000000000000").unwrap());
+    i64::exact_from(&Natural::from_str("1000000000000000000000000").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn i64_exact_from_natural_fail_2() {
-    i64::exact_from(Natural::from_str("9223372036854775808").unwrap());
+    i64::exact_from(&Natural::from_str("9223372036854775808").unwrap());
 }
 
 #[test]
 fn test_i64_wrapping_from_natural() {
     let test = |n, out| {
-        assert_eq!(i64::wrapping_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i64::wrapping_from(&Natural::from_str(n).unwrap()), out);
         assert_eq!(rug::Integer::from_str(n).unwrap().to_i64_wrapping(), out);
     };
@@ -335,7 +314,6 @@ fn test_i64_wrapping_from_natural() {
 #[test]
 fn test_i64_saturating_from_natural() {
     let test = |n, out| {
-        assert_eq!(i64::saturating_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i64::saturating_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", 0);
@@ -348,7 +326,6 @@ fn test_i64_saturating_from_natural() {
 #[test]
 fn test_i64_overflowing_from_natural() {
     let test = |n, out| {
-        assert_eq!(i64::overflowing_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i64::overflowing_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", (0, false));
@@ -361,7 +338,6 @@ fn test_i64_overflowing_from_natural() {
 #[test]
 fn test_i64_convertible_from_natural() {
     let test = |n, out| {
-        assert_eq!(i64::convertible_from(Natural::from_str(n).unwrap()), out);
         assert_eq!(i64::convertible_from(&Natural::from_str(n).unwrap()), out);
     };
     test("0", true);

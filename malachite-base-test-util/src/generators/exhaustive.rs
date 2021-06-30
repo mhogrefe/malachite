@@ -267,6 +267,51 @@ pub fn exhaustive_primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>() -> 
     )
 }
 
+// -- (PrimitiveFloat, PrimitiveUnsigned) --
+
+pub fn exhaustive_primitive_float_unsigned_pair_gen_var_1<
+    T: PrimitiveFloat,
+    U: PrimitiveUnsigned,
+>() -> It<(T, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_positive_finite_primitive_floats(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_primitive_float_unsigned_pair_gen_var_2<T: PrimitiveFloat>() -> It<(T, u64)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_primitive_float_range(T::ONE, T::TWO),
+        exhaustive_unsigneds(),
+    ))
+}
+
+// -- (PrimitiveFloat, PrimitiveUnsigned, RoundingMode) --
+
+pub fn exhaustive_primitive_float_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveFloat,
+    U: PrimitiveUnsigned,
+>() -> It<(T, U, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs_big_tiny(
+            exhaustive_positive_finite_primitive_floats(),
+            exhaustive_unsigneds(),
+        ),
+        exhaustive_rounding_modes(),
+    )))
+}
+
+pub fn exhaustive_primitive_float_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveFloat>(
+) -> It<(T, u64, RoundingMode)> {
+    reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs_big_tiny(
+            exhaustive_primitive_float_range(T::ONE, T::TWO),
+            exhaustive_unsigneds(),
+        ),
+        exhaustive_rounding_modes(),
+    )))
+}
+
 // -- (PrimitiveFloat, RoundingMode) --
 
 pub(crate) fn float_rounding_mode_filter_var_1<T: PrimitiveFloat>(p: &(T, RoundingMode)) -> bool {
@@ -731,6 +776,14 @@ pub fn exhaustive_signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigne
 
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
+pub fn exhaustive_signed_unsigned_pair_gen<T: PrimitiveSigned, U: PrimitiveUnsigned>() -> It<(T, U)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_signeds(),
+        exhaustive_unsigneds(),
+    ))
+}
+
 pub fn exhaustive_signed_unsigned_pair_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>(
 ) -> It<(T, U)> {
     Box::new(exhaustive_pairs_big_tiny(
@@ -889,6 +942,13 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_14<T: PrimitiveSigned, U: Primiti
         ),
         exhaustive_positive_primitive_ints(),
     ))
+}
+
+pub fn exhaustive_signed_unsigned_pair_gen_var_15<T: PrimitiveSigned>() -> It<(T, u64)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_signeds::<T>(), exhaustive_unsigneds())
+            .filter(|&(x, y)| x.checked_pow(y).is_some()),
+    )
 }
 
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
@@ -1132,9 +1192,17 @@ pub fn exhaustive_unsigned_gen_var_9<T: PrimitiveUnsigned>() -> It<T> {
     ))
 }
 
+pub fn exhaustive_unsigned_gen_var_10<T: PrimitiveInt>() -> It<u64> {
+    Box::new(primitive_int_increasing_range(0, T::WIDTH))
+}
+
+pub fn exhaustive_unsigned_gen_var_11<T: PrimitiveInt>() -> It<u64> {
+    Box::new(primitive_int_increasing_inclusive_range(0, T::WIDTH - 2))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt) --
 
-pub fn exhaustive_primitive_int_unsigned_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(
+pub fn exhaustive_unsigned_primitive_int_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(
 ) -> It<(T, U)> {
     Box::new(exhaustive_pairs(
         exhaustive_unsigneds(),
@@ -1286,8 +1354,11 @@ pub fn exhaustive_unsigned_signed_unsigned_triple_gen_var_2<
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned) --
 
-pub fn exhaustive_unsigned_pair_gen<T: PrimitiveUnsigned>() -> It<(T, T)> {
-    Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds()))
+pub fn exhaustive_unsigned_pair_gen<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() -> It<(T, U)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigneds(),
+        exhaustive_unsigneds(),
+    ))
 }
 
 pub fn exhaustive_unsigned_pair_gen_var_1() -> It<(u32, u32)> {
@@ -1505,6 +1576,17 @@ pub fn exhaustive_unsigned_pair_gen_var_19<T: PrimitiveFloat>() -> It<(u64, u64)
         primitive_int_increasing_range(0, u64::power_of_2(T::MANTISSA_WIDTH)),
         primitive_int_increasing_range(0, u64::power_of_2(T::EXPONENT_WIDTH)),
     ))
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_20<T: PrimitiveUnsigned>() -> It<(T, T)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_unsigneds()))
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_21<T: PrimitiveUnsigned>() -> It<(T, u64)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_unsigneds::<T>(), exhaustive_unsigneds())
+            .filter(|&(x, y)| x.checked_pow(y).is_some()),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --

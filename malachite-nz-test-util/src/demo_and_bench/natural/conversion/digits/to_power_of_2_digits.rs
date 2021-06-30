@@ -97,7 +97,9 @@ fn demo_natural_to_power_of_2_digits_desc_natural(gm: GenMode, config: GenConfig
     }
 }
 
-fn benchmark_to_power_of_2_digits_asc_algorithms<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
+fn benchmark_to_power_of_2_digits_asc_algorithms<
+    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -133,7 +135,7 @@ fn benchmark_to_power_of_2_digits_asc_algorithms<T: CheckedFrom<Natural> + Primi
 }
 
 fn benchmark_to_power_of_2_digits_asc_evaluation_strategy<
-    T: CheckedFrom<Natural> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -171,7 +173,7 @@ fn benchmark_to_power_of_2_digits_asc_evaluation_strategy<
 }
 
 fn benchmark_to_power_of_2_digits_desc_evaluation_strategy<
-    T: CheckedFrom<Natural> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,

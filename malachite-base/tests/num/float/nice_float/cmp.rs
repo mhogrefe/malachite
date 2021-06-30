@@ -1,4 +1,4 @@
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::common::test_cmp_helper;
 use malachite_base_test_util::generators::{

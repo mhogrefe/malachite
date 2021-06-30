@@ -5,6 +5,8 @@
 /// # abs_assign
 /// ```
 /// use malachite_base::num::arithmetic::traits::AbsAssign;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
 ///
 /// let mut x = 0i8;
 /// x.abs_assign();
@@ -17,6 +19,22 @@
 /// let mut x = -100i64;
 /// x.abs_assign();
 /// assert_eq!(x, 100i64);
+///
+/// let mut x = -0.0;
+/// x.abs_assign();
+/// assert_eq!(NiceFloat(x), NiceFloat(0.0));
+///
+/// let mut x = f64::NEGATIVE_INFINITY;
+/// x.abs_assign();
+/// assert_eq!(NiceFloat(x), NiceFloat(f64::POSITIVE_INFINITY));
+///
+/// let mut x = 100.0;
+/// x.abs_assign();
+/// assert_eq!(NiceFloat(x), NiceFloat(100.0));
+///
+/// let mut x = -100.0;
+/// x.abs_assign();
+/// assert_eq!(NiceFloat(x), NiceFloat(100.0));
 /// ```
 pub mod abs;
 /// This module contains functions for adding a number and the product of two other numbers.
@@ -1628,18 +1646,313 @@ pub mod neg;
 /// assert_eq!(x, 1 << 40);
 /// ```
 pub mod next_power_of_2;
+/// This module contains functions for taking the absolute value of a number and returning a
+/// boolean indicating whether an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_abs_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingAbsAssign;
+///
+/// let mut x = 0i8;
+/// assert_eq!(x.overflowing_abs_assign(), false);
+/// assert_eq!(x, 0);
+///
+/// let mut x = 100i64;
+/// assert_eq!(x.overflowing_abs_assign(), false);
+/// assert_eq!(x, 100);
+///
+/// let mut x = -100i64;
+/// assert_eq!(x.overflowing_abs_assign(), false);
+/// assert_eq!(x, 100);
+///
+/// let mut x = -128i8;
+/// assert_eq!(x.overflowing_abs_assign(), true);
+/// assert_eq!(x, -128);
+/// ```
 pub mod overflowing_abs;
+/// This module contains functions for adding two numbers and returning a boolean indicating
+/// whether an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_add_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingAddAssign;
+///
+/// let mut x = 123u16;
+/// assert_eq!(x.overflowing_add_assign(456), false);
+/// assert_eq!(x, 579);
+///
+/// let mut x = 123u8;
+/// assert_eq!(x.overflowing_add_assign(200), true);
+/// assert_eq!(x, 67);
+/// ```
 pub mod overflowing_add;
+/// This module contains functions for adding a number and the product of two other numbers, and
+/// returning a boolean indicating whether an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingAddMul;
+///
+/// assert_eq!(2u8.overflowing_add_mul(3, 7), (23, false));
+/// assert_eq!(2u8.overflowing_add_mul(20, 20), (146, true));
+///
+/// assert_eq!(127i8.overflowing_add_mul(-2, 100), (-73, false));
+/// assert_eq!((-127i8).overflowing_add_mul(-2, 100), (-71, true));
+/// ```
+///
+/// # overflowing_add_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingAddMulAssign;
+///
+/// let mut x = 2u8;
+/// assert_eq!(x.overflowing_add_mul_assign(3, 7), false);
+/// assert_eq!(x, 23);
+///
+/// let mut x = 2u8;
+/// assert_eq!(x.overflowing_add_mul_assign(20, 20), true);
+/// assert_eq!(x, 146);
+///
+/// let mut x = 127i8;
+/// assert_eq!(x.overflowing_add_mul_assign(-2, 100), false);
+/// assert_eq!(x, -73);
+///
+/// let mut x = -127i8;
+/// assert_eq!(x.overflowing_add_mul_assign(-2, 100), true);
+/// assert_eq!(x, -71);
+/// ```
 pub mod overflowing_add_mul;
+/// This module contains functions for dividing a number by another number and returning a boolean
+/// indicating whether an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_div_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingDivAssign;
+///
+/// let mut x = 100u16;
+/// assert_eq!(x.overflowing_div_assign(3), false);
+/// assert_eq!(x, 33);
+///
+/// let mut x = -128i8;
+/// assert_eq!(x.overflowing_div_assign(-1), true);
+/// assert_eq!(x, -128);
+/// ```
 pub mod overflowing_div;
+/// This module contains functions for multiplying two numbers and returning a boolean indicating
+/// whether an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingMulAssign;
+///
+/// let mut x = 123u16;
+/// assert_eq!(x.overflowing_mul_assign(456), false);
+/// assert_eq!(x, 56088);
+///
+/// let mut x = 123u8;
+/// assert_eq!(x.overflowing_mul_assign(200), true);
+/// assert_eq!(x, 24);
+/// ```
 pub mod overflowing_mul;
+/// This module contains functions for negating a number and returning a boolean indicating whether
+/// an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_neg_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingNegAssign;
+///
+/// let mut x = 0i8;
+/// assert_eq!(x.overflowing_neg_assign(), false);
+/// assert_eq!(x, 0);
+///
+/// let mut x = 100u64;
+/// assert_eq!(x.overflowing_neg_assign(), true);
+/// assert_eq!(x, 18446744073709551516);
+///
+/// let mut x = -100i64;
+/// assert_eq!(x.overflowing_neg_assign(), false);
+/// assert_eq!(x, 100);
+///
+/// let mut x = -128i8;
+/// assert_eq!(x.overflowing_neg_assign(), true);
+/// assert_eq!(x, -128);
+/// ```
 pub mod overflowing_neg;
+/// This module contains functions for raising a number to a power and returning a boolean
+/// indicating whether an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_pow_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingPowAssign;
+///
+/// let mut x = 3u8;
+/// assert_eq!(x.overflowing_pow_assign(3), false);
+/// assert_eq!(x, 27);
+///
+/// let mut x = -10i32;
+/// assert_eq!(x.overflowing_pow_assign(9), false);
+/// assert_eq!(x, -1000000000);
+///
+/// let mut x = -10i16;
+/// assert_eq!(x.overflowing_pow_assign(9), true);
+/// assert_eq!(x, 13824);
+/// ```
 pub mod overflowing_pow;
+/// This module contains functions for squaring a number and returning a boolean indicating whether
+/// an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_square_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingSquareAssign;
+///
+/// let mut x = 3u8;
+/// assert_eq!(x.overflowing_square_assign(), false);
+/// assert_eq!(x, 9);
+///
+/// let mut x = -1000i32;
+/// assert_eq!(x.overflowing_square_assign(), false);
+/// assert_eq!(x, 1000000);
+///
+/// let mut x = 1000u16;
+/// assert_eq!(x.overflowing_square_assign(), true);
+/// assert_eq!(x, 16960);
+/// ```
 pub mod overflowing_square;
+/// This module contains functions for subtracting a number by another number and returning a
+/// boolean indicating whether an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_square
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingSquare;
+///
+/// assert_eq!(3u8.overflowing_square(), (9, false));
+/// assert_eq!((-1000i32).overflowing_square(), (1000000, false));
+/// assert_eq!(1000u16.overflowing_square(), (16960, true));
+/// ```
+///
+/// # overflowing_sub_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingSubAssign;
+///
+/// let mut x = 456u16;
+/// assert_eq!(x.overflowing_sub_assign(123), false);
+/// assert_eq!(x, 333);
+///
+/// let mut x = 123u16;
+/// assert_eq!(x.overflowing_sub_assign(456), true);
+/// assert_eq!(x, 65203);
+/// ```
 pub mod overflowing_sub;
+/// This module contains functions for subtracting a number by the product of two other numbers,
+/// and returning a boolean indicating whether an overflow occurred.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # overflowing_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingSubMul;
+///
+/// assert_eq!(60u8.overflowing_sub_mul(5, 10), (10, false));
+/// assert_eq!(2u8.overflowing_sub_mul(10, 5), (208, true));
+///
+///
+/// assert_eq!(127i8.overflowing_sub_mul(2, 100), (-73, false));
+/// assert_eq!((-127i8).overflowing_sub_mul(2, 100), (-71, true));
+/// ```
+///
+/// # overflowing_sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::OverflowingSubMulAssign;
+///
+/// let mut x = 60u8;
+/// assert_eq!(x.overflowing_sub_mul_assign(5, 10), false);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 2u8;
+/// assert_eq!(x.overflowing_sub_mul_assign(10, 5), true);
+/// assert_eq!(x, 208);
+///
+/// let mut x = 127i8;
+/// assert_eq!(x.overflowing_sub_mul_assign(2, 100), false);
+/// assert_eq!(x, -73);
+///
+/// let mut x = -127i8;
+/// assert_eq!(x.overflowing_sub_mul_assign(2, 100), true);
+/// assert_eq!(x, -71);
+/// ```
 pub mod overflowing_sub_mul;
+/// This module contains functions for determining whether a number is even or odd.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # even
+/// ```
+/// use malachite_base::num::arithmetic::traits::Parity;
+///
+/// assert_eq!(0u8.even(), true);
+/// assert_eq!((-5i16).even(), false);
+/// assert_eq!(4u32.even(), true);
+/// ```
+///
+/// # odd
+/// ```
+/// use malachite_base::num::arithmetic::traits::Parity;
+///
+/// assert_eq!(0u8.odd(), false);
+/// assert_eq!((-5i16).odd(), true);
+/// assert_eq!(4u32.odd(), false);
+/// ```
 pub mod parity;
+/// This module contains functions for raising a number to a power.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # pow_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::PowAssign;
+///
+/// let mut x = 3u8;
+/// x.pow_assign(3);
+/// assert_eq!(x, 27);
+///
+/// let mut x = -10i32;
+/// x.pow_assign(9);
+/// assert_eq!(x, -1000000000);
+/// ```
 pub mod pow;
+/// This module contains functions for computing a power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # power_of_2
+/// ```
+/// use malachite_base::num::arithmetic::traits::PowerOf2;
+///
+/// assert_eq!(u16::power_of_2(0), 1);
+/// assert_eq!(u8::power_of_2(3), 8);
+/// assert_eq!(u64::power_of_2(40), 1 << 40);
+///
+/// assert_eq!(i16::power_of_2(0), 1);
+/// assert_eq!(i8::power_of_2(3), 8);
+/// assert_eq!(i64::power_of_2(40), 1 << 40);
+/// ```
 pub mod power_of_2;
 pub mod round_to_multiple;
 pub mod round_to_multiple_of_power_of_2;
@@ -1655,6 +1968,54 @@ pub mod saturating_sub_mul;
 pub mod shl_round;
 pub mod shr_round;
 pub mod sign;
+/// This module contains functions for taking the square root of a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # floor_sqrt
+/// ```
+/// use malachite_base::num::arithmetic::traits::FloorSqrt;
+///
+/// assert_eq!(99u8.floor_sqrt(), 9);
+/// assert_eq!(100u8.floor_sqrt(), 10);
+/// assert_eq!(101u8.floor_sqrt(), 10);
+/// assert_eq!(1000000000u32.floor_sqrt(), 31622);
+/// assert_eq!(10000000000u64.floor_sqrt(), 100000);
+/// ```
+///
+/// # ceiling_sqrt
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingSqrt;
+///
+/// assert_eq!(99u8.ceiling_sqrt(), 10);
+/// assert_eq!(100u8.ceiling_sqrt(), 10);
+/// assert_eq!(101u8.ceiling_sqrt(), 11);
+/// assert_eq!(1000000000u32.ceiling_sqrt(), 31623);
+/// assert_eq!(10000000000u64.ceiling_sqrt(), 100000);
+/// ```
+///
+/// # checked_sqrt
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedSqrt;
+///
+/// assert_eq!(99u8.checked_sqrt(), None);
+/// assert_eq!(100u8.checked_sqrt(), Some(10));
+/// assert_eq!(101u8.checked_sqrt(), None);
+/// assert_eq!(1000000000u32.checked_sqrt(), None);
+/// assert_eq!(10000000000u64.checked_sqrt(), Some(100000));
+/// ```
+///
+/// # sqrt_rem
+/// ```
+/// use malachite_base::num::arithmetic::traits::SqrtRem;
+///
+/// assert_eq!(99u8.sqrt_rem(), (9, 18));
+/// assert_eq!(100u8.sqrt_rem(), (10, 0));
+/// assert_eq!(101u8.sqrt_rem(), (10, 1));
+/// assert_eq!(1000000000u32.sqrt_rem(), (31622, 49116));
+/// assert_eq!(10000000000u64.sqrt_rem(), (100000, 0));
+/// ```
+pub mod sqrt;
 pub mod square;
 pub mod sub_mul;
 pub mod traits;

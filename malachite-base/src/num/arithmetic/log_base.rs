@@ -142,7 +142,8 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `base`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `self.significant_bits() / base.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.
@@ -165,7 +166,8 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `base`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `self.significant_bits() / base.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.
@@ -194,7 +196,8 @@ macro_rules! impl_arithmetic_traits {
             ///
             /// $M(n) = O(1)$
             ///
-            /// where $T$ is time, $M$ is additional memory, and $n$ is `base`.
+            /// where $T$ is time, $M$ is additional memory, and $n$ is
+            /// `self.significant_bits() / base.significant_bits()`.
             ///
             /// # Panics
             /// Panics if `self` is 0 or `base` is less than 2.

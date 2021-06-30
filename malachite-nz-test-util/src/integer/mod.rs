@@ -1,5 +1,4 @@
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::float::PrimitiveFloat;
+use malachite_base::num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
 use malachite_base_test_util::stats::moments::CheckedToF64;
 use malachite_nz::integer::Integer;
 

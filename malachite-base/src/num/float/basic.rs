@@ -59,16 +59,6 @@ macro_rules! float_traits {
             }
 
             #[inline]
-            fn is_sign_positive(self) -> bool {
-                $t::is_sign_positive(self)
-            }
-
-            #[inline]
-            fn is_sign_negative(self) -> bool {
-                $t::is_sign_negative(self)
-            }
-
-            #[inline]
             fn to_bits(self) -> u64 {
                 u64::wrapping_from($t::to_bits(self))
             }

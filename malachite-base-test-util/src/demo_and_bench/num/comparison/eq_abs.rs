@@ -3,7 +3,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::bucketers::pair_max_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
-use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen};
+use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -18,13 +18,13 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_eq_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
         println!("{}.eq_abs(&{}) = {:?}", x, y, x.eq_abs(&y));
     }
 }
 
 fn demo_ne_abs_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen::<T>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<T>().get(gm, &config).take(limit) {
         println!("{}.ne_abs(&{}) = {:?}", x, y, x.ne_abs(&y));
     }
 }
@@ -50,7 +50,7 @@ fn benchmark_eq_abs_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.eq_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -68,7 +68,7 @@ fn benchmark_ne_abs_unsigned<T: PrimitiveUnsigned>(
     run_benchmark(
         &format!("{}.ne_abs(&{})", T::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_pair_gen::<T>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

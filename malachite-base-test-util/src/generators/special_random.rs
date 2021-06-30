@@ -343,6 +343,82 @@ pub fn special_random_primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>(
     )
 }
 
+// -- (PrimitiveFloat, PrimitiveUnsigned) --
+
+pub fn special_random_primitive_float_unsigned_pair_gen_var_1<
+    T: PrimitiveFloat,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_positive_finite_primitive_floats,
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_primitive_float_unsigned_pair_gen_var_2<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(T, u64)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| random_primitive_float_range(seed, T::ONE, T::TWO),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (PrimitiveFloat, PrimitiveUnsigned, RoundingMode) --
+
+pub fn special_random_primitive_float_unsigned_rounding_mode_triple_gen_var_1<
+    T: PrimitiveFloat,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, RoundingMode)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &random_positive_finite_primitive_floats,
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
+
+pub fn special_random_primitive_float_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveFloat>(
+    config: &GenConfig,
+) -> It<(T, u64, RoundingMode)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| random_primitive_float_range(seed, T::ONE, T::TWO),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
+
 // -- (PrimitiveFloat, RoundingMode) --
 
 pub fn special_random_primitive_float_rounding_mode_pair_gen_var_1<T: PrimitiveFloat>(

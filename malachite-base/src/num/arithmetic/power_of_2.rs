@@ -9,23 +9,18 @@ fn _power_of_2_unsigned<T: PrimitiveInt>(pow: u64) -> T {
 macro_rules! impl_power_of_2_unsigned {
     ($t:ident) => {
         impl PowerOf2 for $t {
-            /// Computes 2<sup>`pow`</sup>.
+            /// Computes $2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $f(p) = 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than or equal to the width of `$t`.
+            /// Panics if the result would be too large to be represented.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::PowerOf2;
-            ///
-            /// assert_eq!(u16::power_of_2(0), 1);
-            /// assert_eq!(u8::power_of_2(3), 8);
-            /// assert_eq!(u64::power_of_2(40), 1 << 40);
-            /// ```
+            /// See the documentation of the `num::arithmetic::power_of_2` module.
             #[inline]
             fn power_of_2(pow: u64) -> $t {
                 _power_of_2_unsigned(pow)
@@ -43,23 +38,18 @@ fn _power_of_2_signed<T: PrimitiveInt>(pow: u64) -> T {
 macro_rules! impl_power_of_2_signed {
     ($t:ident) => {
         impl PowerOf2 for $t {
-            /// Computes 2<sup>`pow`</sup>.
+            /// Computes $2^p$.
             ///
-            /// Time: worst case O(1)
+            /// $f(p) = 2^p$.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
-            /// Panics if `pow` is greater than or equal to the width of `$t` minus 1.
+            /// Panics if the result would be too large to be represented.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::PowerOf2;
-            ///
-            /// assert_eq!(i16::power_of_2(0), 1);
-            /// assert_eq!(i8::power_of_2(3), 8);
-            /// assert_eq!(i64::power_of_2(40), 1 << 40);
-            /// ```
+            /// See the documentation of the `num::arithmetic::power_of_2` module.
             #[inline]
             fn power_of_2(pow: u64) -> $t {
                 _power_of_2_signed(pow)

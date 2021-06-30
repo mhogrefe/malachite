@@ -5,37 +5,31 @@ macro_rules! impl_parity {
         impl Parity for $t {
             /// Returns whether `self` is even.
             ///
-            /// Time: worst case O(1)
+            /// $f(x) = (2|x)$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $f(x) = (\exists k \in \N \ x = 2k)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::Parity;
-            ///
-            /// assert_eq!(0u8.even(), true);
-            /// assert_eq!((-5i16).even(), false);
-            /// assert_eq!(4u32.even(), true);
-            /// ```
+            /// See the documentation of the `num::arithmetic::parity` module.
             #[inline]
             fn even(self) -> bool {
                 (self & 1) == 0
             }
 
-            /// Returns whether `self` is odd
+            /// Returns whether `self` is odd.
             ///
-            /// Time: worst case O(1)
+            /// $f(x) = (2\nmid x)$.
             ///
-            /// Additional memory: worst case O(1)
+            /// $f(x) = (\exists k \in \N \ x = 2k+1)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::Parity;
-            ///
-            /// assert_eq!(0u8.odd(), false);
-            /// assert_eq!((-5i16).odd(), true);
-            /// assert_eq!(4u32.odd(), false);
-            /// ```
+            /// See the documentation of the `num::arithmetic::parity` module.
             #[inline]
             fn odd(self) -> bool {
                 (self & 1) != 0

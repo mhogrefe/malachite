@@ -4,7 +4,7 @@ use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_base_test_util::bench::bucketers::pair_max_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
-use malachite_base_test_util::generators::unsigned_pair_gen;
+use malachite_base_test_util::generators::unsigned_pair_gen_var_27;
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -16,7 +16,10 @@ fn demo_join_halves<T: JoinHalves + PrimitiveUnsigned>(gm: GenMode, config: GenC
 where
     T::Half: PrimitiveUnsigned,
 {
-    for (x, y) in unsigned_pair_gen::<T::Half>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<T::Half>()
+        .get(gm, &config)
+        .take(limit)
+    {
         println!(
             "{}::join_halves({}, {}) = {}",
             T::NAME,
@@ -43,7 +46,7 @@ fn benchmark_join_halves<T: JoinHalves + PrimitiveUnsigned>(
             T::Half::NAME
         ),
         BenchmarkType::Single,
-        unsigned_pair_gen::<T::Half>().get(gm, &config),
+        unsigned_pair_gen_var_27::<T::Half>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

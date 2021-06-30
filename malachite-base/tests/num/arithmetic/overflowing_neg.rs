@@ -1,5 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 
 fn unsigned_overflowing_neg_helper<T: PrimitiveUnsigned>() {
     let test = |n: T, out, overflow| {
@@ -40,4 +41,32 @@ fn signed_overflowing_neg_helper<T: PrimitiveSigned>() {
 fn test_overflowing_neg() {
     apply_fn_to_unsigneds!(unsigned_overflowing_neg_helper);
     apply_fn_to_signeds!(signed_overflowing_neg_helper);
+}
+
+fn overflowing_neg_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen::<T>().test_properties(|n| {
+        let mut neg = n;
+        let overflow = neg.overflowing_neg_assign();
+        assert_eq!((neg, overflow), n.overflowing_neg());
+        assert_eq!(neg, n.wrapping_neg());
+        assert_eq!(neg == n, n == T::ZERO || n == T::power_of_2(T::WIDTH - 1));
+        assert_eq!(n != T::ZERO, overflow);
+    });
+}
+
+fn overflowing_neg_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|n| {
+        let mut neg = n;
+        let overflow = neg.overflowing_neg_assign();
+        assert_eq!((neg, overflow), n.overflowing_neg());
+        assert_eq!(neg, n.wrapping_neg());
+        assert_eq!(neg == n, n == T::ZERO || n == T::MIN);
+        assert_eq!(n == T::MIN, overflow);
+    });
+}
+
+#[test]
+fn overflowing_neg_properties() {
+    apply_fn_to_unsigneds!(overflowing_neg_properties_helper_unsigned);
+    apply_fn_to_signeds!(overflowing_neg_properties_helper_signed);
 }

@@ -110,7 +110,9 @@ fn demo_limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     }
 }
 
-fn demo_to_digits_asc_limb<T: ConvertibleFrom<Limb> + CheckedFrom<Natural> + PrimitiveUnsigned>(
+fn demo_to_digits_asc_limb<
+    T: ConvertibleFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -131,7 +133,9 @@ fn demo_to_digits_asc_limb<T: ConvertibleFrom<Limb> + CheckedFrom<Natural> + Pri
     }
 }
 
-fn demo_to_digits_desc_limb<T: ConvertibleFrom<Limb> + CheckedFrom<Natural> + PrimitiveUnsigned>(
+fn demo_to_digits_desc_limb<
+    T: ConvertibleFrom<Limb> + for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -337,7 +341,7 @@ fn benchmark_limbs_to_digits_small_base_algorithms<T: PrimitiveUnsigned>(
 }
 
 fn benchmark_limbs_to_digits_basecase_algorithms<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -368,7 +372,7 @@ fn benchmark_limbs_to_digits_basecase_algorithms<
 }
 
 fn benchmark_to_digits_asc_limb<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -393,7 +397,7 @@ fn benchmark_to_digits_asc_limb<
 }
 
 fn benchmark_to_digits_desc_limb<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >(
     gm: GenMode,
     config: GenConfig,
@@ -447,7 +451,7 @@ fn benchmark_to_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize, 
     );
 }
 
-fn benchmark_to_digits_asc_algorithms<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
+fn benchmark_to_digits_asc_algorithms<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

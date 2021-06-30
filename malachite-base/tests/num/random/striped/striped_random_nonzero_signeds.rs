@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::striped::striped_random_nonzero_signeds;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::strings::ToBinaryString;

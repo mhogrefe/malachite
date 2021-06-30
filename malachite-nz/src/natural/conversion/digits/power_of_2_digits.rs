@@ -16,7 +16,9 @@ use platform::Limb;
 use std::cmp::{min, Ordering};
 
 impl Natural {
-    pub fn _to_power_of_2_digits_asc_naive<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
+    pub fn _to_power_of_2_digits_asc_naive<
+        T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+    >(
         &self,
         log_base: u64,
     ) -> Vec<T> {
@@ -35,7 +37,7 @@ impl Natural {
         let mut previous_index = 0;
         for _ in 0..digit_len {
             let index = previous_index + log_base;
-            digits.push(T::exact_from(self.get_bits(previous_index, index)));
+            digits.push(T::exact_from(&self.get_bits(previous_index, index)));
             previous_index = index;
         }
         digits
@@ -548,7 +550,7 @@ impl PowerOf2Digits<Natural> for Natural {
                         if digit.significant_bits() > log_base {
                             return None;
                         }
-                        limbs.push(Limb::wrapping_from(digit));
+                        limbs.push(Limb::wrapping_from(&digit));
                     }
                 }
                 Ordering::Less => {
@@ -559,7 +561,7 @@ impl PowerOf2Digits<Natural> for Natural {
                             if digit.significant_bits() > log_base {
                                 return None;
                             }
-                            limb |= Limb::wrapping_from(digit) << offset;
+                            limb |= Limb::wrapping_from(&digit) << offset;
                             offset += log_base;
                         }
                         limbs.push(limb);
@@ -643,7 +645,7 @@ impl PowerOf2Digits<Natural> for Natural {
                         if digit.significant_bits() > log_base {
                             return None;
                         }
-                        limbs.push(Limb::wrapping_from(digit));
+                        limbs.push(Limb::wrapping_from(&digit));
                     }
                     limbs.reverse();
                 }

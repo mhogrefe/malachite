@@ -218,7 +218,7 @@ fn sub_mul_properties() {
             SignedLimb::from(x)
                 .checked_sub_mul(SignedLimb::from(y), SignedLimb::from(z))
                 .is_some(),
-            SignedLimb::convertible_from(result)
+            SignedLimb::convertible_from(&result)
         );
     });
 }

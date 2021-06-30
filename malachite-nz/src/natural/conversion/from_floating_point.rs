@@ -1,6 +1,8 @@
 use malachite_base::num::arithmetic::traits::ShlRound;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, IntegerMantissaAndExponent, RoundingFrom,
+};
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use natural::Natural;

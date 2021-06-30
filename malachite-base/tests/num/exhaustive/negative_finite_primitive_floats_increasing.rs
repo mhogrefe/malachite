@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use malachite_base::num::exhaustive::negative_finite_primitive_floats_increasing;
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 
 fn negative_finite_primitive_floats_increasing_helper<T: PrimitiveFloat>(

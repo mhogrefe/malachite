@@ -1,5 +1,90 @@
 use rounding_modes::RoundingMode;
 
+/// This trait defines functions that express a value as a `Vec` of digits and read a value from an
+/// iterator of digits.
+///
+/// The trait is parameterized by `T`, which is both the digit type and the base type.
+pub trait Digits<T>: Sized {
+    /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
+    /// significant.
+    fn to_digits_asc(&self, base: &T) -> Vec<T>;
+
+    /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
+    /// significant.
+    fn to_digits_desc(&self, base: &T) -> Vec<T>;
+
+    /// Converts an iterator of digits into a value.
+    ///
+    /// The input digits are in ascending order: least- to most-significant.
+    fn from_digits_asc<I: Iterator<Item = T>>(base: &T, digits: I) -> Option<Self>;
+
+    /// Converts an iterator of digits into a value.
+    ///
+    /// The input digits are in descending order: most- to least-significant.
+    fn from_digits_desc<I: Iterator<Item = T>>(base: &T, digits: I) -> Option<Self>;
+}
+
+/// An iterator over a value's base-power-of-two digits.
+pub trait PowerOf2DigitIterator<T>: Iterator<Item = T> + DoubleEndedIterator<Item = T> {
+    fn get(&self, index: u64) -> T;
+}
+
+/// This trait defines an iterator over a value's base-power-of-two digits.
+pub trait PowerOf2DigitIterable<T> {
+    type PowerOf2DigitIterator: PowerOf2DigitIterator<T>;
+
+    /// Returns a double-ended iterator over a value's digits in base $2^\ell$, where $\ell$ is
+    /// `log_base`.
+    ///
+    /// The iterator ends after the value's most-significant digit.
+    fn power_of_2_digits(self, log_base: u64) -> Self::PowerOf2DigitIterator;
+}
+
+/// This trait defines functions that express a value as a `Vec` of digits and read a value from an
+/// iterator of digits, where the base is a power of 2.
+///
+/// The base-2 logarithm of the base is specified, and the trait is parameterized by the digit type.
+pub trait PowerOf2Digits<T>: Sized {
+    /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
+    /// significant.
+    ///
+    /// The base is $2^\ell$, where $\ell$ is `log_base`.
+    fn to_power_of_2_digits_asc(&self, log_base: u64) -> Vec<T>;
+
+    /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
+    /// significant.
+    ///
+    /// The base is $2^\ell$, where $\ell$ is `log_base`.
+    fn to_power_of_2_digits_desc(&self, log_base: u64) -> Vec<T>;
+
+    /// Converts an iterator of digits into a value.
+    ///
+    /// The input digits are in ascending order: least- to most-significant. The base is $2^\ell$,
+    /// where $\ell$ is `log_base`.
+    fn from_power_of_2_digits_asc<I: Iterator<Item = T>>(log_base: u64, digits: I) -> Option<Self>;
+
+    /// Converts an iterator of digits into a value.
+    ///
+    /// The input digits are in descending order: most- to least-significant. The base is $2^\ell$,
+    /// where $b$ is `log_base`.
+    fn from_power_of_2_digits_desc<I: Iterator<Item = T>>(log_base: u64, digits: I)
+        -> Option<Self>;
+}
+
+/// Converts a string slice in a given base to a value.
+pub trait FromStringBase: Sized {
+    fn from_string_base(base: u64, s: &str) -> Option<Self>;
+}
+
+/// Converts a number to a string using a specified base.
+pub trait ToStringBase {
+    /// Converts a signed number to a lowercase string using a specified base.
+    fn to_string_base(&self, base: u64) -> String;
+
+    /// Converts a signed number to an uppercase string using a specified base.
+    fn to_string_base_upper(&self, base: u64) -> String;
+}
+
 /// This trait defines a conversion from another type. If the conversion fails, `None` is returned.
 ///
 /// If `CheckedFrom` is implemented, it usually makes sense to implement `ConvertibleFrom` as well.
@@ -155,28 +240,6 @@ pub trait ConvertibleFrom<T> {
     fn convertible_from(value: T) -> bool;
 }
 
-/// Converts a number to a string using a specified base.
-pub trait ToStringBase {
-    /// Converts a signed number to a lowercase string using a specified base.
-    fn to_string_base(&self, base: u64) -> String;
-
-    /// Converts a signed number to an uppercase string using a specified base.
-    fn to_string_base_upper(&self, base: u64) -> String;
-}
-
-//TODO
-/// Converts a string slice in a given base to a value.
-///
-/// The string is expected to be an optional `+` sign followed by digits. Leading and trailing
-/// whitespace represent an error. Digits are a subset of these characters, depending on `radix`:
-///
-/// * `0-9`
-/// * `a-z`
-/// * `A-Z`
-pub trait FromStringBase: Sized {
-    fn from_string_base(base: u64, s: &str) -> Option<Self>;
-}
-
 /// Associates with `Self` a type that's half `Self`'s size.
 pub trait HasHalf {
     /// The type that's half the size of `Self`.
@@ -230,73 +293,52 @@ pub trait VecFromOtherType<T>: Sized {
     fn vec_from_other_type(value: T) -> Vec<Self>;
 }
 
-/// This trait defines functions that express a value as a `Vec` of digits and read a value from an
-/// iterator of digits, where the base is a power of 2.
+/// Converts a number to and from a raw mantissa and exponent form.
+pub trait RawMantissaAndExponent<M, E, T = Self>: Sized {
+    fn raw_mantissa_and_exponent(self) -> (M, E);
+
+    fn raw_mantissa(self) -> M {
+        self.raw_mantissa_and_exponent().0
+    }
+
+    fn raw_exponent(self) -> E {
+        self.raw_mantissa_and_exponent().1
+    }
+
+    fn from_raw_mantissa_and_exponent(raw_mantissa: M, raw_exponent: E) -> T;
+}
+
+/// Converts a number to and from an integer mantissa and exponent form.
 ///
-/// The base-2 logarithm of the base is specified, and the trait is parameterized by the digit type.
-pub trait PowerOf2Digits<T>: Sized {
-    /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
-    /// significant.
-    ///
-    /// The base is $2^\ell$, where $\ell$ is `log_base`.
-    fn to_power_of_2_digits_asc(&self, log_base: u64) -> Vec<T>;
+/// The mantissa is an odd integer, and the exponent is an integer, such that $x = 2^em$.
+pub trait IntegerMantissaAndExponent<M, E, T = Self>: Sized {
+    fn integer_mantissa_and_exponent(self) -> (M, E);
 
-    /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
-    /// significant.
-    ///
-    /// The base is $2^\ell$, where $\ell$ is `log_base`.
-    fn to_power_of_2_digits_desc(&self, log_base: u64) -> Vec<T>;
+    fn integer_mantissa(self) -> M {
+        self.integer_mantissa_and_exponent().0
+    }
 
-    /// Converts an iterator of digits into a value.
-    ///
-    /// The input digits are in ascending order: least- to most-significant. The base is $2^\ell$,
-    /// where $\ell$ is `log_base`.
-    fn from_power_of_2_digits_asc<I: Iterator<Item = T>>(log_base: u64, digits: I) -> Option<Self>;
+    fn integer_exponent(self) -> E {
+        self.integer_mantissa_and_exponent().1
+    }
 
-    /// Converts an iterator of digits into a value.
-    ///
-    /// The input digits are in descending order: most- to least-significant. The base is $2^\ell$,
-    /// where $b$ is `log_base`.
-    fn from_power_of_2_digits_desc<I: Iterator<Item = T>>(log_base: u64, digits: I)
-        -> Option<Self>;
+    fn from_integer_mantissa_and_exponent(integer_mantissa: M, integer_exponent: E) -> Option<T>;
 }
 
-/// An iterator over a value's base-power-of-two digits.
-pub trait PowerOf2DigitIterator<T>: Iterator<Item = T> + DoubleEndedIterator<Item = T> {
-    fn get(&self, index: u64) -> T;
-}
-
-/// This trait defines an iterator over a value's base-power-of-two digits.
-pub trait PowerOf2DigitIterable<T> {
-    type PowerOf2DigitIterator: PowerOf2DigitIterator<T>;
-
-    /// Returns a double-ended iterator over a value's digits in base $2^\ell$, where $\ell$ is
-    /// `log_base`.
-    ///
-    /// The iterator ends after the value's most-significant digit.
-    fn power_of_2_digits(self, log_base: u64) -> Self::PowerOf2DigitIterator;
-}
-
-/// This trait defines functions that express a value as a `Vec` of digits and read a value from an
-/// iterator of digits.
+/// Converts a number to and from a scientific mantissa and exponent form.
 ///
-/// The trait is parameterized by `T`, which is both the digit type and the base type.
-pub trait Digits<T>: Sized {
-    /// Returns a `Vec` containing the digits of a value in ascending order: least- to most-
-    /// significant.
-    fn to_digits_asc(&self, base: &T) -> Vec<T>;
+/// The mantissa is a number greater than or equal to 1 and less than 2, and the exponent is an
+/// integer, such that $x = 2^em$.
+pub trait SciMantissaAndExponent<M, E, T = Self>: Sized {
+    fn sci_mantissa_and_exponent(self) -> (M, E);
 
-    /// Returns a `Vec` containing the digits of a value in descending order: most- to least-
-    /// significant.
-    fn to_digits_desc(&self, base: &T) -> Vec<T>;
+    fn sci_mantissa(self) -> M {
+        self.sci_mantissa_and_exponent().0
+    }
 
-    /// Converts an iterator of digits into a value.
-    ///
-    /// The input digits are in ascending order: least- to most-significant.
-    fn from_digits_asc<I: Iterator<Item = T>>(base: &T, digits: I) -> Option<Self>;
+    fn sci_exponent(self) -> E {
+        self.sci_mantissa_and_exponent().1
+    }
 
-    /// Converts an iterator of digits into a value.
-    ///
-    /// The input digits are in descending order: most- to least-significant.
-    fn from_digits_desc<I: Iterator<Item = T>>(base: &T, digits: I) -> Option<Self>;
+    fn from_sci_mantissa_and_exponent(sci_mantissa: M, sci_exponent: E) -> Option<T>;
 }

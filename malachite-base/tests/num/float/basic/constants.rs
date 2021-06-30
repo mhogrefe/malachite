@@ -1,6 +1,6 @@
 use malachite_base::named::Named;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 
 macro_rules! test_common_constants {

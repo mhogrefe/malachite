@@ -1,4 +1,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_unsigned_pair_gen_var_14, unsigned_pair_gen_var_28,
+};
 
 #[test]
 fn test_overflowing_pow() {
@@ -22,4 +27,36 @@ fn test_overflowing_pow() {
     test::<i16>(-10, 9, 13824, true);
     test::<i16>(10, 9, -13824, true);
     test::<i64>(123, 456, 2409344748064316129, true);
+}
+
+fn overflowing_pow_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_28::<T, u64>().test_properties(|(x, y)| {
+        let mut power = x;
+        let overflow = power.overflowing_pow_assign(y);
+        assert_eq!((power, overflow), x.overflowing_pow(y));
+        assert_eq!(x.wrapping_pow(y), power);
+        assert_eq!(x.checked_pow(y).is_none(), overflow);
+        if !overflow {
+            assert_eq!(power, x.pow(y));
+        }
+    });
+}
+
+fn overflowing_pow_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_unsigned_pair_gen_var_14::<T, u64>().test_properties(|(x, y)| {
+        let mut power = x;
+        let overflow = power.overflowing_pow_assign(y);
+        assert_eq!((power, overflow), x.overflowing_pow(y));
+        assert_eq!(x.wrapping_pow(y), power);
+        assert_eq!(x.checked_pow(y).is_none(), overflow);
+        if !overflow {
+            assert_eq!(power, x.pow(y));
+        }
+    });
+}
+
+#[test]
+fn overflowing_pow_properties() {
+    apply_fn_to_unsigneds!(overflowing_pow_properties_helper_unsigned);
+    apply_fn_to_signeds!(overflowing_pow_properties_helper_signed);
 }

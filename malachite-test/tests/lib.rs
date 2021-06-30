@@ -14,19 +14,6 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod overflowing_abs;
-            pub mod overflowing_add;
-            pub mod overflowing_add_mul;
-            pub mod overflowing_div;
-            pub mod overflowing_mul;
-            pub mod overflowing_neg;
-            pub mod overflowing_pow;
-            pub mod overflowing_square;
-            pub mod overflowing_sub;
-            pub mod overflowing_sub_mul;
-            pub mod parity;
-            pub mod pow;
-            pub mod power_of_2;
             pub mod round_to_multiple;
             pub mod round_to_multiple_of_power_of_2;
             pub mod saturating_abs;

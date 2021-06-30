@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
     FloorLogBase2, Pow,
 };
 use malachite_base::num::basic::traits::{One, Two, Zero};
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::generators::{
     natural_gen_var_1, natural_gen_var_2, natural_pair_gen_var_3,

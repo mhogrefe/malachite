@@ -1,6 +1,6 @@
 use malachite_base::named::Named;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
+    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, SciMantissaAndExponent,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;

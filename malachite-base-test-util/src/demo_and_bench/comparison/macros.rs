@@ -3,7 +3,9 @@ use malachite_base_test_util::bench::bucketers::{
 };
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_pair_gen, unsigned_triple_gen};
+use malachite_base_test_util::generators::{
+    unsigned_gen, unsigned_pair_gen_var_27, unsigned_triple_gen,
+};
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -28,7 +30,10 @@ fn demo_max_1(gm: GenMode, config: GenConfig, limit: usize) {
 }
 
 fn demo_max_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen::<u8>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<u8>()
+        .get(gm, &config)
+        .take(limit)
+    {
         println!("max!({}, {}) = {}", x, y, max!(x, y));
     }
 }
@@ -46,7 +51,10 @@ fn demo_min_1(gm: GenMode, config: GenConfig, limit: usize) {
 }
 
 fn demo_min_2(gm: GenMode, config: GenConfig, limit: usize) {
-    for (x, y) in unsigned_pair_gen::<u8>().get(gm, &config).take(limit) {
+    for (x, y) in unsigned_pair_gen_var_27::<u8>()
+        .get(gm, &config)
+        .take(limit)
+    {
         println!("min!({}, {}) = {}", x, y, min!(x, y));
     }
 }
@@ -74,7 +82,7 @@ fn benchmark_max_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str
     run_benchmark(
         "max!(T, T)",
         BenchmarkType::Single,
-        unsigned_pair_gen::<u8>().get(gm, &config),
+        unsigned_pair_gen_var_27::<u8>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -113,7 +121,7 @@ fn benchmark_min_2(gm: GenMode, config: GenConfig, limit: usize, file_name: &str
     run_benchmark(
         "min!(T, T)",
         BenchmarkType::Single,
-        unsigned_pair_gen::<u8>().get(gm, &config),
+        unsigned_pair_gen_var_27::<u8>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

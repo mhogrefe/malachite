@@ -5,9 +5,9 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base_test_util::generators::{
     signed_pair_gen, signed_signed_signed_unsigned_quadruple_gen_var_1,
     signed_signed_unsigned_triple_gen_var_1, signed_signed_unsigned_triple_gen_var_2,
-    signed_signed_unsigned_triple_gen_var_3, signed_unsigned_pair_gen_var_1, unsigned_pair_gen,
-    unsigned_pair_gen_var_2, unsigned_quadruple_gen_var_2, unsigned_triple_gen_var_10,
-    unsigned_triple_gen_var_4, unsigned_triple_gen_var_9,
+    signed_signed_unsigned_triple_gen_var_3, signed_unsigned_pair_gen_var_1,
+    unsigned_pair_gen_var_2, unsigned_pair_gen_var_27, unsigned_quadruple_gen_var_2,
+    unsigned_triple_gen_var_10, unsigned_triple_gen_var_4, unsigned_triple_gen_var_9,
 };
 
 fn eq_mod_power_of_2_primitive_helper<T: PrimitiveInt>() {
@@ -249,7 +249,7 @@ fn eq_mod_power_of_2_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         }
     });
 
-    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         assert!(x.eq_mod_power_of_2(y, 0));
     });
 }

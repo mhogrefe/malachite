@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_pair_gen_var_6, unsigned_pair_gen_var_12};
 use std::panic::catch_unwind;
 
 #[test]
@@ -29,4 +32,33 @@ fn overflowing_div_assign_fail_helper<T: PrimitiveInt>() {
 #[test]
 fn overflowing_div_assign_fail() {
     apply_fn_to_primitive_ints!(overflowing_div_assign_fail_helper);
+}
+
+fn overflowing_div_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_12::<T, T>().test_properties(|(x, y)| {
+        let mut quotient = x;
+        let overflow = quotient.overflowing_div_assign(y);
+        assert_eq!((quotient, overflow), x.overflowing_div(y));
+        assert_eq!(x.wrapping_div(y), quotient);
+        assert!(!overflow);
+        assert_eq!(quotient, x / y);
+    });
+}
+
+fn overflowing_div_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen_var_6::<T>().test_properties(|(x, y)| {
+        let mut quotient = x;
+        let overflow = quotient.overflowing_div_assign(y);
+        assert_eq!((quotient, overflow), x.overflowing_div(y));
+        assert_eq!(x.wrapping_div(y), quotient);
+        if !overflow {
+            assert_eq!(quotient, x / y);
+        }
+    });
+}
+
+#[test]
+fn overflowing_div_properties() {
+    apply_fn_to_unsigneds!(overflowing_div_properties_helper_unsigned);
+    apply_fn_to_signeds!(overflowing_div_properties_helper_signed);
 }

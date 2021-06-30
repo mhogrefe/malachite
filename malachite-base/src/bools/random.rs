@@ -88,7 +88,7 @@ impl Iterator for WeightedRandomBools {
 
 /// Generates random `bool`s, with a fixed probability of generating `true`.
 ///
-/// The probability of generating `true` is $p$ = `w_numerator` / `w_denominator`.
+/// The probability of generating `true` is $p$ = `p_numerator` / `p_denominator`.
 ///
 /// $P(\text{true}) = p$
 ///

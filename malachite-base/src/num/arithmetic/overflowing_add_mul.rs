@@ -22,20 +22,17 @@ macro_rules! impl_overflowing_add_mul_unsigned {
         impl OverflowingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self + y * z`, returning a pair consisting of the wrapped value and a
-            /// boolean indicating whether an arithmetic overflow would occur.
+            /// Calculates $x + yz$.
             ///
-            /// Time: worst case O(1)
+            /// Returns a tuple of the result along with a boolean indicating whether an arithmetic
+            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
+            /// returned.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingAddMul;
-            ///
-            /// assert_eq!(2u8.overflowing_add_mul(3, 7), (23, false));
-            /// assert_eq!(2u8.overflowing_add_mul(20, 20), (146, true));
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
             #[inline]
             fn overflowing_add_mul(self, y: $t, z: $t) -> ($t, bool) {
                 _overflowing_add_mul_unsigned(self, y, z)
@@ -46,24 +43,13 @@ macro_rules! impl_overflowing_add_mul_unsigned {
             /// Replaces `self` with `self + y * z`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
+            /// overflow would have occurred, then the wrapped value is assigned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingAddMulAssign;
-            ///
-            /// let mut x = 2u8;
-            /// assert_eq!(x.overflowing_add_mul_assign(3, 7), false);
-            /// assert_eq!(x, 23);
-            ///
-            /// let mut x = 2u8;
-            /// assert_eq!(x.overflowing_add_mul_assign(20, 20), true);
-            /// assert_eq!(x, 146);
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
             #[inline]
             fn overflowing_add_mul_assign(&mut self, y: $t, z: $t) -> bool {
                 let (product, overflow) = y.overflowing_mul(z);
@@ -123,20 +109,17 @@ macro_rules! impl_overflowing_add_mul_signed {
         impl OverflowingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self + y * z`, returning a pair consisting of the wrapped value and a
-            /// boolean indicating whether an arithmetic overflow would occur.
+            /// Calculates $x + yz$.
             ///
-            /// Time: worst case O(1)
+            /// Returns a tuple of the result along with a boolean indicating whether an arithmetic
+            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
+            /// returned.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingAddMul;
-            ///
-            /// assert_eq!(127i8.overflowing_add_mul(-2, 100), (-73, false));
-            /// assert_eq!((-127i8).overflowing_add_mul(-2, 100), (-71, true));
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
             #[inline]
             fn overflowing_add_mul(self, y: $t, z: $t) -> ($t, bool) {
                 _overflowing_add_mul_signed(self, y, z)
@@ -147,24 +130,13 @@ macro_rules! impl_overflowing_add_mul_signed {
             /// Replaces `self` with `self + y * z`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
+            /// overflow would have occurred, then the wrapped value is assigned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingAddMulAssign;
-            ///
-            /// let mut x = 127i8;
-            /// assert_eq!(x.overflowing_add_mul_assign(-2, 100), false);
-            /// assert_eq!(x, -73);
-            ///
-            /// let mut x = -127i8;
-            /// assert_eq!(x.overflowing_add_mul_assign(-2, 100), true);
-            /// assert_eq!(x, -71);
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
             #[inline]
             fn overflowing_add_mul_assign(&mut self, y: $t, z: $t) -> bool {
                 let (result, overflow) = self.overflowing_add_mul(y, z);

@@ -3,8 +3,8 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{
     signed_gen, signed_gen_var_6, signed_pair_gen, signed_pair_gen_var_3, signed_pair_gen_var_5,
-    unsigned_gen, unsigned_gen_var_1, unsigned_pair_gen, unsigned_pair_gen_var_11,
-    unsigned_pair_gen_var_13,
+    unsigned_gen, unsigned_gen_var_1, unsigned_pair_gen_var_11, unsigned_pair_gen_var_13,
+    unsigned_pair_gen_var_27,
 };
 
 #[test]
@@ -108,7 +108,7 @@ fn test_divisible_by() {
 }
 
 fn divisible_by_properties_helper_unsigned<T: PrimitiveUnsigned>() {
-    unsigned_pair_gen::<T>().test_properties(|(x, y)| {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         let divisible = x.divisible_by(y);
         assert_eq!(x == T::ZERO || y != T::ZERO && x % y == T::ZERO, divisible);
     });

@@ -1,4 +1,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_pair_gen, signed_triple_gen, unsigned_pair_gen_var_27, unsigned_triple_gen,
+};
 
 #[test]
 fn test_overflowing_add_mul() {
@@ -23,4 +28,56 @@ fn test_overflowing_add_mul() {
     test::<i8>(127, 1, 100, -29, true);
     test::<i8>(-127, -1, 100, 29, true);
     test::<i8>(-127, -10, 100, -103, true);
+}
+
+fn overflowing_add_mul_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_triple_gen::<T>().test_properties(|(x, y, z)| {
+        let (result, overflow) = x.overflowing_add_mul(y, z);
+
+        let mut x_alt = x;
+        assert_eq!(x_alt.overflowing_add_mul_assign(y, z), overflow);
+        assert_eq!(x_alt, result);
+
+        assert_eq!(x.overflowing_add_mul(z, y), (result, overflow));
+        assert_eq!(result.overflowing_sub_mul(y, z), (x, overflow));
+        assert_eq!(x.wrapping_add_mul(y, z), result);
+        assert_eq!(x.checked_add_mul(y, z).is_none(), overflow);
+    });
+
+    unsigned_pair_gen_var_27::<T>().test_properties(|(a, b)| {
+        assert_eq!(a.overflowing_add_mul(T::ZERO, b), (a, false));
+        assert_eq!(a.overflowing_add_mul(T::ONE, b), a.overflowing_add(b));
+        assert_eq!(T::ZERO.overflowing_add_mul(a, b), a.overflowing_mul(b));
+        assert_eq!(a.overflowing_add_mul(b, T::ZERO), (a, false));
+        assert_eq!(a.overflowing_add_mul(b, T::ONE), a.overflowing_add(b));
+    });
+}
+
+fn overflowing_add_mul_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_triple_gen::<T>().test_properties(|(x, y, z)| {
+        let (result, overflow) = x.overflowing_add_mul(y, z);
+
+        let mut x_alt = x;
+        assert_eq!(x_alt.overflowing_add_mul_assign(y, z), overflow);
+        assert_eq!(x_alt, result);
+
+        assert_eq!(x.overflowing_add_mul(z, y), (result, overflow));
+        assert_eq!(result.overflowing_sub_mul(y, z), (x, overflow));
+        assert_eq!(x.wrapping_add_mul(y, z), result);
+        assert_eq!(x.checked_add_mul(y, z).is_none(), overflow);
+    });
+
+    signed_pair_gen::<T>().test_properties(|(a, b)| {
+        assert_eq!(a.overflowing_add_mul(T::ZERO, b), (a, false));
+        assert_eq!(a.overflowing_add_mul(T::ONE, b), a.overflowing_add(b));
+        assert_eq!(T::ZERO.overflowing_add_mul(a, b), a.overflowing_mul(b));
+        assert_eq!(a.overflowing_add_mul(b, T::ZERO), (a, false));
+        assert_eq!(a.overflowing_add_mul(b, T::ONE), a.overflowing_add(b));
+    });
+}
+
+#[test]
+fn overflowing_add_mul_properties() {
+    apply_fn_to_unsigneds!(overflowing_add_mul_properties_helper_unsigned);
+    apply_fn_to_signeds!(overflowing_add_mul_properties_helper_signed);
 }

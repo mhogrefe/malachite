@@ -58,6 +58,15 @@ pub fn pair_max_primitive_float_bucketer<'a, T: PrimitiveFloat>(
     }
 }
 
+pub fn triple_1_primitive_float_bucketer<'a, T: PrimitiveFloat, U, V>(
+    var_name: &str,
+) -> Bucketer<'a, (T, U, V)> {
+    Bucketer {
+        bucketing_function: &|&(f, _, _)| float_size(f),
+        bucketing_label: format!("precision({}) + |exponent({})|", var_name, var_name),
+    }
+}
+
 pub fn usize_convertible_direct_bucketer<T: Copy>(var_name: &str) -> Bucketer<T>
 where
     usize: ExactFrom<T>,

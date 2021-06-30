@@ -15,24 +15,13 @@ macro_rules! impl_overflowing_sub {
             /// Replaces `self` with `self - other`.
             ///
             /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
-            /// overflow would have occurred then the wrapped value is assigned.
+            /// overflow would have occurred, then the wrapped value is assigned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingSubAssign;
-            ///
-            /// let mut x = 456u16;
-            /// assert_eq!(x.overflowing_sub_assign(123), false);
-            /// assert_eq!(x, 333);
-            ///
-            /// let mut x = 123u16;
-            /// assert_eq!(x.overflowing_sub_assign(456), true);
-            /// assert_eq!(x, 65203);
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_sub` module.
             #[inline]
             fn overflowing_sub_assign(&mut self, other: $t) -> bool {
                 let (result, overflow) = self.overflowing_sub(other);

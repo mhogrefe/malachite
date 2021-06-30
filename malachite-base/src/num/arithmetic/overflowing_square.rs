@@ -5,20 +5,17 @@ macro_rules! impl_overflowing_square {
         impl OverflowingSquare for $t {
             type Output = $t;
 
-            /// Squares `self`, overflowing around at the boundary of the type.
+            /// Calculates `self ^ 2`.
             ///
-            /// Time: worst case O(1)
+            /// Returns a tuple of the result along with a boolean indicating whether an arithmetic
+            /// overflow would occur. If an overflow would have occurred, then the wrapped value is
+            /// returned.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingSquare;
-            ///
-            /// assert_eq!(3u8.overflowing_square(), (9, false));
-            /// assert_eq!((-1000i32).overflowing_square(), (1000000, false));
-            /// assert_eq!(1000u16.overflowing_square(), (16960, true));
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_square` module.
             #[inline]
             fn overflowing_square(self) -> ($t, bool) {
                 self.overflowing_mul(self)
@@ -26,28 +23,16 @@ macro_rules! impl_overflowing_square {
         }
 
         impl OverflowingSquareAssign for $t {
-            /// Replaces `self` with `self ^ 2`, overflowing around at the boundary of the type.
+            /// Replaces `self` with `self ^ 2`.
             ///
-            /// Time: worst case O(1)
+            /// Returns a boolean indicating whether an arithmetic overflow would occur. If an
+            /// overflow would have occurred, then the wrapped value is assigned.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::OverflowingSquareAssign;
-            ///
-            /// let mut x = 3u8;
-            /// assert_eq!(x.overflowing_square_assign(), false);
-            /// assert_eq!(x, 9);
-            ///
-            /// let mut x = -1000i32;
-            /// assert_eq!(x.overflowing_square_assign(), false);
-            /// assert_eq!(x, 1000000);
-            ///
-            /// let mut x = 1000u16;
-            /// assert_eq!(x.overflowing_square_assign(), true);
-            /// assert_eq!(x, 16960);
-            /// ```
+            /// See the documentation of the `num::arithmetic::overflowing_square` module.
             #[inline]
             fn overflowing_square_assign(&mut self) -> bool {
                 self.overflowing_mul_assign(*self)

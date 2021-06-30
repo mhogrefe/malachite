@@ -7,8 +7,8 @@ use malachite_nz::integer::Integer;
 
 fn expected_range_len(a: &Integer, b: &Integer) -> usize {
     match (*a >= 0, *b >= 0) {
-        (false, false) => usize::exact_from(-a) - usize::exact_from(-b) + 1,
-        (false, true) => usize::exact_from(-a) + usize::exact_from(b) + 1,
+        (false, false) => usize::exact_from(&-a) - usize::exact_from(&-b) + 1,
+        (false, true) => usize::exact_from(&-a) + usize::exact_from(b) + 1,
         (true, false) => panic!(),
         (true, true) => usize::exact_from(b) - usize::exact_from(a) + 1,
     }

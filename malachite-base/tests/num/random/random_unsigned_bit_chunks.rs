@@ -2,7 +2,7 @@ use itertools::{assert_equal, Itertools};
 use malachite_base::bools::random::random_bools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::random_unsigned_bit_chunks;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base_test_util::stats::moments::{

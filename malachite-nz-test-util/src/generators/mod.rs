@@ -416,6 +416,15 @@ pub fn natural_rounding_mode_pair_gen_var_1<
     )
 }
 
+// All `(Natural, RoundingMode)` pairs where the `Natural` is positive.
+pub fn natural_rounding_mode_pair_gen_var_2() -> Generator<(Natural, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_rounding_mode_pair_gen_var_2,
+        &random_natural_rounding_mode_pair_gen_var_2,
+        &special_random_natural_rounding_mode_pair_gen_var_2,
+    )
+}
+
 // -- (String, String, String) --
 
 // All triples of `String`s corresponding to the serialization of a `num::BigUint`, a

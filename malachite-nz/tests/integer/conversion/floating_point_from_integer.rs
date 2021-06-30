@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
@@ -17,7 +17,6 @@ use std::str::FromStr;
 fn test_f32_rounding_from_integer() {
     let test = |s: &str, rm: RoundingMode, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::rounding_from(u.clone(), rm), out);
         assert_eq!(f32::rounding_from(&u, rm), out);
     };
     test("3", RoundingMode::Exact, 3.0);
@@ -235,7 +234,7 @@ fn test_f32_rounding_from_integer() {
 #[should_panic]
 fn f32_rounding_from_integer_fail_1() {
     f32::rounding_from(
-        Integer::from_str("340282346638528859811704183484516925439").unwrap(),
+        &Integer::from_str("340282346638528859811704183484516925439").unwrap(),
         RoundingMode::Exact,
     );
 }
@@ -244,39 +243,6 @@ fn f32_rounding_from_integer_fail_1() {
 #[should_panic]
 fn f32_rounding_from_integer_fail_2() {
     f32::rounding_from(
-        Integer::from_str("340282346638528859811704183484516925441").unwrap(),
-        RoundingMode::Exact,
-    );
-}
-
-#[test]
-#[should_panic]
-fn f32_rounding_from_integer_fail_3() {
-    f32::rounding_from(Integer::from_str("16777217").unwrap(), RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic]
-fn f32_rounding_from_integer_fail_4() {
-    f32::rounding_from(
-        Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
-        RoundingMode::Exact,
-    );
-}
-
-#[test]
-#[should_panic]
-fn f32_rounding_from_integer_ref_fail_1() {
-    f32::rounding_from(
-        &Integer::from_str("340282346638528859811704183484516925439").unwrap(),
-        RoundingMode::Exact,
-    );
-}
-
-#[test]
-#[should_panic]
-fn f32_rounding_from_integer_ref_fail_2() {
-    f32::rounding_from(
         &Integer::from_str("340282346638528859811704183484516925441").unwrap(),
         RoundingMode::Exact,
     );
@@ -284,13 +250,13 @@ fn f32_rounding_from_integer_ref_fail_2() {
 
 #[test]
 #[should_panic]
-fn f32_rounding_from_integer_ref_fail_3() {
+fn f32_rounding_from_integer_fail_3() {
     f32::rounding_from(&Integer::from_str("16777217").unwrap(), RoundingMode::Exact);
 }
 
 #[test]
 #[should_panic]
-fn f32_rounding_from_integer_ref_fail_4() {
+fn f32_rounding_from_integer_fail_4() {
     f32::rounding_from(
         &Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
         RoundingMode::Exact,
@@ -301,7 +267,6 @@ fn f32_rounding_from_integer_ref_fail_4() {
 fn test_f64_rounding_from_integer() {
     let test = |s: &str, rm: RoundingMode, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::rounding_from(u.clone(), rm), out);
         assert_eq!(f64::rounding_from(&u, rm), out);
     };
     test("3", RoundingMode::Exact, 3.0);
@@ -582,7 +547,7 @@ fn test_f64_rounding_from_integer() {
 #[test]
 #[should_panic]
 fn f64_rounding_from_integer_fail_1() {
-    f64::rounding_from(Integer::from_str(
+    f64::rounding_from(&Integer::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
@@ -593,7 +558,7 @@ fn f64_rounding_from_integer_fail_1() {
 #[test]
 #[should_panic]
 fn f64_rounding_from_integer_fail_2() {
-    f64::rounding_from(Integer::from_str(
+    f64::rounding_from(&Integer::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
@@ -605,37 +570,6 @@ fn f64_rounding_from_integer_fail_2() {
 #[should_panic]
 fn f64_rounding_from_integer_fail_3() {
     f64::rounding_from(
-        Integer::from_str("9007199254740993").unwrap(),
-        RoundingMode::Exact,
-    );
-}
-
-#[test]
-#[should_panic]
-fn f64_rounding_from_integer_ref_fail_1() {
-    f64::rounding_from(&Integer::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367").unwrap(),
-                       RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic]
-fn f64_rounding_from_integer_ref_fail_2() {
-    f64::rounding_from(&Integer::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369").unwrap(),
-                       RoundingMode::Exact);
-}
-
-#[test]
-#[should_panic]
-fn f64_rounding_from_integer_ref_fail_3() {
-    f64::rounding_from(
         &Integer::from_str("9007199254740993").unwrap(),
         RoundingMode::Exact,
     );
@@ -645,7 +579,6 @@ fn f64_rounding_from_integer_ref_fail_3() {
 fn test_f32_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::from(u.clone()), out);
         assert_eq!(f32::from(&u), out);
     };
     test("3", 3.0);
@@ -691,7 +624,6 @@ fn test_f32_from_integer() {
 fn test_f64_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::from(u.clone()), out);
         assert_eq!(f64::from(&u), out);
     };
     test("3", 3.0);
@@ -753,7 +685,6 @@ fn test_f64_from_integer() {
 fn test_f32_checked_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::checked_from(u.clone()), out);
         assert_eq!(f32::checked_from(&u), out);
     };
     test("3", Some(3.0));
@@ -805,7 +736,6 @@ fn test_f32_checked_from_integer() {
 fn test_f64_checked_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::checked_from(u.clone()), out);
         assert_eq!(f64::checked_from(&u), out);
     };
     test("3", Some(3.0));
@@ -867,7 +797,6 @@ fn test_f64_checked_from_integer() {
 fn test_f32_exact_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::exact_from(u.clone()), out);
         assert_eq!(f32::exact_from(&u), out);
     };
     test("3", 3.0);
@@ -892,190 +821,90 @@ fn test_f32_exact_from_integer() {
 #[test]
 #[should_panic]
 fn f32_exact_from_integer_fail_1() {
-    f32::exact_from(Integer::from_str("16777217").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_2() {
-    f32::exact_from(Integer::from_str("-16777217").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_3() {
-    f32::exact_from(Integer::from_str("33554433").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_4() {
-    f32::exact_from(Integer::from_str("-33554433").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_5() {
-    f32::exact_from(Integer::from_str("33554434").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_6() {
-    f32::exact_from(Integer::from_str("-33554434").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_7() {
-    f32::exact_from(Integer::from_str("33554435").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_8() {
-    f32::exact_from(Integer::from_str("-33554435").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_9() {
-    f32::exact_from(Integer::from_str("340282346638528859811704183484516925439").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_10() {
-    f32::exact_from(Integer::from_str("-340282346638528859811704183484516925439").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_11() {
-    f32::exact_from(Integer::from_str("340282346638528859811704183484516925441").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_12() {
-    f32::exact_from(Integer::from_str("-340282346638528859811704183484516925441").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_13() {
-    f32::exact_from(Integer::from_str("340282346638528859811704183484516925441").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_14() {
-    f32::exact_from(Integer::from_str("-340282346638528859811704183484516925441").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_15() {
-    f32::exact_from(
-        Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
-    );
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_fail_16() {
-    f32::exact_from(
-        Integer::from_str("-10000000000000000000000000000000000000000000000000000").unwrap(),
-    );
-}
-
-#[test]
-#[should_panic]
-fn f32_exact_from_integer_ref_fail_1() {
     f32::exact_from(&Integer::from_str("16777217").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_2() {
+fn f32_exact_from_integer_fail_2() {
     f32::exact_from(&Integer::from_str("-16777217").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_3() {
+fn f32_exact_from_integer_fail_3() {
     f32::exact_from(&Integer::from_str("33554433").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_4() {
+fn f32_exact_from_integer_fail_4() {
     f32::exact_from(&Integer::from_str("-33554433").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_5() {
+fn f32_exact_from_integer_fail_5() {
     f32::exact_from(&Integer::from_str("33554434").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_6() {
+fn f32_exact_from_integer_fail_6() {
     f32::exact_from(&Integer::from_str("-33554434").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_7() {
+fn f32_exact_from_integer_fail_7() {
     f32::exact_from(&Integer::from_str("33554435").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_8() {
+fn f32_exact_from_integer_fail_8() {
     f32::exact_from(&Integer::from_str("-33554435").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_9() {
+fn f32_exact_from_integer_fail_9() {
     f32::exact_from(&Integer::from_str("340282346638528859811704183484516925439").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_10() {
+fn f32_exact_from_integer_fail_10() {
     f32::exact_from(&Integer::from_str("-340282346638528859811704183484516925439").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_11() {
+fn f32_exact_from_integer_fail_11() {
     f32::exact_from(&Integer::from_str("340282346638528859811704183484516925441").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_12() {
+fn f32_exact_from_integer_fail_12() {
     f32::exact_from(&Integer::from_str("-340282346638528859811704183484516925441").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_13() {
+fn f32_exact_from_integer_fail_13() {
     f32::exact_from(&Integer::from_str("340282346638528859811704183484516925441").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_14() {
+fn f32_exact_from_integer_fail_14() {
     f32::exact_from(&Integer::from_str("-340282346638528859811704183484516925441").unwrap());
 }
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_15() {
+fn f32_exact_from_integer_fail_15() {
     f32::exact_from(
         &Integer::from_str("10000000000000000000000000000000000000000000000000000").unwrap(),
     );
@@ -1083,7 +912,7 @@ fn f32_exact_from_integer_ref_fail_15() {
 
 #[test]
 #[should_panic]
-fn f32_exact_from_integer_ref_fail_16() {
+fn f32_exact_from_integer_fail_16() {
     f32::exact_from(
         &Integer::from_str("-10000000000000000000000000000000000000000000000000000").unwrap(),
     );
@@ -1093,7 +922,6 @@ fn f32_exact_from_integer_ref_fail_16() {
 fn test_f64_exact_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::exact_from(u.clone()), out);
         assert_eq!(f64::exact_from(&u), out);
     };
     test("3", 3.0);
@@ -1126,55 +954,55 @@ fn test_f64_exact_from_integer() {
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_1() {
-    f64::exact_from(Integer::from_str("18014398509481983").unwrap());
+    f64::exact_from(&Integer::from_str("18014398509481983").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_2() {
-    f64::exact_from(Integer::from_str("-18014398509481983").unwrap());
+    f64::exact_from(&Integer::from_str("-18014398509481983").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_3() {
-    f64::exact_from(Integer::from_str("18014398509481985").unwrap());
+    f64::exact_from(&Integer::from_str("18014398509481985").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_4() {
-    f64::exact_from(Integer::from_str("-18014398509481985").unwrap());
+    f64::exact_from(&Integer::from_str("-18014398509481985").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_5() {
-    f64::exact_from(Integer::from_str("18014398509481986").unwrap());
+    f64::exact_from(&Integer::from_str("18014398509481986").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_6() {
-    f64::exact_from(Integer::from_str("-18014398509481986").unwrap());
+    f64::exact_from(&Integer::from_str("-18014398509481986").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_7() {
-    f64::exact_from(Integer::from_str("18014398509481987").unwrap());
+    f64::exact_from(&Integer::from_str("18014398509481987").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_8() {
-    f64::exact_from(Integer::from_str("-18014398509481987").unwrap());
+    f64::exact_from(&Integer::from_str("-18014398509481987").unwrap());
 }
 
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_9() {
-    f64::exact_from(Integer::from_str(
+    f64::exact_from(&Integer::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
@@ -1184,7 +1012,7 @@ fn f64_exact_from_integer_fail_9() {
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_10() {
-    f64::exact_from(Integer::from_str(
+    f64::exact_from(&Integer::from_str(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
         4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
@@ -1194,7 +1022,7 @@ fn f64_exact_from_integer_fail_10() {
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_11() {
-    f64::exact_from(Integer::from_str(
+    f64::exact_from(&Integer::from_str(
         "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
@@ -1204,94 +1032,6 @@ fn f64_exact_from_integer_fail_11() {
 #[test]
 #[should_panic]
 fn f64_exact_from_integer_fail_12() {
-    f64::exact_from(Integer::from_str(
-        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
-        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
-        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858369").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_1() {
-    f64::exact_from(&Integer::from_str("18014398509481983").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_2() {
-    f64::exact_from(&Integer::from_str("-18014398509481983").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_3() {
-    f64::exact_from(&Integer::from_str("18014398509481985").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_4() {
-    f64::exact_from(&Integer::from_str("-18014398509481985").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_5() {
-    f64::exact_from(Integer::from_str("18014398509481986").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_6() {
-    f64::exact_from(&Integer::from_str("-18014398509481986").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_7() {
-    f64::exact_from(&Integer::from_str("18014398509481987").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_8() {
-    f64::exact_from(&Integer::from_str("-18014398509481987").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_9() {
-    f64::exact_from(&Integer::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858367").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_10() {
-    f64::exact_from(&Integer::from_str(
-        "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
-        8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
-        4900903893289440758685084551339423045832369032229481658085593321233482747978262041447231687\
-        38177180919299881250404026184124858367").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_11() {
-    f64::exact_from(&Integer::from_str(
-        "179769313486231570814527423731704356798070567525844996598917476803157260780028538760589558\
-        6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
-        9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
-        8177180919299881250404026184124858369").unwrap());
-}
-
-#[test]
-#[should_panic]
-fn f64_exact_from_integer_ref_fail_12() {
     f64::exact_from(&Integer::from_str(
         "-17976931348623157081452742373170435679807056752584499659891747680315726078002853876058955\
         8632766878171540458953514382464234321326889464182768467546703537516986049910576551282076245\
@@ -1303,7 +1043,6 @@ fn f64_exact_from_integer_ref_fail_12() {
 fn test_f32_convertible_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::convertible_from(u.clone()), out);
         assert_eq!(f32::convertible_from(&u), out);
     };
     test("3", true);
@@ -1349,7 +1088,6 @@ fn test_f32_convertible_from_integer() {
 fn test_f64_convertible_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::convertible_from(u.clone()), out);
         assert_eq!(f64::convertible_from(&u), out);
     };
     test("3", true);
@@ -1412,7 +1150,6 @@ fn float_rounding_from_integer_properties_helper<
         + for<'a> ConvertibleFrom<&'a Integer>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat
-        + RoundingFrom<Integer>
         + for<'a> RoundingFrom<&'a Integer>,
 >()
 where
@@ -1421,19 +1158,14 @@ where
 {
     integer_rounding_mode_pair_gen_var_1::<T>().test_properties(|(n, rm)| {
         let f = T::rounding_from(&n, rm);
-        assert_eq!(NiceFloat(T::rounding_from(n.clone(), rm)), NiceFloat(f));
         assert_eq!(
-            NiceFloat(T::rounding_from(-n, -rm)),
+            NiceFloat(T::rounding_from(&-n, -rm)),
             NiceFloat((-f).abs_negative_zero())
         );
     });
 
     integer_gen_var_1::<T>().test_properties(|n| {
-        let f = T::rounding_from(n.clone(), RoundingMode::Exact);
-        assert_eq!(
-            NiceFloat(T::rounding_from(&n, RoundingMode::Exact)),
-            NiceFloat(f)
-        );
+        let f = T::rounding_from(&n, RoundingMode::Exact);
         assert_eq!(
             NiceFloat(f),
             NiceFloat(T::rounding_from(&n, RoundingMode::Floor))
@@ -1454,43 +1186,15 @@ where
             NiceFloat(f),
             NiceFloat(T::rounding_from(&n, RoundingMode::Nearest))
         );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor))
-        );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Ceiling))
-        );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Down))
-        );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Up))
-        );
-        assert_eq!(
-            NiceFloat(f),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Nearest))
-        );
         assert_eq!(Integer::rounding_from(f, RoundingMode::Exact), n);
     });
 
     integer_gen_var_2::<T>().test_properties(|n| {
         let f_below = T::rounding_from(&n, RoundingMode::Floor);
-        assert_eq!(
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor)),
-            NiceFloat(f_below)
-        );
         let f_above = f_below.next_higher();
         assert_eq!(
             NiceFloat(f_above),
             NiceFloat(T::rounding_from(&n, RoundingMode::Ceiling))
-        );
-        assert_eq!(
-            NiceFloat(f_above),
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Ceiling))
         );
         if n >= 0 {
             assert_eq!(
@@ -1498,16 +1202,8 @@ where
                 NiceFloat(T::rounding_from(&n, RoundingMode::Down))
             );
             assert_eq!(
-                NiceFloat(f_below),
-                NiceFloat(T::rounding_from(n.clone(), RoundingMode::Down))
-            );
-            assert_eq!(
                 NiceFloat(f_above),
                 NiceFloat(T::rounding_from(&n, RoundingMode::Up))
-            );
-            assert_eq!(
-                NiceFloat(f_above),
-                NiceFloat(T::rounding_from(n.clone(), RoundingMode::Up))
             );
         } else {
             assert_eq!(
@@ -1515,16 +1211,8 @@ where
                 NiceFloat(T::rounding_from(&n, RoundingMode::Down))
             );
             assert_eq!(
-                NiceFloat(f_above),
-                NiceFloat(T::rounding_from(n.clone(), RoundingMode::Down))
-            );
-            assert_eq!(
                 NiceFloat(f_below),
                 NiceFloat(T::rounding_from(&n, RoundingMode::Up))
-            );
-            assert_eq!(
-                NiceFloat(f_below),
-                NiceFloat(T::rounding_from(n.clone(), RoundingMode::Up))
             );
         }
         let f_nearest = T::rounding_from(&n, RoundingMode::Nearest);
@@ -1542,7 +1230,7 @@ where
     integer_gen_var_3::<T>().test_properties(|n| {
         let floor = T::rounding_from(&n, RoundingMode::Floor);
         let ceiling = floor.next_higher();
-        let nearest = T::rounding_from(n, RoundingMode::Nearest);
+        let nearest = T::rounding_from(&n, RoundingMode::Nearest);
         assert_eq!(
             NiceFloat(nearest),
             NiceFloat(if floor.to_bits().even() {
@@ -1562,10 +1250,8 @@ fn float_rounding_from_integer_properties() {
 fn float_from_integer_properties_helper<
     T: for<'a> CheckedFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
-        + From<Integer>
         + for<'a> From<&'a Integer>
         + PrimitiveFloat
-        + RoundingFrom<Integer>
         + for<'a> RoundingFrom<&'a Integer>,
 >()
 where
@@ -1574,29 +1260,22 @@ where
 {
     integer_gen().test_properties(|n| {
         let f = T::from(&n);
-        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f));
         assert_eq!(
             NiceFloat(T::rounding_from(&n, RoundingMode::Nearest)),
             NiceFloat(f)
         );
-        assert_eq!(NiceFloat(T::from(-n)), NiceFloat((-f).abs_negative_zero()));
+        assert_eq!(NiceFloat(T::from(&-n)), NiceFloat((-f).abs_negative_zero()));
     });
 
     integer_gen_var_1::<T>().test_properties(|n| {
         let f = T::from(&n);
-        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f));
         assert_eq!(Integer::from(f), n);
     });
 
     integer_gen_var_2::<T>().test_properties(|n| {
         let f_below = T::rounding_from(&n, RoundingMode::Floor);
-        assert_eq!(
-            NiceFloat(T::rounding_from(n.clone(), RoundingMode::Floor)),
-            NiceFloat(f_below)
-        );
         let f_above = f_below.next_higher();
         let f_nearest = T::from(&n);
-        assert_eq!(NiceFloat(T::from(n.clone())), NiceFloat(f_nearest));
         assert!(
             NiceFloat(f_nearest) == NiceFloat(f_below)
                 || NiceFloat(f_nearest) == NiceFloat(f_above)
@@ -1607,7 +1286,7 @@ where
     integer_gen_var_3::<T>().test_properties(|n| {
         let floor = T::rounding_from(&n, RoundingMode::Floor);
         let ceiling = floor.next_higher();
-        let nearest = T::from(n);
+        let nearest = T::from(&n);
         assert_eq!(
             NiceFloat(nearest),
             NiceFloat(if floor.to_bits().even() {
@@ -1625,8 +1304,7 @@ fn float_from_integer_properties() {
 }
 
 fn float_checked_from_integer_properties_helper<
-    T: CheckedFrom<Integer>
-        + for<'a> CheckedFrom<&'a Integer>
+    T: for<'a> CheckedFrom<&'a Integer>
         + for<'a> CheckedFrom<&'a Natural>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat
@@ -1638,16 +1316,14 @@ where
 {
     integer_gen().test_properties(|n| {
         let of = T::checked_from(&n);
-        assert_eq!(T::checked_from(n.clone()).map(NiceFloat), of.map(NiceFloat));
         assert_eq!(
-            T::checked_from(-n).map(NiceFloat),
+            T::checked_from(&-n).map(NiceFloat),
             of.map(|f| NiceFloat((-f).abs_negative_zero()))
         );
     });
 
     integer_gen_var_1::<T>().test_properties(|n| {
         let f = T::exact_from(&n);
-        assert_eq!(NiceFloat(T::exact_from(n.clone())), NiceFloat(f));
         assert_eq!(
             NiceFloat(f),
             NiceFloat(T::rounding_from(&n, RoundingMode::Exact))
@@ -1656,11 +1332,11 @@ where
     });
 
     integer_gen_var_2::<T>().test_properties(|n| {
-        assert!(T::checked_from(n).is_none());
+        assert!(T::checked_from(&n).is_none());
     });
 
     integer_gen_var_3::<T>().test_properties(|n| {
-        assert!(T::checked_from(n).is_none());
+        assert!(T::checked_from(&n).is_none());
     });
 }
 
@@ -1671,7 +1347,6 @@ fn float_checked_from_integer_properties() {
 
 fn float_convertible_from_integer_properties_helper<
     T: for<'a> CheckedFrom<&'a Natural>
-        + ConvertibleFrom<Integer>
         + for<'a> ConvertibleFrom<&'a Integer>
         + for<'a> ConvertibleFrom<&'a Natural>
         + PrimitiveFloat,
@@ -1680,20 +1355,19 @@ where
     Natural: CheckedFrom<T> + From<T>,
 {
     integer_gen().test_properties(|n| {
-        assert_eq!(T::convertible_from(&n), T::convertible_from(n.clone()));
-        assert_eq!(T::convertible_from(&n), T::convertible_from(-n));
+        assert_eq!(T::convertible_from(&n), T::convertible_from(&-n));
     });
 
     integer_gen_var_1::<T>().test_properties(|n| {
-        assert!(T::convertible_from(n));
+        assert!(T::convertible_from(&n));
     });
 
     integer_gen_var_2::<T>().test_properties(|n| {
-        assert!(!T::convertible_from(n));
+        assert!(!T::convertible_from(&n));
     });
 
     integer_gen_var_3::<T>().test_properties(|n| {
-        assert!(!T::convertible_from(n));
+        assert!(!T::convertible_from(&n));
     });
 }
 

@@ -86,7 +86,7 @@ fn add_mul_properties() {
             SignedLimb::from(x)
                 .checked_add_mul(SignedLimb::from(y), SignedLimb::from(z))
                 .is_some(),
-            SignedLimb::convertible_from(result)
+            SignedLimb::convertible_from(&result)
         );
     });
 }

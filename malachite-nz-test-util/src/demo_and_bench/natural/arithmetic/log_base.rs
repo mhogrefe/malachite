@@ -1,6 +1,6 @@
 use crate::bench::bucketers::{natural_bit_bucketer, natural_bit_ratio_bucketer};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase, CheckedLogBase, FloorLogBase};
-use malachite_base::num::float::nice_float::NiceFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;

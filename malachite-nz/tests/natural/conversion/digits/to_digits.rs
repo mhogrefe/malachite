@@ -24,7 +24,9 @@ use malachite_nz_test_util::generators::*;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
-fn verify_limbs_to_digits_small_base_basecase<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
+fn verify_limbs_to_digits_small_base_basecase<
+    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+>(
     original_out: &[T],
     len: usize,
     xs: &[Limb],
@@ -56,7 +58,7 @@ fn verify_limbs_to_digits_small_base_basecase<T: CheckedFrom<Natural> + Primitiv
     );
 }
 
-fn verify_limbs_to_digits_small_base<T: CheckedFrom<Natural> + PrimitiveUnsigned>(
+fn verify_limbs_to_digits_small_base<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned>(
     original_out: &[T],
     original_xs: &[Limb],
     base: u64,
@@ -145,7 +147,7 @@ fn test_limbs_to_digits_small_base_basecase() {
 }
 
 fn limbs_to_digits_small_base_basecase_properties_helper<
-    T: CheckedFrom<Natural> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
 >() {
     let mut config = GenConfig::new();
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
@@ -369,7 +371,9 @@ fn test_limbs_to_digits_small_base() {
     );
 }
 
-fn limbs_to_digits_small_base_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>() {
+fn limbs_to_digits_small_base_properties_helper<
+    T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
+>() {
     let mut config = GenConfig::new();
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     config.insert("mean_stripe_d", 1);
@@ -419,7 +423,7 @@ fn limbs_to_digits_small_base_properties() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_to_digits_basecase() {
-    fn test<T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    fn test<T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         xs_before: &[Limb],
         base: Limb,
         out: &[T],
@@ -513,7 +517,7 @@ fn limbs_to_digits_basecase_fail() {
 }
 
 fn limbs_to_digits_basecase_properties_helper<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >()
 where
     Limb: SaturatingFrom<T>,
@@ -548,7 +552,7 @@ fn limbs_to_digits_basecase_properties() {
 
 #[test]
 fn test_to_digits_asc_limb() {
-    fn test<T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    fn test<T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         x: &str,
         base: Limb,
         out: &[T],
@@ -621,7 +625,7 @@ fn test_to_digits_asc_limb() {
 }
 
 fn to_digits_asc_limb_fail_helper<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >()
 where
     Limb: Digits<T>,
@@ -639,7 +643,7 @@ fn to_digits_asc_limb_fail() {
 }
 
 fn to_digits_asc_limb_properties_helper<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >()
 where
     Limb: Digits<T> + SaturatingFrom<T>,
@@ -676,7 +680,7 @@ fn to_digits_asc_limb_properties() {
 
 #[test]
 fn test_to_digits_desc_limb() {
-    fn test<T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+    fn test<T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         x: &str,
         base: Limb,
         out: &[T],
@@ -731,7 +735,7 @@ fn test_to_digits_desc_limb() {
 }
 
 fn to_digits_desc_limb_fail_helper<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >()
 where
     Limb: Digits<T>,
@@ -749,7 +753,7 @@ fn to_digits_desc_limb_fail() {
 }
 
 fn to_digits_desc_limb_properties_helper<
-    T: CheckedFrom<Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
+    T: for<'a> CheckedFrom<&'a Natural> + ConvertibleFrom<Limb> + PrimitiveUnsigned,
 >()
 where
     Limb: Digits<T> + SaturatingFrom<T>,
@@ -1054,7 +1058,7 @@ fn to_digits_desc_large_properties() {
 
 #[test]
 fn test_to_digits_asc_unsigned() {
-    fn test<T: CheckedFrom<Natural> + PrimitiveUnsigned>(x: &str, base: T, out: &[T])
+    fn test<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned>(x: &str, base: T, out: &[T])
     where
         Natural: Digits<T> + From<T>,
     {
@@ -1120,7 +1124,7 @@ fn to_digits_asc_unsigned_fail() {
     apply_fn_to_unsigneds!(to_digits_asc_unsigned_fail_helper);
 }
 
-fn to_digits_asc_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>()
+fn to_digits_asc_properties_helper<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned>()
 where
     Limb: Digits<T>,
     Natural: Digits<T> + From<T>,
@@ -1152,7 +1156,10 @@ where
 
         let digits_alt = Digits::<Natural>::to_digits_asc(&x, &Natural::from(base));
         assert_eq!(
-            digits_alt.into_iter().map(T::exact_from).collect_vec(),
+            digits_alt
+                .into_iter()
+                .map(|n| T::exact_from(&n))
+                .collect_vec(),
             digits
         );
     });
@@ -1247,7 +1254,7 @@ fn to_digits_desc_unsigned_fail() {
     apply_fn_to_unsigneds!(to_digits_desc_unsigned_fail_helper);
 }
 
-fn to_digits_desc_properties_helper<T: CheckedFrom<Natural> + PrimitiveUnsigned>()
+fn to_digits_desc_properties_helper<T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned>()
 where
     Limb: Digits<T>,
     Natural: Digits<T> + From<T>,
@@ -1276,7 +1283,10 @@ where
 
         let digits_alt = Digits::<Natural>::to_digits_desc(&x, &Natural::from(base));
         assert_eq!(
-            digits_alt.into_iter().map(T::exact_from).collect_vec(),
+            digits_alt
+                .into_iter()
+                .map(|n| T::exact_from(&n))
+                .collect_vec(),
             digits
         );
     });

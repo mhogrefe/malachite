@@ -171,67 +171,48 @@ fn limbs_add_mul_in_place_left_fail_2() {
 
 #[test]
 fn test_add_mul() {
-    let test = |u, v, w, out| {
-        let mut a = Natural::from_str(u).unwrap();
-        a.add_mul_assign(Natural::from_str(v).unwrap(), Natural::from_str(w).unwrap());
+    let test = |r, s, t, out| {
+        let u = Natural::from_str(r).unwrap();
+        let v = Natural::from_str(s).unwrap();
+        let w = Natural::from_str(t).unwrap();
+
+        let mut a = u.clone();
+        a.add_mul_assign(v.clone(), w.clone());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Natural::from_str(u).unwrap();
-        a.add_mul_assign(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let mut a = u.clone();
+        a.add_mul_assign(v.clone(), &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Natural::from_str(u).unwrap();
-        a.add_mul_assign(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(w).unwrap(),
-        );
+        let mut a = u.clone();
+        a.add_mul_assign(&v, w.clone());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let mut a = Natural::from_str(u).unwrap();
-        a.add_mul_assign(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let mut a = u.clone();
+        a.add_mul_assign(&v, &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Natural::from_str(u)
-            .unwrap()
-            .add_mul(Natural::from_str(v).unwrap(), Natural::from_str(w).unwrap());
+        let a = u.clone().add_mul(v.clone(), w.clone());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Natural::from_str(u).unwrap().add_mul(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let a = u.clone().add_mul(v.clone(), &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Natural::from_str(u).unwrap().add_mul(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(w).unwrap(),
-        );
+        let a = u.clone().add_mul(&v, w.clone());
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = Natural::from_str(u).unwrap().add_mul(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let a = u.clone().add_mul(&v, &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
 
-        let a = (&Natural::from_str(u).unwrap()).add_mul(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let a = (&u).add_mul(&v, &w);
         assert_eq!(a.to_string(), out);
         assert!(a.is_valid());
     };

@@ -1,6 +1,8 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::CheckedFrom;
+use malachite_base_test_util::generators::{unsigned_gen_var_15, unsigned_gen_var_16};
 use std::panic::catch_unwind;
 
 fn power_of_2_primitive_helper<T: PrimitiveInt>() {
@@ -38,4 +40,32 @@ fn power_of_2_signed_fail_helper<T: PrimitiveSigned>() {
 fn power_of_2_fail() {
     apply_fn_to_unsigneds!(power_of_2_unsigned_fail_helper);
     apply_fn_to_signeds!(power_of_2_signed_fail_helper);
+}
+
+fn power_of_2_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen_var_15::<T>().test_properties(|pow| {
+        let mut n = T::power_of_2(pow);
+        assert_eq!(n.checked_log_base_2(), Some(pow));
+        assert!(n.is_power_of_2());
+        n.clear_bit(pow);
+        assert_eq!(n, T::ZERO);
+    });
+}
+
+fn power_of_2_properties_helper_signed<
+    U: CheckedFrom<S> + PrimitiveUnsigned,
+    S: PrimitiveSigned,
+>() {
+    unsigned_gen_var_16::<S>().test_properties(|pow| {
+        let mut n = S::power_of_2(pow);
+        assert_eq!(U::exact_from(n), U::power_of_2(pow));
+        n.clear_bit(pow);
+        assert_eq!(n, S::ZERO);
+    });
+}
+
+#[test]
+fn power_of_2_properties() {
+    apply_fn_to_unsigneds!(power_of_2_properties_helper_unsigned);
+    apply_fn_to_unsigned_signed_pairs!(power_of_2_properties_helper_signed);
 }

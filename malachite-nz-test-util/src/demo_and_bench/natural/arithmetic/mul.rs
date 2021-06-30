@@ -9,7 +9,7 @@ use malachite_base_test_util::bench::bucketers::{
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{
-    large_type_gen_var_1, unsigned_pair_gen, unsigned_vec_pair_gen_var_1,
+    large_type_gen_var_1, unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_1,
     unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2,
     unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_26,
     unsigned_vec_triple_gen_var_27, unsigned_vec_triple_gen_var_3, unsigned_vec_unsigned_pair_gen,
@@ -409,7 +409,7 @@ fn demo_limbs_mul_to_out(gm: GenMode, config: GenConfig, limit: usize) {
 macro_rules! mul_valid_helper {
     ($name: ident, $demo_name: ident) => {
         fn $demo_name(gm: GenMode, config: GenConfig, limit: usize) {
-            for (x, y) in unsigned_pair_gen().get(gm, &config).take(limit) {
+            for (x, y) in unsigned_pair_gen_var_27().get(gm, &config).take(limit) {
                 println!(
                     concat!(stringify!($name), "({}, {}) = {}"),
                     x,
