@@ -7,38 +7,35 @@ use num::BigUint;
 use rug;
 use std::str::FromStr;
 
-//TODO clean from_str
-
 #[test]
 fn test_checked_sub_natural() {
-    let test = |u, v, out| {
-        let on = Natural::from_str(u)
-            .unwrap()
-            .checked_sub(Natural::from_str(v).unwrap());
+    let test = |s, t, out| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let on = u.clone().checked_sub(v.clone());
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Natural::from_str(u)
-            .unwrap()
-            .checked_sub(&Natural::from_str(v).unwrap());
+        let on = u.clone().checked_sub(&v);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = (&Natural::from_str(u).unwrap()).checked_sub(Natural::from_str(v).unwrap());
+        let on = (&u).checked_sub(v.clone());
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = (&Natural::from_str(u).unwrap()).checked_sub(&Natural::from_str(v).unwrap());
+        let on = (&u).checked_sub(&v);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = checked_sub(BigUint::from_str(u).unwrap(), BigUint::from_str(v).unwrap())
+        let on = checked_sub(BigUint::from_str(s).unwrap(), BigUint::from_str(t).unwrap())
             .map(|x| biguint_to_natural(&x));
         assert_eq!(on.to_debug_string(), out);
 
         let on = checked_sub(
-            rug::Integer::from_str(u).unwrap(),
-            rug::Integer::from_str(v).unwrap(),
+            rug::Integer::from_str(s).unwrap(),
+            rug::Integer::from_str(t).unwrap(),
         );
         assert_eq!(on.to_debug_string(), out);
     };

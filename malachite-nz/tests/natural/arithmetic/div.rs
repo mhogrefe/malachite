@@ -28249,43 +28249,43 @@ fn limbs_div_to_out_ref_ref_fail_4() {
 
 #[test]
 fn test_div() {
-    let test = |u, v, quotient| {
-        let mut x = Natural::from_str(u).unwrap();
-        x /= Natural::from_str(v).unwrap();
+    let test = |s, t, quotient| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x /= v.clone();
         assert!(x.is_valid());
         assert_eq!(x.to_string(), quotient);
 
-        let mut x = Natural::from_str(u).unwrap();
-        x /= &Natural::from_str(v).unwrap();
+        let mut x = u.clone();
+        x /= &v;
         assert!(x.is_valid());
         assert_eq!(x.to_string(), quotient);
 
-        let q = Natural::from_str(u).unwrap() / Natural::from_str(v).unwrap();
+        let q = u.clone() / v.clone();
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = Natural::from_str(u).unwrap() / &Natural::from_str(v).unwrap();
+        let q = u.clone() / &v;
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = &Natural::from_str(u).unwrap() / Natural::from_str(v).unwrap();
+        let q = &u / v.clone();
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = &Natural::from_str(u).unwrap() / &Natural::from_str(v).unwrap();
+        let q = &u / &v;
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = BigUint::from_str(u).unwrap() / &BigUint::from_str(v).unwrap();
+        let q = BigUint::from_str(s).unwrap() / &BigUint::from_str(t).unwrap();
         assert_eq!(q.to_string(), quotient);
 
-        let q = rug::Integer::from_str(u).unwrap() / rug::Integer::from_str(v).unwrap();
+        let q = rug::Integer::from_str(s).unwrap() / rug::Integer::from_str(t).unwrap();
         assert_eq!(q.to_string(), quotient);
 
-        let q = Natural::from_str(u)
-            .unwrap()
-            .div_mod(Natural::from_str(v).unwrap())
-            .0;
+        let q = u.div_mod(v).0;
         assert_eq!(q.to_string(), quotient);
     };
     test("0", "1", "0");

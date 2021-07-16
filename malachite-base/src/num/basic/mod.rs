@@ -1,3 +1,5 @@
+// TODO
+pub mod floats;
 /// This module defines `PrimitiveInt`.
 ///
 /// Here are usage examples of the associated constants:

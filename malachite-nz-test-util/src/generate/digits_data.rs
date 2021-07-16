@@ -1,14 +1,10 @@
-use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2, Parity, Pow, PowerOf2, ShrRound, Square,
-};
+use malachite_base::num::arithmetic::traits::{FloorSqrt, ModPowerOf2, Parity, Pow, PowerOf2};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
-use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::cmp::Ordering;
 
 /// Calculate r satisfying r*d == 1 mod 2^n.
 ///
@@ -25,35 +21,17 @@ fn invert_mod_power_of_2(x: &Natural, pow: u64) -> Natural {
     inverse
 }
 
-//TODO use real sqrt
-fn simple_sqrt(x: &Natural) -> Natural {
-    let mut low = Natural::ZERO;
-    let mut high = x.clone();
-    loop {
-        if high <= low {
-            return low;
-        }
-        let mid = (&low + &high).shr_round(1u64, RoundingMode::Ceiling);
-        let mid_squared = (&mid).square();
-        match mid_squared.cmp(x) {
-            Ordering::Equal => return mid,
-            Ordering::Less => low = mid,
-            Ordering::Greater => high = mid - Natural::ONE,
-        }
-    }
-}
-
 // Compute log(2) / log(b) as a fixnum.
 //
 // This is mp_2logb from gen-bases.c, GMP 6.2.1.
 fn get_log_base_of_2(base: u64, precision: u64) -> Natural {
     let extended_precision = precision + 16;
     let mut t = Natural::power_of_2(extended_precision);
-    let two = Natural::power_of_2(extended_precision + 1);
+    let two = &t << 1;
     let mut log = Natural::ZERO;
     let mut base = Natural::from(base) << extended_precision;
     for i in (0..precision).rev() {
-        base = simple_sqrt(&(&base << extended_precision));
+        base = (&base << extended_precision).floor_sqrt();
         let next_t = (&t * &base) >> extended_precision;
         if next_t < two {
             log.set_bit(i);

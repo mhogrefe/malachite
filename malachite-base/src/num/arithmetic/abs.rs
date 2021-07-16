@@ -37,7 +37,7 @@ macro_rules! impl_abs_primitive_int {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_abs_primitive_int);
+apply_to_unsigned_signed_pairs!(impl_abs_primitive_int);
 
 macro_rules! impl_abs_primitive_float {
     ($f:ident) => {

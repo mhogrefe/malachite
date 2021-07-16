@@ -397,4 +397,4 @@ macro_rules! impl_from {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_from);
+apply_to_unsigned_signed_pairs!(impl_from);

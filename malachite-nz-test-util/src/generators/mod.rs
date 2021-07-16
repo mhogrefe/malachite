@@ -1,6 +1,6 @@
 use crate::generators::common::{
-    integer_nrm, integer_pair_1_nrm, natural_nrm, natural_pair_1_nrm, natural_pair_nrm,
-    natural_pair_rm,
+    integer_nrm, integer_pair_1_nrm, integer_rm, natural_nrm, natural_pair_1_nrm, natural_pair_nrm,
+    natural_pair_rm, natural_rm,
 };
 use crate::generators::exhaustive::*;
 use crate::generators::random::*;
@@ -67,6 +67,30 @@ where
     )
 }
 
+pub fn integer_gen_var_4() -> Generator<Integer> {
+    Generator::new(
+        &exhaustive_integer_gen_var_4,
+        &random_integer_gen_var_4,
+        &special_random_integer_gen_var_3,
+    )
+}
+
+pub fn integer_gen_var_4_rm() -> Generator<(rug::Integer, Integer)> {
+    Generator::new(
+        &|| integer_rm(exhaustive_integer_gen_var_4()),
+        &|config| integer_rm(random_integer_gen_var_4(config)),
+        &|config| integer_rm(special_random_integer_gen_var_3(config)),
+    )
+}
+
+pub fn integer_gen_var_4_nrm() -> Generator<(BigInt, rug::Integer, Integer)> {
+    Generator::new(
+        &|| integer_nrm(exhaustive_integer_gen_var_4()),
+        &|config| integer_nrm(random_integer_gen_var_4(config)),
+        &|config| integer_nrm(special_random_integer_gen_var_3(config)),
+    )
+}
+
 // -- (Integer, PrimitiveUnsigned) --
 
 // All `(Integer, T)` where `T` is unsigned and between 2 and 36, inclusive.
@@ -130,6 +154,14 @@ pub fn natural_gen() -> Generator<Natural> {
         &exhaustive_natural_gen,
         &random_natural_gen,
         &special_random_natural_gen,
+    )
+}
+
+pub fn natural_gen_rm() -> Generator<(rug::Integer, Natural)> {
+    Generator::new(
+        &|| natural_rm(exhaustive_natural_gen()),
+        &|config| natural_rm(random_natural_gen(config)),
+        &|config| natural_rm(special_random_natural_gen(config)),
     )
 }
 

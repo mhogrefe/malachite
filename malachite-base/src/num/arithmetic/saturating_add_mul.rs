@@ -27,19 +27,22 @@ macro_rules! impl_saturating_add_mul_unsigned {
         impl SaturatingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self + y * z`, saturating at the numeric bounds instead of overflowing.
+            /// Computes $x + yz$, saturating at the numeric bounds instead of overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x, y, z) = \\begin{cases}
+            ///     x + yz & m \leq x + yz \leq M \\\\
+            ///     M & x + yz > M \\\\
+            ///     m & x + yz < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingAddMul;
-            ///
-            /// assert_eq!(2u8.saturating_add_mul(3, 7), 23);
-            /// assert_eq!(2u8.saturating_add_mul(20, 20), 255);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_add_mul` module.
             #[inline]
             fn saturating_add_mul(self, y: $t, z: $t) -> $t {
                 _saturating_add_mul_unsigned(self, y, z)
@@ -47,25 +50,23 @@ macro_rules! impl_saturating_add_mul_unsigned {
         }
 
         impl SaturatingAddMulAssign<$t> for $t {
-            /// Replaces `self` with `self + y * z`, saturating at the numeric bounds instead of
+            /// Replaces $x$ with $x + yz$, saturating at the numeric bounds instead of
             /// overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets \\begin{cases}
+            ///     x + yz & m \leq x + yz \leq M \\\\
+            ///     M & x + yz > M \\\\
+            ///     m & x + yz < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingAddMulAssign;
-            ///
-            /// let mut x = 2u8;
-            /// x.saturating_add_mul_assign(3, 7);
-            /// assert_eq!(x, 23);
-            ///
-            /// let mut x = 2u8;
-            /// x.saturating_add_mul_assign(20, 20);
-            /// assert_eq!(x, 255);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_add_mul` module.
             #[inline]
             fn saturating_add_mul_assign(&mut self, y: $t, z: $t) {
                 _saturating_add_mul_assign_unsigned(self, y, z);
@@ -124,19 +125,22 @@ macro_rules! impl_saturating_add_mul_signed {
         impl SaturatingAddMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self + y * z`, saturating at the numeric bounds instead of overflowing.
+            /// Computes $x + yz$, saturating at the numeric bounds instead of overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x, y, z) = \\begin{cases}
+            ///     x + yz & m \leq x + yz \leq M \\\\
+            ///     M & x + yz > M \\\\
+            ///     m & x + yz < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingAddMul;
-            ///
-            /// assert_eq!(127i8.saturating_add_mul(-2, 100), -73);
-            /// assert_eq!((-127i8).saturating_add_mul(-2, 100), -128);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_add_mul` module.
             #[inline]
             fn saturating_add_mul(self, y: $t, z: $t) -> $t {
                 _saturating_add_mul_signed(self, y, z)
@@ -144,25 +148,23 @@ macro_rules! impl_saturating_add_mul_signed {
         }
 
         impl SaturatingAddMulAssign<$t> for $t {
-            /// Replaces `self` with `self + y * z`, saturating at the numeric bounds instead of
+            /// Replaces $x$ with $x + yz$, saturating at the numeric bounds instead of
             /// overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets \\begin{cases}
+            ///     x + yz & m \leq x + yz \leq M \\\\
+            ///     M & x + yz > M \\\\
+            ///     m & x + yz < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingAddMulAssign;
-            ///
-            /// let mut x = 127i8;
-            /// x.saturating_add_mul_assign(-2, 100);
-            /// assert_eq!(x, -73);
-            ///
-            /// let mut x = -127i8;
-            /// x.saturating_add_mul_assign(-2, 100);
-            /// assert_eq!(x, -128);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_add_mul` module.
             #[inline]
             fn saturating_add_mul_assign(&mut self, y: $t, z: $t) {
                 *self = self.saturating_add_mul(y, z);

@@ -38,7 +38,7 @@ use malachite_base_test_util::generators::exhaustive::{
     UnsignedVecTripleLenGenerator, UnsignedVecTripleXYYLenGenerator,
 };
 use malachite_base_test_util::generators::exhaustive_pairs_big_tiny;
-use malachite_nz::integer::exhaustive::exhaustive_integers;
+use malachite_nz::integer::exhaustive::{exhaustive_integers, exhaustive_natural_integers};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
@@ -105,6 +105,10 @@ where
         lex_pairs(exhaustive_natural_gen_var_5::<T>(), exhaustive_bools())
             .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
     )
+}
+
+pub fn exhaustive_integer_gen_var_4() -> It<Integer> {
+    Box::new(exhaustive_natural_integers())
 }
 
 // -- (Integer, PrimitiveUnsigned) --

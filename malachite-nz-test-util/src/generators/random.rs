@@ -38,7 +38,7 @@ use malachite_base_test_util::generators::common::{GenConfig, It};
 use malachite_base_test_util::generators::random::{
     PrimitiveIntVecTripleLenGenerator, PrimitiveIntVecTripleXYYLenGenerator,
 };
-use malachite_nz::integer::random::random_integers;
+use malachite_nz::integer::random::{random_integers, random_natural_integers};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
@@ -155,6 +155,14 @@ where
         )
         .map(|(n, b)| Integer::from_sign_and_abs(b, n)),
     )
+}
+
+pub fn random_integer_gen_var_4(config: &GenConfig) -> It<Integer> {
+    Box::new(random_natural_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
 }
 
 // -- (Integer, PrimitiveUnsigned) --

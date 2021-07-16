@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 
 #[test]
 fn test_saturating_add() {
@@ -14,4 +17,36 @@ fn test_saturating_add() {
     test::<i16>(123, -456, -333);
     test::<i8>(123, 45, 127);
     test::<i8>(-123, -45, -128);
+}
+
+fn saturating_add_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
+        let mut sum = x;
+        sum.saturating_add_assign(y);
+        assert_eq!(sum, x.saturating_add(y));
+        assert_eq!(y.saturating_add(x), sum);
+        assert!(sum >= x);
+        assert!(sum >= y);
+        if sum < T::MAX {
+            assert_eq!(sum, x + y);
+        }
+    });
+}
+
+fn saturating_add_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen::<T>().test_properties(|(x, y)| {
+        let mut sum = x;
+        sum.saturating_add_assign(y);
+        assert_eq!(sum, x.saturating_add(y));
+        assert_eq!(y.saturating_add(x), sum);
+        if sum > T::MIN && sum < T::MAX {
+            assert_eq!(sum, x + y);
+        }
+    });
+}
+
+#[test]
+fn saturating_add_properties() {
+    apply_fn_to_unsigneds!(saturating_add_properties_helper_unsigned);
+    apply_fn_to_signeds!(saturating_add_properties_helper_signed);
 }

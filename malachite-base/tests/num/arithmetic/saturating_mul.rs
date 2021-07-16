@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 
 #[test]
 fn test_saturating_mul() {
@@ -14,4 +17,36 @@ fn test_saturating_mul() {
     test::<i16>(123, -45, -5535);
     test::<i8>(123, 45, 127);
     test::<i8>(-123, 45, -128);
+}
+
+fn saturating_mul_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
+        let mut product = x;
+        product.saturating_mul_assign(y);
+        assert_eq!(product, x.saturating_mul(y));
+        assert_eq!(y.saturating_mul(x), product);
+        assert!(product == T::ZERO || product >= x);
+        assert!(product == T::ZERO || product >= y);
+        if product < T::MAX {
+            assert_eq!(product, x * y);
+        }
+    });
+}
+
+fn saturating_mul_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen::<T>().test_properties(|(x, y)| {
+        let mut product = x;
+        product.saturating_mul_assign(y);
+        assert_eq!(product, x.saturating_mul(y));
+        assert_eq!(y.saturating_mul(x), product);
+        if product > T::MIN && product < T::MAX {
+            assert_eq!(product, x * y);
+        }
+    });
+}
+
+#[test]
+fn saturating_mul_properties() {
+    apply_fn_to_unsigneds!(saturating_mul_properties_helper_unsigned);
+    apply_fn_to_signeds!(saturating_mul_properties_helper_signed);
 }

@@ -45,4 +45,4 @@ macro_rules! impl_divisible_by_power_of_2_signed {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_divisible_by_power_of_2_signed);
+apply_to_unsigned_signed_pairs!(impl_divisible_by_power_of_2_signed);

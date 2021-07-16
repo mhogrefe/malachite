@@ -64,4 +64,4 @@ macro_rules! impl_significant_bits_signed {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_significant_bits_signed);
+apply_to_unsigned_signed_pairs!(impl_significant_bits_signed);

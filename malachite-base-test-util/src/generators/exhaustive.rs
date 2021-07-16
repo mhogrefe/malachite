@@ -13,13 +13,14 @@ use malachite_base::chars::exhaustive::{exhaustive_ascii_chars, exhaustive_chars
 use malachite_base::comparison::traits::Min;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, PowerOf2, UnsignedAbs,
+    ArithmeticCheckedShl, CheckedNeg, DivRound, PowerOf2, UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom, SplitInHalf, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom,
+    SplitInHalf, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
     exhaustive_finite_primitive_floats, exhaustive_natural_signeds, exhaustive_negative_signeds,
@@ -388,6 +389,16 @@ pub fn exhaustive_primitive_int_pair_gen_var_3<T: PrimitiveInt, U: PrimitiveInt>
     Box::new(exhaustive_pairs_big_small(
         exhaustive_positive_primitive_ints(),
         primitive_int_increasing_inclusive_range(U::TWO, U::MAX),
+    ))
+}
+
+// -- (PrimitiveInt, PrimitiveUnsigned) --
+
+pub fn exhaustive_primitive_int_unsigned_pair_gen_var_1<T: PrimitiveInt, U: PrimitiveUnsigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_positive_primitive_ints(),
+        exhaustive_unsigneds(),
     ))
 }
 
@@ -774,6 +785,72 @@ pub fn exhaustive_signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigne
     ))
 }
 
+fn round_to_multiple_unsigned_helper<T: PrimitiveUnsigned>(x: T, y: T, rm: RoundingMode) -> bool {
+    if x == y {
+        true
+    } else if y == T::ZERO {
+        rm == RoundingMode::Down || rm == RoundingMode::Floor || rm == RoundingMode::Nearest
+    } else {
+        x.div_round(y, rm).checked_mul(y).is_some()
+    }
+}
+
+fn round_to_multiple_signed_helper<
+    U: PrimitiveUnsigned,
+    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+>(
+    x: S,
+    y: S,
+    rm: RoundingMode,
+) -> bool {
+    let x_abs = x.unsigned_abs();
+    let y_abs = y.unsigned_abs();
+    if x >= S::ZERO {
+        round_to_multiple_unsigned_helper(x_abs, y_abs, rm)
+            && S::convertible_from(x_abs.round_to_multiple(y_abs, rm))
+    } else if !round_to_multiple_unsigned_helper(x_abs, y_abs, -rm) {
+        false
+    } else {
+        let abs_result = x_abs.round_to_multiple(y_abs, -rm);
+        abs_result == S::MIN.unsigned_abs()
+            || S::checked_from(abs_result)
+                .and_then(CheckedNeg::checked_neg)
+                .is_some()
+    }
+}
+
+pub(crate) fn round_to_multiple_signed_filter_map<
+    U: PrimitiveUnsigned,
+    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+>(
+    x: S,
+    y: S,
+    rm: RoundingMode,
+) -> Option<(S, S, RoundingMode)> {
+    if rm != RoundingMode::Exact {
+        if round_to_multiple_signed_helper(x, y, rm) {
+            Some((x, y, rm))
+        } else {
+            None
+        }
+    } else {
+        x.checked_mul(y).map(|product| (product, y, rm))
+    }
+}
+
+pub fn exhaustive_signed_signed_rounding_mode_triple_gen_var_2<
+    U: PrimitiveUnsigned,
+    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+>() -> It<(S, S, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs(exhaustive_signeds(), exhaustive_nonzero_signeds()),
+            exhaustive_rounding_modes(),
+        )
+        .filter_map(|((x, y), rm)| round_to_multiple_signed_filter_map::<U, S>(x, y, rm)),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_signed_unsigned_pair_gen<T: PrimitiveSigned, U: PrimitiveUnsigned>() -> It<(T, U)>
@@ -951,6 +1028,14 @@ pub fn exhaustive_signed_unsigned_pair_gen_var_15<T: PrimitiveSigned>() -> It<(T
     )
 }
 
+pub fn exhaustive_signed_unsigned_pair_gen_var_16<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> It<(T, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_signed_range(T::MIN + T::ONE, T::ZERO),
+        exhaustive_unsigneds(),
+    ))
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_signed_unsigned_bool_triple_gen_var_1<T: PrimitiveSigned>() -> It<(T, u64, bool)>
@@ -1071,6 +1156,19 @@ pub fn exhaustive_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
                 }
             })
         }),
+    )
+}
+
+// -- (PrimitiveSigned, PrimitiveUnsigned, RoundingMode) --
+
+pub fn exhaustive_signed_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+) -> It<(T, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(exhaustive_signeds::<T>(), exhaustive_unsigneds::<u64>()),
+            exhaustive_rounding_modes(),
+        )
+        .filter_map(|((x, pow), rm)| round_to_multiple_of_power_of_2_filter_map(x, pow, rm)),
     )
 }
 
@@ -1587,6 +1685,10 @@ pub fn exhaustive_unsigned_pair_gen_var_21<T: PrimitiveUnsigned>() -> It<(T, u64
         exhaustive_pairs(exhaustive_unsigneds::<T>(), exhaustive_unsigneds())
             .filter(|&(x, y)| x.checked_pow(y).is_some()),
     )
+}
+
+pub fn exhaustive_unsigned_pair_gen_var_22<T: PrimitiveUnsigned>() -> It<(T, u64)> {
+    Box::new(exhaustive_unsigned_pair_gen_var_14().map(|(x, p)| (x, T::WIDTH - p)))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
@@ -2140,6 +2242,65 @@ pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveU
         )
         .filter(|&((x, y), rm)| rm != RoundingMode::Exact || x.divisible_by(y)),
     ))
+}
+
+pub(crate) fn round_to_multiple_unsigned_filter_map<T: PrimitiveUnsigned>(
+    x: T,
+    y: T,
+    rm: RoundingMode,
+) -> Option<(T, T, RoundingMode)> {
+    if x == y {
+        Some((x, y, rm))
+    } else if y == T::ZERO {
+        if rm == RoundingMode::Floor || rm == RoundingMode::Down || rm == RoundingMode::Nearest {
+            Some((x, y, rm))
+        } else {
+            None
+        }
+    } else if rm != RoundingMode::Exact {
+        x.div_round(y, rm).checked_mul(y).map(|_| (x, y, rm))
+    } else {
+        x.checked_mul(y).map(|product| (product, y, rm))
+    }
+}
+
+pub(crate) fn round_to_multiple_of_power_of_2_filter_map<T: PrimitiveInt>(
+    n: T,
+    u: u64,
+    rm: RoundingMode,
+) -> Option<(T, u64, RoundingMode)> {
+    if n == T::ZERO || rm != RoundingMode::Exact {
+        n.shr_round(u, rm)
+            .arithmetic_checked_shl(u)
+            .map(|_| (n, u, rm))
+    } else {
+        n.arithmetic_checked_shl(u).map(|shifted| (shifted, u, rm))
+    }
+}
+
+pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_3<T: PrimitiveUnsigned>(
+) -> It<(T, T, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs(
+                exhaustive_unsigneds::<T>(),
+                exhaustive_positive_primitive_ints::<T>(),
+            ),
+            exhaustive_rounding_modes(),
+        )
+        .filter_map(|((x, y), rm)| round_to_multiple_unsigned_filter_map(x, y, rm)),
+    )
+}
+
+pub fn exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_4<T: PrimitiveUnsigned>(
+) -> It<(T, u64, RoundingMode)> {
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(exhaustive_unsigneds::<T>(), exhaustive_unsigneds::<u64>()),
+            exhaustive_rounding_modes(),
+        )
+        .filter_map(|((x, pow), rm)| round_to_multiple_of_power_of_2_filter_map(x, pow, rm)),
+    )
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --

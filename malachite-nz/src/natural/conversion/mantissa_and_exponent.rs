@@ -213,6 +213,9 @@ impl Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `sci_exponent`.
     ///
+    /// # Panics
+    /// Panics if `sci_mantissa` is zero.
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;
@@ -262,6 +265,7 @@ impl Natural {
         sci_exponent: u64,
         rm: RoundingMode,
     ) -> Option<Natural> {
+        assert_ne!(sci_mantissa, T::ZERO);
         if sci_mantissa < T::ONE || sci_mantissa >= T::TWO {
             return None;
         }

@@ -16,26 +16,20 @@ macro_rules! impl_saturating_pow {
             /// Replaces `self` with `self ^ exp`, saturating at the numeric bounds instead of
             /// overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets \\begin{cases}
+            ///     x^y & m \leq x^y \leq M \\\\
+            ///     M & x^y > M \\\\
+            ///     m & x^y < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingPowAssign;
-            ///
-            /// let mut x = 3u8;
-            /// x.saturating_pow_assign(3);
-            /// assert_eq!(x, 27);
-            ///
-            /// let mut x = -10i32;
-            /// x.saturating_pow_assign(9);
-            /// assert_eq!(x, -1000000000);
-            ///
-            /// let mut x = -10i16;
-            /// x.saturating_pow_assign(9);
-            /// assert_eq!(x, -32768);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_pow` module.
             #[inline]
             fn saturating_pow_assign(&mut self, exp: u64) {
                 *self = SaturatingPow::saturating_pow(*self, exp);

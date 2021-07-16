@@ -17,10 +17,20 @@ macro_rules! test_signed_constants {
     };
 }
 
+macro_rules! test_float_constants {
+    ($t: ident) => {
+        assert_eq!($t::ZERO, 0.0);
+        assert_eq!($t::ONE, 1.0);
+        assert_eq!($t::TWO, 2.0);
+        assert_eq!($t::NEGATIVE_ONE, -1.0);
+    };
+}
+
 #[test]
 fn test_constants() {
     apply_to_unsigneds!(test_unsigned_constants);
     apply_to_signeds!(test_signed_constants);
+    apply_to_primitive_floats!(test_float_constants);
 }
 
 #[test]

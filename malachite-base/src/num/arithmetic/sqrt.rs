@@ -457,7 +457,7 @@ impl FloorSqrt for u128 {
     /// $M(n) = O(1)$
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
-    /// Constant-time addition, squaring, bit-shifting, and comparison is assumed.
+    /// Constant-time addition, squaring, bit-shifting, and comparison are assumed.
     ///
     /// # Examples
     /// See the documentation of the `num::arithmetic::sqrt` module.
@@ -656,25 +656,163 @@ impl SqrtRem for u128 {
     }
 }
 
-macro_rules! impl_sqrt_assign {
+macro_rules! impl_sqrt_signed {
+    ($u: ident, $s: ident) => {
+        impl FloorSqrt for $s {
+            type Output = $s;
+
+            /// Returns the floor of the square root of an integer.
+            ///
+            /// $f(x) = \lfloor\sqrt{x}\rfloor$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is negative.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
+            #[inline]
+            fn floor_sqrt(self) -> Self {
+                if self >= 0 {
+                    $s::wrapping_from(self.unsigned_abs().floor_sqrt())
+                } else {
+                    panic!("Cannot take square root of {}", self)
+                }
+            }
+        }
+
+        impl CeilingSqrt for $s {
+            type Output = $s;
+
+            /// Returns the ceiling of the square root of an integer.
+            ///
+            /// $f(x) = \lceil\sqrt{x}\rceil$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is negative.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
+            #[inline]
+            fn ceiling_sqrt(self) -> $s {
+                if self >= 0 {
+                    $s::wrapping_from(self.unsigned_abs().ceiling_sqrt())
+                } else {
+                    panic!("Cannot take square root of {}", self)
+                }
+            }
+        }
+
+        impl CheckedSqrt for $s {
+            type Output = $s;
+
+            /// Returns the the square root of an integer, or `None` if the integer is not a
+            /// perfect square.
+            ///
+            /// $$
+            /// f(x) = \\begin{cases}
+            ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
+            ///     \operatorname{None} & \textrm{otherwise},
+            /// \\end{cases}
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is negative.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
+            #[inline]
+            fn checked_sqrt(self) -> Option<$s> {
+                if self >= 0 {
+                    self.unsigned_abs().checked_sqrt().map($s::wrapping_from)
+                } else {
+                    panic!("Cannot take square root of {}", self)
+                }
+            }
+        }
+
+        impl SqrtRem for $s {
+            type SqrtOutput = $s;
+            type RemOutput = $u;
+
+            /// Returns the floor of the square root of an integer, and the remainder (the
+            /// difference between the integer and the square of the floor).
+            ///
+            /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is negative.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
+            #[inline]
+            fn sqrt_rem(self) -> ($s, $u) {
+                if self >= 0 {
+                    let (sqrt, rem) = self.unsigned_abs().sqrt_rem();
+                    ($s::wrapping_from(sqrt), rem)
+                } else {
+                    panic!("Cannot take square root of {}", self)
+                }
+            }
+        }
+
+        impl SqrtRemAssign for $s {
+            type RemOutput = $u;
+
+            /// Replaces an integer with the floor of its square root, and returns the remainder
+            /// (the difference between the original integer and the square of the floor).
+            ///
+            /// $f(x) = x - \lfloor\sqrt{x}\rfloor^2$,
+            ///
+            /// $x \gets \lfloor\sqrt{x}\rfloor$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is negative.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
+            #[inline]
+            fn sqrt_rem_assign(&mut self) -> $u {
+                let (sqrt, rem) = self.sqrt_rem();
+                *self = sqrt;
+                rem
+            }
+        }
+    };
+}
+apply_to_unsigned_signed_pairs!(impl_sqrt_signed);
+
+macro_rules! impl_sqrt_rem_assign_unsigned {
     ($t: ident) => {
-        impl FloorSqrtAssign for $t {
-            #[inline]
-            fn floor_sqrt_assign(&mut self) {
-                *self = self.floor_sqrt();
-            }
-        }
-
-        impl CeilingSqrtAssign for $t {
-            #[inline]
-            fn ceiling_sqrt_assign(&mut self) {
-                *self = self.ceiling_sqrt();
-            }
-        }
-
         impl SqrtRemAssign for $t {
             type RemOutput = $t;
 
+            /// Replaces an integer with the floor of its square root, and returns the remainder
+            /// (the difference between the original integer and the square of the floor).
+            ///
+            /// $f(x) = x - \lfloor\sqrt{x}\rfloor^2$,
+            ///
+            /// $x \gets \lfloor\sqrt{x}\rfloor$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
             #[inline]
             fn sqrt_rem_assign(&mut self) -> $t {
                 let (sqrt, rem) = self.sqrt_rem();
@@ -684,4 +822,47 @@ macro_rules! impl_sqrt_assign {
         }
     };
 }
-apply_to_unsigneds!(impl_sqrt_assign);
+apply_to_unsigneds!(impl_sqrt_rem_assign_unsigned);
+
+macro_rules! impl_sqrt_assign {
+    ($t: ident) => {
+        impl FloorSqrtAssign for $t {
+            /// Replaces an integer with the floor of its square root.
+            ///
+            /// $x \gets \lfloor\sqrt{x}\rfloor$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is negative.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
+            #[inline]
+            fn floor_sqrt_assign(&mut self) {
+                *self = self.floor_sqrt();
+            }
+        }
+
+        impl CeilingSqrtAssign for $t {
+            /// Replaces an integer with the ceiling of its square root.
+            ///
+            /// $x \gets \lceil\sqrt{x}\rceil$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is negative.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
+            #[inline]
+            fn ceiling_sqrt_assign(&mut self) {
+                *self = self.ceiling_sqrt();
+            }
+        }
+    };
+}
+apply_to_primitive_ints!(impl_sqrt_assign);

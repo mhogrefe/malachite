@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 
 #[test]
 fn test_saturating_square() {
@@ -26,4 +29,35 @@ fn test_saturating_square() {
 
     test::<u16>(1000, u16::MAX);
     test::<i16>(-1000, i16::MAX);
+}
+
+fn saturating_square_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen::<T>().test_properties(|x| {
+        let mut square = x;
+        square.saturating_square_assign();
+        assert_eq!(square, x.saturating_square());
+        assert_eq!(square, x.saturating_pow(2));
+        assert!(square >= x);
+        if square < T::MAX {
+            assert_eq!(square, x.square());
+        }
+    });
+}
+
+fn saturating_square_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|x| {
+        let mut square = x;
+        square.saturating_square_assign();
+        assert_eq!(square, x.saturating_square());
+        assert_eq!(square, x.saturating_pow(2));
+        if square > T::MIN && square < T::MAX {
+            assert_eq!(square, x.square());
+        }
+    });
+}
+
+#[test]
+fn saturating_square_properties() {
+    apply_fn_to_unsigneds!(saturating_square_properties_helper_unsigned);
+    apply_fn_to_signeds!(saturating_square_properties_helper_signed);
 }

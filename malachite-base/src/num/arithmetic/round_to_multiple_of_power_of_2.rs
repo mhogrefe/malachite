@@ -19,18 +19,44 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             type Output = $t;
 
             /// Rounds `self` to a multiple of a power of 2, according to a specified rounding mode.
+            ///
             /// The only rounding mode that is guaranteed to return without a panic is `Down`.
+            ///
+            /// Let $q = \frac{x}{2^p}$:
+            ///
+            /// $f(x, p, \mathrm{Down}) = 2^p \operatorname{sgn}(q) \lfloor |q| \rfloor.$
+            ///
+            /// $f(x, p, \mathrm{Up}) = 2^p \operatorname{sgn}(q) \lceil |q| \rceil.$
+            ///
+            /// $f(x, p, \mathrm{Floor}) = 2^p \lfloor q \rfloor.$
+            ///
+            /// $f(x, p, \mathrm{Ceiling}) = 2^p \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, p, \mathrm{Nearest}) = \begin{cases}
+            ///     2^p \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
+            ///     2^p \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+            ///     2^p \lfloor q \rfloor &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even} \\\\
+            ///     2^p \lceil q \rceil &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is odd.}
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, p, \mathrm{Exact}) = 2^p q$, but panics if $q \notin \Z$.
             ///
             /// The following two expressions are equivalent:
             ///
             /// `x.round_to_multiple_of_power_of_2(pow, RoundingMode::Exact)`
+            ///
             /// `{ assert!(x.divisible_by_power_of_2(pow)); x }`
             ///
             /// but the latter should be used as it is clearer and more efficient.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// - If `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -43,23 +69,8 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             /// - If `rm` is `Nearest`, but the nearest multiple is outside the representable range.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Floor), 8);
-            /// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling), 12);
-            /// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Down), 8);
-            /// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Up), 12);
-            /// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Nearest), 8);
-            /// assert_eq!(12u8.round_to_multiple_of_power_of_2(2, RoundingMode::Exact), 12);
-            /// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Floor), -12);
-            /// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling), -8);
-            /// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Down), -8);
-            /// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Up), -12);
-            /// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest), -8);
-            /// assert_eq!((-12i8).round_to_multiple_of_power_of_2(2, RoundingMode::Exact), -12);
-            /// ```
+            /// See the documentation of the `num::arithmetic::round_to_multiple_of_power_of_2`
+            /// module.
             #[inline]
             fn round_to_multiple_of_power_of_2(self, pow: u64, rm: RoundingMode) -> $t {
                 _round_to_multiple_of_power_of_2(self, pow, rm)
@@ -68,19 +79,22 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
 
         impl RoundToMultipleOfPowerOf2Assign<u64> for $t {
             /// Rounds `self` to a multiple of a power of 2 in place, according to a specified
-            /// rounding mode. The only rounding mode that is guaranteed to return without a panic
-            /// is `Down`.
+            /// rounding mode.
+            ///
+            /// The only rounding mode that is guaranteed to return without a panic is `Down`.
+            ///
+            /// See the `RoundToMultipleOfPowerOf2` documentation for details.
             ///
             /// The following two expressions are equivalent:
             ///
             /// `x.round_to_multiple_of_power_of_2_assign(pow, RoundingMode::Exact);`
+            ///
             /// `assert!(x.divisible_by_power_of_2(pow));`
             ///
             /// but the latter should be used as it is clearer and more efficient.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// - If `rm` is `Exact`, but `self` is not a multiple of the power of 2.
@@ -93,58 +107,8 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             /// - If `rm` is `Nearest`, but the nearest multiple is outside the representable range.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2Assign;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// let mut x = 10u8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Floor);
-            /// assert_eq!(x, 8);
-            ///
-            /// let mut x = 10u8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Ceiling);
-            /// assert_eq!(x, 12);
-            ///
-            /// let mut x = 10u8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Down);
-            /// assert_eq!(x, 8);
-            ///
-            /// let mut x = 10u8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Up);
-            /// assert_eq!(x, 12);
-            ///
-            /// let mut x = 10u8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Nearest);
-            /// assert_eq!(x, 8);
-            ///
-            /// let mut x = 12u8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Exact);
-            /// assert_eq!(x, 12);
-            ///
-            /// let mut x = -10i8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Floor);
-            /// assert_eq!(x, -12);
-            ///
-            /// let mut x = -10i8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Ceiling);
-            /// assert_eq!(x, -8);
-            ///
-            /// let mut x = -10i8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Down);
-            /// assert_eq!(x, -8);
-            ///
-            /// let mut x = -10i8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Up);
-            /// assert_eq!(x, -12);
-            ///
-            /// let mut x = -10i8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Nearest);
-            /// assert_eq!(x, -8);
-            ///
-            /// let mut x = -12i8;
-            /// x.round_to_multiple_of_power_of_2_assign(2, RoundingMode::Exact);
-            /// assert_eq!(x, -12);
-            /// ```
+            /// See the documentation of the `num::arithmetic::round_to_multiple_of_power_of_2`
+            /// module.
             #[inline]
             fn round_to_multiple_of_power_of_2_assign(&mut self, pow: u64, rm: RoundingMode) {
                 *self = self.round_to_multiple_of_power_of_2(pow, rm);

@@ -362,4 +362,4 @@ macro_rules! impl_to_string_base_signed {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_to_string_base_signed);
+apply_to_unsigned_signed_pairs!(impl_to_string_base_signed);

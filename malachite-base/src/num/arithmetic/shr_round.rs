@@ -134,6 +134,27 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`.
                     ///
+                    /// Let $q = \frac{x}{2^p}$:
+                    ///
+                    /// $f(x, p, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+                    ///
+                    /// $f(x, p, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+                    ///
+                    /// $$
+                    /// f(x, p, \mathrm{Nearest}) = \begin{cases}
+                    ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
+                    ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+                    ///     \lfloor q \rfloor &
+                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is even} \\\\
+                    ///     \lceil q \rceil &
+                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is odd.}
+                    /// \end{cases}
+                    /// $$
+                    ///
+                    /// $f(x, p, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
+                    ///
                     /// Time: worst case O(1)
                     ///
                     /// Additional memory: worst case O(1)
@@ -264,6 +285,27 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// `RoundingMode::Down` is equivalent to using `>>`. To test whether
                     /// `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`.
+                    ///
+                    /// Let $q = \frac{x}{2^p}$:
+                    ///
+                    /// $f(x, p, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = \lfloor q \rfloor.$
+                    ///
+                    /// $f(x, p, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = \lceil q \rceil.$
+                    ///
+                    /// $$
+                    /// f(x, p, \mathrm{Nearest}) = \begin{cases}
+                    ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
+                    ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+                    ///     \lfloor q \rfloor &
+                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is even} \\\\
+                    ///     \lceil q \rceil &
+                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is odd.}
+                    /// \end{cases}
+                    /// $$
+                    ///
+                    /// $f(x, p, \mathrm{Exact}) = q$, but panics if $q \notin \N$.
                     ///
                     /// Time: worst case O(1)
                     ///
@@ -452,6 +494,31 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// `RoundingMode::Exact` can be passed, use
                     /// `self.divisible_by_power_of_2(bits)`. Rounding might only be necessary if
                     /// `bits` is non-negative.
+                    ///
+                    /// Let $q = \frac{x}{2^p}$:
+                    ///
+                    /// $f(x, p, \mathrm{Down}) = \operatorname{sgn}(q) \lfloor |q| \rfloor.$
+                    ///
+                    /// $f(x, p, \mathrm{Up}) = \operatorname{sgn}(q) \lceil |q| \rceil.$
+                    ///
+                    /// $f(x, p, \mathrm{Floor}) = \lfloor q \rfloor.$
+                    ///
+                    /// $f(x, p, \mathrm{Ceiling}) = \lceil q \rceil.$
+                    ///
+                    /// $$
+                    /// f(x, p, \mathrm{Nearest}) = \begin{cases}
+                    ///     \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
+                    ///     \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+                    ///     \lfloor q \rfloor &
+                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is even} \\\\
+                    ///     \lceil q \rceil &
+                    ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+                    ///     \\ \text{is odd.}
+                    /// \end{cases}
+                    /// $$
+                    ///
+                    /// $f(x, p, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
                     ///
                     /// Time: worst case O(1)
                     ///

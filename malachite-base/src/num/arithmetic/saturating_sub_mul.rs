@@ -27,19 +27,22 @@ macro_rules! impl_saturating_sub_mul_unsigned {
         impl SaturatingSubMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self - y * z`, saturating at the numeric bounds instead of overflowing.
+            /// Computes $x - yz$, saturating at the numeric bounds instead of overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x, y, z) = \\begin{cases}
+            ///     x - yz & m \leq x - yz \leq M \\\\
+            ///     M & x - yz > M \\\\
+            ///     m & x - yz < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
-            ///
-            /// assert_eq!(60u8.saturating_sub_mul(5, 10), 10);
-            /// assert_eq!(2u8.saturating_sub_mul(10, 5), 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
             #[inline]
             fn saturating_sub_mul(self, y: $t, z: $t) -> $t {
                 _saturating_sub_mul_unsigned(self, y, z)
@@ -47,25 +50,23 @@ macro_rules! impl_saturating_sub_mul_unsigned {
         }
 
         impl SaturatingSubMulAssign<$t> for $t {
-            /// Replaces `self` with `self - y * z`, saturating at the numeric bounds instead of
+            /// Replaces $x$ with $x - yz$, saturating at the numeric bounds instead of
             /// overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets \\begin{cases}
+            ///     x - yz & m \leq x - yz \leq M \\\\
+            ///     M & x - yz > M \\\\
+            ///     m & x - yz < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
-            ///
-            /// let mut x = 60u8;
-            /// x.saturating_sub_mul_assign(5, 10);
-            /// assert_eq!(x, 10);
-            ///
-            /// let mut x = 2u8;
-            /// x.saturating_sub_mul_assign(10, 5);
-            /// assert_eq!(x, 0);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
             #[inline]
             fn saturating_sub_mul_assign(&mut self, y: $t, z: $t) {
                 self.saturating_sub_assign(y.saturating_mul(z));
@@ -125,19 +126,22 @@ macro_rules! impl_saturating_sub_mul_signed {
         impl SaturatingSubMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self - y * z`, saturating at the numeric bounds instead of overflowing.
+            /// Computes $x - yz$, saturating at the numeric bounds instead of overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// f(x, y, z) = \\begin{cases}
+            ///     x - yz & m \leq x - yz \leq M \\\\
+            ///     M & x - yz > M \\\\
+            ///     m & x - yz < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingSubMul;
-            ///
-            /// assert_eq!(127i8.saturating_sub_mul(2, 100), -73);
-            /// assert_eq!((-127i8).saturating_sub_mul(2, 100), -128);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
             #[inline]
             fn saturating_sub_mul(self, y: $t, z: $t) -> $t {
                 _saturating_sub_mul_signed(self, y, z)
@@ -145,25 +149,23 @@ macro_rules! impl_saturating_sub_mul_signed {
         }
 
         impl SaturatingSubMulAssign<$t> for $t {
-            /// Replaces `self` with `self - y * z`, saturating at the numeric bounds instead of
+            /// Replaces $x$ with $x - yz$, saturating at the numeric bounds instead of
             /// overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets \\begin{cases}
+            ///     x - yz & m \leq x - yz \leq M \\\\
+            ///     M & x - yz > M \\\\
+            ///     m & x - yz < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingSubMulAssign;
-            ///
-            /// let mut x = 127i8;
-            /// x.saturating_sub_mul_assign(2, 100);
-            /// assert_eq!(x, -73);
-            ///
-            /// let mut x = -127i8;
-            /// x.saturating_sub_mul_assign(2, 100);
-            /// assert_eq!(x, -128);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
             #[inline]
             fn saturating_sub_mul_assign(&mut self, y: $t, z: $t) {
                 *self = self.saturating_sub_mul(y, z);

@@ -233,7 +233,7 @@ macro_rules! impl_has_random_signed_range {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_has_random_signed_range);
+apply_to_unsigned_signed_pairs!(impl_has_random_signed_range);
 
 /// Uniformly generates random signed integers in the half-open interval $[a, b)$.
 ///
@@ -309,7 +309,7 @@ macro_rules! impl_random_signed_chunkable {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_random_signed_chunkable);
+apply_to_unsigned_signed_pairs!(impl_random_signed_chunkable);
 
 /// Uniformly generates signed integers of up to `chunk_size` bits.
 ///

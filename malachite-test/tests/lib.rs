@@ -14,17 +14,6 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod round_to_multiple;
-            pub mod round_to_multiple_of_power_of_2;
-            pub mod saturating_abs;
-            pub mod saturating_add;
-            pub mod saturating_add_mul;
-            pub mod saturating_mul;
-            pub mod saturating_neg;
-            pub mod saturating_pow;
-            pub mod saturating_square;
-            pub mod saturating_sub;
-            pub mod saturating_sub_mul;
             pub mod shl_round;
             pub mod shr_round;
             pub mod sign;

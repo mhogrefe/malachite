@@ -82,20 +82,42 @@ macro_rules! impl_round_to_multiple_unsigned {
         impl RoundToMultiple<$t> for $t {
             type Output = $t;
 
-            /// Rounds `self` to a multiple of `other`, according to a specified rounding mode. The
-            /// only rounding modes that are guaranteed to return without a panic are `Down` and
-            /// `Floor`.
+            /// Rounds `self` to a multiple of `other`, according to a specified rounding mode.
+            ///
+            /// The only rounding modes that are guaranteed to return without a panic are `Down`
+            /// and `Floor`.
+            ///
+            /// Let $q = \frac{x}{y}$:
+            ///
+            /// $f(x, y, \mathrm{Down}) = f(x, y, \mathrm{Floor}) = y \lfloor q \rfloor.$
+            ///
+            /// $f(x, y, \mathrm{Up}) = f(x, y, \mathrm{Ceiling}) = y \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+            ///     y \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
+            ///     y \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+            ///     y \lfloor q \rfloor &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even} \\\\
+            ///     y \lceil q \rceil y &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is odd.}
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, y, \mathrm{Exact}) = x$, but panics if $q \notin \N$.
             ///
             /// The following two expressions are equivalent:
             ///
             /// `x.round_to_multiple(other, RoundingMode::Exact)`
+            ///
             /// `{ assert!(x.divisible_by(other)); x }`
             ///
             /// but the latter should be used as it is clearer and more efficient.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -103,20 +125,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// assert_eq!(5u32.round_to_multiple(0, RoundingMode::Down), 0);
-            ///
-            /// assert_eq!(10u8.round_to_multiple(4, RoundingMode::Down), 8);
-            /// assert_eq!(10u16.round_to_multiple(4, RoundingMode::Up), 12);
-            /// assert_eq!(10u32.round_to_multiple(5, RoundingMode::Exact), 10);
-            /// assert_eq!(10u64.round_to_multiple(3, RoundingMode::Nearest), 9);
-            /// assert_eq!(20u128.round_to_multiple(3, RoundingMode::Nearest), 21);
-            /// assert_eq!(10usize.round_to_multiple(4, RoundingMode::Nearest), 8);
-            /// assert_eq!(14u8.round_to_multiple(4, RoundingMode::Nearest), 16);
-            /// ```
+            /// See the documentation of the `num::arithmetic::round_to_multiple` module.
             #[inline]
             fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
                 _round_to_multiple_unsigned(self, other, rm)
@@ -125,19 +134,23 @@ macro_rules! impl_round_to_multiple_unsigned {
 
         impl RoundToMultipleAssign<$t> for $t {
             /// Rounds `self` to a multiple of `other` in place, according to a specified rounding
-            /// mode. The only rounding modes that are guaranteed to return without a panic are
-            /// `Down` and `Floor`.
+            /// mode.
+            ///
+            /// The only rounding modes that are guaranteed to return without a panic are `Down`
+            /// and `Floor`.
+            ///
+            /// See the `RoundToMultiple` documentation for details.
             ///
             /// The following two expressions are equivalent:
             ///
             /// `x.round_to_multiple_assign(other, RoundingMode::Exact);`
+            ///
             /// `assert!(x.divisible_by(other));`
             ///
             /// but the latter should be used as it is clearer and more efficient.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -145,42 +158,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// let mut x = 5u32;
-            /// x.round_to_multiple_assign(0, RoundingMode::Down);
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = 10u8;
-            /// x.round_to_multiple_assign(4, RoundingMode::Down);
-            /// assert_eq!(x, 8);
-            ///
-            /// let mut x = 10u16;
-            /// x.round_to_multiple_assign(4, RoundingMode::Up);
-            /// assert_eq!(x, 12);
-            ///
-            /// let mut x = 10u32;
-            /// x.round_to_multiple_assign(5, RoundingMode::Exact);
-            /// assert_eq!(x, 10);
-            ///
-            /// let mut x = 10u64;
-            /// x.round_to_multiple_assign(3, RoundingMode::Nearest);
-            /// assert_eq!(x, 9);
-            ///
-            /// let mut x = 20u128;
-            /// x.round_to_multiple_assign(3, RoundingMode::Nearest);
-            /// assert_eq!(x, 21);
-            ///
-            /// let mut x = 10usize;
-            /// x.round_to_multiple_assign(4, RoundingMode::Nearest);
-            /// assert_eq!(x, 8);
-            ///
-            /// let mut x = 14u8;
-            /// x.round_to_multiple_assign(4, RoundingMode::Nearest);
-            /// assert_eq!(x, 16);
-            /// ```
+            /// See the documentation of the `num::arithmetic::round_to_multiple` module.
             #[inline]
             fn round_to_multiple_assign(&mut self, other: $t, rm: RoundingMode) {
                 *self = self.round_to_multiple(other, rm);
@@ -217,19 +195,45 @@ macro_rules! impl_round_to_multiple_signed {
         impl RoundToMultiple<$t> for $t {
             type Output = $t;
 
-            /// Rounds `self` to a multiple of `other`, according to a specified rounding mode. The
-            /// only rounding mode that is guaranteed to return without a panic is `Down`.
+            /// Rounds `self` to a multiple of `other`, according to a specified rounding mode.
+            ///
+            /// The only rounding mode that is guaranteed to return without a panic is `Down`.
+            ///
+            /// Let $q = \frac{x}{|y|}$:
+            ///
+            /// $f(x, y, \mathrm{Down}) =  \operatorname{sgn}(q) |y| \lfloor |q| \rfloor.$
+            ///
+            /// $f(x, y, \mathrm{Up}) = \operatorname{sgn}(q) |y| \lceil |q| \rceil.$
+            ///
+            /// $f(x, y, \mathrm{Floor}) = |y| \lfloor q \rfloor.$
+            ///
+            /// $f(x, y, \mathrm{Ceiling}) = |y| \lceil q \rceil.$
+            ///
+            /// $$
+            /// f(x, y, \mathrm{Nearest}) = \begin{cases}
+            ///     |y| \lfloor q \rfloor & q - \lfloor q \rfloor < \frac{1}{2} \\\\
+            ///     |y| \lceil q \rceil & q - \lfloor q \rfloor > \frac{1}{2} \\\\
+            ///     |y| \lfloor q \rfloor &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is even} \\\\
+            ///     |y| \lceil q \rceil &
+            ///     q - \lfloor q \rfloor = \frac{1}{2} \\ \text{and} \\ \lfloor q \rfloor
+            ///     \\ \text{is odd.}
+            /// \end{cases}
+            /// $$
+            ///
+            /// $f(x, y, \mathrm{Exact}) = q$, but panics if $q \notin \Z$.
             ///
             /// The following two expressions are equivalent:
             ///
             /// `x.round_to_multiple(other, RoundingMode::Exact)`
+            ///
             /// `{ assert!(x.divisible_by(other)); x }`
             ///
             /// but the latter should be used as it is clearer and more efficient.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -237,28 +241,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RoundToMultiple;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// assert_eq!((-5i32).round_to_multiple(0, RoundingMode::Down), 0);
-            ///
-            /// assert_eq!((-10i8).round_to_multiple(4, RoundingMode::Down), -8);
-            /// assert_eq!((-10i16).round_to_multiple(4, RoundingMode::Up), -12);
-            /// assert_eq!((-10i32).round_to_multiple(5, RoundingMode::Exact), -10);
-            /// assert_eq!((-10i64).round_to_multiple(3, RoundingMode::Nearest), -9);
-            /// assert_eq!((-20i128).round_to_multiple(3, RoundingMode::Nearest), -21);
-            /// assert_eq!((-10isize).round_to_multiple(4, RoundingMode::Nearest), -8);
-            /// assert_eq!((-14i8).round_to_multiple(4, RoundingMode::Nearest), -16);
-            ///
-            /// assert_eq!((-10i16).round_to_multiple(-4, RoundingMode::Down), -8);
-            /// assert_eq!((-10i32).round_to_multiple(-4, RoundingMode::Up), -12);
-            /// assert_eq!((-10i64).round_to_multiple(-5, RoundingMode::Exact), -10);
-            /// assert_eq!((-10i128).round_to_multiple(-3, RoundingMode::Nearest), -9);
-            /// assert_eq!((-20isize).round_to_multiple(-3, RoundingMode::Nearest), -21);
-            /// assert_eq!((-10i8).round_to_multiple(-4, RoundingMode::Nearest), -8);
-            /// assert_eq!((-14i16).round_to_multiple(-4, RoundingMode::Nearest), -16);
-            /// ```
+            /// See the documentation of the `num::arithmetic::round_to_multiple` module.
             #[inline]
             fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
                 _round_to_multiple_signed(self, other, rm)
@@ -267,18 +250,22 @@ macro_rules! impl_round_to_multiple_signed {
 
         impl RoundToMultipleAssign<$t> for $t {
             /// Rounds `self` to a multiple of `other` in place, according to a specified rounding
-            /// mode. The only rounding mode that is guaranteed to return without a panic is `Down`.
+            /// mode.
+            ///
+            /// The only rounding mode that is guaranteed to return without a panic is `Down`.
+            ///
+            /// See the `RoundToMultiple` documentation for details.
             ///
             /// The following two expressions are equivalent:
             ///
             /// `x.round_to_multiple_assign(other, RoundingMode::Exact);`
+            ///
             /// `assert!(x.divisible_by(other));`
             ///
             /// but the latter should be used as it is clearer and more efficient.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Panics
             /// - If `rm` is `Exact`, but `self` is not a multiple of `other`.
@@ -286,70 +273,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// - If `self` is nonzero, `other` is zero, and `rm` is trying to round away from zero.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::RoundToMultipleAssign;
-            /// use malachite_base::rounding_modes::RoundingMode;
-            ///
-            /// let mut x = -5i32;
-            /// x.round_to_multiple_assign(0, RoundingMode::Down);
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = -10i8;
-            /// x.round_to_multiple_assign(4, RoundingMode::Down);
-            /// assert_eq!(x, -8);
-            ///
-            /// let mut x = -10i16;
-            /// x.round_to_multiple_assign(4, RoundingMode::Up);
-            /// assert_eq!(x, -12);
-            ///
-            /// let mut x = -10i32;
-            /// x.round_to_multiple_assign(5, RoundingMode::Exact);
-            /// assert_eq!(x, -10);
-            ///
-            /// let mut x = -10i64;
-            /// x.round_to_multiple_assign(3, RoundingMode::Nearest);
-            /// assert_eq!(x, -9);
-            ///
-            /// let mut x = -20i128;
-            /// x.round_to_multiple_assign(3, RoundingMode::Nearest);
-            /// assert_eq!(x, -21);
-            ///
-            /// let mut x = -10isize;
-            /// x.round_to_multiple_assign(4, RoundingMode::Nearest);
-            /// assert_eq!(x, -8);
-            ///
-            /// let mut x = -14i8;
-            /// x.round_to_multiple_assign(4, RoundingMode::Nearest);
-            /// assert_eq!(x, -16);
-            ///
-            /// let mut x = -10i16;
-            /// x.round_to_multiple_assign(-4, RoundingMode::Down);
-            /// assert_eq!(x, -8);
-            ///
-            /// let mut x = -10i32;
-            /// x.round_to_multiple_assign(-4, RoundingMode::Up);
-            /// assert_eq!(x, -12);
-            ///
-            /// let mut x = -10i64;
-            /// x.round_to_multiple_assign(-5, RoundingMode::Exact);
-            /// assert_eq!(x, -10);
-            ///
-            /// let mut x = -10i128;
-            /// x.round_to_multiple_assign(-3, RoundingMode::Nearest);
-            /// assert_eq!(x, -9);
-            ///
-            /// let mut x = -20isize;
-            /// x.round_to_multiple_assign(-3, RoundingMode::Nearest);
-            /// assert_eq!(x, -21);
-            ///
-            /// let mut x = -10i8;
-            /// x.round_to_multiple_assign(-4, RoundingMode::Nearest);
-            /// assert_eq!(x, -8);
-            ///
-            /// let mut x = -14i16;
-            /// x.round_to_multiple_assign(-4, RoundingMode::Nearest);
-            /// assert_eq!(x, -16);
-            /// ```
+            /// See the documentation of the `num::arithmetic::round_to_multiple` module.
             #[inline]
             fn round_to_multiple_assign(&mut self, other: $t, rm: RoundingMode) {
                 *self = self.round_to_multiple(other, rm);

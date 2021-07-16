@@ -18,6 +18,8 @@ use malachite_nz_test_util::generators::{natural_gen_var_2, natural_rounding_mod
 
 pub(crate) fn register(runner: &mut Runner) {
     register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent);
+    register_primitive_float_demos!(runner, demo_sci_mantissa);
+    register_primitive_float_demos!(runner, demo_sci_exponent);
     register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_with_rounding);
     register_primitive_float_demos!(runner, demo_from_sci_mantissa_and_exponent);
     register_primitive_float_demos!(runner, demo_from_sci_mantissa_and_exponent_targeted);
@@ -46,6 +48,24 @@ where
             n,
             (NiceFloat(mantissa), exponent)
         );
+    }
+}
+
+fn demo_sci_mantissa<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+where
+    for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
+{
+    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+        println!("sci_mantissa({}) = {}", n, NiceFloat(n.sci_mantissa()));
+    }
+}
+
+fn demo_sci_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+where
+    for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
+{
+    for n in natural_gen_var_2().get(gm, &config).take(limit) {
+        println!("sci_exponent({}) = {}", n, n.sci_exponent());
     }
 }
 

@@ -11436,45 +11436,42 @@ fn limbs_div_exact_to_out_ref_ref_fail_4() {
 
 #[test]
 fn test_div_exact() {
-    let test = |u, v, quotient| {
-        let mut x = Natural::from_str(u).unwrap();
-        x.div_exact_assign(Natural::from_str(v).unwrap());
+    let test = |s, t, quotient| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x.div_exact_assign(v.clone());
         assert!(x.is_valid());
         assert_eq!(x.to_string(), quotient);
 
-        let mut x = Natural::from_str(u).unwrap();
-        x.div_exact_assign(&Natural::from_str(v).unwrap());
+        let mut x = u.clone();
+        x.div_exact_assign(&v);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), quotient);
 
-        let q = Natural::from_str(u)
-            .unwrap()
-            .div_exact(Natural::from_str(v).unwrap());
+        let q = u.clone().div_exact(v.clone());
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = Natural::from_str(u)
-            .unwrap()
-            .div_exact(&Natural::from_str(v).unwrap());
+        let q = u.clone().div_exact(&v);
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = (&Natural::from_str(u).unwrap()).div_exact(Natural::from_str(v).unwrap());
+        let q = (&u).div_exact(v.clone());
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = (&Natural::from_str(u).unwrap()).div_exact(&Natural::from_str(v).unwrap());
+        let q = (&u).div_exact(&v);
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = Natural::from_str(u)
-            .unwrap()
-            .div_round(Natural::from_str(v).unwrap(), RoundingMode::Exact);
+        let q = u.div_round(v, RoundingMode::Exact);
         assert_eq!(q.to_string(), quotient);
 
-        let q = rug::Integer::from_str(u)
+        let q = rug::Integer::from_str(s)
             .unwrap()
-            .div_exact(&rug::Integer::from_str(v).unwrap());
+            .div_exact(&rug::Integer::from_str(t).unwrap());
         assert_eq!(q.to_string(), quotient);
     };
     test("0", "123", "0");

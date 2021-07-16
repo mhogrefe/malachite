@@ -360,4 +360,4 @@ macro_rules! impl_bit_iterable_signed {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_bit_iterable_signed);
+apply_to_unsigned_signed_pairs!(impl_bit_iterable_signed);

@@ -1,7 +1,3 @@
-use comparison::traits::{Max, Min};
-use named::Named;
-use num::arithmetic::traits::NegAssign;
-use num::basic::traits::{NegativeOne, One, Two, Zero};
 use num::conversion::traits::{ExactInto, WrappingFrom};
 use num::float::PrimitiveFloat;
 use std::num::FpCategory;
@@ -78,23 +74,6 @@ macro_rules! float_traits {
                 $t::ceil(self)
             }
         }
-
-        impl_named!($t);
-
-        impl Min for $t {
-            const MIN: $t = $t::NEGATIVE_INFINITY;
-        }
-
-        impl Max for $t {
-            const MAX: $t = $t::POSITIVE_INFINITY;
-        }
-
-        impl NegAssign for $t {
-            #[inline]
-            fn neg_assign(&mut self) {
-                *self = -*self;
-            }
-        }
     };
 }
 float_traits!(f32, 32, 1.0e-45, 1.1754942e-38, 1.1754944e-38);
@@ -105,42 +84,3 @@ float_traits!(
     2.225073858507201e-308,
     2.2250738585072014e-308
 );
-
-/// Implements the constants 0, 1, 2, and -1 for primitive floating-point types.
-macro_rules! impl01float {
-    ($t:ty) => {
-        /// The constant 0.0 for primitive floating-point types.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        impl Zero for $t {
-            const ZERO: $t = 0.0;
-        }
-
-        /// The constant 1.0 for primitive floating-point types.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        impl One for $t {
-            const ONE: $t = 1.0;
-        }
-
-        /// The constant 2.0 for primitive floating-point types.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        impl Two for $t {
-            const TWO: $t = 2.0;
-        }
-
-        /// The constant -1.0 for primitive floating-point types.
-        ///
-        /// # Worst-case complexity
-        /// Constant time and additional memory.
-        impl NegativeOne for $t {
-            const NEGATIVE_ONE: $t = -1.0;
-        }
-    };
-}
-impl01float!(f32);
-impl01float!(f64);

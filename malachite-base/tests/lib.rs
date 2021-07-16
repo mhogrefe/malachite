@@ -26,6 +26,7 @@
     clippy::bool_assert_comparison, // Often clearer than using !
     clippy::cognitive_complexity,
     clippy::excessive_precision,
+    clippy::float_cmp,
     clippy::too_many_arguments,
     clippy::upper_case_acronyms,
     unstable_name_collisions

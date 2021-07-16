@@ -183,10 +183,11 @@ impl Integer {
     }
 
     //TODO doc and test
-    pub fn unsigned_abs_mut<F: Fn(&mut Natural)>(&mut self, f: F) {
-        f(&mut self.abs);
+    pub fn unsigned_abs_mut<F: Fn(&mut Natural) -> T, T>(&mut self, f: F) -> T{
+        let out = f(&mut self.abs);
         if !self.sign && self.abs == 0 {
             self.sign = true;
         }
+        out
     }
 }

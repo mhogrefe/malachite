@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 
 #[test]
 fn test_saturating_sub() {
@@ -14,4 +17,33 @@ fn test_saturating_sub() {
     test::<i16>(123, -456, 579);
     test::<i8>(123, -45, 127);
     test::<i8>(-123, 45, -128);
+}
+
+fn saturating_sub_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
+        let mut diff = x;
+        diff.saturating_sub_assign(y);
+        assert_eq!(diff, x.saturating_sub(y));
+        assert!(diff <= x);
+        if diff > T::ZERO {
+            assert_eq!(diff, x - y);
+        }
+    });
+}
+
+fn saturating_sub_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_pair_gen::<T>().test_properties(|(x, y)| {
+        let mut diff = x;
+        diff.saturating_sub_assign(y);
+        assert_eq!(diff, x.saturating_sub(y));
+        if diff > T::MIN && diff < T::MAX {
+            assert_eq!(diff, x - y);
+        }
+    });
+}
+
+#[test]
+fn saturating_sub_properties() {
+    apply_fn_to_unsigneds!(saturating_sub_properties_helper_unsigned);
+    apply_fn_to_signeds!(saturating_sub_properties_helper_signed);
 }

@@ -1,16 +1,5 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod round_to_multiple;
-pub mod round_to_multiple_of_power_of_2;
-pub mod saturating_abs;
-pub mod saturating_add;
-pub mod saturating_add_mul;
-pub mod saturating_mul;
-pub mod saturating_neg;
-pub mod saturating_pow;
-pub mod saturating_square;
-pub mod saturating_sub;
-pub mod saturating_sub_mul;
 pub mod shl_round;
 pub mod shr_round;
 pub mod sign;
@@ -33,17 +22,6 @@ pub mod xxx_sub_yyy_is_zzz;
 pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    round_to_multiple::register(registry);
-    round_to_multiple_of_power_of_2::register(registry);
-    saturating_abs::register(registry);
-    saturating_add::register(registry);
-    saturating_add_mul::register(registry);
-    saturating_mul::register(registry);
-    saturating_neg::register(registry);
-    saturating_pow::register(registry);
-    saturating_square::register(registry);
-    saturating_sub::register(registry);
-    saturating_sub_mul::register(registry);
     shl_round::register(registry);
     shr_round::register(registry);
     sign::register(registry);

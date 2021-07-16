@@ -1,10 +1,11 @@
 use comparison::traits::{Max, Min};
 use named::Named;
 use num::arithmetic::traits::{
-    AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CheckedAdd, CheckedAddMul,
-    CheckedDiv, CheckedMul, CheckedNeg, CheckedPow, CheckedSquare, CheckedSub, CheckedSubMul,
-    DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign,
-    DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Mod, ModAssign, ModPowerOf2,
+    AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CeilingSqrt,
+    CeilingSqrtAssign, CheckedAdd, CheckedAddMul, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow,
+    CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignRem, DivExact,
+    DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOf2,
+    EqMod, EqModPowerOf2, FloorSqrt, FloorSqrtAssign, Mod, ModAssign, ModPowerOf2,
     ModPowerOf2Assign, OverflowingAdd, OverflowingAddAssign, OverflowingAddMul,
     OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
     OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
@@ -15,11 +16,11 @@ use num::arithmetic::traits::{
     SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
     SaturatingPowAssign, SaturatingSquare, SaturatingSquareAssign, SaturatingSub,
     SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound, ShlRoundAssign,
-    ShrRound, ShrRoundAssign, Sign, Square, SquareAssign, SubMul, SubMulAssign, WrappingAdd,
-    WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign, WrappingDiv, WrappingDivAssign,
-    WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign,
-    WrappingSquare, WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul,
-    WrappingSubMulAssign,
+    ShrRound, ShrRoundAssign, Sign, SqrtRem, SqrtRemAssign, Square, SquareAssign, SubMul,
+    SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign,
+    WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
+    WrappingPow, WrappingPowAssign, WrappingSquare, WrappingSquareAssign, WrappingSub,
+    WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
 use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
@@ -85,6 +86,8 @@ pub trait PrimitiveInt:
     + BitScan
     + BitXor<Self, Output = Self>
     + BitXorAssign<Self>
+    + CeilingSqrt<Output = Self>
+    + CeilingSqrtAssign
     + CheckedAdd<Self, Output = Self>
     + CheckedAddMul<Self, Self, Output = Self>
     + CheckedDiv<Self, Output = Self>
@@ -115,6 +118,7 @@ pub trait PrimitiveInt:
     + CheckedMul<Self, Output = Self>
     + CheckedNeg<Output = Self>
     + CheckedPow<u64, Output = Self>
+    + CheckedSqrt<Output = Self>
     + CheckedSquare<Output = Self>
     + CheckedSub<Self, Output = Self>
     + CheckedSubMul<Self, Self, Output = Self>
@@ -165,6 +169,8 @@ pub trait PrimitiveInt:
     + ExactInto<i64>
     + ExactInto<i128>
     + ExactInto<isize>
+    + FloorSqrt<Output = Self>
+    + FloorSqrtAssign
     + FromStr
     + FromStringBase
     + Hash
@@ -369,6 +375,8 @@ pub trait PrimitiveInt:
     + Sign
     + SignificantBits
     + Sized
+    + SqrtRem<SqrtOutput = Self>
+    + SqrtRemAssign
     + Square<Output = Self>
     + SquareAssign
     + Sub<Self, Output = Self>
@@ -471,7 +479,7 @@ pub trait PrimitiveInt:
 }
 
 /// This macro defines basic trait implementations that are the same for unsigned and signed types.
-macro_rules! impl_basic_traits {
+macro_rules! impl_basic_traits_primitive_int {
     ($t:ident, $width:expr) => {
         /// # Examples
         /// See the documentation of the `num::integers` module.
@@ -530,15 +538,15 @@ macro_rules! impl_basic_traits {
         }
     };
 }
-impl_basic_traits!(u8, 8);
-impl_basic_traits!(u16, 16);
-impl_basic_traits!(u32, 32);
-impl_basic_traits!(u64, 64);
-impl_basic_traits!(u128, 128);
-impl_basic_traits!(usize, 0usize.trailing_zeros() as u64);
-impl_basic_traits!(i8, 8);
-impl_basic_traits!(i16, 16);
-impl_basic_traits!(i32, 32);
-impl_basic_traits!(i64, 64);
-impl_basic_traits!(i128, 128);
-impl_basic_traits!(isize, 0usize.trailing_zeros() as u64);
+impl_basic_traits_primitive_int!(u8, 8);
+impl_basic_traits_primitive_int!(u16, 16);
+impl_basic_traits_primitive_int!(u32, 32);
+impl_basic_traits_primitive_int!(u64, 64);
+impl_basic_traits_primitive_int!(u128, 128);
+impl_basic_traits_primitive_int!(usize, 0usize.trailing_zeros() as u64);
+impl_basic_traits_primitive_int!(i8, 8);
+impl_basic_traits_primitive_int!(i16, 16);
+impl_basic_traits_primitive_int!(i32, 32);
+impl_basic_traits_primitive_int!(i64, 64);
+impl_basic_traits_primitive_int!(i128, 128);
+impl_basic_traits_primitive_int!(isize, 0usize.trailing_zeros() as u64);

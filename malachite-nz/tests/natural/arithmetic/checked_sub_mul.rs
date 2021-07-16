@@ -5,38 +5,28 @@ use std::str::FromStr;
 
 #[test]
 fn test_checked_sub_mul() {
-    let test = |u, v, w, out| {
-        let on = Natural::from_str(u)
-            .unwrap()
-            .checked_sub_mul(Natural::from_str(v).unwrap(), Natural::from_str(w).unwrap());
+    let test = |r, s, t, out| {
+        let u = Natural::from_str(r).unwrap();
+        let v = Natural::from_str(s).unwrap();
+        let w = Natural::from_str(t).unwrap();
+
+        let on = u.clone().checked_sub_mul(v.clone(), w.clone());
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Natural::from_str(u).unwrap().checked_sub_mul(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let on = u.clone().checked_sub_mul(v.clone(), &w);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Natural::from_str(u).unwrap().checked_sub_mul(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(w).unwrap(),
-        );
+        let on = u.clone().checked_sub_mul(&v, w.clone());
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = Natural::from_str(u).unwrap().checked_sub_mul(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let on = u.clone().checked_sub_mul(&v, &w);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
 
-        let on = (&Natural::from_str(u).unwrap()).checked_sub_mul(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(w).unwrap(),
-        );
+        let on = (&u).checked_sub_mul(&v, &w);
         assert_eq!(on.to_debug_string(), out);
         assert!(on.map_or(true, |n| n.is_valid()));
     };

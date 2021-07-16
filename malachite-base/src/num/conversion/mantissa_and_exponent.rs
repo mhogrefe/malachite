@@ -1,11 +1,13 @@
-use num::arithmetic::traits::{DivisibleByPowerOf2, ModPowerOf2};
+use num::arithmetic::traits::{ArithmeticCheckedShl, DivisibleByPowerOf2, ModPowerOf2, ShrRound};
 use num::basic::integers::PrimitiveInt;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{
     ExactFrom, ExactInto, IntegerMantissaAndExponent, RawMantissaAndExponent,
     SciMantissaAndExponent, WrappingFrom,
 };
 use num::float::PrimitiveFloat;
 use num::logic::traits::{BitAccess, LeadingZeros, LowMask, SignificantBits, TrailingZeros};
+use rounding_modes::RoundingMode;
 
 fn _raw_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, u64) {
     let bits = x.to_bits();
@@ -38,7 +40,7 @@ fn _from_raw_mantissa_and_exponent<T: PrimitiveFloat>(raw_mantissa: u64, raw_exp
     }
 }
 
-fn _integer_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, i64) {
+fn _integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (u64, i64) {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (mut raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -58,7 +60,7 @@ fn _integer_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, i64) {
     }
 }
 
-fn _integer_mantissa<T: PrimitiveFloat>(x: T) -> u64 {
+fn _integer_mantissa_primitive_float<T: PrimitiveFloat>(x: T) -> u64 {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (mut raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -68,7 +70,7 @@ fn _integer_mantissa<T: PrimitiveFloat>(x: T) -> u64 {
     raw_mantissa >> raw_mantissa.trailing_zeros()
 }
 
-fn _integer_exponent<T: PrimitiveFloat>(x: T) -> i64 {
+fn _integer_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> i64 {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -87,7 +89,7 @@ fn _integer_exponent<T: PrimitiveFloat>(x: T) -> i64 {
     }
 }
 
-fn _from_integer_mantissa_and_exponent<T: PrimitiveFloat>(
+fn _from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     integer_mantissa: u64,
     integer_exponent: i64,
 ) -> Option<T> {
@@ -125,7 +127,7 @@ fn _from_integer_mantissa_and_exponent<T: PrimitiveFloat>(
     ))
 }
 
-fn _sci_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (T, i64) {
+fn _sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (T, i64) {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -147,7 +149,7 @@ fn _sci_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (T, i64) {
     }
 }
 
-fn _sci_mantissa<T: PrimitiveFloat>(x: T) -> T {
+fn _sci_mantissa_primitive_float<T: PrimitiveFloat>(x: T) -> T {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (mut mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -159,7 +161,7 @@ fn _sci_mantissa<T: PrimitiveFloat>(x: T) -> T {
     T::from_raw_mantissa_and_exponent(mantissa, u64::wrapping_from(T::MAX_EXPONENT))
 }
 
-fn _sci_exponent<T: PrimitiveFloat>(x: T) -> i64 {
+fn _sci_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> i64 {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -173,7 +175,7 @@ fn _sci_exponent<T: PrimitiveFloat>(x: T) -> i64 {
 }
 
 #[allow(clippy::wrong_self_convention)]
-fn _from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
+fn _from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     sci_mantissa: T,
     sci_exponent: i64,
 ) -> Option<T> {
@@ -203,7 +205,353 @@ fn _from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     }
 }
 
-macro_rules! impl_mantissa_and_exponent {
+/// Returns the scientific mantissa and exponent.
+///
+/// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is
+/// a rational number with $1 \leq m_s < 2$. We represent the rational mantissa as a float. The
+/// conversion might not be exact, so we round to the nearest float using the provided rounding
+/// mode. If the rounding mode is `Exact` but the conversion is not exact, `None` is returned.
+/// $$
+/// f(x, r) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
+/// $$
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+/// use malachite_base::num::conversion::mantissa_and_exponent::*;
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+/// use malachite_base::num::float::NiceFloat;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::rounding_modes::RoundingMode;
+///
+/// fn test<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+///     n: T,
+///     rm: RoundingMode,
+///     out: Option<(U, u64)>
+/// ) {
+///     assert_eq!(
+///         sci_mantissa_and_exponent_with_rounding(n, rm).map(|(m, e)| (NiceFloat(m), e)),
+///         out.map(|(m, e)| (NiceFloat(m), e))
+///     );
+/// }
+/// test::<u32, f32>(3, RoundingMode::Down, Some((1.5, 1)));
+/// test::<u32, f32>(3, RoundingMode::Ceiling, Some((1.5, 1)));
+/// test::<u32, f32>(3, RoundingMode::Up, Some((1.5, 1)));
+/// test::<u32, f32>(3, RoundingMode::Nearest, Some((1.5, 1)));
+/// test::<u32, f32>(3, RoundingMode::Exact, Some((1.5, 1)));
+///
+/// test::<u32, f32>(123, RoundingMode::Floor, Some((1.921875, 6)));
+/// test::<u32, f32>(123, RoundingMode::Down, Some((1.921875, 6)));
+/// test::<u32, f32>(123, RoundingMode::Ceiling, Some((1.921875, 6)));
+/// test::<u32, f32>(123, RoundingMode::Up, Some((1.921875, 6)));
+/// test::<u32, f32>(123, RoundingMode::Nearest, Some((1.921875, 6)));
+/// test::<u32, f32>(123, RoundingMode::Exact, Some((1.921875, 6)));
+///
+/// test::<u32, f32>(1000000000, RoundingMode::Nearest, Some((1.8626451, 29)));
+/// ```
+pub fn sci_mantissa_and_exponent_with_rounding<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+    x: T,
+    rm: RoundingMode,
+) -> Option<(U, u64)> {
+    assert_ne!(x, T::ZERO);
+    let significant_bits = x.significant_bits();
+    let mut exponent = significant_bits - 1;
+    let mut raw_mantissa: u64 = if significant_bits > U::MANTISSA_WIDTH {
+        let shift = significant_bits - U::MANTISSA_WIDTH - 1;
+        if rm == RoundingMode::Exact && TrailingZeros::trailing_zeros(x) < shift {
+            return None;
+        }
+        x.shr_round(shift, rm).wrapping_into()
+    } else {
+        let x: u64 = x.wrapping_into();
+        x << (U::MANTISSA_WIDTH - significant_bits + 1)
+    };
+    if raw_mantissa.significant_bits() == U::MANTISSA_WIDTH + 2 {
+        // Rounding up to a power of 2
+        raw_mantissa >>= 1;
+        exponent += 1;
+    }
+    raw_mantissa.clear_bit(U::MANTISSA_WIDTH);
+    // Note that Self::MAX_EXPONENT is also the raw exponent of 1.0.
+    Some((
+        U::from_raw_mantissa_and_exponent(raw_mantissa, u64::wrapping_from(U::MAX_EXPONENT)),
+        exponent,
+    ))
+}
+
+/// Constructs a primitive integer from its scientific mantissa and exponent.
+///
+/// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an integer and $m_s$ is a
+/// rational number with $1 \leq m_s < 2$. Here, the rational mantissa is provided as a float. If
+/// the mantissa is outside the range $[1, 2)$, `None` is returned.
+///
+/// Some combinations of mantissas and exponents do not specify an integer, in which case the
+/// resulting value is rounded to an integer using the specified rounding mode. If the rounding
+/// mode is `Exact` but the input does not exactly specify an integer, `None` is returned.
+///
+/// $$
+/// f(x, r) \approx 2^{e_s}m_s.
+/// $$
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
+///
+/// # Panics
+/// Panics if `sci_mantissa` is zero.
+///
+/// # Examples
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+/// use malachite_base::num::conversion::mantissa_and_exponent::*;
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::rounding_modes::RoundingMode;
+/// use std::str::FromStr;
+///
+/// fn test<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+///     mantissa: U,
+///     exponent: u64,
+///     rm: RoundingMode,
+///     out: Option<T>
+/// ) {
+///     assert_eq!(
+///         from_sci_mantissa_and_exponent_with_rounding::<T, U>(mantissa, exponent, rm),
+///         out
+///     );
+/// };
+/// test::<u32, f32>(1.5, 1, RoundingMode::Floor, Some(3));
+/// test::<u32, f32>(1.5, 1, RoundingMode::Down, Some(3));
+/// test::<u32, f32>(1.5, 1, RoundingMode::Ceiling, Some(3));
+/// test::<u32, f32>(1.5, 1, RoundingMode::Up, Some(3));
+/// test::<u32, f32>(1.5, 1, RoundingMode::Nearest, Some(3));
+/// test::<u32, f32>(1.5, 1, RoundingMode::Exact, Some(3));
+///
+/// test::<u32, f32>(1.51, 1, RoundingMode::Floor, Some(3));
+/// test::<u32, f32>(1.51, 1, RoundingMode::Down, Some(3));
+/// test::<u32, f32>(1.51, 1, RoundingMode::Ceiling, Some(4));
+/// test::<u32, f32>(1.51, 1, RoundingMode::Up, Some(4));
+/// test::<u32, f32>(1.51, 1, RoundingMode::Nearest, Some(3));
+/// test::<u32, f32>(1.51, 1, RoundingMode::Exact, None);
+///
+/// test::<u32, f32>(2.0, 1, RoundingMode::Floor, None);
+/// test::<u32, f32>(10.0, 1, RoundingMode::Floor, None);
+/// test::<u32, f32>(0.5, 1, RoundingMode::Floor, None);
+/// ```
+pub fn from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+    sci_mantissa: U,
+    sci_exponent: u64,
+    rm: RoundingMode,
+) -> Option<T> {
+    assert_ne!(sci_mantissa, U::ZERO);
+    if sci_mantissa < U::ONE || sci_mantissa >= U::TWO {
+        return None;
+    }
+    let mut raw_mantissa = sci_mantissa.raw_mantissa();
+    raw_mantissa.set_bit(U::MANTISSA_WIDTH);
+    if sci_exponent >= U::MANTISSA_WIDTH {
+        T::checked_from(raw_mantissa)?.arithmetic_checked_shl(sci_exponent - U::MANTISSA_WIDTH)
+    } else {
+        let shift = U::MANTISSA_WIDTH - sci_exponent;
+        if rm == RoundingMode::Exact && TrailingZeros::trailing_zeros(raw_mantissa) < shift {
+            return None;
+        }
+        T::checked_from(raw_mantissa.shr_round(shift, rm))
+    }
+}
+
+macro_rules! impl_mantissa_and_exponent_unsigned {
+    ($t:ident) => {
+        impl IntegerMantissaAndExponent<$t, u64> for $t {
+            /// Returns the integer mantissa and exponent.
+            ///
+            /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+            /// $m_i$ is an odd integer.
+            /// $$
+            /// f(x) = (\frac{|x|}{2^{e_i}}, e_i),
+            /// $$
+            /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
+            ///
+            /// The inverse operation is `from_integer_mantissa_and_exponent`.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is zero.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            #[inline]
+            fn integer_mantissa_and_exponent(self) -> ($t, u64) {
+                assert_ne!(self, 0);
+                let exponent = TrailingZeros::trailing_zeros(self);
+                (self >> exponent, exponent)
+            }
+
+            /// Returns the integer mantissa.
+            ///
+            /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+            /// $m_i$ is an odd integer.
+            /// $$
+            /// f(x) = \frac{|x|}{2^{e_i}},
+            /// $$
+            /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is zero.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            #[inline]
+            fn integer_mantissa(self) -> $t {
+                assert_ne!(self, 0);
+                self >> self.trailing_zeros()
+            }
+
+            /// Returns the integer exponent.
+            ///
+            /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+            /// $m_i$ is an odd integer.
+            /// $$
+            /// f(x) = e_i,
+            /// $$
+            /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Panics
+            /// Panics if `self` is zero.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            #[inline]
+            fn integer_exponent(self) -> u64 {
+                assert_ne!(self, 0);
+                TrailingZeros::trailing_zeros(self)
+            }
+
+            /// Constructs a primitive unsigned integer from its integer mantissa and exponent.
+            ///
+            /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+            /// $m_i$ is an odd integer.
+            ///
+            /// $$
+            /// f(x) = 2^{e_i}m_i,
+            /// $$
+            /// or `None` if the result cannot be exactly represented as an integer of the desired
+            /// type (this happens if the exponent is too large).
+            ///
+            /// The input does not have to be reduced; that is, the mantissa does not have to be
+            /// odd.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
+            #[inline]
+            fn from_integer_mantissa_and_exponent(
+                integer_mantissa: $t,
+                integer_exponent: u64,
+            ) -> Option<$t> {
+                integer_mantissa.arithmetic_checked_shl(integer_exponent)
+            }
+        }
+    };
+}
+apply_to_unsigneds!(impl_mantissa_and_exponent_unsigned);
+
+macro_rules! impl_sci_mantissa_and_exponent_unsigned {
+    ($u:ident) => {
+        macro_rules! impl_sci_mantissa_and_exponent_unsigned_inner {
+            ($f:ident) => {
+                impl SciMantissaAndExponent<$f, u64> for $u {
+                    /// Returns the scientific mantissa and exponent.
+                    ///
+                    /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an
+                    /// integer and $m_s$ is a rational number with $1 \leq m_s < 2$. We represent
+                    /// the rational mantissa as a float. The conversion might not be exact, so we
+                    /// round to the nearest float using the `Nearest` rounding mode. To use other
+                    /// rounding modes, use `sci_mantissa_and_exponent`.
+                    ///
+                    /// If the result cannot be expressed as an integer of the specified type,
+                    /// `None` is returned.
+                    /// $$
+                    /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}},
+                    /// \lfloor \log_2 x \rfloor).
+                    /// $$
+                    ///
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
+                    ///
+                    /// # Panics
+                    /// Panics if `self` is zero.
+                    ///
+                    /// # Examples
+                    /// See the documentation of the `num::conversion::mantissa_and_exponent`
+                    /// module.
+                    #[inline]
+                    fn sci_mantissa_and_exponent(self) -> ($f, u64) {
+                        sci_mantissa_and_exponent_with_rounding(self, RoundingMode::Nearest)
+                            .unwrap()
+                    }
+
+                    /// Constructs a primitive integer from its scientific mantissa and exponent.
+                    ///
+                    /// When $x$ is positive, we can write $x = 2^{e_s}m_s$, where $e_s$ is an
+                    /// integer and $m_s$ is a rational number with $1 \leq m_s < 2$. Here, the
+                    /// rational mantissa is provided as a float. If the mantissa is outside the
+                    /// range $[1, 2)$, `None` is returned.
+                    ///
+                    /// Some combinations of mantissas and exponents do not specify an integer, in
+                    /// which case the resulting value is rounded to an integer using the `Nearest`
+                    /// rounding mode. To specify other rounding modes, use
+                    /// `from_sci_mantissa_and_exponent_with_rounding`.
+                    ///
+                    /// $$
+                    /// f(x) \approx 2^{e_s}m_s.
+                    /// $$
+                    ///
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
+                    ///
+                    /// # Panics
+                    /// Panics if `sci_mantissa` is zero.
+                    ///
+                    /// # Examples
+                    /// See the documentation of the `num::conversion::mantissa_and_exponent`
+                    /// module.
+                    #[inline]
+                    fn from_sci_mantissa_and_exponent(
+                        sci_mantissa: $f,
+                        sci_exponent: u64,
+                    ) -> Option<$u> {
+                        from_sci_mantissa_and_exponent_with_rounding(
+                            sci_mantissa,
+                            sci_exponent,
+                            RoundingMode::Nearest,
+                        )
+                    }
+                }
+            };
+        }
+        apply_to_primitive_floats!(impl_sci_mantissa_and_exponent_unsigned_inner);
+    };
+}
+apply_to_unsigneds!(impl_sci_mantissa_and_exponent_unsigned);
+
+macro_rules! impl_mantissa_and_exponent_primitive_float {
     ($t:ident) => {
         impl RawMantissaAndExponent<u64, u64> for $t {
             /// Returns the raw mantissa and exponent.
@@ -350,7 +698,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn integer_mantissa_and_exponent(self) -> (u64, i64) {
-                _integer_mantissa_and_exponent(self)
+                _integer_mantissa_and_exponent_primitive_float(self)
             }
 
             /// Returns the integer mantissa.
@@ -372,7 +720,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn integer_mantissa(self) -> u64 {
-                _integer_mantissa(self)
+                _integer_mantissa_primitive_float(self)
             }
 
             /// Returns the integer exponent.
@@ -394,7 +742,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn integer_exponent(self) -> i64 {
-                _integer_exponent(self)
+                _integer_exponent_primitive_float(self)
             }
 
             /// Constructs a float from its integer mantissa and exponent.
@@ -422,7 +770,10 @@ macro_rules! impl_mantissa_and_exponent {
                 integer_mantissa: u64,
                 integer_exponent: i64,
             ) -> Option<$t> {
-                _from_integer_mantissa_and_exponent(integer_mantissa, integer_exponent)
+                _from_integer_mantissa_and_exponent_primitive_float(
+                    integer_mantissa,
+                    integer_exponent,
+                )
             }
         }
 
@@ -449,7 +800,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, i64) {
-                _sci_mantissa_and_exponent(self)
+                _sci_mantissa_and_exponent_primitive_float(self)
             }
 
             /// Returns the scientific mantissa.
@@ -472,7 +823,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn sci_mantissa(self) -> $t {
-                _sci_mantissa(self)
+                _sci_mantissa_primitive_float(self)
             }
 
             /// Returns the scientific exponent.
@@ -493,7 +844,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn sci_exponent(self) -> i64 {
-                _sci_exponent(self)
+                _sci_exponent_primitive_float(self)
             }
 
             /// Constructs a float from its scientific mantissa and exponent.
@@ -519,9 +870,9 @@ macro_rules! impl_mantissa_and_exponent {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn from_sci_mantissa_and_exponent(sci_mantissa: $t, sci_exponent: i64) -> Option<$t> {
-                _from_sci_mantissa_and_exponent(sci_mantissa, sci_exponent)
+                _from_sci_mantissa_and_exponent_primitive_float(sci_mantissa, sci_exponent)
             }
         }
     };
 }
-apply_to_primitive_floats!(impl_mantissa_and_exponent);
+apply_to_primitive_floats!(impl_mantissa_and_exponent_primitive_float);

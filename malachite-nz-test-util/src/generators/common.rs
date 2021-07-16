@@ -10,6 +10,10 @@ pub fn natural_nrm(xs: It<Natural>) -> It<(BigUint, rug::Integer, Natural)> {
     Box::new(xs.map(|x| (natural_to_biguint(&x), natural_to_rug_integer(&x), x)))
 }
 
+pub fn natural_rm(xs: It<Natural>) -> It<(rug::Integer, Natural)> {
+    Box::new(xs.map(|x| (natural_to_rug_integer(&x), x)))
+}
+
 #[allow(clippy::type_complexity)]
 pub fn natural_pair_nrm(
     ps: It<(Natural, Natural)>,
@@ -49,6 +53,10 @@ pub fn natural_pair_1_nrm<T: 'static + Clone>(
             (x, y),
         )
     }))
+}
+
+pub fn integer_rm(xs: It<Integer>) -> It<(rug::Integer, Integer)> {
+    Box::new(xs.map(|x| (integer_to_rug_integer(&x), x)))
 }
 
 pub fn integer_nrm(xs: It<Integer>) -> It<(BigInt, rug::Integer, Integer)> {

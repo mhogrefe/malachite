@@ -4,7 +4,9 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::float::NiceFloat;
+use malachite_base_test_util::generators::unsigned_pair_gen_var_24;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::{
     natural_gen_var_1, natural_gen_var_2, natural_pair_gen_var_3,
 };
@@ -251,6 +253,13 @@ fn floor_log_base_properties() {
     natural_gen_var_1().test_properties(|base| {
         assert_eq!(Natural::ONE.floor_log_base(&base), 0);
     });
+
+    unsigned_pair_gen_var_24::<Limb, Limb>().test_properties(|(n, base)| {
+        assert_eq!(
+            n.floor_log_base(base),
+            Natural::from(n).floor_log_base(&Natural::from(base))
+        );
+    });
 }
 
 #[test]
@@ -282,6 +291,13 @@ fn ceiling_log_base_properties() {
     natural_gen_var_1().test_properties(|base| {
         assert_eq!(Natural::ONE.ceiling_log_base(&base), 0);
     });
+
+    unsigned_pair_gen_var_24::<Limb, Limb>().test_properties(|(n, base)| {
+        assert_eq!(
+            n.ceiling_log_base(base),
+            Natural::from(n).ceiling_log_base(&Natural::from(base))
+        );
+    });
 }
 
 #[test]
@@ -304,5 +320,12 @@ fn checked_log_base_properties() {
 
     natural_gen_var_1().test_properties(|base| {
         assert_eq!(Natural::ONE.checked_log_base(&base), Some(0));
+    });
+
+    unsigned_pair_gen_var_24::<Limb, Limb>().test_properties(|(n, base)| {
+        assert_eq!(
+            n.checked_log_base(base),
+            Natural::from(n).checked_log_base(&Natural::from(base))
+        );
     });
 }

@@ -1,7 +1,15 @@
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom};
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    signed_pair_gen, signed_pair_gen_var_5, signed_rounding_mode_pair_gen,
+    signed_signed_rounding_mode_triple_gen_var_2, unsigned_pair_gen_var_13,
+    unsigned_pair_gen_var_27, unsigned_rounding_mode_pair_gen,
+    unsigned_unsigned_rounding_mode_triple_gen_var_2,
+};
 use std::panic::catch_unwind;
 
 #[test]
@@ -1080,4 +1088,179 @@ fn round_to_multiple_signed_fail_helper<T: PrimitiveSigned>() {
 fn round_to_multiple_fail() {
     apply_fn_to_primitive_ints!(round_to_multiple_fail_helper);
     apply_fn_to_signeds!(round_to_multiple_signed_fail_helper);
+}
+
+fn round_to_multiple_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_unsigned_rounding_mode_triple_gen_var_2::<T>().test_properties(|(x, y, rm)| {
+        let rounded = x.round_to_multiple(y, rm);
+
+        let mut mut_x = x;
+        mut_x.round_to_multiple_assign(y, rm);
+        assert_eq!(mut_x, rounded);
+
+        assert!(rounded.divisible_by(y));
+        match rm {
+            RoundingMode::Floor | RoundingMode::Down => assert!(rounded <= x),
+            RoundingMode::Ceiling | RoundingMode::Up => assert!(rounded >= x),
+            RoundingMode::Exact => assert_eq!(rounded, x),
+            RoundingMode::Nearest => {
+                if y == T::ZERO {
+                    assert_eq!(rounded, T::ZERO);
+                } else {
+                    let mut closest = None;
+                    let mut second_closest = None;
+                    if rounded <= x {
+                        if let Some(above) = rounded.checked_add(y) {
+                            closest = Some(x - rounded);
+                            second_closest = Some(above - x);
+                        }
+                    } else if let Some(below) = rounded.checked_sub(y) {
+                        closest = Some(rounded - x);
+                        second_closest = Some(x - below);
+                    }
+                    if let (Some(closest), Some(second_closest)) = (closest, second_closest) {
+                        assert!(closest <= second_closest);
+                        if closest == second_closest {
+                            assert!(rounded.div_exact(y).even());
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
+        if let Some(product) = x.checked_mul(y) {
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Down), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Up), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Floor), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Ceiling), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Nearest), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Exact), product);
+        }
+    });
+
+    unsigned_pair_gen_var_13::<T>().test_properties(|(x, y)| {
+        let down = x.round_to_multiple(y, RoundingMode::Down);
+        if let Some(up) = down.checked_add(y) {
+            assert_eq!(x.round_to_multiple(y, RoundingMode::Up), up);
+            assert_eq!(x.round_to_multiple(y, RoundingMode::Floor), down);
+            assert_eq!(x.round_to_multiple(y, RoundingMode::Ceiling), up);
+            let nearest = x.round_to_multiple(y, RoundingMode::Nearest);
+            assert!(nearest == down || nearest == up);
+        }
+    });
+
+    unsigned_rounding_mode_pair_gen::<T>().test_properties(|(n, rm)| {
+        if rm == RoundingMode::Floor || rm == RoundingMode::Down || rm == RoundingMode::Nearest {
+            assert_eq!(n.round_to_multiple(T::ZERO, rm), T::ZERO);
+        }
+        assert_eq!(T::ZERO.round_to_multiple(n, rm), T::ZERO);
+        assert_eq!(n.round_to_multiple(T::ONE, rm), n);
+        assert_eq!(n.round_to_multiple(n, rm), n);
+    });
+}
+
+fn round_to_multiple_properties_helper_signed<
+    U: PrimitiveUnsigned,
+    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+>() {
+    signed_signed_rounding_mode_triple_gen_var_2::<U, S>().test_properties(|(x, y, rm)| {
+        let rounded = x.round_to_multiple(y, rm);
+
+        let mut mut_x = x;
+        mut_x.round_to_multiple_assign(y, rm);
+        assert_eq!(mut_x, rounded);
+
+        assert!(rounded.divisible_by(y));
+        match rm {
+            RoundingMode::Floor => assert!(rounded <= x),
+            RoundingMode::Ceiling => assert!(rounded >= x),
+            RoundingMode::Down => assert!(rounded.le_abs(&x)),
+            RoundingMode::Up => assert!(rounded.ge_abs(&x)),
+            RoundingMode::Exact => assert_eq!(rounded, x),
+            RoundingMode::Nearest => {
+                if y == S::ZERO {
+                    assert_eq!(rounded, S::ZERO);
+                } else {
+                    let mut closest = None;
+                    let mut second_closest = None;
+                    let (o_above, o_below) = if y >= S::ZERO {
+                        (rounded.checked_add(y), rounded.checked_sub(y))
+                    } else {
+                        (rounded.checked_sub(y), rounded.checked_add(y))
+                    };
+                    if rounded <= x {
+                        if let Some(above) = o_above {
+                            closest = x.checked_sub(rounded);
+                            second_closest = above.checked_sub(x);
+                        }
+                    } else if let Some(below) = o_below {
+                        closest = rounded.checked_sub(x);
+                        second_closest = x.checked_sub(below);
+                    }
+                    if let (Some(closest), Some(second_closest)) = (closest, second_closest) {
+                        assert!(closest <= second_closest);
+                        if closest == second_closest {
+                            assert!(rounded.div_exact(y).even());
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    signed_pair_gen::<S>().test_properties(|(x, y)| {
+        if let Some(product) = x.checked_mul(y) {
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Down), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Up), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Floor), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Ceiling), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Nearest), product);
+            assert_eq!(product.round_to_multiple(y, RoundingMode::Exact), product);
+        }
+    });
+
+    signed_pair_gen_var_5::<S>().test_properties(|(x, y)| {
+        let down = x.round_to_multiple(y, RoundingMode::Down);
+        if let Some(up) = if (x >= S::ZERO) == (y >= S::ZERO) {
+            down.checked_add(y)
+        } else {
+            down.checked_sub(y)
+        } {
+            assert_eq!(x.round_to_multiple(y, RoundingMode::Up), up);
+            if x >= S::ZERO {
+                assert_eq!(x.round_to_multiple(y, RoundingMode::Floor), down);
+                assert_eq!(x.round_to_multiple(y, RoundingMode::Ceiling), up);
+            } else {
+                assert_eq!(x.round_to_multiple(y, RoundingMode::Floor), up);
+                assert_eq!(x.round_to_multiple(y, RoundingMode::Ceiling), down);
+            }
+            let nearest = x.round_to_multiple(y, RoundingMode::Nearest);
+            assert!(nearest == down || nearest == up);
+        }
+    });
+
+    signed_rounding_mode_pair_gen::<S>().test_properties(|(n, rm)| {
+        if rm == RoundingMode::Down
+            || rm == RoundingMode::Nearest
+            || rm
+                == if n >= S::ZERO {
+                    RoundingMode::Floor
+                } else {
+                    RoundingMode::Ceiling
+                }
+        {
+            assert_eq!(n.round_to_multiple(S::ZERO, rm), S::ZERO);
+        }
+        assert_eq!(S::ZERO.round_to_multiple(n, rm), S::ZERO);
+        assert_eq!(n.round_to_multiple(S::ONE, rm), n);
+        assert_eq!(n.round_to_multiple(n, rm), n);
+    });
+}
+
+#[test]
+fn round_to_multiple_properties() {
+    apply_fn_to_unsigneds!(round_to_multiple_properties_helper_unsigned);
+    apply_fn_to_unsigned_signed_pairs!(round_to_multiple_properties_helper_signed);
 }

@@ -379,4 +379,4 @@ macro_rules! impl_mod_power_of_2_signed {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_mod_power_of_2_signed);
+apply_to_unsigned_signed_pairs!(impl_mod_power_of_2_signed);

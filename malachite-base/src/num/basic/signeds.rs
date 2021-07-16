@@ -59,4 +59,4 @@ macro_rules! impl_basic_traits {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_basic_traits);
+apply_to_unsigned_signed_pairs!(impl_basic_traits);

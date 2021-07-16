@@ -64,6 +64,13 @@ pub fn pair_1_natural_bit_bucketer<T>(var_name: &str) -> Bucketer<(Natural, T)> 
     }
 }
 
+pub fn pair_2_natural_bit_bucketer<T>(var_name: &str) -> Bucketer<(T, Natural)> {
+    Bucketer {
+        bucketing_function: &|(_, x)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
 pub fn triple_1_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(Natural, T, U)> {
     Bucketer {
         bucketing_function: &|(x, _, _)| usize::exact_from(x.significant_bits()),
@@ -97,6 +104,13 @@ pub fn integer_bit_bucketer(var_name: &str) -> Bucketer<Integer> {
 pub fn pair_1_integer_bit_bucketer<T>(var_name: &str) -> Bucketer<(Integer, T)> {
     Bucketer {
         bucketing_function: &|(x, _)| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
+pub fn pair_2_integer_bit_bucketer<T>(var_name: &str) -> Bucketer<(T, Integer)> {
+    Bucketer {
+        bucketing_function: &|(_, x)| usize::exact_from(x.significant_bits()),
         bucketing_label: format!("{}.significant_bits()", var_name),
     }
 }

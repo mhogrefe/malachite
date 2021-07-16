@@ -31,6 +31,9 @@ fn pow_assign_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let mut power = x;
         power.pow_assign(y);
         assert_eq!(power, x.pow(y));
+        if x > T::ONE {
+            assert_eq!(power.checked_log_base(x), Some(y));
+        }
     });
 }
 

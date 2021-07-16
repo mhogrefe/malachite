@@ -15,30 +15,19 @@ macro_rules! impl_saturating_neg {
             /// Replaces `self` with its negative, saturating at the numeric bounds instead of
             /// overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets \\begin{cases}
+            ///     -x & x^2 > -2^{W-1} \\\\
+            ///     2^{W-1} - 1 & x = -2^{W-1},
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingNegAssign;
-            ///
-            /// let mut x = 0i8;
-            /// x.saturating_neg_assign();
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = 100i64;
-            /// x.saturating_neg_assign();
-            /// assert_eq!(x, -100);
-            ///
-            /// let mut x = -100i64;
-            /// x.saturating_neg_assign();
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -128i8;
-            /// x.saturating_neg_assign();
-            /// assert_eq!(x, 127);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_neg` module.
             #[inline]
             fn saturating_neg_assign(&mut self) {
                 *self = self.saturating_neg();

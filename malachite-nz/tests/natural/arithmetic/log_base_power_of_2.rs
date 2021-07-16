@@ -8,7 +8,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
-    unsigned_gen_var_11, unsigned_vec_unsigned_pair_gen_var_13,
+    unsigned_gen_var_11, unsigned_pair_gen_var_21, unsigned_vec_unsigned_pair_gen_var_13,
 };
 use malachite_nz::natural::arithmetic::log_base_power_of_2::{
     _ceiling_log_base_power_of_2_naive, limbs_ceiling_log_base_power_of_2,
@@ -334,6 +334,13 @@ fn floor_log_base_power_of_2_properties() {
     unsigned_gen_var_11().test_properties(|pow| {
         assert_eq!(Natural::ONE.floor_log_base_power_of_2(pow), 0);
     });
+
+    unsigned_pair_gen_var_21::<Limb, u64>().test_properties(|(n, pow)| {
+        assert_eq!(
+            n.floor_log_base_power_of_2(pow),
+            Natural::from(n).floor_log_base_power_of_2(pow)
+        );
+    });
 }
 
 #[test]
@@ -365,6 +372,13 @@ fn ceiling_log_base_power_of_2_properties() {
     unsigned_gen_var_11().test_properties(|pow| {
         assert_eq!(Natural::ONE.ceiling_log_base_power_of_2(pow), 0);
     });
+
+    unsigned_pair_gen_var_21::<Limb, u64>().test_properties(|(n, pow)| {
+        assert_eq!(
+            n.ceiling_log_base_power_of_2(pow),
+            Natural::from(n).ceiling_log_base_power_of_2(pow)
+        );
+    });
 }
 
 #[test]
@@ -390,5 +404,12 @@ fn checked_log_base_power_of_2_properties() {
 
     unsigned_gen_var_11().test_properties(|pow| {
         assert_eq!(Natural::ONE.checked_log_base_power_of_2(pow), Some(0));
+    });
+
+    unsigned_pair_gen_var_21::<Limb, u64>().test_properties(|(n, pow)| {
+        assert_eq!(
+            n.checked_log_base_power_of_2(pow),
+            Natural::from(n).checked_log_base_power_of_2(pow)
+        );
     });
 }

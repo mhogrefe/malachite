@@ -1,4 +1,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_pair_gen, signed_triple_gen, unsigned_pair_gen_var_27, unsigned_triple_gen,
+};
 
 #[test]
 fn test_saturating_add_mul() {
@@ -23,4 +28,51 @@ fn test_saturating_add_mul() {
     test::<i8>(127, 1, 100, 127);
     test::<i8>(-127, -1, 100, -128);
     test::<i8>(-127, -10, 100, -128);
+}
+
+fn saturating_add_mul_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_triple_gen::<T>().test_properties(|(x, y, z)| {
+        let result = x.saturating_add_mul(y, z);
+
+        let mut x_alt = x;
+        x_alt.saturating_add_mul_assign(y, z);
+        assert_eq!(x_alt, result);
+
+        assert_eq!(x.saturating_add_mul(z, y), result);
+        assert!(result >= x);
+    });
+
+    unsigned_pair_gen_var_27::<T>().test_properties(|(a, b)| {
+        assert_eq!(a.saturating_add_mul(T::ZERO, b), a);
+        assert_eq!(a.saturating_add_mul(T::ONE, b), a.saturating_add(b));
+        assert_eq!(T::ZERO.saturating_add_mul(a, b), a.saturating_mul(b));
+        assert_eq!(a.saturating_add_mul(b, T::ZERO), a);
+        assert_eq!(a.saturating_add_mul(b, T::ONE), a.saturating_add(b));
+    });
+}
+
+fn saturating_add_mul_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_triple_gen::<T>().test_properties(|(x, y, z)| {
+        let result = x.saturating_add_mul(y, z);
+
+        let mut x_alt = x;
+        x_alt.saturating_add_mul_assign(y, z);
+        assert_eq!(x_alt, result);
+
+        assert_eq!(x.saturating_add_mul(z, y), result);
+    });
+
+    signed_pair_gen::<T>().test_properties(|(a, b)| {
+        assert_eq!(a.saturating_add_mul(T::ZERO, b), a);
+        assert_eq!(a.saturating_add_mul(T::ONE, b), a.saturating_add(b));
+        assert_eq!(T::ZERO.saturating_add_mul(a, b), a.saturating_mul(b));
+        assert_eq!(a.saturating_add_mul(b, T::ZERO), a);
+        assert_eq!(a.saturating_add_mul(b, T::ONE), a.saturating_add(b));
+    });
+}
+
+#[test]
+fn saturating_add_mul_properties() {
+    apply_fn_to_unsigneds!(saturating_add_mul_properties_helper_unsigned);
+    apply_fn_to_signeds!(saturating_add_mul_properties_helper_signed);
 }

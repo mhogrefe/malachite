@@ -286,4 +286,4 @@ macro_rules! impl_bit_block_access_signed {
         }
     };
 }
-apply_to_unsigned_signed_pair!(impl_bit_block_access_signed);
+apply_to_unsigned_signed_pairs!(impl_bit_block_access_signed);

@@ -1,6 +1,9 @@
 use generators::common::{reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, GenConfig, It};
 use generators::exhaustive::{float_rounding_mode_filter_var_1, valid_digit_chars};
-use generators::{digits_valid, signed_assign_bits_valid, unsigned_assign_bits_valid};
+use generators::{
+    digits_valid, round_to_multiple_of_power_of_2_filter_map, round_to_multiple_signed_filter_map,
+    round_to_multiple_unsigned_filter_map, signed_assign_bits_valid, unsigned_assign_bits_valid,
+};
 use itertools::repeat_n;
 use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::chars::constants::NUMBER_OF_CHARS;
@@ -16,8 +19,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom, SplitInHalf, WrappingFrom,
-    WrappingInto,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom,
+    SplitInHalf, WrappingFrom, WrappingInto,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
@@ -1239,6 +1242,28 @@ pub fn random_primitive_int_unsigned_unsigned_unsigned_quadruple_gen_var_1<
     )
 }
 
+// --(PrimitiveInt, PrimitiveUnsigned, RoundingMode) --
+
+pub fn random_primitive_int_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(T, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &random_primitive_ints,
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter_map(|(x, pow, rm)| round_to_multiple_of_power_of_2_filter_map(x, pow, rm)),
+    )
+}
+
 // --(PrimitiveInt, PrimitiveUnsigned, Vec<bool>) --
 
 struct PrimitiveIntUnsignedBoolVecTripleGeneratorVar1<T: PrimitiveInt> {
@@ -1543,6 +1568,23 @@ pub fn random_signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
     })
 }
 
+pub fn random_signed_signed_rounding_mode_triple_gen_var_2<
+    U: PrimitiveUnsigned,
+    S: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
+>(
+    _config: &GenConfig,
+) -> It<(S, S, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &random_primitive_ints,
+            &random_nonzero_signeds,
+            &random_rounding_modes,
+        )
+        .filter_map(|(x, y, rm)| round_to_multiple_signed_filter_map(x, y, rm)),
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned) --
 
 pub fn random_signed_unsigned_pair_gen_var_1<T: PrimitiveSigned>(
@@ -1745,6 +1787,38 @@ pub fn random_signed_unsigned_pair_gen_var_9<T: PrimitiveSigned>(
     )
 }
 
+pub fn random_signed_unsigned_pair_gen_var_10<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_positive_signeds,
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_signed_unsigned_pair_gen_var_11<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| random_signed_range(seed, T::MIN + T::ONE, T::ZERO),
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (PrimitiveSigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn random_signed_unsigned_unsigned_triple_gen_var_1<
@@ -1817,8 +1891,6 @@ pub fn random_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
         }),
     )
 }
-
-// -- (PrimitiveSigned, RoundingMode) --
 
 pub fn random_signed_rounding_mode_pair_gen_var_1<T: PrimitiveSigned>(
     _config: &GenConfig,
@@ -2492,6 +2564,10 @@ pub fn random_unsigned_pair_gen_var_18<T: PrimitiveUnsigned>(config: &GenConfig)
     )
 }
 
+pub fn random_unsigned_pair_gen_var_19<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, u64)> {
+    Box::new(random_unsigned_pair_gen_var_8(config).map(|(x, p)| (x, T::WIDTH - p)))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
 
 struct ModPowerOfTwoQuadrupleWithExtraPrimitiveIntGenerator<T: PrimitiveUnsigned, U: PrimitiveInt> {
@@ -2840,6 +2916,20 @@ pub fn random_unsigned_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsig
         xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
         rms: random_rounding_modes(EXAMPLE_SEED.fork("rms")),
     })
+}
+
+pub fn random_unsigned_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, T, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &random_primitive_ints,
+            &random_positive_unsigneds,
+            &random_rounding_modes,
+        )
+        .filter_map(|(x, y, rm)| round_to_multiple_unsigned_filter_map(x, y, rm)),
+    )
 }
 
 // -- (PrimitiveUnsigned, RoundingMode) --

@@ -1,4 +1,5 @@
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_with_rounding;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
@@ -6,19 +7,27 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::{
     primitive_float_unsigned_pair_gen_var_1, primitive_float_unsigned_pair_gen_var_2,
     primitive_float_unsigned_rounding_mode_triple_gen_var_1,
-    primitive_float_unsigned_rounding_mode_triple_gen_var_2,
+    primitive_float_unsigned_rounding_mode_triple_gen_var_2, unsigned_gen_var_1,
+    unsigned_rounding_mode_pair_gen_var_1,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::{natural_gen_var_2, natural_rounding_mode_pair_gen_var_2};
+use std::panic::catch_unwind;
 use std::str::FromStr;
 
 #[test]
 fn test_sci_mantissa_and_exponent() {
-    let test = |n: &str, mantissa: f32, exponent: u64| {
-        let (actual_mantissa, actual_exponent) =
-            Natural::from_str(n).unwrap().sci_mantissa_and_exponent();
+    let test = |s: &str, mantissa: f32, exponent: u64| {
+        let n = Natural::from_str(s).unwrap();
+        let (actual_mantissa, actual_exponent) = n.sci_mantissa_and_exponent();
         assert_eq!(NiceFloat(actual_mantissa), NiceFloat(mantissa));
         assert_eq!(actual_exponent, exponent);
+        assert_eq!(NiceFloat(n.sci_mantissa()), NiceFloat(mantissa));
+        assert_eq!(
+            SciMantissaAndExponent::<f32, u64, Natural>::sci_exponent(&n),
+            exponent
+        );
     };
     test("3", 1.5, 1);
     test("123", 1.921875, 6);
@@ -356,6 +365,20 @@ fn test_from_sci_mantissa_and_exponent() {
     test(0.5, 1, None);
 }
 
+fn from_sci_mantissa_and_exponent_fail_helper<T: PrimitiveFloat>()
+where
+    for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
+{
+    assert_panic!(
+        <&Natural as SciMantissaAndExponent<T, u64, _>>::from_sci_mantissa_and_exponent(T::ZERO, 0)
+    );
+}
+
+#[test]
+fn from_sci_mantissa_and_exponent_fail() {
+    apply_fn_to_primitive_floats!(from_sci_mantissa_and_exponent_fail_helper);
+}
+
 #[test]
 fn test_from_sci_mantissa_and_exponent_with_rounding() {
     let test = |mantissa: f32, exponent: u64, rm: RoundingMode, out: Option<&str>| {
@@ -447,9 +470,12 @@ fn test_from_sci_mantissa_and_exponent_with_rounding() {
 fn sci_mantissa_and_exponent_properties_helper<T: PrimitiveFloat>()
 where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
+    Limb: SciMantissaAndExponent<T, u64>,
 {
     natural_gen_var_2().test_properties(|n| {
         let (mantissa, exponent) = n.sci_mantissa_and_exponent();
+        assert_eq!(NiceFloat(n.sci_mantissa()), NiceFloat(mantissa));
+        assert_eq!(n.sci_exponent(), exponent);
         assert!(mantissa >= T::ONE);
         assert!(mantissa < T::TWO);
         assert_eq!(
@@ -457,6 +483,13 @@ where
                 .map(|(m, e): (T, u64)| (NiceFloat(m), e)),
             Some((NiceFloat(mantissa), exponent))
         );
+    });
+
+    unsigned_gen_var_1::<Limb>().test_properties(|x| {
+        let (mantissa_1, exponent_1) = x.sci_mantissa_and_exponent();
+        let (mantissa_2, exponent_2) = Natural::from(x).sci_mantissa_and_exponent();
+        assert_eq!(NiceFloat(mantissa_1), NiceFloat(mantissa_2));
+        assert_eq!(exponent_1, exponent_2);
     });
 }
 
@@ -525,6 +558,16 @@ fn sci_mantissa_and_exponent_with_rounding_properties_helper<T: PrimitiveFloat>(
                 assert_eq!(floor_exponent, ceiling_exponent);
             }
         }
+    });
+
+    unsigned_rounding_mode_pair_gen_var_1::<Limb>().test_properties(|(x, rm)| {
+        assert_eq!(
+            sci_mantissa_and_exponent_with_rounding::<Limb, T>(x, rm)
+                .map(|(m, e)| (NiceFloat(m), e)),
+            Natural::from(x)
+                .sci_mantissa_and_exponent_with_rounding(rm)
+                .map(|(m, e)| (NiceFloat(m), e))
+        );
     });
 }
 

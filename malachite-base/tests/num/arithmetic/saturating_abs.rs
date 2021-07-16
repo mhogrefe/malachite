@@ -1,4 +1,5 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base_test_util::generators::signed_gen;
 
 fn saturating_abs_assign_helper<T: PrimitiveSigned>() {
     let test = |n: T, out| {
@@ -20,4 +21,22 @@ fn saturating_abs_assign_helper<T: PrimitiveSigned>() {
 #[test]
 fn test_saturating_abs_assign() {
     apply_fn_to_signeds!(saturating_abs_assign_helper);
+}
+
+fn saturating_abs_properties_helper<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|n| {
+        let mut abs = n;
+        abs.saturating_abs_assign();
+        assert_eq!(abs, n.saturating_abs());
+        assert_eq!(abs.saturating_abs(), abs);
+        if n != T::MIN {
+            assert_eq!(n.abs(), abs);
+        }
+        assert_eq!(abs == n, n >= T::ZERO);
+    });
+}
+
+#[test]
+fn saturating_abs_properties() {
+    apply_fn_to_signeds!(saturating_abs_properties_helper);
 }

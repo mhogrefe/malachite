@@ -35,7 +35,7 @@ macro_rules! apply_to_primitive_ints {
 
 #[doc(hidden)]
 #[macro_export]
-macro_rules! apply_to_unsigned_signed_pair {
+macro_rules! apply_to_unsigned_signed_pairs {
     ($m: tt) => {
         $m!(u8, i8);
         $m!(u16, i16);
@@ -177,6 +177,25 @@ macro_rules! apply_fn_to_unsigneds_and_signeds {
         $f::<usize, i64>();
         $f::<usize, i128>();
         $f::<usize, isize>();
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! apply_fn_to_unsigneds_and_primitive_floats {
+    ($f: ident) => {
+        $f::<u8, f32>();
+        $f::<u8, f64>();
+        $f::<u16, f32>();
+        $f::<u16, f64>();
+        $f::<u32, f32>();
+        $f::<u32, f64>();
+        $f::<u64, f32>();
+        $f::<u64, f64>();
+        $f::<u128, f32>();
+        $f::<u128, f64>();
+        $f::<usize, f32>();
+        $f::<usize, f64>();
     };
 }
 

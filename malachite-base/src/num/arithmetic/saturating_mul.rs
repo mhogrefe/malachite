@@ -15,22 +15,20 @@ macro_rules! impl_saturating_mul {
             /// Replaces `self` with `self * other`, saturating at the numeric bounds instead of
             /// overflowing.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets \\begin{cases}
+            ///     xy & m \leq xy \leq M \\\\
+            ///     M & xy > M \\\\
+            ///     m & xy < m,
+            /// \\end{cases}
+            /// $$
+            /// where $m$ is `$t::MIN` and $M$ is `$t::MAX`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::SaturatingMulAssign;
-            ///
-            /// let mut x = 123u16;
-            /// x.saturating_mul_assign(456);
-            /// assert_eq!(x, 56088);
-            ///
-            /// let mut x = 123u8;
-            /// x.saturating_mul_assign(200);
-            /// assert_eq!(x, 255);
-            /// ```
+            /// See the documentation of the `num::arithmetic::saturating_mul` module.
             #[inline]
             fn saturating_mul_assign(&mut self, other: $t) {
                 *self = self.saturating_mul(other);
