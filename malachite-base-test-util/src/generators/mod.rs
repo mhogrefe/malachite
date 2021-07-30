@@ -8,8 +8,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom,
-    SplitInHalf, WrappingFrom, WrappingInto,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
+    SaturatingFrom, SplitInHalf, WrappingFrom, WrappingInto,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
@@ -263,6 +263,62 @@ pub fn primitive_float_gen_var_12<T: PrimitiveFloat>() -> Generator<T> {
     )
 }
 
+// All primitive floats `T` that are equal to an unsigned value of type `U`.
+pub fn primitive_float_gen_var_13<
+    T: CheckedFrom<U> + PrimitiveFloat + RoundingFrom<U>,
+    U: PrimitiveUnsigned,
+>() -> Generator<T> {
+    Generator::new(
+        &exhaustive_primitive_float_gen_var_13::<T, U>,
+        &random_primitive_float_gen_var_13::<T, U>,
+        &special_random_primitive_float_gen_var_13::<T, U>,
+    )
+}
+
+// All primitive floats `T` that are equal to a signed value of type `U`.
+pub fn primitive_float_gen_var_14<
+    T: CheckedFrom<U> + PrimitiveFloat + RoundingFrom<U>,
+    U: PrimitiveSigned,
+>() -> Generator<T> {
+    Generator::new(
+        &exhaustive_primitive_float_gen_var_14::<T, U>,
+        &random_primitive_float_gen_var_13::<T, U>,
+        &special_random_primitive_float_gen_var_14::<T, U>,
+    )
+}
+
+// All primitive floats of type `T` that are not equal to any primitive integer of type `U`.
+pub fn primitive_float_gen_var_15<T: PrimitiveFloat, U: ConvertibleFrom<T> + PrimitiveInt>(
+) -> Generator<T> {
+    Generator::new(
+        &exhaustive_primitive_float_gen_var_15::<T, U>,
+        &random_primitive_float_gen_var_14::<T, U>,
+        &special_random_primitive_float_gen_var_15::<T, U>,
+    )
+}
+
+// All primitive floats of type `T` that are halfway between two adjacent values of the primitive
+// unsigned type `U`.
+pub fn primitive_float_gen_var_16<T: PrimitiveFloat + RoundingFrom<U>, U: PrimitiveUnsigned>(
+) -> Generator<T> {
+    Generator::new(
+        &exhaustive_primitive_float_gen_var_16::<T, U>,
+        &random_primitive_float_gen_var_15::<T, U>,
+        &special_random_primitive_float_gen_var_16::<T, U>,
+    )
+}
+
+// All primitive floats of type `T` that are halfway between two adjacent values of the primitive
+// signed type `U`.
+pub fn primitive_float_gen_var_17<T: PrimitiveFloat + RoundingFrom<U>, U: PrimitiveSigned>(
+) -> Generator<T> {
+    Generator::new(
+        &exhaustive_primitive_float_gen_var_17::<T, U>,
+        &random_primitive_float_gen_var_16::<T, U>,
+        &special_random_primitive_float_gen_var_17::<T, U>,
+    )
+}
+
 // -- (PrimitiveFloat, PrimitiveFloat) --
 
 pub fn primitive_float_pair_gen<T: PrimitiveFloat>() -> Generator<(T, T)> {
@@ -387,6 +443,19 @@ pub fn primitive_float_rounding_mode_pair_gen_var_2<T: PrimitiveFloat>(
     )
 }
 
+// All `(T, RoundingMode)` where `T` is a primitive float, `U` is unsigned, and the pair is a valid
+// input to `U::rounding_from`.
+pub fn primitive_float_rounding_mode_pair_gen_var_3<
+    T: PrimitiveFloat + RoundingFrom<U>,
+    U: ConvertibleFrom<T> + PrimitiveInt,
+>() -> Generator<(T, RoundingMode)> {
+    Generator::new(
+        &exhaustive_primitive_float_rounding_mode_pair_gen_var_3::<T, U>,
+        &random_primitive_float_rounding_mode_pair_gen_var_3::<T, U>,
+        &special_random_primitive_float_rounding_mode_pair_gen_var_3::<T, U>,
+    )
+}
+
 // -- PrimitiveSigned --
 
 pub fn signed_gen<T: PrimitiveSigned>() -> Generator<T> {
@@ -444,6 +513,53 @@ pub fn signed_gen_var_6<T: PrimitiveSigned>() -> Generator<T> {
         &exhaustive_signed_gen_var_5,
         &random_signed_gen_var_6,
         &special_random_signed_gen_var_5,
+    )
+}
+
+// All signeds `T` that are equal to a primitive float value of type `U`.
+pub fn signed_gen_var_7<
+    T: PrimitiveSigned + RoundingFrom<U>,
+    U: ConvertibleFrom<T> + PrimitiveFloat + RoundingFrom<T>,
+>() -> Generator<T> {
+    Generator::new(
+        &exhaustive_signed_gen_var_6::<T, U>,
+        &random_primitive_int_gen_var_1::<T, U>,
+        &special_random_primitive_int_gen_var_1::<T, U>,
+    )
+}
+
+type G<T> = Generator<T>;
+// All signeds `T` that are not exactly equal to any value of a floating-point type `U`.
+//
+// Acceptable `(T, U)` pairs are those where `T::WIDTH` > `U::MANTISSA_WIDTH`.
+pub fn signed_gen_var_8<T: PrimitiveSigned, U: ConvertibleFrom<T> + PrimitiveFloat>() -> G<T> {
+    Generator::new_no_special(
+        &exhaustive_signed_gen_var_7::<T, U>,
+        &random_signed_gen_var_7::<T, U>,
+    )
+}
+
+// All signeds `T` that are exactly between two values of a floating-point type `U`.
+//
+// Acceptable `(T, U)` pairs are those where `T::WIDTH` > `U::MANTISSA_WIDTH`.
+pub fn signed_gen_var_9<
+    T: CheckedFrom<U> + PrimitiveSigned,
+    U: ConvertibleFrom<T> + PrimitiveFloat + RoundingFrom<T>,
+>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_signed_gen_var_8::<T, U>,
+        &random_signed_gen_var_8::<T, U>,
+    )
+}
+
+// All unsigned `T`s whose square is also representable as a `T`.
+pub fn signed_gen_var_10<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() -> Generator<S> {
+    Generator::new_no_special(
+        &exhaustive_signed_gen_var_9::<U, S>,
+        &random_signed_gen_var_9::<U, S>,
     )
 }
 
@@ -629,6 +745,7 @@ pub fn signed_signed_unsigned_triple_gen_var_3<T: PrimitiveSigned>() -> Generato
 
 // -- (PrimitiveSigned, PrimitiveSigned, RoundingMode) --
 
+//TODO description
 pub fn signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
 ) -> Generator<(T, T, RoundingMode)> {
     Generator::new(
@@ -648,6 +765,28 @@ pub fn signed_signed_rounding_mode_triple_gen_var_2<
         &exhaustive_signed_signed_rounding_mode_triple_gen_var_2,
         &random_signed_signed_rounding_mode_triple_gen_var_2,
         &special_random_signed_signed_rounding_mode_triple_gen_var_2,
+    )
+}
+
+// All `(T, U, RoundingMode)` where `T` and `U` are signed and the triple is a valid input to
+// `T::shr_round`.
+pub fn signed_signed_rounding_mode_triple_gen_var_3<T: PrimitiveSigned, U: PrimitiveSigned>(
+) -> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_signed_signed_rounding_mode_triple_gen_var_3,
+        &random_primitive_int_signed_rounding_mode_triple_gen_var_1,
+        &special_random_signed_signed_rounding_mode_triple_gen_var_3,
+    )
+}
+
+// All `(T, U, RoundingMode)` where `T` and `U` are signed and the triple is a valid input to
+// `T::shl_round`.
+pub fn signed_signed_rounding_mode_triple_gen_var_4<T: PrimitiveSigned, U: PrimitiveSigned>(
+) -> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_signed_signed_rounding_mode_triple_gen_var_4,
+        &random_primitive_int_signed_rounding_mode_triple_gen_var_2,
+        &special_random_signed_signed_rounding_mode_triple_gen_var_4,
     )
 }
 
@@ -898,12 +1037,23 @@ pub fn signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
 
 // All `(T, u64, RoundingMode)` where `T` is signed and the triple is a valid input to
 // `T::round_to_multiple_of_power_of_2`.
-pub fn signed_unsigned_rounding_mode_triple_gen_var_3<T: PrimitiveSigned>(
+pub fn signed_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
 ) -> Generator<(T, u64, RoundingMode)> {
     Generator::new(
         &exhaustive_signed_unsigned_rounding_mode_triple_gen_var_1,
         &random_primitive_int_unsigned_rounding_mode_triple_gen_var_1,
-        &special_random_signed_unsigned_rounding_mode_triple_gen_var_3,
+        &special_random_signed_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(T, U, RoundingMode)` where `T` is signed, `U` is unsigned, and the triple is a valid input
+// to `T::shr_round`.
+pub fn signed_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveSigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_signed_unsigned_rounding_mode_triple_gen_var_2,
+        &random_primitive_int_unsigned_rounding_mode_triple_gen_var_2,
+        &special_random_signed_unsigned_rounding_mode_triple_gen_var_2,
     )
 }
 
@@ -941,6 +1091,19 @@ pub fn signed_rounding_mode_pair_gen_var_3<T: PrimitiveSigned>() -> Generator<(T
         &exhaustive_signed_rounding_mode_pair_gen_var_3,
         &random_signed_rounding_mode_pair_gen_var_3,
         &special_random_signed_rounding_mode_pair_gen_var_3,
+    )
+}
+
+// All `(T, RoundingMode)` where `T` is signed, `U` is a primitive float type, and the pair is a
+// valid input to `U::rounding_from`.
+pub fn signed_rounding_mode_pair_gen_var_4<
+    T: PrimitiveSigned,
+    U: ConvertibleFrom<T> + PrimitiveFloat,
+>() -> Generator<(T, RoundingMode)> {
+    Generator::new(
+        &exhaustive_signed_rounding_mode_pair_gen_var_4::<T, U>,
+        &random_primitive_int_rounding_mode_pair_gen_var_1::<T, U>,
+        &special_random_signed_rounding_mode_pair_gen_var_4::<T, U>,
     )
 }
 
@@ -1092,6 +1255,58 @@ pub fn unsigned_gen_var_16<T: PrimitiveInt>() -> Generator<u64> {
     )
 }
 
+// All unsigned `T`s whose two highest bits are not both zero.
+pub fn unsigned_gen_var_17<T: PrimitiveUnsigned>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_gen_var_5::<T>,
+        &random_unsigned_gen_var_17::<T>,
+    )
+}
+
+// All unsigneds `T` that are equal to a primitive float value of type `U`.
+pub fn unsigned_gen_var_18<
+    T: PrimitiveUnsigned + RoundingFrom<U>,
+    U: ConvertibleFrom<T> + PrimitiveFloat + RoundingFrom<T>,
+>() -> Generator<T> {
+    Generator::new(
+        &exhaustive_unsigned_gen_var_12::<T, U>,
+        &random_primitive_int_gen_var_1::<T, U>,
+        &special_random_primitive_int_gen_var_1::<T, U>,
+    )
+}
+
+// All unsigneds `T` that are not exactly equal to any value of a floating-point type `U`.
+//
+// Acceptable `(T, U)` pairs are those where `T::WIDTH` > `U::MANTISSA_WIDTH`.
+pub fn unsigned_gen_var_19<T: PrimitiveUnsigned, U: ConvertibleFrom<T> + PrimitiveFloat>(
+) -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_gen_var_13::<T, U>,
+        &random_unsigned_gen_var_18::<T, U>,
+    )
+}
+
+// All unsigneds `T` that are exactly between two values of a floating-point type `U`.
+//
+// Acceptable `(T, U)` pairs are those where `T::WIDTH` > `U::MANTISSA_WIDTH`.
+pub fn unsigned_gen_var_20<
+    T: CheckedFrom<U> + PrimitiveUnsigned,
+    U: ConvertibleFrom<T> + PrimitiveFloat + RoundingFrom<T>,
+>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_gen_var_14::<T, U>,
+        &random_unsigned_gen_var_19::<T, U>,
+    )
+}
+
+// All unsigned `T`s whose square is also representable as a `T`.
+pub fn unsigned_gen_var_21<T: PrimitiveUnsigned>() -> Generator<T> {
+    Generator::new_no_special(
+        &exhaustive_unsigned_gen_var_15::<T>,
+        &random_unsigned_gen_var_20::<T>,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveSigned) --
 
 pub fn unsigned_signed_pair_gen<T: PrimitiveUnsigned, U: PrimitiveSigned>() -> Generator<(T, U)> {
@@ -1143,6 +1358,30 @@ pub fn unsigned_signed_unsigned_triple_gen_var_2<T: PrimitiveUnsigned, U: Primit
         &exhaustive_unsigned_signed_unsigned_triple_gen_var_2,
         &random_primitive_int_signed_primitive_int_triple_gen_var_1,
         &special_random_unsigned_signed_unsigned_triple_gen_var_2,
+    )
+}
+
+// -- (PrimitiveUnsigned, PrimitiveSigned, RoundingMode) --
+
+// All `(T, U, RoundingMode)` where `T` is unsigned, `U` is signed, and the triple is a valid input
+// to `T::shr_round`.
+pub fn unsigned_signed_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveSigned>(
+) -> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_signed_rounding_mode_triple_gen_var_1,
+        &random_primitive_int_signed_rounding_mode_triple_gen_var_1,
+        &special_random_unsigned_signed_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(T, U, RoundingMode)` where `T` is unsigned, `U` is signed, and the triple is a valid input
+// to `T::shl_round`.
+pub fn unsigned_signed_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveSigned>(
+) -> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_signed_rounding_mode_triple_gen_var_2,
+        &random_primitive_int_signed_rounding_mode_triple_gen_var_2,
+        &special_random_unsigned_signed_rounding_mode_triple_gen_var_2,
     )
 }
 
@@ -1433,6 +1672,14 @@ pub fn unsigned_pair_gen_var_30<T: PrimitiveUnsigned>() -> Generator<(T, u64)> {
         &exhaustive_unsigned_pair_gen_var_22,
         &random_unsigned_pair_gen_var_19,
         &special_random_unsigned_pair_gen_var_20,
+    )
+}
+
+// All pairs of unsigned `T` where the two highest bits of the first `T` are not both zero.
+pub fn unsigned_pair_gen_var_31<T: PrimitiveUnsigned>() -> Generator<(T, T)> {
+    Generator::new_no_special(
+        &exhaustive_primitive_int_unsigned_pair_gen_var_2::<T, T>,
+        &random_unsigned_primitive_int_pair_gen_var_1::<T, T>,
     )
 }
 
@@ -1782,6 +2029,19 @@ pub fn unsigned_unsigned_rounding_mode_triple_gen_var_3<T: PrimitiveUnsigned>(
     )
 }
 
+// All `(T, U, RoundingMode)` where `T` is unsigned, `U` is unsigned, and the triple is a valid
+// input to `T::shr_round`.
+pub fn unsigned_unsigned_rounding_mode_triple_gen_var_4<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(T, U, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_rounding_mode_triple_gen_var_5,
+        &random_primitive_int_unsigned_rounding_mode_triple_gen_var_2,
+        &special_random_unsigned_unsigned_rounding_mode_triple_gen_var_4,
+    )
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, Vec<bool>) --
 
 // All `(T, u64, Vec<bool>)` where `T` is unsigned, the `u64` is between 1 and `U::WIDTH`,
@@ -1813,6 +2073,19 @@ pub fn unsigned_rounding_mode_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generato
         &exhaustive_primitive_int_rounding_mode_pair_gen_var_1,
         &random_unsigned_rounding_mode_pair_gen_var_1,
         &special_random_unsigned_rounding_mode_pair_gen_var_1,
+    )
+}
+
+// All `(T, RoundingMode)` where `T` is unsigned, `U` is a primitive float type, and the pair is a
+// valid input to `U::rounding_from`.
+pub fn unsigned_rounding_mode_pair_gen_var_2<
+    T: PrimitiveUnsigned,
+    U: ConvertibleFrom<T> + PrimitiveFloat,
+>() -> Generator<(T, RoundingMode)> {
+    Generator::new(
+        &exhaustive_unsigned_rounding_mode_pair_gen_var_1::<T, U>,
+        &random_primitive_int_rounding_mode_pair_gen_var_1::<T, U>,
+        &special_random_unsigned_rounding_mode_pair_gen_var_2::<T, U>,
     )
 }
 
@@ -2242,6 +2515,15 @@ pub fn unsigned_vec_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(Vec<T>,
     )
 }
 
+// All `(Vec<T>, Vec<T>)` that are valid `(out, xs)` inputs to `_limbs_sqrt_rem_helper`.
+pub fn unsigned_vec_pair_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4::<T>,
+        &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1::<T>,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4::<T>,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // All `(Vec<T>, Vec<T>, T)` where `T` is unsigned and the first `Vec` is at least as long as the
@@ -2255,7 +2537,7 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>
     )
 }
 
-// var 2 is in malachite-nz
+// vars 2 and 3 are in malachite-nz
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
@@ -2341,11 +2623,21 @@ pub fn unsigned_vec_triple_gen_var_27<T: PrimitiveUnsigned>() -> Generator<(Vec<
 
 // -- large types --
 
+//TODO description
 pub fn large_type_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, T, T)> {
     Generator::new(
         &exhaustive_large_type_gen_var_1,
         &random_large_type_gen_var_1,
         &special_random_large_type_gen_var_1,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, u64, bool)` that are valid inputs to `_limbs_sqrt_helper`.
+pub fn large_type_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, u64, bool)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_2,
+        &random_large_type_gen_var_2,
+        &special_random_large_type_gen_var_2,
     )
 }
 

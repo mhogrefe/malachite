@@ -64,7 +64,11 @@ pub(crate) fn register(runner: &mut Runner) {
     saturating_square::register(runner);
     saturating_sub::register(runner);
     saturating_sub_mul::register(runner);
+    shl_round::register(runner);
+    shr_round::register(runner);
+    sign::register(runner);
     sqrt::register(runner);
+    square::register(runner);
     sub_mul::register(runner);
     x_mul_y_is_zz::register(runner);
 }
@@ -132,6 +136,10 @@ mod saturating_pow;
 mod saturating_square;
 mod saturating_sub;
 mod saturating_sub_mul;
+mod shl_round;
+mod shr_round;
+mod sign;
 mod sqrt;
+mod square;
 mod sub_mul;
 mod x_mul_y_is_zz;

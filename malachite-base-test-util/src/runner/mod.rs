@@ -117,6 +117,50 @@ macro_rules! register_primitive_float_demos {
 }
 
 #[macro_export]
+macro_rules! register_primitive_float_unsigned_demos {
+    ($runner: ident, $f: ident) => {
+        register_generic_demos_2!(
+            $runner,
+            $f,
+            [f32, u8],
+            [f32, u16],
+            [f32, u32],
+            [f32, u64],
+            [f32, u128],
+            [f32, usize],
+            [f64, u8],
+            [f64, u16],
+            [f64, u32],
+            [f64, u64],
+            [f64, u128],
+            [f64, usize]
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! register_primitive_float_signed_demos {
+    ($runner: ident, $f: ident) => {
+        register_generic_demos_2!(
+            $runner,
+            $f,
+            [f32, i8],
+            [f32, i16],
+            [f32, i32],
+            [f32, i64],
+            [f32, i128],
+            [f32, isize],
+            [f64, i8],
+            [f64, i16],
+            [f64, i32],
+            [f64, i64],
+            [f64, i128],
+            [f64, isize]
+        );
+    };
+}
+
+#[macro_export]
 macro_rules! register_signed_unsigned_match_demos {
     ($runner: ident, $f: ident) => {
         register_generic_demos_2_only_first_in_key!(
@@ -341,7 +385,7 @@ macro_rules! register_primitive_int_signed_demos {
 }
 
 #[macro_export]
-macro_rules! register_unsigned_primitive_flost_demos {
+macro_rules! register_unsigned_primitive_float_demos {
     ($runner: ident, $f: ident) => {
         register_generic_demos_2!(
             $runner,
@@ -359,6 +403,36 @@ macro_rules! register_unsigned_primitive_flost_demos {
             [usize, f32],
             [usize, f64]
         );
+    };
+}
+
+#[macro_export]
+macro_rules! register_signed_primitive_float_demos {
+    ($runner: ident, $f: ident) => {
+        register_generic_demos_2!(
+            $runner,
+            $f,
+            [i8, f32],
+            [i8, f64],
+            [i16, f32],
+            [i16, f64],
+            [i32, f32],
+            [i32, f64],
+            [i64, f32],
+            [i64, f64],
+            [i128, f32],
+            [i128, f64],
+            [isize, f32],
+            [isize, f64]
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! register_primitive_int_primitive_float_demos {
+    ($runner: ident, $f: ident) => {
+        register_unsigned_primitive_float_demos!($runner, $f);
+        register_signed_primitive_float_demos!($runner, $f);
     };
 }
 
@@ -420,6 +494,50 @@ macro_rules! register_signed_benches {
 macro_rules! register_primitive_float_benches {
     ($runner: ident, $f: ident) => {
         register_generic_benches!($runner, $f, f32, f64);
+    };
+}
+
+#[macro_export]
+macro_rules! register_primitive_float_unsigned_benches {
+    ($runner: ident, $f: ident) => {
+        register_generic_benches_2!(
+            $runner,
+            $f,
+            [f32, u8],
+            [f32, u16],
+            [f32, u32],
+            [f32, u64],
+            [f32, u128],
+            [f32, usize],
+            [f64, u8],
+            [f64, u16],
+            [f64, u32],
+            [f64, u64],
+            [f64, u128],
+            [f64, usize]
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! register_primitive_float_signed_benches {
+    ($runner: ident, $f: ident) => {
+        register_generic_benches_2!(
+            $runner,
+            $f,
+            [f32, i8],
+            [f32, i16],
+            [f32, i32],
+            [f32, i64],
+            [f32, i128],
+            [f32, isize],
+            [f64, i8],
+            [f64, i16],
+            [f64, i32],
+            [f64, i64],
+            [f64, i128],
+            [f64, isize]
+        );
     };
 }
 
@@ -666,6 +784,36 @@ macro_rules! register_unsigned_primitive_float_benches {
             [usize, f32],
             [usize, f64]
         );
+    };
+}
+
+#[macro_export]
+macro_rules! register_signed_primitive_float_benches {
+    ($runner: ident, $f: ident) => {
+        register_generic_benches_2!(
+            $runner,
+            $f,
+            [i8, f32],
+            [i8, f64],
+            [i16, f32],
+            [i16, f64],
+            [i32, f32],
+            [i32, f64],
+            [i64, f32],
+            [i64, f64],
+            [i128, f32],
+            [i128, f64],
+            [isize, f32],
+            [isize, f64]
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! register_primitive_int_primitive_float_benches {
+    ($runner: ident, $f: ident) => {
+        register_unsigned_primitive_float_benches!($runner, $f);
+        register_signed_primitive_float_benches!($runner, $f);
     };
 }
 

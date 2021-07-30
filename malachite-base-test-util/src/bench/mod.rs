@@ -40,7 +40,6 @@ where
 
 fn quick_median(mut xs: Vec<u64>) -> u64 {
     assert!(!xs.is_empty());
-    //let mut xs = xs.clone();
     xs.sort_unstable();
     let half_index = xs.len() >> 1;
     if xs.len().odd() {

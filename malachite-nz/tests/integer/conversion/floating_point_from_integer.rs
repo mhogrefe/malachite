@@ -5,8 +5,12 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    signed_gen, signed_gen_var_7, signed_rounding_mode_pair_gen_var_4,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::SignedLimb;
 use malachite_nz_test_util::generators::{
     integer_gen, integer_gen_var_1, integer_gen_var_2, integer_gen_var_3,
     integer_rounding_mode_pair_gen_var_1,
@@ -1240,6 +1244,14 @@ where
             })
         );
     });
+
+    signed_rounding_mode_pair_gen_var_4::<SignedLimb, T>().test_properties(|(i, rm)| {
+        let n: Integer = From::from(i);
+        assert_eq!(
+            NiceFloat(T::rounding_from(i, rm)),
+            NiceFloat(T::rounding_from(&n, rm))
+        );
+    });
 }
 
 #[test]
@@ -1313,6 +1325,7 @@ fn float_checked_from_integer_properties_helper<
 where
     Integer: RoundingFrom<T>,
     Natural: CheckedFrom<T> + From<T>,
+    SignedLimb: RoundingFrom<T>,
 {
     integer_gen().test_properties(|n| {
         let of = T::checked_from(&n);
@@ -1337,6 +1350,19 @@ where
 
     integer_gen_var_3::<T>().test_properties(|n| {
         assert!(T::checked_from(&n).is_none());
+    });
+
+    signed_gen::<SignedLimb>().test_properties(|i| {
+        if let Some(f) = T::checked_from(i) {
+            assert_eq!(NiceFloat(f), NiceFloat(T::exact_from(&Integer::from(i))));
+        }
+    });
+
+    signed_gen_var_7::<SignedLimb, T>().test_properties(|i| {
+        assert_eq!(
+            NiceFloat(T::exact_from(i)),
+            NiceFloat(T::exact_from(&Integer::from(i)))
+        );
     });
 }
 
@@ -1368,6 +1394,11 @@ where
 
     integer_gen_var_3::<T>().test_properties(|n| {
         assert!(!T::convertible_from(&n));
+    });
+
+    signed_gen::<SignedLimb>().test_properties(|i| {
+        let n: Integer = From::from(i);
+        assert_eq!(T::convertible_from(i), T::convertible_from(&n));
     });
 }
 

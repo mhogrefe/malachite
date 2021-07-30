@@ -1,4 +1,13 @@
+use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
+use malachite_base::num::float::NiceFloat;
+use malachite_base::num::float::PrimitiveFloat;
+use malachite_base_test_util::generators::{
+    primitive_float_gen, signed_gen_var_10, unsigned_gen_var_21,
+};
 
 #[test]
 fn test_square() {
@@ -23,4 +32,50 @@ fn test_square() {
     test::<i128>(-10, 100);
     test::<isize>(-123, 15129);
     test::<i32>(-1000, 1000000);
+}
+
+fn square_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen_var_21::<T>().test_properties(|x| {
+        let mut square = x;
+        square.square_assign();
+        assert_eq!(square, x.square());
+        assert_eq!(square, x.pow(2));
+        assert_eq!(square.checked_sqrt(), Some(x));
+    });
+}
+
+fn square_properties_helper_signed<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
+>() {
+    signed_gen_var_10::<U, S>().test_properties(|x| {
+        let mut square = x;
+        square.square_assign();
+        assert_eq!(square, x.square());
+        assert_eq!(square, x.pow(2));
+        if x != S::MIN {
+            assert_eq!((-x).square(), square);
+        }
+        assert_eq!(
+            U::wrapping_from(square).checked_sqrt().unwrap(),
+            x.unsigned_abs()
+        );
+    });
+}
+
+fn square_properties_helper_primitive_float<T: PrimitiveFloat>() {
+    primitive_float_gen::<T>().test_properties(|x| {
+        let mut square = x;
+        square.square_assign();
+        assert_eq!(NiceFloat(square), NiceFloat(x.square()));
+        assert_eq!(NiceFloat(square), NiceFloat(x.powf(T::TWO)));
+        assert_eq!(NiceFloat((-x).square()), NiceFloat(square));
+    });
+}
+
+#[test]
+fn square_properties() {
+    apply_fn_to_unsigneds!(square_properties_helper_unsigned);
+    apply_fn_to_unsigned_signed_pairs!(square_properties_helper_signed);
+    apply_fn_to_primitive_floats!(square_properties_helper_primitive_float);
 }

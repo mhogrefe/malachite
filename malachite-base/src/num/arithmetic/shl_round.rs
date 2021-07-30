@@ -56,35 +56,22 @@ macro_rules! impl_shl_round {
 
                     /// Shifts `self` left (multiplies it by a power of 2 or divides it by a power
                     /// of 2 and takes the floor) and rounds according to the specified rounding
-                    /// mode. Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
+                    /// mode.
+                    ///
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
                     /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
                     /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
                     /// necessary if `bits` is non-negative.
                     ///
-                    /// Time: worst case O(1)
-                    ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
                     ///
                     /// # Panics
                     /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
-                    /// not divisible by 2<sup>`bits`</sup>.
+                    /// not divisible by $2^b$
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::rounding_modes::RoundingMode;
-                    /// use malachite_base::num::arithmetic::traits::ShlRound;
-                    ///
-                    /// assert_eq!(0x101u16.shl_round(-8i8, RoundingMode::Down), 1);
-                    /// assert_eq!(0x101u32.shl_round(-8i16, RoundingMode::Up), 2);
-                    ///
-                    /// assert_eq!((-0x101i16).shl_round(-9i32, RoundingMode::Down), 0);
-                    /// assert_eq!((-0x101i32).shl_round(-9i64, RoundingMode::Up), -1);
-                    /// assert_eq!((-0x101i64).shl_round(-9i8, RoundingMode::Nearest), -1);
-                    /// assert_eq!((-0xffi32).shl_round(-9i16, RoundingMode::Nearest), 0);
-                    /// assert_eq!((-0x100i16).shl_round(-9i32, RoundingMode::Nearest), 0);
-                    ///
-                    /// assert_eq!(0x100u64.shl_round(-8i64, RoundingMode::Exact), 1);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::shl_round` module.
                     #[inline]
                     fn shl_round(self, bits: $u, rm: RoundingMode) -> $t {
                         _shl_round(self, bits, rm)
@@ -94,56 +81,22 @@ macro_rules! impl_shl_round {
                 impl ShlRoundAssign<$u> for $t {
                     /// Shifts `self` left (multiplies it by a power of 2 or divides it by a power
                     /// of 2 and takes the floor) and rounds according to the specified rounding
-                    /// mode, in place. Passing `RoundingMode::Floor` or `RoundingMode::Down` is
-                    /// equivalent to using `>>`. To test whether `RoundingMode::Exact` can be
-                    /// passed, use `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding
-                    /// might only be necessary if `bits` is non-negative.
+                    /// mode, in place.
                     ///
-                    /// Time: worst case O(1)
+                    /// Passing `RoundingMode::Floor` or `RoundingMode::Down` is equivalent to
+                    /// using `>>`. To test whether `RoundingMode::Exact` can be passed, use
+                    /// `bits > 0 || self.divisible_by_power_of_2(bits)`. Rounding might only be
+                    /// necessary if `bits` is non-negative.
                     ///
-                    /// Additional memory: worst case O(1)
+                    /// # Worst-case complexity
+                    /// Constant time and additional memory.
                     ///
                     /// # Panics
                     /// Panics if `bits` is positive and `rm` is `RoundingMode::Exact` but `self` is
-                    /// not divisible by 2<sup>`bits`</sup>.
+                    /// not divisible by $2^b$.
                     ///
                     /// # Examples
-                    /// ```
-                    /// use malachite_base::rounding_modes::RoundingMode;
-                    /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
-                    ///
-                    /// let mut x = 0x101u16;
-                    /// x.shl_round_assign(-8i8, RoundingMode::Down);
-                    /// assert_eq!(x, 1);
-                    ///
-                    /// let mut x = 0x101u32;
-                    /// x.shl_round_assign(-8i16, RoundingMode::Up);
-                    /// assert_eq!(x, 2);
-                    ///
-                    /// let mut x = -0x101i16;
-                    /// x.shl_round_assign(-9i32, RoundingMode::Down);
-                    /// assert_eq!(x, 0);
-                    ///
-                    /// let mut x = -0x101i32;
-                    /// x.shl_round_assign(-9i64, RoundingMode::Up);
-                    /// assert_eq!(x, -1);
-                    ///
-                    /// let mut x = -0x101i64;
-                    /// x.shl_round_assign(-9i8, RoundingMode::Nearest);
-                    /// assert_eq!(x, -1);
-                    ///
-                    /// let mut x = -0xffi32;
-                    /// x.shl_round_assign(-9i16, RoundingMode::Nearest);
-                    /// assert_eq!(x, 0);
-                    ///
-                    /// let mut x = -0x100i16;
-                    /// x.shl_round_assign(-9i32, RoundingMode::Nearest);
-                    /// assert_eq!(x, 0);
-                    ///
-                    /// let mut x = 0x100u64;
-                    /// x.shl_round_assign(-8i64, RoundingMode::Exact);
-                    /// assert_eq!(x, 1);
-                    /// ```
+                    /// See the documentation of the `num::arithmetic::shl_round` module.
                     #[inline]
                     fn shl_round_assign(&mut self, bits: $u, rm: RoundingMode) {
                         _shl_round_assign(self, bits, rm)

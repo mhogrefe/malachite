@@ -1,9 +1,5 @@
 use malachite_test::common::DemoBenchRegistry;
 
-pub mod shl_round;
-pub mod shr_round;
-pub mod sign;
-pub mod square;
 pub mod wrapping_abs;
 pub mod wrapping_add;
 pub mod wrapping_add_mul;
@@ -22,10 +18,6 @@ pub mod xxx_sub_yyy_is_zzz;
 pub mod xxxx_add_yyyy_is_zzzz;
 
 pub(crate) fn register(registry: &mut DemoBenchRegistry) {
-    shl_round::register(registry);
-    shr_round::register(registry);
-    sign::register(registry);
-    square::register(registry);
     wrapping_abs::register(registry);
     wrapping_add::register(registry);
     wrapping_add_mul::register(registry);

@@ -1,9 +1,10 @@
 use comparison::traits::{Max, Min};
 use named::Named;
-use num::arithmetic::traits::{Abs, AbsAssign, NegAssign, Sign};
+use num::arithmetic::traits::{Abs, AbsAssign, NegAssign, Sign, Square, SquareAssign};
 use num::basic::traits::{NegativeOne, One, Two, Zero};
 use num::conversion::traits::{
-    IntegerMantissaAndExponent, RawMantissaAndExponent, SciMantissaAndExponent, WrappingFrom,
+    CheckedFrom, CheckedInto, ConvertibleFrom, IntegerMantissaAndExponent, IsInteger,
+    RawMantissaAndExponent, RoundingFrom, RoundingInto, SciMantissaAndExponent, WrappingFrom,
 };
 use num::logic::traits::{BitAccess, LowMask, SignificantBits, TrailingZeros};
 use std::cmp::Ordering;
@@ -80,6 +81,42 @@ pub trait PrimitiveFloat:
     + AddAssign<Self>
     + Abs<Output = Self>
     + AbsAssign
+    + CheckedFrom<u8>
+    + CheckedFrom<u16>
+    + CheckedFrom<u32>
+    + CheckedFrom<u64>
+    + CheckedFrom<u128>
+    + CheckedFrom<usize>
+    + CheckedFrom<i8>
+    + CheckedFrom<i16>
+    + CheckedFrom<i32>
+    + CheckedFrom<i64>
+    + CheckedFrom<i128>
+    + CheckedFrom<isize>
+    + CheckedInto<u8>
+    + CheckedInto<u16>
+    + CheckedInto<u32>
+    + CheckedInto<u64>
+    + CheckedInto<u128>
+    + CheckedInto<usize>
+    + CheckedInto<i8>
+    + CheckedInto<i16>
+    + CheckedInto<i32>
+    + CheckedInto<i64>
+    + CheckedInto<i128>
+    + CheckedInto<isize>
+    + ConvertibleFrom<u8>
+    + ConvertibleFrom<u16>
+    + ConvertibleFrom<u32>
+    + ConvertibleFrom<u64>
+    + ConvertibleFrom<u128>
+    + ConvertibleFrom<usize>
+    + ConvertibleFrom<i8>
+    + ConvertibleFrom<i16>
+    + ConvertibleFrom<i32>
+    + ConvertibleFrom<i64>
+    + ConvertibleFrom<i128>
+    + ConvertibleFrom<isize>
     + Copy
     + Debug
     + Default
@@ -92,6 +129,7 @@ pub trait PrimitiveFloat:
     + FromStr
     + IntegerMantissaAndExponent<u64, i64>
     + Into<f64>
+    + IsInteger
     + LowerExp
     + Min
     + Max
@@ -108,9 +146,35 @@ pub trait PrimitiveFloat:
     + RawMantissaAndExponent<u64, u64>
     + Rem<Output = Self>
     + RemAssign<Self>
+    + RoundingFrom<u8>
+    + RoundingFrom<u16>
+    + RoundingFrom<u32>
+    + RoundingFrom<u64>
+    + RoundingFrom<u128>
+    + RoundingFrom<usize>
+    + RoundingFrom<i8>
+    + RoundingFrom<i16>
+    + RoundingFrom<i32>
+    + RoundingFrom<i64>
+    + RoundingFrom<i128>
+    + RoundingFrom<isize>
+    + RoundingInto<u8>
+    + RoundingInto<u16>
+    + RoundingInto<u32>
+    + RoundingInto<u64>
+    + RoundingInto<u128>
+    + RoundingInto<usize>
+    + RoundingInto<i8>
+    + RoundingInto<i16>
+    + RoundingInto<i32>
+    + RoundingInto<i64>
+    + RoundingInto<i128>
+    + RoundingInto<isize>
     + SciMantissaAndExponent<Self, i64>
     + Sign
     + Sized
+    + Square<Output = Self>
+    + SquareAssign
     + Sub<Output = Self>
     + SubAssign<Self>
     + Sum<Self>
@@ -431,24 +495,7 @@ pub trait PrimitiveFloat:
         }
     }
 
-    fn is_integer(self) -> bool {
-        if self.is_nan() || self.is_infinite() {
-            false
-        } else if self == Self::ZERO {
-            true
-        } else {
-            let (raw_mantissa, raw_exponent) = self.raw_mantissa_and_exponent();
-            raw_exponent != 0
-                && i64::wrapping_from(
-                    raw_exponent
-                        + if raw_mantissa == 0 {
-                            Self::MANTISSA_WIDTH
-                        } else {
-                            TrailingZeros::trailing_zeros(raw_mantissa)
-                        },
-                ) > -Self::MIN_EXPONENT
-        }
-    }
+    fn powf(self, exponent: Self) -> Self;
 }
 
 pub mod basic;

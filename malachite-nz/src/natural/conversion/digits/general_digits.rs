@@ -19,7 +19,7 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
 use natural::arithmetic::div_mod::{
-    limbs_div_limb_in_place_mod, limbs_div_mod_extra_in_place, limbs_div_mod_to_out,
+    limbs_div_limb_in_place_mod, limbs_div_mod_extra_in_place, limbs_div_mod_qs_to_out_rs_to_ns,
 };
 use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb_in_place};
 use natural::arithmetic::mul::limbs_mul_to_out;
@@ -633,9 +633,7 @@ fn _limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
             )
         } else {
             let power = &powers[i];
-            //TODO manage memory better
-            let xs_copy = xs[shift..].to_vec();
-            limbs_div_mod_to_out(scratch, &mut xs[shift..], &xs_copy, power.power);
+            limbs_div_mod_qs_to_out_rs_to_ns(scratch, &mut xs[shift..], power.power);
             let mut q_len = xs_len - total_len;
             if scratch[q_len] != 0 {
                 q_len += 1;

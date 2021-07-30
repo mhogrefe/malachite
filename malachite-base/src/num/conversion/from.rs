@@ -1,8 +1,17 @@
 use comparison::traits::{Max, Min};
+use named::Named;
+use num::arithmetic::traits::{ArithmeticCheckedShl, ShrRoundAssign};
+use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
+use num::conversion::mantissa_and_exponent::sci_mantissa_and_exponent_with_rounding;
 use num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
+    CheckedFrom, ConvertibleFrom, IntegerMantissaAndExponent, IsInteger, OverflowingFrom,
+    RoundingFrom, SaturatingFrom, SciMantissaAndExponent, WrappingFrom,
 };
+use num::float::PrimitiveFloat;
+use num::logic::traits::SignificantBits;
+use rounding_modes::RoundingMode;
+use std::ops::Neg;
 
 /// This macro defines conversions from a type to itself.
 macro_rules! identity_conversion {
@@ -452,3 +461,305 @@ no_containment_conversion!(usize, isize);
 no_containment_conversion!(i32, isize);
 no_containment_conversion!(i64, isize);
 no_containment_conversion!(i128, isize);
+
+macro_rules! impl_from_float_unsigned {
+    ($u:ident) => {
+        macro_rules! impl_from_float_unsigned_inner {
+            ($f:ident) => {
+                impl RoundingFrom<$u> for $f {
+                    #[inline]
+                    fn rounding_from(value: $u, rm: RoundingMode) -> $f {
+                        if value == 0 {
+                            return 0.0;
+                        }
+                        let (mantissa, exponent) =
+                            sci_mantissa_and_exponent_with_rounding(value, rm).unwrap();
+                        if let Some(f) = $f::from_sci_mantissa_and_exponent(
+                            mantissa,
+                            i64::wrapping_from(exponent),
+                        ) {
+                            f
+                        } else {
+                            match rm {
+                                RoundingMode::Exact => {
+                                    panic!("Value cannot be represented exactly as an {}", $f::NAME)
+                                }
+                                RoundingMode::Floor
+                                | RoundingMode::Down
+                                | RoundingMode::Nearest => $f::MAX_FINITE,
+                                _ => $f::POSITIVE_INFINITY,
+                            }
+                        }
+                    }
+                }
+
+                impl RoundingFrom<$f> for $u {
+                    #[inline]
+                    fn rounding_from(value: $f, rm: RoundingMode) -> $u {
+                        assert!(!value.is_nan());
+                        if value.is_infinite() {
+                            let limit = if value > 0.0 { $u::MAX } else { 0 };
+                            return match rm {
+                                RoundingMode::Exact => {
+                                    panic!("Value cannot be represented exactly as a {}", $u::NAME)
+                                }
+                                RoundingMode::Down | RoundingMode::Nearest => limit,
+                                RoundingMode::Floor if value > 0.0 => limit,
+                                RoundingMode::Ceiling if value < 0.0 => limit,
+                                _ => panic!("Cannot round away from extreme value"),
+                            };
+                        }
+                        if value == 0.0 {
+                            return 0;
+                        }
+                        if value < 0.0 {
+                            return match rm {
+                                RoundingMode::Exact => {
+                                    panic!("Value cannot be represented exactly as a {}", $u::NAME)
+                                }
+                                RoundingMode::Ceiling
+                                | RoundingMode::Down
+                                | RoundingMode::Nearest => 0,
+                                _ => panic!("Value is less than 0 and rounding mode is {}", rm),
+                            };
+                        }
+                        let (mut mantissa, exponent) = value.integer_mantissa_and_exponent();
+                        let result = if exponent <= 0 {
+                            mantissa.shr_round_assign(-exponent, rm);
+                            $u::checked_from(mantissa)
+                        } else {
+                            $u::checked_from(mantissa)
+                                .and_then(|n| n.arithmetic_checked_shl(exponent))
+                        };
+                        if let Some(n) = result {
+                            n
+                        } else {
+                            match rm {
+                                RoundingMode::Exact => {
+                                    panic!("Value cannot be represented exactly as a {}", $u::NAME)
+                                }
+                                RoundingMode::Floor
+                                | RoundingMode::Down
+                                | RoundingMode::Nearest => $u::MAX,
+                                _ => panic!(
+                                    "Value is greater than {}::MAX and rounding mode is {}",
+                                    $u::NAME,
+                                    rm
+                                ),
+                            }
+                        }
+                    }
+                }
+
+                impl CheckedFrom<$u> for $f {
+                    #[inline]
+                    fn checked_from(value: $u) -> Option<$f> {
+                        if value == 0 {
+                            return Some(0.0);
+                        }
+                        let (mantissa, exponent) =
+                            sci_mantissa_and_exponent_with_rounding(value, RoundingMode::Exact)?;
+                        $f::from_sci_mantissa_and_exponent(mantissa, i64::wrapping_from(exponent))
+                    }
+                }
+
+                impl CheckedFrom<$f> for $u {
+                    #[inline]
+                    fn checked_from(value: $f) -> Option<$u> {
+                        if !value.is_finite() {
+                            None
+                        } else if value == 0.0 {
+                            Some(0)
+                        } else if value < 0.0 {
+                            None
+                        } else {
+                            let (mantissa, exponent) = value.integer_mantissa_and_exponent();
+                            if exponent < 0 {
+                                None
+                            } else {
+                                $u::checked_from(mantissa)
+                                    .and_then(|n| n.arithmetic_checked_shl(exponent))
+                            }
+                        }
+                    }
+                }
+
+                impl ConvertibleFrom<$u> for $f {
+                    #[inline]
+                    fn convertible_from(value: $u) -> bool {
+                        if value == 0 {
+                            return true;
+                        }
+                        let precision = (value >> value.trailing_zeros()).significant_bits();
+                        precision <= $f::MANTISSA_WIDTH + 1
+                            && i64::wrapping_from(SciMantissaAndExponent::<$f, u64>::sci_exponent(
+                                value,
+                            )) <= $f::MAX_EXPONENT
+                    }
+                }
+
+                impl ConvertibleFrom<$f> for $u {
+                    #[inline]
+                    fn convertible_from(value: $f) -> bool {
+                        value >= 0.0
+                            && value.is_integer()
+                            && (value == 0.0
+                                || value.sci_exponent() < i64::wrapping_from($u::WIDTH))
+                    }
+                }
+            };
+        }
+        apply_to_primitive_floats!(impl_from_float_unsigned_inner);
+    };
+}
+apply_to_unsigneds!(impl_from_float_unsigned);
+
+macro_rules! impl_from_float_signed {
+    ($u:ident, $i:ident) => {
+        macro_rules! impl_from_float_signed_inner {
+            ($f:ident) => {
+                impl RoundingFrom<$i> for $f {
+                    #[inline]
+                    fn rounding_from(value: $i, rm: RoundingMode) -> $f {
+                        let abs = value.unsigned_abs();
+                        if value >= 0 {
+                            $f::rounding_from(abs, rm)
+                        } else {
+                            -$f::rounding_from(abs, -rm)
+                        }
+                    }
+                }
+
+                impl RoundingFrom<$f> for $i {
+                    #[inline]
+                    fn rounding_from(value: $f, rm: RoundingMode) -> $i {
+                        if value.is_infinite() {
+                            let limit = if value > 0.0 { $i::MAX } else { $i::MIN };
+                            return match rm {
+                                RoundingMode::Exact => {
+                                    panic!("Value cannot be represented exactly as a {}", $u::NAME)
+                                }
+                                RoundingMode::Down | RoundingMode::Nearest => limit,
+                                RoundingMode::Floor if value > 0.0 => limit,
+                                RoundingMode::Ceiling if value < 0.0 => limit,
+                                _ => panic!("Cannot round away from extreme value"),
+                            };
+                        }
+                        if value >= 0.0 {
+                            let abs = $u::rounding_from(value, rm);
+                            if let Some(n) = $i::checked_from(abs) {
+                                n
+                            } else {
+                                match rm {
+                                    RoundingMode::Exact => {
+                                        panic!(
+                                            "Value cannot be represented exactly as an {}",
+                                            $i::NAME
+                                        )
+                                    }
+                                    RoundingMode::Floor
+                                    | RoundingMode::Down
+                                    | RoundingMode::Nearest => $i::MAX,
+                                    _ => panic!(
+                                        "Value is greater than {}::MAX and rounding mode is {}",
+                                        $i::NAME,
+                                        rm
+                                    ),
+                                }
+                            }
+                        } else {
+                            let abs = $u::rounding_from(-value, -rm);
+                            let n = if abs == $i::MIN.unsigned_abs() {
+                                Some($i::MIN)
+                            } else {
+                                $i::checked_from(abs).map(Neg::neg)
+                            };
+                            if let Some(n) = n {
+                                n
+                            } else {
+                                match rm {
+                                    RoundingMode::Exact => {
+                                        panic!(
+                                            "Value cannot be represented exactly as an {}",
+                                            $i::NAME
+                                        )
+                                    }
+                                    RoundingMode::Ceiling
+                                    | RoundingMode::Down
+                                    | RoundingMode::Nearest => $i::MIN,
+                                    _ => panic!(
+                                        "Value is smaller than {}::MIN and rounding mode is {}",
+                                        $u::NAME,
+                                        rm
+                                    ),
+                                }
+                            }
+                        }
+                    }
+                }
+
+                impl CheckedFrom<$i> for $f {
+                    #[inline]
+                    fn checked_from(value: $i) -> Option<$f> {
+                        let abs = value.unsigned_abs();
+                        if value >= 0 {
+                            $f::checked_from(abs)
+                        } else {
+                            $f::checked_from(abs).map(Neg::neg)
+                        }
+                    }
+                }
+
+                impl CheckedFrom<$f> for $i {
+                    #[inline]
+                    fn checked_from(value: $f) -> Option<$i> {
+                        if !value.is_finite() {
+                            return None;
+                        }
+                        if value >= 0.0 {
+                            $i::checked_from($u::checked_from(value)?)
+                        } else {
+                            let abs = $u::checked_from(-value)?;
+                            if abs == $i::MIN.unsigned_abs() {
+                                Some($i::MIN)
+                            } else {
+                                $i::checked_from(abs).map(Neg::neg)
+                            }
+                        }
+                    }
+                }
+
+                impl ConvertibleFrom<$i> for $f {
+                    #[inline]
+                    fn convertible_from(value: $i) -> bool {
+                        $f::convertible_from(value.unsigned_abs())
+                    }
+                }
+
+                impl ConvertibleFrom<$f> for $i {
+                    #[allow(clippy::float_cmp)]
+                    #[inline]
+                    fn convertible_from(value: $f) -> bool {
+                        if !value.is_integer() {
+                            return false;
+                        }
+                        if value >= 0.0 {
+                            value == 0.0 || value.sci_exponent() < i64::wrapping_from($u::WIDTH) - 1
+                        } else {
+                            let exponent = value.sci_exponent();
+                            let limit = i64::wrapping_from($u::WIDTH) - 1;
+                            value == 0.0
+                                || exponent < limit
+                                || exponent == limit
+                                    && value
+                                        == -$f::from_sci_mantissa_and_exponent(1.0, exponent)
+                                            .unwrap()
+                        }
+                    }
+                }
+            };
+        }
+        apply_to_primitive_floats!(impl_from_float_signed_inner);
+    };
+}
+apply_to_unsigned_signed_pairs!(impl_from_float_signed);

@@ -3,6 +3,9 @@ pub mod from_floating_point;
 pub mod from_natural;
 pub mod from_primitive_int;
 pub mod from_twos_complement_limbs;
+/// This module implements a trait for determining whether an `Integer` is an integer. (It always
+/// is.)
+pub mod is_integer;
 pub mod natural_from_integer;
 pub mod primitive_int_from_integer;
 pub mod string;

@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::ShlRound;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, IntegerMantissaAndExponent, RoundingFrom,
+    CheckedFrom, ConvertibleFrom, IntegerMantissaAndExponent, IsInteger, RoundingFrom,
 };
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
@@ -60,19 +60,22 @@ macro_rules! float_impls {
             /// assert_eq!(Natural::rounding_from(-0.5, RoundingMode::Nearest).to_string(), "0");
             /// ```
             fn rounding_from(value: $f, rm: RoundingMode) -> Self {
-                if value.is_nan() || value.is_infinite() {
+                if value.is_nan() || value == $f::POSITIVE_INFINITY {
                     panic!("Cannot convert {} to Natural", value);
                 } else if value == 0.0 {
                     Natural::ZERO
-                } else {
-                    let (mantissa, exponent) = value.integer_mantissa_and_exponent();
-                    let value_negative = value < 0.0;
-                    let n = Natural::from(mantissa)
-                        .shl_round(exponent, if value_negative { -rm } else { rm });
-                    if value_negative && n != 0 {
+                } else if value < 0.0 {
+                    if rm == RoundingMode::Down
+                        || rm == RoundingMode::Ceiling
+                        || rm == RoundingMode::Nearest
+                    {
+                        Natural::ZERO
+                    } else {
                         panic!("Result is negative and cannot be converted to a Natural");
                     }
-                    n
+                } else {
+                    let (mantissa, exponent) = value.integer_mantissa_and_exponent();
+                    Natural::from(mantissa).shl_round(exponent, rm)
                 }
             }
         }
@@ -215,6 +218,5 @@ macro_rules! float_impls {
         }
     };
 }
-
 float_impls!(f32);
 float_impls!(f64);

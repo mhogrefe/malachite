@@ -4,7 +4,7 @@ use malachite_base_test_util::bench::bucketers::triple_1_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{
-    signed_unsigned_rounding_mode_triple_gen_var_3,
+    signed_unsigned_rounding_mode_triple_gen_var_1,
     unsigned_unsigned_rounding_mode_triple_gen_var_3,
 };
 use malachite_base_test_util::runner::Runner;
@@ -69,7 +69,7 @@ fn demo_round_to_multiple_of_power_of_2_signed<T: PrimitiveSigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for (x, pow, rm) in signed_unsigned_rounding_mode_triple_gen_var_3::<T>()
+    for (x, pow, rm) in signed_unsigned_rounding_mode_triple_gen_var_1::<T>()
         .get(gm, &config)
         .take(limit)
     {
@@ -88,7 +88,7 @@ fn demo_round_to_multiple_of_power_of_2_assign_signed<T: PrimitiveSigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut x, pow, rm) in signed_unsigned_rounding_mode_triple_gen_var_3::<T>()
+    for (mut x, pow, rm) in signed_unsigned_rounding_mode_triple_gen_var_1::<T>()
         .get(gm, &config)
         .take(limit)
     {
@@ -162,7 +162,7 @@ fn benchmark_round_to_multiple_of_power_of_2_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_unsigned_rounding_mode_triple_gen_var_3::<T>().get(gm, &config),
+        signed_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -186,7 +186,7 @@ fn benchmark_round_to_multiple_of_power_of_2_assign_signed<T: PrimitiveSigned>(
             T::NAME
         ),
         BenchmarkType::Single,
-        signed_unsigned_rounding_mode_triple_gen_var_3::<T>().get(gm, &config),
+        signed_unsigned_rounding_mode_triple_gen_var_1::<T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

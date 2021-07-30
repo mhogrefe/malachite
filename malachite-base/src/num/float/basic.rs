@@ -73,6 +73,11 @@ macro_rules! float_traits {
             fn ceil(self) -> Self {
                 $t::ceil(self)
             }
+
+            #[inline]
+            fn powf(self, exponent: Self) -> Self {
+                $t::powf(self, exponent)
+            }
         }
     };
 }

@@ -7,11 +7,12 @@ use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
 use malachite_base_test_util::generators::{
-    primitive_float_gen, primitive_float_gen_var_5, primitive_float_gen_var_6,
-    primitive_float_gen_var_7, primitive_float_gen_var_8,
-    primitive_float_rounding_mode_pair_gen_var_2,
+    primitive_float_gen, primitive_float_gen_var_14, primitive_float_gen_var_5,
+    primitive_float_gen_var_6, primitive_float_gen_var_7, primitive_float_gen_var_8,
+    primitive_float_rounding_mode_pair_gen_var_2, primitive_float_rounding_mode_pair_gen_var_3,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
 
 #[test]
 fn test_rounding_from_f32() {
@@ -873,7 +874,8 @@ fn rounding_from_float_properties_helper<
     T: for<'a> From<&'a Integer> + PrimitiveFloat + for<'a> RoundingFrom<&'a Integer>,
 >()
 where
-    Integer: RoundingFrom<T>,
+    Integer: From<T> + RoundingFrom<T>,
+    SignedLimb: ConvertibleFrom<T> + RoundingFrom<T>,
 {
     primitive_float_rounding_mode_pair_gen_var_2::<T>().test_properties(|(f, rm)| {
         let n = Integer::rounding_from(f, rm);
@@ -915,6 +917,23 @@ where
         let nearest = Integer::rounding_from(f, RoundingMode::Nearest);
         assert_eq!(nearest, if floor.even() { floor } else { ceiling });
     });
+
+    let min: Integer = From::from(SignedLimb::MIN);
+    let max: Integer = From::from(SignedLimb::MAX);
+    primitive_float_rounding_mode_pair_gen_var_3::<T, SignedLimb>().test_properties(
+        move |(f, rm)| {
+            if f.is_finite() {
+                let mut n = Integer::rounding_from(f, rm);
+                if n > max {
+                    n = max.clone();
+                }
+                if n < min {
+                    n = min.clone();
+                }
+                assert_eq!(SignedLimb::rounding_from(f, rm), n);
+            }
+        },
+    );
 }
 
 #[test]
@@ -963,11 +982,15 @@ fn from_float_properties() {
 fn checked_from_float_properties_helper<T: PrimitiveFloat + for<'a> RoundingFrom<&'a Integer>>()
 where
     Integer: CheckedFrom<T> + RoundingFrom<T>,
+    SignedLimb: CheckedFrom<T>,
 {
     primitive_float_gen::<T>().test_properties(|f| {
         let on = Integer::checked_from(f);
         assert!(on.as_ref().map_or(true, Integer::is_valid));
         assert_eq!(Integer::checked_from(-f), on.map(|n| -n));
+        if let Some(n) = SignedLimb::checked_from(f) {
+            assert_eq!(n, Integer::exact_from(f));
+        }
     });
 
     primitive_float_gen_var_5::<T>().test_properties(|f| {
@@ -984,6 +1007,10 @@ where
     primitive_float_gen_var_7::<T>().test_properties(|f| {
         assert!(Integer::checked_from(f).is_none());
     });
+
+    primitive_float_gen_var_14::<T, SignedLimb>().test_properties(|f| {
+        assert_eq!(SignedLimb::exact_from(f), Integer::exact_from(f));
+    });
 }
 
 #[test]
@@ -994,9 +1021,13 @@ fn checked_from_float_properties() {
 fn convertible_from_float_properties_helper<T: PrimitiveFloat>()
 where
     Integer: ConvertibleFrom<T>,
+    SignedLimb: ConvertibleFrom<T>,
 {
     primitive_float_gen::<T>().test_properties(|f| {
-        Integer::convertible_from(f);
+        let nc = Integer::convertible_from(f);
+        if SignedLimb::convertible_from(f) {
+            assert!(nc);
+        }
     });
 
     primitive_float_gen_var_5::<T>().test_properties(|f| {

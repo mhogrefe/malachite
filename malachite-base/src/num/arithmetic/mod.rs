@@ -41,7 +41,7 @@ pub mod abs;
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # add_mul_assign
+/// # add_mul
 /// ```
 /// use malachite_base::num::arithmetic::traits::AddMul;
 ///
@@ -2404,8 +2404,232 @@ pub mod saturating_sub;
 /// assert_eq!(x, -128);
 /// ```
 pub mod saturating_sub_mul;
+/// This module contains functions for multiplying a number by a power of 2 and rounding according
+/// to a specified rounding mode.
+///
+/// # shl_round
+/// ```
+/// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::num::arithmetic::traits::ShlRound;
+///
+/// assert_eq!(0x101u16.shl_round(-8i8, RoundingMode::Down), 1);
+/// assert_eq!(0x101u32.shl_round(-8i16, RoundingMode::Up), 2);
+///
+/// assert_eq!((-0x101i16).shl_round(-9i32, RoundingMode::Down), 0);
+/// assert_eq!((-0x101i32).shl_round(-9i64, RoundingMode::Up), -1);
+/// assert_eq!((-0x101i64).shl_round(-9i8, RoundingMode::Nearest), -1);
+/// assert_eq!((-0xffi32).shl_round(-9i16, RoundingMode::Nearest), 0);
+/// assert_eq!((-0x100i16).shl_round(-9i32, RoundingMode::Nearest), 0);
+///
+/// assert_eq!(0x100u64.shl_round(-8i64, RoundingMode::Exact), 1);
+/// ```
+///
+/// # shl_round_assign
+/// ```
+/// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
+///
+/// let mut x = 0x101u16;
+/// x.shl_round_assign(-8i8, RoundingMode::Down);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 0x101u32;
+/// x.shl_round_assign(-8i16, RoundingMode::Up);
+/// assert_eq!(x, 2);
+///
+/// let mut x = -0x101i16;
+/// x.shl_round_assign(-9i32, RoundingMode::Down);
+/// assert_eq!(x, 0);
+///
+/// let mut x = -0x101i32;
+/// x.shl_round_assign(-9i64, RoundingMode::Up);
+/// assert_eq!(x, -1);
+///
+/// let mut x = -0x101i64;
+/// x.shl_round_assign(-9i8, RoundingMode::Nearest);
+/// assert_eq!(x, -1);
+///
+/// let mut x = -0xffi32;
+/// x.shl_round_assign(-9i16, RoundingMode::Nearest);
+/// assert_eq!(x, 0);
+///
+/// let mut x = -0x100i16;
+/// x.shl_round_assign(-9i32, RoundingMode::Nearest);
+/// assert_eq!(x, 0);
+///
+/// let mut x = 0x100u64;
+/// x.shl_round_assign(-8i64, RoundingMode::Exact);
+/// assert_eq!(x, 1);
+/// ```
 pub mod shl_round;
+/// This module contains functions for multiplying a number by a power of 2 and rounding according
+/// to a specified rounding mode.
+///
+/// # shr_round
+/// ```
+/// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::num::arithmetic::traits::ShrRound;
+///
+/// assert_eq!(0x101u32.shr_round(8u8, RoundingMode::Down), 1);
+/// assert_eq!(0x101u16.shr_round(8u16, RoundingMode::Up), 2);
+///
+/// assert_eq!(0x101u64.shr_round(9u32, RoundingMode::Down), 0);
+/// assert_eq!(0x101u32.shr_round(9u64, RoundingMode::Up), 1);
+/// assert_eq!(0x101u16.shr_round(9u8, RoundingMode::Nearest), 1);
+/// assert_eq!(0xffu8.shr_round(9u16, RoundingMode::Nearest), 0);
+/// assert_eq!(0x100u32.shr_round(9u32, RoundingMode::Nearest), 0);
+///
+/// assert_eq!(0x100u32.shr_round(8u64, RoundingMode::Exact), 1);
+///
+/// assert_eq!(0x101i32.shr_round(8u8, RoundingMode::Down), 1);
+/// assert_eq!(0x101i16.shr_round(8u16, RoundingMode::Up), 2);
+///
+/// assert_eq!((-0x101i32).shr_round(9u32, RoundingMode::Down), 0);
+/// assert_eq!((-0x101i64).shr_round(9u64, RoundingMode::Up), -1);
+/// assert_eq!((-0x101i16).shr_round(9u8, RoundingMode::Nearest), -1);
+/// assert_eq!((-0xffi32).shr_round(9u16, RoundingMode::Nearest), 0);
+/// assert_eq!((-0x100i64).shr_round(9u32, RoundingMode::Nearest), 0);
+///
+/// assert_eq!(0x100i32.shr_round(8u64, RoundingMode::Exact), 1);
+///
+/// assert_eq!(0x101u32.shr_round(8i8, RoundingMode::Down), 1);
+/// assert_eq!(0x101u16.shr_round(8i16, RoundingMode::Up), 2);
+///
+/// assert_eq!((-0x101i32).shr_round(9i32, RoundingMode::Down), 0);
+/// assert_eq!((-0x101i64).shr_round(9i64, RoundingMode::Up), -1);
+/// assert_eq!((-0x101i16).shr_round(9i8, RoundingMode::Nearest), -1);
+/// assert_eq!((-0xffi32).shr_round(9i16, RoundingMode::Nearest), 0);
+/// assert_eq!((-0x100i64).shr_round(9i32, RoundingMode::Nearest), 0);
+///
+/// assert_eq!(0x100u32.shr_round(8i64, RoundingMode::Exact), 1);
+/// ```
+///
+/// # shr_round_assign
+/// ```
+/// use malachite_base::rounding_modes::RoundingMode;
+/// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
+///
+/// let mut x = 0x101u32;
+/// x.shr_round_assign(8u8, RoundingMode::Down);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 0x101u16;
+/// x.shr_round_assign(8u16, RoundingMode::Up);
+/// assert_eq!(x, 2);
+///
+/// let mut x = 0x101u64;
+/// x.shr_round_assign(9u32, RoundingMode::Down);
+/// assert_eq!(x, 0);
+///
+/// let mut x = 0x101u32;
+/// x.shr_round_assign(9u64, RoundingMode::Up);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 0x101u16;
+/// x.shr_round_assign(9u8, RoundingMode::Nearest);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 0xffu8;
+/// x.shr_round_assign(9u16, RoundingMode::Nearest);
+/// assert_eq!(x, 0);
+///
+/// let mut x = 0x100u32;
+/// x.shr_round_assign(9u32, RoundingMode::Nearest);
+/// assert_eq!(x, 0);
+///
+/// let mut x = 0x100u32;
+/// x.shr_round_assign(8u64, RoundingMode::Exact);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 0x101i32;
+/// x.shr_round_assign(8u8, RoundingMode::Down);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 0x101i16;
+/// x.shr_round_assign(8u16, RoundingMode::Up);
+/// assert_eq!(x, 2);
+///
+/// let mut x = -0x101i32;
+/// x.shr_round_assign(9u32, RoundingMode::Down);
+/// assert_eq!(x, 0);
+///
+/// let mut x = -0x101i64;
+/// x.shr_round_assign(9u64, RoundingMode::Up);
+/// assert_eq!(x, -1);
+///
+/// let mut x = -0x101i16;
+/// x.shr_round_assign(9u8, RoundingMode::Nearest);
+/// assert_eq!(x, -1);
+///
+/// let mut x = -0xffi32;
+/// x.shr_round_assign(9u16, RoundingMode::Nearest);
+/// assert_eq!(x, 0);
+///
+/// let mut x = -0x100i64;
+/// x.shr_round_assign(9u32, RoundingMode::Nearest);
+/// assert_eq!(x, 0);
+///
+/// let mut x = 0x100u32;
+/// x.shr_round_assign(8i64, RoundingMode::Exact);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 0x101u32;
+/// x.shr_round_assign(8i8, RoundingMode::Down);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 0x101u16;
+/// x.shr_round_assign(8i16, RoundingMode::Up);
+/// assert_eq!(x, 2);
+///
+/// let mut x = -0x101i32;
+/// x.shr_round_assign(9i32, RoundingMode::Down);
+/// assert_eq!(x, 0);
+///
+/// let mut x = -0x101i64;
+/// x.shr_round_assign(9i64, RoundingMode::Up);
+/// assert_eq!(x, -1);
+///
+/// let mut x = -0x101i16;
+/// x.shr_round_assign(9i8, RoundingMode::Nearest);
+/// assert_eq!(x, -1);
+///
+/// let mut x = -0xffi32;
+/// x.shr_round_assign(9i16, RoundingMode::Nearest);
+/// assert_eq!(x, 0);
+///
+/// let mut x = -0x100i64;
+/// x.shr_round_assign(9i32, RoundingMode::Nearest);
+/// assert_eq!(x, 0);
+///
+/// let mut x = 0x100u32;
+/// x.shr_round_assign(8i64, RoundingMode::Exact);
+/// assert_eq!(x, 1);
+/// ```
 pub mod shr_round;
+/// This module contains functions for determining the sign of a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # sign
+/// ```
+/// use malachite_base::num::arithmetic::traits::Sign;
+/// use malachite_base::num::float::PrimitiveFloat;
+/// use std::cmp::Ordering;
+///
+/// assert_eq!(0u8.sign(), Ordering::Equal);
+/// assert_eq!(100u64.sign(), Ordering::Greater);
+/// assert_eq!((-100i16).sign(), Ordering::Less);
+///
+/// assert_eq!(0.0.sign(), Ordering::Greater);
+/// assert_eq!(1.0.sign(), Ordering::Greater);
+/// assert_eq!(f64::POSITIVE_INFINITY.sign(), Ordering::Greater);
+///
+/// assert_eq!((-0.0).sign(), Ordering::Less);
+/// assert_eq!((-1.0).sign(), Ordering::Less);
+/// assert_eq!(f64::NEGATIVE_INFINITY.sign(), Ordering::Less);
+///
+/// assert_eq!(f64::NAN.sign(), Ordering::Equal);
+/// ```
 pub mod sign;
 /// This module contains functions for taking the square root of a number.
 ///
@@ -2530,7 +2754,60 @@ pub mod sign;
 /// assert_eq!(x, 100000);
 /// ```
 pub mod sqrt;
+/// This module contains functions for squaring a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # square
+/// ```
+/// use malachite_base::num::arithmetic::traits::Square;
+///
+/// assert_eq!(3u8.square(), 9);
+/// assert_eq!((-1000i32).square(), 1000000);
+/// assert_eq!(1.5f32.square(), 2.25);
+/// ```
+///
+/// # square_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::SquareAssign;
+///
+/// let mut x = 3u8;
+/// x.square_assign();
+/// assert_eq!(x, 9);
+///
+/// let mut x = -1000i32;
+/// x.square_assign();
+/// assert_eq!(x, 1000000);
+///
+/// let mut x = 1.5f32;
+/// x.square_assign();
+/// assert_eq!(x, 2.25);
+/// ```
 pub mod square;
+/// This module contains functions for subtracting the product of two numbers from a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::SubMul;
+///
+/// assert_eq!(60u32.sub_mul(5, 10), 10);
+/// assert_eq!(127i8.sub_mul(2, 100), -73);
+/// ```
+///
+/// # sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::SubMulAssign;
+///
+/// let mut x = 60u32;
+/// x.sub_mul_assign(5, 10);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 127i8;
+/// x.sub_mul_assign(2, 100);
+/// assert_eq!(x, -73);
+/// ```
 pub mod sub_mul;
 pub mod traits;
 pub mod wrapping_abs;

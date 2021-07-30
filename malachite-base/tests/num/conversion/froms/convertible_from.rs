@@ -2,7 +2,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom};
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use malachite_base::num::float::PrimitiveFloat;
+use malachite_base_test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
 use std::fmt::Debug;
 
 #[test]
@@ -56,8 +57,43 @@ fn convertible_from_helper_primitive_int_signed<
     });
 }
 
+fn convertible_from_helper_primitive_int_primitive_float<
+    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveInt,
+    U: PrimitiveFloat,
+>() {
+    primitive_float_gen::<U>().test_properties(|f| {
+        let convertible = T::convertible_from(f);
+        assert_eq!(convertible, T::checked_from(f).is_some())
+    });
+}
+
+fn convertible_from_helper_primitive_float_unsigned<
+    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveFloat,
+    U: PrimitiveUnsigned,
+>() {
+    unsigned_gen::<U>().test_properties(|u| {
+        let convertible = T::convertible_from(u);
+        assert_eq!(convertible, T::checked_from(u).is_some())
+    });
+}
+
+fn convertible_from_helper_primitive_float_signed<
+    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveFloat,
+    U: PrimitiveSigned,
+>() {
+    signed_gen::<U>().test_properties(|i| {
+        let convertible = T::convertible_from(i);
+        assert_eq!(convertible, T::checked_from(i).is_some())
+    });
+}
+
 #[test]
 fn convertible_from_properties() {
     apply_fn_to_primitive_ints_and_unsigneds!(convertible_from_helper_primitive_int_unsigned);
     apply_fn_to_primitive_ints_and_signeds!(convertible_from_helper_primitive_int_signed);
+    apply_fn_to_primitive_ints_and_primitive_floats!(
+        convertible_from_helper_primitive_int_primitive_float
+    );
+    apply_fn_to_primitive_floats_and_unsigneds!(convertible_from_helper_primitive_float_unsigned);
+    apply_fn_to_primitive_floats_and_signeds!(convertible_from_helper_primitive_float_signed);
 }

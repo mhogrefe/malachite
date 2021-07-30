@@ -499,15 +499,6 @@ where
     )
 }
 
-// All pairs of signeds where the second is nonzero and the first is not divisible by the second.
-pub fn pairs_of_signeds_var_3<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(pairs_of_signed_and_nonzero_signed::<T, T>(gm).filter(|&(x, y)| !x.divisible_by(y)))
-}
-
 // All pairs of `T`s where `T` is signed, the second `T` is nonzero, and the first `T` is divisible
 // by the second.
 pub fn pairs_of_signeds_var_4<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
@@ -739,16 +730,6 @@ pub fn pairs_of_unsigned_and_positive_unsigned<
             &special_random_positive_unsigned,
         )),
     }
-}
-
-// All pairs of `T`s`, where `T` is unsigned, the second `T` is nonzero, and the first `T` is not
-// divisible by the second.
-pub fn pairs_of_unsigned_and_positive_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, T)> {
-    Box::new(
-        pairs_of_unsigned_and_positive_unsigned::<T, T>(gm).filter(|&(x, y)| !x.divisible_by(y)),
-    )
 }
 
 pub fn pairs_of_signed_and_nonzero_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned + Rand>(

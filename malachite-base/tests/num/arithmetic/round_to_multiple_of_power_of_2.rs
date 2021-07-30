@@ -5,7 +5,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::{
     signed_rounding_mode_pair_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_16,
     signed_unsigned_pair_gen_var_17, signed_unsigned_pair_gen_var_8,
-    signed_unsigned_rounding_mode_triple_gen_var_3, unsigned_pair_gen_var_14,
+    signed_unsigned_rounding_mode_triple_gen_var_1, unsigned_pair_gen_var_14,
     unsigned_pair_gen_var_2, unsigned_pair_gen_var_21, unsigned_rounding_mode_pair_gen,
     unsigned_unsigned_rounding_mode_triple_gen_var_3,
 };
@@ -214,7 +214,7 @@ fn round_to_multiple_of_power_of_2_properties_helper_unsigned<T: PrimitiveUnsign
 }
 
 fn round_to_multiple_of_power_of_2_properties_helper_signed<T: PrimitiveSigned>() {
-    signed_unsigned_rounding_mode_triple_gen_var_3::<T>().test_properties(|(n, pow, rm)| {
+    signed_unsigned_rounding_mode_triple_gen_var_1::<T>().test_properties(|(n, pow, rm)| {
         let rounded = n.round_to_multiple_of_power_of_2(pow, rm);
 
         let mut mut_n = n;

@@ -112,7 +112,7 @@ fn benchmark_power_of_2_digits_size_hint<
     file_name: &str,
 ) {
     run_benchmark(
-        &&format!(
+        &format!(
             "PowerOf2DigitIterable::<{}>::power_of_2_digits(&{}, u64).size_hint()",
             U::NAME,
             T::NAME
@@ -139,7 +139,7 @@ fn benchmark_power_of_2_digits_get_algorithms<
     file_name: &str,
 ) {
     run_benchmark(
-        &&format!(
+        &format!(
             "PowerOf2DigitIterable::<{}>::power_of_2_digits(&{}, u64).size_hint()",
             U::NAME,
             T::NAME

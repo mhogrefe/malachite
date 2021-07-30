@@ -13,15 +13,16 @@ use malachite_base::chars::random::{
 use malachite_base::comparison::traits::Min;
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
-    ArithmeticCheckedShl, DivRound, PowerOf2, ShrRound, UnsignedAbs,
+    ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, SaturatingFrom,
-    SplitInHalf, WrappingFrom, WrappingInto,
+    CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
+    SaturatingFrom, SplitInHalf, WrappingFrom, WrappingInto,
 };
+use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::num::random::geometric::{
@@ -41,8 +42,8 @@ use malachite_base::num::random::{
     special_random_positive_finite_primitive_floats,
     special_random_primitive_float_inclusive_range, special_random_primitive_float_range,
     special_random_primitive_floats, variable_range_generator, RandomPrimitiveInts,
-    RandomUnsignedBitChunks, RandomUnsignedInclusiveRange, SpecialRandomNonzeroFiniteFloats,
-    VariableRangeGenerator,
+    RandomUnsignedBitChunks, RandomUnsignedInclusiveRange, RandomUnsignedRange,
+    SpecialRandomNonzeroFiniteFloats, VariableRangeGenerator,
 };
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::random::{random_rounding_modes, RandomRoundingModes};
@@ -342,6 +343,122 @@ pub fn random_primitive_float_gen_var_12<T: PrimitiveFloat>(config: &GenConfig) 
     ))
 }
 
+pub fn random_primitive_float_gen_var_13<T: PrimitiveFloat + RoundingFrom<U>, U: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<T> {
+    Box::new(
+        random_primitive_ints::<U>(EXAMPLE_SEED).map(|n| T::rounding_from(n, RoundingMode::Down)),
+    )
+}
+
+pub fn random_primitive_float_gen_var_14<
+    T: PrimitiveFloat,
+    U: ConvertibleFrom<T> + PrimitiveInt,
+>(
+    config: &GenConfig,
+) -> It<T> {
+    Box::new(
+        special_random_primitive_floats::<T>(
+            EXAMPLE_SEED,
+            config.get_or("exponent_mean_n", 8),
+            config.get_or("exponent_mean_d", 1),
+            config.get_or("precision_mean_n", 8),
+            config.get_or("precision_mean_d", 1),
+            config.get_or("special_p_mean_n", 1),
+            config.get_or("special_p_mean_d", 64),
+        )
+        .filter(|&f| !U::convertible_from(f)),
+    )
+}
+
+pub fn random_primitive_float_gen_var_15<
+    T: PrimitiveFloat + RoundingFrom<U>,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<T> {
+    let limit = min(
+        NiceFloat(T::rounding_from(U::MAX, RoundingMode::Down)),
+        NiceFloat(
+            T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH))
+                .unwrap(),
+        ),
+    )
+    .0;
+    Box::new(
+        special_random_primitive_float_inclusive_range::<T>(
+            EXAMPLE_SEED,
+            T::ONE,
+            limit,
+            config.get_or("exponent_mean_n", 8),
+            config.get_or("exponent_mean_d", 1),
+            config.get_or("precision_mean_n", 8),
+            config.get_or("precision_mean_d", 1),
+            1,
+            100,
+        )
+        .map(|f| f.floor() - T::ONE / T::TWO),
+    )
+}
+
+pub fn random_primitive_float_gen_var_16<
+    T: PrimitiveFloat + RoundingFrom<U>,
+    U: PrimitiveSigned,
+>(
+    config: &GenConfig,
+) -> It<T> {
+    let min_limit = min(
+        NiceFloat(-T::rounding_from(U::MIN, RoundingMode::Down)),
+        NiceFloat(
+            T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH))
+                .unwrap(),
+        ),
+    )
+    .0;
+    let max_limit = min(
+        NiceFloat(T::rounding_from(U::MAX, RoundingMode::Down)),
+        NiceFloat(
+            T::from_integer_mantissa_and_exponent(1, i64::wrapping_from(T::MANTISSA_WIDTH))
+                .unwrap(),
+        ),
+    )
+    .0;
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                special_random_primitive_float_inclusive_range::<T>(
+                    seed,
+                    T::ONE,
+                    max_limit,
+                    config.get_or("exponent_mean_n", 8),
+                    config.get_or("exponent_mean_d", 1),
+                    config.get_or("precision_mean_n", 8),
+                    config.get_or("precision_mean_d", 1),
+                    1,
+                    100,
+                )
+                .map(|f| f.floor() - T::ONE / T::TWO)
+            },
+            &|seed| {
+                special_random_primitive_float_inclusive_range::<T>(
+                    seed,
+                    T::ONE,
+                    min_limit,
+                    config.get_or("exponent_mean_n", 8),
+                    config.get_or("exponent_mean_d", 1),
+                    config.get_or("precision_mean_n", 8),
+                    config.get_or("precision_mean_d", 1),
+                    1,
+                    100,
+                )
+                .map(|f| T::ONE / T::TWO - f.floor())
+            },
+        )
+        .map(Union2::unwrap),
+    )
+}
+
 // -- (PrimitiveFloat, PrimitiveFloat) --
 
 pub fn random_primitive_float_pair_gen<T: PrimitiveFloat>(config: &GenConfig) -> It<(T, T)> {
@@ -605,10 +722,67 @@ pub fn random_primitive_float_rounding_mode_pair_gen_var_2<T: PrimitiveFloat>(
     )
 }
 
+pub fn random_primitive_float_rounding_mode_pair_gen_var_3<
+    T: PrimitiveFloat + RoundingFrom<U>,
+    U: ConvertibleFrom<T> + PrimitiveInt,
+>(
+    config: &GenConfig,
+) -> It<(T, RoundingMode)> {
+    let f_min = T::rounding_from(U::MIN, RoundingMode::Down);
+    let f_max = T::rounding_from(U::MAX, RoundingMode::Down);
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                special_random_primitive_floats::<T>(
+                    seed,
+                    config.get_or("exponent_mean_n", 8),
+                    config.get_or("exponent_mean_d", 1),
+                    config.get_or("precision_mean_n", 8),
+                    config.get_or("precision_mean_d", 1),
+                    config.get_or("special_p_mean_n", 1),
+                    config.get_or("special_p_mean_d", 64),
+                )
+                .filter(|f| !f.is_nan())
+            },
+            &random_rounding_modes,
+        )
+        .filter(move |&(f, rm)| match rm {
+            RoundingMode::Up => f >= f_min && f <= f_max,
+            RoundingMode::Ceiling => f <= f_max,
+            RoundingMode::Floor => f >= f_min,
+            RoundingMode::Down | RoundingMode::Nearest => true,
+            RoundingMode::Exact => U::convertible_from(f),
+        }),
+    )
+}
+
 // -- PrimitiveInt --
 
 pub fn random_primitive_int_gen<T: PrimitiveInt>(_config: &GenConfig) -> It<T> {
     Box::new(random_primitive_ints(EXAMPLE_SEED))
+}
+
+pub fn random_primitive_int_gen_var_1<
+    T: PrimitiveInt + RoundingFrom<U>,
+    U: PrimitiveFloat + RoundingFrom<T>,
+>(
+    config: &GenConfig,
+) -> It<T> {
+    Box::new(
+        special_random_primitive_float_range(
+            EXAMPLE_SEED,
+            U::rounding_from(T::MIN, RoundingMode::Down),
+            U::rounding_from(T::MAX, RoundingMode::Down),
+            config.get_or("exponent_mean_n", 8),
+            config.get_or("exponent_mean_d", 1),
+            config.get_or("precision_mean_n", 8),
+            config.get_or("precision_mean_d", 1),
+            config.get_or("special_p_mean_n", 1),
+            config.get_or("special_p_mean_d", 64),
+        )
+        .map(|f| T::rounding_from(f, RoundingMode::Down)),
+    )
 }
 
 // -- (PrimitiveInt, PrimitiveInt) --
@@ -923,6 +1097,61 @@ pub fn random_primitive_int_signed_primitive_int_triple_gen_var_1<
             Ordering::Equal => None,
             Ordering::Less => Some((x, y, z)),
             Ordering::Greater => Some((z, y, x)),
+        }),
+    )
+}
+
+// -- (PrimitiveInt, PrimitiveSigned, RoundingMode) --
+
+pub fn random_primitive_int_signed_rounding_mode_triple_gen_var_1<
+    T: PrimitiveInt,
+    U: PrimitiveSigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &random_primitive_ints::<T>,
+            &|seed| {
+                geometric_random_signeds::<U>(
+                    seed,
+                    config.get_or("mean_shift_n", 4),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(x, pow, rm)| {
+            rm != RoundingMode::Exact
+                || pow <= U::ZERO
+                || x.divisible_by_power_of_2(pow.exact_into())
+        }),
+    )
+}
+
+pub fn random_primitive_int_signed_rounding_mode_triple_gen_var_2<
+    T: PrimitiveInt,
+    U: PrimitiveSigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &random_primitive_ints::<T>,
+            &|seed| {
+                geometric_random_signeds::<U>(
+                    seed,
+                    config.get_or("mean_shift_n", 4),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(x, pow, rm)| {
+            let pow: i64 = pow.exact_into();
+            rm != RoundingMode::Exact || pow >= 0 || x.divisible_by_power_of_2(pow.unsigned_abs())
         }),
     )
 }
@@ -1254,13 +1483,38 @@ pub fn random_primitive_int_unsigned_rounding_mode_triple_gen_var_1<T: Primitive
             &|seed| {
                 geometric_random_unsigneds(
                     seed,
-                    config.get_or("mean_length_n", 4),
-                    config.get_or("mean_length_d", 1),
+                    config.get_or("mean_shift_n", 4),
+                    config.get_or("mean_shift_d", 1),
                 )
             },
             &random_rounding_modes,
         )
         .filter_map(|(x, pow, rm)| round_to_multiple_of_power_of_2_filter_map(x, pow, rm)),
+    )
+}
+
+pub fn random_primitive_int_unsigned_rounding_mode_triple_gen_var_2<
+    T: PrimitiveInt,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &random_primitive_ints::<T>,
+            &|seed| {
+                geometric_random_unsigneds::<U>(
+                    seed,
+                    config.get_or("mean_shift_n", 4),
+                    config.get_or("mean_shift_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter(|&(x, y, rm)| {
+            rm != RoundingMode::Exact || x.divisible_by_power_of_2(y.exact_into())
+        }),
     )
 }
 
@@ -1310,6 +1564,18 @@ pub fn random_primitive_int_rounding_mode_pair_gen<T: PrimitiveInt>(
     ))
 }
 
+pub fn random_primitive_int_rounding_mode_pair_gen_var_1<
+    T: PrimitiveInt,
+    U: ConvertibleFrom<T> + PrimitiveFloat,
+>(
+    _config: &GenConfig,
+) -> It<(T, RoundingMode)> {
+    Box::new(
+        random_pairs(EXAMPLE_SEED, &random_primitive_ints, &random_rounding_modes)
+            .filter(move |&(n, rm)| rm != RoundingMode::Exact || U::convertible_from(n)),
+    )
+}
+
 // -- PrimitiveSigned --
 
 pub fn random_signed_gen_var_1<T: PrimitiveSigned>(_config: &GenConfig) -> It<T> {
@@ -1338,6 +1604,96 @@ pub fn random_signed_gen_var_5<T: PrimitiveSigned>(config: &GenConfig) -> It<T> 
 
 pub fn random_signed_gen_var_6<T: PrimitiveSigned>(_config: &GenConfig) -> It<T> {
     Box::new(random_nonzero_signeds(EXAMPLE_SEED))
+}
+
+pub fn random_signed_gen_var_7<T: PrimitiveSigned, U: ConvertibleFrom<T> + PrimitiveFloat>(
+    _config: &GenConfig,
+) -> It<T> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_signed_inclusive_range(
+                    seed,
+                    T::saturating_from(U::SMALLEST_UNREPRESENTABLE_UINT),
+                    T::MAX,
+                )
+            },
+            &|seed| {
+                random_signed_inclusive_range(
+                    seed,
+                    T::MIN,
+                    T::saturating_from(U::SMALLEST_UNREPRESENTABLE_UINT).saturating_neg(),
+                )
+            },
+        )
+        .map(Union2::unwrap)
+        .filter(|&x| !U::convertible_from(x)),
+    )
+}
+
+pub fn random_signed_gen_var_8<
+    T: CheckedFrom<U> + PrimitiveSigned,
+    U: PrimitiveFloat + RoundingFrom<T>,
+>(
+    _config: &GenConfig,
+) -> It<T> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_signed_inclusive_range(
+                    seed,
+                    T::exact_from(U::SMALLEST_UNREPRESENTABLE_UINT),
+                    T::MAX,
+                )
+                .filter_map(|a| {
+                    let f = U::rounding_from(a, RoundingMode::Down);
+                    let a = T::checked_from(f)?;
+                    let b = T::checked_from(f.next_higher())?;
+                    let diff = b - a;
+                    if diff.even() {
+                        // This happens almost always
+                        Some(a + (diff >> 1))
+                    } else {
+                        None
+                    }
+                })
+            },
+            &|seed| {
+                random_signed_inclusive_range(
+                    seed,
+                    T::MIN,
+                    T::exact_from(U::SMALLEST_UNREPRESENTABLE_UINT)
+                        .checked_neg()
+                        .unwrap(),
+                )
+                .filter_map(|a| {
+                    let f = U::rounding_from(a, RoundingMode::Down);
+                    let a = T::checked_from(f)?;
+                    let b = T::checked_from(f.next_lower())?;
+                    let diff = a - b;
+                    if diff.even() {
+                        // This happens almost always
+                        Some(a - (diff >> 1))
+                    } else {
+                        None
+                    }
+                })
+            },
+        )
+        .map(Union2::unwrap),
+    )
+}
+
+pub fn random_signed_gen_var_9<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    _config: &GenConfig,
+) -> It<S> {
+    let limit = S::wrapping_from(U::wrapping_from(S::MAX).floor_sqrt());
+    Box::new(random_signed_inclusive_range(EXAMPLE_SEED, -limit, limit))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned) --
@@ -2052,6 +2408,74 @@ pub fn random_unsigned_gen_var_16<T: PrimitiveInt>(_config: &GenConfig) -> It<u6
     Box::new(random_unsigneds_less_than(EXAMPLE_SEED, T::WIDTH - 1))
 }
 
+pub fn random_unsigned_gen_var_17<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<T> {
+    Box::new(random_unsigned_inclusive_range(
+        EXAMPLE_SEED,
+        T::power_of_2(T::WIDTH - 2),
+        T::MAX,
+    ))
+}
+
+pub fn random_unsigned_gen_var_18<T: PrimitiveUnsigned, U: ConvertibleFrom<T> + PrimitiveFloat>(
+    _config: &GenConfig,
+) -> It<T> {
+    Box::new(
+        random_unsigned_inclusive_range(
+            EXAMPLE_SEED,
+            T::saturating_from(U::SMALLEST_UNREPRESENTABLE_UINT),
+            T::MAX,
+        )
+        .filter(|&x| !U::convertible_from(x)),
+    )
+}
+
+pub fn random_unsigned_gen_var_19<
+    T: CheckedFrom<U> + PrimitiveUnsigned,
+    U: PrimitiveFloat + RoundingFrom<T>,
+>(
+    _config: &GenConfig,
+) -> It<T> {
+    Box::new(
+        random_unsigned_inclusive_range(
+            EXAMPLE_SEED,
+            T::exact_from(U::SMALLEST_UNREPRESENTABLE_UINT),
+            T::MAX,
+        )
+        .filter_map(|a| {
+            let f = U::rounding_from(a, RoundingMode::Down);
+            let a = T::checked_from(f)?;
+            let b = T::checked_from(f.next_higher())?;
+            let diff = b - a;
+            if diff.even() {
+                // This happens almost always
+                Some(a + (diff >> 1))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub fn random_unsigned_gen_var_20<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<T> {
+    Box::new(random_unsigned_inclusive_range(
+        EXAMPLE_SEED,
+        T::ZERO,
+        T::MAX.floor_sqrt(),
+    ))
+}
+
+// -- (PrimitiveUnsigned, PrimitiveInt) --
+
+pub fn random_unsigned_primitive_int_pair_gen_var_1<T: PrimitiveUnsigned, U: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| random_unsigned_inclusive_range(seed, T::power_of_2(T::WIDTH - 2), T::MAX),
+        &random_primitive_ints,
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveInt, PrimitiveInt, PrimitiveUnsigned) --
 
 struct ModPowerOfTwoQuadrupleWithTwoExtraPrimitiveIntsGenerator<
@@ -2566,6 +2990,16 @@ pub fn random_unsigned_pair_gen_var_18<T: PrimitiveUnsigned>(config: &GenConfig)
 
 pub fn random_unsigned_pair_gen_var_19<T: PrimitiveUnsigned>(config: &GenConfig) -> It<(T, u64)> {
     Box::new(random_unsigned_pair_gen_var_8(config).map(|(x, p)| (x, T::WIDTH - p)))
+}
+
+pub fn random_unsigned_pair_gen_var_20<T: PrimitiveInt, U: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| random_unsigned_inclusive_range(seed, U::power_of_2(U::WIDTH - 2), U::MAX),
+    ))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveInt, PrimitiveUnsigned) --
@@ -4169,6 +4603,52 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     })
 }
 
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+
+pub struct UnsignedVecSqrtRemGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize)>> {
+    pub phantom: PhantomData<*const T>,
+    pub lengths: I,
+    pub xs: RandomPrimitiveInts<T>,
+    hi_n_bits: RandomUnsignedRange<T>,
+}
+
+impl<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize)>> Iterator
+    for UnsignedVecSqrtRemGenerator<T, I>
+{
+    type Item = (Vec<T>, Vec<T>);
+
+    fn next(&mut self) -> Option<(Vec<T>, Vec<T>)> {
+        let (out_len, len) = self.lengths.next().unwrap();
+        let out = (&mut self.xs).take(out_len).collect();
+        let mut ns: Vec<T> = (&mut self.xs).take(len).collect();
+        let n_hi = &mut ns[(usize::exact_from(out_len) << 1) - 1];
+        n_hi.mod_power_of_2_assign(T::WIDTH - 2);
+        *n_hi |= self.hi_n_bits.next().unwrap() << (T::WIDTH - 2);
+        Some((out, ns))
+    }
+}
+
+pub fn random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(UnsignedVecSqrtRemGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(|(x, y)| {
+            let out_len = x.checked_add(2)?;
+            let len: usize = out_len.arithmetic_checked_shl(1)?;
+            let len = len.checked_add(y)?;
+            Some((out_len, len))
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+        hi_n_bits: random_unsigned_range(EXAMPLE_SEED.fork("hi_n_bits"), T::ONE, T::exact_from(4)),
+    })
+}
+
 // -- large types --
 
 pub fn random_large_type_gen_var_1<T: PrimitiveInt>(
@@ -4179,4 +4659,43 @@ pub fn random_large_type_gen_var_1<T: PrimitiveInt>(
         &|seed| random_primitive_int_vec_pair_gen_var_1_helper(config, seed),
         &|seed| random_pairs_from_single(random_primitive_ints(seed)),
     )))
+}
+
+pub struct UnsignedVecSqrtRemGenerator2<T: PrimitiveUnsigned> {
+    pub phantom: PhantomData<*const T>,
+    pub lengths: GeometricRandomNaturalValues<usize>,
+    pub xs: RandomPrimitiveInts<T>,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for UnsignedVecSqrtRemGenerator2<T> {
+    type Item = (Vec<T>, Vec<T>, u64, bool);
+
+    fn next(&mut self) -> Option<(Vec<T>, Vec<T>, u64, bool)> {
+        let len = self.lengths.next().unwrap();
+        let n = len.shr_round(1, RoundingMode::Ceiling);
+        let out = (&mut self.xs).take(n).collect();
+        let mut ns: Vec<T> = (&mut self.xs).take(len).collect();
+        let last = ns.last_mut().unwrap();
+        if *last == T::ZERO {
+            *last = T::ONE;
+        }
+        let shift = last.leading_zeros() >> 1;
+        Some((out, ns, shift, len.odd()))
+    }
+}
+
+pub fn random_large_type_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, u64, bool)> {
+    Box::new(UnsignedVecSqrtRemGenerator2 {
+        phantom: PhantomData,
+        lengths: geometric_random_unsigned_range::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            9,
+            usize::MAX,
+            config.get_or("mean_length_n", 12),
+            config.get_or("mean_length_d", 1),
+        ),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
 }

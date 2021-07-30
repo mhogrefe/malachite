@@ -6,13 +6,23 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
+use malachite_base_test_util::generators::{
+    large_type_gen_var_2, unsigned_pair_gen_var_31, unsigned_vec_pair_gen_var_4,
+};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::sqrt::{
     _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _sqrt_rem_binary,
 };
+use malachite_nz::natural::arithmetic::sqrt::{
+    _limbs_sqrt_helper, _limbs_sqrt_rem_helper, _limbs_sqrt_rem_helper_scratch_len,
+    _sqrt_rem_2_newton,
+};
 use malachite_nz_test_util::generators::{natural_gen, natural_gen_nrm, natural_gen_rm};
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_demo!(runner, demo_sqrt_rem_2_newton);
+    register_demo!(runner, demo_limbs_sqrt_rem_helper);
+    register_demo!(runner, demo_limbs_sqrt_helper);
     register_demo!(runner, demo_natural_floor_sqrt);
     register_demo!(runner, demo_natural_floor_sqrt_ref);
     register_demo!(runner, demo_natural_floor_sqrt_assign);
@@ -37,6 +47,43 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_sqrt_rem_algorithms);
     register_bench!(runner, benchmark_natural_sqrt_rem_library_comparison);
     register_bench!(runner, benchmark_natural_sqrt_rem_assign);
+}
+
+fn demo_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize) {
+    for (h_hi, h_lo) in unsigned_pair_gen_var_31().get(gm, &config).take(limit) {
+        println!(
+            "sqrt_rem_2_newton({}, {}) = {:?}",
+            h_hi,
+            h_lo,
+            _sqrt_rem_2_newton(h_hi, h_lo)
+        );
+    }
+}
+
+fn demo_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut out, mut xs) in unsigned_vec_pair_gen_var_4().get(gm, &config).take(limit) {
+        let mut scratch = vec![0; _limbs_sqrt_rem_helper_scratch_len(out.len())];
+        let old_out = out.clone();
+        let old_xs = xs.clone();
+        let r_hi = _limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch);
+        println!(
+            "out := {:?}, xs := {:?}; \
+            _limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch) = {}; \
+            out = {:?}, xs = {:?}",
+            old_out, old_xs, r_hi, out, xs
+        );
+    }
+}
+
+fn demo_limbs_sqrt_helper(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut out, xs, shift, odd) in large_type_gen_var_2().get(gm, &config).take(limit) {
+        let old_out = out.clone();
+        let r = _limbs_sqrt_helper(&mut out, &xs, shift, odd);
+        println!(
+            "out := {:?}, _limbs_sqrt_helper(&mut out, {:?}, {}, {}) = {}; out = {:?}",
+            old_out, xs, shift, odd, r, out
+        );
+    }
 }
 
 fn demo_natural_floor_sqrt(gm: GenMode, config: GenConfig, limit: usize) {

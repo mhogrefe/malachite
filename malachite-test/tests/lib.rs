@@ -14,10 +14,6 @@ extern crate rust_wheels;
 pub mod base {
     pub mod num {
         pub mod arithmetic {
-            pub mod shl_round;
-            pub mod shr_round;
-            pub mod sign;
-            pub mod square;
             pub mod wrapping_abs;
             pub mod wrapping_add;
             pub mod wrapping_add_mul;

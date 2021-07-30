@@ -22,20 +22,20 @@ use malachite_base_test_util::generators::{
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_primitive_flost_demos!(runner, demo_sci_mantissa_and_exponent_unsigned);
-    register_unsigned_primitive_flost_demos!(runner, demo_sci_mantissa_unsigned);
-    register_unsigned_primitive_flost_demos!(runner, demo_sci_exponent_unsigned);
-    register_unsigned_primitive_flost_demos!(runner, demo_sci_mantissa_and_exponent_with_rounding);
-    register_unsigned_primitive_flost_demos!(runner, demo_from_sci_mantissa_and_exponent_unsigned);
-    register_unsigned_primitive_flost_demos!(
+    register_unsigned_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_unsigned);
+    register_unsigned_primitive_float_demos!(runner, demo_sci_mantissa_unsigned);
+    register_unsigned_primitive_float_demos!(runner, demo_sci_exponent_unsigned);
+    register_unsigned_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_with_rounding);
+    register_unsigned_primitive_float_demos!(runner, demo_from_sci_mantissa_and_exponent_unsigned);
+    register_unsigned_primitive_float_demos!(
         runner,
         demo_from_sci_mantissa_and_exponent_targeted_unsigned
     );
-    register_unsigned_primitive_flost_demos!(
+    register_unsigned_primitive_float_demos!(
         runner,
         demo_from_sci_mantissa_and_exponent_with_rounding
     );
-    register_unsigned_primitive_flost_demos!(
+    register_unsigned_primitive_float_demos!(
         runner,
         demo_from_sci_mantissa_and_exponent_with_rounding_targeted
     );

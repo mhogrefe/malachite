@@ -49,9 +49,7 @@ macro_rules! impl_trivial_random_primitive_ints {
             type State = ();
 
             #[inline]
-            fn new_state() -> () {
-                ()
-            }
+            fn new_state() -> () {}
 
             #[inline]
             fn get_random(rng: &mut ChaCha20Rng, _state: &mut ()) -> $t {
@@ -1293,8 +1291,8 @@ pub fn random_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// Every float within the range has an equal probability of being chosen. This does not mean that
 /// the distribution approximates a uniform distribution over the reals. For example, a float in
-/// $(-1/2, 1/4]$ is as likely to be chosen as a float in $(-2, -1]$, since these subranges contain
-/// an equal number of floats.
+/// $(-1/2, -1/4]$ is as likely to be chosen as a float in $(-2, -1]$, since these subranges
+/// contain an equal number of floats.
 ///
 /// Negative zero is generated; positive zero is not. `NaN` is not generated either.
 ///

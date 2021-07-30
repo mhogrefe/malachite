@@ -5,7 +5,11 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    unsigned_gen, unsigned_gen_var_18, unsigned_rounding_mode_pair_gen_var_2,
+};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::{
     natural_gen, natural_gen_var_3, natural_gen_var_4, natural_gen_var_5,
     natural_rounding_mode_pair_gen_var_1,
@@ -703,6 +707,14 @@ where
             })
         );
     });
+
+    unsigned_rounding_mode_pair_gen_var_2::<Limb, T>().test_properties(|(u, rm)| {
+        let n: Natural = From::from(u);
+        assert_eq!(
+            NiceFloat(T::rounding_from(u, rm)),
+            NiceFloat(T::rounding_from(&n, rm))
+        );
+    });
 }
 
 #[test]
@@ -772,6 +784,7 @@ fn float_checked_from_natural_properties_helper<
 >()
 where
     Natural: CheckedFrom<T> + From<T> + RoundingFrom<T>,
+    Limb: RoundingFrom<T>,
 {
     natural_gen().test_properties(|n| {
         T::checked_from(&n);
@@ -792,6 +805,18 @@ where
 
     natural_gen_var_5::<T>().test_properties(|n| {
         assert!(T::checked_from(&n).is_none());
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        if let Some(f) = T::checked_from(u) {
+            let n: Natural = From::from(u);
+            assert_eq!(NiceFloat(f), NiceFloat(T::exact_from(&n)));
+        }
+    });
+
+    unsigned_gen_var_18::<Limb, T>().test_properties(|u| {
+        let n: Natural = From::from(u);
+        assert_eq!(NiceFloat(T::exact_from(u)), NiceFloat(T::exact_from(&n)));
     });
 }
 
@@ -820,6 +845,11 @@ where
 
     natural_gen_var_5::<T>().test_properties(|n| {
         assert!(!T::convertible_from(&n));
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        let n: Natural = From::from(u);
+        assert_eq!(T::convertible_from(u), T::convertible_from(&n));
     });
 }
 

@@ -3,8 +3,11 @@ pub mod floating_point_from_natural;
 pub mod from_floating_point;
 pub mod from_limbs;
 pub mod from_primitive_int;
+/// This module implements a trait for determining whether a `Natural` is an integer. (It always
+/// is.)
+pub mod is_integer;
 pub mod limb_count;
-/// This module provides traits for converting numbers to and from mantissa and exponent
+/// This implements traits for converting numbers to and from mantissa and exponent
 /// representations.
 ///
 /// Here are some examples of the macro-generated functions:

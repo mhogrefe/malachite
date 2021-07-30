@@ -1,12 +1,41 @@
+use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::sqrt::{
     _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _sqrt_rem_binary,
 };
 use malachite_base::num::arithmetic::traits::{SqrtRem, SqrtRemAssign};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::{signed_gen_var_2, unsigned_gen};
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base_test_util::generators::{signed_gen_var_2, unsigned_gen, unsigned_gen_var_17};
 use std::panic::catch_unwind;
+
+#[test]
+fn test_sqrt_rem_newton() {
+    fn test<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned + WrappingFrom<U>>(
+        n: U,
+        sqrt: U,
+        rem: U,
+    ) {
+        let (actual_sqrt, actual_rem) = sqrt_rem_newton::<U, S>(n);
+        assert_eq!(actual_sqrt, sqrt);
+        assert_eq!(actual_rem, rem);
+        assert_eq!(n.sqrt_rem(), (sqrt, rem));
+    }
+    // no initial underestimate
+    test::<u32, i32>(2000000000, 44721, 32159);
+    test::<u32, i32>(u32::MAX, 65535, 131070);
+    // initial underestimate
+    test::<u32, i32>(1073741824, 32768, 0);
+
+    test::<u64, i64>(10000000000000000000, 3162277660, 1064924400);
+    test::<u64, i64>(u64::MAX, 4294967295, 8589934590);
+}
+
+#[test]
+fn sqrt_rem_newton_fail() {
+    assert_panic!(sqrt_rem_newton::<u32, i32>(1));
+    assert_panic!(sqrt_rem_newton::<u64, i64>(1));
+}
 
 #[test]
 fn test_floor_sqrt() {
@@ -360,6 +389,15 @@ fn sqrt_rem_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     });
 }
 
+fn sqrt_rem_properties_helper_unsigned_extra<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() {
+    unsigned_gen_var_17::<U>().test_properties(|n| {
+        assert_eq!(sqrt_rem_newton::<U, S>(n), n.sqrt_rem());
+    });
+}
+
 fn sqrt_rem_properties_helper_signed<
     U: PrimitiveUnsigned,
     S: ExactFrom<U> + PrimitiveSigned + SqrtRem<RemOutput = U> + SqrtRemAssign<RemOutput = U>,
@@ -379,5 +417,8 @@ fn sqrt_rem_properties_helper_signed<
 #[test]
 fn sqrt_rem_properties() {
     apply_fn_to_unsigneds!(sqrt_rem_properties_helper_unsigned);
+    sqrt_rem_properties_helper_unsigned_extra::<u32, i32>();
+    sqrt_rem_properties_helper_unsigned_extra::<u64, i64>();
+
     apply_fn_to_unsigned_signed_pairs!(sqrt_rem_properties_helper_signed);
 }

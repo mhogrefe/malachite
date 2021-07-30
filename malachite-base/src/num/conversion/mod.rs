@@ -125,6 +125,28 @@ pub mod from;
 /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
 /// ```
 pub mod half;
+/// This module provides a trait for determining whether a value is an integer.
+///
+/// Here are some examples of the macro-generated functions:
+///
+/// # is_integer
+/// ```
+/// use malachite_base::num::conversion::traits::IsInteger;
+/// use malachite_base::num::float::PrimitiveFloat;
+///
+/// assert_eq!(0.0.is_integer(), true);
+/// assert_eq!(1.0.is_integer(), true);
+/// assert_eq!(100.0.is_integer(), true);
+/// assert_eq!((-1.0).is_integer(), true);
+/// assert_eq!((-100.0).is_integer(), true);
+///
+/// assert_eq!(0.1.is_integer(), false);
+/// assert_eq!(100.1.is_integer(), false);
+/// assert_eq!(f32::NAN.is_integer(), false);
+/// assert_eq!(f32::POSITIVE_INFINITY.is_integer(), false);
+/// assert_eq!(f32::NEGATIVE_INFINITY.is_integer(), false);
+/// ```
+pub mod is_integer;
 /// This module provides traits for converting numbers to and from mantissa and exponent
 /// representations.
 ///

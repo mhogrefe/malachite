@@ -7,11 +7,12 @@ use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
 use malachite_base_test_util::generators::{
-    primitive_float_gen, primitive_float_gen_var_1, primitive_float_gen_var_2,
-    primitive_float_gen_var_3, primitive_float_gen_var_4,
-    primitive_float_rounding_mode_pair_gen_var_1,
+    primitive_float_gen, primitive_float_gen_var_1, primitive_float_gen_var_13,
+    primitive_float_gen_var_2, primitive_float_gen_var_3, primitive_float_gen_var_4,
+    primitive_float_rounding_mode_pair_gen_var_1, primitive_float_rounding_mode_pair_gen_var_3,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 
 #[test]
 fn test_rounding_from_f32() {
@@ -57,6 +58,13 @@ fn test_rounding_from_f32() {
     test(-0.99, RoundingMode::Down, "0");
     test(-0.499, RoundingMode::Nearest, "0");
     test(-0.5, RoundingMode::Nearest, "0");
+
+    test(f32::NEGATIVE_INFINITY, RoundingMode::Nearest, "0");
+    test(f32::NEGATIVE_INFINITY, RoundingMode::Down, "0");
+    test(f32::NEGATIVE_INFINITY, RoundingMode::Ceiling, "0");
+    test(-123.0, RoundingMode::Nearest, "0");
+    test(-123.0, RoundingMode::Down, "0");
+    test(-123.0, RoundingMode::Ceiling, "0");
 }
 
 #[test]
@@ -99,12 +107,6 @@ fn rounding_from_f32_fail_6() {
 #[should_panic]
 fn rounding_from_f32_fail_7() {
     Natural::rounding_from(-0.1, RoundingMode::Up);
-}
-
-#[test]
-#[should_panic]
-fn rounding_from_f32_fail_8() {
-    Natural::rounding_from(-0.51, RoundingMode::Nearest);
 }
 
 #[test]
@@ -165,6 +167,13 @@ fn test_rounding_from_f64() {
     test(-0.99, RoundingMode::Down, "0");
     test(-0.499, RoundingMode::Nearest, "0");
     test(-0.5, RoundingMode::Nearest, "0");
+
+    test(f64::NEGATIVE_INFINITY, RoundingMode::Nearest, "0");
+    test(f64::NEGATIVE_INFINITY, RoundingMode::Down, "0");
+    test(f64::NEGATIVE_INFINITY, RoundingMode::Ceiling, "0");
+    test(-123.0, RoundingMode::Nearest, "0");
+    test(-123.0, RoundingMode::Down, "0");
+    test(-123.0, RoundingMode::Ceiling, "0");
 }
 
 #[test]
@@ -210,12 +219,6 @@ fn rounding_from_f64_fail_7() {
 }
 
 #[test]
-#[should_panic]
-fn rounding_from_f64_fail_8() {
-    Natural::rounding_from(-0.51, RoundingMode::Nearest);
-}
-
-#[test]
 fn test_from_f32() {
     let test = |f: f32, out| {
         let x = Natural::from(f);
@@ -242,6 +245,10 @@ fn test_from_f32() {
     test(f32::MAX_SUBNORMAL, "0");
     test(f32::MIN_POSITIVE_NORMAL, "0");
     test(f32::MAX_FINITE, "340282346638528859811704183484516925440");
+
+    test(f32::NEGATIVE_INFINITY, "0");
+    test(-123.0, "0");
+    test(-0.51, "0");
 }
 
 #[test]
@@ -254,24 +261,6 @@ fn from_f32_fail_1() {
 #[should_panic]
 fn from_f32_fail_2() {
     Natural::from(f32::POSITIVE_INFINITY);
-}
-
-#[test]
-#[should_panic]
-fn from_f32_fail_3() {
-    Natural::from(f32::NEGATIVE_INFINITY);
-}
-
-#[test]
-#[should_panic]
-fn from_f32_fail_4() {
-    Natural::from(-123.0);
-}
-
-#[test]
-#[should_panic]
-fn from_f32_fail_5() {
-    Natural::from(-0.51);
 }
 
 #[test]
@@ -315,6 +304,10 @@ fn test_from_f64() {
         6327668781715404589535143824642343213268894641827684675467035375169860499105765512820762454\
         9009038932894407586850845513394230458323690322294816580855933212334827479782620414472316873\
         8177180919299881250404026184124858368");
+
+    test(f64::NEGATIVE_INFINITY, "0");
+    test(-123.0, "0");
+    test(-0.51, "0");
 }
 
 #[test]
@@ -327,24 +320,6 @@ fn from_f64_fail_1() {
 #[should_panic]
 fn from_f64_fail_2() {
     Natural::from(f64::POSITIVE_INFINITY);
-}
-
-#[test]
-#[should_panic]
-fn from_f64_fail_3() {
-    Natural::from(f64::NEGATIVE_INFINITY);
-}
-
-#[test]
-#[should_panic]
-fn from_f64_fail_4() {
-    Natural::from(-123.0);
-}
-
-#[test]
-#[should_panic]
-fn from_f64_fail_5() {
-    Natural::from(-0.51);
 }
 
 #[test]
@@ -766,6 +741,7 @@ fn rounding_from_float_properties() {
 fn from_float_properties_helper<T: for<'a> From<&'a Natural> + PrimitiveFloat>()
 where
     Natural: From<T> + RoundingFrom<T>,
+    Limb: ConvertibleFrom<T> + RoundingFrom<T>,
 {
     primitive_float_gen_var_1::<T>().test_properties(|f| {
         let n = Natural::from(f);
@@ -793,6 +769,17 @@ where
         let nearest = Natural::from(f);
         assert_eq!(nearest, if floor.even() { floor } else { ceiling });
     });
+
+    let max: Natural = From::from(Limb::MAX);
+    primitive_float_rounding_mode_pair_gen_var_3::<T, Limb>().test_properties(|(f, rm)| {
+        if f != T::POSITIVE_INFINITY {
+            let mut n = Natural::rounding_from(f, rm);
+            if n > max {
+                n = max.clone();
+            }
+            assert_eq!(Limb::rounding_from(f, rm), n);
+        }
+    });
 }
 
 #[test]
@@ -803,10 +790,14 @@ fn from_float_properties() {
 fn checked_from_float_properties_helper<T: PrimitiveFloat + for<'a> RoundingFrom<&'a Natural>>()
 where
     Natural: CheckedFrom<T> + RoundingFrom<T>,
+    Limb: CheckedFrom<T>,
 {
     primitive_float_gen::<T>().test_properties(|f| {
         let on = Natural::checked_from(f);
         assert!(on.map_or(true, |n| n.is_valid()));
+        if let Some(n) = Limb::checked_from(f) {
+            assert_eq!(n, Natural::exact_from(f));
+        }
     });
 
     primitive_float_gen_var_2::<T>().test_properties(|f| {
@@ -823,6 +814,10 @@ where
     primitive_float_gen_var_4::<T>().test_properties(|f| {
         assert!(Natural::checked_from(f).is_none());
     });
+
+    primitive_float_gen_var_13::<T, Limb>().test_properties(|f| {
+        assert_eq!(Limb::exact_from(f), Natural::exact_from(f));
+    });
 }
 
 #[test]
@@ -833,9 +828,13 @@ fn checked_from_float_properties() {
 fn convertible_from_float_properties_helper<T: PrimitiveFloat>()
 where
     Natural: ConvertibleFrom<T>,
+    Limb: ConvertibleFrom<T>,
 {
     primitive_float_gen::<T>().test_properties(|f| {
-        Natural::convertible_from(f);
+        let nc = Natural::convertible_from(f);
+        if Limb::convertible_from(f) {
+            assert!(nc);
+        }
     });
 
     primitive_float_gen_var_2::<T>().test_properties(|f| {

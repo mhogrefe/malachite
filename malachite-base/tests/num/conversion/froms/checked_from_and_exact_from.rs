@@ -1,8 +1,15 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, OverflowingFrom};
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, RoundingFrom,
+};
+use malachite_base::num::float::PrimitiveFloat;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    primitive_float_gen, primitive_float_gen_var_13, primitive_float_gen_var_14, signed_gen,
+    signed_gen_var_7, unsigned_gen, unsigned_gen_var_18,
+};
 use std::fmt::Debug;
 
 #[test]
@@ -134,6 +141,86 @@ fn checked_from_and_exact_from_helper_primitive_int_signed<
     });
 }
 
+fn checked_from_and_exact_from_helper_unsigned_primitive_float<
+    T: CheckedFrom<U> + PrimitiveUnsigned + RoundingFrom<U>,
+    U: CheckedFrom<T> + PrimitiveFloat + RoundingFrom<T>,
+>() {
+    primitive_float_gen::<U>().test_properties(|f| {
+        let result = T::checked_from(f);
+        if let Some(u) = result {
+            assert_eq!(u, T::exact_from(f));
+            assert_eq!(f, U::exact_from(u));
+        }
+    });
+
+    primitive_float_gen_var_13::<U, T>().test_properties(|f| {
+        let u = T::exact_from(f);
+        assert_eq!(U::exact_from(u), f);
+        assert_eq!(T::checked_from(f).unwrap(), u);
+        assert_eq!(T::rounding_from(f, RoundingMode::Exact), u);
+    });
+}
+
+fn checked_from_and_exact_from_helper_signed_primitive_float<
+    T: CheckedFrom<U> + PrimitiveSigned + RoundingFrom<U>,
+    U: CheckedFrom<T> + PrimitiveFloat + RoundingFrom<T>,
+>() {
+    primitive_float_gen::<U>().test_properties(|f| {
+        let result = T::checked_from(f);
+        if let Some(i) = result {
+            assert_eq!(i, T::exact_from(f));
+            assert_eq!(f, U::exact_from(i));
+        }
+    });
+
+    primitive_float_gen_var_14::<U, T>().test_properties(|f| {
+        let i = T::exact_from(f);
+        assert_eq!(U::exact_from(i), f);
+        assert_eq!(T::checked_from(f).unwrap(), i);
+        assert_eq!(T::rounding_from(f, RoundingMode::Exact), i);
+    });
+}
+
+fn checked_from_and_exact_from_helper_primitive_float_unsigned<
+    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveFloat + RoundingFrom<U>,
+    U: CheckedFrom<T> + PrimitiveUnsigned + RoundingFrom<T>,
+>() {
+    unsigned_gen::<U>().test_properties(|u| {
+        let result = T::checked_from(u);
+        if let Some(f) = result {
+            assert_eq!(f, T::exact_from(u));
+            assert_eq!(u, U::exact_from(f));
+        }
+    });
+
+    unsigned_gen_var_18::<U, T>().test_properties(|u| {
+        let f = T::exact_from(u);
+        assert_eq!(U::exact_from(f), u);
+        assert_eq!(T::checked_from(u).unwrap(), f);
+        assert_eq!(T::rounding_from(u, RoundingMode::Exact), f);
+    });
+}
+
+fn checked_from_and_exact_from_helper_primitive_float_signed<
+    T: CheckedFrom<U> + ConvertibleFrom<U> + PrimitiveFloat + RoundingFrom<U>,
+    U: CheckedFrom<T> + PrimitiveSigned + RoundingFrom<T>,
+>() {
+    signed_gen::<U>().test_properties(|i| {
+        let result = T::checked_from(i);
+        if let Some(f) = result {
+            assert_eq!(f, T::exact_from(i));
+            assert_eq!(i, U::exact_from(f));
+        }
+    });
+
+    signed_gen_var_7::<U, T>().test_properties(|i| {
+        let f = T::exact_from(i);
+        assert_eq!(U::exact_from(f), i);
+        assert_eq!(T::checked_from(i).unwrap(), f);
+        assert_eq!(T::rounding_from(i, RoundingMode::Exact), f);
+    });
+}
+
 #[test]
 fn checked_from_and_exact_from_properties() {
     apply_fn_to_primitive_ints_and_unsigneds!(
@@ -141,5 +228,17 @@ fn checked_from_and_exact_from_properties() {
     );
     apply_fn_to_primitive_ints_and_signeds!(
         checked_from_and_exact_from_helper_primitive_int_signed
+    );
+    apply_fn_to_unsigneds_and_primitive_floats!(
+        checked_from_and_exact_from_helper_unsigned_primitive_float
+    );
+    apply_fn_to_signeds_and_primitive_floats!(
+        checked_from_and_exact_from_helper_signed_primitive_float
+    );
+    apply_fn_to_primitive_floats_and_unsigneds!(
+        checked_from_and_exact_from_helper_primitive_float_unsigned
+    );
+    apply_fn_to_primitive_floats_and_signeds!(
+        checked_from_and_exact_from_helper_primitive_float_signed
     );
 }

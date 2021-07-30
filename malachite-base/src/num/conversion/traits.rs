@@ -278,19 +278,10 @@ pub trait SplitInHalf: HasHalf {
     }
 }
 
-/// Converts a slice of one type of value to a single value of another type.
-pub trait FromOtherTypeSlice<T: Sized> {
-    fn from_other_type_slice(slice: &[T]) -> Self;
-}
-
-/// Converts a slice of one type of value to a `Vec` of another type.
-pub trait VecFromOtherTypeSlice<T: Sized>: Sized {
-    fn vec_from_other_type_slice(slice: &[T]) -> Vec<Self>;
-}
-
-/// Converts a slice of one type of value to a `Vec` of another type.
-pub trait VecFromOtherType<T>: Sized {
-    fn vec_from_other_type(value: T) -> Vec<Self>;
+/// Determines whether a value is an integer.
+pub trait IsInteger {
+    #[allow(clippy::wrong_self_convention)]
+    fn is_integer(self) -> bool;
 }
 
 /// Converts a number to and from a raw mantissa and exponent form.
@@ -341,4 +332,19 @@ pub trait SciMantissaAndExponent<M, E, T = Self>: Sized {
     }
 
     fn from_sci_mantissa_and_exponent(sci_mantissa: M, sci_exponent: E) -> Option<T>;
+}
+
+/// Converts a slice of one type of value to a single value of another type.
+pub trait FromOtherTypeSlice<T: Sized> {
+    fn from_other_type_slice(slice: &[T]) -> Self;
+}
+
+/// Converts a slice of one type of value to a `Vec` of another type.
+pub trait VecFromOtherTypeSlice<T: Sized>: Sized {
+    fn vec_from_other_type_slice(slice: &[T]) -> Vec<Self>;
+}
+
+/// Converts a slice of one type of value to a `Vec` of another type.
+pub trait VecFromOtherType<T>: Sized {
+    fn vec_from_other_type(value: T) -> Vec<Self>;
 }

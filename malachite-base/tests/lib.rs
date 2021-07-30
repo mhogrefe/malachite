@@ -292,6 +292,7 @@ pub mod num {
             pub mod convertible_from;
             pub mod from;
             pub mod overflowing_from;
+            pub mod rounding_from;
             pub mod saturating_from;
             pub mod wrapping_from;
         }
@@ -301,6 +302,7 @@ pub mod num {
             pub mod split_in_half;
             pub mod upper_half;
         }
+        pub mod is_integer;
         pub mod mantissa_and_exponent {
             pub mod integer_mantissa_and_exponent;
             pub mod raw_mantissa_and_exponent;

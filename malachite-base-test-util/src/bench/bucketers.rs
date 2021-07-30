@@ -281,6 +281,18 @@ where
     }
 }
 
+pub fn triple_2_unsigned_abs_bucketer<T, U: Copy + UnsignedAbs, V>(
+    y_name: &str,
+) -> Bucketer<(T, U, V)>
+where
+    usize: ExactFrom<<U as UnsignedAbs>::Output>,
+{
+    Bucketer {
+        bucketing_function: &|&(_, y, _)| usize::exact_from(y.unsigned_abs()),
+        bucketing_label: y_name.to_string(),
+    }
+}
+
 pub fn pair_1_bit_bucketer<T: Copy + SignificantBits, U>(x_name: &str) -> Bucketer<(T, U)> {
     Bucketer {
         bucketing_function: &|&(x, _)| usize::exact_from(x.significant_bits()),

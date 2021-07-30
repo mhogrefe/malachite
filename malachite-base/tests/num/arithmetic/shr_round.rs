@@ -1,6 +1,19 @@
-use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, ShlRound, ShrRound, ShrRoundAssign,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    signed_rounding_mode_pair_gen, signed_signed_rounding_mode_triple_gen_var_3,
+    signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_16,
+    signed_unsigned_pair_gen_var_17, signed_unsigned_pair_gen_var_8,
+    signed_unsigned_rounding_mode_triple_gen_var_2, unsigned_pair_gen_var_14,
+    unsigned_pair_gen_var_2, unsigned_pair_gen_var_21, unsigned_rounding_mode_pair_gen,
+    unsigned_signed_rounding_mode_triple_gen_var_1,
+    unsigned_unsigned_rounding_mode_triple_gen_var_4,
+};
 use std::panic::catch_unwind;
 
 #[test]
@@ -630,4 +643,211 @@ fn shr_round_fail_helper<
 #[test]
 fn shr_round_fail() {
     apply_fn_to_primitive_ints_and_primitive_ints!(shr_round_fail_helper);
+}
+
+fn shr_round_properties_helper_unsigned_unsigned<
+    T: ArithmeticCheckedShl<U, Output = T>
+        + PrimitiveUnsigned
+        + ShrRound<U, Output = T>
+        + ShrRoundAssign<U>,
+    U: PrimitiveUnsigned,
+>() {
+    unsigned_unsigned_rounding_mode_triple_gen_var_4::<T, U>().test_properties(|(n, u, rm)| {
+        let mut mut_n = n;
+        mut_n.shr_round_assign(u, rm);
+        let shifted = mut_n;
+
+        assert_eq!(n.shr_round(u, rm), shifted);
+        assert!(shifted <= n);
+    });
+
+    unsigned_pair_gen_var_2::<T, U>().test_properties(|(n, u)| {
+        if u < U::exact_from(T::WIDTH) {
+            if let Some(shifted) = n.arithmetic_checked_shl(u) {
+                assert_eq!(shifted.shr_round(u, RoundingMode::Down), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Up), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Floor), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Ceiling), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Nearest), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Exact), n);
+            }
+        }
+    });
+
+    unsigned_pair_gen_var_14::<T, U>().test_properties(|(n, u)| {
+        let down = n.shr_round(u, RoundingMode::Down);
+        if let Some(up) = down.checked_add(T::ONE) {
+            assert_eq!(n.shr_round(u, RoundingMode::Up), up);
+            assert_eq!(n.shr_round(u, RoundingMode::Floor), down);
+            assert_eq!(n.shr_round(u, RoundingMode::Ceiling), up);
+            let nearest = n.shr_round(u, RoundingMode::Nearest);
+            assert!(nearest == down || nearest == up);
+        }
+    });
+
+    unsigned_pair_gen_var_21::<T, U>().test_properties(|(t, u)| {
+        if let Some(shift) = u.checked_add(U::exact_from(T::WIDTH)) {
+            assert_eq!(t.shr_round(shift, RoundingMode::Down), T::ZERO);
+            assert_eq!(t.shr_round(shift, RoundingMode::Floor), T::ZERO);
+            assert_eq!(t.shr_round(shift, RoundingMode::Up), T::ONE);
+            assert_eq!(t.shr_round(shift, RoundingMode::Ceiling), T::ONE);
+            if let Some(extra_shift) = shift.checked_add(U::ONE) {
+                assert_eq!(t.shr_round(extra_shift, RoundingMode::Nearest), T::ZERO);
+            }
+        }
+    });
+
+    unsigned_rounding_mode_pair_gen::<T>().test_properties(|(n, rm)| {
+        assert_eq!(n.shr_round(U::ZERO, rm), n);
+    });
+
+    unsigned_rounding_mode_pair_gen::<U>().test_properties(|(u, rm)| {
+        assert_eq!(T::ZERO.shr_round(u, rm), T::ZERO);
+    });
+}
+
+fn shr_round_properties_helper_unsigned_signed<
+    T: PrimitiveUnsigned + ShlRound<U, Output = T> + ShrRound<U, Output = T> + ShrRoundAssign<U>,
+    U: PrimitiveSigned,
+>() {
+    unsigned_signed_rounding_mode_triple_gen_var_1::<T, U>().test_properties(|(n, i, rm)| {
+        let mut mut_n = n;
+        mut_n.shr_round_assign(i, rm);
+        let shifted = mut_n;
+
+        assert_eq!(n.shr_round(i, rm), shifted);
+        if i >= U::ZERO {
+            assert!(shifted <= n);
+        }
+        if i != U::MIN {
+            assert_eq!(n.shl_round(-i, rm), shifted);
+        }
+    });
+
+    unsigned_rounding_mode_pair_gen::<T>().test_properties(|(n, rm)| {
+        assert_eq!(n.shr_round(U::ZERO, rm), n);
+    });
+
+    signed_rounding_mode_pair_gen::<U>().test_properties(|(i, rm)| {
+        assert_eq!(T::ZERO.shr_round(i, rm), T::ZERO);
+    });
+}
+
+fn shr_round_properties_helper_signed_unsigned<
+    T: ArithmeticCheckedShl<U, Output = T>
+        + PrimitiveSigned
+        + ShrRound<U, Output = T>
+        + ShrRoundAssign<U>,
+    U: PrimitiveUnsigned,
+>() {
+    signed_unsigned_rounding_mode_triple_gen_var_2::<T, U>().test_properties(|(n, u, rm)| {
+        let mut mut_n = n;
+        mut_n.shr_round_assign(u, rm);
+        let shifted = mut_n;
+        assert_eq!(n.shr_round(u, rm), shifted);
+
+        assert!(n.shr_round(u, rm).le_abs(&n));
+        if n != T::MIN {
+            let x = (-n).shr_round(u, -rm);
+            if x != T::MIN {
+                assert_eq!(-x, shifted);
+            }
+        }
+    });
+
+    signed_unsigned_pair_gen_var_1::<T, U>().test_properties(|(n, u)| {
+        if u < U::exact_from(T::WIDTH) {
+            if let Some(shifted) = n.arithmetic_checked_shl(u) {
+                assert_eq!(shifted.shr_round(u, RoundingMode::Down), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Up), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Floor), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Ceiling), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Nearest), n);
+                assert_eq!(shifted.shr_round(u, RoundingMode::Exact), n);
+            }
+        }
+    });
+
+    signed_unsigned_pair_gen_var_8::<T, U>().test_properties(|(n, u)| {
+        let floor = n.shr_round(u, RoundingMode::Floor);
+        if let Some(ceiling) = floor.checked_add(T::ONE) {
+            assert_eq!(n.shr_round(u, RoundingMode::Ceiling), ceiling);
+            if n >= T::ZERO {
+                assert_eq!(n.shr_round(u, RoundingMode::Up), ceiling);
+                assert_eq!(n.shr_round(u, RoundingMode::Down), floor);
+            } else {
+                assert_eq!(n.shr_round(u, RoundingMode::Up), floor);
+                assert_eq!(n.shr_round(u, RoundingMode::Down), ceiling);
+            }
+            let nearest = n.shr_round(u, RoundingMode::Nearest);
+            assert!(nearest == floor || nearest == ceiling);
+        }
+    });
+
+    signed_unsigned_pair_gen_var_16::<T, U>().test_properties(|(i, u)| {
+        if let Some(shift) = u.checked_add(U::exact_from(T::WIDTH - 1)) {
+            assert_eq!(i.shr_round(shift, RoundingMode::Down), T::ZERO);
+            assert_eq!(i.shr_round(shift, RoundingMode::Floor), T::ZERO);
+            assert_eq!(i.shr_round(shift, RoundingMode::Up), T::ONE);
+            assert_eq!(i.shr_round(shift, RoundingMode::Ceiling), T::ONE);
+            if let Some(extra_shift) = shift.checked_add(U::ONE) {
+                assert_eq!(i.shr_round(extra_shift, RoundingMode::Nearest), T::ZERO);
+            }
+        }
+    });
+
+    signed_unsigned_pair_gen_var_17::<T, U>().test_properties(|(i, u)| {
+        if let Some(shift) = u.checked_add(U::exact_from(T::WIDTH - 1)) {
+            assert_eq!(i.shr_round(shift, RoundingMode::Down), T::ZERO);
+            assert_eq!(i.shr_round(shift, RoundingMode::Floor), T::NEGATIVE_ONE);
+            assert_eq!(i.shr_round(shift, RoundingMode::Up), T::NEGATIVE_ONE);
+            assert_eq!(i.shr_round(shift, RoundingMode::Ceiling), T::ZERO);
+            if let Some(extra_shift) = shift.checked_add(U::ONE) {
+                assert_eq!(i.shr_round(extra_shift, RoundingMode::Nearest), T::ZERO);
+            }
+        }
+    });
+
+    signed_rounding_mode_pair_gen::<T>().test_properties(|(n, rm)| {
+        assert_eq!(n.shr_round(U::ZERO, rm), n);
+    });
+
+    unsigned_rounding_mode_pair_gen::<U>().test_properties(|(u, rm)| {
+        assert_eq!(T::ZERO.shr_round(u, rm), T::ZERO);
+    });
+}
+
+fn shr_round_properties_helper_signed_signed<
+    T: PrimitiveSigned + ShlRound<U, Output = T> + ShrRound<U, Output = T> + ShrRoundAssign<U>,
+    U: PrimitiveSigned,
+>() {
+    signed_signed_rounding_mode_triple_gen_var_3::<T, U>().test_properties(|(n, i, rm)| {
+        let mut mut_n = n;
+        mut_n.shr_round_assign(i, rm);
+        let shifted = mut_n;
+
+        assert_eq!(n.shr_round(i, rm), shifted);
+        if i >= U::ZERO {
+            assert!(shifted.le_abs(&n));
+        }
+        if i != U::MIN {
+            assert_eq!(n.shl_round(-i, rm), shifted);
+        }
+    });
+
+    signed_rounding_mode_pair_gen::<T>().test_properties(|(n, rm)| {
+        assert_eq!(n.shr_round(U::ZERO, rm), n);
+    });
+
+    signed_rounding_mode_pair_gen::<U>().test_properties(|(i, rm)| {
+        assert_eq!(T::ZERO.shr_round(i, rm), T::ZERO);
+    });
+}
+
+#[test]
+fn shr_round_properties() {
+    apply_fn_to_unsigneds_and_unsigneds!(shr_round_properties_helper_unsigned_unsigned);
+    apply_fn_to_unsigneds_and_signeds!(shr_round_properties_helper_unsigned_signed);
+    apply_fn_to_signeds_and_unsigneds!(shr_round_properties_helper_signed_unsigned);
+    apply_fn_to_signeds_and_signeds!(shr_round_properties_helper_signed_signed);
 }

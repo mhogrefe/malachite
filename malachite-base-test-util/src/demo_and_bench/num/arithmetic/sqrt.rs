@@ -1,13 +1,15 @@
+use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::sqrt::{
     _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _sqrt_rem_binary,
 };
 use malachite_base::num::arithmetic::traits::{SqrtRem, SqrtRemAssign};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base_test_util::bench::bucketers::{signed_bit_bucketer, unsigned_bit_bucketer};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
-use malachite_base_test_util::generators::{signed_gen_var_2, unsigned_gen};
+use malachite_base_test_util::generators::{signed_gen_var_2, unsigned_gen, unsigned_gen_var_17};
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -37,6 +39,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_unsigned_benches!(runner, benchmark_checked_sqrt_algorithms_unsigned);
     register_signed_benches!(runner, benchmark_checked_sqrt_signed);
     register_unsigned_benches!(runner, benchmark_sqrt_rem_algorithms_unsigned);
+    register_generic_benches_2_only_first_in_key!(
+        runner,
+        benchmark_sqrt_rem_algorithms_unsigned_2,
+        [u32, i32],
+        [u64, i64]
+    );
     register_signed_benches!(runner, benchmark_sqrt_rem_signed);
     register_unsigned_benches!(runner, benchmark_sqrt_rem_assign_unsigned);
     register_signed_benches!(runner, benchmark_sqrt_rem_assign_signed);
@@ -368,6 +376,39 @@ fn benchmark_sqrt_rem_algorithms_unsigned<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |n| no_out!(n.sqrt_rem())),
             ("binary", &mut |n| no_out!(_sqrt_rem_binary(n))),
+        ],
+    );
+}
+
+#[allow(clippy::unnecessary_operation)]
+fn benchmark_sqrt_rem_algorithms_unsigned_2<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        &format!("{}.sqrt_rem_assign()", U::NAME),
+        BenchmarkType::Algorithms,
+        unsigned_gen_var_17::<U>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_bit_bucketer(),
+        &mut [
+            ("default", &mut |n| {
+                for _ in 0..10 {
+                    n.sqrt_rem().0;
+                }
+            }),
+            ("Newton's method", &mut |n| {
+                for _ in 0..10 {
+                    sqrt_rem_newton::<U, S>(n).0;
+                }
+            }),
         ],
     );
 }

@@ -1880,7 +1880,8 @@ pub(crate) fn _limbs_div_mod_balanced(
 /// assert_eq!(limbs_div_mod(&[1, 2, 3], &[4, 5]), (vec![2576980377, 0], vec![2576980381, 2]));
 /// ```
 ///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where qp and rp are returned.
+/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1 and qp and rp are
+/// returned.
 pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let d_len = ds.len();
     let mut qs = vec![0; ns.len() - d_len + 1];
@@ -1946,6 +1947,12 @@ pub fn limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &
             _limbs_div_mod_unbalanced(qs, rs, ns, ds, adjusted_n_len);
         }
     }
+}
+
+//TODO improve!
+pub fn limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+    let ns_copy = ns.to_vec();
+    limbs_div_mod_to_out(qs, ns, &ns_copy, ds);
 }
 
 impl Natural {

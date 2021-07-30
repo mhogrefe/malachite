@@ -7,7 +7,7 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 use std::cmp::{max, Ordering};
-use std::ops::{BitAnd, BitAndAssign};
+use std::ops::{BitAnd, BitAndAssign}; 
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
 /// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by

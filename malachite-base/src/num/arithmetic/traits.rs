@@ -1099,13 +1099,117 @@ pub trait SaturatingSubMulAssign<Y = Self, Z = Self> {
     fn saturating_sub_mul_assign(&mut self, y: Y, z: Z);
 }
 
-// TODO order
+/// Calculates $2^y x$, rounding the result according to a specified rounding mode.
+///
+/// Rounding might only be necessary if `other` is negative.
+pub trait ShlRound<RHS> {
+    type Output;
+
+    fn shl_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+/// Replaces $x$ with $2^y x$, rounding the result according to a specified
+/// rounding mode.
+///
+/// Rounding might only be necessary if `other` is negative.
+pub trait ShlRoundAssign<RHS> {
+    fn shl_round_assign(&mut self, other: RHS, rm: RoundingMode);
+}
+
+/// Calculates $2^{-y} x$, rounding the result according to a specified rounding mode.
+///
+/// Rounding might only be necessary if `other` is non-negative.
+pub trait ShrRound<RHS> {
+    type Output;
+
+    fn shr_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
+}
+
+/// Replaces $x$ with $2^{-y} x$, rounding the result according to a specified rounding mode.
+///
+/// Rounding might only be necessary if `other` is non-negative.
+pub trait ShrRoundAssign<RHS> {
+    fn shr_round_assign(&mut self, other: RHS, rm: RoundingMode);
+}
 
 /// Returns `Greater`, `Equal`, or `Less`, depending on whether `self` is positive, zero, or
 /// negative, respectively.
 pub trait Sign {
     fn sign(&self) -> Ordering;
 }
+
+/// Provides a function to get the floor of the square root of `self`.
+pub trait FloorSqrt {
+    type Output;
+
+    fn floor_sqrt(self) -> Self::Output;
+}
+
+/// Replaces `self` with the floor of its square root.
+pub trait FloorSqrtAssign {
+    fn floor_sqrt_assign(&mut self);
+}
+
+/// Provides a function to get the ceiling of the square root of `self`.
+pub trait CeilingSqrt {
+    type Output;
+
+    fn ceiling_sqrt(self) -> Self::Output;
+}
+
+/// Replaces `self` with the ceiling of its square root.
+pub trait CeilingSqrtAssign {
+    fn ceiling_sqrt_assign(&mut self);
+}
+
+/// Provides a function to get the square root of `self`, returning `None` if `self` is not a
+/// perfect square.
+pub trait CheckedSqrt {
+    type Output;
+
+    fn checked_sqrt(self) -> Option<Self::Output>;
+}
+
+/// Provides a function to get the floor of the square root of `self` and the remainder.
+pub trait SqrtRem {
+    type SqrtOutput;
+    type RemOutput;
+
+    fn sqrt_rem(self) -> (Self::SqrtOutput, Self::RemOutput);
+}
+
+/// Replaces `self` with the floor of its square root and returns the remainder.
+pub trait SqrtRemAssign {
+    type RemOutput;
+
+    fn sqrt_rem_assign(&mut self) -> Self::RemOutput;
+}
+
+/// Squares `self`.
+pub trait Square {
+    type Output;
+
+    fn square(self) -> Self::Output;
+}
+
+/// Replaces `self` with `self` squared.
+pub trait SquareAssign {
+    fn square_assign(&mut self);
+}
+
+/// Computes $x - yz$.
+pub trait SubMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn sub_mul(self, y: Y, z: Z) -> Self::Output;
+}
+
+/// Replaces $x$ with $x - yz$.
+pub trait SubMulAssign<Y = Self, Z = Self> {
+    fn sub_mul_assign(&mut self, y: Y, z: Z);
+}
+
+// TODO order
 
 /// Wrapping (modular) negation. Computes `-self`, wrapping around at the boundary of the type.
 pub trait WrappingNeg {
@@ -1253,18 +1357,6 @@ pub trait WrappingAddMulAssign<Y = Self, Z = Self> {
     fn wrapping_add_mul_assign(&mut self, y: Y, z: Z);
 }
 
-/// Computes $x - yz$.
-pub trait SubMul<Y = Self, Z = Self> {
-    type Output;
-
-    fn sub_mul(self, y: Y, z: Z) -> Self::Output;
-}
-
-/// Replaces $x$ with $x - yz$.
-pub trait SubMulAssign<Y = Self, Z = Self> {
-    fn sub_mul_assign(&mut self, y: Y, z: Z);
-}
-
 /// Computes $x - yz$, wrapping around at the boundary of the type.
 pub trait WrappingSubMul<Y = Self, Z = Self> {
     type Output;
@@ -1275,34 +1367,6 @@ pub trait WrappingSubMul<Y = Self, Z = Self> {
 /// Replaces $x$ with $x - yz$, wrapping around at the boundary of the type.
 pub trait WrappingSubMulAssign<Y = Self, Z = Self> {
     fn wrapping_sub_mul_assign(&mut self, y: Y, z: Z);
-}
-
-/// Calculates `self` * 2<sup>`other`</sup>, rounding the result according to a specified rounding
-/// mode. Rounding might only be necessary if `other` is negative.
-pub trait ShlRound<RHS> {
-    type Output;
-
-    fn shl_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
-}
-
-/// Replaces `self` with `self` * 2<sup>`other`</sup>, rounding the result according to a specified
-/// rounding mode. Rounding might only be necessary if `other` is negative.
-pub trait ShlRoundAssign<RHS> {
-    fn shl_round_assign(&mut self, other: RHS, rm: RoundingMode);
-}
-
-/// Calculates `self` / 2<sup>`other`</sup>, rounding the result according to a specified rounding
-/// mode. Rounding might only be necessary if `other` is non-negative.
-pub trait ShrRound<RHS> {
-    type Output;
-
-    fn shr_round(self, other: RHS, rm: RoundingMode) -> Self::Output;
-}
-
-/// Replaces `self` with `self` / 2<sup>`other`</sup>, rounding the result according to a specified
-/// rounding mode. Rounding might only be necessary if `other` is non-negative.
-pub trait ShrRoundAssign<RHS> {
-    fn shr_round_assign(&mut self, other: RHS, rm: RoundingMode);
 }
 
 /// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,
@@ -1339,18 +1403,6 @@ pub trait WrappingPowAssign<RHS = Self> {
     fn wrapping_pow_assign(&mut self, exp: RHS);
 }
 
-/// Squares `self`.
-pub trait Square {
-    type Output;
-
-    fn square(self) -> Self::Output;
-}
-
-/// Replaces `self` with `self` ^ 2.
-pub trait SquareAssign {
-    fn square_assign(&mut self);
-}
-
 /// Wrapping (modular) squaring. Squares `self`, wrapping around at the boundary of the type.
 pub trait WrappingSquare {
     type Output;
@@ -1362,51 +1414,4 @@ pub trait WrappingSquare {
 /// the type.
 pub trait WrappingSquareAssign {
     fn wrapping_square_assign(&mut self);
-}
-
-/// Provides a function to get the floor of the square root of `self`.
-pub trait FloorSqrt {
-    type Output;
-
-    fn floor_sqrt(self) -> Self::Output;
-}
-
-/// Replaces `self` with the floor of its square root.
-pub trait FloorSqrtAssign {
-    fn floor_sqrt_assign(&mut self);
-}
-
-/// Provides a function to get the ceiling of the square root of `self`.
-pub trait CeilingSqrt {
-    type Output;
-
-    fn ceiling_sqrt(self) -> Self::Output;
-}
-
-/// Replaces `self` with the ceiling of its square root.
-pub trait CeilingSqrtAssign {
-    fn ceiling_sqrt_assign(&mut self);
-}
-
-/// Provides a function to get the square root of `self`, returning `None` if `self` is not a
-/// perfect square.
-pub trait CheckedSqrt {
-    type Output;
-
-    fn checked_sqrt(self) -> Option<Self::Output>;
-}
-
-/// Provides a function to get the floor of the square root of `self` and the remainder.
-pub trait SqrtRem {
-    type SqrtOutput;
-    type RemOutput;
-
-    fn sqrt_rem(self) -> (Self::SqrtOutput, Self::RemOutput);
-}
-
-/// Replaces `self` with the floor of its square root and returns the remainder.
-pub trait SqrtRemAssign {
-    type RemOutput;
-
-    fn sqrt_rem_assign(&mut self) -> Self::RemOutput;
 }

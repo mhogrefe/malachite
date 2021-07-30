@@ -25,8 +25,9 @@ use num::arithmetic::traits::{
 use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use num::conversion::traits::{
-    CheckedFrom, CheckedInto, ExactFrom, ExactInto, FromStringBase, OverflowingFrom,
-    OverflowingInto, SaturatingFrom, SaturatingInto, ToStringBase, WrappingFrom, WrappingInto,
+    CheckedFrom, CheckedInto, ConvertibleFrom, ExactFrom, ExactInto, FromStringBase, IsInteger,
+    OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom, SaturatingInto,
+    ToStringBase, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
@@ -91,6 +92,8 @@ pub trait PrimitiveInt:
     + CheckedAdd<Self, Output = Self>
     + CheckedAddMul<Self, Self, Output = Self>
     + CheckedDiv<Self, Output = Self>
+    + CheckedFrom<f32>
+    + CheckedFrom<f64>
     + CheckedFrom<u8>
     + CheckedFrom<u16>
     + CheckedFrom<u32>
@@ -123,6 +126,20 @@ pub trait PrimitiveInt:
     + CheckedSub<Self, Output = Self>
     + CheckedSubMul<Self, Self, Output = Self>
     + Clone
+    + ConvertibleFrom<f32>
+    + ConvertibleFrom<f64>
+    + ConvertibleFrom<u8>
+    + ConvertibleFrom<u16>
+    + ConvertibleFrom<u32>
+    + ConvertibleFrom<u64>
+    + ConvertibleFrom<u128>
+    + ConvertibleFrom<usize>
+    + ConvertibleFrom<i8>
+    + ConvertibleFrom<i16>
+    + ConvertibleFrom<i32>
+    + ConvertibleFrom<i64>
+    + ConvertibleFrom<i128>
+    + ConvertibleFrom<isize>
     + Copy
     + CountOnes
     + CountZeros
@@ -175,6 +192,7 @@ pub trait PrimitiveInt:
     + FromStringBase
     + Hash
     + HasRandomPrimitiveInts
+    + IsInteger
     + Iverson
     + LeadingZeros
     + LowerHex
@@ -248,6 +266,10 @@ pub trait PrimitiveInt:
     + RemAssign<Self>
     + RemPowerOf2<Output = Self>
     + RemPowerOf2Assign
+    + RoundingFrom<f32>
+    + RoundingFrom<f64>
+    + RoundingInto<f32>
+    + RoundingInto<f64>
     + RoundToMultiple<Self, Output = Self>
     + RoundToMultipleAssign<Self>
     + RoundToMultipleOfPowerOf2<u64, Output = Self>

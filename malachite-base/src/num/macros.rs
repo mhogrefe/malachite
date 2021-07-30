@@ -201,6 +201,72 @@ macro_rules! apply_fn_to_unsigneds_and_primitive_floats {
 
 #[doc(hidden)]
 #[macro_export]
+macro_rules! apply_fn_to_signeds_and_primitive_floats {
+    ($f: ident) => {
+        $f::<i8, f32>();
+        $f::<i8, f64>();
+        $f::<i16, f32>();
+        $f::<i16, f64>();
+        $f::<i32, f32>();
+        $f::<i32, f64>();
+        $f::<i64, f32>();
+        $f::<i64, f64>();
+        $f::<i128, f32>();
+        $f::<i128, f64>();
+        $f::<isize, f32>();
+        $f::<isize, f64>();
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! apply_fn_to_primitive_ints_and_primitive_floats {
+    ($f: ident) => {
+        apply_fn_to_unsigneds_and_primitive_floats!($f);
+        apply_fn_to_signeds_and_primitive_floats!($f);
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! apply_fn_to_primitive_floats_and_unsigneds {
+    ($f: ident) => {
+        $f::<f32, u8>();
+        $f::<f32, u16>();
+        $f::<f32, u32>();
+        $f::<f32, u64>();
+        $f::<f32, u128>();
+        $f::<f32, usize>();
+        $f::<f64, u8>();
+        $f::<f64, u16>();
+        $f::<f64, u32>();
+        $f::<f64, u64>();
+        $f::<f64, u128>();
+        $f::<f64, usize>();
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! apply_fn_to_primitive_floats_and_signeds {
+    ($f: ident) => {
+        $f::<f32, i8>();
+        $f::<f32, i16>();
+        $f::<f32, i32>();
+        $f::<f32, i64>();
+        $f::<f32, i128>();
+        $f::<f32, isize>();
+        $f::<f64, i8>();
+        $f::<f64, i16>();
+        $f::<f64, i32>();
+        $f::<f64, i64>();
+        $f::<f64, i128>();
+        $f::<f64, isize>();
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
 macro_rules! apply_fn_to_signeds_and_unsigneds {
     ($f: ident) => {
         $f::<i8, u8>();
