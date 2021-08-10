@@ -81,11 +81,10 @@ use rust_wheels::iterators::integers_geometric::{
     i32s_geometric, range_up_geometric_u32, u32s_geometric,
 };
 use rust_wheels::iterators::primitive_ints::{
-    random_natural_signed, random_negative_signed, random_nonzero_signed, random_positive_signed,
-    random_positive_unsigned, random_range, random_range_down, random_range_up,
-    special_random_natural_signed, special_random_negative_signed, special_random_nonzero_signed,
-    special_random_positive_signed, special_random_positive_unsigned, special_random_signed,
-    special_random_unsigned,
+    random_natural_signed, random_negative_signed, random_nonzero_signed, random_positive_unsigned,
+    random_range, random_range_down, random_range_up, special_random_natural_signed,
+    special_random_negative_signed, special_random_nonzero_signed,
+    special_random_positive_unsigned, special_random_signed, special_random_unsigned,
 };
 use rust_wheels::iterators::rounding_modes::random_rounding_modes;
 use rust_wheels::iterators::tuples::{
@@ -854,20 +853,6 @@ pub fn pairs_of_unsigned_and_small_unsigned<T: PrimitiveUnsigned + Rand, U: Prim
     }
 }
 
-// All pairs of `T` and small `U`, where `T` and `U` are unsigned and the `T` is not divisible by 2
-// to the power of the `U`.
-pub fn pairs_of_unsigned_and_small_unsigned_var_1<
-    T: PrimitiveUnsigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    gm: GenerationMode,
-) -> It<(T, U)> {
-    Box::new(
-        pairs_of_unsigned_and_small_unsigned::<T, U>(gm)
-            .filter(|&(n, u)| !n.divisible_by_power_of_2(u.exact_into())),
-    )
-}
-
 // All pairs of unsigned `T` and `u64`, where the `u64` is between the number of significant bits of
 // the `T` and `T::WIDTH`, inclusive.
 pub fn pairs_of_unsigned_and_small_u64_var_2<T: PrimitiveUnsigned + Rand + SampleRange>(
@@ -1004,31 +989,6 @@ pub fn pairs_of_positive_unsigned_and_small_unsigned<
     }
 }
 
-pub fn pairs_of_positive_signed_and_small_unsigned<
-    T: PrimitiveSigned + Rand,
-    U: PrimitiveUnsigned + Rand,
->(
-    gm: GenerationMode,
-) -> It<(T, U)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    match gm {
-        GenerationMode::Exhaustive => sqrt_pairs_of_positive_primitive_and_unsigned(),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &random_positive_signed,
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &special_random_positive_signed,
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-        )),
-    }
-}
-
 pub fn pairs_of_signed_and_small_unsigned<T: PrimitiveSigned + Rand, U: PrimitiveUnsigned>(
     gm: GenerationMode,
 ) -> It<(T, U)>
@@ -1049,7 +1009,7 @@ where
 
 // All pairs of `T` and small `U`, where `T` is signed, `U` is unsigned, and the `T` is not
 // divisible by 2 to the power of the `U`.
-pub fn pairs_of_signed_and_small_unsigned_var_1<
+fn pairs_of_signed_and_small_unsigned_var_1<
     T: PrimitiveSigned + Rand,
     U: PrimitiveUnsigned + Rand,
 >(
@@ -1232,34 +1192,6 @@ pub fn triples_of_positive_unsigned_small_unsigned_and_small_unsigned_var_1<
         )),
     };
     Box::new(ts.filter(|&(_, start, end)| start <= end))
-}
-
-pub fn pairs_of_negative_signed_not_min_and_small_unsigned<
-    T: PrimitiveSigned + Rand,
-    U: PrimitiveUnsigned,
->(
-    gm: GenerationMode,
-) -> It<(T, U)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
-            exhaustive_negative_signeds().filter(|&i| i != T::MIN),
-            exhaustive_unsigneds(),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_negative_signed(seed).filter(|&i| i != T::MIN)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| special_random_negative_signed(seed).filter(|&i| i != T::MIN)),
-            &(|seed| u32s_geometric(seed, scale).flat_map(U::checked_from)),
-        )),
-    }
 }
 
 pub fn triples_of_signed_signed_and_small_unsigned<

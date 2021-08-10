@@ -17,7 +17,7 @@ macro_rules! impl_saturating_abs {
             ///
             /// $$
             /// x \gets \\begin{cases}
-            ///     |x| & x^2 > -2^{W-1} \\\\
+            ///     |x| & x > -2^{W-1} \\\\
             ///     2^{W-1} - 1 & x = -2^{W-1},
             /// \\end{cases}
             /// $$

@@ -5,10 +5,10 @@ use crate::generators::common::{
 use crate::generators::exhaustive::*;
 use crate::generators::random::*;
 use crate::generators::special_random::*;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::common::Generator;
 use malachite_nz::integer::Integer;

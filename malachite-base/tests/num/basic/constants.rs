@@ -1,6 +1,8 @@
 use malachite_base::named::Named;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Two, Zero};
+use malachite_base::num::float::NiceFloat;
 
 macro_rules! test_unsigned_constants {
     ($t: ident) => {
@@ -23,6 +25,7 @@ macro_rules! test_float_constants {
         assert_eq!($t::ONE, 1.0);
         assert_eq!($t::TWO, 2.0);
         assert_eq!($t::NEGATIVE_ONE, -1.0);
+        assert_eq!($t::NEGATIVE_ZERO, -0.0);
     };
 }
 
@@ -76,6 +79,66 @@ fn test_width_constants() {
     assert_eq!(i128::WIDTH_MASK, 0x7f);
 }
 
+#[allow(clippy::float_cmp)]
+#[test]
+fn test_other_float_constants() {
+    assert_eq!(f32::WIDTH, 32);
+    assert_eq!(f32::EXPONENT_WIDTH, 8);
+    assert_eq!(f32::MANTISSA_WIDTH, 23);
+    assert_eq!(f32::MIN_NORMAL_EXPONENT, -126);
+    assert_eq!(f32::MIN_EXPONENT, -149);
+    assert_eq!(f32::MAX_EXPONENT, 127);
+    assert_eq!(NiceFloat(f32::MIN_POSITIVE_SUBNORMAL), NiceFloat(1.0e-45));
+    assert_eq!(NiceFloat(f32::MAX_SUBNORMAL), NiceFloat(1.1754942e-38));
+    assert_eq!(
+        NiceFloat(f32::MIN_POSITIVE_NORMAL),
+        NiceFloat(1.1754944e-38)
+    );
+    assert_eq!(NiceFloat(f32::MAX_FINITE), NiceFloat(3.4028235e38));
+    assert_eq!(
+        NiceFloat(f32::POSITIVE_INFINITY),
+        NiceFloat(std::f32::INFINITY)
+    );
+    assert_eq!(
+        NiceFloat(f32::NEGATIVE_INFINITY),
+        NiceFloat(std::f32::NEG_INFINITY)
+    );
+    assert_eq!(NiceFloat(f32::NAN), NiceFloat(std::f32::NAN));
+    assert_eq!(f32::SMALLEST_UNREPRESENTABLE_UINT, 0x1000001);
+    assert_eq!(f32::LARGEST_ORDERED_REPRESENTATION, 0xff000001);
+
+    assert_eq!(f64::WIDTH, 64);
+    assert_eq!(f64::EXPONENT_WIDTH, 11);
+    assert_eq!(f64::MANTISSA_WIDTH, 52);
+    assert_eq!(f64::MIN_NORMAL_EXPONENT, -1022);
+    assert_eq!(f64::MIN_EXPONENT, -1074);
+    assert_eq!(f64::MAX_EXPONENT, 1023);
+    assert_eq!(NiceFloat(f64::MIN_POSITIVE_SUBNORMAL), NiceFloat(5.0e-324));
+    assert_eq!(
+        NiceFloat(f64::MAX_SUBNORMAL),
+        NiceFloat(2.225073858507201e-308)
+    );
+    assert_eq!(
+        NiceFloat(f64::MIN_POSITIVE_NORMAL),
+        NiceFloat(2.2250738585072014e-308)
+    );
+    assert_eq!(
+        NiceFloat(f64::MAX_FINITE),
+        NiceFloat(1.7976931348623157e308)
+    );
+    assert_eq!(
+        NiceFloat(f64::POSITIVE_INFINITY),
+        NiceFloat(std::f64::INFINITY)
+    );
+    assert_eq!(
+        NiceFloat(f64::NEGATIVE_INFINITY),
+        NiceFloat(std::f64::NEG_INFINITY)
+    );
+    assert_eq!(NiceFloat(f64::NAN), NiceFloat(std::f64::NAN));
+    assert_eq!(f32::SMALLEST_UNREPRESENTABLE_UINT, 0x1000001);
+    assert_eq!(f64::LARGEST_ORDERED_REPRESENTATION, 0xffe0000000000001);
+}
+
 #[test]
 pub fn test_named() {
     fn test<T: Named>(out: &str) {
@@ -93,4 +156,6 @@ pub fn test_named() {
     test::<i64>("i64");
     test::<i128>("i128");
     test::<isize>("isize");
+    test::<f32>("f32");
+    test::<f64>("f64");
 }

@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::ShlRound;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, IntegerMantissaAndExponent, IsInteger, RoundingFrom,
 };
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use natural::Natural;
 
@@ -134,7 +134,7 @@ macro_rules! float_impls {
             /// extern crate malachite_nz;
             ///
             /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_base::num::float::PrimitiveFloat;
+            /// use malachite_base::num::basic::floats::PrimitiveFloat;
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(format!("{:?}", Natural::checked_from(f64::NAN)), "None");
@@ -190,7 +190,7 @@ macro_rules! float_impls {
             /// extern crate malachite_nz;
             ///
             /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_base::num::float::PrimitiveFloat;
+            /// use malachite_base::num::basic::floats::PrimitiveFloat;
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(Natural::convertible_from(f64::NAN), false);

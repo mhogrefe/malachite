@@ -1,12 +1,12 @@
 use iterators::{nonzero_values, NonzeroValues};
 use itertools::{Interleave, Itertools};
 use num::arithmetic::traits::{PowerOf2, RoundToMultipleOfPowerOf2};
+use num::basic::floats::PrimitiveFloat;
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use num::float::NiceFloat;
-use num::float::PrimitiveFloat;
 use num::iterators::{ruler_sequence, RulerSequence};
 use num::logic::traits::{BitAccess, NotAssign, SignificantBits};
 use rounding_modes::RoundingMode;
@@ -865,7 +865,7 @@ pub fn finite_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloat
 ///
 /// use malachite_base::num::exhaustive::positive_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
 ///     positive_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
@@ -921,7 +921,7 @@ pub fn positive_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///
 /// use malachite_base::num::exhaustive::negative_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
 ///     negative_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
@@ -980,7 +980,7 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///
 /// use malachite_base::num::exhaustive::nonzero_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
 ///     nonzero_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
@@ -1037,7 +1037,7 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 ///
 /// use malachite_base::num::exhaustive::primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
 ///     primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
@@ -1582,7 +1582,7 @@ pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::num::exhaustive::exhaustive_positive_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
 ///     exhaustive_positive_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
@@ -1623,7 +1623,7 @@ pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::num::exhaustive::exhaustive_negative_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
 ///     exhaustive_negative_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
@@ -1664,7 +1664,7 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::num::exhaustive::exhaustive_nonzero_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
 ///     exhaustive_nonzero_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
@@ -1707,7 +1707,7 @@ pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::num::exhaustive::exhaustive_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
 ///     exhaustive_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),

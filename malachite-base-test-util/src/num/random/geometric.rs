@@ -1,5 +1,5 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::BitAccess;
 use std::cmp::Ordering;
 

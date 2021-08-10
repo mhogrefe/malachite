@@ -4,7 +4,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::EqAbs;
 use malachite_base_test_util::generators::{
     signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen_var_27,
-    unsigned_triple_gen,
+    unsigned_triple_gen_var_19,
 };
 
 #[test]
@@ -44,7 +44,7 @@ fn properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert!(!x.ne_abs(&x));
     });
 
-    unsigned_triple_gen::<T>().test_properties(|(x, y, z)| {
+    unsigned_triple_gen_var_19::<T>().test_properties(|(x, y, z)| {
         if x == y && y == z {
             assert!(x == z);
         }

@@ -1,25 +1,25 @@
+#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::arithmetic::traits::{
-    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, SqrtRem,
+    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ShrRound, SqrtRem,
     SqrtRemAssign, Square,
 };
-#[cfg(feature = "32_bit_limbs")]
-use malachite_base::num::arithmetic::traits::{Parity, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::BitAccess;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LeadingZeros;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
-    large_type_gen_var_2, unsigned_gen, unsigned_pair_gen_var_31, unsigned_vec_pair_gen_var_4,
+    large_type_gen_var_2, unsigned_gen, unsigned_pair_gen_var_31, unsigned_vec_gen_var_1,
+    unsigned_vec_pair_gen_var_4, unsigned_vec_pair_gen_var_5, unsigned_vec_triple_gen_var_28,
 };
 use malachite_nz::natural::arithmetic::sqrt::{
-    _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _limbs_sqrt_helper,
-    _limbs_sqrt_rem_helper, _limbs_sqrt_rem_helper_scratch_len, _sqrt_rem_2_newton,
-    _sqrt_rem_binary,
+    _limbs_sqrt_helper, _limbs_sqrt_rem_helper, _limbs_sqrt_rem_helper_scratch_len,
+    _sqrt_rem_2_newton, limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_rem,
+    limbs_sqrt_rem_to_out, limbs_sqrt_to_out,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -27,6 +27,9 @@ use malachite_nz_test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz_test_util::natural::arithmetic::sqrt::{
+    _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _sqrt_rem_binary,
+};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -277,6 +280,244 @@ fn limbs_sqrt_helper_fail() {
     });
 }
 
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sqrt_to_out() {
+    fn test(xs: &[Limb], out_out: &[Limb]) {
+        let xs_len = xs.len();
+        let mut out = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+        limbs_sqrt_to_out(&mut out, xs);
+        assert_eq!(out, out_out);
+        let x = Natural::from_limbs_asc(xs);
+        let sqrt = Natural::from_owned_limbs_asc(out);
+        assert_eq!((&x).floor_sqrt(), sqrt);
+        assert!((&sqrt).square() <= x);
+        assert!((sqrt + Natural::ONE).square() > x);
+    }
+    // shift != 0
+    // xs_len == 1
+    // xs_len == 1 && shift != 0
+    test(&[1], &[1]);
+    // shift == 0
+    // xs_len == 1 && shift == 0
+    test(&[4000000000], &[63245]);
+    // xs_len == 2
+    // xs_len == 2 && shift != 0
+    test(&[1, 2], &[92681]);
+    // xs_len == 2 && shift == 0
+    test(&[1, 4000000000], &[4144860574]);
+    // xs_len > 2
+    // 2 < xs_len <= 8
+    // xs_len.odd() || shift != 0
+    // xs_len > 2 && shift == 0
+    // tn > 1
+    test(&[1, 2, 3], &[3144134278, 1]);
+    // xs_len > 2 && shift != 0
+    test(&[1, 2, 4000000000], &[2375990371, 63245]);
+    // xs_len > 8
+    test(
+        &[
+            2572912965, 1596092594, 2193991530, 2899278504, 3717617329, 1249076698, 879590153,
+            4210532297, 3303769392, 1147691304, 3624392894,
+        ],
+        &[
+            3491190173, 18317336, 2518787533, 3220458996, 3998374718, 60202,
+        ],
+    );
+    // xs_len.even() && shift == 0
+    test(
+        &[345016311, 2711392466, 1490697280, 1246394087],
+        &[2306404477, 2313703058],
+    );
+}
+
+#[test]
+fn limbs_sqrt_to_out_fail() {
+    // xs empty
+    assert_panic!({
+        let out = &mut [1, 2, 3];
+        let xs = &mut [];
+        limbs_sqrt_to_out(out, xs);
+    });
+    // out too short
+    assert_panic!({
+        let out = &mut [1, 2, 3];
+        let xs = &mut [Limb::MAX; 8];
+        limbs_sqrt_to_out(out, xs);
+    });
+    // last element of xs is 0
+    assert_panic!({
+        let out = &mut [1, 2, 3];
+        let xs = &mut [1, 2, 3, 4, 5, 0];
+        limbs_sqrt_to_out(out, xs);
+    });
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sqrt_rem_to_out() {
+    fn test(xs: &[Limb], out_out_sqrt: &[Limb], out_out_rem: &[Limb]) {
+        let xs_len = xs.len();
+        let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+        let mut out_rem = vec![0; xs_len];
+        let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
+        assert_eq!(out_sqrt, out_out_sqrt);
+        assert_eq!(&out_rem[..rem_len], out_out_rem);
+        let x = Natural::from_limbs_asc(xs);
+        let sqrt = Natural::from_owned_limbs_asc(out_sqrt);
+        let rem = Natural::from_limbs_asc(&out_rem[..rem_len]);
+        let (sqrt_alt, rem_alt) = (&x).sqrt_rem();
+        assert_eq!(sqrt_alt, sqrt);
+        assert_eq!(rem_alt, rem);
+        assert_eq!((&sqrt).square() + &rem, x);
+        assert!((&sqrt).square() <= x);
+        assert!((sqrt + Natural::ONE).square() > x);
+    }
+    // shift != 0
+    // xs_len == 1
+    // xs_len == 1 && shift != 0
+    test(&[1], &[1], &[]);
+    // shift == 0
+    // xs_len == 1 && shift == 0
+    test(&[4000000000], &[63245], &[69975]);
+    // xs_len == 2
+    // xs_len == 2 && shift != 0
+    test(&[1, 2], &[92681], &[166832]);
+    // xs_len == 2 && shift == 0
+    test(&[1, 4000000000], &[4144860574], &[1805423229, 1]);
+    // xs_len > 2
+    // xs_len.odd() || shift != 0
+    // xs_len > 2 && shift != 0 first time
+    // shift >= Limb::WIDTH
+    // xs_len > 2 && shift != 0 second time
+    test(&[1, 2, 3], &[3144134278, 1], &[1429311965, 0]);
+    // xs_len > 2 && shift == 0 first time
+    // xs_len > 2 && shift == 0 second time
+    test(
+        &[1, 2, 4000000000],
+        &[2375990371, 63245],
+        &[3710546360, 103937],
+    );
+    // xs_len.even() && shift == 0
+    test(
+        &[2977742827, 3919053323, 1548431690, 1948915452],
+        &[733991603, 2893186501],
+        &[2063111874, 210353161, 1],
+    );
+    // shift < Limb::WIDTH
+    test(
+        &[
+            1347797001, 1439220470, 2750411815, 3145460224, 3430380546, 2707019846, 2327263540,
+            551116682,
+        ],
+        &[1077346225, 1488699754, 3604020692, 1538514909],
+        &[4064782248, 3993147064, 4166228975, 2172636662, 0],
+    );
+}
+
+#[test]
+fn limbs_sqrt_rem_to_out_fail() {
+    // xs empty
+    assert_panic!({
+        let out_sqrt = &mut [1, 2, 3];
+        let out_rem = &mut [0; 8];
+        let xs = &mut [];
+        limbs_sqrt_rem_to_out(out_sqrt, out_rem, xs);
+    });
+    // out too short
+    assert_panic!({
+        let out_sqrt = &mut [1, 2, 3];
+        let out_rem = &mut [0; 8];
+        let xs = &mut [Limb::MAX; 8];
+        limbs_sqrt_rem_to_out(out_sqrt, out_rem, xs);
+    });
+    // rem too short
+    assert_panic!({
+        let out_sqrt = &mut [1, 2, 3, 4];
+        let out_rem = &mut [0; 7];
+        let xs = &mut [Limb::MAX; 8];
+        limbs_sqrt_rem_to_out(out_sqrt, out_rem, xs);
+    });
+    // last element of xs is 0
+    assert_panic!({
+        let out_sqrt = &mut [1, 2, 3];
+        let out_rem = &mut [0; 6];
+        let xs = &mut [1, 2, 3, 4, 5, 0];
+        limbs_sqrt_rem_to_out(out_sqrt, out_rem, xs);
+    });
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_floor_sqrt() {
+    fn test(xs: &[Limb], out: &[Limb]) {
+        assert_eq!(limbs_floor_sqrt(xs), out);
+    }
+    test(&[1, 2, 3], &[3144134278, 1]);
+}
+
+#[test]
+fn limbs_floor_sqrt_fail() {
+    // xs empty
+    assert_panic!(limbs_floor_sqrt(&[]));
+    // last element of xs is 0
+    assert_panic!(limbs_floor_sqrt(&[1, 2, 0]));
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_ceiling_sqrt() {
+    fn test(xs: &[Limb], out: &[Limb]) {
+        assert_eq!(limbs_ceiling_sqrt(xs), out);
+    }
+    test(&[1, 2, 3], &[3144134279, 1]);
+}
+
+#[test]
+fn limbs_ceiling_sqrt_fail() {
+    // xs empty
+    assert_panic!(limbs_ceiling_sqrt(&[]));
+    // last element of xs is 0
+    assert_panic!(limbs_ceiling_sqrt(&[1, 2, 0]));
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_checked_sqrt() {
+    fn test(xs: &[Limb], out: Option<&[Limb]>) {
+        assert_eq!(limbs_checked_sqrt(xs), out.map(|xs| xs.to_vec()));
+    }
+    test(&[1, 2, 3], None);
+    test(&[0, 0, 1], Some(&[0, 1]));
+}
+
+#[test]
+fn limbs_checked_sqrt_fail() {
+    // xs empty
+    assert_panic!(limbs_checked_sqrt(&[]));
+    // last element of xs is 0
+    assert_panic!(limbs_checked_sqrt(&[1, 2, 0]));
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_sqrt_rem() {
+    fn test(xs: &[Limb], out_sqrt: &[Limb], out_rem: &[Limb]) {
+        let (sqrt, rem) = limbs_sqrt_rem(xs);
+        assert_eq!(sqrt, out_sqrt);
+        assert_eq!(rem, out_rem);
+    }
+    test(&[1, 2, 3], &[3144134278, 1], &[1429311965, 0]);
+}
+
+#[test]
+fn limbs_sqrt_rem_fail() {
+    // xs empty
+    assert_panic!(limbs_sqrt_rem(&[]));
+    // last element of xs is 0
+    assert_panic!(limbs_sqrt_rem(&[1, 2, 0]));
+}
+
 #[test]
 fn test_floor_sqrt() {
     let test = |s, out| {
@@ -471,6 +712,105 @@ fn limbs_sqrt_helper_properties() {
         assert_eq!(has_remainder, rem != 0);
         assert!((&sqrt).square() <= x);
         assert!((sqrt + Natural::ONE).square() > x);
+    });
+}
+
+#[test]
+fn limbs_sqrt_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_5().test_properties_with_config(&config, |(mut out, xs)| {
+        limbs_sqrt_to_out(&mut out, &xs);
+        let xs_len = xs.len();
+        let sqrt_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+        let x = Natural::from_limbs_asc(&xs);
+        let sqrt = Natural::from_limbs_asc(&out[..sqrt_len]);
+        assert_eq!((&x).floor_sqrt(), sqrt);
+        assert!((&sqrt).square() <= x);
+        assert!((sqrt + Natural::ONE).square() > x);
+    });
+}
+
+#[test]
+fn limbs_sqrt_rem_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_28().test_properties_with_config(
+        &config,
+        |(mut out_sqrt, mut out_rem, xs)| {
+            let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, &xs);
+            let xs_len = xs.len();
+            let sqrt_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+            let x = Natural::from_limbs_asc(&xs);
+            let sqrt = Natural::from_limbs_asc(&out_sqrt[..sqrt_len]);
+            let rem = Natural::from_limbs_asc(&out_rem[..rem_len]);
+            let (sqrt_alt, rem_alt) = (&x).sqrt_rem();
+            assert_eq!(sqrt_alt, sqrt);
+            assert_eq!(rem_alt, rem);
+            assert_eq!((&sqrt).square() + &rem, x);
+            assert!((&sqrt).square() <= x);
+            assert!((sqrt + Natural::ONE).square() > x);
+        },
+    );
+}
+
+#[test]
+fn limbs_floor_sqrt_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_1().test_properties_with_config(&config, |xs| {
+        let sqrt = Natural::from_owned_limbs_asc(limbs_floor_sqrt(&xs));
+        let x = Natural::from_owned_limbs_asc(xs);
+        assert_eq!((&x).floor_sqrt(), sqrt);
+        assert!((&sqrt).square() <= x);
+        assert!((sqrt + Natural::ONE).square() > x);
+    });
+}
+
+#[test]
+fn limbs_ceiling_sqrt_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_1().test_properties_with_config(&config, |xs| {
+        let sqrt = Natural::from_owned_limbs_asc(limbs_ceiling_sqrt(&xs));
+        let x = Natural::from_owned_limbs_asc(xs);
+        assert_eq!((&x).ceiling_sqrt(), sqrt);
+        assert!((&sqrt).square() >= x);
+        assert!((sqrt - Natural::ONE).square() < x);
+    });
+}
+
+#[test]
+fn limbs_checked_sqrt_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_1().test_properties_with_config(&config, |xs| {
+        let sqrt = limbs_checked_sqrt(&xs).map(Natural::from_owned_limbs_asc);
+        let x = Natural::from_owned_limbs_asc(xs);
+        assert_eq!((&x).checked_sqrt(), sqrt);
+        if let Some(sqrt) = sqrt {
+            assert_eq!(sqrt.square(), x);
+        }
+    });
+}
+
+#[test]
+fn limbs_sqrt_rem_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_1().test_properties_with_config(&config, |xs| {
+        let (sqrt, rem) = limbs_sqrt_rem(&xs);
+        let sqrt = Natural::from_owned_limbs_asc(sqrt);
+        let rem = Natural::from_owned_limbs_asc(rem);
+        let x = Natural::from_owned_limbs_asc(xs);
+        assert_eq!((&sqrt).square() + &rem, x);
+        assert_eq!((&x).sqrt_rem(), (sqrt, rem));
     });
 }
 

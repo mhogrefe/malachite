@@ -1,10 +1,10 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::mantissa_and_exponent::{
     from_sci_mantissa_and_exponent_with_rounding, sci_mantissa_and_exponent_with_rounding,
 };
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::bench::bucketers::{
     pair_1_primitive_float_bucketer, primitive_float_bucketer, triple_1_primitive_float_bucketer,
     unsigned_bit_bucketer,

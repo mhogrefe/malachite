@@ -119,7 +119,7 @@ macro_rules! float_impls {
             /// extern crate malachite_nz;
             ///
             /// use malachite_base::num::conversion::traits::CheckedFrom;
-            /// use malachite_base::num::float::PrimitiveFloat;
+            /// use malachite_base::num::basic::floats::PrimitiveFloat;
             /// use malachite_nz::integer::Integer;
             ///
             /// assert_eq!(format!("{:?}", Integer::checked_from(f64::NAN)), "None");
@@ -165,7 +165,7 @@ macro_rules! float_impls {
             /// extern crate malachite_nz;
             ///
             /// use malachite_base::num::conversion::traits::ConvertibleFrom;
-            /// use malachite_base::num::float::PrimitiveFloat;
+            /// use malachite_base::num::basic::floats::PrimitiveFloat;
             /// use malachite_nz::integer::Integer;
             ///
             /// assert_eq!(Integer::convertible_from(f64::NAN), false);

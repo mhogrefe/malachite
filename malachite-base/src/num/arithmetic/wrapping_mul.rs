@@ -14,22 +14,13 @@ macro_rules! impl_wrapping_mul {
         impl WrappingMulAssign<$t> for $t {
             /// Replaces `self` with `self * other`, wrapping around at the boundary of the type.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets z$, where $z \equiv xy \mod 2^W$ and $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::WrappingMulAssign;
-            ///
-            /// let mut x = 123u16;
-            /// x.wrapping_mul_assign(456);
-            /// assert_eq!(x, 56088);
-            ///
-            /// let mut x = 123u8;
-            /// x.wrapping_mul_assign(200);
-            /// assert_eq!(x, 24);
-            /// ```
+            /// See the documentation of the `num::arithmetic::wrapping_mul` module.
             #[inline]
             fn wrapping_mul_assign(&mut self, other: $t) {
                 *self = self.wrapping_mul(other);

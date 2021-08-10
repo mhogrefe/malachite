@@ -33,27 +33,28 @@ pub fn _xxxx_add_yyyy_is_zzzz<T: PrimitiveUnsigned>(
 macro_rules! impl_xxxx_add_yyyy_is_zzzz {
     ($t:ident) => {
         impl XXXXAddYYYYIsZZZZ for $t {
-            /// Adds two numbers, each composed of four `$t` values. The sum is returned as a
-            /// quadruple of `$t` values. The more significant value always comes first. Addition is
-            /// wrapping, and overflow is not indicated.
+            /// Adds two numbers, each composed of four `Self` values, returning the sum as a
+            /// quadruple of `Self` values.
             ///
-            /// Time: worst case O(1)
+            /// The more significant value always comes first. Addition is wrapping, and overflow
+            /// is not indicated.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x_3, x_2, x_1, x_0, y_2, y_2, y_1, y_0) = (z_3, z_2, z_1, z_0),
+            /// $$
+            /// where $W$ is `Self::WIDTH`,
+            ///
+            /// $x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0, z_3, z_2, z_1, z_0 < 2^W$, and
+            /// $$
+            /// (2^{3W}x_3 + 2^{2W}x_2 + 2^Wx_1 + x_0) + (2^{3W}y_3 + 2^{2W}y_2 + 2^Wy_1 + y_0)
+            /// \equiv 2^{3W}z_3 + 2^{2W}z_2 + 2^Wz_1 + z_0 \mod 2^{4W}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::XXXXAddYYYYIsZZZZ;
-            ///
-            /// assert_eq!(
-            ///     u64::xxxx_add_yyyy_is_zzzz(0x12, 0x34, 0x56, 0x78, 0x33, 0x33, 0x33, 0x33),
-            ///     (0x45, 0x67, 0x89, 0xab)
-            /// );
-            /// assert_eq!(
-            ///     u8::xxxx_add_yyyy_is_zzzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc, 0xba, 0x98),
-            ///     (0x77, 0x77, 0x77, 0x76)
-            /// );
-            /// ```
+            /// See the documentation of the `num::arithmetic::xxxx_add_yyyy_is_zzzz` module.
             ///
             /// This is add_ssssaaaaaaaa from longlong.h, FLINT 2.7.1, where (s3, s2, s1, s0) is
             /// returned.
@@ -81,13 +82,28 @@ impl_xxxx_add_yyyy_is_zzzz!(u64);
 impl_xxxx_add_yyyy_is_zzzz!(u128);
 
 impl XXXXAddYYYYIsZZZZ for usize {
-    /// Adds two numbers, each composed of four `usize` values. The sum is returned as a quadruple
-    /// of `usize` values. The more significant value always comes first. Addition is wrapping, and
-    /// overflow is not indicated.
+    /// Adds two numbers, each composed of four `usize` values, returning the sum as a quadruple
+    /// of `usize` values.
     ///
-    /// Time: worst case O(1)
+    /// The more significant value always comes first. Addition is wrapping, and overflow is not
+    /// indicated.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x_3, x_2, x_1, x_0, y_2, y_2, y_1, y_0) = (z_3, z_2, z_1, z_0),
+    /// $$
+    /// where $W$ is `Self::WIDTH`,
+    ///
+    /// $x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0, z_3, z_2, z_1, z_0 < 2^W$, and
+    /// $$
+    /// (2^{3W}x_3 + 2^{2W}x_2 + 2^Wx_1 + x_0) + (2^{3W}y_3 + 2^{2W}y_2 + 2^Wy_1 + y_0)
+    /// \equiv 2^{3W}z_3 + 2^{2W}z_2 + 2^Wz_1 + z_0 \mod 2^{4W}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See the documentation of the `num::arithmetic::xxxx_add_yyyy_is_zzzz` module.
     ///
     /// This is add_ssssaaaaaaaa from longlong.h, FLINT 2.7.1, where (s3, s2, s1, s0) is returned.
     fn xxxx_add_yyyy_is_zzzz(

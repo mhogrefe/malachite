@@ -1,5 +1,5 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{string_gen, string_gen_var_10};
 use std::fmt::Debug;

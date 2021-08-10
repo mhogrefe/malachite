@@ -252,7 +252,6 @@ pub fn sqrt_rem_newton<
     (sqrt, n - square)
 }
 
-/// TODO clean up float conversion
 /// This is n_sqrt from ulong_extras/sqrt.c, FLINT 2.7.1.
 fn _floor_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,

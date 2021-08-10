@@ -5,12 +5,12 @@ use iterators::{
 };
 use itertools::Itertools;
 use num::arithmetic::traits::{Parity, PowerOf2, ShrRound};
+use num::basic::floats::PrimitiveFloat;
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 use num::float::NiceFloat;
-use num::float::PrimitiveFloat;
 use num::iterators::{iterator_to_bit_chunks, IteratorToBitChunks};
 use num::logic::traits::{BitAccess, SignificantBits};
 use num::random::geometric::{
@@ -1740,7 +1740,7 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::random::special_random_finite_primitive_floats;
 ///
 /// assert_eq!(
@@ -1811,7 +1811,7 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::random::special_random_positive_primitive_floats;
 ///
 /// assert_eq!(
@@ -1883,7 +1883,7 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::random::special_random_negative_primitive_floats;
 ///
 /// assert_eq!(
@@ -1955,7 +1955,7 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::random::special_random_nonzero_primitive_floats;
 ///
 /// assert_eq!(
@@ -2025,7 +2025,7 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::random::special_random_primitive_floats;
 ///
 /// assert_eq!(
@@ -2372,7 +2372,7 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::random::special_random_primitive_float_range;
 ///
 /// assert_eq!(
@@ -2459,7 +2459,7 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::random::special_random_primitive_float_inclusive_range;
 ///
 /// assert_eq!(

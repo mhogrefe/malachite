@@ -5,8 +5,8 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base_test_util::generators::{
     signed_pair_gen, signed_quadruple_gen, signed_triple_gen, signed_triple_gen_var_4,
-    signed_triple_gen_var_5, unsigned_pair_gen_var_27, unsigned_quadruple_gen, unsigned_triple_gen,
-    unsigned_triple_gen_var_7, unsigned_triple_gen_var_8,
+    signed_triple_gen_var_5, unsigned_pair_gen_var_27, unsigned_quadruple_gen_var_10,
+    unsigned_triple_gen_var_19, unsigned_triple_gen_var_7, unsigned_triple_gen_var_8,
 };
 
 #[test]
@@ -191,7 +191,7 @@ fn test_eq_mod() {
 }
 
 fn eq_mod_properties_helper_unsigned<T: PrimitiveUnsigned>() {
-    unsigned_triple_gen::<T>().test_properties(|(x, y, m)| {
+    unsigned_triple_gen_var_19::<T>().test_properties(|(x, y, m)| {
         let equal = x.eq_mod(y, m);
         assert_eq!(y.eq_mod(x, m), equal);
     });
@@ -213,7 +213,7 @@ fn eq_mod_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert!(x.eq_mod(x, y));
     });
 
-    unsigned_quadruple_gen::<T>().test_properties(|(x, y, z, m)| {
+    unsigned_quadruple_gen_var_10::<T>().test_properties(|(x, y, z, m)| {
         if x.eq_mod(y, m) && y.eq_mod(z, m) {
             assert!(x.eq_mod(z, m));
         }

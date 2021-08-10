@@ -1,10 +1,10 @@
 use malachite_base::chars::crement::char_to_contiguous_range;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use std::cmp::max;
 
@@ -202,6 +202,113 @@ pub fn triple_max_bit_bucketer<
     }
 }
 
+pub fn quadruple_max_bit_bucketer<
+    'a,
+    T: Copy + SignificantBits,
+    U: Copy + SignificantBits,
+    V: Copy + SignificantBits,
+    W: Copy + SignificantBits,
+>(
+    x_name: &str,
+    y_name: &str,
+    z_name: &str,
+    w_name: &str,
+) -> Bucketer<'a, (T, U, V, W)> {
+    Bucketer {
+        bucketing_function: &|&(x, y, z, w)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits(),
+                w.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits(), \
+            {}.significant_bits())",
+            x_name, y_name, z_name, w_name
+        ),
+    }
+}
+
+pub fn sextuple_max_bit_bucketer<
+    'a,
+    T: Copy + SignificantBits,
+    U: Copy + SignificantBits,
+    V: Copy + SignificantBits,
+    W: Copy + SignificantBits,
+    X: Copy + SignificantBits,
+    Y: Copy + SignificantBits,
+>(
+    x_name: &str,
+    y_name: &str,
+    z_name: &str,
+    w_name: &str,
+    v_name: &str,
+    u_name: &str,
+) -> Bucketer<'a, (T, U, V, W, X, Y)> {
+    Bucketer {
+        bucketing_function: &|&(x, y, z, w, v, u)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits(),
+                w.significant_bits(),
+                v.significant_bits(),
+                u.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits(), \
+            {}.significant_bits(), {}.significant_bits(), {}.significant_bits())",
+            x_name, y_name, z_name, w_name, v_name, u_name
+        ),
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn octuple_max_bit_bucketer<
+    'a,
+    T: Copy + SignificantBits,
+    U: Copy + SignificantBits,
+    V: Copy + SignificantBits,
+    W: Copy + SignificantBits,
+    X: Copy + SignificantBits,
+    Y: Copy + SignificantBits,
+    Z: Copy + SignificantBits,
+    A: Copy + SignificantBits,
+>(
+    x_name: &str,
+    y_name: &str,
+    z_name: &str,
+    w_name: &str,
+    v_name: &str,
+    u_name: &str,
+    t_name: &str,
+    s_name: &str,
+) -> Bucketer<'a, (T, U, V, W, X, Y, Z, A)> {
+    Bucketer {
+        bucketing_function: &|&(x, y, z, w, v, u, t, s)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits(),
+                w.significant_bits(),
+                v.significant_bits(),
+                u.significant_bits(),
+                t.significant_bits(),
+                s.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits(), \
+            {}.significant_bits(), {}.significant_bits(), {}.significant_bits(), \
+            {}.significant_bits(), {}.significant_bits())",
+            x_name, y_name, z_name, w_name, v_name, u_name, t_name, s_name
+        ),
+    }
+}
+
 pub fn triple_1_2_max_bit_bucketer<'a, T: Copy + SignificantBits, U: Copy + SignificantBits, V>(
     x_name: &str,
     y_name: &str,
@@ -340,6 +447,13 @@ pub fn pair_1_vec_len_bucketer<T, U>(xs_name: &str) -> Bucketer<(Vec<T>, U)> {
     Bucketer {
         bucketing_function: &|&(ref xs, _)| xs.len(),
         bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
+pub fn pair_2_vec_len_bucketer<T, U>(ys_name: &str) -> Bucketer<(T, Vec<U>)> {
+    Bucketer {
+        bucketing_function: &|&(_, ref ys)| ys.len(),
+        bucketing_label: format!("{}.len()", ys_name),
     }
 }
 

@@ -1,7 +1,7 @@
 use itertools::Itertools;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::primitive_floats_increasing;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 
 fn primitive_floats_increasing_helper<T: PrimitiveFloat>(first_20: &[T], last_20: &[T]) {
     let xs = primitive_floats_increasing::<T>();

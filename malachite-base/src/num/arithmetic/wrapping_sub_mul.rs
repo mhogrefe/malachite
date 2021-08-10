@@ -23,19 +23,15 @@ macro_rules! impl_wrapping_sub_mul {
         impl WrappingSubMul<$t> for $t {
             type Output = $t;
 
-            /// Computes `self - y * z`, wrapping around at the boundary of the type.
+            /// Computes $x - yz$, wrapping around at the boundary of the type.
             ///
-            /// Time: worst case O(1)
+            /// $f(x, y, z) = w$, where $w \equiv x - yz \mod 2^W$ and $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::WrappingSubMul;
-            ///
-            /// assert_eq!(127i8.wrapping_sub_mul(2, 100), -73);
-            /// assert_eq!((-127i8).wrapping_sub_mul(2, 100), -71);
-            /// ```
+            /// See the documentation of the `num::arithmetic::wrapping_sub_mul` module.
             #[inline]
             fn wrapping_sub_mul(self, y: $t, z: $t) -> $t {
                 _wrapping_sub_mul(self, y, z)
@@ -43,24 +39,15 @@ macro_rules! impl_wrapping_sub_mul {
         }
 
         impl WrappingSubMulAssign<$t> for $t {
-            /// Replaces `self` with `self - y * z`, wrapping around at the boundary of the type.
+            /// Replaces $x$ with $x - yz$, wrapping around at the boundary of the type.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets w$, where $w \equiv x - yz \mod 2^W$ and $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::WrappingSubMulAssign;
-            ///
-            /// let mut x = 127i8;
-            /// x.wrapping_sub_mul_assign(2, 100);
-            /// assert_eq!(x, -73);
-            ///
-            /// let mut x = -127i8;
-            /// x.wrapping_sub_mul_assign(2, 100);
-            /// assert_eq!(x, -71);
-            /// ```
+            /// See the documentation of the `num::arithmetic::wrapping_sub_mul` module.
             #[inline]
             fn wrapping_sub_mul_assign(&mut self, y: $t, z: $t) {
                 _wrapping_sub_mul_assign(self, y, z)

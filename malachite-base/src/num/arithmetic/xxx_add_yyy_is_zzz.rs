@@ -26,27 +26,28 @@ pub fn _xxx_add_yyy_is_zzz<T: PrimitiveUnsigned>(
 macro_rules! impl_xxx_add_yyy_is_zzz {
     ($t:ident) => {
         impl XXXAddYYYIsZZZ for $t {
-            /// Adds two numbers, each composed of three `$t` values. The sum is returned as a
-            /// triple of `$t` values. The more significant value always comes first. Addition is
-            /// wrapping, and overflow is not indicated.
+            /// Adds two numbers, each composed of three `Self` values, returning the sum as a
+            /// triple of `Self` values.
             ///
-            /// Time: worst case O(1)
+            /// The more significant value always comes first. Addition is wrapping, and overflow
+            /// is not indicated.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x_2, x_1, x_0, y_2, y_1, y_0) = (z_2, z_1, z_0),
+            /// $$
+            /// where $W$ is `Self::WIDTH`,
+            ///
+            /// $x_2, x_1, x_0, y_2, y_1, y_0, z_2, z_1, z_0 < 2^W$, and
+            /// $$
+            /// (2^{2W}x_2 + 2^Wx_1 + x_0) + (2^{2W}y_2 + 2^Wy_1 + y_0)
+            /// \equiv 2^{2W}z_2 + 2^Wz_1 + z_0 \mod 2^{3W}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::XXXAddYYYIsZZZ;
-            ///
-            /// assert_eq!(
-            ///     u64::xxx_add_yyy_is_zzz(0x12, 0x34, 0x56, 0x33, 0x33, 0x33),
-            ///     (0x45, 0x67, 0x89)
-            /// );
-            /// assert_eq!(
-            ///     u8::xxx_add_yyy_is_zzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc),
-            ///     (0x57, 0x99, 0x98)
-            /// );
-            /// ```
+            /// See the documentation of the `num::arithmetic::xxx_add_yyy_is_zzz` module.
             ///
             /// This is add_sssaaaaaa from longlong.h, FLINT 2.7.1, where (sh, sm, sl) is returned.
             #[inline]
@@ -71,13 +72,28 @@ impl_xxx_add_yyy_is_zzz!(u64);
 impl_xxx_add_yyy_is_zzz!(u128);
 
 impl XXXAddYYYIsZZZ for usize {
-    /// Adds two numbers, each composed of three `usize` values. The sum is returned as a triple of
-    /// `usize` values. The more significant value always comes first. Addition is wrapping, and
-    /// overflow is not indicated.
+    /// Adds two numbers, each composed of three `usize` values, returning the sum as a triple of
+    /// `usize` values.
     ///
-    /// Time: worst case O(1)
+    /// The more significant value always comes first. Addition is wrapping, and overflow is not
+    /// indicated.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x_2, x_1, x_0, y_2, y_1, y_0) = (z_2, z_1, z_0),
+    /// $$
+    /// where $W$ is `Self::WIDTH`,
+    ///
+    /// $x_2, x_1, x_0, y_2, y_1, y_0, z_2, z_1, z_0 < 2^W$, and
+    /// $$
+    /// (2^{2W}x_2 + 2^Wx_1 + x_0) + (2^{2W}y_2 + 2^Wy_1 + y_0)
+    /// \equiv 2^{2W}z_2 + 2^Wz_1 + z_0 \mod 2^{3W}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See the documentation of the `num::arithmetic::xxx_add_yyy_is_zzz` module.
     ///
     /// This is add_sssaaaaaa from longlong.h, FLINT 2.7.1, where (sh, sm, sl) is returned.
     fn xxx_add_yyy_is_zzz(

@@ -182,6 +182,7 @@ pub mod num {
         pub mod add_mul;
         pub mod arithmetic_checked_shl;
         pub mod arithmetic_checked_shr;
+        pub mod ceiling;
         pub mod checked_abs;
         pub mod checked_add_mul;
         pub mod checked_neg;
@@ -194,6 +195,7 @@ pub mod num {
         pub mod divisible_by_power_of_2;
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
+        pub mod floor;
         pub mod log_base;
         pub mod log_base_2;
         pub mod log_base_power_of_2;
@@ -359,11 +361,12 @@ pub mod num {
     pub mod float {
         pub mod basic {
             pub mod abs_negative_zero;
-            pub mod constants;
             pub mod from_ordered_representation;
             pub mod is_negative_zero;
+            pub mod max_precision_for_sci_exponent;
             pub mod next_higher;
             pub mod next_lower;
+            pub mod precision;
             pub mod to_ordered_representation;
         }
         pub mod nice_float {

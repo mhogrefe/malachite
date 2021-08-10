@@ -27,17 +27,17 @@ fn demo_overflowing_div_unsigned<T: PrimitiveUnsigned>(
         .get(gm, &config)
         .take(limit)
     {
-        println!("{}.overflowing_add({}) = {:?}", x, y, x.overflowing_add(y));
+        println!("{}.overflowing_div({}) = {:?}", x, y, x.overflowing_div(y));
     }
 }
 
 fn demo_overflowing_div_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, y) in signed_pair_gen_var_6::<T>().get(gm, &config).take(limit) {
         println!(
-            "({}).overflowing_add({}) = {:?}",
+            "({}).overflowing_div({}) = {:?}",
             x,
             y,
-            x.overflowing_add(y)
+            x.overflowing_div(y)
         );
     }
 }
@@ -52,9 +52,9 @@ fn demo_overflowing_div_assign_unsigned<T: PrimitiveUnsigned>(
         .take(limit)
     {
         let old_x = x;
-        let overflow = x.overflowing_add_assign(y);
+        let overflow = x.overflowing_div_assign(y);
         println!(
-            "x := {}; x.overflowing_add_assign({}) = {}; x = {}",
+            "x := {}; x.overflowing_div_assign({}) = {}; x = {}",
             old_x, y, overflow, x
         );
     }
@@ -67,9 +67,9 @@ fn demo_overflowing_div_assign_signed<T: PrimitiveSigned>(
 ) {
     for (mut x, y) in signed_pair_gen_var_6::<T>().get(gm, &config).take(limit) {
         let old_x = x;
-        let overflow = x.overflowing_add_assign(y);
+        let overflow = x.overflowing_div_assign(y);
         println!(
-            "x := {}; x.overflowing_add_assign({}) = {}; x = {}",
+            "x := {}; x.overflowing_div_assign({}) = {}; x = {}",
             old_x, y, overflow, x
         );
     }
@@ -82,14 +82,14 @@ fn benchmark_overflowing_div_unsigned<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.overflowing_add({})", T::NAME, T::NAME),
+        &format!("{}.overflowing_div({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.overflowing_add(y)))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.overflowing_div(y)))],
     );
 }
 
@@ -100,14 +100,14 @@ fn benchmark_overflowing_div_signed<T: PrimitiveSigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.overflowing_add({})", T::NAME, T::NAME),
+        &format!("{}.overflowing_div({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         signed_pair_gen_var_6::<T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &pair_max_bit_bucketer("x", "y"),
-        &mut [("Malachite", &mut |(x, y)| no_out!(x.overflowing_add(y)))],
+        &mut [("Malachite", &mut |(x, y)| no_out!(x.overflowing_div(y)))],
     );
 }
 
@@ -118,7 +118,7 @@ fn benchmark_overflowing_div_assign_unsigned<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.overflowing_add_assign({})", T::NAME, T::NAME),
+        &format!("{}.overflowing_div_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
         gm.name(),
@@ -126,7 +126,7 @@ fn benchmark_overflowing_div_assign_unsigned<T: PrimitiveUnsigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y)| {
-            no_out!(x.overflowing_add_assign(y))
+            no_out!(x.overflowing_div_assign(y))
         })],
     );
 }
@@ -138,7 +138,7 @@ fn benchmark_overflowing_div_assign_signed<T: PrimitiveSigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.overflowing_add_assign({})", T::NAME, T::NAME),
+        &format!("{}.overflowing_div_assign({})", T::NAME, T::NAME),
         BenchmarkType::Single,
         signed_pair_gen_var_6::<T>().get(gm, &config),
         gm.name(),
@@ -146,7 +146,7 @@ fn benchmark_overflowing_div_assign_signed<T: PrimitiveSigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [("Malachite", &mut |(mut x, y)| {
-            no_out!(x.overflowing_add_assign(y))
+            no_out!(x.overflowing_div_assign(y))
         })],
     );
 }

@@ -1,10 +1,10 @@
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::generators::{
     primitive_float_gen, signed_gen_var_10, unsigned_gen_var_21,
 };
@@ -68,7 +68,7 @@ fn square_properties_helper_primitive_float<T: PrimitiveFloat>() {
         let mut square = x;
         square.square_assign();
         assert_eq!(NiceFloat(square), NiceFloat(x.square()));
-        assert_eq!(NiceFloat(square), NiceFloat(x.powf(T::TWO)));
+        assert_eq!(NiceFloat(square), NiceFloat(x.pow(2)));
         assert_eq!(NiceFloat((-x).square()), NiceFloat(square));
     });
 }

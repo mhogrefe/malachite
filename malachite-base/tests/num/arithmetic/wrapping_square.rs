@@ -1,4 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 
 #[test]
 fn test_wrapping_square() {
@@ -26,4 +29,31 @@ fn test_wrapping_square() {
 
     test::<u16>(1000, 16960);
     test::<i16>(-1000, 16960);
+}
+
+fn wrapping_square_properties_helper_unsigned<T: PrimitiveUnsigned>() {
+    unsigned_gen::<T>().test_properties(|x| {
+        let mut square = x;
+        square.wrapping_square_assign();
+        assert_eq!(square, x.wrapping_square());
+        assert_eq!(square, x.wrapping_pow(2));
+    });
+}
+
+fn wrapping_square_properties_helper_signed<T: PrimitiveSigned>() {
+    signed_gen::<T>().test_properties(|x| {
+        let mut square = x;
+        square.wrapping_square_assign();
+        assert_eq!(square, x.wrapping_square());
+        assert_eq!(square, x.wrapping_pow(2));
+        if x != T::MIN {
+            assert_eq!((-x).wrapping_square(), square);
+        }
+    });
+}
+
+#[test]
+fn saturating_square_properties() {
+    apply_fn_to_unsigneds!(wrapping_square_properties_helper_unsigned);
+    apply_fn_to_signeds!(wrapping_square_properties_helper_signed);
 }

@@ -1,6 +1,6 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::bench::bucketers::{
     pair_1_bit_bucketer, primitive_float_bucketer, unsigned_bit_bucketer,
 };

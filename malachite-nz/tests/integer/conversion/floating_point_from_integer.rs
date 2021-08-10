@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::{
     signed_gen, signed_gen_var_7, signed_rounding_mode_pair_gen_var_4,

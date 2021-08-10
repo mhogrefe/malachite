@@ -1,8 +1,8 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
 };
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::bench::bucketers::{
     pair_1_primitive_float_bucketer, primitive_float_bucketer,
 };

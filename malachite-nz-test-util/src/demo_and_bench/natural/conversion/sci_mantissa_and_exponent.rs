@@ -1,7 +1,7 @@
 use crate::bench::bucketers::{natural_bit_bucketer, pair_1_natural_bit_bucketer};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::bench::bucketers::{
     pair_1_primitive_float_bucketer, triple_1_primitive_float_bucketer,
 };
@@ -17,28 +17,37 @@ use malachite_nz::natural::Natural;
 use malachite_nz_test_util::generators::{natural_gen_var_2, natural_rounding_mode_pair_gen_var_2};
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent);
-    register_primitive_float_demos!(runner, demo_sci_mantissa);
-    register_primitive_float_demos!(runner, demo_sci_exponent);
-    register_primitive_float_demos!(runner, demo_sci_mantissa_and_exponent_with_rounding);
-    register_primitive_float_demos!(runner, demo_from_sci_mantissa_and_exponent);
-    register_primitive_float_demos!(runner, demo_from_sci_mantissa_and_exponent_targeted);
-    register_primitive_float_demos!(runner, demo_from_sci_mantissa_and_exponent_with_rounding);
+    register_primitive_float_demos!(runner, demo_natural_sci_mantissa_and_exponent);
+    register_primitive_float_demos!(runner, demo_natural_sci_mantissa);
+    register_primitive_float_demos!(runner, demo_natural_sci_exponent);
+    register_primitive_float_demos!(runner, demo_natural_sci_mantissa_and_exponent_with_rounding);
+    register_primitive_float_demos!(runner, demo_natural_from_sci_mantissa_and_exponent);
+    register_primitive_float_demos!(runner, demo_natural_from_sci_mantissa_and_exponent_targeted);
     register_primitive_float_demos!(
         runner,
-        demo_from_sci_mantissa_and_exponent_with_rounding_targeted
+        demo_natural_from_sci_mantissa_and_exponent_with_rounding
     );
-    register_primitive_float_benches!(runner, benchmark_sci_mantissa_and_exponent);
-    register_primitive_float_benches!(runner, benchmark_sci_mantissa_and_exponent_with_rounding);
-    register_primitive_float_benches!(runner, benchmark_from_sci_mantissa_and_exponent);
+    register_primitive_float_demos!(
+        runner,
+        demo_natural_from_sci_mantissa_and_exponent_with_rounding_targeted
+    );
+    register_primitive_float_benches!(runner, benchmark_natural_sci_mantissa_and_exponent);
     register_primitive_float_benches!(
         runner,
-        benchmark_from_sci_mantissa_and_exponent_with_rounding
+        benchmark_natural_sci_mantissa_and_exponent_with_rounding
+    );
+    register_primitive_float_benches!(runner, benchmark_natural_from_sci_mantissa_and_exponent);
+    register_primitive_float_benches!(
+        runner,
+        benchmark_natural_from_sci_mantissa_and_exponent_with_rounding
     );
 }
 
-fn demo_sci_mantissa_and_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
-where
+fn demo_natural_sci_mantissa_and_exponent<T: PrimitiveFloat>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
 {
     for n in natural_gen_var_2().get(gm, &config).take(limit) {
@@ -51,7 +60,7 @@ where
     }
 }
 
-fn demo_sci_mantissa<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_sci_mantissa<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
 where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
 {
@@ -60,7 +69,7 @@ where
     }
 }
 
-fn demo_sci_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_sci_exponent<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize)
 where
     for<'a> &'a Natural: SciMantissaAndExponent<T, u64, Natural>,
 {
@@ -69,7 +78,7 @@ where
     }
 }
 
-fn demo_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn demo_natural_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -88,7 +97,7 @@ fn demo_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
     }
 }
 
-fn demo_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
+fn demo_natural_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -108,7 +117,7 @@ fn demo_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     }
 }
 
-fn demo_from_sci_mantissa_and_exponent_targeted<T: PrimitiveFloat>(
+fn demo_natural_from_sci_mantissa_and_exponent_targeted<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -128,7 +137,7 @@ fn demo_from_sci_mantissa_and_exponent_targeted<T: PrimitiveFloat>(
     }
 }
 
-fn demo_from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn demo_natural_from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -147,7 +156,7 @@ fn demo_from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
     }
 }
 
-fn demo_from_sci_mantissa_and_exponent_with_rounding_targeted<T: PrimitiveFloat>(
+fn demo_natural_from_sci_mantissa_and_exponent_with_rounding_targeted<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -166,7 +175,7 @@ fn demo_from_sci_mantissa_and_exponent_with_rounding_targeted<T: PrimitiveFloat>
     }
 }
 
-fn benchmark_sci_mantissa_and_exponent<T: PrimitiveFloat>(
+fn benchmark_natural_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -186,7 +195,7 @@ fn benchmark_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     );
 }
 
-fn benchmark_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn benchmark_natural_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -206,7 +215,7 @@ fn benchmark_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
     );
 }
 
-fn benchmark_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
+fn benchmark_natural_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -230,7 +239,7 @@ fn benchmark_from_sci_mantissa_and_exponent<T: PrimitiveFloat>(
     );
 }
 
-fn benchmark_from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
+fn benchmark_natural_from_sci_mantissa_and_exponent_with_rounding<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,

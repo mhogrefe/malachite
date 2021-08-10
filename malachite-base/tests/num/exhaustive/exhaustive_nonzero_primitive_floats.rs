@@ -1,7 +1,7 @@
 use itertools::Itertools;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::exhaustive_nonzero_primitive_floats;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 
 fn exhaustive_nonzero_primitive_floats_helper<T: PrimitiveFloat>(out: &[T]) {
     assert_eq!(

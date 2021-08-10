@@ -14,30 +14,13 @@ macro_rules! impl_wrapping_neg {
         impl WrappingNegAssign for $t {
             /// Replaces `self` with its negative, wrapping around at the boundary of the type.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets y$, where $y \equiv -x \mod 2^W$ and $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::WrappingNegAssign;
-            ///
-            /// let mut x = 0i8;
-            /// x.wrapping_neg_assign();
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = 100u64;
-            /// x.wrapping_neg_assign();
-            /// assert_eq!(x, 18446744073709551516);
-            ///
-            /// let mut x = -100i64;
-            /// x.wrapping_neg_assign();
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -128i8;
-            /// x.wrapping_neg_assign();
-            /// assert_eq!(x, -128);
-            /// ```
+            /// See the documentation of the `num::arithmetic::wrapping_neg` module.
             #[inline]
             fn wrapping_neg_assign(&mut self) {
                 *self = self.wrapping_neg();

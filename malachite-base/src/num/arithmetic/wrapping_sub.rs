@@ -14,22 +14,13 @@ macro_rules! impl_wrapping_sub {
         impl WrappingSubAssign<$t> for $t {
             /// Replaces `self` with `self - other`, wrapping around at the boundary of the type.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets z$, where $z \equiv x - y \mod 2^W$ and $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::WrappingSubAssign;
-            ///
-            /// let mut x = 456u16;
-            /// x.wrapping_sub_assign(123);
-            /// assert_eq!(x, 333);
-            ///
-            /// let mut x = 123u16;
-            /// x.wrapping_sub_assign(456);
-            /// assert_eq!(x, 65203);
-            /// ```
+            /// See the documentation of the `num::arithmetic::wrapping_sub` module.
             #[inline]
             fn wrapping_sub_assign(&mut self, other: $t) {
                 *self = self.wrapping_sub(other);

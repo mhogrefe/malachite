@@ -253,6 +253,7 @@ pub mod natural {
         pub mod from_primitive_int;
         pub mod is_integer;
         pub mod mantissa_and_exponent {
+            pub mod integer_mantissa_and_exponent;
             pub mod sci_mantissa_and_exponent;
         }
         pub mod primitive_int_from_natural;

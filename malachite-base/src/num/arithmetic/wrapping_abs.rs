@@ -15,30 +15,19 @@ macro_rules! impl_wrapping_abs {
             /// Replaces `self` with its absolute value, wrapping around at the boundary of the
             /// type.
             ///
-            /// Time: worst case O(1)
+            /// $$
+            /// x \gets \\begin{cases}
+            ///     |x| & x > -2^{W-1} \\\\
+            ///     -2^{W-1} & x = -2^{W-1},
+            /// \\end{cases}
+            /// $$
+            /// where $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::WrappingAbsAssign;
-            ///
-            /// let mut x = 0i8;
-            /// x.wrapping_abs_assign();
-            /// assert_eq!(x, 0);
-            ///
-            /// let mut x = 100i64;
-            /// x.wrapping_abs_assign();
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -100i64;
-            /// x.wrapping_abs_assign();
-            /// assert_eq!(x, 100);
-            ///
-            /// let mut x = -128i8;
-            /// x.wrapping_abs_assign();
-            /// assert_eq!(x, -128);
-            /// ```
+            /// See the documentation of the `num::arithmetic::wrapping_abs` module.
             #[inline]
             fn wrapping_abs_assign(&mut self) {
                 *self = self.wrapping_abs();

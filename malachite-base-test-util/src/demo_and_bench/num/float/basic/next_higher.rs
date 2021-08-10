@@ -1,5 +1,5 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::bench::bucketers::primitive_float_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};

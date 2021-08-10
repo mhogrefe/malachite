@@ -47,6 +47,16 @@ pub trait ArithmeticCheckedShr<RHS> {
     fn arithmetic_checked_shr(self, other: RHS) -> Option<Self::Output>;
 }
 
+/// Calculates the ceiling of `self`.
+pub trait Ceiling {
+    fn ceiling(self) -> Self;
+}
+
+/// Replaces `self` with its ceiling.
+pub trait CeilingAssign {
+    fn ceiling_assign(&mut self);
+}
+
 /// Checked absolute value. Computes `self.abs()`, returning `None` if there is no valid result.
 pub trait CheckedAbs {
     type Output;
@@ -258,6 +268,16 @@ pub trait EqModPowerOf2<RHS = Self> {
 /// Determines whether `self` is equal to `other` mod `m`.
 pub trait EqMod<RHS = Self, M = Self> {
     fn eq_mod(self, other: RHS, m: M) -> bool;
+}
+
+/// Calculates the floor of `self`.
+pub trait Floor {
+    fn floor(self) -> Self;
+}
+
+/// Replaces `self` with its floor.
+pub trait FloorAssign {
+    fn floor_assign(&mut self);
 }
 
 /// Determines whether `self` == $2^k$ for some integer k.
@@ -1209,21 +1229,6 @@ pub trait SubMulAssign<Y = Self, Z = Self> {
     fn sub_mul_assign(&mut self, y: Y, z: Z);
 }
 
-// TODO order
-
-/// Wrapping (modular) negation. Computes `-self`, wrapping around at the boundary of the type.
-pub trait WrappingNeg {
-    type Output;
-
-    fn wrapping_neg(self) -> Self::Output;
-}
-
-/// Wrapping (modular) negation. Replaces `self` with its negative, wrapping around at the boundary
-/// of the type.
-pub trait WrappingNegAssign {
-    fn wrapping_neg_assign(&mut self);
-}
-
 /// Wrapping (modular) absolute value. Computes `self.abs()`, wrapping around at the boundary of the
 /// type.
 pub trait WrappingAbs {
@@ -1252,99 +1257,6 @@ pub trait WrappingAddAssign<RHS = Self> {
     fn wrapping_add_assign(&mut self, other: RHS);
 }
 
-/// Adds two numbers, each composed of two `Self` values. The sum is returned as a pair of `Self`
-/// values. The more significant value always comes first. Addition is wrapping, and overflow is not
-/// indicated.
-pub trait XXAddYYIsZZ: Sized {
-    fn xx_add_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
-}
-
-/// Adds two numbers, each composed of three `Self` values. The sum is returned as a triple of
-/// `Self` values. The more significant value always comes first. Addition is wrapping, and overflow
-/// is not indicated.
-pub trait XXXAddYYYIsZZZ: Sized {
-    fn xxx_add_yyy_is_zzz(
-        x_2: Self,
-        x_1: Self,
-        x_0: Self,
-        y_2: Self,
-        y_1: Self,
-        y_0: Self,
-    ) -> (Self, Self, Self);
-}
-
-/// Adds two numbers, each composed of four `Self` values. The sum is returned as a quadruple of
-/// `Self` values. The more significant value always comes first. Addition is wrapping, and overflow
-/// is not indicated.
-pub trait XXXXAddYYYYIsZZZZ: Sized {
-    #[allow(clippy::too_many_arguments)]
-    fn xxxx_add_yyyy_is_zzzz(
-        x_3: Self,
-        x_2: Self,
-        x_1: Self,
-        x_0: Self,
-        y_3: Self,
-        y_2: Self,
-        y_1: Self,
-        y_0: Self,
-    ) -> (Self, Self, Self, Self);
-}
-
-/// Wrapping (modular) subtraction. Computes `self - other`, wrapping around at the boundary of the
-/// type.
-pub trait WrappingSub<RHS = Self> {
-    type Output;
-
-    fn wrapping_sub(self, other: RHS) -> Self::Output;
-}
-
-/// Wrapping (modular) subtraction. Replaces `self` with `self - other`, wrapping around at the
-/// boundary of the type.
-pub trait WrappingSubAssign<RHS = Self> {
-    fn wrapping_sub_assign(&mut self, other: RHS);
-}
-
-/// Subtracts two numbers, each composed of two `Self` values. The difference is returned as a pair
-/// of `Self` values. The more significant value always comes first. Subtraction is wrapping, and
-/// overflow is not indicated.
-pub trait XXSubYYIsZZ: Sized {
-    fn xx_sub_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
-}
-
-/// Subtracts two numbers, each composed of three `Self` values. The difference is returned as a
-/// triple of `Self` values. The more significant value always comes first. Subtraction is wrapping,
-/// and overflow is not indicated.
-pub trait XXXSubYYYIsZZZ: Sized {
-    fn xxx_sub_yyy_is_zzz(
-        x_2: Self,
-        x_1: Self,
-        x_0: Self,
-        y_2: Self,
-        y_1: Self,
-        y_0: Self,
-    ) -> (Self, Self, Self);
-}
-
-/// Wrapping (modular) multiplication. Computes `self * other`, wrapping around at the boundary of
-/// the type.
-pub trait WrappingMul<RHS = Self> {
-    type Output;
-
-    fn wrapping_mul(self, other: RHS) -> Self::Output;
-}
-
-/// Wrapping (modular) multiplication. Replaces `self` with `self * other`, wrapping around at the
-/// boundary of the type.
-pub trait WrappingMulAssign<RHS = Self> {
-    fn wrapping_mul_assign(&mut self, other: RHS);
-}
-
-/// Multiplies two numbers, returning the product as a pair of `Self` values. The more significant
-/// value always comes first.
-pub trait XMulYIsZZ: Sized {
-    fn x_mul_y_is_zz(x: Self, y: Self) -> (Self, Self);
-}
-
 /// Computes $x + yz$, wrapping around at the boundary of the type.
 pub trait WrappingAddMul<Y = Self, Z = Self> {
     type Output;
@@ -1355,24 +1267,6 @@ pub trait WrappingAddMul<Y = Self, Z = Self> {
 /// Replaces $x$ with $x + yz$, wrapping around at the boundary of the type.
 pub trait WrappingAddMulAssign<Y = Self, Z = Self> {
     fn wrapping_add_mul_assign(&mut self, y: Y, z: Z);
-}
-
-/// Computes $x - yz$, wrapping around at the boundary of the type.
-pub trait WrappingSubMul<Y = Self, Z = Self> {
-    type Output;
-
-    fn wrapping_sub_mul(self, y: Y, z: Z) -> Self::Output;
-}
-
-/// Replaces $x$ with $x - yz$, wrapping around at the boundary of the type.
-pub trait WrappingSubMulAssign<Y = Self, Z = Self> {
-    fn wrapping_sub_mul_assign(&mut self, y: Y, z: Z);
-}
-
-/// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,
-/// and the second of a single one. `x_0` must be less than `y`.
-pub trait XXDivModYIsQR: Sized {
-    fn xx_div_mod_y_is_qr(x_1: Self, x_0: Self, y: Self) -> (Self, Self);
 }
 
 /// Wrapping (modular) division. Computes `self / other`, wrapping around at the boundary of the
@@ -1389,6 +1283,33 @@ pub trait WrappingDivAssign<RHS = Self> {
     fn wrapping_div_assign(&mut self, other: RHS);
 }
 
+/// Wrapping (modular) multiplication. Computes `self * other`, wrapping around at the boundary of
+/// the type.
+pub trait WrappingMul<RHS = Self> {
+    type Output;
+
+    fn wrapping_mul(self, other: RHS) -> Self::Output;
+}
+
+/// Wrapping (modular) multiplication. Replaces `self` with `self * other`, wrapping around at the
+/// boundary of the type.
+pub trait WrappingMulAssign<RHS = Self> {
+    fn wrapping_mul_assign(&mut self, other: RHS);
+}
+
+/// Wrapping (modular) negation. Computes `-self`, wrapping around at the boundary of the type.
+pub trait WrappingNeg {
+    type Output;
+
+    fn wrapping_neg(self) -> Self::Output;
+}
+
+/// Wrapping (modular) negation. Replaces `self` with its negative, wrapping around at the boundary
+/// of the type.
+pub trait WrappingNegAssign {
+    fn wrapping_neg_assign(&mut self);
+}
+
 /// Wrapping (modular) exponentiation. Raises `self` to the power of `exp`, wrapping around at the
 /// boundary of the type.
 pub trait WrappingPow<RHS> {
@@ -1397,8 +1318,8 @@ pub trait WrappingPow<RHS> {
     fn wrapping_pow(self, exp: RHS) -> Self::Output;
 }
 
-/// Wrapping (modular) exponentiation. Replaces `self` with `self` ^ `exp`, wrapping around at the
-/// boundary of the type.
+/// Wrapping (modular) exponentiation. Replaces `self` with `self` to the power of `exp`, wrapping
+/// around at the boundary of the type.
 pub trait WrappingPowAssign<RHS = Self> {
     fn wrapping_pow_assign(&mut self, exp: RHS);
 }
@@ -1414,4 +1335,114 @@ pub trait WrappingSquare {
 /// the type.
 pub trait WrappingSquareAssign {
     fn wrapping_square_assign(&mut self);
+}
+
+/// Wrapping (modular) subtraction. Computes `self - other`, wrapping around at the boundary of the
+/// type.
+pub trait WrappingSub<RHS = Self> {
+    type Output;
+
+    fn wrapping_sub(self, other: RHS) -> Self::Output;
+}
+
+/// Wrapping (modular) subtraction. Replaces `self` with `self - other`, wrapping around at the
+/// boundary of the type.
+pub trait WrappingSubAssign<RHS = Self> {
+    fn wrapping_sub_assign(&mut self, other: RHS);
+}
+
+/// Computes $x - yz$, wrapping around at the boundary of the type.
+pub trait WrappingSubMul<Y = Self, Z = Self> {
+    type Output;
+
+    fn wrapping_sub_mul(self, y: Y, z: Z) -> Self::Output;
+}
+
+/// Replaces $x$ with $x - yz$, wrapping around at the boundary of the type.
+pub trait WrappingSubMulAssign<Y = Self, Z = Self> {
+    fn wrapping_sub_mul_assign(&mut self, y: Y, z: Z);
+}
+
+/// Multiplies two numbers, returning the product as a pair of `Self` values.
+///
+/// The more significant value always comes first.
+pub trait XMulYIsZZ: Sized {
+    fn x_mul_y_is_zz(x: Self, y: Self) -> (Self, Self);
+}
+
+/// Adds two numbers, each composed of two `Self` values, returning the sum as a pair of `Self`
+/// values.
+///
+/// The more significant value always comes first. Addition is wrapping, and overflow is not
+/// indicated.
+pub trait XXAddYYIsZZ: Sized {
+    fn xx_add_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
+}
+
+/// Computes the quotient and remainder of two numbers. The first is composed of two `Self` values,
+/// and the second of a single one.
+///
+/// `x_1` must be less than `y`.
+pub trait XXDivModYIsQR: Sized {
+    fn xx_div_mod_y_is_qr(x_1: Self, x_0: Self, y: Self) -> (Self, Self);
+}
+
+/// Subtracts two numbers, each composed of two `Self` values, returing the difference as a pair of
+/// `Self` values.
+///
+/// The more significant value always comes first. Subtraction is wrapping, and overflow is not
+/// indicated.
+pub trait XXSubYYIsZZ: Sized {
+    fn xx_sub_yy_is_zz(x_1: Self, x_0: Self, y_1: Self, y_0: Self) -> (Self, Self);
+}
+
+/// Adds two numbers, each composed of three `Self` values, returning the sum as a triple of `Self`
+/// values.
+///
+/// The more significant value always comes first. Addition is wrapping, and overflow is not
+/// indicated.
+pub trait XXXAddYYYIsZZZ: Sized {
+    fn xxx_add_yyy_is_zzz(
+        x_2: Self,
+        x_1: Self,
+        x_0: Self,
+        y_2: Self,
+        y_1: Self,
+        y_0: Self,
+    ) -> (Self, Self, Self);
+}
+
+/// Subtracts two numbers, each composed of three `Self` values, returing the difference as a
+/// triple of `Self` values.
+///
+/// The more significant value always comes first. Subtraction is wrapping, and overflow is not
+/// indicated.
+pub trait XXXSubYYYIsZZZ: Sized {
+    fn xxx_sub_yyy_is_zzz(
+        x_2: Self,
+        x_1: Self,
+        x_0: Self,
+        y_2: Self,
+        y_1: Self,
+        y_0: Self,
+    ) -> (Self, Self, Self);
+}
+
+/// Adds two numbers, each composed of four `Self` values, returning the sum as a quadruple of
+/// `Self` values.
+///
+/// The more significant value always comes first. Addition is wrapping, and overflow is not
+/// indicated.
+pub trait XXXXAddYYYYIsZZZZ: Sized {
+    #[allow(clippy::too_many_arguments)]
+    fn xxxx_add_yyyy_is_zzzz(
+        x_3: Self,
+        x_2: Self,
+        x_1: Self,
+        x_0: Self,
+        y_3: Self,
+        y_2: Self,
+        y_1: Self,
+        y_0: Self,
+    ) -> (Self, Self, Self, Self);
 }

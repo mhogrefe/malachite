@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::x_mul_y_is_zz::_explicit_x_mul_y_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{
-    unsigned_gen, unsigned_pair_gen_var_27, unsigned_triple_gen,
+    unsigned_gen, unsigned_pair_gen_var_27, unsigned_triple_gen_var_19,
 };
 
 #[test]
@@ -32,7 +32,7 @@ fn x_mul_y_is_zz_properties_helper<T: PrimitiveUnsigned>() {
         assert_eq!(T::x_mul_y_is_zz(T::ONE, x), (T::ZERO, x));
     });
 
-    unsigned_triple_gen::<T>().test_properties(|(x, y, z)| {
+    unsigned_triple_gen_var_19::<T>().test_properties(|(x, y, z)| {
         let (_, product_1) = T::x_mul_y_is_zz(x, y);
         let (_, product_2) = T::x_mul_y_is_zz(y, z);
         assert_eq!(product_1.wrapping_mul(z), x.wrapping_mul(product_2));

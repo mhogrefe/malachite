@@ -26,21 +26,27 @@ pub fn _explicit_xx_sub_yy_is_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y
 macro_rules! implicit_xx_sub_yy_is_zz {
     ($t:ident, $dt:ident) => {
         impl XXSubYYIsZZ for $t {
-            /// Subtracts two numbers, each composed of two `$t` values. The difference is returned
-            /// as a pair of `$t` values. The more significant value always comes first. Subtraction
-            /// is wrapping, and overflow is not indicated.
+            /// Subtracts two numbers, each composed of two `Self` values, returning the difference
+            /// as a pair of `Self` values.
             ///
-            /// Time: worst case O(1)
+            /// The more significant value always comes first. Subtraction is wrapping, and
+            /// overflow is not indicated.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x_1, x_0, y_1, y_0) = (z_1, z_0),
+            /// $$
+            /// where $W$ is `Self::WIDTH`,
+            ///
+            /// $x_1, x_0, y_1, y_0, z_1, z_0 < 2^W$, and
+            /// $$
+            /// (2^Wx_1 + x_0) - (2^Wy_1 + y_0) \equiv 2^Wz_1 + z_0 \mod 2^{2W}.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::XXSubYYIsZZ;
-            ///
-            /// assert_eq!(u64::xx_sub_yy_is_zz(0x67, 0x89, 0x33, 0x33), (0x34, 0x56));
-            /// assert_eq!(u8::xx_sub_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0xbb, 0xbc));
-            /// ```
+            /// See the documentation of the `num::arithmetic::xx_sub_yy_is_zz` module.
             ///
             /// This is sub_ddmmss from longlong.h, GMP 6.2.1, where (sh, sl) is returned.
             #[inline]
@@ -57,13 +63,24 @@ implicit_xx_sub_yy_is_zz!(u32, u64);
 implicit_xx_sub_yy_is_zz!(u64, u128);
 
 impl XXSubYYIsZZ for usize {
-    /// Subtracts two numbers, each composed of two `usize` values. The difference is returned as a
-    /// pair of `usize` values. The more significant value always comes first. Subtraction is
-    /// wrapping, and overflow is not indicated.
+    /// Subtracts two numbers, each composed of two `usize` values, returning the difference as a
+    /// pair of `usize` values.
     ///
-    /// Time: worst case O(1)
+    /// The more significant value always comes first. Subtraction is wrapping, and overflow is not
+    /// indicated.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x_1, x_0, y_1, y_0) = (z_1, z_0),
+    /// $$
+    /// where $W$ is `Self::WIDTH`,
+    ///
+    /// $x_1, x_0, y_1, y_0, z_1, z_0 < 2^W$, and
+    /// $$
+    /// (2^Wx_1 + x_0) - (2^Wy_1 + y_0) \equiv 2^Wz_1 + z_0 \mod 2^{2W}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// This is sub_ddmmss from longlong.h, GMP 6.2.1, where (sh, sl) is returned.
     fn xx_sub_yy_is_zz(x_1: usize, x_0: usize, y_1: usize, y_0: usize) -> (usize, usize) {
@@ -88,13 +105,24 @@ impl XXSubYYIsZZ for usize {
 }
 
 impl XXSubYYIsZZ for u128 {
-    /// Subtracts two numbers, each composed of two `u128` values. The difference is returned as a
-    /// pair of `u128` values. The more significant value always comes first. Subtraction is
-    /// wrapping, and overflow is not indicated.
+    /// Subtracts two numbers, each composed of two `u128` values, returning the difference as a
+    /// pair of `u128` values.
     ///
-    /// Time: worst case O(1)
+    /// The more significant value always comes first. Subtraction is wrapping, and overflow is not
+    /// indicated.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x_1, x_0, y_1, y_0) = (z_1, z_0),
+    /// $$
+    /// where $W$ is `Self::WIDTH`,
+    ///
+    /// $x_1, x_0, y_1, y_0, z_1, z_0 < 2^W$, and
+    /// $$
+    /// (2^Wx_1 + x_0) - (2^Wy_1 + y_0) \equiv 2^Wz_1 + z_0 \mod 2^{2W}.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
     /// This is sub_ddmmss from longlong.h, GMP 6.2.1, where (sh, sl) is returned.
     #[inline]

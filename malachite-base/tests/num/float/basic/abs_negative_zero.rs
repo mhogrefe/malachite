@@ -1,5 +1,5 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::generators::primitive_float_gen;
 
 fn abs_negative_zero_helper<T: PrimitiveFloat>() {

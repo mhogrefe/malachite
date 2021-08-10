@@ -1,8 +1,8 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom};
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
 use std::fmt::Debug;
 
@@ -35,6 +35,33 @@ pub fn test_convertible_from() {
     test_double::<_, u32>(-5i32, false);
     test_double::<_, i32>(3000000000u32, false);
     test_double::<_, i8>(-1000i16, false);
+
+    test_double::<_, u8>(0.0f32, true);
+    test_double::<_, u8>(-0.0f32, true);
+    test_double::<_, u8>(123.0f32, true);
+    test_double::<_, i8>(-123.0f32, true);
+    test_double::<_, u8>(-123.0f32, false);
+    test_double::<_, u8>(500.0f32, false);
+    test_double::<_, u8>(123.1f32, false);
+    test_double::<_, u8>(f32::NAN, false);
+    test_double::<_, u8>(f32::POSITIVE_INFINITY, false);
+    test_double::<_, u8>(f32::NEGATIVE_INFINITY, false);
+    test_double::<_, u8>(255.0f32, true);
+    test_double::<_, u8>(256.0f32, false);
+    test_double::<_, i8>(127.0f32, true);
+    test_double::<_, i8>(128.0f32, false);
+    test_double::<_, i8>(-128.0f32, true);
+    test_double::<_, i8>(-129.0f32, false);
+
+    test_double::<_, f32>(0u8, true);
+    test_double::<_, f32>(123u8, true);
+    test_double::<_, f32>(-123i8, true);
+    test_double::<_, f32>(u128::MAX, false);
+    test_double::<_, f32>(i128::MIN, true);
+    test_double::<_, f32>(i128::MIN + 1, false);
+    test_double::<_, f32>(u32::MAX, false);
+    test_double::<_, f32>(i32::MIN, true);
+    test_double::<_, f32>(i32::MIN + 1, false);
 }
 
 fn convertible_from_helper_primitive_int_unsigned<

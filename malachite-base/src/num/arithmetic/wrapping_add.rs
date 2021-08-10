@@ -14,22 +14,13 @@ macro_rules! impl_wrapping_add {
         impl WrappingAddAssign<$t> for $t {
             /// Replaces `self` with `self + other`, wrapping around at the boundary of the type.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets z$, where $z \equiv x + y \mod 2^W$ and $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::WrappingAddAssign;
-            ///
-            /// let mut x = 123u16;
-            /// x.wrapping_add_assign(456);
-            /// assert_eq!(x, 579);
-            ///
-            /// let mut x = 123u8;
-            /// x.wrapping_add_assign(200);
-            /// assert_eq!(x, 67);
-            /// ```
+            /// See the documentation of the `num::arithmetic::wrapping_add` module.
             #[inline]
             fn wrapping_add_assign(&mut self, other: $t) {
                 *self = self.wrapping_add(other);

@@ -1,7 +1,7 @@
 use itertools::Itertools;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::exhaustive::exhaustive_nonzero_finite_primitive_floats_in_range;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use std::panic::catch_unwind;
 
 fn exhaustive_nonzero_finite_primitive_floats_in_range_helper<T: PrimitiveFloat>(

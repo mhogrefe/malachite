@@ -15,6 +15,7 @@ use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, DivRound, Parity, PowerOf2, ShrRound, UnsignedAbs,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -23,7 +24,6 @@ use malachite_base::num::conversion::traits::{
     SaturatingFrom, SplitInHalf, WrappingFrom, WrappingInto,
 };
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::num::random::geometric::{
     geometric_random_natural_signeds, geometric_random_nonzero_signeds,
@@ -51,8 +51,9 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::random::{random_strings, random_strings_using_chars};
 use malachite_base::strings::strings_from_char_vecs;
 use malachite_base::tuples::random::{
-    random_pairs, random_pairs_from_single, random_quadruples_from_single, random_quadruples_xxxy,
-    random_quadruples_xxyx, random_quadruples_xyyx, random_quadruples_xyyz, random_triples,
+    random_octuples_from_single, random_pairs, random_pairs_from_single,
+    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xxyx,
+    random_quadruples_xyyx, random_quadruples_xyyz, random_sextuples_from_single, random_triples,
     random_triples_from_single, random_triples_xxy, random_triples_xyx, random_triples_xyy,
 };
 use malachite_base::unions::random::{random_union2s, random_union3s};
@@ -504,6 +505,32 @@ pub fn random_primitive_float_triple_gen<T: PrimitiveFloat>(config: &GenConfig) 
 
 // -- (PrimitiveFloat, PrimitiveSigned) --
 
+pub fn random_primitive_float_signed_pair_gen<T: PrimitiveFloat, U: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            special_random_primitive_floats(
+                seed,
+                config.get_or("exponent_mean_n", 8),
+                config.get_or("exponent_mean_d", 1),
+                config.get_or("precision_mean_n", 8),
+                config.get_or("precision_mean_d", 1),
+                config.get_or("special_p_mean_n", 1),
+                config.get_or("special_p_mean_d", 64),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("small_signed_mean_n", 32),
+                config.get_or("small_signed_mean_d", 1),
+            )
+        },
+    ))
+}
+
 pub fn random_primitive_float_signed_pair_gen_var_1<T: PrimitiveFloat, U: PrimitiveSigned>(
     config: &GenConfig,
 ) -> It<(T, U)> {
@@ -831,12 +858,6 @@ pub fn random_primitive_int_pair_gen_var_3<T: PrimitiveInt>(_config: &GenConfig)
 
 // -- (PrimitiveInt, PrimitiveInt, PrimitiveInt) --
 
-pub fn random_primitive_int_triple_gen<T: PrimitiveInt>(_config: &GenConfig) -> It<(T, T, T)> {
-    Box::new(random_triples_from_single(random_primitive_ints(
-        EXAMPLE_SEED,
-    )))
-}
-
 pub fn random_primitive_int_triple_gen_var_1<T: PrimitiveInt>(
     _config: &GenConfig,
 ) -> It<(T, T, T)> {
@@ -902,15 +923,15 @@ pub fn random_primitive_int_triple_gen_var_3<T: PrimitiveInt, U: PrimitiveInt>(
     )
 }
 
-// -- (PrimitiveInt, PrimitiveInt, PrimitiveInt, PrimitiveInt) --
-
-pub fn random_primitive_int_quadruple_gen<T: PrimitiveInt>(
+pub fn random_primitive_int_triple_gen_var_4<T: PrimitiveInt>(
     _config: &GenConfig,
-) -> It<(T, T, T, T)> {
-    Box::new(random_quadruples_from_single(random_primitive_ints(
+) -> It<(T, T, T)> {
+    Box::new(random_triples_from_single(random_primitive_ints(
         EXAMPLE_SEED,
     )))
 }
+
+// -- (PrimitiveInt, PrimitiveInt, PrimitiveInt, PrimitiveInt) --
 
 pub fn random_primitive_int_quadruple_gen_var_1<T: PrimitiveInt>(
     _config: &GenConfig,
@@ -974,6 +995,63 @@ pub fn random_primitive_int_quadruple_gen_var_3<T: PrimitiveInt, U: PrimitiveInt
             Ordering::Less => Some((x, y, z, w)),
             Ordering::Greater => Some((w, y, z, x)),
         }),
+    )
+}
+
+pub fn random_primitive_int_quadruple_gen_var_4<T: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, T, T, T)> {
+    Box::new(random_quadruples_from_single(random_primitive_ints(
+        EXAMPLE_SEED,
+    )))
+}
+
+// -- (PrimitiveInt * 6) --
+
+pub fn random_primitive_int_sextuple_gen_var_1<T: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, T, T, T, T, T)> {
+    Box::new(random_sextuples_from_single(random_primitive_ints(
+        EXAMPLE_SEED,
+    )))
+}
+
+// -- (PrimitiveInt * 8) --
+
+#[allow(clippy::type_complexity)]
+pub fn random_primitive_int_octuple_gen_var_1<T: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, T, T, T, T, T, T, T)> {
+    Box::new(random_octuples_from_single(random_primitive_ints(
+        EXAMPLE_SEED,
+    )))
+}
+
+// -- (PrimitiveInt * 9) --
+
+#[allow(clippy::type_complexity)]
+pub fn random_primitive_int_nonuple_gen_var_1<T: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, T, T, T, T, T, T, T, T)> {
+    Box::new(
+        random_triples_from_single(random_triples_from_single(random_primitive_ints(
+            EXAMPLE_SEED,
+        )))
+        .map(|((a, b, c), (d, e, f), (g, h, i))| (a, b, c, d, e, f, g, h, i)),
+    )
+}
+
+// -- (PrimitiveInt * 12) --
+
+#[allow(clippy::type_complexity)]
+pub fn random_primitive_int_duodecuple_gen_var_1<T: PrimitiveInt>(
+    _config: &GenConfig,
+) -> It<(T, T, T, T, T, T, T, T, T, T, T, T)> {
+    Box::new(
+        random_triples_from_single(random_quadruples_from_single(random_primitive_ints(
+            EXAMPLE_SEED,
+        )))
+        .map(|((a, b, c, d), (e, f, g, h), (i, j, k, l))| (a, b, c, d, e, f, g, h, i, j, k, l)),
     )
 }
 
@@ -1694,6 +1772,14 @@ pub fn random_signed_gen_var_9<
 ) -> It<S> {
     let limit = S::wrapping_from(U::wrapping_from(S::MAX).floor_sqrt());
     Box::new(random_signed_inclusive_range(EXAMPLE_SEED, -limit, limit))
+}
+
+pub fn random_signed_gen_var_10<T: PrimitiveFloat>(_config: &GenConfig) -> It<i64> {
+    Box::new(random_signed_inclusive_range(
+        EXAMPLE_SEED,
+        T::MIN_EXPONENT,
+        T::MAX_EXPONENT,
+    ))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned) --
@@ -4603,9 +4689,9 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     })
 }
 
-// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
-pub struct UnsignedVecSqrtRemGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize)>> {
+struct UnsignedVecSqrtRemGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize)>> {
     pub phantom: PhantomData<*const T>,
     pub lengths: I,
     pub xs: RandomPrimitiveInts<T>,
@@ -4628,7 +4714,7 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize)>> Iterator
     }
 }
 
-pub fn random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+pub fn random_unsigned_vec_pair_gen_var_1<T: PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(Vec<T>, Vec<T>)> {
     Box::new(UnsignedVecSqrtRemGenerator {
@@ -4649,6 +4735,97 @@ pub fn random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: PrimitiveUn
     })
 }
 
+struct UnsignedVecSqrtGenerator<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize)>> {
+    pub phantom: PhantomData<*const T>,
+    pub lengths: I,
+    pub xs: RandomPrimitiveInts<T>,
+}
+
+impl<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize)>> Iterator
+    for UnsignedVecSqrtGenerator<T, I>
+{
+    type Item = (Vec<T>, Vec<T>);
+
+    fn next(&mut self) -> Option<(Vec<T>, Vec<T>)> {
+        let (out_len, len) = self.lengths.next().unwrap();
+        let out = (&mut self.xs).take(out_len).collect();
+        let mut ns: Vec<T> = (&mut self.xs).take(len).collect();
+        let hi_n = ns.last_mut().unwrap();
+        if *hi_n == T::ZERO {
+            *hi_n = T::ONE;
+        }
+        Some((out, ns))
+    }
+}
+
+pub fn random_unsigned_vec_pair_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(UnsignedVecSqrtGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(|(x, y)| {
+            let in_len = x.checked_add(1)?;
+            let mut out_len: usize = in_len.shr_round(1, RoundingMode::Ceiling);
+            out_len = out_len.checked_add(y)?;
+            Some((out_len, in_len))
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
+
+struct UnsignedVecSqrtRemGenerator3<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize, usize)>>
+{
+    pub phantom: PhantomData<*const T>,
+    pub lengths: I,
+    pub xs: RandomPrimitiveInts<T>,
+}
+
+impl<T: PrimitiveUnsigned, I: Iterator<Item = (usize, usize, usize)>> Iterator
+    for UnsignedVecSqrtRemGenerator3<T, I>
+{
+    type Item = (Vec<T>, Vec<T>, Vec<T>);
+
+    fn next(&mut self) -> Option<(Vec<T>, Vec<T>, Vec<T>)> {
+        let (out_len, rs_len, len) = self.lengths.next().unwrap();
+        let out = (&mut self.xs).take(out_len).collect();
+        let rs = (&mut self.xs).take(rs_len).collect();
+        let mut ns: Vec<T> = (&mut self.xs).take(len).collect();
+        let hi_n = ns.last_mut().unwrap();
+        if *hi_n == T::ZERO {
+            *hi_n = T::ONE;
+        }
+        Some((out, rs, ns))
+    }
+}
+
+pub fn random_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(UnsignedVecSqrtRemGenerator3 {
+        phantom: PhantomData,
+        lengths: random_triples_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(|(x, y, z)| {
+            let in_len = x.checked_add(1)?;
+            let mut out_len: usize = in_len.shr_round(1, RoundingMode::Ceiling);
+            out_len = out_len.checked_add(y)?;
+            let rem_len = in_len.checked_add(z)?;
+            Some((out_len, rem_len, in_len))
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
+
 // -- large types --
 
 pub fn random_large_type_gen_var_1<T: PrimitiveInt>(
@@ -4661,7 +4838,7 @@ pub fn random_large_type_gen_var_1<T: PrimitiveInt>(
     )))
 }
 
-pub struct UnsignedVecSqrtRemGenerator2<T: PrimitiveUnsigned> {
+struct UnsignedVecSqrtRemGenerator2<T: PrimitiveUnsigned> {
     pub phantom: PhantomData<*const T>,
     pub lengths: GeometricRandomNaturalValues<usize>,
     pub xs: RandomPrimitiveInts<T>,

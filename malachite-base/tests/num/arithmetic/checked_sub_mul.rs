@@ -2,7 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{
-    signed_pair_gen, signed_triple_gen, unsigned_pair_gen_var_27, unsigned_triple_gen,
+    signed_pair_gen, signed_triple_gen, unsigned_pair_gen_var_27, unsigned_triple_gen_var_19,
 };
 
 #[test]
@@ -27,7 +27,7 @@ fn test_checked_sub_mul() {
 }
 
 fn checked_sub_mul_properties_helper_unsigned<T: PrimitiveUnsigned>() {
-    unsigned_triple_gen::<T>().test_properties(|(x, y, z)| {
+    unsigned_triple_gen_var_19::<T>().test_properties(|(x, y, z)| {
         let result = x.checked_sub_mul(y, z);
         assert_eq!(x.checked_sub_mul(z, y), result);
         assert_eq!(result.is_none(), x.overflowing_sub_mul(y, z).1);

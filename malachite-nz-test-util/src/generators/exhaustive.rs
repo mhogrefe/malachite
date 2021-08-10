@@ -5,6 +5,7 @@ use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, Parity, PowerOf2};
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -16,7 +17,6 @@ use malachite_base::num::exhaustive::{
     primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
     PrimitiveIntIncreasingRange,
 };
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;

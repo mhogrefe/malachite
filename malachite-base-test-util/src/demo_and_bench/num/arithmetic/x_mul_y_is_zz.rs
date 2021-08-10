@@ -24,7 +24,7 @@ fn benchmark_x_mul_y_is_zz_algorithms<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.x_mul_y_is_zz({}, {})", T::NAME, T::NAME, T::NAME),
+        &format!("{}::x_mul_y_is_zz({}, {})", T::NAME, T::NAME, T::NAME),
         BenchmarkType::Algorithms,
         unsigned_pair_gen_var_27::<T>().get(gm, &config),
         gm.name(),

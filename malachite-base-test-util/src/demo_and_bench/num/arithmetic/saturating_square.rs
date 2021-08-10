@@ -7,10 +7,31 @@ use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    register_unsigned_demos!(runner, demo_saturating_square_unsigned);
+    register_signed_demos!(runner, demo_saturating_square_signed);
     register_unsigned_demos!(runner, demo_saturating_square_assign_unsigned);
     register_signed_demos!(runner, demo_saturating_square_assign_signed);
+
+    register_unsigned_benches!(runner, benchmark_saturating_square_unsigned);
+    register_signed_benches!(runner, benchmark_saturating_square_signed);
     register_unsigned_benches!(runner, benchmark_saturating_square_assign_unsigned);
     register_signed_benches!(runner, benchmark_saturating_square_assign_signed);
+}
+
+fn demo_saturating_square_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) {
+    for x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+        println!("{}.saturating_square() = {}", x, x.saturating_square());
+    }
+}
+
+fn demo_saturating_square_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
+    for x in signed_gen::<T>().get(gm, &config).take(limit) {
+        println!("{}.saturating_square() = {}", x, x.saturating_square());
+    }
 }
 
 fn demo_saturating_square_assign_unsigned<T: PrimitiveUnsigned>(
@@ -18,10 +39,10 @@ fn demo_saturating_square_assign_unsigned<T: PrimitiveUnsigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for mut u in unsigned_gen::<T>().get(gm, &config).take(limit) {
-        let old_u = u;
-        u.saturating_square_assign();
-        println!("u := {}; u.saturating_square_assign(); u = {}", old_u, u);
+    for mut x in unsigned_gen::<T>().get(gm, &config).take(limit) {
+        let old_x = x;
+        x.saturating_square_assign();
+        println!("x := {}; x.saturating_square_assign(); x = {}", old_x, x);
     }
 }
 
@@ -30,11 +51,47 @@ fn demo_saturating_square_assign_signed<T: PrimitiveSigned>(
     config: GenConfig,
     limit: usize,
 ) {
-    for mut i in signed_gen::<T>().get(gm, &config).take(limit) {
-        let old_i = i;
-        i.saturating_square_assign();
-        println!("i := {}; i.saturating_square_assign(); i = {}", old_i, i);
+    for mut x in signed_gen::<T>().get(gm, &config).take(limit) {
+        let old_x = x;
+        x.saturating_square_assign();
+        println!("x := {}; x.saturating_square_assign(); x = {}", old_x, x);
     }
+}
+
+fn benchmark_saturating_square_unsigned<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        &format!("{}.saturating_square()", T::NAME),
+        BenchmarkType::Single,
+        unsigned_gen::<T>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &unsigned_bit_bucketer(),
+        &mut [("Malachite", &mut |x| no_out!(x.saturating_square()))],
+    );
+}
+
+fn benchmark_saturating_square_signed<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        &format!("{}.saturating_square()", T::NAME),
+        BenchmarkType::Single,
+        signed_gen::<T>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &signed_bit_bucketer(),
+        &mut [("Malachite", &mut |x| no_out!(x.saturating_square()))],
+    );
 }
 
 fn benchmark_saturating_square_assign_unsigned<T: PrimitiveUnsigned>(
@@ -44,14 +101,14 @@ fn benchmark_saturating_square_assign_unsigned<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.saturating_square_assign()", T::NAME),
+        &format!("{}.saturating_square_assign()", T::NAME,),
         BenchmarkType::Single,
         unsigned_gen::<T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &unsigned_bit_bucketer(),
-        &mut [("Malachite", &mut |mut i| i.saturating_square_assign())],
+        &mut [("Malachite", &mut |mut x| x.saturating_square_assign())],
     );
 }
 
@@ -62,13 +119,13 @@ fn benchmark_saturating_square_assign_signed<T: PrimitiveSigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.saturating_square_assign()", T::NAME),
+        &format!("{}.saturating_square_assign()", T::NAME,),
         BenchmarkType::Single,
         signed_gen::<T>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &signed_bit_bucketer(),
-        &mut [("Malachite", &mut |mut i| i.saturating_square_assign())],
+        &mut [("Malachite", &mut |mut x| x.saturating_square_assign())],
     );
 }

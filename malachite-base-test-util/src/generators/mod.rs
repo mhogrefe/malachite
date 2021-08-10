@@ -4,6 +4,7 @@ use generators::random::*;
 use generators::special_random::*;
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -11,7 +12,6 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
     SaturatingFrom, SplitInHalf, WrappingFrom, WrappingInto,
 };
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
@@ -350,6 +350,15 @@ pub fn primitive_float_triple_gen<T: PrimitiveFloat>() -> Generator<(T, T, T)> {
 
 // -- (PrimitiveFloat, PrimitiveSigned) --
 
+pub fn primitive_float_signed_pair_gen<T: PrimitiveFloat, U: PrimitiveSigned>() -> Generator<(T, U)>
+{
+    Generator::new(
+        &exhaustive_primitive_float_signed_pair_gen,
+        &random_primitive_float_signed_pair_gen,
+        &special_random_primitive_float_signed_pair_gen,
+    )
+}
+
 // All `(T, U)` where `T` is a primitive float type, `U` is signed, the `T` is finite and positive,
 // and the `U` is small.
 pub fn primitive_float_signed_pair_gen_var_1<T: PrimitiveFloat, U: PrimitiveSigned>(
@@ -563,6 +572,14 @@ pub fn signed_gen_var_10<
     )
 }
 
+// All valid scientific exponents for the float type `T`.
+pub fn signed_gen_var_11<T: PrimitiveFloat>() -> Generator<i64> {
+    Generator::new_no_special(
+        &exhaustive_signed_gen_var_10::<T>,
+        &random_signed_gen_var_10::<T>,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned) --
 
 pub fn signed_pair_gen<T: PrimitiveSigned>() -> Generator<(T, T)> {
@@ -633,7 +650,7 @@ pub fn signed_pair_gen_var_6<T: PrimitiveSigned>() -> Generator<(T, T)> {
 pub fn signed_triple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
     Generator::new(
         &exhaustive_signed_triple_gen,
-        &random_primitive_int_triple_gen,
+        &random_primitive_int_triple_gen_var_4,
         &special_random_signed_triple_gen,
     )
 }
@@ -691,7 +708,7 @@ pub fn signed_triple_gen_var_5<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
 pub fn signed_quadruple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T, T)> {
     Generator::new(
         &exhaustive_signed_quadruple_gen,
-        &random_primitive_int_quadruple_gen,
+        &random_primitive_int_quadruple_gen_var_4,
         &special_random_signed_quadruple_gen,
     )
 }
@@ -1698,14 +1715,6 @@ pub fn unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>() -> Genera
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
-pub fn unsigned_triple_gen<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
-    Generator::new(
-        &exhaustive_unsigned_triple_gen,
-        &random_primitive_int_triple_gen,
-        &special_random_unsigned_triple_gen,
-    )
-}
-
 // All `(x, y, z): (T, T, T)` where `T` is unsigned and x + y * z does not overflow.
 pub fn unsigned_triple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
     Generator::new(
@@ -1889,15 +1898,16 @@ pub fn unsigned_triple_gen_var_18<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     )
 }
 
-// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
-
-pub fn unsigned_quadruple_gen<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
+// All triples of unsigneds of the same type.
+pub fn unsigned_triple_gen_var_19<T: PrimitiveUnsigned>() -> Generator<(T, T, T)> {
     Generator::new(
-        &exhaustive_unsigned_quadruple_gen,
-        &random_primitive_int_quadruple_gen,
-        &special_random_unsigned_quadruple_gen,
+        &exhaustive_unsigned_triple_gen_var_17,
+        &random_primitive_int_triple_gen_var_4,
+        &special_random_unsigned_triple_gen_var_19,
     )
 }
+
+// -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 // All `(T, u64, u64, U)` where `T` and `U` are unsigned, both `u64`s are small, and the four values
 // are valid arguments to `assign_bits`.
@@ -1992,6 +2002,64 @@ pub fn unsigned_quadruple_gen_var_9<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
         &exhaustive_unsigned_quadruple_gen_var_9,
         &random_unsigned_primitive_int_primitive_int_unsigned_quadruple_gen_var_1,
         &special_random_unsigned_quadruple_gen_var_9,
+    )
+}
+
+// All quadruples of unsigneds of the same type.
+pub fn unsigned_quadruple_gen_var_10<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_quadruple_gen_var_10,
+        &random_primitive_int_quadruple_gen_var_4,
+        &special_random_unsigned_quadruple_gen_var_10,
+    )
+}
+
+// -- (PrimitiveUnsigned * 6) --
+
+// All sextuples of unsigneds of the same type.
+pub fn unsigned_sextuple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_sextuple_gen_var_1,
+        &random_primitive_int_sextuple_gen_var_1,
+        &special_random_unsigned_sextuple_gen_var_1,
+    )
+}
+
+// -- (PrimitiveUnsigned * 8) --
+
+// All octuples of unsigneds of the same type.
+#[allow(clippy::type_complexity)]
+pub fn unsigned_octuple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T, T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_octuple_gen_var_1,
+        &random_primitive_int_octuple_gen_var_1,
+        &special_random_unsigned_octuple_gen_var_1,
+    )
+}
+
+// -- (PrimitiveUnsigned * 9) --
+
+// All nonuples of unsigneds of the same type.
+#[allow(clippy::type_complexity)]
+pub fn unsigned_nonuple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, T, T, T, T, T, T, T, T)>
+{
+    Generator::new(
+        &exhaustive_unsigned_nonuple_gen_var_1,
+        &random_primitive_int_nonuple_gen_var_1,
+        &special_random_unsigned_nonuple_gen_var_1,
+    )
+}
+
+// -- (PrimitiveUnsigned * 12) --
+
+// All duodecuples of unsigneds of the same type.
+#[allow(clippy::type_complexity)]
+pub fn unsigned_duodecuple_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(T, T, T, T, T, T, T, T, T, T, T, T)> {
+    Generator::new(
+        &exhaustive_unsigned_duodecuple_gen_var_1,
+        &random_primitive_int_duodecuple_gen_var_1,
+        &special_random_unsigned_duodecuple_gen_var_1,
     )
 }
 
@@ -2518,9 +2586,18 @@ pub fn unsigned_vec_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(Vec<T>,
 // All `(Vec<T>, Vec<T>)` that are valid `(out, xs)` inputs to `_limbs_sqrt_rem_helper`.
 pub fn unsigned_vec_pair_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
     Generator::new(
-        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4::<T>,
-        &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1::<T>,
-        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4::<T>,
+        &exhaustive_unsigned_vec_pair_gen_var_5::<T>,
+        &random_unsigned_vec_pair_gen_var_1::<T>,
+        &special_random_unsigned_vec_pair_gen_var_5::<T>,
+    )
+}
+
+// All `(Vec<T>, Vec<T>)` that are valid `(out, xs)` inputs to `limbs_sqrt_to_out`.
+pub fn unsigned_vec_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_pair_gen_var_6::<T>,
+        &random_unsigned_vec_pair_gen_var_2::<T>,
+        &special_random_unsigned_vec_pair_gen_var_6::<T>,
     )
 }
 
@@ -2618,6 +2695,16 @@ pub fn unsigned_vec_triple_gen_var_27<T: PrimitiveUnsigned>() -> Generator<(Vec<
         &exhaustive_unsigned_vec_triple_gen_var_27,
         &random_primitive_int_vec_triple_gen_var_27,
         &special_random_unsigned_vec_triple_gen_var_27,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` that are valid `(out, rs, xs)` inputs to `limbs_sqrt_rem_to_out`.
+pub fn unsigned_vec_triple_gen_var_28<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_28::<T>,
+        &random_unsigned_vec_triple_gen_var_1::<T>,
+        &special_random_unsigned_vec_triple_gen_var_28::<T>,
     )
 }
 

@@ -1,5 +1,5 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::strings::string_is_subset;
 use malachite_base_test_util::generators::primitive_float_gen;
 use malachite_base_test_util::num::float::PRIMITIVE_FLOAT_CHARS;

@@ -1,6 +1,6 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base_test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
 
 #[test]

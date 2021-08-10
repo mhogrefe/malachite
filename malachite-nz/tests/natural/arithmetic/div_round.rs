@@ -6,72 +6,69 @@ use num::{BigUint, Integer};
 use rug::ops::DivRounding;
 use std::str::FromStr;
 
-//TODO clean from_str
-
 #[test]
 fn test_div_round() {
-    let test = |u, v, rm, quotient| {
-        let mut x = Natural::from_str(u).unwrap();
-        x.div_round_assign(Natural::from_str(v).unwrap(), rm);
+    let test = |s, t, rm, quotient| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x.div_round_assign(v.clone(), rm);
         assert_eq!(x.to_string(), quotient);
         assert!(x.is_valid());
 
-        let mut x = Natural::from_str(u).unwrap();
-        x.div_round_assign(&Natural::from_str(v).unwrap(), rm);
+        let mut x = u.clone();
+        x.div_round_assign(&v, rm);
         assert_eq!(x.to_string(), quotient);
         assert!(x.is_valid());
 
-        let q = Natural::from_str(u)
-            .unwrap()
-            .div_round(Natural::from_str(v).unwrap(), rm);
+        let q = u.clone().div_round(v.clone(), rm);
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = Natural::from_str(u)
-            .unwrap()
-            .div_round(&Natural::from_str(v).unwrap(), rm);
+        let q = u.clone().div_round(&v, rm);
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = (&Natural::from_str(u).unwrap()).div_round(Natural::from_str(v).unwrap(), rm);
+        let q = (&u).div_round(v.clone(), rm);
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
-        let q = (&Natural::from_str(u).unwrap()).div_round(&Natural::from_str(v).unwrap(), rm);
+        let q = (&u).div_round(&v, rm);
         assert!(q.is_valid());
         assert_eq!(q.to_string(), quotient);
 
         match rm {
             RoundingMode::Down => {
                 assert_eq!(
-                    rug::Integer::from_str(u)
+                    rug::Integer::from_str(s)
                         .unwrap()
-                        .div_trunc(rug::Integer::from_str(v).unwrap())
+                        .div_trunc(rug::Integer::from_str(t).unwrap())
                         .to_string(),
                     quotient
                 );
             }
             RoundingMode::Floor => {
                 assert_eq!(
-                    BigUint::from_str(u)
+                    BigUint::from_str(s)
                         .unwrap()
-                        .div_floor(&BigUint::from_str(v).unwrap())
+                        .div_floor(&BigUint::from_str(t).unwrap())
                         .to_string(),
                     quotient
                 );
                 assert_eq!(
-                    rug::Integer::from_str(u)
+                    rug::Integer::from_str(s)
                         .unwrap()
-                        .div_floor(rug::Integer::from_str(v).unwrap())
+                        .div_floor(rug::Integer::from_str(t).unwrap())
                         .to_string(),
                     quotient
                 );
             }
             RoundingMode::Ceiling => {
                 assert_eq!(
-                    rug::Integer::from_str(u)
+                    rug::Integer::from_str(s)
                         .unwrap()
-                        .div_ceil(rug::Integer::from_str(v).unwrap())
+                        .div_ceil(rug::Integer::from_str(t).unwrap())
                         .to_string(),
                     quotient
                 );

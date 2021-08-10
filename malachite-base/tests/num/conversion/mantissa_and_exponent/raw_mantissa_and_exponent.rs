@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::generators::{primitive_float_gen, unsigned_pair_gen_var_26};
 use std::cmp::Ordering;

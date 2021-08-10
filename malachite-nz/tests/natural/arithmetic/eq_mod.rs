@@ -621,6 +621,8 @@ fn limbs_eq_mod_ref_ref_ref_fail_6() {
     limbs_eq_mod_ref_ref_ref(&[1, 1, 1], &[1, 0, 3], &[7, 0]);
 }
 
+//TODO clean from_str
+
 #[test]
 fn test_eq_mod() {
     let test = |x, y, m, out| {

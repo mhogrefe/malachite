@@ -1,11 +1,11 @@
 use malachite_base::num::arithmetic::traits::{
     ModPowerOf2, ModPowerOf2Assign, Parity, PowerOf2, ShrRound, Sign,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::{
-    ExactFrom, FromOtherTypeSlice, SciMantissaAndExponent, WrappingFrom,
+    ExactFrom, FromOtherTypeSlice, IntegerMantissaAndExponent, SciMantissaAndExponent, WrappingFrom,
 };
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
@@ -285,6 +285,166 @@ impl Natural {
                 Some(Natural::from(integer_mantissa).shr_round(integer_exponent - sci_exponent, rm))
             }
         }
+    }
+}
+
+impl<'a> IntegerMantissaAndExponent<Natural, u64, Natural> for &'a Natural {
+    /// Returns the integer mantissa and exponent.
+    ///
+    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
+    /// $$
+    /// f(x) = (\frac{|x|}{2^{e_i}}, e_i),
+    /// $$
+    /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
+    ///
+    /// The inverse operation is `from_integer_mantissa_and_exponent`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(
+    ///     Natural::from(123u32).integer_mantissa_and_exponent(),
+    ///     (Natural::from(123u32), 0)
+    /// );
+    /// assert_eq!(
+    ///     Natural::from(100u32).integer_mantissa_and_exponent(),
+    ///     (Natural::from(25u32), 2)
+    /// );
+    /// ```
+    #[inline]
+    fn integer_mantissa_and_exponent(self) -> (Natural, u64) {
+        let trailing_zeros = self.trailing_zeros().unwrap();
+        (self >> trailing_zeros, trailing_zeros)
+    }
+
+    /// Returns the integer mantissa.
+    ///
+    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
+    /// $$
+    /// f(x) = \frac{|x|}{2^{e_i}},
+    /// $$
+    /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(123u32).integer_mantissa(), 123);
+    /// assert_eq!(Natural::from(100u32).integer_mantissa(), 25);
+    /// ```
+    #[inline]
+    fn integer_mantissa(self) -> Natural {
+        self >> self.trailing_zeros().unwrap()
+    }
+
+    /// Returns the integer exponent.
+    ///
+    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and
+    /// $m_i$ is an odd integer.
+    /// $$
+    /// f(x) = e_i,
+    /// $$
+    /// where $e_i$ is the unique integer such that $x/2^{e_i}$ is an odd integer.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(1)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.significant_bits()`.
+    ///
+    /// # Panics
+    /// Panics if `self` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Natural::from(123u32).integer_exponent(), 0);
+    /// assert_eq!(Natural::from(100u32).integer_exponent(), 2);
+    /// ```
+    #[inline]
+    fn integer_exponent(self) -> u64 {
+        self.trailing_zeros().unwrap()
+    }
+
+    /// Constructs a `Natural` from its integer mantissa and exponent.
+    ///
+    /// When $x$ is nonzero, we can write $x = 2^{e_i}m_i$, where $e_i$ is an integer and $m_i$ is
+    /// an odd integer.
+    ///
+    /// $$
+    /// f(x) = 2^{e_i}m_i.
+    /// $$
+    ///
+    /// The input does not have to be reduced; that is, the mantissa does not have to be odd.
+    ///
+    /// The result is an `Option`, but for this trait implementation the result is always `Some`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is
+    /// `integer_mantissa.significant_bits() + integer_exponent`.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let n = <&Natural as IntegerMantissaAndExponent<_, _, _>>
+    ///     ::from_integer_mantissa_and_exponent(Natural::from(123u32), 0).unwrap();
+    /// assert_eq!(n, 123);
+    /// let n = <&Natural as IntegerMantissaAndExponent<_, _, _>>
+    ///     ::from_integer_mantissa_and_exponent(Natural::from(25u32), 2).unwrap();
+    /// assert_eq!(n, 100);
+    /// ```
+    #[inline]
+    fn from_integer_mantissa_and_exponent(
+        integer_mantissa: Natural,
+        integer_exponent: u64,
+    ) -> Option<Natural> {
+        Some(integer_mantissa << integer_exponent)
     }
 }
 

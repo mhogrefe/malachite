@@ -2,7 +2,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{
     signed_gen, signed_pair_gen, signed_triple_gen, unsigned_gen, unsigned_pair_gen_var_27,
-    unsigned_triple_gen,
+    unsigned_triple_gen_var_19,
 };
 use std::cmp::{max, min};
 
@@ -27,7 +27,7 @@ fn unsigned_max_properties_helper<T: PrimitiveUnsigned>() {
         assert_eq!(max!(x, y), max(x, y));
     });
 
-    unsigned_triple_gen::<T>().test_properties(|(x, y, z)| {
+    unsigned_triple_gen_var_19::<T>().test_properties(|(x, y, z)| {
         assert_eq!(max!(x, y, z), max(max(x, y), z));
         assert_eq!(max!(x, y, z), max(x, max(y, z)));
     });
@@ -63,7 +63,7 @@ fn unsigned_min_properties_helper<T: PrimitiveUnsigned>() {
         assert_eq!(min!(x, y), min(x, y));
     });
 
-    unsigned_triple_gen::<T>().test_properties(|(x, y, z)| {
+    unsigned_triple_gen_var_19::<T>().test_properties(|(x, y, z)| {
         assert_eq!(min!(x, y, z), min(min(x, y), z));
         assert_eq!(min!(x, y, z), min(x, min(y, z)));
     });

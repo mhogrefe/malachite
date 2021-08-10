@@ -70,19 +70,27 @@ macro_rules! implicit_xx_div_mod_is_qr {
     ($t:ident, $dt:ident) => {
         impl XXDivModYIsQR for $t {
             /// Computes the quotient and remainder of two numbers. The first is composed of two
-            /// `Self` values, and the second of a single one. `x_0` must be less than `y`.
+            /// `Self` values, and the second of a single one.
             ///
-            /// Time: worst case O(1)
+            /// `x_1` must be less than `y`.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x_1, x_0, y) = (q, r),
+            /// $$
+            /// where $W$ is `Self::WIDTH`,
+            ///
+            /// $x_1, x_0, y, q, r < 2^W$,
+            ///
+            /// $x_1, r < y$, and
+            /// $$
+            /// qy + r = 2^Wx_1 + x_0.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::XXDivModYIsQR;
-            ///
-            /// assert_eq!(u64::xx_div_mod_y_is_qr(0x12, 0x34, 0x33), (0x5a5a5a5a5a5a5a5b, 0x13));
-            /// assert_eq!(u8::xx_div_mod_y_is_qr(0x78, 0x9a, 0xbc), (0xa4, 0x2a));
-            /// ```
+            /// See the documentation of the `num::arithmetic::xx_div_mod_y_is_qr` module.
             ///
             /// This is udiv_qrnnd from longlong.h, FLINT 2.7.1, where  (q, r) is returned.
             #[inline]
@@ -100,11 +108,27 @@ implicit_xx_div_mod_is_qr!(u64, u128);
 
 impl XXDivModYIsQR for usize {
     /// Computes the quotient and remainder of two numbers. The first is composed of two `usize`
-    /// values, and the second of a single one. `x_0` must be less than `y`.
+    /// values, and the second of a single one.
     ///
-    /// Time: worst case O(1)
+    /// `x_1` must be less than `y`.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x_1, x_0, y) = (q, r),
+    /// $$
+    /// where $W$ is `Self::WIDTH`,
+    ///
+    /// $x_1, x_0, y, q, r < 2^W$,
+    ///
+    /// $x_1, r < y$, and
+    /// $$
+    /// qy + r = 2^Wx_1 + x_0.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See the documentation of the `num::arithmetic::xx_div_mod_y_is_qr` module.
     ///
     /// This is udiv_qrnnd from longlong.h, FLINT 2.7.1, where (q, r) is returned.
     fn xx_div_mod_y_is_qr(x_1: usize, x_0: usize, y: usize) -> (usize, usize) {
@@ -128,11 +152,27 @@ impl XXDivModYIsQR for usize {
 
 impl XXDivModYIsQR for u128 {
     /// Computes the quotient and remainder of two numbers. The first is composed of two `u128`
-    /// values, and the second of a single one. `x_0` must be less than `y`.
+    /// values, and the second of a single one.
     ///
-    /// Time: worst case O(1)
+    /// `x_1` must be less than `y`.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x_1, x_0, y) = (q, r),
+    /// $$
+    /// where $W$ is `Self::WIDTH`,
+    ///
+    /// $x_1, x_0, y, q, r < 2^W$,
+    ///
+    /// $x_1, r < y$, and
+    /// $$
+    /// qy + r = 2^Wx_1 + x_0.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See the documentation of the `num::arithmetic::xx_div_mod_y_is_qr` module.
     ///
     /// This is udiv_qrnnd from longlong.h, FLINT 2.7.1, where (q, r) is returned.
     #[inline]

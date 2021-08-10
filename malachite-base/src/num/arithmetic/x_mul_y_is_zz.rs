@@ -31,20 +31,25 @@ pub fn _explicit_x_mul_y_is_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
 macro_rules! implicit_x_mul_y_is_zz {
     ($t:ident, $dt:ident) => {
         impl XMulYIsZZ for $t {
-            /// Multiplies two numbers, returning the product as a pair of `Self` values. The more
-            /// significant value always comes first.
+            /// Multiplies two numbers, returning the product as a pair of `Self` values.
             ///
-            /// Time: worst case O(1)
+            /// The more significant value always comes first.
             ///
-            /// Additional memory: worst case O(1)
+            /// $$
+            /// f(x, y) = (z_1, z_0),
+            /// $$
+            /// where $W$ is `Self::WIDTH`,
+            ///
+            /// $x, y, z_1, z_0 < 2^W$, and
+            /// $$
+            /// xy = 2^Wz_1 + z_0.
+            /// $$
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::XMulYIsZZ;
-            ///
-            /// assert_eq!(u64::x_mul_y_is_zz(15, 3), (0, 45));
-            /// assert_eq!(u8::x_mul_y_is_zz(0x78, 0x9a), (0x48, 0x30));
-            /// ```
+            /// See the documentation of the `num::arithmetic::x_mul_y_is_zz` module.
             ///
             /// This is umul_ppmm from longlong.h, GMP 6.2.1, where (w1, w0) is returned.
             #[inline]
@@ -61,12 +66,25 @@ implicit_x_mul_y_is_zz!(u32, u64);
 implicit_x_mul_y_is_zz!(u64, u128);
 
 impl XMulYIsZZ for usize {
-    /// Multiplies two `usize`s, returning the product as a pair of `usize` values. The more
-    /// significant value always comes first.
+    /// Multiplies two numbers, returning the product as a pair of `usize` values.
     ///
-    /// Time: worst case O(1)
+    /// The more significant value always comes first.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x, y) = (z_1, z_0),
+    /// $$
+    /// where $W$ is `Self::WIDTH`,
+    ///
+    /// $x, y, z_1, z_0 < 2^W$, and
+    /// $$
+    /// xy = 2^Wz_1 + z_0.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See the documentation of the `num::arithmetic::x_mul_y_is_zz` module.
     ///
     /// This is umul_ppmm from longlong.h, GMP 6.2.1, where (w1, w0) is returned.
     fn x_mul_y_is_zz(x: usize, y: usize) -> (usize, usize) {
@@ -81,12 +99,25 @@ impl XMulYIsZZ for usize {
 }
 
 impl XMulYIsZZ for u128 {
-    /// Multiplies two `u128`s, returning the product as a pair of `u128` values. The more
-    /// significant value always comes first.
+    /// Multiplies two numbers, returning the product as a pair of `u128` values.
     ///
-    /// Time: worst case O(1)
+    /// The more significant value always comes first.
     ///
-    /// Additional memory: worst case O(1)
+    /// $$
+    /// f(x, y) = (z_1, z_0),
+    /// $$
+    /// where $W$ is `Self::WIDTH`,
+    ///
+    /// $x, y, z_1, z_0 < 2^W$, and
+    /// $$
+    /// xy = 2^Wz_1 + z_0.
+    /// $$
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// See the documentation of the `num::arithmetic::x_mul_y_is_zz` module.
     ///
     /// This is umul_ppmm from longlong.h, GMP 6.2.1, where (w1, w0) is returned.
     #[inline]

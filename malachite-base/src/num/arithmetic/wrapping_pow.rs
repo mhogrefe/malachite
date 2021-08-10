@@ -13,28 +13,16 @@ macro_rules! impl_wrapping_pow {
         }
 
         impl WrappingPowAssign<u64> for $t {
-            /// Replaces `self` with `self ^ exp`, wrapping around at the boundary of the type.
+            /// Replaces `self` with `self` raised to the power of `exp`, wrapping around at the
+            /// boundary of the type.
             ///
-            /// Time: worst case O(1)
+            /// $x \gets y$, where $y \equiv x^n \mod 2^W$ and $W$ is `$t::WIDTH`.
             ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_base::num::arithmetic::traits::WrappingPowAssign;
-            ///
-            /// let mut x = 3u8;
-            /// x.wrapping_pow_assign(3);
-            /// assert_eq!(x, 27);
-            ///
-            /// let mut x = -10i32;
-            /// x.wrapping_pow_assign(9);
-            /// assert_eq!(x, -1000000000);
-            ///
-            /// let mut x = -10i16;
-            /// x.wrapping_pow_assign(9);
-            /// assert_eq!(x, 13824);
-            /// ```
+            /// See the documentation of the `num::arithmetic::wrapping_pow` module.
             #[inline]
             fn wrapping_pow_assign(&mut self, exp: u64) {
                 *self = WrappingPow::wrapping_pow(*self, exp);

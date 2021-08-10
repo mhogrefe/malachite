@@ -1,4 +1,7 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    unsigned_sextuple_gen_var_1, unsigned_triple_gen_var_19,
+};
 
 #[test]
 #[allow(clippy::too_many_arguments)]
@@ -34,4 +37,46 @@ fn test_xxx_sub_yyy_is_zzz() {
         0,
         0,
     );
+}
+
+fn xxx_sub_yyy_is_zzz_properties_helper<T: PrimitiveUnsigned>() {
+    unsigned_sextuple_gen_var_1::<T>().test_properties(|(x_2, x_1, x_0, y_2, y_1, y_0)| {
+        let (z_2, z_1, z_0) = T::xxx_sub_yyy_is_zzz(x_2, x_1, x_0, y_2, y_1, y_0);
+
+        assert_eq!(
+            T::xxx_add_yyy_is_zzz(z_2, z_1, z_0, y_2, y_1, y_0),
+            (x_2, x_1, x_0)
+        );
+        assert_eq!(
+            T::xxx_sub_yyy_is_zzz(z_2, z_1, z_0, x_2, x_1, x_0),
+            T::xxx_sub_yyy_is_zzz(T::ZERO, T::ZERO, T::ZERO, y_2, y_1, y_0)
+        );
+        assert_eq!(
+            T::xxx_sub_yyy_is_zzz(y_2, y_1, y_0, x_2, x_1, x_0),
+            T::xxx_sub_yyy_is_zzz(T::ZERO, T::ZERO, T::ZERO, z_2, z_1, z_0)
+        );
+
+        let (neg_y_2, neg_y_1, neg_y_0) =
+            T::xxx_sub_yyy_is_zzz(T::ZERO, T::ZERO, T::ZERO, y_2, y_1, y_0);
+        assert_eq!(
+            T::xxx_add_yyy_is_zzz(x_2, x_1, x_0, neg_y_2, neg_y_1, neg_y_0),
+            (z_2, z_1, z_0)
+        );
+    });
+
+    unsigned_triple_gen_var_19::<T>().test_properties(|(x_2, x_1, x_0)| {
+        assert_eq!(
+            T::xxx_sub_yyy_is_zzz(x_2, x_1, x_0, T::ZERO, T::ZERO, T::ZERO),
+            (x_2, x_1, x_0)
+        );
+        assert_eq!(
+            T::xxx_sub_yyy_is_zzz(x_2, x_1, x_0, x_2, x_1, x_0),
+            (T::ZERO, T::ZERO, T::ZERO)
+        );
+    });
+}
+
+#[test]
+fn xxx_sub_yyy_is_zzz_properties() {
+    apply_fn_to_unsigneds!(xxx_sub_yyy_is_zzz_properties_helper);
 }

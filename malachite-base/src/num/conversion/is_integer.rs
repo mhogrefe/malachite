@@ -1,6 +1,6 @@
+use num::basic::floats::PrimitiveFloat;
 use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::{IsInteger, WrappingFrom};
-use num::float::PrimitiveFloat;
 use num::logic::traits::TrailingZeros;
 
 impl<T: PrimitiveInt> IsInteger for T {

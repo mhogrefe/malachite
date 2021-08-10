@@ -6,7 +6,7 @@
 /// ```
 /// use malachite_base::num::arithmetic::traits::AbsAssign;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// let mut x = 0i8;
 /// x.abs_assign();
@@ -133,6 +133,23 @@ pub mod arithmetic_checked_shl;
 /// assert_eq!(0i8.arithmetic_checked_shr(-100), Some(0i8));
 /// ```
 pub mod arithmetic_checked_shr;
+/// This module contains functions for computing the ceiling of a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # ceiling
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingAssign;
+///
+/// let mut x = 1.5f32;
+/// x.ceiling_assign();
+/// assert_eq!(x, 2.0);
+///
+/// let mut x = -1.5f32;
+/// x.ceiling_assign();
+/// assert_eq!(x, -1.0);
+/// ```
+pub mod ceiling;
 /// This module wraps the `checked_abs` function into an implementation of `CheckedAbs`.
 pub mod checked_abs;
 /// This module wraps the `checked_add` function into an implementation of `CheckedAdd`.
@@ -600,6 +617,23 @@ pub mod eq_mod;
 /// assert_eq!((-0b1101i64).eq_mod_power_of_2(0b11011, 4), false);
 /// ```
 pub mod eq_mod_power_of_2;
+/// This module contains functions for computing the floor of a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # floor
+/// ```
+/// use malachite_base::num::arithmetic::traits::FloorAssign;
+///
+/// let mut x = 1.5f32;
+/// x.floor_assign();
+/// assert_eq!(x, 1.0);
+///
+/// let mut x = -1.5f32;
+/// x.floor_assign();
+/// assert_eq!(x, -2.0);
+/// ```
+pub mod floor;
 /// This module wraps the `is_power_of_two` function into an implementation of `IsPowerOf2`.
 pub mod is_power_of_2;
 /// This module contains functions for taking the base-$b$ logarithm of a number.
@@ -1939,6 +1973,14 @@ pub mod parity;
 /// let mut x = -10i32;
 /// x.pow_assign(9);
 /// assert_eq!(x, -1000000000);
+///
+/// let mut x = 2.0f32;
+/// x.pow_assign(5);
+/// assert_eq!(x, 32.0);
+///
+/// let mut x = 2.0f32;
+/// x.pow_assign(5.0);
+/// assert_eq!(x, 32.0);
 /// ```
 pub mod pow;
 /// This module contains functions for computing a power of 2.
@@ -2613,7 +2655,7 @@ pub mod shr_round;
 /// # sign
 /// ```
 /// use malachite_base::num::arithmetic::traits::Sign;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use std::cmp::Ordering;
 ///
 /// assert_eq!(0u8.sign(), Ordering::Equal);
@@ -2809,21 +2851,339 @@ pub mod square;
 /// assert_eq!(x, -73);
 /// ```
 pub mod sub_mul;
+/// This module defines various traits for performing arithmetic operations on numbers.
 pub mod traits;
+/// This module contains functions for computing the absolute value of a number, wrapping at the
+/// boundary of the type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_abs_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingAbsAssign;
+///
+/// let mut x = 0i8;
+/// x.wrapping_abs_assign();
+/// assert_eq!(x, 0);
+///
+/// let mut x = 100i64;
+/// x.wrapping_abs_assign();
+/// assert_eq!(x, 100);
+///
+/// let mut x = -100i64;
+/// x.wrapping_abs_assign();
+/// assert_eq!(x, 100);
+///
+/// let mut x = -128i8;
+/// x.wrapping_abs_assign();
+/// assert_eq!(x, -128);
+/// ```
 pub mod wrapping_abs;
+/// This module contains functions for adding two numbers, wrapping at the boundary of the type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_add_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingAddAssign;
+///
+/// let mut x = 123u16;
+/// x.wrapping_add_assign(456);
+/// assert_eq!(x, 579);
+///
+/// let mut x = 123u8;
+/// x.wrapping_add_assign(200);
+/// assert_eq!(x, 67);
+/// ```
 pub mod wrapping_add;
+/// This module contains functions for adding the product of two numbers to a third, wrapping at
+/// the boundary of the type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_add_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingAddMul;
+///
+/// assert_eq!(2u8.wrapping_add_mul(3, 7), 23);
+/// assert_eq!((-127i8).wrapping_add_mul(-2, 100), -71);
+/// ```
+///
+/// # wrapping_add_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingAddMulAssign;
+///
+/// let mut x = 2u8;
+/// x.wrapping_add_mul_assign(3, 7);
+/// assert_eq!(x, 23);
+///
+/// let mut x = -127i8;
+/// x.wrapping_add_mul_assign(-2, 100);
+/// assert_eq!(x, -71);
+/// ```
 pub mod wrapping_add_mul;
+/// This module contains functions for dividing two numbers, wrapping at the boundary of the type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_div_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingDivAssign;
+///
+/// let mut x = 100u16;
+/// x.wrapping_div_assign(3);
+/// assert_eq!(x, 33);
+///
+/// let mut x = -128i8;
+/// x.wrapping_div_assign(-1);
+/// assert_eq!(x, -128);
+/// ```
 pub mod wrapping_div;
+/// This module contains functions for multiplying two numbers, wrapping at the boundary of the
+/// type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingMulAssign;
+///
+/// let mut x = 123u16;
+/// x.wrapping_mul_assign(456);
+/// assert_eq!(x, 56088);
+///
+/// let mut x = 123u8;
+/// x.wrapping_mul_assign(200);
+/// assert_eq!(x, 24);
+/// ```
 pub mod wrapping_mul;
+/// This module contains functions for negating a number, wrapping at the boundary of the type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_neg_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingNegAssign;
+///
+/// let mut x = 0i8;
+/// x.wrapping_neg_assign();
+/// assert_eq!(x, 0);
+///
+/// let mut x = 100u64;
+/// x.wrapping_neg_assign();
+/// assert_eq!(x, 18446744073709551516);
+///
+/// let mut x = -100i64;
+/// x.wrapping_neg_assign();
+/// assert_eq!(x, 100);
+///
+/// let mut x = -128i8;
+/// x.wrapping_neg_assign();
+/// assert_eq!(x, -128);
+/// ```
 pub mod wrapping_neg;
+/// This module contains functions for raising a number to a power, wrapping at the boundary of the
+/// type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_pow_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingPowAssign;
+///
+/// let mut x = 3u8;
+/// x.wrapping_pow_assign(3);
+/// assert_eq!(x, 27);
+///
+/// let mut x = -10i32;
+/// x.wrapping_pow_assign(9);
+/// assert_eq!(x, -1000000000);
+///
+/// let mut x = -10i16;
+/// x.wrapping_pow_assign(9);
+/// assert_eq!(x, 13824);
+/// ```
 pub mod wrapping_pow;
+/// This module contains functions for squaring a number, wrapping at the boundary of the type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_square
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingSquare;
+///
+/// assert_eq!(3u8.wrapping_square(), 9);
+/// assert_eq!((-1000i32).wrapping_square(), 1000000);
+/// assert_eq!(1000u16.wrapping_square(), 16960);
+/// ```
+///
+/// # wrapping_square_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingSquareAssign;
+///
+/// let mut x = 3u8;
+/// x.wrapping_square_assign();
+/// assert_eq!(x, 9);
+///
+/// let mut x = -1000i32;
+/// x.wrapping_square_assign();
+/// assert_eq!(x, 1000000);
+///
+/// let mut x = 1000u16;
+/// x.wrapping_square_assign();
+/// assert_eq!(x, 16960);
+/// ```
 pub mod wrapping_square;
+/// This module contains functions for subtracting two numbers, wrapping at the boundary of the
+/// type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_sub_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingSubAssign;
+///
+/// let mut x = 456u16;
+/// x.wrapping_sub_assign(123);
+/// assert_eq!(x, 333);
+///
+/// let mut x = 123u16;
+/// x.wrapping_sub_assign(456);
+/// assert_eq!(x, 65203);
+/// ```
 pub mod wrapping_sub;
+/// This module contains functions for subtracting a number by the product of two other numbers,
+/// wrapping at the boundary of the type.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # wrapping_sub_mul
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingSubMul;
+///
+/// assert_eq!(127i8.wrapping_sub_mul(2, 100), -73);
+/// assert_eq!((-127i8).wrapping_sub_mul(2, 100), -71);
+/// ```
+///
+/// # wrapping_sub_mul_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::WrappingAddMulAssign;
+///
+/// let mut x = 2u8;
+/// x.wrapping_add_mul_assign(3, 7);
+/// assert_eq!(x, 23);
+///
+/// let mut x = -127i8;
+/// x.wrapping_add_mul_assign(-2, 100);
+/// assert_eq!(x, -71);
+/// ```
 pub mod wrapping_sub_mul;
+/// This module contains functions for multiplying two numbers and returning the result as a
+/// double-width number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # x_mul_y_is_zz
+/// ```
+/// use malachite_base::num::arithmetic::traits::XMulYIsZZ;
+///
+/// assert_eq!(u64::x_mul_y_is_zz(15, 3), (0, 45));
+/// assert_eq!(u8::x_mul_y_is_zz(0x78, 0x9a), (0x48, 0x30));
+/// ```
 pub mod x_mul_y_is_zz;
+/// This module contains functions for adding two double-width numbers and returning the result as
+/// a double-width number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # xx_add_yy_is_zz
+/// ```
+/// use malachite_base::num::arithmetic::traits::XXAddYYIsZZ;
+///
+/// assert_eq!(u64::xx_add_yy_is_zz(0x12, 0x34, 0x33, 0x33), (0x45, 0x67));
+/// assert_eq!(u8::xx_add_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0x35, 0x78));
+/// ```
 pub mod xx_add_yy_is_zz;
+/// This module contains functions for dividing a double-width number by a single-width number and
+/// returning the quotient and remainder.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # xx_div_mod_y_is_qr
+/// ```
+/// use malachite_base::num::arithmetic::traits::XXDivModYIsQR;
+///
+/// assert_eq!(u64::xx_div_mod_y_is_qr(0x12, 0x34, 0x33), (0x5a5a5a5a5a5a5a5b, 0x13));
+/// assert_eq!(u8::xx_div_mod_y_is_qr(0x78, 0x9a, 0xbc), (0xa4, 0x2a));
+/// ```
 pub mod xx_div_mod_y_is_qr;
+/// This module contains functions for subtracting two double-width numbers and returning the
+/// result as a double-width number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # xx_sub_yy_is_zz
+/// ```
+/// use malachite_base::num::arithmetic::traits::XXSubYYIsZZ;
+///
+/// assert_eq!(u64::xx_sub_yy_is_zz(0x67, 0x89, 0x33, 0x33), (0x34, 0x56));
+/// assert_eq!(u8::xx_sub_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0xbb, 0xbc));
+/// ```
 pub mod xx_sub_yy_is_zz;
+/// This module contains functions for adding two triple-width numbers and returning the result as
+/// a triple-width number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # xxx_add_yyy_is_zzz
+/// ```
+/// use malachite_base::num::arithmetic::traits::XXXAddYYYIsZZZ;
+///
+/// assert_eq!(
+///     u64::xxx_add_yyy_is_zzz(0x12, 0x34, 0x56, 0x33, 0x33, 0x33),
+///     (0x45, 0x67, 0x89)
+/// );
+/// assert_eq!(
+///     u8::xxx_add_yyy_is_zzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc),
+///     (0x57, 0x99, 0x98)
+/// );
+/// ```
 pub mod xxx_add_yyy_is_zzz;
+/// This module contains functions for subtracting two triple-width numbers and returning the
+/// result as a triple-width number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # xxx_sub_yyy_is_zzz
+/// ```
+/// use malachite_base::num::arithmetic::traits::XXXSubYYYIsZZZ;
+///
+/// assert_eq!(
+///     u64::xxx_sub_yyy_is_zzz(0x67, 0x89, 0xab, 0x33, 0x33, 0x33),
+///     (0x34, 0x56, 0x78)
+/// );
+/// assert_eq!(
+///     u8::xxx_sub_yyy_is_zzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc),
+///     (0x99, 0x9b, 0xe0)
+/// );
+/// ```
 pub mod xxx_sub_yyy_is_zzz;
+/// This module contains functions for adding two quadruple-width numbers and returning the result
+/// as a quadruple-width number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # xxxx_add_yyyy_is_zzzz
+/// ```
+/// use malachite_base::num::arithmetic::traits::XXXXAddYYYYIsZZZZ;
+///
+/// assert_eq!(
+///     u64::xxxx_add_yyyy_is_zzzz(0x12, 0x34, 0x56, 0x78, 0x33, 0x33, 0x33, 0x33),
+///     (0x45, 0x67, 0x89, 0xab)
+/// );
+/// assert_eq!(
+///     u8::xxxx_add_yyyy_is_zzzz(0x78, 0x9a, 0xbc, 0xde, 0xfe, 0xdc, 0xba, 0x98),
+///     (0x77, 0x77, 0x77, 0x76)
+/// );
+/// ```
 pub mod xxxx_add_yyyy_is_zzzz;

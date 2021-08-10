@@ -1,16 +1,17 @@
 use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
-    PowerOf2, ShrRound, SqrtRem, SqrtRemAssign, Square, WrappingAddAssign, WrappingSubAssign,
+    ShrRound, SqrtRem, SqrtRemAssign, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::num::basic::traits::{Iverson, One, Two};
+use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::logic::traits::{BitAccess, LeadingZeros, LowMask};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 use natural::arithmetic::add::{
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
+    limbs_vec_add_limb_in_place,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::div::{
@@ -25,7 +26,9 @@ use natural::arithmetic::shl::limbs_shl_to_out;
 use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::square::limbs_square_to_out;
 use natural::arithmetic::sub::{limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left};
+use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::ord::limbs_cmp_same_length;
+use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, SignedLimb, DC_DIVAPPR_Q_THRESHOLD, MU_DIVAPPR_Q_THRESHOLD};
 use std::cmp::Ordering;
@@ -81,9 +84,9 @@ pub const fn _limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
 /// Let x be xs[..2 * n] before execution.
 /// Let s be out after execution.
 /// Let r be xs[..n] after execution.
-/// 
+///
 /// xs[2 * n - 1].leading_zeros() must be less than 2.
-/// 
+///
 /// If approx = 0, then s = floor(sqrt(x)) and r = x - s ^ 2.
 ///
 /// This is mpn_dc_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1.
@@ -198,8 +201,8 @@ fn limbs_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &
 pub fn _limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
     let odd = usize::iverson(odd);
-    assert_eq!(xs.len(), 2 * n - odd);
-    assert_ne!(xs[2 * n - 1 - odd], 0);
+    assert_eq!(xs.len(), (n << 1) - odd);
+    assert_ne!(*xs.last().unwrap(), 0);
     assert!(n > 4);
     assert!(shift < Limb::WIDTH >> 1);
     let h1 = (n - 1) >> 1;
@@ -307,63 +310,330 @@ pub fn _limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) 
     nonzero_remainder
 }
 
-fn floor_inverse_binary<F: Fn(&Natural) -> Natural>(
-    f: F,
-    x: &Natural,
-    mut low: Natural,
-    mut high: Natural,
-) -> Natural {
-    loop {
-        if high <= low {
-            return low;
+/// Computes the floor of the square root of a `Natural`.
+///
+/// Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural`
+/// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out`. Then
+/// $s = \lfloor \sqrt x \rfloor$.
+///
+/// All limbs are in ascending order (least-significant first).
+///
+/// # Worst-case complexity
+/// TODO
+///
+/// # Examples
+/// ```
+/// use malachite_nz::natural::arithmetic::sqrt::limbs_sqrt_to_out;
+///
+/// let out = &mut [10, 10];
+/// limbs_sqrt_to_out(out, &[1, 2, 3]);
+/// assert_eq!(out, &[3144134278, 1]);
+/// ```
+///
+/// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is NULL.
+pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
+    let xs_len = xs.len();
+    let high = xs[xs_len - 1];
+    assert_ne!(high, 0);
+    let mut shift = LeadingZeros::leading_zeros(high) >> 1;
+    let two_shift = shift << 1;
+    match xs_len {
+        1 => {
+            out[0] = sqrt_rem_newton::<Limb, SignedLimb>(high << two_shift).0 >> shift;
         }
-        let mid = (&low + &high).shr_round(1, RoundingMode::Ceiling);
-        match f(&mid).cmp(x) {
-            Ordering::Equal => return mid,
-            Ordering::Less => low = mid,
-            Ordering::Greater => high = mid - Natural::ONE,
+        2 => {
+            out[0] = if shift == 0 {
+                _sqrt_rem_2_newton(xs[1], xs[0]).0
+            } else {
+                let lo = xs[0];
+                _sqrt_rem_2_newton(
+                    (high << two_shift) | (lo >> (Limb::WIDTH - two_shift)),
+                    lo << two_shift,
+                )
+                .0 >> shift
+            };
+        }
+        _ if xs_len > 8 => {
+            let out_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+            _limbs_sqrt_helper(&mut out[..out_len], xs, shift, xs_len.odd());
+        }
+        _ => {
+            let out_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+            let out = &mut out[..out_len];
+            if xs_len.odd() || shift != 0 {
+                let scratch_1_len = out_len << 1;
+                let mut scratch = vec![0; scratch_1_len + (out_len >> 1) + 1];
+                let (scratch_1, scratch_2) = scratch.split_at_mut(scratch_1_len);
+                // needed only when 2 * out_len > xs_len, but saves a test
+                let shifted_scratch_1 = if xs_len.odd() {
+                    &mut scratch_1[1..]
+                } else {
+                    scratch_1[0] = 0;
+                    &mut *scratch_1
+                };
+                if shift == 0 {
+                    shifted_scratch_1.copy_from_slice(xs);
+                } else {
+                    limbs_shl_to_out(shifted_scratch_1, xs, two_shift);
+                }
+                if xs_len.odd() {
+                    shift += Limb::WIDTH >> 1;
+                }
+                _limbs_sqrt_rem_helper(out, scratch_1, Limb::low_mask(shift) - 1, scratch_2);
+                limbs_slice_shr_in_place(out, shift);
+            } else {
+                let mut rem = xs.to_vec();
+                let mut scratch = vec![0; (out_len >> 1) + 1];
+                _limbs_sqrt_rem_helper(out, &mut rem, 0, &mut scratch);
+            }
         }
     }
 }
 
-#[doc(hidden)]
-pub fn _floor_sqrt_binary(x: &Natural) -> Natural {
-    if x < &Natural::TWO {
-        x.clone()
-    } else {
-        let p = Natural::power_of_2(x.significant_bits().shr_round(1, RoundingMode::Ceiling));
-        floor_inverse_binary(|x| x.square(), x, &p >> 1, p)
+/// Computes the square root and remainder of a `Natural`.
+///
+/// Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural`
+/// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out_sqrt`, $m$ the return value, and
+/// $r$ be the `Natural` whose limbs are the first $m$ limbs of `out_rem`. Then
+/// $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that $r \leq 2x$.
+///
+/// All limbs are in ascending order (least-significant first).
+///
+/// # Worst-case complexity
+/// TODO
+///
+/// # Examples
+/// ```
+/// use malachite_nz::natural::arithmetic::sqrt::limbs_sqrt_rem_to_out;
+///
+/// let out_sqrt = &mut [10, 10];
+/// let out_rem = &mut [10; 3];
+/// let rem_len = limbs_sqrt_rem_to_out(out_sqrt, out_rem, &[1, 2, 3]);
+/// assert_eq!(out_sqrt, &[3144134278, 1]);
+/// assert_eq!(rem_len, 2);
+/// assert_eq!(&out_rem[..rem_len], &[1429311965, 0]);
+/// ```
+///
+/// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is not NULL.
+pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[Limb]) -> usize {
+    let xs_len = xs.len();
+    let high = xs[xs_len - 1];
+    assert_ne!(high, 0);
+    let mut shift = LeadingZeros::leading_zeros(high) >> 1;
+    let two_shift = shift << 1;
+    match xs_len {
+        1 => {
+            let r_lo = if shift == 0 {
+                let (sqrt, r) = sqrt_rem_newton::<Limb, SignedLimb>(high);
+                out_sqrt[0] = sqrt;
+                r
+            } else {
+                let sqrt = sqrt_rem_newton::<Limb, SignedLimb>(high << two_shift).0 >> shift;
+                out_sqrt[0] = sqrt;
+                high - sqrt.square()
+            };
+            out_rem[0] = r_lo;
+            usize::iverson(r_lo != 0)
+        }
+        2 => {
+            if shift == 0 {
+                let (sqrt, r_hi, r_lo) = _sqrt_rem_2_newton(xs[1], xs[0]);
+                out_rem[0] = r_lo;
+                out_sqrt[0] = sqrt;
+                if r_hi {
+                    out_rem[1] = 1;
+                    2
+                } else {
+                    usize::iverson(r_lo != 0)
+                }
+            } else {
+                let mut lo = xs[0];
+                let hi = (high << two_shift) | (lo >> (Limb::WIDTH - two_shift));
+                out_sqrt[0] = _sqrt_rem_2_newton(hi, lo << two_shift).0 >> shift;
+                lo.wrapping_sub_assign(out_sqrt[0].wrapping_square());
+                out_rem[0] = lo;
+                usize::iverson(lo != 0)
+            }
+        }
+        _ => {
+            let mut out_len = xs_len.shr_round(1, RoundingMode::Ceiling);
+            let out_sqrt = &mut out_sqrt[..out_len];
+            if xs_len.odd() || shift != 0 {
+                let scratch_1_len = out_len << 1;
+                let mut scratch = vec![0; scratch_1_len + (out_len >> 1) + 1];
+                let (mut scratch_1, scratch_2) = scratch.split_at_mut(scratch_1_len);
+                // needed only when 2 * out_len > xs_len, but saves a test
+                let shifted_scratch_1 = if xs_len.odd() {
+                    &mut scratch_1[1..]
+                } else {
+                    scratch_1[0] = 0;
+                    &mut *scratch_1
+                };
+                if shift == 0 {
+                    shifted_scratch_1.copy_from_slice(xs);
+                } else {
+                    limbs_shl_to_out(shifted_scratch_1, xs, two_shift);
+                }
+                if xs_len.odd() {
+                    shift += Limb::WIDTH >> 1;
+                }
+                let r_hi = _limbs_sqrt_rem_helper(out_sqrt, scratch_1, 0, scratch_2);
+                let s = out_sqrt[0] & Limb::low_mask(shift);
+                let scratch_1_lo = &mut scratch_1[..out_len];
+                let mut r_lo = limbs_slice_add_mul_limb_same_length_in_place_left(
+                    scratch_1_lo,
+                    out_sqrt,
+                    s << 1,
+                );
+                if r_hi {
+                    r_lo += 1;
+                }
+                let (scratch_1_lo_lo, scratch_1_lo_hi) = scratch_1_lo.split_at_mut(1);
+                let carry = limbs_sub_mul_limb_same_length_in_place_left(scratch_1_lo_lo, &[s], s);
+                if limbs_sub_limb_in_place(scratch_1_lo_hi, carry) {
+                    r_lo -= 1;
+                }
+                limbs_slice_shr_in_place(out_sqrt, shift);
+                scratch_1[out_len] = r_lo;
+                shift <<= 1;
+                if shift < Limb::WIDTH {
+                    out_len += 1;
+                } else {
+                    scratch_1 = &mut scratch_1[1..];
+                    shift -= Limb::WIDTH;
+                }
+                let scratch_1 = &mut scratch_1[..out_len];
+                if shift == 0 {
+                    out_rem[..out_len].copy_from_slice(scratch_1);
+                } else {
+                    limbs_shr_to_out(out_rem, scratch_1, shift);
+                }
+            } else {
+                out_rem[..xs_len].copy_from_slice(xs);
+                let mut scratch = vec![0; (out_len >> 1) + 1];
+                if _limbs_sqrt_rem_helper(out_sqrt, out_rem, 0, &mut scratch) {
+                    out_rem[out_len] = 1;
+                    out_len += 1;
+                }
+            }
+            out_len
+        }
     }
 }
 
-#[doc(hidden)]
-pub fn _ceiling_sqrt_binary(x: &Natural) -> Natural {
-    let floor_sqrt = _floor_sqrt_binary(x);
-    if &(&floor_sqrt).square() == x {
-        floor_sqrt
-    } else {
-        floor_sqrt + Natural::ONE
-    }
+/// Computes the floor of the square root of a `Natural`.
+///
+/// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
+/// returned. Then $s = \lfloor \sqrt x \rfloor$.
+///
+/// All limbs are in ascending order (least-significant first).
+///
+/// # Worst-case complexity
+/// TODO
+///
+/// # Examples
+/// ```
+/// use malachite_nz::natural::arithmetic::sqrt::limbs_floor_sqrt;
+///
+/// assert_eq!(limbs_floor_sqrt(&[1, 2, 3]), &[3144134278, 1]);
+/// ```
+pub fn limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
+    let mut out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
+    limbs_sqrt_to_out(&mut out, xs);
+    out
 }
 
-#[doc(hidden)]
-pub fn _checked_sqrt_binary(x: &Natural) -> Option<Natural> {
-    let floor_sqrt = _floor_sqrt_binary(x);
-    if &(&floor_sqrt).square() == x {
-        Some(floor_sqrt)
+/// Computes the ceiling of the square root of a `Natural`.
+///
+/// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
+/// returned. Then $s = \lceil \sqrt x \rceil$.
+///
+/// All limbs are in ascending order (least-significant first).
+///
+/// # Worst-case complexity
+/// TODO
+///
+/// # Examples
+/// ```
+/// use malachite_nz::natural::arithmetic::sqrt::limbs_ceiling_sqrt;
+///
+/// assert_eq!(limbs_ceiling_sqrt(&[1, 2, 3]), &[3144134279, 1]);
+/// ```
+pub fn limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
+    let xs_len = xs.len();
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+    let mut out_rem = vec![0; xs_len];
+    let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
+    if !slice_test_zero(&out_rem[..rem_len]) {
+        limbs_vec_add_limb_in_place(&mut out_sqrt, 1);
+    }
+    out_sqrt
+}
+
+/// Computes the square root of a `Natural`, returning `None` if the `Natural` is not a perfect
+/// square.
+///
+/// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
+/// returned.
+///
+/// $$
+/// s = \\begin{cases}
+///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
+///     \operatorname{None} & \textrm{otherwise}.
+/// \\end{cases}
+/// $$
+///
+/// All limbs are in ascending order (least-significant first).
+///
+/// # Worst-case complexity
+/// TODO
+///
+/// # Examples
+/// ```
+/// use malachite_nz::natural::arithmetic::sqrt::limbs_checked_sqrt;
+///
+/// assert_eq!(limbs_checked_sqrt(&[1, 2, 3]), None);
+/// assert_eq!(limbs_checked_sqrt(&[0, 0, 1]), Some(vec![0, 1]));
+/// ```
+pub fn limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
+    let xs_len = xs.len();
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+    let mut out_rem = vec![0; xs_len];
+    let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
+    if slice_test_zero(&out_rem[..rem_len]) {
+        Some(out_sqrt)
     } else {
         None
     }
 }
 
-#[doc(hidden)]
-pub fn _sqrt_rem_binary(x: &Natural) -> (Natural, Natural) {
-    let floor_sqrt = _floor_sqrt_binary(x);
-    let rem = x - (&floor_sqrt).square();
-    (floor_sqrt, rem)
+/// Computes the square root and remainder of a `Natural`.
+///
+/// Let `out_sqrt` and `out_rem` be the two returned `Limb` `Vec`s. Let $n$ be `xs.len()` and $x$
+/// be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural` whose limbs are the first
+/// $\lceil n/2 \rceil$ limbs of `out_sqrt` and $r$ be the `Natural` whose limbs are the first $n$
+/// limbs of `out_rem`.  Then $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that
+/// $r \leq 2x$.
+///
+/// All limbs are in ascending order (least-significant first).
+///
+/// # Worst-case complexity
+/// TODO
+///
+/// # Examples
+/// ```
+/// use malachite_nz::natural::arithmetic::sqrt::limbs_sqrt_rem;
+///
+/// assert_eq!(limbs_sqrt_rem(&[1, 2, 3]), (vec![3144134278, 1], vec![1429311965, 0]));
+/// ```
+pub fn limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
+    let xs_len = xs.len();
+    let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
+    let mut out_rem = vec![0; xs_len];
+    let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
+    out_rem.truncate(rem_len);
+    (out_sqrt, out_rem)
 }
-
-//TODO use better algorithms
 
 impl FloorSqrtAssign for Natural {
     /// Replaces a `Natural` with the floor of its square root.
@@ -403,7 +673,7 @@ impl FloorSqrtAssign for Natural {
     /// ```
     #[inline]
     fn floor_sqrt_assign(&mut self) {
-        *self = _floor_sqrt_binary(&*self);
+        *self = (&*self).floor_sqrt();
     }
 }
 
@@ -433,7 +703,7 @@ impl FloorSqrt for Natural {
     /// ```
     #[inline]
     fn floor_sqrt(self) -> Natural {
-        _floor_sqrt_binary(&self)
+        (&self).floor_sqrt()
     }
 }
 
@@ -461,9 +731,11 @@ impl<'a> FloorSqrt for &'a Natural {
     /// assert_eq!((&Natural::from(1000000000u32)).floor_sqrt(), 31622);
     /// assert_eq!((&Natural::from(10000000000u64)).floor_sqrt(), 100000);
     /// ```
-    #[inline]
     fn floor_sqrt(self) -> Natural {
-        _floor_sqrt_binary(self)
+        match self {
+            Natural(Small(small)) => Natural::from(small.floor_sqrt()),
+            Natural(Large(ref limbs)) => Natural::from_owned_limbs_asc(limbs_floor_sqrt(limbs)),
+        }
     }
 }
 
@@ -505,7 +777,7 @@ impl CeilingSqrtAssign for Natural {
     /// ```
     #[inline]
     fn ceiling_sqrt_assign(&mut self) {
-        *self = _ceiling_sqrt_binary(&*self);
+        *self = (&*self).ceiling_sqrt();
     }
 }
 
@@ -535,7 +807,7 @@ impl CeilingSqrt for Natural {
     /// ```
     #[inline]
     fn ceiling_sqrt(self) -> Natural {
-        _ceiling_sqrt_binary(&self)
+        (&self).ceiling_sqrt()
     }
 }
 
@@ -563,9 +835,11 @@ impl<'a> CeilingSqrt for &'a Natural {
     /// assert_eq!(Natural::from(1000000000u32).ceiling_sqrt(), 31623);
     /// assert_eq!(Natural::from(10000000000u64).ceiling_sqrt(), 100000);
     /// ```
-    #[inline]
     fn ceiling_sqrt(self) -> Natural {
-        _ceiling_sqrt_binary(self)
+        match self {
+            Natural(Small(small)) => Natural::from(small.ceiling_sqrt()),
+            Natural(Large(ref limbs)) => Natural::from_owned_limbs_asc(limbs_ceiling_sqrt(limbs)),
+        }
     }
 }
 
@@ -602,7 +876,7 @@ impl CheckedSqrt for Natural {
     /// ```
     #[inline]
     fn checked_sqrt(self) -> Option<Natural> {
-        _checked_sqrt_binary(&self)
+        (&self).checked_sqrt()
     }
 }
 
@@ -640,9 +914,13 @@ impl<'a> CheckedSqrt for &'a Natural {
     ///     "Some(100000)"
     /// );
     /// ```
-    #[inline]
     fn checked_sqrt(self) -> Option<Natural> {
-        _checked_sqrt_binary(self)
+        match self {
+            Natural(Small(small)) => small.checked_sqrt().map(Natural::from),
+            Natural(Large(ref limbs)) => {
+                limbs_checked_sqrt(limbs).map(Natural::from_owned_limbs_asc)
+            }
+        }
     }
 }
 
@@ -689,7 +967,7 @@ impl SqrtRemAssign for Natural {
     /// ```
     #[inline]
     fn sqrt_rem_assign(&mut self) -> Natural {
-        let (sqrt, rem) = _sqrt_rem_binary(&*self);
+        let (sqrt, rem) = (&*self).sqrt_rem();
         *self = sqrt;
         rem
     }
@@ -724,7 +1002,7 @@ impl SqrtRem for Natural {
     /// ```
     #[inline]
     fn sqrt_rem(self) -> (Natural, Natural) {
-        _sqrt_rem_binary(&self)
+        (&self).sqrt_rem()
     }
 }
 
@@ -755,8 +1033,19 @@ impl<'a> SqrtRem for &'a Natural {
     /// assert_eq!((&Natural::from(1000000000u32)).sqrt_rem().to_debug_string(), "(31622, 49116)");
     /// assert_eq!((&Natural::from(10000000000u64)).sqrt_rem().to_debug_string(), "(100000, 0)");
     /// ```
-    #[inline]
     fn sqrt_rem(self) -> (Natural, Natural) {
-        _sqrt_rem_binary(self)
+        match self {
+            Natural(Small(small)) => {
+                let (sqrt, rem) = small.sqrt_rem();
+                (Natural::from(sqrt), Natural::from(rem))
+            }
+            Natural(Large(ref limbs)) => {
+                let (sqrt_limbs, rem_limbs) = limbs_sqrt_rem(limbs);
+                (
+                    Natural::from_owned_limbs_asc(sqrt_limbs),
+                    Natural::from_owned_limbs_asc(rem_limbs),
+                )
+            } 
+        }
     }
 }

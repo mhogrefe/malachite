@@ -6,13 +6,13 @@ use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
     ArithmeticCheckedShl, CeilingLogBase2, DivRound, Parity, PowerOf2,
 };
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
 };
-use malachite_base::num::float::PrimitiveFloat;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
     geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_unsigneds,

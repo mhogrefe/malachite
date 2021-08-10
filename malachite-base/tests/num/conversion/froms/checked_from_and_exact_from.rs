@@ -1,16 +1,18 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, RoundingFrom,
 };
-use malachite_base::num::float::PrimitiveFloat;
+use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::{
     primitive_float_gen, primitive_float_gen_var_13, primitive_float_gen_var_14, signed_gen,
     signed_gen_var_7, unsigned_gen, unsigned_gen_var_18,
 };
 use std::fmt::Debug;
+use std::panic::catch_unwind;
 
 #[test]
 pub fn test_checked_from() {
@@ -25,22 +27,58 @@ pub fn test_checked_from() {
     test_single(i64::MIN);
     test_single(usize::MAX);
 
-    fn test_double<T, U: CheckedFrom<T> + Copy + Debug + Eq>(n_in: T, n_out: Option<U>) {
+    fn test_double_primitive_int<T, U: CheckedFrom<T> + Copy + Debug + Eq>(
+        n_in: T,
+        n_out: Option<U>,
+    ) {
         assert_eq!(U::checked_from(n_in), n_out);
     }
-    test_double(0u8, Some(0u16));
-    test_double(1000u16, Some(1000i32));
-    test_double(-5i16, Some(-5i8));
-    test_double(255u8, Some(255u64));
+    test_double_primitive_int(0u8, Some(0u16));
+    test_double_primitive_int(1000u16, Some(1000i32));
+    test_double_primitive_int(-5i16, Some(-5i8));
+    test_double_primitive_int(255u8, Some(255u64));
 
-    test_double::<_, u32>(-1i8, None);
-    test_double::<_, u16>(u32::MAX, None);
-    test_double::<_, u32>(i32::MIN, None);
-    test_double::<_, u16>(i32::MIN, None);
-    test_double::<_, i16>(i32::MIN, None);
-    test_double::<_, u32>(-5i32, None);
-    test_double::<_, i32>(3000000000u32, None);
-    test_double::<_, i8>(-1000i16, None);
+    test_double_primitive_int::<_, u32>(-1i8, None);
+    test_double_primitive_int::<_, u16>(u32::MAX, None);
+    test_double_primitive_int::<_, u32>(i32::MIN, None);
+    test_double_primitive_int::<_, u16>(i32::MIN, None);
+    test_double_primitive_int::<_, i16>(i32::MIN, None);
+    test_double_primitive_int::<_, u32>(-5i32, None);
+    test_double_primitive_int::<_, i32>(3000000000u32, None);
+    test_double_primitive_int::<_, i8>(-1000i16, None);
+
+    test_double_primitive_int::<_, u8>(0.0f32, Some(0));
+    test_double_primitive_int::<_, u8>(-0.0f32, Some(0));
+    test_double_primitive_int::<_, u8>(123.0f32, Some(123));
+    test_double_primitive_int::<_, i8>(-123.0f32, Some(-123));
+    test_double_primitive_int::<_, u8>(-123.0f32, None);
+    test_double_primitive_int::<_, u8>(500.0f32, None);
+    test_double_primitive_int::<_, u8>(123.1f32, None);
+    test_double_primitive_int::<_, u8>(f32::NAN, None);
+    test_double_primitive_int::<_, u8>(f32::POSITIVE_INFINITY, None);
+    test_double_primitive_int::<_, u8>(f32::NEGATIVE_INFINITY, None);
+    test_double_primitive_int::<_, u8>(255.0f32, Some(255));
+    test_double_primitive_int::<_, u8>(256.0f32, None);
+    test_double_primitive_int::<_, i8>(127.0f32, Some(127));
+    test_double_primitive_int::<_, i8>(128.0f32, None);
+    test_double_primitive_int::<_, i8>(-128.0f32, Some(-128));
+    test_double_primitive_int::<_, i8>(-129.0f32, None);
+
+    fn test_double_primitive_float<T, U: CheckedFrom<T> + PrimitiveFloat>(
+        n_in: T,
+        n_out: Option<U>,
+    ) {
+        assert_eq!(U::checked_from(n_in).map(NiceFloat), n_out.map(NiceFloat));
+    }
+    test_double_primitive_float::<_, f32>(0u8, Some(0.0));
+    test_double_primitive_float::<_, f32>(123u8, Some(123.0));
+    test_double_primitive_float::<_, f32>(-123i8, Some(-123.0));
+    test_double_primitive_float::<_, f32>(u128::MAX, None);
+    test_double_primitive_float::<_, f32>(i128::MIN, Some(-1.7014118e38));
+    test_double_primitive_float::<_, f32>(i128::MIN + 1, None);
+    test_double_primitive_float::<_, f32>(u32::MAX, None);
+    test_double_primitive_float::<_, f32>(i32::MIN, Some(-2147483600.0));
+    test_double_primitive_float::<_, f32>(i32::MIN + 1, None);
 }
 
 #[test]
@@ -56,61 +94,55 @@ pub fn test_exact_from() {
     test_single(i64::MIN);
     test_single(usize::MAX);
 
-    fn test_double<T, U: Copy + Debug + Eq + ExactFrom<T>>(n_in: T, n_out: U) {
+    fn test_double_primitive_int<T, U: Copy + Debug + Eq + ExactFrom<T>>(n_in: T, n_out: U) {
         assert_eq!(U::exact_from(n_in), n_out);
     }
-    test_double(0u8, 0u16);
-    test_double(1000u16, 1000i32);
-    test_double(-5i16, -5i8);
-    test_double(255u8, 255u64);
+    test_double_primitive_int(0u8, 0u16);
+    test_double_primitive_int(1000u16, 1000i32);
+    test_double_primitive_int(-5i16, -5i8);
+    test_double_primitive_int(255u8, 255u64);
+
+    test_double_primitive_int(0.0f32, 0u8);
+    test_double_primitive_int(-0.0f32, 0u8);
+    test_double_primitive_int(123.0f32, 123u8);
+    test_double_primitive_int(-123.0f32, -123i8);
+    test_double_primitive_int(255.0f32, 255u8);
+    test_double_primitive_int(127.0f32, 127i8);
+    test_double_primitive_int(-128.0f32, -128i8);
+
+    fn test_double_primitive_float<T, U: CheckedFrom<T> + PrimitiveFloat>(n_in: T, n_out: U) {
+        assert_eq!(NiceFloat(U::exact_from(n_in)), NiceFloat(n_out));
+    }
+    test_double_primitive_float(0u8, 0.0f32);
+    test_double_primitive_float(123u8, 123.0f32);
+    test_double_primitive_float(-123i8, -123.0f32);
+    test_double_primitive_float(i128::MIN, -1.7014118e38f32);
+    test_double_primitive_float(i32::MIN, -2147483600.0f32);
 }
 
 #[test]
-#[should_panic]
-fn exact_from_fail_1() {
-    u32::exact_from(-1i8);
-}
-
-#[test]
-#[should_panic]
-fn exact_from_fail_2() {
-    u16::exact_from(u32::MAX);
-}
-
-#[test]
-#[should_panic]
-fn exact_from_fail_3() {
-    u32::exact_from(i32::MIN);
-}
-
-#[test]
-#[should_panic]
-fn exact_from_fail_4() {
-    u16::exact_from(i32::MIN);
-}
-
-#[test]
-#[should_panic]
-fn exact_from_fail_5() {
-    i16::exact_from(i32::MIN);
-}
-
-#[test]
-#[should_panic]
-fn exact_from_fail_6() {
-    u32::exact_from(-5i32);
-}
-
-#[test]
-#[should_panic]
-fn exact_from_fail_7() {
-    i32::exact_from(3000000000u32);
-}
-
-#[test]
-#[should_panic]
-fn exact_from_fail_8() {
-    i8::exact_from(-1000i16);
+fn exact_from_fail() {
+    assert_panic!(u32::exact_from(-1i8));
+    assert_panic!(u16::exact_from(u32::MAX));
+    assert_panic!(u32::exact_from(i32::MIN));
+    assert_panic!(u16::exact_from(i32::MIN));
+    assert_panic!(i16::exact_from(i32::MIN));
+    assert_panic!(u32::exact_from(-5i32));
+    assert_panic!(i32::exact_from(3000000000u32));
+    assert_panic!(i8::exact_from(-1000i16));
+    assert_panic!(u8::exact_from(-123.0f32));
+    assert_panic!(u8::exact_from(500.0f32));
+    assert_panic!(u8::exact_from(123.1f32));
+    assert_panic!(u8::exact_from(f32::NAN));
+    assert_panic!(u8::exact_from(f32::POSITIVE_INFINITY));
+    assert_panic!(u8::exact_from(f32::NEGATIVE_INFINITY));
+    assert_panic!(u8::exact_from(256.0f32));
+    assert_panic!(i8::exact_from(128.0f32));
+    assert_panic!(i8::exact_from(-129.0f32));
+    assert_panic!(f32::exact_from(u128::MAX));
+    assert_panic!(f32::exact_from(i128::MIN + 1));
+    assert_panic!(f32::exact_from(u32::MAX));
+    assert_panic!(f32::exact_from(i32::MIN + 1));
 }
 
 fn checked_from_and_exact_from_helper_primitive_int_unsigned<

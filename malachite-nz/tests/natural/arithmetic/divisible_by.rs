@@ -777,43 +777,28 @@ fn limbs_divisible_by_ref_ref_fail_4() {
 
 #[test]
 fn test_divisible_by() {
-    let test = |u, v, divisible| {
-        assert_eq!(
-            Natural::from_str(u)
-                .unwrap()
-                .divisible_by(Natural::from_str(v).unwrap()),
-            divisible
-        );
-        assert_eq!(
-            Natural::from_str(u)
-                .unwrap()
-                .divisible_by(&Natural::from_str(v).unwrap()),
-            divisible
-        );
-        assert_eq!(
-            (&Natural::from_str(u).unwrap()).divisible_by(Natural::from_str(v).unwrap()),
-            divisible
-        );
-        assert_eq!(
-            (&Natural::from_str(u).unwrap()).divisible_by(&Natural::from_str(v).unwrap()),
-            divisible
-        );
+    let test = |s, t, divisible| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
 
-        let x = Natural::from_str(u).unwrap();
-        let y = Natural::from_str(v).unwrap();
-        assert_eq!(x == 0 || y != 0 && x % y == 0, divisible);
+        assert_eq!(u.clone().divisible_by(v.clone()), divisible);
+        assert_eq!(u.clone().divisible_by(&v), divisible);
+        assert_eq!((&u).divisible_by(v.clone()), divisible);
+        assert_eq!((&u).divisible_by(&v), divisible);
+
+        assert_eq!(u == 0 || v != 0 && &u % &v == 0, divisible);
 
         assert_eq!(
             num_divisible_by(
-                &BigUint::from_str(u).unwrap(),
-                &BigUint::from_str(v).unwrap()
+                &BigUint::from_str(s).unwrap(),
+                &BigUint::from_str(t).unwrap()
             ),
             divisible
         );
         assert_eq!(
-            rug::Integer::from_str(u)
+            rug::Integer::from_str(s)
                 .unwrap()
-                .is_divisible(&rug::Integer::from_str(v).unwrap()),
+                .is_divisible(&rug::Integer::from_str(t).unwrap()),
             divisible
         );
     };

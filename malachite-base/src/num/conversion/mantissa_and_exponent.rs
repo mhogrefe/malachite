@@ -1,11 +1,11 @@
 use num::arithmetic::traits::{ArithmeticCheckedShl, DivisibleByPowerOf2, ModPowerOf2, ShrRound};
+use num::basic::floats::PrimitiveFloat;
 use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{
     ExactFrom, ExactInto, IntegerMantissaAndExponent, RawMantissaAndExponent,
     SciMantissaAndExponent, WrappingFrom,
 };
-use num::float::PrimitiveFloat;
 use num::logic::traits::{BitAccess, LeadingZeros, LowMask, SignificantBits, TrailingZeros};
 use rounding_modes::RoundingMode;
 
@@ -226,7 +226,7 @@ fn _from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 /// use malachite_base::num::conversion::mantissa_and_exponent::*;
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::rounding_modes::RoundingMode;
 ///
 /// fn test<T: PrimitiveUnsigned, U: PrimitiveFloat>(
@@ -311,7 +311,7 @@ pub fn sci_mantissa_and_exponent_with_rounding<T: PrimitiveUnsigned, U: Primitiv
 /// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 /// use malachite_base::num::conversion::mantissa_and_exponent::*;
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
-/// use malachite_base::num::float::PrimitiveFloat;
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use std::str::FromStr;
 ///
