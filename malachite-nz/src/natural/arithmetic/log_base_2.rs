@@ -110,6 +110,8 @@ pub fn limbs_checked_log_base_2(xs: &[Limb]) -> Option<u64> {
 }
 
 impl<'a> FloorLogBase2 for &'a Natural {
+    type Output = u64;
+
     /// Returns the floor of the base-2 logarithm of a positive `Natural`.
     ///
     /// $f(x) = \lfloor\log_2 x\rfloor$.
@@ -140,6 +142,8 @@ impl<'a> FloorLogBase2 for &'a Natural {
 }
 
 impl<'a> CeilingLogBase2 for &'a Natural {
+    type Output = u64;
+
     /// Returns the ceiling of the base-2 logarithm of a positive `Natural`.
     ///
     /// $f(x) = \lceil\log_2 x\rceil$.
@@ -174,6 +178,8 @@ impl<'a> CeilingLogBase2 for &'a Natural {
 }
 
 impl<'a> CheckedLogBase2 for &'a Natural {
+    type Output = u64;
+
     /// Returns the base-2 logarithm of a positive `Natural`. If the integer is not a power of 2,
     /// `None` is returned.
     ///

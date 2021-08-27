@@ -288,51 +288,69 @@ pub trait IsPowerOf2 {
 /// Provides a function to get the base-`b` logarithm of `self`, or return `None` if the result is
 /// not exact.
 pub trait CheckedLogBase<B = Self> {
-    fn checked_log_base(self, base: B) -> Option<u64>;
+    type Output;
+
+    fn checked_log_base(self, base: B) -> Option<Self::Output>;
 }
 
 /// Provides a function to get the floor of the base-`b` logarithm of `self`.
 pub trait FloorLogBase<B = Self> {
-    fn floor_log_base(self, base: B) -> u64;
+    type Output;
+
+    fn floor_log_base(self, base: B) -> Self::Output;
 }
 
 /// Provides a function to get the ceiling of the base-`b` logarithm of `self`.
 pub trait CeilingLogBase<B = Self> {
-    fn ceiling_log_base(self, base: B) -> u64;
+    type Output;
+
+    fn ceiling_log_base(self, base: B) -> Self::Output;
 }
 
 /// Provides a function to get the base-2 logarithm of `self`, or return `None` if `self` is not a
 /// power of 2.
 pub trait CheckedLogBase2 {
-    fn checked_log_base_2(self) -> Option<u64>;
+    type Output;
+
+    fn checked_log_base_2(self) -> Option<Self::Output>;
 }
 
 /// Provides a function to get the floor of the base-2 logarithm of `self`.
 pub trait FloorLogBase2 {
-    fn floor_log_base_2(self) -> u64;
+    type Output;
+
+    fn floor_log_base_2(self) -> Self::Output;
 }
 
 /// Provides a function to get the ceiling of the base-2 logarithm of `self`.
 pub trait CeilingLogBase2 {
-    fn ceiling_log_base_2(self) -> u64;
+    type Output;
+
+    fn ceiling_log_base_2(self) -> Self::Output;
 }
 
 /// Provides a function to get the base-`p` logarithm of `self`. where `p` is a power of 2, or
 /// return `None` if the result is not exact.
 pub trait CheckedLogBasePowerOf2 {
-    fn checked_log_base_power_of_2(self, pow: u64) -> Option<u64>;
+    type Output;
+
+    fn checked_log_base_power_of_2(self, pow: u64) -> Option<Self::Output>;
 }
 
 /// Provides a function to get the floor of the base-`p` logarithm of `self`, where `p` is a power
 /// of 2.
 pub trait FloorLogBasePowerOf2 {
-    fn floor_log_base_power_of_2(self, pow: u64) -> u64;
+    type Output;
+
+    fn floor_log_base_power_of_2(self, pow: u64) -> Self::Output;
 }
 
 /// Provides a function to get the ceiling of the base-`p` logarithm of `self`, where `p` is a
 /// power of 2.
 pub trait CeilingLogBasePowerOf2 {
-    fn ceiling_log_base_power_of_2(self, pow: u64) -> u64;
+    type Output;
+
+    fn ceiling_log_base_power_of_2(self, pow: u64) -> Self::Output;
 }
 
 /// Computes `self + other` mod `m`. Assumes the inputs are already reduced mod `m`.
@@ -972,8 +990,55 @@ pub trait PowAssign<RHS = Self> {
 }
 
 /// Calculates $2^p$.
-pub trait PowerOf2 {
-    fn power_of_2(pow: u64) -> Self;
+pub trait PowerOf2<POW> {
+    fn power_of_2(pow: POW) -> Self;
+}
+
+/// Provides a function to get the floor of the $n$th root of `self`.
+pub trait FloorRoot {
+    type Output;
+
+    fn floor_root(self, exp: u64) -> Self::Output;
+}
+
+/// Replaces `self` with the floor of its $n$th root.
+pub trait FloorRootAssign {
+    fn floor_root_assign(&mut self, exp: u64);
+}
+
+/// Provides a function to get the ceiling of the $n$th root of `self`.
+pub trait CeilingRoot {
+    type Output;
+
+    fn ceiling_root(self, exp: u64) -> Self::Output;
+}
+
+/// Replaces `self` with the ceiling of its $n$th root.
+pub trait CeilingRootAssign {
+    fn ceiling_root_assign(&mut self, exp: u64);
+}
+
+/// Provides a function to get the $n$th root of `self`, returning `None` if `self` is not a
+/// perfect $n$th power.
+pub trait CheckedRoot {
+    type Output;
+
+    fn checked_root(self, exp: u64) -> Option<Self::Output>;
+}
+
+/// Provides a function to get the floor of the $n$th root of `self` and the remainder.
+pub trait RootRem {
+    type RootOutput;
+    type RemOutput;
+
+    fn root_rem(self, exp: u64) -> (Self::RootOutput, Self::RemOutput);
+}
+
+/// Replaces `self` with the floor of its $n$th root and returns the remainder.
+pub trait RootAssignRem {
+    type RemOutput;
+
+    fn root_assign_rem(&mut self, exp: u64) -> Self::RemOutput;
 }
 
 /// Rounds `self` to a multiple of other, according to a specified rounding mode.
@@ -1158,6 +1223,18 @@ pub trait Sign {
     fn sign(&self) -> Ordering;
 }
 
+/// Provides a function to get the square root of `self`.
+pub trait Sqrt {
+    type Output;
+
+    fn sqrt(self) -> Self::Output;
+}
+
+/// Replaces `self` with its square root.
+pub trait SqrtAssign {
+    fn sqrt_assign(&mut self);
+}
+
 /// Provides a function to get the floor of the square root of `self`.
 pub trait FloorSqrt {
     type Output;
@@ -1199,10 +1276,10 @@ pub trait SqrtRem {
 }
 
 /// Replaces `self` with the floor of its square root and returns the remainder.
-pub trait SqrtRemAssign {
+pub trait SqrtAssignRem {
     type RemOutput;
 
-    fn sqrt_rem_assign(&mut self) -> Self::RemOutput;
+    fn sqrt_assign_rem(&mut self) -> Self::RemOutput;
 }
 
 /// Squares `self`.

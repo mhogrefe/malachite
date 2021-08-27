@@ -62,14 +62,8 @@ fn test_random_unsigned_inclusive_range() {
 
     // u16, 1, 6
     let values = &[2, 6, 4, 2, 3, 5, 6, 2, 3, 6, 5, 1, 6, 1, 3, 6, 3, 1, 5, 1];
-    let common_values = &[
-        (4, 167408),
-        (1, 167104),
-        (5, 166935),
-        (6, 166549),
-        (3, 166068),
-        (2, 165936),
-    ];
+    let common_values =
+        &[(4, 167408), (1, 167104), (5, 166935), (6, 166549), (3, 166068), (2, 165936)];
     let pop_median = (3, Some(4));
     let sample_median = (4, None);
     let pop_moment_stats = MomentStats {
@@ -96,9 +90,7 @@ fn test_random_unsigned_inclusive_range() {
     );
 
     // u32, 10, 19
-    let values = &[
-        11, 17, 15, 14, 16, 14, 12, 18, 11, 17, 15, 10, 12, 16, 13, 15, 12, 12, 19, 15,
-    ];
+    let values = &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17, 15, 10, 12, 16, 13, 15, 12, 12, 19, 15];
     let common_values = &[
         (15, 100442),
         (12, 100144),

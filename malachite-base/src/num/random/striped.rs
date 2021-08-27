@@ -63,8 +63,8 @@ impl StripedBitSource {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::num::random::striped::StripedBitSource;
+    /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 4, 1);
     /// let mut string = String::with_capacity(40);
@@ -97,8 +97,8 @@ impl StripedBitSource {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::num::random::striped::StripedBitSource;
+    /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// fn generate_string(bit_source: &mut StripedBitSource) -> String {
     ///     let mut string = String::with_capacity(40);
@@ -286,15 +286,19 @@ impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedsLessThan<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::striped::striped_random_unsigneds;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_unsigneds::<u8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect_vec(),
-///     &["1", "1001100", "1111111", "11000011", "0", "10000000", "1111", "1110110", "0",
-///     "11111000"]
+///     striped_random_unsigneds::<u8>(EXAMPLE_SEED, 4, 1)
+///         .take(10)
+///         .map(|x| x.to_binary_string())
+///         .collect_vec(),
+///     &[
+///         "1", "1001100", "1111111", "11000011", "0", "10000000", "1111", "1110110", "0",
+///         "11111000"
+///     ]
 /// )
 /// ```
 #[inline]
@@ -326,15 +330,19 @@ pub fn striped_random_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::striped::striped_random_positive_unsigneds;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_positive_unsigneds::<u8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect_vec(),
-///     &["1", "1001100", "1111111", "11000011", "10000000", "1111", "1110110", "11111000",
-///     "11111111", "11111101"]
+///     striped_random_positive_unsigneds::<u8>(EXAMPLE_SEED, 4, 1)
+///         .take(10)
+///         .map(|x| x.to_binary_string())
+///         .collect_vec(),
+///     &[
+///         "1", "1001100", "1111111", "11000011", "10000000", "1111", "1110110", "11111000",
+///         "11111111", "11111101"
+///     ]
 /// )
 /// ```
 pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
@@ -365,15 +373,19 @@ pub fn striped_random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::striped::striped_random_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect_vec(),
-///     &["1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
-///     "111101", "11111100"]
+///     striped_random_signeds::<i8>(EXAMPLE_SEED, 4, 1)
+///         .take(10)
+///         .map(|x| x.to_binary_string())
+///         .collect_vec(),
+///     &[
+///         "1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
+///         "111101", "11111100"
+///     ]
 /// )
 /// ```
 pub fn striped_random_signeds<T: PrimitiveSigned>(
@@ -408,13 +420,15 @@ pub fn striped_random_signeds<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::striped::striped_random_natural_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_natural_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect_vec(),
+///     striped_random_natural_signeds::<i8>(EXAMPLE_SEED, 4, 1)
+///         .take(10)
+///         .map(|x| x.to_binary_string())
+///         .collect_vec(),
 ///     &["0", "101100", "110000", "1111100", "1111", "1111110", "0", "111", "11101", "1100000"]
 /// )
 /// ```
@@ -449,15 +463,19 @@ pub fn striped_random_natural_signeds<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::striped::striped_random_positive_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_positive_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect_vec(),
-///     &["101100", "110000", "1111100", "1111", "1111110", "111", "11101", "1100000", "1111111",
-///     "1100000"]
+///     striped_random_positive_signeds::<i8>(EXAMPLE_SEED, 4, 1)
+///         .take(10)
+///         .map(|x| x.to_binary_string())
+///         .collect_vec(),
+///     &[
+///         "101100", "110000", "1111100", "1111", "1111110", "111", "11101", "1100000", "1111111",
+///         "1100000"
+///     ]
 /// )
 /// ```
 pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
@@ -492,15 +510,19 @@ pub fn striped_random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::striped::striped_random_negative_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_negative_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect_vec(),
-///     &["10000000", "10101100", "10110000", "11111100", "10001111", "11111110", "10000000",
-///     "10000111", "10011101", "11100000"]
+///     striped_random_negative_signeds::<i8>(EXAMPLE_SEED, 4, 1)
+///         .take(10)
+///         .map(|x| x.to_binary_string())
+///         .collect_vec(),
+///     &[
+///         "10000000", "10101100", "10110000", "11111100", "10001111", "11111110", "10000000",
+///         "10000111", "10011101", "11100000"
+///     ]
 /// )
 /// ```
 pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
@@ -534,15 +556,19 @@ pub fn striped_random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::striped::striped_random_nonzero_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_nonzero_signeds::<i8>(EXAMPLE_SEED, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect_vec(),
-///     &["1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
-///     "111101", "11111100"]
+///     striped_random_nonzero_signeds::<i8>(EXAMPLE_SEED, 4, 1)
+///         .take(10)
+///         .map(|x| x.to_binary_string())
+///         .collect_vec(),
+///     &[
+///         "1100001", "1000000", "1100000", "10000111", "1111", "10000001", "1111000", "100011",
+///         "111101", "11111100"
+///     ]
 /// )
 /// ```
 pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
@@ -575,13 +601,15 @@ pub fn striped_random_nonzero_signeds<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::striped::striped_random_unsigned_bit_chunks;
+/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToBinaryString;
 ///
 /// assert_eq!(
-///     striped_random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3, 4, 1).take(10)
-///         .map(|x| x.to_binary_string()).collect_vec(),
+///     striped_random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3, 4, 1)
+///         .take(10)
+///         .map(|x| x.to_binary_string())
+///         .collect_vec(),
 ///     &["0", "0", "0", "101", "11", "100", "11", "11", "0", "111"]
 /// )
 /// ```
@@ -619,7 +647,9 @@ pub fn striped_random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 ///
 /// let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 10, 1);
 /// let bits: String = get_striped_bool_vec(&mut bit_source, 50)
-///         .into_iter().map(|b| if b { '1' } else { '0' }).collect();
+///     .into_iter()
+///     .map(|b| if b { '1' } else { '0' })
+///     .collect();
 /// assert_eq!(bits, "00011111111111000000011111111111111000000000001111");
 /// ```
 pub fn get_striped_bool_vec(bit_source: &mut StripedBitSource, len: u64) -> Vec<bool> {
@@ -671,9 +701,9 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomBoolVecs<I> {
 ///     10,
 ///     1,
 /// )
-///     .take(20)
-///     .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
-///     .collect_vec();
+/// .take(20)
+/// .map(|bs| bs.into_iter().map(|b| if b { '1' } else { '0' }).collect())
+/// .collect_vec();
 /// assert_eq!(
 ///     bss.iter().map(String::as_str).collect_vec(),
 ///     &[
@@ -789,8 +819,26 @@ pub fn striped_random_fixed_length_bool_vecs(
 /// assert_eq!(
 ///     bss.iter().map(String::as_str).collect_vec(),
 ///     &[
-///         "000000", "0", "00000000", "0", "00000001110000", "", "11111", "0000", "1", "",
-///         "011111", "11", "", "", "1", "000", "", "0", "", "0"
+///         "000000",
+///         "0",
+///         "00000000",
+///         "0",
+///         "00000001110000",
+///         "",
+///         "11111",
+///         "0000",
+///         "1",
+///         "",
+///         "011111",
+///         "11",
+///         "",
+///         "",
+///         "1",
+///         "000",
+///         "",
+///         "0",
+///         "",
+///         "0"
 ///     ]
 /// );
 /// ```
@@ -852,9 +900,26 @@ pub fn striped_random_bool_vecs(
 /// assert_eq!(
 ///     bss.iter().map(String::as_str).collect_vec(),
 ///     &[
-///         "000000000", "0000", "00000000111", "0111", "00000000011111111", "100", "00000111",
-///         "1111111", "0001", "111", "111111111", "00000", "000", "000", "1111", "000000", "111",
-///         "0011", "000", "1111"
+///         "000000000",
+///         "0000",
+///         "00000000111",
+///         "0111",
+///         "00000000011111111",
+///         "100",
+///         "00000111",
+///         "1111111",
+///         "0001",
+///         "111",
+///         "111111111",
+///         "00000",
+///         "000",
+///         "000",
+///         "1111",
+///         "000000",
+///         "111",
+///         "0011",
+///         "000",
+///         "1111"
 ///     ]
 /// );
 /// ```
@@ -926,9 +991,26 @@ pub fn striped_random_bool_vecs_min_length(
 /// assert_eq!(
 ///     bss.iter().map(String::as_str).collect_vec(),
 ///     &[
-///         "000000000", "000000000", "000111000", "000000000", "0111", "11111", "00111111",
-///         "1000000", "00000011", "111111111", "111111", "00000000", "00000000", "001111",
-///         "111111111", "000000000", "110000", "0001111", "0000000", "111101111"
+///         "000000000",
+///         "000000000",
+///         "000111000",
+///         "000000000",
+///         "0111",
+///         "11111",
+///         "00111111",
+///         "1000000",
+///         "00000011",
+///         "111111111",
+///         "111111",
+///         "00000000",
+///         "00000000",
+///         "001111",
+///         "111111111",
+///         "000000000",
+///         "110000",
+///         "0001111",
+///         "0000000",
+///         "111101111"
 ///     ]
 /// );
 /// ```
@@ -991,9 +1073,26 @@ pub fn striped_random_bool_vecs_length_range(
 /// assert_eq!(
 ///     bss.iter().map(String::as_str).collect_vec(),
 ///     &[
-///         "000000000", "000000000", "000111000", "000000000", "0111", "11111", "00111111",
-///         "1000000", "00000011", "111111111", "111111", "00000000", "00000000", "001111",
-///         "111111111", "000000000", "110000", "0001111", "0000000", "111101111"
+///         "000000000",
+///         "000000000",
+///         "000111000",
+///         "000000000",
+///         "0111",
+///         "11111",
+///         "00111111",
+///         "1000000",
+///         "00000011",
+///         "111111111",
+///         "111111",
+///         "00000000",
+///         "00000000",
+///         "001111",
+///         "111111111",
+///         "000000000",
+///         "110000",
+///         "0001111",
+///         "0000000",
+///         "111101111"
 ///     ]
 /// );
 /// ```
@@ -1038,7 +1137,9 @@ pub fn striped_random_bool_vecs_length_inclusive_range(
 ///
 /// let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 10, 1);
 /// let xs = get_striped_unsigned_vec::<u8>(&mut bit_source, 100)
-///     .iter().map(u8::to_binary_string).collect_vec();
+///     .iter()
+///     .map(u8::to_binary_string)
+///     .collect_vec();
 /// assert_eq!(
 ///     xs,
 ///     &[
@@ -1105,9 +1206,13 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = u64>> Iterator for StripedRandomUn
 ///     10,
 ///     1,
 /// )
-///     .take(10)
-///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
-///     .collect_vec();
+/// .take(10)
+/// .map(|xs| {
+///     xs.into_iter()
+///         .map(|x: u8| x.to_binary_string())
+///         .collect_vec()
+/// })
+/// .collect_vec();
 /// let xss = xss
 ///     .iter()
 ///     .map(|xs| xs.iter().map(String::as_str).collect_vec())
@@ -1115,9 +1220,16 @@ impl<T: PrimitiveUnsigned, I: Iterator<Item = u64>> Iterator for StripedRandomUn
 /// assert_eq!(
 ///     xss,
 ///     &[
-///         &["0", "0"][..], &["1110000", "0", "11111100", "11"], &["11111110", "1111"],
-///         &["0", "0", "0", "11111000"], &["0", "0", "1111110", "0"], &["11011111", "11111111"],
-///         &[], &["11110000", "11111111"], &[], &["11111111", "11000011", "11111", "0"]
+///         &["0", "0"][..],
+///         &["1110000", "0", "11111100", "11"],
+///         &["11111110", "1111"],
+///         &["0", "0", "0", "11111000"],
+///         &["0", "0", "1111110", "0"],
+///         &["11011111", "11111111"],
+///         &[],
+///         &["11110000", "11111111"],
+///         &[],
+///         &["11111111", "11000011", "11111", "0"]
 ///     ]
 /// );
 /// ```
@@ -1168,7 +1280,11 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
 ///
 /// let xss = striped_random_fixed_length_unsigned_vecs::<u8>(EXAMPLE_SEED, 3, 10, 1)
 ///     .take(10)
-///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
+///     .map(|xs| {
+///         xs.into_iter()
+///             .map(|x: u8| x.to_binary_string())
+///             .collect_vec()
+///     })
 ///     .collect_vec();
 /// let xss = xss
 ///     .iter()
@@ -1177,10 +1293,16 @@ pub fn striped_random_unsigned_vecs_from_length_iterator<
 /// assert_eq!(
 ///     xss,
 ///     &[
-///         &["0", "0", "111000"], &["0", "11111100", "11"], &["11111110", "1111", "0"],
-///         &["0", "0", "11111000"], &["0", "0", "1111110"], &["11111111", "11011111", "11111111"],
-///         &["11110000", "11111111", "11111111"], &["11000011", "11111", "0"],
-///         &["0", "10000000", "11111001"], &["11111111", "0", "0"]
+///         &["0", "0", "111000"],
+///         &["0", "11111100", "11"],
+///         &["11111110", "1111", "0"],
+///         &["0", "0", "11111000"],
+///         &["0", "0", "1111110"],
+///         &["11111111", "11011111", "11111111"],
+///         &["11110000", "11111111", "11111111"],
+///         &["11000011", "11111", "0"],
+///         &["0", "10000000", "11111001"],
+///         &["11111111", "0", "0"]
 ///     ]
 /// );
 /// ```
@@ -1237,7 +1359,11 @@ pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
 ///
 /// let xss = striped_random_unsigned_vecs::<u8>(EXAMPLE_SEED, 10, 1, 2, 1)
 ///     .take(10)
-///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
+///     .map(|xs| {
+///         xs.into_iter()
+///             .map(|x: u8| x.to_binary_string())
+///             .collect_vec()
+///     })
 ///     .collect_vec();
 /// let xss = xss
 ///     .iter()
@@ -1246,14 +1372,19 @@ pub fn striped_random_fixed_length_unsigned_vecs<T: PrimitiveUnsigned>(
 /// assert_eq!(
 ///     xss,
 ///     &[
-///         &["0", "0", "111000", "0", "11111110", "10000001"][..], &["0"],
+///         &["0", "0", "111000", "0", "11111110", "10000001"][..],
+///         &["0"],
 ///         &["11110000", "11111111", "11111111", "11111111", "11", "0", "10000000", "11111"],
 ///         &["0"],
 ///         &[
 ///             "10000", "0", "11111100", "11111111", "1111111", "11111000", "11", "0", "0",
 ///             "10011000", "11111111", "111", "0", "0"
-///         ], &[], &["11111111", "11111111", "11111111", "11111111", "10111111"],
-///         &["0", "0", "0", "11110000"], &["11111111"], &[]
+///         ],
+///         &[],
+///         &["11111111", "11111111", "11111111", "11111111", "10111111"],
+///         &["0", "0", "0", "11110000"],
+///         &["11111111"],
+///         &[]
 ///     ]
 /// );
 /// ```
@@ -1318,7 +1449,11 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
 ///
 /// let xss = striped_random_unsigned_vecs_min_length::<u8>(EXAMPLE_SEED, 2, 10, 1, 3, 1)
 ///     .take(10)
-///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
+///     .map(|xs| {
+///         xs.into_iter()
+///             .map(|x: u8| x.to_binary_string())
+///             .collect_vec()
+///     })
 ///     .collect_vec();
 /// let xss = xss
 ///     .iter()
@@ -1327,11 +1462,16 @@ pub fn striped_random_unsigned_vecs<T: PrimitiveUnsigned>(
 /// assert_eq!(
 ///     xss,
 ///     &[
-///         &["0", "0", "111000"][..], &["0", "11111100", "11", "11111111"],
+///         &["0", "0", "111000"][..],
+///         &["0", "11111100", "11", "11111111"],
 ///         &["11110000", "11111111", "11111111", "11111111"],
-///         &["11111000", "11111111", "11111111", "11000000"], &["0", "10000", "0"],
-///         &["111", "0", "0", "1111"], &["11110000", "11111111"], &["11111111", "111111"],
-///         &["110", "10000000", "11111111"], &["11111111", "11111111"]
+///         &["11111000", "11111111", "11111111", "11000000"],
+///         &["0", "10000", "0"],
+///         &["111", "0", "0", "1111"],
+///         &["11110000", "11111111"],
+///         &["11111111", "111111"],
+///         &["110", "10000000", "11111111"],
+///         &["11111111", "11111111"]
 ///     ]
 /// );
 /// ```
@@ -1398,7 +1538,11 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
 ///
 /// let xss = striped_random_unsigned_vecs_length_range::<u8>(EXAMPLE_SEED, 2, 4, 10, 1)
 ///     .take(10)
-///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
+///     .map(|xs| {
+///         xs.into_iter()
+///             .map(|x: u8| x.to_binary_string())
+///             .collect_vec()
+///     })
 ///     .collect_vec();
 /// let xss = xss
 ///     .iter()
@@ -1407,10 +1551,15 @@ pub fn striped_random_unsigned_vecs_min_length<T: PrimitiveUnsigned>(
 /// assert_eq!(
 ///     xss,
 ///     &[
-///         &["0", "0", "111000"][..], &["0", "11111100"], &["11111000", "1", "11110000"],
-///         &["0", "0", "0"], &["11110000", "11111111"], &["11111111", "11", "11111111"],
+///         &["0", "0", "111000"][..],
+///         &["0", "11111100"],
+///         &["11111000", "1", "11110000"],
+///         &["0", "0", "0"],
+///         &["11110000", "11111111"],
+///         &["11111111", "11", "11111111"],
 ///         &["1000000", "0", "11110000"],
-///         &["11111111", "11111111"], &["1111000", "11000000", "11111111"],
+///         &["11111111", "11111111"],
+///         &["1111000", "11000000", "11111111"],
 ///         &["11111111", "11111111", "1100"]
 ///     ]
 /// );
@@ -1469,7 +1618,11 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
 ///
 /// let xss = striped_random_unsigned_vecs_length_inclusive_range::<u8>(EXAMPLE_SEED, 2, 3, 10, 1)
 ///     .take(10)
-///     .map(|xs| xs.into_iter().map(|x: u8| x.to_binary_string()).collect_vec())
+///     .map(|xs| {
+///         xs.into_iter()
+///             .map(|x: u8| x.to_binary_string())
+///             .collect_vec()
+///     })
 ///     .collect_vec();
 /// let xss = xss
 ///     .iter()
@@ -1478,10 +1631,15 @@ pub fn striped_random_unsigned_vecs_length_range<T: PrimitiveUnsigned>(
 /// assert_eq!(
 ///     xss,
 ///     &[
-///         &["0", "0", "111000"][..], &["0", "11111100"], &["11111000", "1", "11110000"],
-///         &["0", "0", "0"], &["11110000", "11111111"], &["11111111", "11", "11111111"],
+///         &["0", "0", "111000"][..],
+///         &["0", "11111100"],
+///         &["11111000", "1", "11110000"],
+///         &["0", "0", "0"],
+///         &["11110000", "11111111"],
+///         &["11111111", "11", "11111111"],
 ///         &["1000000", "0", "11110000"],
-///         &["11111111", "11111111"], &["1111000", "11000000", "11111111"],
+///         &["11111111", "11111111"],
+///         &["1111000", "11000000", "11111111"],
 ///         &["11111111", "11111111", "1100"]
 ///     ]
 /// );

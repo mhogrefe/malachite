@@ -122,6 +122,8 @@ pub fn _ceiling_log_base_power_of_2_naive(x: &Natural, pow: u64) -> u64 {
 }
 
 impl<'a> FloorLogBasePowerOf2 for &'a Natural {
+    type Output = u64;
+    
     /// Returns the floor of the base-$2^p$ logarithm of a positive `Natural`.
     ///
     /// $f(x, p) = \lfloor\log_{2^p} x\rfloor$.
@@ -152,6 +154,8 @@ impl<'a> FloorLogBasePowerOf2 for &'a Natural {
 }
 
 impl<'a> CeilingLogBasePowerOf2 for &'a Natural {
+    type Output = u64;
+
     /// Returns the ceiling of the base-$2^p$ logarithm of a positive `Natural`.
     ///
     /// $f(x, p) = \lceil\log_{2^p} x\rceil$.
@@ -186,6 +190,8 @@ impl<'a> CeilingLogBasePowerOf2 for &'a Natural {
 }
 
 impl<'a> CheckedLogBasePowerOf2 for &'a Natural {
+    type Output = u64;
+
     /// Returns the base-$2^p$ logarithm of a positive `Natural`. If the integer is not a power of
     /// $2^p$, `None` is returned.
     ///

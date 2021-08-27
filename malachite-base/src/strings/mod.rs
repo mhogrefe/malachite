@@ -99,7 +99,10 @@ impl<T: Debug> ToDebugString for T {
     /// use malachite_base::strings::ToDebugString;
     ///
     /// assert_eq!([1, 2, 3].to_debug_string(), "[1, 2, 3]");
-    /// assert_eq!([vec![2, 3], vec![], vec![4]].to_debug_string(), "[[2, 3], [], [4]]");
+    /// assert_eq!(
+    ///     [vec![2, 3], vec![], vec![4]].to_debug_string(),
+    ///     "[[2, 3], [], [4]]"
+    /// );
     /// assert_eq!(Some(5).to_debug_string(), "Some(5)");
     /// ```
     #[inline]
@@ -247,9 +250,12 @@ impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
 ///
 /// use malachite_base::strings::strings_from_char_vecs;
 ///
-/// let ss = &strings_from_char_vecs([vec!['a', 'b'], vec!['c', 'd']].iter().cloned())
-///     .collect_vec();
-/// assert_eq!(ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(), &["ab", "cd"]);
+/// let ss =
+///     &strings_from_char_vecs([vec!['a', 'b'], vec!['c', 'd']].iter().cloned()).collect_vec();
+/// assert_eq!(
+///     ss.iter().map(|cs| cs.as_str()).collect_vec().as_slice(),
+///     &["ab", "cd"]
+/// );
 /// ```
 #[inline]
 pub fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(css: I) -> StringsFromCharVecs<I> {

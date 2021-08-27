@@ -108,8 +108,12 @@ fn round_to_multiple_of_power_of_2_properties_helper_unsigned<T: PrimitiveUnsign
 
         assert!(rounded.divisible_by_power_of_2(pow));
         match rm {
-            RoundingMode::Floor | RoundingMode::Down => assert!(rounded <= n),
-            RoundingMode::Ceiling | RoundingMode::Up => assert!(rounded >= n),
+            RoundingMode::Floor | RoundingMode::Down => {
+                assert!(rounded <= n)
+            }
+            RoundingMode::Ceiling | RoundingMode::Up => {
+                assert!(rounded >= n)
+            }
             RoundingMode::Exact => assert_eq!(rounded, n),
             RoundingMode::Nearest => {
                 if let Some(k) = T::ONE.arithmetic_checked_shl(pow) {

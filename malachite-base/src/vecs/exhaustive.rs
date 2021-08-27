@@ -466,8 +466,22 @@ where
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[0, 0], &[0, 1], &[0, 2], &[0, 3], &[1, 0], &[1, 1], &[1, 2], &[1, 3], &[2, 0],
-///         &[2, 1], &[2, 2], &[2, 3], &[3, 0], &[3, 1], &[3, 2], &[3, 3]
+///         &[0, 0],
+///         &[0, 1],
+///         &[0, 2],
+///         &[0, 3],
+///         &[1, 0],
+///         &[1, 1],
+///         &[1, 2],
+///         &[1, 3],
+///         &[2, 0],
+///         &[2, 1],
+///         &[2, 2],
+///         &[2, 3],
+///         &[3, 0],
+///         &[3, 1],
+///         &[3, 2],
+///         &[3, 3]
 ///     ]
 /// );
 /// ```
@@ -999,13 +1013,32 @@ where
 /// );
 /// let xss_prefix = xss.take(20).collect_vec();
 /// assert_eq!(
-///     xss_prefix.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     xss_prefix
+///         .iter()
+///         .map(Vec::as_slice)
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
-///         &['a', 'a', 'a'], &['a', 'a', 'b'], &['a', 'a', 'c'], &['a', 'a', 'd'],
-///         &['a', 'b', 'a'], &['a', 'b', 'b'], &['a', 'b', 'c'], &['a', 'b', 'd'],
-///         &['a', 'a', 'e'], &['a', 'a', 'f'], &['a', 'a', 'g'], &['a', 'a', 'h'],
-///         &['a', 'b', 'e'], &['a', 'b', 'f'], &['a', 'b', 'g'], &['a', 'b', 'h'],
-///         &['b', 'a', 'a'], &['b', 'a', 'b'], &['b', 'a', 'c'], &['b', 'a', 'd']
+///         &['a', 'a', 'a'],
+///         &['a', 'a', 'b'],
+///         &['a', 'a', 'c'],
+///         &['a', 'a', 'd'],
+///         &['a', 'b', 'a'],
+///         &['a', 'b', 'b'],
+///         &['a', 'b', 'c'],
+///         &['a', 'b', 'd'],
+///         &['a', 'a', 'e'],
+///         &['a', 'a', 'f'],
+///         &['a', 'a', 'g'],
+///         &['a', 'a', 'h'],
+///         &['a', 'b', 'e'],
+///         &['a', 'b', 'f'],
+///         &['a', 'b', 'g'],
+///         &['a', 'b', 'h'],
+///         &['b', 'a', 'a'],
+///         &['b', 'a', 'b'],
+///         &['b', 'a', 'c'],
+///         &['b', 'a', 'd']
 ///     ]
 /// );
 /// ```
@@ -1062,8 +1095,22 @@ where
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 2], &[0, 3], &[1, 2], &[1, 3], &[2, 0],
-///         &[2, 1], &[3, 0], &[3, 1], &[2, 2], &[2, 3], &[3, 2], &[3, 3]
+///         &[0, 0],
+///         &[0, 1],
+///         &[1, 0],
+///         &[1, 1],
+///         &[0, 2],
+///         &[0, 3],
+///         &[1, 2],
+///         &[1, 3],
+///         &[2, 0],
+///         &[2, 1],
+///         &[3, 0],
+///         &[3, 1],
+///         &[2, 2],
+///         &[2, 3],
+///         &[3, 2],
+///         &[3, 3]
 ///     ]
 /// );
 /// ```
@@ -1165,15 +1212,26 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[false, false][..], &[false, true], &[true, false], &[true, true], &[false], &[true],
-///         &[false, false], &[false, true], &[true, false], &[true, true]
+///         &[false, false][..],
+///         &[false, true],
+///         &[true, false],
+///         &[true, true],
+///         &[false],
+///         &[true],
+///         &[false, false],
+///         &[false, true],
+///         &[true, false],
+///         &[true, true]
 ///     ]
 /// );
 ///
-/// let xss = shortlex_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers())
-///     .collect_vec();
+/// let xss =
+///     shortlex_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers()).collect_vec();
 /// // Stops after first empty ys
-/// assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), &[&[], &[]]);
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[], &[]]
+/// );
 /// ```
 #[inline]
 pub fn shortlex_vecs_from_length_iterator<
@@ -1219,11 +1277,26 @@ pub fn shortlex_vecs_from_length_iterator<
 /// assert_eq!(
 ///     bss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[][..], &[false], &[true], &[false, false], &[false, true], &[true, false],
-///         &[true, true], &[false, false, false], &[false, false, true], &[false, true, false],
-///         &[false, true, true], &[true, false, false], &[true, false, true], &[true, true, false],
-///         &[true, true, true], &[false, false, false, false], &[false, false, false, true],
-///         &[false, false, true, false], &[false, false, true, true], &[false, true, false, false]
+///         &[][..],
+///         &[false],
+///         &[true],
+///         &[false, false],
+///         &[false, true],
+///         &[true, false],
+///         &[true, true],
+///         &[false, false, false],
+///         &[false, false, true],
+///         &[false, true, false],
+///         &[false, true, true],
+///         &[true, false, false],
+///         &[true, false, true],
+///         &[true, true, false],
+///         &[true, true, true],
+///         &[false, false, false, false],
+///         &[false, false, false, true],
+///         &[false, false, true, false],
+///         &[false, false, true, true],
+///         &[false, true, false, false]
 ///     ]
 /// );
 /// ```
@@ -1268,16 +1341,32 @@ where
 /// use malachite_base::bools::exhaustive::exhaustive_bools;
 /// use malachite_base::vecs::exhaustive::shortlex_vecs_min_length;
 ///
-/// let bss = shortlex_vecs_min_length(2, exhaustive_bools()).take(20).collect_vec();
+/// let bss = shortlex_vecs_min_length(2, exhaustive_bools())
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     bss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[false, false][..], &[false, true], &[true, false], &[true, true],
-///         &[false, false, false], &[false, false, true], &[false, true, false],
-///         &[false, true, true], &[true, false, false], &[true, false, true], &[true, true, false],
-///         &[true, true, true], &[false, false, false, false], &[false, false, false, true],
-///         &[false, false, true, false], &[false, false, true, true], &[false, true, false, false],
-///         &[false, true, false, true], &[false, true, true, false], &[false, true, true, true]
+///         &[false, false][..],
+///         &[false, true],
+///         &[true, false],
+///         &[true, true],
+///         &[false, false, false],
+///         &[false, false, true],
+///         &[false, true, false],
+///         &[false, true, true],
+///         &[true, false, false],
+///         &[true, false, true],
+///         &[true, true, false],
+///         &[true, true, true],
+///         &[false, false, false, false],
+///         &[false, false, false, true],
+///         &[false, false, true, false],
+///         &[false, false, true, true],
+///         &[false, true, false, false],
+///         &[false, true, false, true],
+///         &[false, true, true, false],
+///         &[false, true, true, true]
 ///     ]
 /// );
 /// ```
@@ -1336,9 +1425,17 @@ where
 /// assert_eq!(
 ///     bss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[false, false][..], &[false, true], &[true, false], &[true, true],
-///         &[false, false, false], &[false, false, true], &[false, true, false],
-///         &[false, true, true], &[true, false, false], &[true, false, true], &[true, true, false],
+///         &[false, false][..],
+///         &[false, true],
+///         &[true, false],
+///         &[true, true],
+///         &[false, false, false],
+///         &[false, false, true],
+///         &[false, true, false],
+///         &[false, true, true],
+///         &[true, false, false],
+///         &[true, false, true],
+///         &[true, true, false],
 ///         &[true, true, true]
 ///     ]
 /// );
@@ -1396,9 +1493,17 @@ where
 /// assert_eq!(
 ///     bss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[false, false][..], &[false, true], &[true, false], &[true, true],
-///         &[false, false, false], &[false, false, true], &[false, true, false],
-///         &[false, true, true], &[true, false, false], &[true, false, true], &[true, true, false],
+///         &[false, false][..],
+///         &[false, true],
+///         &[true, false],
+///         &[true, true],
+///         &[false, false, false],
+///         &[false, false, true],
+///         &[false, true, false],
+///         &[false, true, true],
+///         &[true, false, false],
+///         &[true, false, true],
+///         &[true, true, false],
 ///         &[true, true, true]
 ///     ]
 /// );
@@ -1519,15 +1624,26 @@ impl<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>> Iterator
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[false, false][..], &[false], &[false, true], &[false, false], &[true, false], &[true],
-///         &[true, true], &[false, true], &[true, false], &[true, true]
+///         &[false, false][..],
+///         &[false],
+///         &[false, true],
+///         &[false, false],
+///         &[true, false],
+///         &[true],
+///         &[true, true],
+///         &[false, true],
+///         &[true, false],
+///         &[true, true]
 ///     ]
 /// );
 ///
-/// let xss = exhaustive_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers())
-///     .collect_vec();
+/// let xss =
+///     exhaustive_vecs_from_length_iterator([0, 0, 1, 0].iter().cloned(), nevers()).collect_vec();
 /// // Stops at some point after first empty ys
-/// assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), &[&[], &[]]);
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[&[], &[]]
+/// );
 /// ```
 #[inline]
 pub fn exhaustive_vecs_from_length_iterator<
@@ -1563,12 +1679,32 @@ pub fn exhaustive_vecs_from_length_iterator<
 /// use malachite_base::num::exhaustive::exhaustive_unsigneds;
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs;
 ///
-/// let xss = exhaustive_vecs(exhaustive_unsigneds::<u32>()).take(20).collect_vec();
+/// let xss = exhaustive_vecs(exhaustive_unsigneds::<u32>())
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[][..], &[0], &[1], &[0, 0, 0], &[2], &[0, 0], &[3], &[0, 0, 0, 0], &[4], &[0, 1],
-///         &[5], &[0, 0, 1], &[6], &[1, 0], &[7], &[0, 0, 0, 0, 0], &[8], &[1, 1], &[9], &[0, 1, 0]
+///         &[][..],
+///         &[0],
+///         &[1],
+///         &[0, 0, 0],
+///         &[2],
+///         &[0, 0],
+///         &[3],
+///         &[0, 0, 0, 0],
+///         &[4],
+///         &[0, 1],
+///         &[5],
+///         &[0, 0, 1],
+///         &[6],
+///         &[1, 0],
+///         &[7],
+///         &[0, 0, 0, 0, 0],
+///         &[8],
+///         &[1, 1],
+///         &[9],
+///         &[0, 1, 0]
 ///     ]
 /// );
 /// ```
@@ -1606,13 +1742,31 @@ where
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_min_length;
 ///
 /// let xss = exhaustive_vecs_min_length(2, exhaustive_unsigneds::<u32>())
-///         .take(20).collect_vec();
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[0, 0, 0, 0], &[1, 0], &[0, 0, 1], &[1, 1],
-///         &[0, 0, 0, 0, 0], &[0, 2], &[0, 1, 0], &[0, 3], &[0, 0, 0, 1], &[1, 2], &[0, 1, 1],
-///         &[1, 3], &[0, 0, 0, 0, 0, 0], &[2, 0], &[1, 0, 0], &[2, 1], &[0, 0, 1, 0]
+///         &[0, 0][..],
+///         &[0, 0, 0],
+///         &[0, 1],
+///         &[0, 0, 0, 0],
+///         &[1, 0],
+///         &[0, 0, 1],
+///         &[1, 1],
+///         &[0, 0, 0, 0, 0],
+///         &[0, 2],
+///         &[0, 1, 0],
+///         &[0, 3],
+///         &[0, 0, 0, 1],
+///         &[1, 2],
+///         &[0, 1, 1],
+///         &[1, 3],
+///         &[0, 0, 0, 0, 0, 0],
+///         &[2, 0],
+///         &[1, 0, 0],
+///         &[2, 1],
+///         &[0, 0, 1, 0]
 ///     ]
 /// );
 /// ```
@@ -1663,13 +1817,31 @@ where
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_range;
 ///
 /// let xss = exhaustive_vecs_length_range(2, 4, exhaustive_unsigneds::<u32>())
-///         .take(20).collect_vec();
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 0, 1], &[0, 2], &[0, 1, 0],
-///         &[0, 3], &[0, 1, 1], &[1, 2], &[1, 3], &[2, 0], &[1, 0, 0], &[2, 1], &[3, 0], &[3, 1],
-///         &[1, 0, 1], &[2, 2], &[2, 3]
+///         &[0, 0][..],
+///         &[0, 0, 0],
+///         &[0, 1],
+///         &[1, 0],
+///         &[1, 1],
+///         &[0, 0, 1],
+///         &[0, 2],
+///         &[0, 1, 0],
+///         &[0, 3],
+///         &[0, 1, 1],
+///         &[1, 2],
+///         &[1, 3],
+///         &[2, 0],
+///         &[1, 0, 0],
+///         &[2, 1],
+///         &[3, 0],
+///         &[3, 1],
+///         &[1, 0, 1],
+///         &[2, 2],
+///         &[2, 3]
 ///     ]
 /// );
 /// ```
@@ -1717,13 +1889,31 @@ where
 /// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_inclusive_range;
 ///
 /// let xss = exhaustive_vecs_length_inclusive_range(2, 4, exhaustive_unsigneds::<u32>())
-///         .take(20).collect_vec();
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &[0, 0][..], &[0, 0, 0], &[0, 1], &[0, 0, 0, 0], &[1, 0], &[0, 0, 1], &[1, 1], &[0, 2],
-///         &[0, 3], &[0, 1, 0], &[1, 2], &[0, 0, 0, 1], &[1, 3], &[0, 1, 1], &[2, 0], &[1, 0, 0],
-///         &[2, 1], &[1, 0, 1], &[3, 0], &[0, 0, 1, 0]
+///         &[0, 0][..],
+///         &[0, 0, 0],
+///         &[0, 1],
+///         &[0, 0, 0, 0],
+///         &[1, 0],
+///         &[0, 0, 1],
+///         &[1, 1],
+///         &[0, 2],
+///         &[0, 3],
+///         &[0, 1, 0],
+///         &[1, 2],
+///         &[0, 0, 0, 1],
+///         &[1, 3],
+///         &[0, 1, 1],
+///         &[2, 0],
+///         &[1, 0, 0],
+///         &[2, 1],
+///         &[1, 0, 1],
+///         &[3, 0],
+///         &[0, 0, 1, 0]
 ///     ]
 /// );
 /// ```

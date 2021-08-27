@@ -79,15 +79,25 @@ impl<I: Iterator<Item = i64>> Iterator for RandomIntegers<I> {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_natural_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     random_natural_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "20431208470830262", "2777240", "114", "12184833305054", "1121025855008623490210",
-///         "13478874522577592", "115311695", "7", "18", "54522366353"
+///         "20431208470830262",
+///         "2777240",
+///         "114",
+///         "12184833305054",
+///         "1121025855008623490210",
+///         "13478874522577592",
+///         "115311695",
+///         "7",
+///         "18",
+///         "54522366353"
 ///     ]
 /// )
 /// ```
@@ -145,15 +155,25 @@ pub fn random_natural_integers(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_positive_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     random_positive_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "22", "4", "178", "55845661150", "93254818", "7577967529619388", "8", "11316951483471",
-///         "11", "1005760138411689342464923704482"
+///         "22",
+///         "4",
+///         "178",
+///         "55845661150",
+///         "93254818",
+///         "7577967529619388",
+///         "8",
+///         "11316951483471",
+///         "11",
+///         "1005760138411689342464923704482"
 ///     ]
 /// )
 /// ```
@@ -212,15 +232,25 @@ pub fn random_positive_integers(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_negative_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     random_negative_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "-22", "-4", "-178", "-55845661150", "-93254818", "-7577967529619388", "-8",
-///         "-11316951483471", "-11", "-1005760138411689342464923704482"
+///         "-22",
+///         "-4",
+///         "-178",
+///         "-55845661150",
+///         "-93254818",
+///         "-7577967529619388",
+///         "-8",
+///         "-11316951483471",
+///         "-11",
+///         "-1005760138411689342464923704482"
 ///     ]
 /// )
 /// ```
@@ -278,15 +308,25 @@ pub fn random_negative_integers(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_nonzero_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     random_nonzero_integers(EXAMPLE_SEED, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "6", "373973144", "46887963477285686350042496363292819122", "-93254818", "-126908",
-///         "-4471675267836600", "1860142159", "-118004986915853475", "-98", "346513"
+///         "6",
+///         "373973144",
+///         "46887963477285686350042496363292819122",
+///         "-93254818",
+///         "-126908",
+///         "-4471675267836600",
+///         "1860142159",
+///         "-118004986915853475",
+///         "-98",
+///         "346513"
 ///     ]
 /// )
 /// ```
@@ -344,14 +384,25 @@ pub fn random_nonzero_integers(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     random_integers(EXAMPLE_SEED, 32, 1).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     random_integers(EXAMPLE_SEED, 32, 1)
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "89270", "69403499476962893258904", "62", "-1848070042786", "-64671510460", "-696", "0",
-///         "-79", "70819", "7330"
+///         "89270",
+///         "69403499476962893258904",
+///         "62",
+///         "-1848070042786",
+///         "-64671510460",
+///         "-696",
+///         "0",
+///         "-79",
+///         "70819",
+///         "7330"
 ///     ]
 /// )
 /// ```
@@ -423,15 +474,25 @@ impl<I: Iterator<Item = i64>> Iterator for StripedRandomIntegers<I> {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_natural_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     striped_random_natural_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "18014656207519744", "2228160", "64", "17592184995840", "1179440951012584587264",
-///         "9007749010526207", "67108864", "5", "24", "34359738879"
+///         "18014656207519744",
+///         "2228160",
+///         "64",
+///         "17592184995840",
+///         "1179440951012584587264",
+///         "9007749010526207",
+///         "67108864",
+///         "5",
+///         "24",
+///         "34359738879"
 ///     ]
 /// )
 /// ```
@@ -487,15 +548,25 @@ pub fn striped_random_natural_integers(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_positive_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     striped_random_positive_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "16", "4", "128", "34391195648", "75493376", "9007199120523391", "8", "8796094070783",
-///         "8", "950737950171027935941967741439"
+///         "16",
+///         "4",
+///         "128",
+///         "34391195648",
+///         "75493376",
+///         "9007199120523391",
+///         "8",
+///         "8796094070783",
+///         "8",
+///         "950737950171027935941967741439"
 ///     ]
 /// )
 /// ```
@@ -552,15 +623,25 @@ pub fn striped_random_positive_integers(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_negative_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     striped_random_negative_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "-16", "-4", "-128", "-34391195648", "-75493376", "-9007199120523391", "-8",
-///         "-8796094070783", "-8", "-950737950171027935941967741439"
+///         "-16",
+///         "-4",
+///         "-128",
+///         "-34391195648",
+///         "-75493376",
+///         "-9007199120523391",
+///         "-8",
+///         "-8796094070783",
+///         "-8",
+///         "-950737950171027935941967741439"
 ///     ]
 /// )
 /// ```
@@ -619,15 +700,25 @@ pub fn striped_random_negative_integers(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_nonzero_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     striped_random_nonzero_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "4", "268435456", "84405977732342160290572740160760316144", "-133169152", "-131064",
-///         "-2251834173421823", "1577058304", "-126100789566374399", "-76", "270335"
+///         "4",
+///         "268435456",
+///         "84405977732342160290572740160760316144",
+///         "-133169152",
+///         "-131064",
+///         "-2251834173421823",
+///         "1577058304",
+///         "-126100789566374399",
+///         "-76",
+///         "270335"
 ///     ]
 /// )
 /// ```
@@ -686,15 +777,25 @@ pub fn striped_random_nonzero_integers(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::striped_random_integers;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     striped_random_integers(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "65536", "75521006248971741167616", "32", "-2199023255520", "-68719468544", "-527", "0",
-///         "-112", "131071", "4152"
+///         "65536",
+///         "75521006248971741167616",
+///         "32",
+///         "-2199023255520",
+///         "-68719468544",
+///         "-527",
+///         "0",
+///         "-112",
+///         "131071",
+///         "4152"
 ///     ]
 /// )
 /// ```
@@ -765,15 +866,14 @@ impl Iterator for UniformRandomIntegerRange {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::uniform_random_integer_range;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
-///     uniform_random_integer_range(
-///         EXAMPLE_SEED,
-///         Integer::from(-10),
-///         Integer::from(100)
-///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     uniform_random_integer_range(EXAMPLE_SEED, Integer::from(-10), Integer::from(100))
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &["77", "83", "-3", "95", "94", "97", "74", "17", "36", "83"]
 /// )
 /// ```
@@ -820,15 +920,18 @@ pub fn uniform_random_integer_range(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::uniform_random_integer_inclusive_range;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     uniform_random_integer_inclusive_range(
 ///         EXAMPLE_SEED,
 ///         Integer::from(-10),
 ///         Integer::from(100)
-///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     )
+///     .take(10)
+///     .map(|x| Integer::to_string(&x))
+///     .collect_vec(),
 ///     &["77", "83", "-3", "95", "94", "97", "74", "17", "36", "83"]
 /// )
 /// ```
@@ -949,12 +1052,14 @@ impl Iterator for RandomIntegerRangeToInfinity {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_integer_range_to_infinity;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     random_integer_range_to_infinity(EXAMPLE_SEED, Integer::from(-1000), 10, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &["15542", "2", "1714", "27863518", "-162", "956", "8", "14648399", "-419", "-98"]
 /// )
 /// ```
@@ -1009,14 +1114,24 @@ pub fn random_integer_range_to_infinity(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_integer_range_to_negative_infinity;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     random_integer_range_to_negative_infinity(EXAMPLE_SEED, Integer::from(1000), 10, 1)
-///         .take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Integer::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "6", "2", "-1714", "-235958584061012446", "-455842", "514", "-12", "-14936760", "335",
+///         "6",
+///         "2",
+///         "-1714",
+///         "-235958584061012446",
+///         "-455842",
+///         "514",
+///         "-12",
+///         "-14936760",
+///         "335",
 ///         "99"
 ///     ]
 /// )
@@ -1130,8 +1245,8 @@ impl Iterator for RandomIntegerRange {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_integer_range;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     random_integer_range(
@@ -1140,8 +1255,22 @@ impl Iterator for RandomIntegerRange {
 ///         Integer::from(1000000000),
 ///         20,
 ///         1
-///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
-///     &["1", "1728664", "434", "-30", "5282", "515436476", "2353848", "-15", "19", "418"]
+///     )
+///     .take(10)
+///     .map(|x| Integer::to_string(&x))
+///     .collect_vec(),
+///     &[
+///         "1",
+///         "1728664",
+///         "434",
+///         "-30",
+///         "5282",
+///         "515436476",
+///         "2353848",
+///         "-15",
+///         "19",
+///         "418"
+///     ]
 /// )
 /// ```
 #[inline]
@@ -1202,8 +1331,8 @@ pub fn random_integer_range(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::integer::Integer;
 /// use malachite_nz::integer::random::random_integer_inclusive_range;
+/// use malachite_nz::integer::Integer;
 ///
 /// assert_eq!(
 ///     random_integer_inclusive_range(
@@ -1212,8 +1341,22 @@ pub fn random_integer_range(
 ///         Integer::from(999999999),
 ///         20,
 ///         1
-///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
-///     &["1", "1728664", "434", "-30", "5282", "515436476", "2353848", "-15", "19", "418"]
+///     )
+///     .take(10)
+///     .map(|x| Integer::to_string(&x))
+///     .collect_vec(),
+///     &[
+///         "1",
+///         "1728664",
+///         "434",
+///         "-30",
+///         "5282",
+///         "515436476",
+///         "2353848",
+///         "-15",
+///         "19",
+///         "418"
+///     ]
 /// )
 /// ```
 pub fn random_integer_inclusive_range(

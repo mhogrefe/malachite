@@ -43,15 +43,7 @@ fn test_limbs_cmp() {
 
 #[test]
 fn test_cmp() {
-    let strings = vec![
-        "0",
-        "1",
-        "2",
-        "123",
-        "999999999999",
-        "1000000000000",
-        "1000000000001",
-    ];
+    let strings = vec!["0", "1", "2", "123", "999999999999", "1000000000000", "1000000000001"];
     test_cmp_helper::<Natural>(&strings);
     test_cmp_helper::<BigUint>(&strings);
     test_cmp_helper::<rug::Integer>(&strings);

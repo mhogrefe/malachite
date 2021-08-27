@@ -29,7 +29,7 @@ fn test_is_graphic() {
         141798
     );
     assert_eq!(
-        matching_intervals_in_iterator(chars_increasing(), |&c| char_is_graphic(c))
+        matching_intervals_in_iterator(chars_increasing(), |&c| { char_is_graphic(c) })
             .iter()
             .map(|i| (i.0 as u32, i.1 as u32))
             .collect_vec(),

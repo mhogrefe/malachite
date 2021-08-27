@@ -31,7 +31,7 @@ fn _to_digits_asc<
         + ExactFrom<U>
         + PowerOf2Digits<U>
         + Zero,
-    U: CheckedLogBase2 + Copy + One + Ord + WrappingFrom<T>,
+    U: CheckedLogBase2<Output = u64> + Copy + One + Ord + WrappingFrom<T>,
 >(
     x: &T,
     base: &U,
@@ -54,7 +54,7 @@ fn _to_digits_desc<
         + ExactFrom<U>
         + PowerOf2Digits<U>
         + Zero,
-    U: CheckedLogBase2 + Copy + One + Ord + WrappingFrom<T>,
+    U: CheckedLogBase2<Output = u64> + Copy + One + Ord + WrappingFrom<T>,
 >(
     x: &T,
     base: &U,
@@ -73,7 +73,7 @@ fn _to_digits_desc<
 
 fn _from_digits_asc<
     T: Digits<U> + PowerOf2Digits<U>,
-    U: CheckedLogBase2 + Copy,
+    U: CheckedLogBase2<Output = u64> + Copy,
     I: Iterator<Item = U>,
 >(
     base: &U,
@@ -97,7 +97,7 @@ fn _from_digits_desc<
         + Ord
         + PowerOf2Digits<U>
         + Zero,
-    U: CheckedLogBase2 + Copy + One + Ord,
+    U: CheckedLogBase2<Output = u64> + Copy + One + Ord,
     I: Iterator<Item = U>,
 >(
     base: &U,

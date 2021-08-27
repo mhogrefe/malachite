@@ -23,8 +23,12 @@ pub type ExhaustiveRoundingModes = Cloned<Iter<'static, RoundingMode>>;
 /// assert_eq!(
 ///     exhaustive_rounding_modes().collect_vec(),
 ///     &[
-///         RoundingMode::Down, RoundingMode::Up, RoundingMode::Floor, RoundingMode::Ceiling,
-///         RoundingMode::Nearest, RoundingMode::Exact,
+///         RoundingMode::Down,
+///         RoundingMode::Up,
+///         RoundingMode::Floor,
+///         RoundingMode::Ceiling,
+///         RoundingMode::Nearest,
+///         RoundingMode::Exact,
 ///     ]
 /// );
 /// ```

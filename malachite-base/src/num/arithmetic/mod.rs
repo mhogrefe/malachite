@@ -5,8 +5,8 @@
 /// # abs_assign
 /// ```
 /// use malachite_base::num::arithmetic::traits::AbsAssign;
-/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
 ///
 /// let mut x = 0i8;
 /// x.abs_assign();
@@ -47,6 +47,7 @@ pub mod abs;
 ///
 /// assert_eq!(2u8.add_mul(3, 7), 23);
 /// assert_eq!(127i8.add_mul(-2, 100), -73);
+/// assert_eq!(1.0f32.add_mul(2.0, 3.0), 7.0);
 /// ```
 ///
 /// # add_mul_assign
@@ -60,6 +61,10 @@ pub mod abs;
 /// let mut x = 127i8;
 /// x.add_mul_assign(-2, 100);
 /// assert_eq!(x, -73);
+///
+/// let mut x = 1.0f32;
+/// x.add_mul_assign(2.0, 3.0);
+/// assert_eq!(x, 7.0);
 /// ```
 pub mod add_mul;
 /// This module contains functions for left-shifting a number and checking whether the result is
@@ -634,7 +639,19 @@ pub mod eq_mod_power_of_2;
 /// assert_eq!(x, -2.0);
 /// ```
 pub mod floor;
-/// This module wraps the `is_power_of_two` function into an implementation of `IsPowerOf2`.
+/// This module contains functions for determining whether a number is an integer power of 2.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # is_power_of_2
+/// ```
+/// use malachite_base::num::arithmetic::traits::IsPowerOf2;
+///
+/// assert_eq!(4.0.is_power_of_2(), true);
+/// assert_eq!(0.25.is_power_of_2(), true);
+/// assert_eq!(0.2.is_power_of_2(), false);
+/// assert_eq!((-4.0).is_power_of_2(), false);
+/// ```
 pub mod is_power_of_2;
 /// This module contains functions for taking the base-$b$ logarithm of a number.
 ///
@@ -683,6 +700,10 @@ pub mod log_base;
 ///
 /// assert_eq!(1u8.floor_log_base_2(), 0);
 /// assert_eq!(100u64.floor_log_base_2(), 6);
+///
+/// assert_eq!(1.0f32.floor_log_base_2(), 0);
+/// assert_eq!(100.0f32.floor_log_base_2(), 6);
+/// assert_eq!(0.1f32.floor_log_base_2(), -4);
 /// ```
 ///
 /// # ceiling_log_base_2
@@ -691,6 +712,10 @@ pub mod log_base;
 ///
 /// assert_eq!(1u8.ceiling_log_base_2(), 0);
 /// assert_eq!(100u64.ceiling_log_base_2(), 7);
+///
+/// assert_eq!(1.0f32.ceiling_log_base_2(), 0);
+/// assert_eq!(100.0f32.ceiling_log_base_2(), 7);
+/// assert_eq!(0.1f32.ceiling_log_base_2(), -3);
 /// ```
 ///
 /// # checked_log_base_2
@@ -700,6 +725,12 @@ pub mod log_base;
 /// assert_eq!(1u8.checked_log_base_2(), Some(0));
 /// assert_eq!(100u64.checked_log_base_2(), None);
 /// assert_eq!(128u64.checked_log_base_2(), Some(7));
+///
+/// assert_eq!(1.0f32.checked_log_base_2(), Some(0));
+/// assert_eq!(100.0f32.checked_log_base_2(), None);
+/// assert_eq!(128.0f32.checked_log_base_2(), Some(7));
+/// assert_eq!(0.1f32.checked_log_base_2(), None);
+/// assert_eq!(0.0625f32.checked_log_base_2(), Some(-4));
 /// ```
 pub mod log_base_2;
 /// This module contains functions for taking the base-$b$ logarithm of a number, where $b$ is a
@@ -713,6 +744,8 @@ pub mod log_base_2;
 ///
 /// assert_eq!(1u8.floor_log_base_power_of_2(4), 0);
 /// assert_eq!(100u64.floor_log_base_power_of_2(2), 3);
+///
+/// assert_eq!(0.1f32.floor_log_base_power_of_2(2), -2);
 /// ```
 ///
 /// # ceiling_log_base_power_of_2
@@ -721,6 +754,8 @@ pub mod log_base_2;
 ///
 /// assert_eq!(1u8.ceiling_log_base_power_of_2(4), 0);
 /// assert_eq!(100u64.ceiling_log_base_power_of_2(2), 4);
+///
+/// assert_eq!(0.1f32.ceiling_log_base_power_of_2(2), -1);
 /// ```
 ///
 /// # checked_log_base_power_of_2
@@ -730,6 +765,9 @@ pub mod log_base_2;
 /// assert_eq!(1u8.checked_log_base_power_of_2(4), Some(0));
 /// assert_eq!(100u64.checked_log_base_power_of_2(4), None);
 /// assert_eq!(256u64.checked_log_base_power_of_2(4), Some(2));
+///
+/// assert_eq!(0.1f32.checked_log_base_power_of_2(2), None);
+/// assert_eq!(0.0625f32.checked_log_base_power_of_2(2), Some(-2));
 /// ```
 pub mod log_base_power_of_2;
 /// This module contains functions for adding two numbers mod another number.
@@ -904,7 +942,6 @@ pub mod mod_neg;
 ///
 /// // 2 * 10 + 3 = 23
 /// assert_eq!(23u8.mod_op(10), 3);
-///
 ///
 /// // 9 * 5 + 0 = 45
 /// assert_eq!(45u32.mod_op(5), 0);
@@ -1087,9 +1124,7 @@ pub mod mod_op;
 ///
 /// # mod_pow_precomputed_assign
 /// ```
-/// use malachite_base::num::arithmetic::traits::{
-///     ModPowPrecomputed, ModPowPrecomputedAssign
-/// };
+/// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModPowPrecomputedAssign};
 ///
 /// let data = u32::precompute_mod_pow_data(&497);
 ///
@@ -1578,9 +1613,7 @@ pub mod mod_shr;
 ///
 /// # mod_square_precomputed
 /// ```
-/// use malachite_base::num::arithmetic::traits::{
-///     ModPowPrecomputed, ModSquarePrecomputed
-/// };
+/// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputed};
 ///
 /// let data = u16::precompute_mod_pow_data(&497);
 /// assert_eq!(100u16.mod_square_precomputed(497, &data), 60);
@@ -1590,9 +1623,7 @@ pub mod mod_shr;
 ///
 /// # mod_square_precomputed_assign
 /// ```
-/// use malachite_base::num::arithmetic::traits::{
-///     ModPowPrecomputed, ModSquarePrecomputedAssign
-/// };
+/// use malachite_base::num::arithmetic::traits::{ModPowPrecomputed, ModSquarePrecomputedAssign};
 ///
 /// let data = u32::precompute_mod_pow_data(&497);
 ///
@@ -1663,6 +1694,14 @@ pub mod neg;
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
+/// # next_power_of_2
+/// ```
+/// use malachite_base::num::arithmetic::traits::NextPowerOf2;
+///
+/// assert_eq!(100.0f32.next_power_of_2(), 128.0);
+/// assert_eq!(0.01f32.next_power_of_2(), 0.015625);
+/// ```
+///
 /// # next_power_of_2_assign
 /// ```
 /// use malachite_base::num::arithmetic::traits::NextPowerOf2Assign;
@@ -1682,6 +1721,14 @@ pub mod neg;
 /// let mut x = (1u64 << 40) - 5;
 /// x.next_power_of_2_assign();
 /// assert_eq!(x, 1 << 40);
+///
+/// let mut x = 100.0f32;
+/// x.next_power_of_2_assign();
+/// assert_eq!(x, 128.0);
+///
+/// let mut x = 0.01f32;
+/// x.next_power_of_2_assign();
+/// assert_eq!(x, 0.015625);
 /// ```
 pub mod next_power_of_2;
 /// This module contains functions for taking the absolute value of a number and returning a
@@ -1910,7 +1957,6 @@ pub mod overflowing_sub;
 /// assert_eq!(60u8.overflowing_sub_mul(5, 10), (10, false));
 /// assert_eq!(2u8.overflowing_sub_mul(10, 5), (208, true));
 ///
-///
 /// assert_eq!(127i8.overflowing_sub_mul(2, 100), (-73, false));
 /// assert_eq!((-127i8).overflowing_sub_mul(2, 100), (-71, true));
 /// ```
@@ -1998,8 +2044,132 @@ pub mod pow;
 /// assert_eq!(i16::power_of_2(0), 1);
 /// assert_eq!(i8::power_of_2(3), 8);
 /// assert_eq!(i64::power_of_2(40), 1 << 40);
+///
+/// assert_eq!(f32::power_of_2(0), 1.0);
+/// assert_eq!(f32::power_of_2(3), 8.0);
+/// assert_eq!(f32::power_of_2(-3), 0.125);
 /// ```
 pub mod power_of_2;
+/// This module contains functions for taking the $n$th root of a number.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # floor_root
+/// ```
+/// use malachite_base::num::arithmetic::traits::FloorRoot;
+///
+/// assert_eq!(999u16.floor_root(3), 9);
+/// assert_eq!(1000u16.floor_root(3), 10);
+/// assert_eq!(1001u16.floor_root(3), 10);
+/// assert_eq!(100000000000i64.floor_root(5), 158);
+/// assert_eq!((-100000000000i64).floor_root(5), -159);
+/// ```
+///
+/// # floor_root_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::FloorRootAssign;
+///
+/// let mut x = 999u16;
+/// x.floor_root_assign(3);
+/// assert_eq!(x, 9);
+///
+/// let mut x = 1000u16;
+/// x.floor_root_assign(3);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 1001u16;
+/// x.floor_root_assign(3);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 100000000000i64;
+/// x.floor_root_assign(5);
+/// assert_eq!(x, 158);
+///
+/// let mut x = -100000000000i64;
+/// x.floor_root_assign(5);
+/// assert_eq!(x, -159);
+/// ```
+///
+/// # ceiling_root
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingRoot;
+///
+/// assert_eq!(999u16.ceiling_root(3), 10);
+/// assert_eq!(1000u16.ceiling_root(3), 10);
+/// assert_eq!(1001u16.ceiling_root(3), 11);
+/// assert_eq!(100000000000i64.ceiling_root(5), 159);
+/// assert_eq!((-100000000000i64).ceiling_root(5), -158);
+/// ```
+///
+/// # ceiling_root_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::CeilingRootAssign;
+///
+/// let mut x = 999u16;
+/// x.ceiling_root_assign(3);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 1000u16;
+/// x.ceiling_root_assign(3);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 1001u16;
+/// x.ceiling_root_assign(3);
+/// assert_eq!(x, 11);
+///
+/// let mut x = 100000000000i64;
+/// x.ceiling_root_assign(5);
+/// assert_eq!(x, 159);
+///
+/// let mut x = -100000000000i64;
+/// x.ceiling_root_assign(5);
+/// assert_eq!(x, -158);
+/// ```
+///
+/// # checked_root
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedRoot;
+///
+/// assert_eq!(999u16.checked_root(3), None);
+/// assert_eq!(1000u16.checked_root(3), Some(10));
+/// assert_eq!(1001u16.checked_root(3), None);
+/// assert_eq!(100000000000i64.checked_root(5), None);
+/// assert_eq!((-100000000000i64).checked_root(5), None);
+/// assert_eq!(10000000000i64.checked_root(5), Some(100));
+/// assert_eq!((-10000000000i64).checked_root(5), Some(-100));
+/// ```
+///
+/// # root_rem
+/// ```
+/// use malachite_base::num::arithmetic::traits::RootRem;
+///
+/// assert_eq!(999u16.root_rem(3), (9, 270));
+/// assert_eq!(1000u16.root_rem(3), (10, 0));
+/// assert_eq!(1001u16.root_rem(3), (10, 1));
+/// assert_eq!(100000000000u64.root_rem(5), (158, 1534195232));
+/// ```
+///
+/// # root_assign_rem
+/// ```
+/// use malachite_base::num::arithmetic::traits::RootAssignRem;
+///
+/// let mut x = 999u16;
+/// assert_eq!(x.root_assign_rem(3), 270);
+/// assert_eq!(x, 9);
+///
+/// let mut x = 1000u16;
+/// assert_eq!(x.root_assign_rem(3), 0);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 1001u16;
+/// assert_eq!(x.root_assign_rem(3), 1);
+/// assert_eq!(x, 10);
+///
+/// let mut x = 100000000000u64;
+/// assert_eq!(x.root_assign_rem(5), 1534195232);
+/// assert_eq!(x, 158);
+/// ```
+pub mod root;
 /// This module contains functions for rounding a number to a multiple of another number.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -2145,18 +2315,54 @@ pub mod round_to_multiple;
 /// use malachite_base::num::arithmetic::traits::RoundToMultipleOfPowerOf2;
 /// use malachite_base::rounding_modes::RoundingMode;
 ///
-/// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Floor), 8);
-/// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling), 12);
-/// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Down), 8);
-/// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Up), 12);
-/// assert_eq!(10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Nearest), 8);
-/// assert_eq!(12u8.round_to_multiple_of_power_of_2(2, RoundingMode::Exact), 12);
-/// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Floor), -12);
-/// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling), -8);
-/// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Down), -8);
-/// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Up), -12);
-/// assert_eq!((-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest), -8);
-/// assert_eq!((-12i8).round_to_multiple_of_power_of_2(2, RoundingMode::Exact), -12);
+/// assert_eq!(
+///     10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Floor),
+///     8
+/// );
+/// assert_eq!(
+///     10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling),
+///     12
+/// );
+/// assert_eq!(
+///     10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Down),
+///     8
+/// );
+/// assert_eq!(
+///     10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Up),
+///     12
+/// );
+/// assert_eq!(
+///     10u8.round_to_multiple_of_power_of_2(2, RoundingMode::Nearest),
+///     8
+/// );
+/// assert_eq!(
+///     12u8.round_to_multiple_of_power_of_2(2, RoundingMode::Exact),
+///     12
+/// );
+/// assert_eq!(
+///     (-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Floor),
+///     -12
+/// );
+/// assert_eq!(
+///     (-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Ceiling),
+///     -8
+/// );
+/// assert_eq!(
+///     (-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Down),
+///     -8
+/// );
+/// assert_eq!(
+///     (-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Up),
+///     -12
+/// );
+/// assert_eq!(
+///     (-10i8).round_to_multiple_of_power_of_2(2, RoundingMode::Nearest),
+///     -8
+/// );
+/// assert_eq!(
+///     (-12i8).round_to_multiple_of_power_of_2(2, RoundingMode::Exact),
+///     -12
+/// );
 /// ```
 ///
 /// # round_to_multiple_of_power_of_2_assign
@@ -2451,8 +2657,8 @@ pub mod saturating_sub_mul;
 ///
 /// # shl_round
 /// ```
-/// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShlRound;
+/// use malachite_base::rounding_modes::RoundingMode;
 ///
 /// assert_eq!(0x101u16.shl_round(-8i8, RoundingMode::Down), 1);
 /// assert_eq!(0x101u32.shl_round(-8i16, RoundingMode::Up), 2);
@@ -2468,8 +2674,8 @@ pub mod saturating_sub_mul;
 ///
 /// # shl_round_assign
 /// ```
-/// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShlRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode;
 ///
 /// let mut x = 0x101u16;
 /// x.shl_round_assign(-8i8, RoundingMode::Down);
@@ -2509,8 +2715,8 @@ pub mod shl_round;
 ///
 /// # shr_round
 /// ```
-/// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShrRound;
+/// use malachite_base::rounding_modes::RoundingMode;
 ///
 /// assert_eq!(0x101u32.shr_round(8u8, RoundingMode::Down), 1);
 /// assert_eq!(0x101u16.shr_round(8u16, RoundingMode::Up), 2);
@@ -2548,8 +2754,8 @@ pub mod shl_round;
 ///
 /// # shr_round_assign
 /// ```
-/// use malachite_base::rounding_modes::RoundingMode;
 /// use malachite_base::num::arithmetic::traits::ShrRoundAssign;
+/// use malachite_base::rounding_modes::RoundingMode;
 ///
 /// let mut x = 0x101u32;
 /// x.shr_round_assign(8u8, RoundingMode::Down);
@@ -2767,32 +2973,32 @@ pub mod sign;
 /// assert_eq!(99u8.sqrt_rem(), (9, 18));
 /// assert_eq!(100u8.sqrt_rem(), (10, 0));
 /// assert_eq!(101u8.sqrt_rem(), (10, 1));
-/// assert_eq!(1000000000i32.sqrt_rem(), (31622, 49116));
-/// assert_eq!(10000000000i64.sqrt_rem(), (100000, 0));
+/// assert_eq!(1000000000u32.sqrt_rem(), (31622, 49116));
+/// assert_eq!(10000000000u64.sqrt_rem(), (100000, 0));
 /// ```
 ///
-/// # sqrt_rem_assign
+/// # sqrt_assign_rem
 /// ```
-/// use malachite_base::num::arithmetic::traits::SqrtRemAssign;
+/// use malachite_base::num::arithmetic::traits::SqrtAssignRem;
 ///
 /// let mut x = 99u8;
-/// assert_eq!(x.sqrt_rem_assign(), 18);
+/// assert_eq!(x.sqrt_assign_rem(), 18);
 /// assert_eq!(x, 9);
 ///
 /// let mut x = 100u8;
-/// assert_eq!(x.sqrt_rem_assign(), 0);
+/// assert_eq!(x.sqrt_assign_rem(), 0);
 /// assert_eq!(x, 10);
 ///
 /// let mut x = 101u8;
-/// assert_eq!(x.sqrt_rem_assign(), 1);
+/// assert_eq!(x.sqrt_assign_rem(), 1);
 /// assert_eq!(x, 10);
 ///
-/// let mut x = 1000000000i32;
-/// assert_eq!(x.sqrt_rem_assign(), 49116);
+/// let mut x = 1000000000u32;
+/// assert_eq!(x.sqrt_assign_rem(), 49116);
 /// assert_eq!(x, 31622);
 ///
-/// let mut x = 10000000000i64;
-/// assert_eq!(x.sqrt_rem_assign(), 0);
+/// let mut x = 10000000000u64;
+/// assert_eq!(x.sqrt_assign_rem(), 0);
 /// assert_eq!(x, 100000);
 /// ```
 pub mod sqrt;
@@ -2836,6 +3042,7 @@ pub mod square;
 ///
 /// assert_eq!(60u32.sub_mul(5, 10), 10);
 /// assert_eq!(127i8.sub_mul(2, 100), -73);
+/// assert_eq!(1.0f32.sub_mul(2.0, 3.0), -5.0);
 /// ```
 ///
 /// # sub_mul_assign
@@ -2849,6 +3056,10 @@ pub mod square;
 /// let mut x = 127i8;
 /// x.sub_mul_assign(2, 100);
 /// assert_eq!(x, -73);
+///
+/// let mut x = 1.0f32;
+/// x.sub_mul_assign(2.0, 3.0);
+/// assert_eq!(x, -5.0);
 /// ```
 pub mod sub_mul;
 /// This module defines various traits for performing arithmetic operations on numbers.
@@ -3113,7 +3324,10 @@ pub mod xx_add_yy_is_zz;
 /// ```
 /// use malachite_base::num::arithmetic::traits::XXDivModYIsQR;
 ///
-/// assert_eq!(u64::xx_div_mod_y_is_qr(0x12, 0x34, 0x33), (0x5a5a5a5a5a5a5a5b, 0x13));
+/// assert_eq!(
+///     u64::xx_div_mod_y_is_qr(0x12, 0x34, 0x33),
+///     (0x5a5a5a5a5a5a5a5b, 0x13)
+/// );
 /// assert_eq!(u8::xx_div_mod_y_is_qr(0x78, 0x9a, 0xbc), (0xa4, 0x2a));
 /// ```
 pub mod xx_div_mod_y_is_qr;

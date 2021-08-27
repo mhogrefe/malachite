@@ -71,11 +71,11 @@ pub fn _checked_log_base_naive<T: CheckedMul<T, Output = T> + Copy + Debug + Ord
 }
 
 fn _floor_log_base<
-    T: CheckedLogBase2
+    T: CheckedLogBase2<Output = u64>
         + CheckedMul<T, Output = T>
         + Copy
         + Debug
-        + FloorLogBasePowerOf2
+        + FloorLogBasePowerOf2<Output = u64>
         + Ord
         + One
         + Zero,
@@ -91,11 +91,11 @@ fn _floor_log_base<
 }
 
 fn _ceiling_log_base<
-    T: CheckedLogBase2
+    T: CheckedLogBase2<Output = u64>
         + CheckedMul<T, Output = T>
         + Copy
         + Debug
-        + CeilingLogBasePowerOf2
+        + CeilingLogBasePowerOf2<Output = u64>
         + Ord
         + One
         + Zero,
@@ -111,11 +111,11 @@ fn _ceiling_log_base<
 }
 
 fn _checked_log_base<
-    T: CheckedLogBase2
+    T: CheckedLogBase2<Output = u64>
         + CheckedMul<T, Output = T>
         + Copy
         + Debug
-        + CheckedLogBasePowerOf2
+        + CheckedLogBasePowerOf2<Output = u64>
         + Ord
         + One
         + Zero,
@@ -130,9 +130,11 @@ fn _checked_log_base<
     }
 }
 
-macro_rules! impl_arithmetic_traits {
+macro_rules! impl_log_base_unsigned {
     ($t:ident) => {
         impl FloorLogBase for $t {
+            type Output = u64;
+
             /// Returns the floor of the base-$b$ logarithm of a positive integer.
             ///
             /// $f(x, b) = \lfloor\log_b x\rfloor$.
@@ -157,6 +159,8 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl CeilingLogBase for $t {
+            type Output = u64;
+
             /// Returns the ceiling of the base-$b$ logarithm of a positive integer.
             ///
             /// $f(x, b) = \lceil\log_b x\rceil$.
@@ -181,6 +185,8 @@ macro_rules! impl_arithmetic_traits {
         }
 
         impl CheckedLogBase for $t {
+            type Output = u64;
+
             /// Returns the base-$b$ logarithm of a positive integer. If the integer is not a
             /// power of $b$, `None` is returned.
             ///
@@ -211,4 +217,4 @@ macro_rules! impl_arithmetic_traits {
         }
     };
 }
-apply_to_unsigneds!(impl_arithmetic_traits);
+apply_to_unsigneds!(impl_log_base_unsigned);

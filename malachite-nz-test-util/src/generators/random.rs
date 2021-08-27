@@ -8,6 +8,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
@@ -16,12 +17,12 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
     geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_unsigneds,
-    GeometricRandomNaturalValues, GeometricRandomSignedRange,
+    GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
 };
 use malachite_base::num::random::{
-    random_primitive_ints, random_unsigned_inclusive_range, random_unsigneds_less_than,
-    variable_range_generator, RandomPrimitiveInts, RandomUnsignedRange, RandomUnsignedsLessThan,
-    VariableRangeGenerator,
+    random_natural_signeds, random_primitive_ints, random_unsigned_inclusive_range,
+    random_unsigneds_less_than, variable_range_generator, RandomPrimitiveInts, RandomUnsignedRange,
+    RandomUnsignedsLessThan, VariableRangeGenerator,
 };
 use malachite_base::options::random::{random_options, RandomOptions};
 use malachite_base::random::{Seed, EXAMPLE_SEED};
@@ -30,6 +31,8 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
     random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
 };
+use malachite_base::unions::random::random_union2s;
+use malachite_base::unions::Union2;
 use malachite_base::vecs::random::{
     random_vecs, random_vecs_length_range, random_vecs_min_length, RandomVecs,
 };
@@ -38,7 +41,9 @@ use malachite_base_test_util::generators::common::{GenConfig, It};
 use malachite_base_test_util::generators::random::{
     PrimitiveIntVecTripleLenGenerator, PrimitiveIntVecTripleXYYLenGenerator,
 };
-use malachite_nz::integer::random::{random_integers, random_natural_integers};
+use malachite_nz::integer::random::{
+    random_integers, random_natural_integers, random_negative_integers, RandomIntegers,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
@@ -165,6 +170,23 @@ pub fn random_integer_gen_var_4(config: &GenConfig) -> It<Integer> {
     ))
 }
 
+pub fn random_integer_gen_var_5<T: PrimitiveInt>(_config: &GenConfig) -> It<Integer>
+where
+    Integer: From<T>,
+{
+    Box::new(random_primitive_ints(EXAMPLE_SEED).map(Integer::from))
+}
+
+// -- (Integer, Integer) --
+
+pub fn random_integer_pair_gen(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(random_pairs_from_single(random_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 // -- (Integer, PrimitiveUnsigned) --
 
 pub fn random_integer_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
@@ -203,6 +225,56 @@ pub fn random_integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
             )
         },
     ))
+}
+
+pub fn random_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        random_natural_integers(
+                            seed_2,
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_positive_unsigneds(
+                            seed_2,
+                            config.get_or("small_unsigned_mean_n", 32),
+                            config.get_or("small_unsigned_mean_d", 1),
+                        )
+                    },
+                )
+            },
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        random_negative_integers(
+                            seed_2,
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_unsigneds::<T>(
+                            seed_2,
+                            config.get_or("small_unsigned_mean_n", 32),
+                            config.get_or("small_unsigned_mean_d", 1),
+                        )
+                        .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE))
+                    },
+                )
+            },
+        )
+        .map(Union2::unwrap),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -254,6 +326,36 @@ pub fn random_integer_rounding_mode_pair_gen_var_1<
         )
         .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
     )
+}
+
+// --(Integer, Vec<bool>) --
+
+struct IntegerBoolVecPairGenerator {
+    xs: RandomIntegers<GeometricRandomSigneds<i64>>,
+    bs: RandomBools,
+}
+
+impl Iterator for IntegerBoolVecPairGenerator {
+    type Item = (Integer, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Integer, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let bs = (&mut self.bs)
+            .take(x.to_twos_complement_limbs_asc().len())
+            .collect();
+        Some((x, bs))
+    }
+}
+
+pub fn random_integer_bool_vec_pair_gen_var_1(config: &GenConfig) -> It<(Integer, Vec<bool>)> {
+    Box::new(IntegerBoolVecPairGenerator {
+        xs: random_integers(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+        bs: random_bools(EXAMPLE_SEED.fork("bs")),
+    })
 }
 
 // -- Natural --
@@ -381,6 +483,20 @@ where
             }
         }),
     )
+}
+
+pub fn random_natural_gen_var_6<T: PrimitiveUnsigned>(_config: &GenConfig) -> It<Natural>
+where
+    Natural: From<T>,
+{
+    Box::new(random_primitive_ints(EXAMPLE_SEED).map(Natural::from))
+}
+
+pub fn random_natural_gen_var_7<T: PrimitiveSigned>(_config: &GenConfig) -> It<Natural>
+where
+    Natural: ExactFrom<T>,
+{
+    Box::new(random_natural_signeds(EXAMPLE_SEED).map(Natural::exact_from))
 }
 
 // -- (Natural, Natural) --
@@ -805,6 +921,36 @@ pub fn random_natural_rounding_mode_pair_gen_var_2(
         },
         &random_rounding_modes,
     ))
+}
+
+// --(Natural, Vec<bool>) --
+
+struct NaturalBoolVecPairGenerator {
+    xs: RandomNaturals<GeometricRandomNaturalValues<u64>>,
+    bs: RandomBools,
+}
+
+impl Iterator for NaturalBoolVecPairGenerator {
+    type Item = (Natural, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let bs = (&mut self.bs)
+            .take(usize::exact_from(x.limb_count()))
+            .collect();
+        Some((x, bs))
+    }
+}
+
+pub fn random_natural_bool_vec_pair_gen_var_1(config: &GenConfig) -> It<(Natural, Vec<bool>)> {
+    Box::new(NaturalBoolVecPairGenerator {
+        xs: random_naturals(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+        bs: random_bools(EXAMPLE_SEED.fork("bs")),
+    })
 }
 
 // -- (String, String, String) --

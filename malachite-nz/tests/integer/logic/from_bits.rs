@@ -22,9 +22,7 @@ fn test_from_bits_asc_and_from_bit_iterator_asc() {
         "105",
     );
     test(
-        &[
-            true, false, false, true, false, true, true, false, false, false,
-        ],
+        &[true, false, false, true, false, true, true, false, false, false],
         "105",
     );
     test(&[true, true, true, false, true, false, false, true], "-105");
@@ -78,16 +76,12 @@ fn test_from_bits_desc() {
         "105",
     );
     test(
-        &[
-            false, false, false, true, true, false, true, false, false, true,
-        ],
+        &[false, false, false, true, true, false, true, false, false, true],
         "105",
     );
     test(&[true, false, false, true, false, true, true, true], "-105");
     test(
-        &[
-            true, true, true, false, false, true, false, true, true, true,
-        ],
+        &[true, true, true, false, false, true, false, true, true, true],
         "-105",
     );
     test(

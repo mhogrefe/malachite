@@ -6,6 +6,7 @@ pub(crate) fn register(runner: &mut Runner) {
     log_base_power_of_2::register(runner);
     mul::register(runner);
     neg::register(runner);
+    root::register(runner);
     sqrt::register(runner);
 }
 
@@ -14,4 +15,5 @@ mod log_base_2;
 mod log_base_power_of_2;
 mod mul;
 mod neg;
+mod root;
 mod sqrt;

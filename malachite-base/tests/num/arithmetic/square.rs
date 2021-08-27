@@ -41,6 +41,9 @@ fn square_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert_eq!(square, x.square());
         assert_eq!(square, x.pow(2));
         assert_eq!(square.checked_sqrt(), Some(x));
+        if x > T::ONE {
+            assert_eq!(square.checked_log_base(x), Some(2));
+        }
     });
 }
 

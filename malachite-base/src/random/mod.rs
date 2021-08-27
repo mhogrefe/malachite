@@ -54,8 +54,8 @@ impl Seed {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::random::Seed;
+    /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// assert_eq!(
     ///     EXAMPLE_SEED.next(),
@@ -82,8 +82,8 @@ impl Seed {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::random::Seed;
+    /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// assert_eq!(
     ///     EXAMPLE_SEED.fork("first"),

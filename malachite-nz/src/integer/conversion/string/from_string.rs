@@ -62,13 +62,25 @@ impl FromStringBase for Integer {
     /// assert_eq!(Integer::from_string_base(10, "123456").unwrap(), 123456);
     /// assert_eq!(Integer::from_string_base(10, "00123456").unwrap(), 123456);
     /// assert_eq!(Integer::from_string_base(16, "0").unwrap(), 0);
-    /// assert_eq!(Integer::from_string_base(16, "deadbeef").unwrap(), 3735928559i64);
-    /// assert_eq!(Integer::from_string_base(16, "deAdBeEf").unwrap(), 3735928559i64);
+    /// assert_eq!(
+    ///     Integer::from_string_base(16, "deadbeef").unwrap(),
+    ///     3735928559i64
+    /// );
+    /// assert_eq!(
+    ///     Integer::from_string_base(16, "deAdBeEf").unwrap(),
+    ///     3735928559i64
+    /// );
     /// assert_eq!(Integer::from_string_base(10, "-123456").unwrap(), -123456);
     /// assert_eq!(Integer::from_string_base(10, "-00123456").unwrap(), -123456);
     /// assert_eq!(Integer::from_string_base(16, "-0").unwrap(), 0);
-    /// assert_eq!(Integer::from_string_base(16, "-deadbeef").unwrap(), -3735928559i64);
-    /// assert_eq!(Integer::from_string_base(16, "-deAdBeEf").unwrap(), -3735928559i64);
+    /// assert_eq!(
+    ///     Integer::from_string_base(16, "-deadbeef").unwrap(),
+    ///     -3735928559i64
+    /// );
+    /// assert_eq!(
+    ///     Integer::from_string_base(16, "-deAdBeEf").unwrap(),
+    ///     -3735928559i64
+    /// );
     ///
     /// assert!(Integer::from_string_base(10, "").is_none());
     /// assert!(Integer::from_string_base(10, "a").is_none());

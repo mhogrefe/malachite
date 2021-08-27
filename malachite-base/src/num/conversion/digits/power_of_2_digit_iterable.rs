@@ -165,10 +165,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     /// # Examples
     /// ```
     /// use malachite_base::num::conversion::digits::power_of_2_digit_iterable::*;
-    /// use malachite_base::num::conversion::traits::{
-    ///     PowerOf2DigitIterable,
-    ///     PowerOf2DigitIterator
-    /// };
+    /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
     ///
     /// let mut digits = PowerOf2DigitIterable::<u8>::power_of_2_digits(0u8, 2);
     /// assert_eq!(digits.get(0), 0);

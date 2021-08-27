@@ -30,9 +30,7 @@ fn test_exhaustive_primitive_floats_with_sci_exponent_and_precision() {
     exhaustive_primitive_floats_with_sci_exponent_and_precision_helper::<f32>(
         0,
         5,
-        &[
-            1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375,
-        ],
+        &[1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375],
     );
     exhaustive_primitive_floats_with_sci_exponent_and_precision_helper::<f32>(4, 1, &[16.0]);
     exhaustive_primitive_floats_with_sci_exponent_and_precision_helper::<f32>(4, 2, &[24.0]);
@@ -90,9 +88,7 @@ fn test_exhaustive_primitive_floats_with_sci_exponent_and_precision() {
     exhaustive_primitive_floats_with_sci_exponent_and_precision_helper::<f64>(
         0,
         5,
-        &[
-            1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375,
-        ],
+        &[1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375],
     );
     exhaustive_primitive_floats_with_sci_exponent_and_precision_helper::<f64>(4, 1, &[16.0]);
     exhaustive_primitive_floats_with_sci_exponent_and_precision_helper::<f64>(4, 2, &[24.0]);

@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use natural::Natural;
 
-impl PowerOf2 for Natural {
+impl PowerOf2<u64> for Natural {
     /// Computes 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(`pow`)

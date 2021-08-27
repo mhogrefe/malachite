@@ -189,11 +189,17 @@ pub mod bit_block_access;
 ///
 /// assert_eq!(0u8.to_bits_asc(), &[]);
 /// assert_eq!(2u16.to_bits_asc(), &[false, true]);
-/// assert_eq!(123u32.to_bits_asc(), &[true, true, false, true, true, true, true]);
+/// assert_eq!(
+///     123u32.to_bits_asc(),
+///     &[true, true, false, true, true, true, true]
+/// );
 ///
 /// assert_eq!(0i8.to_bits_asc(), &[]);
 /// assert_eq!(2i16.to_bits_asc(), &[false, true, false]);
-/// assert_eq!((-123i32).to_bits_asc(), &[true, false, true, false, false, false, false, true]);
+/// assert_eq!(
+///     (-123i32).to_bits_asc(),
+///     &[true, false, true, false, false, false, false, true]
+/// );
 /// ```
 ///
 /// # to_bits_desc
@@ -202,11 +208,17 @@ pub mod bit_block_access;
 ///
 /// assert_eq!(0u8.to_bits_desc(), &[]);
 /// assert_eq!(2u16.to_bits_desc(), &[true, false]);
-/// assert_eq!(123u32.to_bits_desc(), &[true, true, true, true, false, true, true]);
+/// assert_eq!(
+///     123u32.to_bits_desc(),
+///     &[true, true, true, true, false, true, true]
+/// );
 ///
 /// assert_eq!(0i8.to_bits_desc(), &[]);
 /// assert_eq!(2i16.to_bits_desc(), &[false, true, false]);
-/// assert_eq!((-123i32).to_bits_desc(), &[true, false, false, false, false, true, false, true]);
+/// assert_eq!(
+///     (-123i32).to_bits_desc(),
+///     &[true, false, false, false, false, true, false, true]
+/// );
 /// ```
 ///
 /// # from_bits_asc
@@ -224,7 +236,11 @@ pub mod bit_block_access;
 /// assert_eq!(i8::from_bits_asc(empty()), 0);
 /// assert_eq!(i16::from_bits_asc([false, true, false].iter().cloned()), 2);
 /// assert_eq!(
-///     i32::from_bits_asc([true, false, true, false, false, false, false, true].iter().cloned()),
+///     i32::from_bits_asc(
+///         [true, false, true, false, false, false, false, true]
+///             .iter()
+///             .cloned()
+///     ),
 ///     -123
 /// );
 /// ```
@@ -244,7 +260,11 @@ pub mod bit_block_access;
 /// assert_eq!(i8::from_bits_desc(empty()), 0);
 /// assert_eq!(i16::from_bits_desc([false, true, false].iter().cloned()), 2);
 /// assert_eq!(
-///     i32::from_bits_desc([true, false, false, false, false, true, false, true].iter().cloned()),
+///     i32::from_bits_desc(
+///         [true, false, false, false, false, true, false, true]
+///             .iter()
+///             .cloned()
+///     ),
 ///     -123
 /// );
 /// ```
@@ -263,15 +283,24 @@ pub mod bit_convertible;
 ///
 /// assert!(0u8.bits().next().is_none());
 /// // 105 = 1101001b
-/// assert_eq!(105u32.bits().collect_vec(), &[true, false, false, true, false, true, true]);
+/// assert_eq!(
+///     105u32.bits().collect_vec(),
+///     &[true, false, false, true, false, true, true]
+/// );
 ///
 /// assert!(0u8.bits().next_back().is_none());
 /// // 105 = 1101001b
-/// assert_eq!(105u32.bits().rev().collect_vec(), &[true, true, false, true, false, false, true]);
+/// assert_eq!(
+///     105u32.bits().rev().collect_vec(),
+///     &[true, true, false, true, false, false, true]
+/// );
 ///
 /// assert_eq!(0i8.bits().next(), None);
 /// // 105 = 01101001b, with a leading false bit to indicate sign
-/// assert_eq!(105i32.bits().collect_vec(), &[true, false, false, true, false, true, true, false]);
+/// assert_eq!(
+///     105i32.bits().collect_vec(),
+///     &[true, false, false, true, false, true, true, false]
+/// );
 /// // -105 = 10010111 in two's complement, with a leading true bit to indicate sign
 /// assert_eq!(
 ///     (-105i32).bits().collect_vec(),

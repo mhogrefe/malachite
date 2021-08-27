@@ -38,15 +38,8 @@ fn geometric_random_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
 fn test_geometric_random_signeds() {
     // i64, um = 1 / 64
     let values = &[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    let common_values = &[
-        (0, 969281),
-        (-1, 15234),
-        (1, 14983),
-        (-2, 267),
-        (2, 230),
-        (3, 3),
-        (-3, 2),
-    ];
+    let common_values =
+        &[(0, 969281), (-1, 15234), (1, 14983), (-2, 267), (2, 230), (3, 3), (-3, 2)];
     let natural_mean = NiceFloat(0.01570299999999922);
     let pop_median = (0, None);
     let sample_median = (0, None);
@@ -75,9 +68,7 @@ fn test_geometric_random_signeds() {
     );
 
     // i64, um = 12345/10000
-    let values = &[
-        -1, -1, 0, -3, 1, 0, 0, -4, 0, -6, 1, 4, 0, 1, -2, 4, -3, -3, 1, -3,
-    ];
+    let values = &[-1, -1, 0, -3, 1, 0, 0, -4, 0, -6, 1, 4, 0, 1, -2, 4, -3, -3, 1, -3];
     let common_values = &[
         (0, 288130),
         (1, 159322),
@@ -118,9 +109,7 @@ fn test_geometric_random_signeds() {
     );
 
     // i64, um = 2
-    let values = &[
-        -5, 0, 0, 1, -1, -1, -4, 2, 4, 6, -2, -2, 0, -1, -9, -13, 0, -2, 0, -7,
-    ];
+    let values = &[-5, 0, 0, 1, -1, -1, -4, 2, 4, 6, -2, -2, 0, -1, -9, -13, 0, -2, 0, -7];
     let common_values = &[
         (0, 200052),
         (-1, 133433),
@@ -204,9 +193,8 @@ fn test_geometric_random_signeds() {
     );
 
     // i8, um = 1000
-    let values = &[
-        25, -53, 39, 32, 26, 13, -94, 45, 125, 119, 11, 15, 66, 68, 60, -71, -54, 83, 76, -33,
-    ];
+    let values =
+        &[25, -53, 39, 32, 26, 13, -94, 45, 125, 119, 11, 15, 66, 68, 60, -71, -54, 83, 76, -33];
     let common_values = &[
         (-2, 4277),
         (1, 4263),

@@ -49,7 +49,8 @@ impl Natural {
     ///
     /// let test = |n: Natural, rm: RoundingMode, out: Option<(f32, u64)>| {
     ///     assert_eq!(
-    ///         n.sci_mantissa_and_exponent_with_rounding(rm).map(|(m, e)| (NiceFloat(m), e)),
+    ///         n.sci_mantissa_and_exponent_with_rounding(rm)
+    ///             .map(|(m, e)| (NiceFloat(m), e)),
     ///         out.map(|(m, e)| (NiceFloat(m), e))
     ///     );
     /// };
@@ -59,15 +60,43 @@ impl Natural {
     /// test(Natural::from(3u32), RoundingMode::Nearest, Some((1.5, 1)));
     /// test(Natural::from(3u32), RoundingMode::Exact, Some((1.5, 1)));
     ///
-    /// test(Natural::from(123u32), RoundingMode::Floor, Some((1.921875, 6)));
-    /// test(Natural::from(123u32), RoundingMode::Down, Some((1.921875, 6)));
-    /// test(Natural::from(123u32), RoundingMode::Ceiling, Some((1.921875, 6)));
+    /// test(
+    ///     Natural::from(123u32),
+    ///     RoundingMode::Floor,
+    ///     Some((1.921875, 6)),
+    /// );
+    /// test(
+    ///     Natural::from(123u32),
+    ///     RoundingMode::Down,
+    ///     Some((1.921875, 6)),
+    /// );
+    /// test(
+    ///     Natural::from(123u32),
+    ///     RoundingMode::Ceiling,
+    ///     Some((1.921875, 6)),
+    /// );
     /// test(Natural::from(123u32), RoundingMode::Up, Some((1.921875, 6)));
-    /// test(Natural::from(123u32), RoundingMode::Nearest, Some((1.921875, 6)));
-    /// test(Natural::from(123u32), RoundingMode::Exact, Some((1.921875, 6)));
+    /// test(
+    ///     Natural::from(123u32),
+    ///     RoundingMode::Nearest,
+    ///     Some((1.921875, 6)),
+    /// );
+    /// test(
+    ///     Natural::from(123u32),
+    ///     RoundingMode::Exact,
+    ///     Some((1.921875, 6)),
+    /// );
     ///
-    /// test(Natural::from(1000000000u32), RoundingMode::Nearest, Some((1.8626451, 29)));
-    /// test(Natural::from(10u32).pow(52), RoundingMode::Nearest, Some((1.670478, 172)));
+    /// test(
+    ///     Natural::from(1000000000u32),
+    ///     RoundingMode::Nearest,
+    ///     Some((1.8626451, 29)),
+    /// );
+    /// test(
+    ///     Natural::from(10u32).pow(52),
+    ///     RoundingMode::Nearest,
+    ///     Some((1.670478, 172)),
+    /// );
     ///
     /// test(Natural::from(10u32).pow(52), RoundingMode::Exact, None);
     /// ```

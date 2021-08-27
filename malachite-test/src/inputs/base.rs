@@ -1,7 +1,7 @@
 use common::{GenerationMode, NoSpecialGenerationMode};
 use inputs::common::{
     permute_1_2_4_3, permute_1_3_2, permute_1_3_4_2, permute_2_1, permute_2_1_3, reshape_2_1_to_3,
-    reshape_2_2_to_4, reshape_3_1_to_4, reshape_3_3_3_to_9, reshape_4_4_4_to_12,
+    reshape_2_2_to_4, reshape_3_1_to_4,
 };
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::exhaustive_bools;
@@ -29,10 +29,9 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_test_zero;
 use malachite_base::tuples::exhaustive::{
-    exhaustive_octuples_from_single, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_quadruples, exhaustive_quadruples_from_single, exhaustive_quintuples,
-    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_from_single,
-    lex_pairs,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
+    exhaustive_quadruples_from_single, exhaustive_quintuples, exhaustive_sextuples_from_single,
+    exhaustive_triples, exhaustive_triples_from_single, lex_pairs,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_vecs, exhaustive_vecs_min_length, shortlex_vecs,
@@ -88,9 +87,8 @@ use rust_wheels::iterators::primitive_ints::{
 };
 use rust_wheels::iterators::rounding_modes::random_rounding_modes;
 use rust_wheels::iterators::tuples::{
-    random_octuples_from_single, random_pairs, random_pairs_from_single, random_quadruples,
-    random_quadruples_from_single, random_quintuples, random_sextuples_from_single, random_triples,
-    random_triples_from_single,
+    random_pairs, random_pairs_from_single, random_quadruples, random_quadruples_from_single,
+    random_quintuples, random_sextuples_from_single, random_triples, random_triples_from_single,
 };
 use rust_wheels::iterators::vecs::{
     random_vecs, random_vecs_min_length, special_random_bool_vecs, special_random_unsigned_vecs,
@@ -330,13 +328,6 @@ pub fn triples_of_unsigneds_var_1<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, T, T)> {
     Box::new(triples_of_unsigneds(gm).filter(|&(x, y, m)| x < m && y < m))
-}
-
-// All triples of unsigned `T` where the first `T` is smaller than the third.
-pub fn triples_of_unsigneds_var_2<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, T, T)> {
-    Box::new(triples_of_unsigneds(gm).filter(|&(x_1, _, y)| x_1 < y))
 }
 
 fn add_mul_inputs_valid<T: PrimitiveInt>(x: T, y: T, z: T) -> bool {
@@ -731,7 +722,7 @@ pub fn pairs_of_unsigned_and_positive_unsigned<
     }
 }
 
-pub fn pairs_of_signed_and_nonzero_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned + Rand>(
+fn pairs_of_signed_and_nonzero_signed<T: PrimitiveSigned + Rand, U: PrimitiveSigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, U)>
 where
@@ -1269,7 +1260,7 @@ where
     }
 }
 
-pub fn sextuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
+fn sextuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(T, T, T, T, T, T)> {
     match gm {
@@ -1330,37 +1321,6 @@ pub fn sextuples_of_limbs_var_1(gm: GenerationMode) -> It<(Limb, Limb, Limb, Lim
     }))
 }
 
-pub fn octuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, T, T, T, T, T, T, T)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_octuples_from_single(exhaustive_unsigneds()))
-        }
-        GenerationMode::Random(_) => Box::new(random_octuples_from_single(random(&EXAMPLE_SEED))),
-        GenerationMode::SpecialRandom(_) => Box::new(random_octuples_from_single(
-            special_random_unsigned(&EXAMPLE_SEED),
-        )),
-    }
-}
-
-pub fn nonuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, T, T, T, T, T, T, T, T)> {
-    let ts: It<((T, T, T), (T, T, T), (T, T, T))> = match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
-            exhaustive_triples_from_single(exhaustive_unsigneds()),
-        )),
-        GenerationMode::Random(_) => Box::new(random_triples_from_single(
-            random_triples_from_single(random(&EXAMPLE_SEED)),
-        )),
-        GenerationMode::SpecialRandom(_) => Box::new(random_triples_from_single(
-            random_triples_from_single(special_random_unsigned(&EXAMPLE_SEED)),
-        )),
-    };
-    reshape_3_3_3_to_9(ts)
-}
-
 /// All nonuples of `Limb` that are valid inputs to _limbs_mod_mul_two_limbs.
 pub fn nonuples_of_limbs_var_1(
     gm: GenerationMode,
@@ -1381,23 +1341,6 @@ pub fn nonuples_of_limbs_var_1(
             }
         }),
     )
-}
-
-pub fn duodecuples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, T, T, T, T, T, T, T, T, T, T, T)> {
-    let qs: It<((T, T, T, T), (T, T, T, T), (T, T, T, T))> = match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
-            exhaustive_quadruples_from_single(exhaustive_unsigneds()),
-        )),
-        GenerationMode::Random(_) => Box::new(random_triples_from_single(
-            random_quadruples_from_single(random(&EXAMPLE_SEED)),
-        )),
-        GenerationMode::SpecialRandom(_) => Box::new(random_triples_from_single(
-            random_quadruples_from_single(special_random_unsigned(&EXAMPLE_SEED)),
-        )),
-    };
-    reshape_4_4_4_to_12(qs)
 }
 
 fn vecs_of_unsigned_with_seed<T: PrimitiveUnsigned + Rand>(
@@ -2892,20 +2835,6 @@ pub fn sextuples_of_four_limb_vecs_and_two_usizes_var_1(
             Some((scratch, ds, qs, rs_hi, scratch_len, i_len))
         }),
     )
-}
-
-pub fn quadruples_of_unsigneds<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(T, T, T, T)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_quadruples_from_single(exhaustive_unsigneds()))
-        }
-        GenerationMode::Random(_) => Box::new(random_quadruples_from_single(random(&EXAMPLE_SEED))),
-        GenerationMode::SpecialRandom(_) => Box::new(random_quadruples_from_single(
-            special_random_unsigned(&EXAMPLE_SEED),
-        )),
-    }
 }
 
 // All quadruples of `Vec<Limb>`, `Vec<Limb>`, `Limb`, and `Limb` where the first limb is a divisor

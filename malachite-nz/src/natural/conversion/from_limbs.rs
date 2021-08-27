@@ -34,7 +34,10 @@ impl Natural {
     /// assert_eq!(Natural::from_limbs_asc(&[]).to_string(), "0");
     /// assert_eq!(Natural::from_limbs_asc(&[123]).to_string(), "123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_limbs_asc(&[3567587328, 232]).to_string(), "1000000000000");
+    /// assert_eq!(
+    ///     Natural::from_limbs_asc(&[3567587328, 232]).to_string(),
+    ///     "1000000000000"
+    /// );
     /// ```
     pub fn from_limbs_asc(xs: &[Limb]) -> Natural {
         let significant_length = limbs_significant_length(xs);
@@ -66,7 +69,10 @@ impl Natural {
     /// assert_eq!(Natural::from_limbs_desc(&[]).to_string(), "0");
     /// assert_eq!(Natural::from_limbs_desc(&[123]).to_string(), "123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_limbs_desc(&[232, 3567587328]).to_string(), "1000000000000");
+    /// assert_eq!(
+    ///     Natural::from_limbs_desc(&[232, 3567587328]).to_string(),
+    ///     "1000000000000"
+    /// );
     /// ```
     pub fn from_limbs_desc(xs: &[Limb]) -> Natural {
         Natural::from_owned_limbs_asc(xs.iter().cloned().rev().collect())
@@ -93,8 +99,10 @@ impl Natural {
     /// assert_eq!(Natural::from_owned_limbs_asc(vec![]).to_string(), "0");
     /// assert_eq!(Natural::from_owned_limbs_asc(vec![123]).to_string(), "123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_owned_limbs_asc(vec![3567587328, 232]).to_string(),
-    ///     "1000000000000");
+    /// assert_eq!(
+    ///     Natural::from_owned_limbs_asc(vec![3567587328, 232]).to_string(),
+    ///     "1000000000000"
+    /// );
     /// ```
     pub fn from_owned_limbs_asc(mut xs: Vec<Limb>) -> Natural {
         let significant_length = limbs_significant_length(&xs);
@@ -129,8 +137,10 @@ impl Natural {
     /// assert_eq!(Natural::from_owned_limbs_desc(vec![]).to_string(), "0");
     /// assert_eq!(Natural::from_owned_limbs_desc(vec![123]).to_string(), "123");
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::from_owned_limbs_desc(vec![232, 3567587328]).to_string(),
-    ///     "1000000000000");
+    /// assert_eq!(
+    ///     Natural::from_owned_limbs_desc(vec![232, 3567587328]).to_string(),
+    ///     "1000000000000"
+    /// );
     /// ```
     pub fn from_owned_limbs_desc(mut xs: Vec<Limb>) -> Natural {
         xs.reverse();

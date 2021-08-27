@@ -1,8 +1,10 @@
 use comparison::traits::{Max, Min};
 use named::Named;
 use num::arithmetic::traits::{
-    Abs, AbsAssign, Ceiling, CeilingAssign, Floor, FloorAssign, NegAssign, Pow, PowAssign, Sign,
-    Square, SquareAssign,
+    Abs, AbsAssign, AddMul, AddMulAssign, Ceiling, CeilingAssign, CeilingLogBase2,
+    CeilingLogBasePowerOf2, CheckedLogBase2, CheckedLogBasePowerOf2, Floor, FloorAssign,
+    FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, NegAssign, NextPowerOf2, NextPowerOf2Assign,
+    Pow, PowAssign, PowerOf2, Sign, Sqrt, SqrtAssign, Square, SquareAssign, SubMul, SubMulAssign,
 };
 use num::basic::traits::{Iverson, NegativeOne, One, Two, Zero};
 use num::conversion::traits::{
@@ -80,12 +82,16 @@ use std::str::FromStr;
 /// $$
 pub trait PrimitiveFloat:
     'static
-    + Add<Output = Self>
-    + AddAssign<Self>
     + Abs<Output = Self>
     + AbsAssign
+    + Add<Output = Self>
+    + AddAssign<Self>
+    + AddMul<Output = Self>
+    + AddMulAssign<Self, Self>
     + Ceiling
     + CeilingAssign
+    + CeilingLogBase2<Output = i64>
+    + CeilingLogBasePowerOf2<Output = i64>
     + CheckedFrom<u8>
     + CheckedFrom<u16>
     + CheckedFrom<u32>
@@ -110,6 +116,8 @@ pub trait PrimitiveFloat:
     + CheckedInto<i64>
     + CheckedInto<i128>
     + CheckedInto<isize>
+    + CheckedLogBase2<Output = i64>
+    + CheckedLogBasePowerOf2<Output = i64>
     + ConvertibleFrom<u8>
     + ConvertibleFrom<u16>
     + ConvertibleFrom<u32>
@@ -131,12 +139,15 @@ pub trait PrimitiveFloat:
     + Display
     + Floor
     + FloorAssign
+    + FloorLogBase2<Output = i64>
+    + FloorLogBasePowerOf2<Output = i64>
     + FmtRyuString
     + From<f32>
     + FromStr
     + IntegerMantissaAndExponent<u64, i64>
     + Into<f64>
     + IsInteger
+    + IsPowerOf2
     + Iverson
     + LowerExp
     + Min
@@ -147,6 +158,8 @@ pub trait PrimitiveFloat:
     + Neg<Output = Self>
     + NegAssign
     + NegativeOne
+    + NextPowerOf2<Output = Self>
+    + NextPowerOf2Assign
     + One
     + PartialEq<Self>
     + PartialOrd<Self>
@@ -154,6 +167,7 @@ pub trait PrimitiveFloat:
     + Pow<Self, Output = Self>
     + PowAssign<i64>
     + PowAssign<Self>
+    + PowerOf2<i64>
     + Product
     + RawMantissaAndExponent<u64, u64>
     + Rem<Output = Self>
@@ -185,10 +199,14 @@ pub trait PrimitiveFloat:
     + SciMantissaAndExponent<Self, i64>
     + Sign
     + Sized
+    + Sqrt<Output = Self>
+    + SqrtAssign
     + Square<Output = Self>
     + SquareAssign
     + Sub<Output = Self>
     + SubAssign<Self>
+    + SubMul<Output = Self>
+    + SubMulAssign<Self, Self>
     + Sum<Self>
     + Two
     + UpperExp
@@ -286,8 +304,8 @@ pub trait PrimitiveFloat:
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::float::NiceFloat;
     ///
     /// assert_eq!(NiceFloat((-0.0).abs_negative_zero()), NiceFloat(0.0));
     /// assert_eq!(NiceFloat(0.0.abs_negative_zero()), NiceFloat(0.0));
@@ -312,8 +330,8 @@ pub trait PrimitiveFloat:
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::float::NiceFloat;
     ///
     /// let mut f = -0.0;
     /// f.abs_negative_zero_assign();
@@ -354,8 +372,8 @@ pub trait PrimitiveFloat:
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::float::NiceFloat;
     ///
     /// assert_eq!(NiceFloat((-0.0f32).next_higher()), NiceFloat(0.0));
     /// assert_eq!(NiceFloat(0.0f32.next_higher()), NiceFloat(1.0e-45));
@@ -387,8 +405,8 @@ pub trait PrimitiveFloat:
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::float::NiceFloat;
     ///
     /// assert_eq!(NiceFloat(0.0f32.next_lower()), NiceFloat(-0.0));
     /// assert_eq!(NiceFloat((-0.0f32).next_lower()), NiceFloat(-1.0e-45));
@@ -431,7 +449,10 @@ pub trait PrimitiveFloat:
     /// assert_eq!((-0.0f32).to_ordered_representation(), 2139095040);
     /// assert_eq!(0.0f32.to_ordered_representation(), 2139095041);
     /// assert_eq!(1.0f32.to_ordered_representation(), 3204448257);
-    /// assert_eq!(f32::POSITIVE_INFINITY.to_ordered_representation(), 4278190081);
+    /// assert_eq!(
+    ///     f32::POSITIVE_INFINITY.to_ordered_representation(),
+    ///     4278190081
+    /// );
     /// ```
     fn to_ordered_representation(self) -> u64 {
         assert!(!self.is_nan());
@@ -466,7 +487,10 @@ pub trait PrimitiveFloat:
     /// assert_eq!(f32::from_ordered_representation(2139095040), -0.0f32);
     /// assert_eq!(f32::from_ordered_representation(2139095041), 0.0f32);
     /// assert_eq!(f32::from_ordered_representation(3204448257), 1.0f32);
-    /// assert_eq!(f32::from_ordered_representation(4278190081), f32::POSITIVE_INFINITY);
+    /// assert_eq!(
+    ///     f32::from_ordered_representation(4278190081),
+    ///     f32::POSITIVE_INFINITY
+    /// );
     /// ```
     fn from_ordered_representation(n: u64) -> Self {
         let zero_exp = u64::low_mask(Self::EXPONENT_WIDTH) << Self::MANTISSA_WIDTH;

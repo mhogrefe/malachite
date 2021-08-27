@@ -62,9 +62,6 @@ fn benchmark_natural_neg_evaluation_strategy(
         limit,
         file_name,
         &natural_bit_bucketer("x"),
-        &mut [
-            ("-Natural", &mut |x| no_out!(-x)),
-            ("-&Natural", &mut |x| no_out!(-&x)),
-        ],
+        &mut [("-Natural", &mut |x| no_out!(-x)), ("-&Natural", &mut |x| no_out!(-&x))],
     );
 }

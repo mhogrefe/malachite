@@ -72,10 +72,7 @@ fn benchmark_integer_neg_evaluation_strategy(
         limit,
         file_name,
         &integer_bit_bucketer("x"),
-        &mut [
-            ("-Integer", &mut |x| no_out!(-x)),
-            ("-&Integer", &mut |x| no_out!(-&x)),
-        ],
+        &mut [("-Integer", &mut |x| no_out!(-x)), ("-&Integer", &mut |x| no_out!(-&x))],
     );
 }
 

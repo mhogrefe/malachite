@@ -30,15 +30,7 @@ fn test_limbs_mod_power_of_2_limb_sub_limbs_and_limbs_mod_power_of_2_limb_sub_li
         3,
         &[1, 2, 3],
         200,
-        &[
-            2,
-            u32::MAX - 1,
-            0xfffffffc,
-            u32::MAX,
-            u32::MAX,
-            u32::MAX,
-            255,
-        ],
+        &[2, u32::MAX - 1, 0xfffffffc, u32::MAX, u32::MAX, u32::MAX, 255],
     );
 }
 

@@ -10,8 +10,9 @@ use num::arithmetic::traits::{
     ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
     ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
     ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOf2,
-    NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, SqrtRem, SqrtRemAssign, XMulYIsZZ,
-    XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
+    NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, RootAssignRem, RootRem, SqrtAssignRem,
+    SqrtRem, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ,
+    XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -23,18 +24,18 @@ use num::logic::traits::HammingDistance;
 
 /// This trait defines functions on primitive unsigned integral types: uxx and usize.
 pub trait PrimitiveUnsigned:
-    CeilingLogBase
-    + CeilingLogBase2
-    + CeilingLogBasePowerOf2
+    CeilingLogBase<Output = u64>
+    + CeilingLogBase2<Output = u64>
+    + CeilingLogBasePowerOf2<Output = u64>
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
     + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
-    + CheckedLogBase
-    + CheckedLogBase2
-    + CheckedLogBasePowerOf2
+    + CheckedLogBase<Output = u64>
+    + CheckedLogBase2<Output = u64>
+    + CheckedLogBasePowerOf2<Output = u64>
     + CheckedNextPowerOf2<Output = Self>
-    + FloorLogBase
-    + FloorLogBase2
-    + FloorLogBasePowerOf2
+    + FloorLogBase<Output = u64>
+    + FloorLogBase2<Output = u64>
+    + FloorLogBasePowerOf2<Output = u64>
     + From<u8>
     + FromOtherTypeSlice<u8>
     + FromOtherTypeSlice<u16>
@@ -130,10 +131,12 @@ pub trait PrimitiveUnsigned:
     + PowerOf2DigitIterable<u128>
     + PowerOf2DigitIterable<usize>
     + PrimitiveInt
+    + RootRem<RootOutput = Self, RemOutput = Self>
+    + RootAssignRem<RemOutput = Self>
     + SciMantissaAndExponent<f32, u64>
     + SciMantissaAndExponent<f64, u64>
-    + SqrtRem<RemOutput = Self>
-    + SqrtRemAssign<RemOutput = Self>
+    + SqrtRem<SqrtOutput = Self, RemOutput = Self>
+    + SqrtAssignRem<RemOutput = Self>
     + VecFromOtherType<u8>
     + VecFromOtherType<u16>
     + VecFromOtherType<u32>

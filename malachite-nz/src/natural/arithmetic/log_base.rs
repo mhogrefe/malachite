@@ -81,6 +81,8 @@ fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
 }
 
 impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
+    type Output = u64;
+
     /// Returns the floor of the base-$b$ logarithm of a positive `Natural`.
     ///
     /// $f(x, b) = \lfloor\log_b x\rfloor$.
@@ -114,6 +116,8 @@ impl<'a, 'b> FloorLogBase<&'b Natural> for &'a Natural {
 }
 
 impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
+    type Output = u64;
+
     /// Returns the ceiling of the base-$b$ logarithm of a positive `Natural`.
     ///
     /// $f(x, b) = \lceil\log_b x\rceil$.
@@ -152,6 +156,8 @@ impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
 }
 
 impl<'a, 'b> CheckedLogBase<&'b Natural> for &'a Natural {
+    type Output = u64;
+    
     /// Returns the base-$b$ logarithm of a positive `Natural`. If the integer is not a power of
     /// $b$, `None` is returned.
     ///

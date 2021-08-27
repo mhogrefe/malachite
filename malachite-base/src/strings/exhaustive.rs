@@ -209,7 +209,9 @@ pub fn exhaustive_fixed_length_strings(
 ///
 /// use malachite_base::strings::exhaustive::shortlex_strings_using_chars;
 ///
-/// let ss = shortlex_strings_using_chars('x'..='z').take(20).collect_vec();
+/// let ss = shortlex_strings_using_chars('x'..='z')
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     ss.iter().map(String::as_str).collect_vec().as_slice(),
 ///     &[
@@ -255,8 +257,8 @@ pub fn shortlex_strings_using_chars<I: Clone + Iterator<Item = char>>(
 /// assert_eq!(
 ///     ss.iter().map(String::as_str).collect_vec().as_slice(),
 ///     &[
-///         "", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q",
-///         "r", "s"
+///         "", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
+///         "q", "r", "s"
 ///     ]
 /// );
 /// ```
@@ -287,7 +289,9 @@ pub fn shortlex_strings(
 ///
 /// use malachite_base::strings::exhaustive::exhaustive_strings_using_chars;
 ///
-/// let ss = exhaustive_strings_using_chars('x'..='z').take(20).collect_vec();
+/// let ss = exhaustive_strings_using_chars('x'..='z')
+///     .take(20)
+///     .collect_vec();
 /// assert_eq!(
 ///     ss.iter().map(String::as_str).collect_vec().as_slice(),
 ///     &[

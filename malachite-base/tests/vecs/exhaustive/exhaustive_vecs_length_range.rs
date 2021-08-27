@@ -59,15 +59,7 @@ fn test_exhaustive_vecs_length_range() {
         3,
         exhaustive_bools(),
         7,
-        &[
-            &[],
-            &[false],
-            &[true],
-            &[false, false],
-            &[false, true],
-            &[true, false],
-            &[true, true],
-        ],
+        &[&[], &[false], &[true], &[false, false], &[false, true], &[true, false], &[true, true]],
     );
     exhaustive_vecs_length_range_small_helper(
         2,

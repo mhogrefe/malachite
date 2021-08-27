@@ -1,7 +1,13 @@
+use malachite_base::num::arithmetic::traits::ModPowerOf2;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::generators::natural_gen;
 use rug;
 use std::str::FromStr;
 
@@ -345,4 +351,88 @@ fn test_i64_convertible_from_natural() {
     test("1000000000000000000000000", false);
     test("9223372036854775807", true);
     test("9223372036854775808", false);
+}
+
+fn primitive_int_properties<
+    T: for<'a> ConvertibleFrom<&'a Natural>
+        + for<'a> OverflowingFrom<&'a Natural>
+        + PartialEq<Natural>
+        + PartialOrd<Natural>
+        + PrimitiveInt
+        + for<'a> SaturatingFrom<&'a Natural>
+        + for<'a> WrappingFrom<&'a Natural>,
+>()
+where
+    Natural: PartialOrd<T>,
+{
+    natural_gen().test_properties(|x| {
+        let result = T::wrapping_from(&x);
+        assert_eq!(result, T::overflowing_from(&x).0);
+
+        let result = T::saturating_from(&x);
+        assert!(result <= x);
+        assert_eq!(result == x, T::convertible_from(&x));
+
+        let result = T::overflowing_from(&x);
+        assert_eq!(result, (T::wrapping_from(&x), !T::convertible_from(&x)));
+
+        let convertible = T::convertible_from(&x);
+        assert_eq!(convertible, x >= T::MIN && x <= T::MAX);
+    });
+}
+
+fn unsigned_properties<
+    T: for<'a> CheckedFrom<&'a Natural>
+        + for<'a> OverflowingFrom<&'a Natural>
+        + PartialEq<Natural>
+        + PrimitiveUnsigned
+        + for<'a> WrappingFrom<&'a Natural>,
+>()
+where
+    Natural: From<T>,
+{
+    natural_gen().test_properties(|x| {
+        let result = T::checked_from(&x);
+        if x.significant_bits() <= T::WIDTH {
+            assert_eq!(Natural::from(result.unwrap()), x);
+            assert_eq!(result, Some(T::wrapping_from(&x)));
+            assert_eq!(result, Some(T::exact_from(&x)));
+        } else {
+            assert!(result.is_none());
+        }
+        assert_eq!(result.is_none(), T::overflowing_from(&x).1);
+
+        let result = T::wrapping_from(&x);
+        assert_eq!(result, T::exact_from(&(&x).mod_power_of_2(T::WIDTH)));
+    });
+}
+
+fn signed_properties<
+    T: for<'a> CheckedFrom<&'a Natural>
+        + for<'a> OverflowingFrom<&'a Natural>
+        + PartialEq<Natural>
+        + PrimitiveSigned
+        + for<'a> WrappingFrom<&'a Natural>,
+>()
+where
+    Natural: ExactFrom<T>,
+{
+    natural_gen().test_properties(|x| {
+        let result = T::checked_from(&x);
+        if x >= 0 && x.significant_bits() < T::WIDTH {
+            assert_eq!(Natural::exact_from(result.unwrap()), x);
+            assert_eq!(result, Some(T::wrapping_from(&x)));
+            assert_eq!(result, Some(T::exact_from(&x)));
+        } else {
+            assert!(result.is_none());
+        }
+        assert_eq!(result.is_none(), T::overflowing_from(&x).1);
+    });
+}
+
+#[test]
+fn primitive_int_from_natural_properties() {
+    apply_fn_to_primitive_ints!(primitive_int_properties);
+    apply_fn_to_unsigneds!(unsigned_properties);
+    apply_fn_to_signeds!(signed_properties);
 }

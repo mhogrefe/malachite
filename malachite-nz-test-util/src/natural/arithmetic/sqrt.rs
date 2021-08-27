@@ -2,27 +2,8 @@ use malachite_base::num::arithmetic::traits::{PowerOf2, ShrRound, Square};
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_nz::natural::arithmetic::root::floor_inverse_binary;
 use malachite_nz::natural::Natural;
-use std::cmp::Ordering;
-
-fn floor_inverse_binary<F: Fn(&Natural) -> Natural>(
-    f: F,
-    x: &Natural,
-    mut low: Natural,
-    mut high: Natural,
-) -> Natural {
-    loop {
-        if high <= low {
-            return low;
-        }
-        let mid = (&low + &high).shr_round(1, RoundingMode::Ceiling);
-        match f(&mid).cmp(x) {
-            Ordering::Equal => return mid,
-            Ordering::Less => low = mid,
-            Ordering::Greater => high = mid - Natural::ONE,
-        }
-    }
-}
 
 #[doc(hidden)]
 pub fn _floor_sqrt_binary(x: &Natural) -> Natural {

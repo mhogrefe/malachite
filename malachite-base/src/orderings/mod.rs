@@ -11,8 +11,8 @@ pub(crate) const ORDERINGS: [Ordering; 3] = [Ordering::Equal, Ordering::Less, Or
 ///
 /// # Examples
 /// ```
-/// use std::cmp::Ordering;
 /// use malachite_base::orderings::ordering_from_str;
+/// use std::cmp::Ordering;
 ///
 /// assert_eq!(ordering_from_str("Equal"), Some(Ordering::Equal));
 /// assert_eq!(ordering_from_str("Less"), Some(Ordering::Less));

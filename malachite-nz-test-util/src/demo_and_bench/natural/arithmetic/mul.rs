@@ -1456,10 +1456,7 @@ fn benchmark_natural_mul_assign_library_comparison(
         limit,
         file_name,
         &pair_2_pair_natural_max_bit_bucketer("x", "y"),
-        &mut [
-            ("Malachite", &mut |(_, (mut x, y))| x *= y),
-            ("rug", &mut |((mut x, y), _)| x *= y),
-        ],
+        &mut [("Malachite", &mut |(_, (mut x, y))| x *= y), ("rug", &mut |((mut x, y), _)| x *= y)],
     );
 }
 

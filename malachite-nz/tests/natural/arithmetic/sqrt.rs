@@ -1,8 +1,8 @@
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::arithmetic::traits::{
-    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ShrRound, SqrtRem,
-    SqrtRemAssign, Square,
+    CeilingRoot, CeilingSqrt, CeilingSqrtAssign, CheckedRoot, CheckedSqrt, FloorRoot, FloorSqrt,
+    FloorSqrtAssign, RootRem, ShrRound, SqrtAssignRem, SqrtRem, Square,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One};
@@ -320,9 +320,7 @@ fn test_limbs_sqrt_to_out() {
             2572912965, 1596092594, 2193991530, 2899278504, 3717617329, 1249076698, 879590153,
             4210532297, 3303769392, 1147691304, 3624392894,
         ],
-        &[
-            3491190173, 18317336, 2518787533, 3220458996, 3998374718, 60202,
-        ],
+        &[3491190173, 18317336, 2518787533, 3220458996, 3998374718, 60202],
     );
     // xs_len.even() && shift == 0
     test(
@@ -634,7 +632,7 @@ fn test_sqrt_rem() {
         assert_eq!(rem.to_string(), rem_out);
 
         let mut n = n;
-        assert_eq!(n.sqrt_rem_assign().to_string(), rem_out);
+        assert_eq!(n.sqrt_assign_rem().to_string(), rem_out);
         assert_eq!(n.to_string(), sqrt_out);
     };
     test("0", "0", "0");
@@ -823,6 +821,7 @@ fn floor_sqrt_properties() {
         n_alt.floor_sqrt_assign();
         assert_eq!(n_alt, sqrt);
         assert_eq!(_floor_sqrt_binary(&n), sqrt);
+        assert_eq!((&n).floor_root(2), sqrt);
         assert_eq!(biguint_to_natural(&natural_to_biguint(&n).sqrt()), sqrt);
         assert_eq!(
             rug_integer_to_natural(&natural_to_rug_integer(&n).sqrt()),
@@ -854,6 +853,7 @@ fn ceiling_sqrt_properties() {
         n_alt.ceiling_sqrt_assign();
         assert_eq!(n_alt, sqrt);
         assert_eq!(_ceiling_sqrt_binary(&n), sqrt);
+        assert_eq!((&n).ceiling_root(2), sqrt);
         let square = (&sqrt).square();
         let floor_sqrt = (&n).floor_sqrt();
         if square == n {
@@ -878,6 +878,7 @@ fn checked_sqrt_properties() {
         let sqrt = n.clone().checked_sqrt();
         assert_eq!((&n).checked_sqrt(), sqrt);
         assert_eq!(_checked_sqrt_binary(&n), sqrt);
+        assert_eq!((&n).checked_root(2), sqrt);
         if let Some(sqrt) = sqrt {
             assert_eq!((&sqrt).square(), n);
             assert_eq!((&n).floor_sqrt(), sqrt);
@@ -899,9 +900,10 @@ fn sqrt_rem_properties() {
         let (sqrt, rem) = n.clone().sqrt_rem();
         assert_eq!((&n).sqrt_rem(), (sqrt.clone(), rem.clone()));
         let mut n_alt = n.clone();
-        assert_eq!(n_alt.sqrt_rem_assign(), rem);
+        assert_eq!(n_alt.sqrt_assign_rem(), rem);
         assert_eq!(n_alt, sqrt);
         assert_eq!(_sqrt_rem_binary(&n), (sqrt.clone(), rem.clone()));
+        assert_eq!((&n).root_rem(2), (sqrt.clone(), rem.clone()));
         let (rug_sqrt, rug_rem) = natural_to_rug_integer(&n).sqrt_rem(rug::Integer::new());
         assert_eq!(rug_integer_to_natural(&rug_sqrt), sqrt);
         assert_eq!(rug_integer_to_natural(&rug_rem), rem);

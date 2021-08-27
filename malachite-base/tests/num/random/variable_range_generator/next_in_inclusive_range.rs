@@ -23,9 +23,7 @@ fn test_next_in_inclusive_range() {
     next_in_inclusive_range_helper::<u32>(
         10,
         19,
-        &[
-            11, 17, 15, 14, 16, 14, 12, 18, 11, 17, 15, 10, 12, 16, 13, 15, 12, 12, 19, 15,
-        ],
+        &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17, 15, 10, 12, 16, 13, 15, 12, 12, 19, 15],
     );
     next_in_inclusive_range_helper::<u8>(
         0,

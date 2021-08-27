@@ -79,7 +79,6 @@ fn test_width_constants() {
     assert_eq!(i128::WIDTH_MASK, 0x7f);
 }
 
-#[allow(clippy::float_cmp)]
 #[test]
 fn test_other_float_constants() {
     assert_eq!(f32::WIDTH, 32);

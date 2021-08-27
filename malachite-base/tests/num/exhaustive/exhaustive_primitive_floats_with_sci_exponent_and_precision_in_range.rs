@@ -74,9 +74,7 @@ fn test_exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range() {
         core::f32::consts::PI,
         1,
         7,
-        &[
-            2.71875, 2.78125, 2.84375, 2.90625, 2.96875, 3.03125, 3.09375,
-        ],
+        &[2.71875, 2.78125, 2.84375, 2.90625, 2.96875, 3.03125, 3.09375],
     );
 
     exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f32>(
@@ -206,9 +204,7 @@ fn test_exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range() {
         core::f64::consts::PI,
         1,
         7,
-        &[
-            2.71875, 2.78125, 2.84375, 2.90625, 2.96875, 3.03125, 3.09375,
-        ],
+        &[2.71875, 2.78125, 2.84375, 2.90625, 2.96875, 3.03125, 3.09375],
     );
 
     exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range_helper::<f64>(

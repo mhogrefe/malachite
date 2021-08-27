@@ -63,7 +63,10 @@ impl Iterator for WeightedGraphicRandomCharRange {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_chars(EXAMPLE_SEED).take(10).collect::<String>().as_str(),
+///     random_chars(EXAMPLE_SEED)
+///         .take(10)
+///         .collect::<String>()
+///         .as_str(),
 ///     "\u{5f771}\u{87234}\u{bcd36}\u{9e195}\u{5da07}\u{36553}\u{45028}\u{1cdfd}\u{d8530}\u{c7f2e}"
 /// )
 /// ```
@@ -92,7 +95,10 @@ pub fn random_chars(seed: Seed) -> RandomCharRange {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_ascii_chars(EXAMPLE_SEED).take(20).collect::<String>().as_str(),
+///     random_ascii_chars(EXAMPLE_SEED)
+///         .take(20)
+///         .collect::<String>()
+///         .as_str(),
 ///     "q^\u{17}bF\\4T!/\u{1}q6\n/\u{11}Y\\wB"
 /// )
 /// ```
@@ -129,7 +135,10 @@ pub fn random_ascii_chars(seed: Seed) -> RandomCharRange {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_char_range(EXAMPLE_SEED, 'a', 'z').take(50).collect::<String>().as_str(),
+///     random_char_range(EXAMPLE_SEED, 'a', 'z')
+///         .take(50)
+///         .collect::<String>()
+///         .as_str(),
 ///     "rlewrsgkdlbeouylrelopxqkoonftexoshqulgvonioatekqes"
 /// )
 /// ```
@@ -170,7 +179,10 @@ pub fn random_char_range(seed: Seed, a: char, mut b: char) -> RandomCharRange {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_char_inclusive_range(EXAMPLE_SEED, 'a', 'z').take(50).collect::<String>().as_str(),
+///     random_char_inclusive_range(EXAMPLE_SEED, 'a', 'z')
+///         .take(50)
+///         .collect::<String>()
+///         .as_str(),
 ///     "rlewrsgkdlbeouylrelopxqkoonftexoshqulgvonioatekqes"
 /// )
 /// ```
@@ -220,7 +232,10 @@ pub fn random_char_inclusive_range(seed: Seed, a: char, b: char) -> RandomCharRa
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     graphic_weighted_random_chars(EXAMPLE_SEED, 10, 11).take(20).collect::<String>().as_str(),
+///     graphic_weighted_random_chars(EXAMPLE_SEED, 10, 11)
+///         .take(20)
+///         .collect::<String>()
+///         .as_str(),
 ///     "𘓸𰫖祝껆ꆍ枽쮱𬭊▟𣡌⢻𱉳灋\u{8c401}ՠ𦷆𪑘\u{369b5}\u{d5da0}𧎊"
 /// )
 /// ```
@@ -275,7 +290,9 @@ pub fn graphic_weighted_random_chars(
 ///
 /// assert_eq!(
 ///     graphic_weighted_random_ascii_chars(EXAMPLE_SEED, 10, 11)
-///         .take(40).collect::<String>().as_str(),
+///         .take(40)
+///         .collect::<String>()
+///         .as_str(),
 ///     "x14N(bcXr$g)7\u{1b}/E+\u{8}\rf\u{2}\u{11}Y\u{11}Poo.$V2R.$V=6\u{13}\t\u{11}"
 /// )
 /// ```
@@ -335,7 +352,9 @@ pub fn graphic_weighted_random_ascii_chars(
 ///
 /// assert_eq!(
 ///     graphic_weighted_random_char_range(EXAMPLE_SEED, '\u{100}', '\u{400}', 10, 11)
-///         .take(30).collect::<String>().as_str(),
+///         .take(30)
+///         .collect::<String>()
+///         .as_str(),
 ///     "ǘɂŜȢΙƘƣʅΰǟ˳ˊȇ\u{31b}ʰɥΈ\u{324}\u{35a}Ϟ\u{367}\u{337}ƃ\u{342}ʌμƢϳϪǰ"
 /// )
 /// ```
@@ -394,7 +413,9 @@ pub fn graphic_weighted_random_char_range(
 ///
 /// assert_eq!(
 ///     graphic_weighted_random_char_inclusive_range(EXAMPLE_SEED, '\u{100}', '\u{3ff}', 10, 11)
-///         .take(30).collect::<String>().as_str(),
+///         .take(30)
+///         .collect::<String>()
+///         .as_str(),
 ///     "ǘɂŜȢΙƘƣʅΰǟ˳ˊȇ\u{31b}ʰɥΈ\u{324}\u{35a}Ϟ\u{367}\u{337}ƃ\u{342}ʌμƢϳϪǰ"
 /// )
 /// ```

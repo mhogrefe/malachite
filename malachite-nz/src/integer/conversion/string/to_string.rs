@@ -198,11 +198,17 @@ impl Display for Integer {
     /// assert_eq!(Integer::ZERO.to_string(), "0");
     ///
     /// assert_eq!(Integer::from(123).to_string(), "123");
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().to_string(), "1000000000000");
+    /// assert_eq!(
+    ///     Integer::from_str("1000000000000").unwrap().to_string(),
+    ///     "1000000000000"
+    /// );
     /// assert_eq!(format!("{:05}", Integer::from(123)), "00123");
     ///
     /// assert_eq!(Integer::from(-123).to_string(), "-123");
-    /// assert_eq!(Integer::from_str("-1000000000000").unwrap().to_string(), "-1000000000000");
+    /// assert_eq!(
+    ///     Integer::from_str("-1000000000000").unwrap().to_string(),
+    ///     "-1000000000000"
+    /// );
     /// assert_eq!(format!("{:05}", Integer::from(-123)), "-0123");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
@@ -241,12 +247,19 @@ impl Debug for Integer {
     /// assert_eq!(Integer::ZERO.to_debug_string(), "0");
     ///
     /// assert_eq!(Integer::from(123).to_debug_string(), "123");
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().to_debug_string(), "1000000000000");
+    /// assert_eq!(
+    ///     Integer::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_debug_string(),
+    ///     "1000000000000"
+    /// );
     /// assert_eq!(format!("{:05?}", Integer::from(123)), "00123");
     ///
     /// assert_eq!(Integer::from(-123).to_debug_string(), "-123");
     /// assert_eq!(
-    ///     Integer::from_str("-1000000000000").unwrap().to_debug_string(),
+    ///     Integer::from_str("-1000000000000")
+    ///         .unwrap()
+    ///         .to_debug_string(),
     ///     "-1000000000000"
     /// );
     /// assert_eq!(format!("{:05?}", Integer::from(-123)), "-0123");
@@ -273,21 +286,25 @@ impl Binary for Integer {
     /// ```
     /// extern crate malachite_base;
     ///
-    /// use malachite_base::strings::ToBinaryString;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToBinaryString;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_binary_string(), "0");
     /// assert_eq!(Integer::from(123).to_binary_string(), "1111011");
     /// assert_eq!(
-    ///     Integer::from_str("1000000000000").unwrap().to_binary_string(),
+    ///     Integer::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_binary_string(),
     ///     "1110100011010100101001010001000000000000"
     /// );
     /// assert_eq!(format!("{:011b}", Integer::from(123)), "00001111011");
     /// assert_eq!(Integer::from(-123).to_binary_string(), "-1111011");
     /// assert_eq!(
-    ///     Integer::from_str("-1000000000000").unwrap().to_binary_string(),
+    ///     Integer::from_str("-1000000000000")
+    ///         .unwrap()
+    ///         .to_binary_string(),
     ///     "-1110100011010100101001010001000000000000"
     /// );
     /// assert_eq!(format!("{:011b}", Integer::from(-123)), "-0001111011");
@@ -347,18 +364,25 @@ impl Octal for Integer {
     /// ```
     /// extern crate malachite_base;
     ///
-    /// use malachite_base::strings::ToOctalString;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToOctalString;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_octal_string(), "0");
     /// assert_eq!(Integer::from(123).to_octal_string(), "173");
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().to_octal_string(), "16432451210000");
+    /// assert_eq!(
+    ///     Integer::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_octal_string(),
+    ///     "16432451210000"
+    /// );
     /// assert_eq!(format!("{:07o}", Integer::from(123)), "0000173");
     /// assert_eq!(Integer::from(-123).to_octal_string(), "-173");
     /// assert_eq!(
-    ///     Integer::from_str("-1000000000000").unwrap().to_octal_string(),
+    ///     Integer::from_str("-1000000000000")
+    ///         .unwrap()
+    ///         .to_octal_string(),
     ///     "-16432451210000"
     /// );
     /// assert_eq!(format!("{:07o}", Integer::from(-123)), "-000173");
@@ -418,28 +442,41 @@ impl LowerHex for Integer {
     /// ```
     /// extern crate malachite_base;
     ///
-    /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_lower_hex_string(), "0");
     /// assert_eq!(Integer::from(123).to_lower_hex_string(), "7b");
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().to_lower_hex_string(), "e8d4a51000");
+    /// assert_eq!(
+    ///     Integer::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_lower_hex_string(),
+    ///     "e8d4a51000"
+    /// );
     /// assert_eq!(format!("{:07x}", Integer::from(123)), "000007b");
     /// assert_eq!(Integer::from(-123).to_lower_hex_string(), "-7b");
     /// assert_eq!(
-    ///     Integer::from_str("-1000000000000").unwrap().to_lower_hex_string(),
+    ///     Integer::from_str("-1000000000000")
+    ///         .unwrap()
+    ///         .to_lower_hex_string(),
     ///     "-e8d4a51000"
     /// );
     /// assert_eq!(format!("{:07x}", Integer::from(-123)), "-00007b");
     ///
     /// assert_eq!(format!("{:#x}", Integer::ZERO), "0x0");
     /// assert_eq!(format!("{:#x}", Integer::from(123)), "0x7b");
-    /// assert_eq!(format!("{:#x}", Integer::from_str("1000000000000").unwrap()), "0xe8d4a51000");
+    /// assert_eq!(
+    ///     format!("{:#x}", Integer::from_str("1000000000000").unwrap()),
+    ///     "0xe8d4a51000"
+    /// );
     /// assert_eq!(format!("{:#07x}", Integer::from(123)), "0x0007b");
     /// assert_eq!(format!("{:#x}", Integer::from(-123)), "-0x7b");
-    /// assert_eq!(format!("{:#x}", Integer::from_str("-1000000000000").unwrap()), "-0xe8d4a51000");
+    /// assert_eq!(
+    ///     format!("{:#x}", Integer::from_str("-1000000000000").unwrap()),
+    ///     "-0xe8d4a51000"
+    /// );
     /// assert_eq!(format!("{:#07x}", Integer::from(-123)), "-0x007b");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
@@ -483,28 +520,41 @@ impl UpperHex for Integer {
     /// ```
     /// extern crate malachite_base;
     ///
-    /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_nz::integer::Integer;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Integer::ZERO.to_upper_hex_string(), "0");
     /// assert_eq!(Integer::from(123).to_upper_hex_string(), "7B");
-    /// assert_eq!(Integer::from_str("1000000000000").unwrap().to_upper_hex_string(), "E8D4A51000");
+    /// assert_eq!(
+    ///     Integer::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_upper_hex_string(),
+    ///     "E8D4A51000"
+    /// );
     /// assert_eq!(format!("{:07X}", Integer::from(123)), "000007B");
     /// assert_eq!(Integer::from(-123).to_upper_hex_string(), "-7B");
     /// assert_eq!(
-    ///     Integer::from_str("-1000000000000").unwrap().to_upper_hex_string(),
+    ///     Integer::from_str("-1000000000000")
+    ///         .unwrap()
+    ///         .to_upper_hex_string(),
     ///     "-E8D4A51000"
     /// );
     /// assert_eq!(format!("{:07X}", Integer::from(-123)), "-00007B");
     ///
     /// assert_eq!(format!("{:#X}", Integer::ZERO), "0x0");
     /// assert_eq!(format!("{:#X}", Integer::from(123)), "0x7B");
-    /// assert_eq!(format!("{:#X}", Integer::from_str("1000000000000").unwrap()), "0xE8D4A51000");
+    /// assert_eq!(
+    ///     format!("{:#X}", Integer::from_str("1000000000000").unwrap()),
+    ///     "0xE8D4A51000"
+    /// );
     /// assert_eq!(format!("{:#07X}", Integer::from(123)), "0x0007B");
     /// assert_eq!(format!("{:#X}", Integer::from(-123)), "-0x7B");
-    /// assert_eq!(format!("{:#X}", Integer::from_str("-1000000000000").unwrap()), "-0xE8D4A51000");
+    /// assert_eq!(
+    ///     format!("{:#X}", Integer::from_str("-1000000000000").unwrap()),
+    ///     "-0xE8D4A51000"
+    /// );
     /// assert_eq!(format!("{:#07X}", Integer::from(-123)), "-0x007B");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {

@@ -23,6 +23,7 @@
 )]
 #![allow(
     clippy::cognitive_complexity,
+    clippy::float_cmp,
     clippy::many_single_char_names,
     clippy::too_many_arguments,
     clippy::upper_case_acronyms,
@@ -156,7 +157,7 @@ pub mod tuples;
 /// ```
 /// use std::str::FromStr;
 ///
-/// use malachite_base::unions::{UnionFromStrError, Union3};
+/// use malachite_base::unions::{Union3, UnionFromStrError};
 ///
 /// let u3: Union3<bool, u32, char> = Union3::from_str("B(5)").unwrap();
 /// assert_eq!(u3, Union3::B(5));

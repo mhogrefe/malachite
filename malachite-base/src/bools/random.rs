@@ -112,7 +112,9 @@ impl Iterator for WeightedRandomBools {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     weighted_random_bools(EXAMPLE_SEED, 3, 4).take(10).collect_vec(),
+///     weighted_random_bools(EXAMPLE_SEED, 3, 4)
+///         .take(10)
+///         .collect_vec(),
 ///     &[true, true, false, true, false, false, true, false, true, true]
 /// )
 /// ```

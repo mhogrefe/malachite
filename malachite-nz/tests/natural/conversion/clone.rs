@@ -1,4 +1,10 @@
+use malachite_base_test_util::generators::{unsigned_gen, unsigned_pair_gen_var_27};
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_nz_test_util::generators::{natural_gen, natural_pair_gen};
 use num::BigUint;
 use rug;
 use std::str::FromStr;
@@ -41,4 +47,53 @@ fn test_clone_and_clone_from() {
     test("123", "1000000000000");
     test("1000000000000", "123");
     test("1000000000000", "2000000000000");
+}
+
+#[allow(clippy::redundant_clone)]
+#[test]
+fn clone_and_clone_from_properties() {
+    natural_gen().test_properties(|x| {
+        let mut_x = x.clone();
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, x);
+
+        assert_eq!(biguint_to_natural(&natural_to_biguint(&x).clone()), x);
+        assert_eq!(
+            rug_integer_to_natural(&natural_to_rug_integer(&x).clone()),
+            x
+        );
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        let n = Natural::from(u);
+        let cloned_u = u;
+        let cloned_n = n.clone();
+        assert_eq!(cloned_u, cloned_n);
+    });
+
+    natural_pair_gen().test_properties(|(x, y)| {
+        let mut mut_x = x.clone();
+        mut_x.clone_from(&y);
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, y);
+
+        let mut num_x = natural_to_biguint(&x);
+        num_x.clone_from(&natural_to_biguint(&y));
+        assert_eq!(biguint_to_natural(&num_x), y);
+
+        let mut rug_x = natural_to_rug_integer(&x);
+        rug_x.clone_from(&natural_to_rug_integer(&y));
+        assert_eq!(rug_integer_to_natural(&rug_x), y);
+    });
+
+    unsigned_pair_gen_var_27::<Limb>().test_properties(|(u, v)| {
+        let x = Natural::from(u);
+        let y = Natural::from(v);
+
+        let mut mut_u = u;
+        let mut mut_x = x.clone();
+        mut_u.clone_from(&v);
+        mut_x.clone_from(&y);
+        assert_eq!(mut_x, mut_u);
+    });
 }

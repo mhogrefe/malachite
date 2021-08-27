@@ -196,12 +196,7 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
         2,
         exhaustive_bools(),
         4,
-        &[
-            &[false, false],
-            &[false, true],
-            &[true, false],
-            &[true, true],
-        ],
+        &[&[false, false], &[false, true], &[true, false], &[true, true]],
     );
     exhaustive_fixed_length_vecs_from_single_finite_helper(
         4,
@@ -231,66 +226,26 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
         exhaustive_bools(),
         1024,
         &[
-            &[
-                false, false, false, false, false, false, false, false, false, false,
-            ],
-            &[
-                false, false, false, false, false, false, false, false, false, true,
-            ],
-            &[
-                false, false, false, false, false, false, false, false, true, false,
-            ],
-            &[
-                false, false, false, false, false, false, false, false, true, true,
-            ],
-            &[
-                false, false, false, false, false, false, false, true, false, false,
-            ],
-            &[
-                false, false, false, false, false, false, false, true, false, true,
-            ],
-            &[
-                false, false, false, false, false, false, false, true, true, false,
-            ],
-            &[
-                false, false, false, false, false, false, false, true, true, true,
-            ],
-            &[
-                false, false, false, false, false, false, true, false, false, false,
-            ],
-            &[
-                false, false, false, false, false, false, true, false, false, true,
-            ],
-            &[
-                false, false, false, false, false, false, true, false, true, false,
-            ],
-            &[
-                false, false, false, false, false, false, true, false, true, true,
-            ],
-            &[
-                false, false, false, false, false, false, true, true, false, false,
-            ],
-            &[
-                false, false, false, false, false, false, true, true, false, true,
-            ],
-            &[
-                false, false, false, false, false, false, true, true, true, false,
-            ],
-            &[
-                false, false, false, false, false, false, true, true, true, true,
-            ],
-            &[
-                false, false, false, false, false, true, false, false, false, false,
-            ],
-            &[
-                false, false, false, false, false, true, false, false, false, true,
-            ],
-            &[
-                false, false, false, false, false, true, false, false, true, false,
-            ],
-            &[
-                false, false, false, false, false, true, false, false, true, true,
-            ],
+            &[false, false, false, false, false, false, false, false, false, false],
+            &[false, false, false, false, false, false, false, false, false, true],
+            &[false, false, false, false, false, false, false, false, true, false],
+            &[false, false, false, false, false, false, false, false, true, true],
+            &[false, false, false, false, false, false, false, true, false, false],
+            &[false, false, false, false, false, false, false, true, false, true],
+            &[false, false, false, false, false, false, false, true, true, false],
+            &[false, false, false, false, false, false, false, true, true, true],
+            &[false, false, false, false, false, false, true, false, false, false],
+            &[false, false, false, false, false, false, true, false, false, true],
+            &[false, false, false, false, false, false, true, false, true, false],
+            &[false, false, false, false, false, false, true, false, true, true],
+            &[false, false, false, false, false, false, true, true, false, false],
+            &[false, false, false, false, false, false, true, true, false, true],
+            &[false, false, false, false, false, false, true, true, true, false],
+            &[false, false, false, false, false, false, true, true, true, true],
+            &[false, false, false, false, false, true, false, false, false, false],
+            &[false, false, false, false, false, true, false, false, false, true],
+            &[false, false, false, false, false, true, false, false, true, false],
+            &[false, false, false, false, false, true, false, false, true, true],
         ],
     );
     exhaustive_fixed_length_vecs_from_single_finite_helper(

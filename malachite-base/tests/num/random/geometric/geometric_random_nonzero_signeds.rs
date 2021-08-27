@@ -37,19 +37,9 @@ fn geometric_random_nonzero_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
 #[test]
 fn test_geometric_random_nonzero_signeds() {
     // i64, um = 65 / 64
-    let values = &[
-        -1, -1, -1, 1, -1, 1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, -1,
-    ];
-    let common_values = &[
-        (1, 492630),
-        (-1, 491792),
-        (2, 7695),
-        (-2, 7623),
-        (-3, 130),
-        (3, 128),
-        (4, 1),
-        (-4, 1),
-    ];
+    let values = &[-1, -1, -1, 1, -1, 1, -1, -1, -1, 1, 1, 1, -1, -1, 1, -1, -1, -1, -1, -1];
+    let common_values =
+        &[(1, 492630), (-1, 491792), (2, 7695), (-2, 7623), (-3, 130), (3, 128), (4, 1), (-4, 1)];
     let abs_mean = NiceFloat(1.0158400000000025);
     let pop_median = (-1, Some(1));
     let sample_median = (1, None);
@@ -78,9 +68,7 @@ fn test_geometric_random_nonzero_signeds() {
     );
 
     // i64, um = 12345/10000
-    let values = &[
-        -3, -1, -1, 2, -1, 1, -1, -1, -1, 1, 3, 2, -2, -1, 1, -1, -2, -1, -1, -1,
-    ];
+    let values = &[-3, -1, -1, 2, -1, 1, -1, -1, -1, 1, 3, 2, -2, -1, 1, -1, -2, -1, -1, -1];
     let common_values = &[
         (1, 405592),
         (-1, 404788),
@@ -121,9 +109,7 @@ fn test_geometric_random_nonzero_signeds() {
     );
 
     // i64, um = 2
-    let values = &[
-        -2, -2, -2, 2, -3, 2, -1, -1, -1, 1, 1, 1, -2, -1, 1, -2, -1, -1, -2, -1,
-    ];
+    let values = &[-2, -2, -2, 2, -3, 2, -1, -1, -1, 1, 1, 1, -2, -1, 1, -2, -1, -1, -2, -1];
     let common_values = &[
         (1, 250123),
         (-1, 250114),
@@ -207,9 +193,8 @@ fn test_geometric_random_nonzero_signeds() {
     );
 
     // i8, um = 1000
-    let values = &[
-        29, -58, 40, 58, 29, 21, -101, 50, 126, -3, 13, 22, 22, 69, 70, 62, -82, -67, 91, 87,
-    ];
+    let values =
+        &[29, -58, 40, 58, 29, 21, -101, 50, 126, -3, 13, 22, 22, 69, 70, 62, -82, -67, 91, 87];
     let common_values = &[
         (3, 4314),
         (-1, 4293),

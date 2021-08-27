@@ -31,12 +31,6 @@ fn test_delta_directions() {
     );
     delta_directions_helper(
         &[3, 1, 4, 1, 5, 9],
-        &[
-            Ordering::Less,
-            Ordering::Greater,
-            Ordering::Less,
-            Ordering::Greater,
-            Ordering::Greater,
-        ],
+        &[Ordering::Less, Ordering::Greater, Ordering::Less, Ordering::Greater, Ordering::Greater],
     );
 }

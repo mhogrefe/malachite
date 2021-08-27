@@ -16,6 +16,7 @@ use platform::Limb;
 use std::cmp::{min, Ordering};
 
 impl Natural {
+    #[doc(hidden)]
     pub fn _to_power_of_2_digits_asc_naive<
         T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
     >(
@@ -43,6 +44,7 @@ impl Natural {
         digits
     }
 
+    #[doc(hidden)]
     pub fn _from_power_of_2_digits_asc_naive<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
         log_base: u64,
         digits: I,
@@ -322,8 +324,7 @@ macro_rules! power_of_2_digits_unsigned {
             ///     2
             /// );
             /// assert_eq!(
-            ///     Natural::from_power_of_2_digits_desc(3, [1u16, 7, 3].iter().cloned())
-            ///         .unwrap(),
+            ///     Natural::from_power_of_2_digits_desc(3, [1u16, 7, 3].iter().cloned()).unwrap(),
             ///     123
             /// );
             ///
@@ -526,13 +527,22 @@ impl PowerOf2Digits<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let digits = &[Natural::ZERO, Natural::ZERO, Natural::ZERO];
-    /// assert_eq!(Natural::from_power_of_2_digits_asc(6, digits.iter().cloned()).unwrap(), 0);
+    /// assert_eq!(
+    ///     Natural::from_power_of_2_digits_asc(6, digits.iter().cloned()).unwrap(),
+    ///     0
+    /// );
     ///
     /// let digits = &[Natural::TWO, Natural::ZERO];
-    /// assert_eq!(Natural::from_power_of_2_digits_asc(6, digits.iter().cloned()).unwrap(), 2);
+    /// assert_eq!(
+    ///     Natural::from_power_of_2_digits_asc(6, digits.iter().cloned()).unwrap(),
+    ///     2
+    /// );
     ///
     /// let digits = &[Natural::from(3u32), Natural::from(7u32), Natural::ONE];
-    /// assert_eq!(Natural::from_power_of_2_digits_asc(3, digits.iter().cloned()).unwrap(), 123);
+    /// assert_eq!(
+    ///     Natural::from_power_of_2_digits_asc(3, digits.iter().cloned()).unwrap(),
+    ///     123
+    /// );
     ///
     /// let digits = &[Natural::from(100u32)];
     /// assert!(Natural::from_power_of_2_digits_asc(3, digits.iter().cloned()).is_none());
@@ -621,13 +631,22 @@ impl PowerOf2Digits<Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let digits = &[Natural::ZERO, Natural::ZERO, Natural::ZERO];
-    /// assert_eq!(Natural::from_power_of_2_digits_desc(6, digits.iter().cloned()).unwrap(), 0);
+    /// assert_eq!(
+    ///     Natural::from_power_of_2_digits_desc(6, digits.iter().cloned()).unwrap(),
+    ///     0
+    /// );
     ///
     /// let digits = &[Natural::ZERO, Natural::TWO];
-    /// assert_eq!(Natural::from_power_of_2_digits_desc(6, digits.iter().cloned()).unwrap(), 2);
+    /// assert_eq!(
+    ///     Natural::from_power_of_2_digits_desc(6, digits.iter().cloned()).unwrap(),
+    ///     2
+    /// );
     ///
     /// let digits = &[Natural::ONE, Natural::from(7u32), Natural::from(3u32)];
-    /// assert_eq!(Natural::from_power_of_2_digits_desc(3, digits.iter().cloned()).unwrap(), 123);
+    /// assert_eq!(
+    ///     Natural::from_power_of_2_digits_desc(3, digits.iter().cloned()).unwrap(),
+    ///     123
+    /// );
     ///
     /// let digits = &[Natural::from(100u32)];
     /// assert!(Natural::from_power_of_2_digits_desc(3, digits.iter().cloned()).is_none());
@@ -697,6 +716,7 @@ impl PowerOf2Digits<Natural> for Natural {
 }
 
 impl Natural {
+    #[doc(hidden)]
     pub fn _to_power_of_2_digits_asc_natural_naive(&self, log_base: u64) -> Vec<Natural> {
         assert_ne!(log_base, 0);
         let digit_len = self
@@ -712,6 +732,7 @@ impl Natural {
         digits
     }
 
+    #[doc(hidden)]
     pub fn _from_power_of_2_digits_asc_natural_naive<I: Iterator<Item = Natural>>(
         log_base: u64,
         digits: I,

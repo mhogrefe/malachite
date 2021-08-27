@@ -82,7 +82,10 @@ impl Iterator for ExhaustiveNaturalRangeToInfinity {
 /// use malachite_nz::natural::exhaustive::exhaustive_naturals;
 ///
 /// assert_eq!(
-///     exhaustive_naturals().take(10).collect_vec().to_debug_string(),
+///     exhaustive_naturals()
+///         .take(10)
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]"
 /// )
 /// ```
@@ -118,7 +121,10 @@ pub const fn exhaustive_naturals() -> ExhaustiveNaturalRangeToInfinity {
 /// use malachite_nz::natural::exhaustive::exhaustive_positive_naturals;
 ///
 /// assert_eq!(
-///     exhaustive_positive_naturals().take(10).collect_vec().to_debug_string(),
+///     exhaustive_positive_naturals()
+///         .take(10)
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
 /// )
 /// ```
@@ -163,7 +169,8 @@ pub const fn exhaustive_positive_naturals() -> ExhaustiveNaturalRangeToInfinity 
 ///
 /// assert_eq!(
 ///     exhaustive_natural_range(Natural::exact_from(5), Natural::exact_from(10))
-///         .collect_vec().to_debug_string(),
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[5, 6, 7, 8, 9]"
 /// )
 /// ```
@@ -212,7 +219,8 @@ pub fn exhaustive_natural_range(a: Natural, b: Natural) -> ExhaustiveNaturalRang
 ///
 /// assert_eq!(
 ///     exhaustive_natural_inclusive_range(Natural::exact_from(5), Natural::exact_from(10))
-///         .collect_vec().to_debug_string(),
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[5, 6, 7, 8, 9, 10]"
 /// )
 /// ```
@@ -256,8 +264,10 @@ pub fn exhaustive_natural_inclusive_range(a: Natural, b: Natural) -> ExhaustiveN
 /// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
-///     exhaustive_natural_range_to_infinity(Natural::exact_from(5)).take(10)
-///         .collect_vec().to_debug_string(),
+///     exhaustive_natural_range_to_infinity(Natural::exact_from(5))
+///         .take(10)
+///         .collect_vec()
+///         .to_debug_string(),
 ///     "[5, 6, 7, 8, 9, 10, 11, 12, 13, 14]"
 /// )
 /// ```

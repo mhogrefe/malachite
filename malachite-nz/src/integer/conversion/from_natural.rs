@@ -14,7 +14,10 @@ impl From<Natural> for Integer {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Integer::from(Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!(Integer::from(Natural::trillion()).to_string(), "1000000000000");
+    /// assert_eq!(
+    ///     Integer::from(Natural::trillion()).to_string(),
+    ///     "1000000000000"
+    /// );
     /// ```
     fn from(value: Natural) -> Integer {
         Integer {
@@ -39,7 +42,10 @@ impl<'a> From<&'a Natural> for Integer {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!(Integer::from(&Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!(Integer::from(&Natural::trillion()).to_string(), "1000000000000");
+    /// assert_eq!(
+    ///     Integer::from(&Natural::trillion()).to_string(),
+    ///     "1000000000000"
+    /// );
     /// ```
     fn from(value: &'a Natural) -> Integer {
         Integer {

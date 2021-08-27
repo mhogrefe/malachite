@@ -2,7 +2,7 @@ use integer::Integer;
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 
-impl PowerOf2 for Integer {
+impl PowerOf2<u64> for Integer {
     /// Computes 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(`pow`)

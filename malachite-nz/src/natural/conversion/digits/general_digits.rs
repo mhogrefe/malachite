@@ -36,8 +36,10 @@ use std::cmp::Ordering;
 
 const GET_STR_THRESHOLD_LIMIT: usize = 150;
 
+#[doc(hidden)]
 pub const GET_STR_PRECOMPUTE_THRESHOLD: usize = 29;
 
+#[doc(hidden)]
 #[inline]
 pub const fn get_chars_per_limb(base: u64) -> usize {
     BASES[base as usize].0
@@ -82,12 +84,6 @@ fn limbs_digit_count_helper(bit_count: u64, base: u64) -> u64 {
 
 /// The result is either exact or one too big.
 ///
-/// To be exact always it'd be necessary to examine all the limbs of the
-/// operand, since numbers like 100..000 and 99...999 generally differ only
-/// in the lowest limb.  It'd be possible to examine just a couple of high
-/// limbs to increase the probability of being exact, but that doesn't seem
-/// worth bothering with.
-///
 /// This is MPN_SIZEINBASE from gmp-impl.h, GMP 6.2.1, where result is returned and base is not a
 /// power of 2.
 pub fn limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
@@ -127,6 +123,7 @@ macro_rules! base_10_normalization_step {
 /// `len` must be at least as large as the actual number of digits.
 ///
 /// This is mpn_bc_get_str from mpn/generic/get_str.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn _limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
     out: &mut [T],
     len: usize,
@@ -245,6 +242,7 @@ struct PowerTableIndicesRow {
     digits_in_base: usize, // number of corresponding digits
 }
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct PowerTableRow<'a> {
     power: &'a [Limb],
@@ -258,6 +256,7 @@ const HAVE_MPN_COMPUTE_POWTAB_MUL: bool = DIV_1_VS_MUL_1_PERCENT > 120;
 
 const HAVE_MPN_COMPUTE_POWTAB_DIV: bool = DIV_1_VS_MUL_1_PERCENT < 275;
 
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum PowerTableAlgorithm {
     Mul,
@@ -265,6 +264,7 @@ pub enum PowerTableAlgorithm {
 }
 
 /// This is powtab_decide from mpn/compute_powtab.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn _limbs_choose_power_table_algorithm(
     exptab: &mut [usize],
     xs_len: usize,
@@ -325,6 +325,7 @@ const fn _limbs_to_digits_small_base_divide_and_conquer_scratch_len(xs_len: usiz
 }
 
 /// This is mpn_compute_powtab_mul from mpn/compute_powtab.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn _limbs_compute_power_table_using_mul<'a>(
     power_table_memory: &'a mut [Limb],
     base: u64,
@@ -492,6 +493,7 @@ pub fn _limbs_compute_power_table_using_mul<'a>(
 }
 
 /// This is mpn_compute_powtab_div from mpn/compute_powtab.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn _limbs_compute_power_table_using_div<'a>(
     power_table_memory: &'a mut [Limb],
     base: u64,
@@ -559,6 +561,7 @@ pub fn _limbs_compute_power_table_using_div<'a>(
 }
 
 /// This is mpn_compute_powtab from mpn/compute_powtab.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn _limbs_compute_power_table(
     power_table_memory: &mut [Limb],
     xs_len: usize,
@@ -672,6 +675,7 @@ fn _limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
 
 /// This is mpn_get_str from mpn/generic/get_str.c, GMP 6.2.1, where un != 0 and base is not a power
 /// of two.
+#[doc(hidden)]
 pub fn _limbs_to_digits_small_base<T: PrimitiveUnsigned>(
     out: &mut [T],
     base: u64,
@@ -706,7 +710,8 @@ pub fn _limbs_to_digits_small_base<T: PrimitiveUnsigned>(
     }
 }
 
-// Returns digits in ascending order
+/// Returns digits in ascending order.
+#[doc(hidden)]
 pub fn _limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     digits: &mut Vec<T>,
     xs: &mut [Limb],
@@ -732,6 +737,7 @@ pub fn _limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     digits.truncate(digits.len() - trailing_zeros);
 }
 
+#[doc(hidden)]
 pub fn _to_digits_asc_naive_primitive<T: for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned>(
     digits: &mut Vec<T>,
     x: &Natural,
@@ -747,6 +753,7 @@ pub fn _to_digits_asc_naive_primitive<T: for<'a> ExactFrom<&'a Natural> + Primit
     }
 }
 
+#[doc(hidden)]
 pub fn _to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natural) {
     assert!(*base > 1);
     let mut remainder = x.clone();
@@ -837,6 +844,7 @@ fn _to_digits_asc_divide_and_conquer(
     }
 }
 
+#[doc(hidden)]
 pub fn _to_digits_asc_limb<
     T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
 >(
@@ -891,6 +899,7 @@ where
     }
 }
 
+#[doc(hidden)]
 pub fn _to_digits_desc_limb<
     T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
 >(
@@ -945,7 +954,8 @@ where
     }
 }
 
-// optimized for large base
+/// optimized for large base
+#[doc(hidden)]
 pub fn _to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     if *x == 0 {
         Vec::new()
@@ -972,7 +982,8 @@ pub fn _to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     }
 }
 
-// optimized for large base
+/// optimized for large base
+#[doc(hidden)]
 pub fn _to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     if *x == 0 {
         Vec::new()
@@ -1000,6 +1011,7 @@ pub fn _to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     }
 }
 
+#[doc(hidden)]
 pub fn _from_digits_desc_naive_primitive<T: PrimitiveUnsigned>(xs: &[T], base: T) -> Option<Natural>
 where
     Natural: From<T>,
@@ -1017,6 +1029,7 @@ where
     Some(n)
 }
 
+#[doc(hidden)]
 pub fn _from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natural> {
     assert!(*base > 1);
     let mut n = Natural::ZERO;
@@ -1034,6 +1047,7 @@ pub fn _from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natural
 ///
 /// This is LIMBS_PER_DIGIT_IN_BASE from gmp-impl.h, where res is returned and base is not a power
 /// of 2.
+#[doc(hidden)]
 pub fn limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
     (u64::exact_from(Limb::x_mul_y_is_zz(get_log_2_of_base(base), Limb::exact_from(digit_count)).0)
         >> (Limb::LOG_WIDTH - 3))
@@ -1043,6 +1057,7 @@ pub fn limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
 /// The input digits are in descending order.
 ///
 /// This is mpn_bc_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+#[doc(hidden)]
 pub fn _limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
@@ -1158,6 +1173,7 @@ const SET_STR_DC_THRESHOLD: usize = 7100;
 /// The input digits are in descending order.
 ///
 /// This is mpn_dc_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+#[doc(hidden)]
 pub fn _limbs_from_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
@@ -1241,6 +1257,7 @@ const SET_STR_PRECOMPUTE_THRESHOLD: usize = 7100;
 /// The input digits are in descending order.
 ///
 /// This is mpn_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+#[doc(hidden)]
 pub fn _limbs_from_digits_small_base<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
@@ -1272,6 +1289,7 @@ where
     }
 }
 
+#[doc(hidden)]
 pub fn _from_digits_desc_basecase<T: PrimitiveUnsigned>(xs: &[T], base: Limb) -> Option<Natural>
 where
     Limb: WrappingFrom<T>,
@@ -1354,6 +1372,7 @@ where
     }
 }
 
+#[doc(hidden)]
 pub fn _from_digits_desc_divide_and_conquer(
     xs: &[Natural],
     base: &Natural,
@@ -1381,6 +1400,7 @@ pub fn _from_digits_desc_divide_and_conquer(
     }
 }
 
+#[doc(hidden)]
 pub fn _from_digits_asc_limb<I: Iterator<Item = T>, T: CheckedFrom<Limb> + PrimitiveUnsigned>(
     xs: I,
     base: Limb,
@@ -1462,6 +1482,7 @@ where
     }
 }
 
+#[doc(hidden)]
 pub fn _from_digits_desc_limb<I: Iterator<Item = T>, T: PrimitiveUnsigned>(
     xs: I,
     base: Limb,
@@ -1541,7 +1562,8 @@ where
     }
 }
 
-// optimized for large base
+/// optimized for large base
+#[doc(hidden)]
 pub fn _from_digits_asc_large<I: Iterator<Item = Natural>>(
     xs: I,
     base: &Natural,
@@ -1556,7 +1578,8 @@ pub fn _from_digits_asc_large<I: Iterator<Item = Natural>>(
     }
 }
 
-// optimized for large base
+/// optimized for large base
+#[doc(hidden)]
 pub fn _from_digits_desc_large<I: Iterator<Item = Natural>>(
     xs: I,
     base: &Natural,
@@ -1945,12 +1968,18 @@ impl Digits<Natural> for Natural {
     ///
     /// assert!(Natural::ZERO.to_digits_asc(&Natural::from(6u32)).is_empty());
     ///
-    /// let digits = Natural::TWO.to_digits_asc(&Natural::from(6u32))
-    ///     .iter().map(Natural::to_string).collect_vec();
+    /// let digits = Natural::TWO
+    ///     .to_digits_asc(&Natural::from(6u32))
+    ///     .iter()
+    ///     .map(Natural::to_string)
+    ///     .collect_vec();
     /// assert_eq!(digits.iter().map(String::as_str).collect_vec(), &["2"]);
     ///
-    /// let digits = Natural::from(123456u32).to_digits_asc(&Natural::from(3u32))
-    ///     .iter().map(Natural::to_string).collect_vec();
+    /// let digits = Natural::from(123456u32)
+    ///     .to_digits_asc(&Natural::from(3u32))
+    ///     .iter()
+    ///     .map(Natural::to_string)
+    ///     .collect_vec();
     /// assert_eq!(
     ///     digits.iter().map(String::as_str).collect_vec(),
     ///     &["0", "1", "1", "0", "0", "1", "1", "2", "0", "0", "2"]
@@ -1996,14 +2025,22 @@ impl Digits<Natural> for Natural {
     /// use malachite_base::num::conversion::traits::Digits;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert!(Natural::ZERO.to_digits_desc(&Natural::from(6u32)).is_empty());
+    /// assert!(Natural::ZERO
+    ///     .to_digits_desc(&Natural::from(6u32))
+    ///     .is_empty());
     ///
-    /// let digits = Natural::TWO.to_digits_desc(&Natural::from(6u32))
-    ///     .iter().map(Natural::to_string).collect_vec();
+    /// let digits = Natural::TWO
+    ///     .to_digits_desc(&Natural::from(6u32))
+    ///     .iter()
+    ///     .map(Natural::to_string)
+    ///     .collect_vec();
     /// assert_eq!(digits.iter().map(String::as_str).collect_vec(), &["2"]);
     ///
-    /// let digits = Natural::from(123456u32).to_digits_desc(&Natural::from(3u32))
-    ///     .iter().map(Natural::to_string).collect_vec();
+    /// let digits = Natural::from(123456u32)
+    ///     .to_digits_desc(&Natural::from(3u32))
+    ///     .iter()
+    ///     .map(Natural::to_string)
+    ///     .collect_vec();
     /// assert_eq!(
     ///     digits.iter().map(String::as_str).collect_vec(),
     ///     &["2", "0", "0", "2", "1", "1", "0", "0", "1", "1", "0"]
@@ -2049,32 +2086,41 @@ impl Digits<Natural> for Natural {
     /// assert_eq!(
     ///     Natural::from_digits_asc(
     ///         &Natural::from(64u32),
-    ///         ["0", "0", "0"].iter().map(|s| Natural::from_str(s).unwrap())
-    ///     ).unwrap(),
+    ///         ["0", "0", "0"]
+    ///             .iter()
+    ///             .map(|s| Natural::from_str(s).unwrap())
+    ///     )
+    ///     .unwrap(),
     ///     0
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_asc(
     ///         &Natural::from(3u32),
     ///         ["0", "1", "1", "0", "0", "1", "1", "2", "0", "0", "2"]
-    ///             .iter().map(|s| Natural::from_str(s).unwrap())
-    ///     ).unwrap(),
+    ///             .iter()
+    ///             .map(|s| Natural::from_str(s).unwrap())
+    ///     )
+    ///     .unwrap(),
     ///     123456
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_asc(
     ///         &Natural::from(8u32),
-    ///         ["3", "7", "1"].iter().map(|s| Natural::from_str(s).unwrap())
-    ///     ).unwrap(),
+    ///         ["3", "7", "1"]
+    ///             .iter()
+    ///             .map(|s| Natural::from_str(s).unwrap())
+    ///     )
+    ///     .unwrap(),
     ///     123
     /// );
     ///
-    /// assert!(
-    ///     Natural::from_digits_asc(
-    ///         &Natural::from(8u32),
-    ///         ["1", "10", "3"].iter().map(|s| Natural::from_str(s).unwrap())
-    ///     ).is_none(),
-    /// );
+    /// assert!(Natural::from_digits_asc(
+    ///     &Natural::from(8u32),
+    ///     ["1", "10", "3"]
+    ///         .iter()
+    ///         .map(|s| Natural::from_str(s).unwrap())
+    /// )
+    /// .is_none(),);
     /// ```
     #[inline]
     fn from_digits_asc<I: Iterator<Item = Natural>>(base: &Natural, digits: I) -> Option<Natural> {
@@ -2113,32 +2159,41 @@ impl Digits<Natural> for Natural {
     /// assert_eq!(
     ///     Natural::from_digits_desc(
     ///         &Natural::from(64u32),
-    ///         ["0", "0", "0"].iter().map(|s| Natural::from_str(s).unwrap())
-    ///     ).unwrap(),
+    ///         ["0", "0", "0"]
+    ///             .iter()
+    ///             .map(|s| Natural::from_str(s).unwrap())
+    ///     )
+    ///     .unwrap(),
     ///     0
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_desc(
     ///         &Natural::from(3u32),
     ///         ["2", "0", "0", "2", "1", "1", "0", "0", "1", "1", "0"]
-    ///             .iter().map(|s| Natural::from_str(s).unwrap())
-    ///     ).unwrap(),
+    ///             .iter()
+    ///             .map(|s| Natural::from_str(s).unwrap())
+    ///     )
+    ///     .unwrap(),
     ///     123456
     /// );
     /// assert_eq!(
     ///     Natural::from_digits_desc(
     ///         &Natural::from(8u32),
-    ///         ["1", "7", "3"].iter().map(|s| Natural::from_str(s).unwrap())
-    ///     ).unwrap(),
+    ///         ["1", "7", "3"]
+    ///             .iter()
+    ///             .map(|s| Natural::from_str(s).unwrap())
+    ///     )
+    ///     .unwrap(),
     ///     123
     /// );
     ///
-    /// assert!(
-    ///     Natural::from_digits_desc(
-    ///         &Natural::from(8u32),
-    ///         ["1", "10", "3"].iter().map(|s| Natural::from_str(s).unwrap())
-    ///     ).is_none(),
-    /// );
+    /// assert!(Natural::from_digits_desc(
+    ///     &Natural::from(8u32),
+    ///     ["1", "10", "3"]
+    ///         .iter()
+    ///         .map(|s| Natural::from_str(s).unwrap())
+    /// )
+    /// .is_none(),);
     /// ```
     #[inline]
     fn from_digits_desc<I: Iterator<Item = Natural>>(base: &Natural, digits: I) -> Option<Natural> {

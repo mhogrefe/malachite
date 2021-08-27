@@ -137,8 +137,8 @@ impl<T: PrimitiveFloat> Ord for NiceFloat<T> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::float::NiceFloat;
     ///
     /// assert!(NiceFloat(0.0) > NiceFloat(-0.0));
     /// assert!(NiceFloat(f32::NAN) < NiceFloat(0.0));
@@ -238,8 +238,8 @@ impl<T: PrimitiveFloat> Display for NiceFloat<T> {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::num::float::NiceFloat;
     /// use malachite_base::num::basic::floats::PrimitiveFloat;
+    /// use malachite_base::num::float::NiceFloat;
     ///
     /// assert_eq!(NiceFloat(0.0).to_string(), "0.0");
     /// assert_eq!(NiceFloat(-0.0).to_string(), "-0.0");
@@ -249,9 +249,18 @@ impl<T: PrimitiveFloat> Display for NiceFloat<T> {
     ///
     /// assert_eq!(NiceFloat(1.0).to_string(), "1.0");
     /// assert_eq!(NiceFloat(-1.0).to_string(), "-1.0");
-    /// assert_eq!(NiceFloat(f32::MIN_POSITIVE_SUBNORMAL).to_string(), "1.0e-45");
-    /// assert_eq!(NiceFloat(std::f64::consts::E).to_string(), "2.718281828459045");
-    /// assert_eq!(NiceFloat(std::f64::consts::PI).to_string(), "3.141592653589793");
+    /// assert_eq!(
+    ///     NiceFloat(f32::MIN_POSITIVE_SUBNORMAL).to_string(),
+    ///     "1.0e-45"
+    /// );
+    /// assert_eq!(
+    ///     NiceFloat(std::f64::consts::E).to_string(),
+    ///     "2.718281828459045"
+    /// );
+    /// assert_eq!(
+    ///     NiceFloat(std::f64::consts::PI).to_string(),
+    ///     "3.141592653589793"
+    /// );
     /// ```
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         if self.0.is_nan() {

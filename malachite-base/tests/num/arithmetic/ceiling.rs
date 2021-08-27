@@ -22,7 +22,7 @@ fn ceiling_assign_primitive_float_helper<T: PrimitiveFloat>() {
 }
 
 #[test]
-fn test_abs() {
+fn test_ceiling() {
     apply_fn_to_primitive_floats!(ceiling_assign_primitive_float_helper);
 }
 

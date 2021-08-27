@@ -14,7 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_floor_assign<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
     for mut f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
         let old_f = f;
-        f.abs_assign();
+        f.floor_assign();
         println!(
             "i := {}; i.floor_assign(); i = {}",
             NiceFloat(old_f),

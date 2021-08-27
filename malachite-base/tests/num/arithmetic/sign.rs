@@ -5,7 +5,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
 use std::cmp::Ordering;
 
-fn primitive_sign_helper<T: PrimitiveInt>() {
+fn sign_helper_primitive_int<T: PrimitiveInt>() {
     let test = |n: T, out| {
         assert_eq!(n.sign(), out);
     };
@@ -15,7 +15,7 @@ fn primitive_sign_helper<T: PrimitiveInt>() {
     test(T::MAX, Ordering::Greater);
 }
 
-fn signed_sign_helper<T: PrimitiveSigned>() {
+fn sign_helper_signed<T: PrimitiveSigned>() {
     let test = |n: T, out| {
         assert_eq!(n.sign(), out);
     };
@@ -24,10 +24,24 @@ fn signed_sign_helper<T: PrimitiveSigned>() {
     test(T::MIN, Ordering::Less);
 }
 
+fn sign_helper_primitive_float<T: PrimitiveFloat>() {
+    let test = |n: T, out| {
+        assert_eq!(n.sign(), out);
+    };
+    test(T::ZERO, Ordering::Greater);
+    test(T::NEGATIVE_ZERO, Ordering::Less);
+    test(T::ONE, Ordering::Greater);
+    test(T::NEGATIVE_ONE, Ordering::Less);
+    test(T::POSITIVE_INFINITY, Ordering::Greater);
+    test(T::NEGATIVE_INFINITY, Ordering::Less);
+    test(T::NAN, Ordering::Equal);
+}
+
 #[test]
 fn test_sign() {
-    apply_fn_to_primitive_ints!(primitive_sign_helper);
-    apply_fn_to_signeds!(signed_sign_helper);
+    apply_fn_to_primitive_ints!(sign_helper_primitive_int);
+    apply_fn_to_signeds!(sign_helper_signed);
+    apply_fn_to_primitive_floats!(sign_helper_primitive_float);
 }
 
 fn sign_properties_helper_unsigned<T: PrimitiveUnsigned>() {

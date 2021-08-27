@@ -84,12 +84,15 @@ pub fn vec_delete_left<T: Copy>(xs: &mut Vec<T>, delete_size: usize) {
 ///
 /// # Examples
 /// ```
-/// use malachite_base::vecs::vec_from_str;
 /// use malachite_base::nevers::Never;
+/// use malachite_base::vecs::vec_from_str;
 ///
 /// assert_eq!(vec_from_str::<Never>("[]"), Some(vec![]));
 /// assert_eq!(vec_from_str::<u32>("[5, 6, 7]"), Some(vec![5, 6, 7]));
-/// assert_eq!(vec_from_str::<bool>("[false, false, true]"), Some(vec![false, false, true]));
+/// assert_eq!(
+///     vec_from_str::<bool>("[false, false, true]"),
+///     Some(vec![false, false, true])
+/// );
 /// assert_eq!(vec_from_str::<bool>("[false, false, true"), None);
 /// ```
 #[inline]
@@ -137,7 +140,10 @@ pub fn vec_from_str<T: FromStr>(src: &str) -> Option<Vec<T>> {
 ///     vec_from_str_custom(&vec_from_str, "[[], [3], [2, 5]]"),
 ///     Some(vec![vec![], vec![3], vec![2, 5]]),
 /// );
-/// assert_eq!(vec_from_str_custom(&option_from_str::<bool>, "[Some(fals), None]"), None);
+/// assert_eq!(
+///     vec_from_str_custom(&option_from_str::<bool>, "[Some(fals), None]"),
+///     None
+/// );
 /// ```
 pub fn vec_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Option<Vec<T>> {
     if !src.starts_with('[') || !src.ends_with(']') {
@@ -204,7 +210,9 @@ impl<T: Clone> Iterator for RandomValuesFromVec<T> {
 ///
 /// let xs = vec![2, 3, 5, 7, 11];
 /// assert_eq!(
-///     random_values_from_vec(EXAMPLE_SEED, xs).take(10).collect_vec(),
+///     random_values_from_vec(EXAMPLE_SEED, xs)
+///         .take(10)
+///         .collect_vec(),
 ///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
 /// );
 /// ```
@@ -264,7 +272,8 @@ impl<T: Clone> Iterator for ExhaustiveVecPermutations<T> {
 /// use malachite_base::vecs::exhaustive_vec_permutations;
 ///
 /// let css: Vec<String> = exhaustive_vec_permutations(vec!['a', 'b', 'c', 'd'])
-///     .map(|ds| ds.into_iter().collect()).collect();
+///     .map(|ds| ds.into_iter().collect())
+///     .collect();
 /// assert_eq!(
 ///     css.iter().map(String::as_str).collect_vec().as_slice(),
 ///     [
@@ -325,8 +334,10 @@ impl<T: Clone> Iterator for RandomVecPermutations<T> {
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::vecs::random_vec_permutations;
 ///
-/// let css: Vec<String> = random_vec_permutations(EXAMPLE_SEED, vec!['a', 'b', 'c', 'd']).take(20)
-///     .map(|ds| ds.into_iter().collect()).collect();
+/// let css: Vec<String> = random_vec_permutations(EXAMPLE_SEED, vec!['a', 'b', 'c', 'd'])
+///     .take(20)
+///     .map(|ds| ds.into_iter().collect())
+///     .collect();
 /// assert_eq!(
 ///     css.iter().map(String::as_str).collect_vec().as_slice(),
 ///     [
@@ -358,13 +369,21 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// let xss = lex_length_2_vecs(
 ///     ['a', 'b', 'c'].iter().cloned(),
-///     ['x', 'y', 'z'].iter().cloned()
-/// ).collect_vec();
+///     ['x', 'y', 'z'].iter().cloned(),
+/// )
+/// .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &['a', 'x'], &['a', 'y'], &['a', 'z'], &['b', 'x'], &['b', 'y'], &['b', 'z'],
-///         &['c', 'x'], &['c', 'y'], &['c', 'z']
+///         &['a', 'x'],
+///         &['a', 'y'],
+///         &['a', 'z'],
+///         &['b', 'x'],
+///         &['b', 'y'],
+///         &['b', 'z'],
+///         &['c', 'x'],
+///         &['c', 'y'],
+///         &['c', 'z']
 ///     ]
 /// );
 /// ```
@@ -391,13 +410,32 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// );
 /// let xss_prefix = xss.take(20).collect_vec();
 /// assert_eq!(
-///     xss_prefix.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     xss_prefix
+///         .iter()
+///         .map(Vec::as_slice)
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
-///         &['a', 'x', 'a'], &['a', 'x', 'b'], &['a', 'x', 'c'], &['a', 'x', 'd'],
-///         &['a', 'x', 'e'], &['a', 'x', 'f'], &['a', 'x', 'g'], &['a', 'x', 'h'],
-///         &['a', 'x', 'i'], &['a', 'x', 'j'], &['a', 'x', 'k'], &['a', 'x', 'l'],
-///         &['a', 'x', 'm'], &['a', 'x', 'n'], &['a', 'x', 'o'], &['a', 'x', 'p'],
-///         &['a', 'x', 'q'], &['a', 'x', 'r'], &['a', 'x', 's'], &['a', 'x', 't']
+///         &['a', 'x', 'a'],
+///         &['a', 'x', 'b'],
+///         &['a', 'x', 'c'],
+///         &['a', 'x', 'd'],
+///         &['a', 'x', 'e'],
+///         &['a', 'x', 'f'],
+///         &['a', 'x', 'g'],
+///         &['a', 'x', 'h'],
+///         &['a', 'x', 'i'],
+///         &['a', 'x', 'j'],
+///         &['a', 'x', 'k'],
+///         &['a', 'x', 'l'],
+///         &['a', 'x', 'm'],
+///         &['a', 'x', 'n'],
+///         &['a', 'x', 'o'],
+///         &['a', 'x', 'p'],
+///         &['a', 'x', 'q'],
+///         &['a', 'x', 'r'],
+///         &['a', 'x', 's'],
+///         &['a', 'x', 't']
 ///     ]
 /// );
 /// ```
@@ -412,13 +450,21 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// let xss = exhaustive_length_2_vecs(
 ///     ['a', 'b', 'c'].iter().cloned(),
-///     ['x', 'y', 'z'].iter().cloned()
-/// ).collect_vec();
+///     ['x', 'y', 'z'].iter().cloned(),
+/// )
+/// .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &['a', 'x'], &['a', 'y'], &['b', 'x'], &['b', 'y'], &['a', 'z'], &['b', 'z'],
-///         &['c', 'x'], &['c', 'y'], &['c', 'z']
+///         &['a', 'x'],
+///         &['a', 'y'],
+///         &['b', 'x'],
+///         &['b', 'y'],
+///         &['a', 'z'],
+///         &['b', 'z'],
+///         &['c', 'x'],
+///         &['c', 'y'],
+///         &['c', 'z']
 ///     ]
 /// );
 /// ```
@@ -451,13 +497,32 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// );
 /// let xss_prefix = xss.take(20).collect_vec();
 /// assert_eq!(
-///     xss_prefix.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     xss_prefix
+///         .iter()
+///         .map(Vec::as_slice)
+///         .collect_vec()
+///         .as_slice(),
 ///     &[
-///         &['a', 'x', 'a'], &['a', 'x', 'b'], &['a', 'x', 'c'], &['a', 'x', 'd'],
-///         &['a', 'y', 'a'], &['a', 'y', 'b'], &['a', 'y', 'c'], &['a', 'y', 'd'],
-///         &['a', 'x', 'e'], &['a', 'x', 'f'], &['a', 'x', 'g'], &['a', 'x', 'h'],
-///         &['a', 'y', 'e'], &['a', 'y', 'f'], &['a', 'y', 'g'], &['a', 'y', 'h'],
-///         &['b', 'x', 'a'], &['b', 'x', 'b'], &['b', 'x', 'c'], &['b', 'x', 'd']
+///         &['a', 'x', 'a'],
+///         &['a', 'x', 'b'],
+///         &['a', 'x', 'c'],
+///         &['a', 'x', 'd'],
+///         &['a', 'y', 'a'],
+///         &['a', 'y', 'b'],
+///         &['a', 'y', 'c'],
+///         &['a', 'y', 'd'],
+///         &['a', 'x', 'e'],
+///         &['a', 'x', 'f'],
+///         &['a', 'x', 'g'],
+///         &['a', 'x', 'h'],
+///         &['a', 'y', 'e'],
+///         &['a', 'y', 'f'],
+///         &['a', 'y', 'g'],
+///         &['a', 'y', 'h'],
+///         &['b', 'x', 'a'],
+///         &['b', 'x', 'b'],
+///         &['b', 'x', 'c'],
+///         &['b', 'x', 'd']
 ///     ]
 /// );
 /// ```
@@ -480,14 +545,32 @@ pub mod exhaustive;
 ///     EXAMPLE_SEED,
 ///     &|seed| random_char_inclusive_range(seed, 'a', 'c'),
 ///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
-/// ).take(20).collect_vec();
+/// )
+/// .take(20)
+/// .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &['b', 'z'], &['b', 'x'], &['b', 'z'], &['b', 'y'], &['c', 'x'], &['a', 'z'],
-///         &['a', 'z'], &['a', 'z'], &['c', 'z'], &['a', 'y'], &['c', 'x'], &['a', 'x'],
-///         &['c', 'z'], &['a', 'z'], &['c', 'x'], &['c', 'x'], &['c', 'y'], &['b', 'y'],
-///         &['a', 'x'], &['c', 'x']
+///         &['b', 'z'],
+///         &['b', 'x'],
+///         &['b', 'z'],
+///         &['b', 'y'],
+///         &['c', 'x'],
+///         &['a', 'z'],
+///         &['a', 'z'],
+///         &['a', 'z'],
+///         &['c', 'z'],
+///         &['a', 'y'],
+///         &['c', 'x'],
+///         &['a', 'x'],
+///         &['c', 'z'],
+///         &['a', 'z'],
+///         &['c', 'x'],
+///         &['c', 'x'],
+///         &['c', 'y'],
+///         &['b', 'y'],
+///         &['a', 'x'],
+///         &['c', 'x']
 ///     ]
 /// );
 /// ```
@@ -499,9 +582,9 @@ pub mod exhaustive;
 /// use itertools::Itertools;
 ///
 /// use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
-/// use malachite_base::vecs::random::random_fixed_length_vecs_2_inputs;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToDebugString;
+/// use malachite_base::vecs::random::random_fixed_length_vecs_2_inputs;
 ///
 /// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator
 /// // (with index 0) produces random ASCII `char`s, and the second (index 1) produces the three
@@ -513,15 +596,32 @@ pub mod exhaustive;
 ///     &random_ascii_chars,
 ///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
 ///     &[0, 1, 0],
-/// ).take(20).collect_vec();
+/// )
+/// .take(20)
+/// .collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
-///         &['U', 'z', '\u{16}'], &[' ', 'x', 'D'], &['<', 'z', ']'], &['a', 'y', 'e'],
-///         &['_', 'x', 'M'], &[',', 'z', 'O'], &['\u{1d}', 'z', 'V'], &['(', 'z', '\u{10}'],
-///         &['&', 'z', 'U'], &['{', 'y', 'P'], &['-', 'x', 'K'], &['Z', 'x', '\u{4}'],
-///         &['X', 'z', '\u{19}'], &['_', 'z', ','], &['\u{1d}', 'x', ','], &['?', 'x', '\''],
-///         &['[', 'y', 'N'], &['|', 'y', '}'], &['*', 'x', '\u{15}'], &['z', 'x', 't']
+///         &['U', 'z', '\u{16}'],
+///         &[' ', 'x', 'D'],
+///         &['<', 'z', ']'],
+///         &['a', 'y', 'e'],
+///         &['_', 'x', 'M'],
+///         &[',', 'z', 'O'],
+///         &['\u{1d}', 'z', 'V'],
+///         &['(', 'z', '\u{10}'],
+///         &['&', 'z', 'U'],
+///         &['{', 'y', 'P'],
+///         &['-', 'x', 'K'],
+///         &['Z', 'x', '\u{4}'],
+///         &['X', 'z', '\u{19}'],
+///         &['_', 'z', ','],
+///         &['\u{1d}', 'x', ','],
+///         &['?', 'x', '\''],
+///         &['[', 'y', 'N'],
+///         &['|', 'y', '}'],
+///         &['*', 'x', '\u{15}'],
+///         &['z', 'x', 't']
 ///     ]
 /// );
 /// ```

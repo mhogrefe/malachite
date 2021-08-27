@@ -43,7 +43,9 @@ impl<I: Iterator> Iterator for RandomSomes<I> {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_somes(random_primitive_ints::<u8>(EXAMPLE_SEED)).take(5).collect_vec(),
+///     random_somes(random_primitive_ints::<u8>(EXAMPLE_SEED))
+///         .take(5)
+///         .collect_vec(),
 ///     &[Some(113), Some(239), Some(69), Some(108), Some(228)],
 /// )
 /// ```
@@ -110,9 +112,19 @@ impl<I: Iterator> Iterator for RandomOptions<I> {
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_options(EXAMPLE_SEED, 1, 2, &random_primitive_ints::<u8>).take(10).collect_vec(),
+///     random_options(EXAMPLE_SEED, 1, 2, &random_primitive_ints::<u8>)
+///         .take(10)
+///         .collect_vec(),
 ///     &[
-///         Some(85), Some(11), Some(136), None, Some(200), None, Some(235), Some(134), Some(203),
+///         Some(85),
+///         Some(11),
+///         Some(136),
+///         None,
+///         Some(200),
+///         None,
+///         Some(235),
+///         Some(134),
+///         Some(203),
 ///         None
 ///     ],
 /// )

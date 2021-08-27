@@ -68,15 +68,8 @@ fn striped_random_naturals_helper(
 fn test_striped_random_naturals() {
     // mean bits = 1/64
     let values = &["0"; 20];
-    let common_values = &[
-        ("0", 984681),
-        ("1", 15077),
-        ("3", 120),
-        ("2", 117),
-        ("4", 3),
-        ("5", 1),
-        ("7", 1),
-    ];
+    let common_values =
+        &[("0", 984681), ("1", 15077), ("3", 120), ("2", 117), ("4", 3), ("5", 1), ("7", 1)];
     let sample_median = ("0", None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(0.015695000000000875),

@@ -62,16 +62,12 @@ where
     exhaustive_signed_inclusive_range_helper_helper(
         T::ZERO,
         T::MAX,
-        &[
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-        ],
+        &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     );
     exhaustive_signed_inclusive_range_helper_helper(
         T::ZERO,
         T::MAX - T::ONE,
-        &[
-            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-        ],
+        &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
     );
     exhaustive_signed_inclusive_range_helper_helper(
         T::exact_from(-20),
@@ -81,23 +77,17 @@ where
     exhaustive_signed_inclusive_range_helper_helper(
         T::exact_from(-100),
         T::exact_from(99),
-        &[
-            0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10,
-        ],
+        &[0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10],
     );
     exhaustive_signed_inclusive_range_helper_helper(
         T::MIN,
         T::MAX,
-        &[
-            0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10,
-        ],
+        &[0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10],
     );
     exhaustive_signed_inclusive_range_helper_helper(
         T::MIN + T::ONE,
         T::MAX - T::ONE,
-        &[
-            0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10,
-        ],
+        &[0, 1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6, 7, -7, 8, -8, 9, -9, 10],
     );
 }
 

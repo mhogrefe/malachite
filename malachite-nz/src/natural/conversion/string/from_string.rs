@@ -167,8 +167,14 @@ impl FromStringBase for Natural {
     /// assert_eq!(Natural::from_string_base(10, "123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_string_base(10, "00123456").unwrap(), 123456);
     /// assert_eq!(Natural::from_string_base(16, "0").unwrap(), 0);
-    /// assert_eq!(Natural::from_string_base(16, "deadbeef").unwrap(), 3735928559u32);
-    /// assert_eq!(Natural::from_string_base(16, "deAdBeEf").unwrap(), 3735928559u32);
+    /// assert_eq!(
+    ///     Natural::from_string_base(16, "deadbeef").unwrap(),
+    ///     3735928559u32
+    /// );
+    /// assert_eq!(
+    ///     Natural::from_string_base(16, "deAdBeEf").unwrap(),
+    ///     3735928559u32
+    /// );
     ///
     /// assert!(Natural::from_string_base(10, "").is_none());
     /// assert!(Natural::from_string_base(10, "a").is_none());

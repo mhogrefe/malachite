@@ -323,12 +323,14 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 ///
 /// assert_eq!(
 ///     iterator_to_bit_chunks::<_, u16, u32>([123, 456].iter().cloned(), 10, 10)
-///         .map(Option::unwrap).collect_vec(),
+///         .map(Option::unwrap)
+///         .collect_vec(),
 ///     &[123, 456]
 /// );
 /// assert_eq!(
 ///     iterator_to_bit_chunks::<_, u16, u16>([0b000111111, 0b110010010].iter().cloned(), 9, 3)
-///         .map(Option::unwrap).collect_vec(),
+///         .map(Option::unwrap)
+///         .collect_vec(),
 ///     &[0b111, 0b111, 0b000, 0b010, 0b010, 0b110]
 /// );
 /// assert_eq!(
@@ -336,7 +338,9 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 ///         [0b111, 0b111, 0b000, 0b010, 0b010, 0b110].iter().cloned(),
 ///         3,
 ///         9
-///     ).map(Option::unwrap).collect_vec(),
+///     )
+///     .map(Option::unwrap)
+///     .collect_vec(),
 ///     &[0b000111111, 0b110010010]
 /// );
 /// assert_eq!(
@@ -344,7 +348,9 @@ impl<I: Iterator<Item = T>, T: PrimitiveUnsigned, U: PrimitiveUnsigned + Wrappin
 ///         [0b1010101, 0b1111101, 0b0100001, 0b110010].iter().cloned(),
 ///         7,
 ///         6
-///     ).map(Option::unwrap).collect_vec(),
+///     )
+///     .map(Option::unwrap)
+///     .collect_vec(),
 ///     &[0b010101, 0b111011, 0b000111, 0b010010, 0b110]
 /// );
 /// ```
@@ -503,7 +509,9 @@ impl Iterator for BitDistributorSequence {
 ///     bit_distributor_sequence(
 ///         BitDistributorOutputType::normal(1),
 ///         BitDistributorOutputType::normal(2)
-///     ).take(50).collect_vec(),
+///     )
+///     .take(50)
+///     .collect_vec(),
 ///     &[
 ///         0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2,
 ///         3, 2, 3, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 2, 3, 2, 3, 2, 3, 0, 1
@@ -513,7 +521,9 @@ impl Iterator for BitDistributorSequence {
 ///     bit_distributor_sequence(
 ///         BitDistributorOutputType::normal(2),
 ///         BitDistributorOutputType::normal(1)
-///     ).take(50).collect_vec(),
+///     )
+///     .take(50)
+///     .collect_vec(),
 ///     &[
 ///         0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9, 10, 11, 8, 9, 10, 11, 12, 13, 14,
 ///         15, 12, 13, 14, 15, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 4, 5, 6, 7, 8, 9,

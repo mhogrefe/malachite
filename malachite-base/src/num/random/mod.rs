@@ -367,7 +367,9 @@ where
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_primitive_ints::<u8>(EXAMPLE_SEED).take(10).collect_vec(),
+///     random_primitive_ints::<u8>(EXAMPLE_SEED)
+///         .take(10)
+///         .collect_vec(),
 ///     &[113, 239, 69, 108, 228, 210, 168, 161, 87, 32]
 /// )
 /// ```
@@ -400,11 +402,13 @@ pub fn random_primitive_ints<T: PrimitiveInt>(seed: Seed) -> RandomPrimitiveInts
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_positive_unsigneds;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_positive_unsigneds::<u8>(EXAMPLE_SEED).take(10).collect_vec(),
+///     random_positive_unsigneds::<u8>(EXAMPLE_SEED)
+///         .take(10)
+///         .collect_vec(),
 ///     &[113, 239, 69, 108, 228, 210, 168, 161, 87, 32]
 /// )
 /// ```
@@ -436,11 +440,13 @@ pub fn random_positive_unsigneds<T: PrimitiveUnsigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_positive_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_positive_signeds::<i8>(EXAMPLE_SEED).take(10).collect_vec(),
+///     random_positive_signeds::<i8>(EXAMPLE_SEED)
+///         .take(10)
+///         .collect_vec(),
 ///     &[113, 94, 23, 98, 70, 92, 52, 84, 33, 47]
 /// )
 /// ```
@@ -472,11 +478,13 @@ pub fn random_positive_signeds<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_negative_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_negative_signeds::<i8>(EXAMPLE_SEED).take(10).collect_vec(),
+///     random_negative_signeds::<i8>(EXAMPLE_SEED)
+///         .take(10)
+///         .collect_vec(),
 ///     &[-15, -34, -105, -30, -58, -36, -76, -44, -95, -81]
 /// )
 /// ```
@@ -511,11 +519,13 @@ pub fn random_negative_signeds<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_natural_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_natural_signeds::<i8>(EXAMPLE_SEED).take(10).collect_vec(),
+///     random_natural_signeds::<i8>(EXAMPLE_SEED)
+///         .take(10)
+///         .collect_vec(),
 ///     &[113, 94, 23, 98, 70, 92, 52, 84, 33, 47]
 /// )
 /// ```
@@ -545,11 +555,13 @@ pub fn random_natural_signeds<T: PrimitiveSigned>(seed: Seed) -> RandomSignedBit
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_nonzero_signeds;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_nonzero_signeds::<i8>(EXAMPLE_SEED).take(10).collect_vec(),
+///     random_nonzero_signeds::<i8>(EXAMPLE_SEED)
+///         .take(10)
+///         .collect_vec(),
 ///     &[113, -17, 69, 108, -28, -46, -88, -95, 87, 32]
 /// )
 /// ```
@@ -584,11 +596,13 @@ pub fn random_nonzero_signeds<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_unsigneds_less_than;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_unsigneds_less_than::<u8>(EXAMPLE_SEED, 10).take(10).collect_vec(),
+///     random_unsigneds_less_than::<u8>(EXAMPLE_SEED, 10)
+///         .take(10)
+///         .collect_vec(),
 ///     &[1, 7, 5, 4, 6, 4, 2, 8, 1, 7]
 /// )
 /// ```
@@ -634,11 +648,13 @@ pub fn random_unsigneds_less_than<T: PrimitiveUnsigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_unsigned_range;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_unsigned_range::<u8>(EXAMPLE_SEED, 10, 20).take(10).collect_vec(),
+///     random_unsigned_range::<u8>(EXAMPLE_SEED, 10, 20)
+///         .take(10)
+///         .collect_vec(),
 ///     &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17]
 /// )
 /// ```
@@ -681,11 +697,13 @@ pub fn random_unsigned_range<T: PrimitiveUnsigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 10, 19).take(10).collect_vec(),
+///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 10, 19)
+///         .take(10)
+///         .collect_vec(),
 ///     &[11, 17, 15, 14, 16, 14, 12, 18, 11, 17]
 /// )
 /// ```
@@ -730,11 +748,13 @@ pub fn random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_signed_range;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_signed_range::<i8>(EXAMPLE_SEED, -100, 100).take(10).collect_vec(),
+///     random_signed_range::<i8>(EXAMPLE_SEED, -100, 100)
+///         .take(10)
+///         .collect_vec(),
 ///     &[13, -31, 8, 68, 61, -13, -68, 10, -17, 88]
 /// )
 /// ```
@@ -773,11 +793,13 @@ pub fn random_signed_range<T: PrimitiveSigned>(seed: Seed, a: T, b: T) -> Random
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_signed_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_signed_inclusive_range::<i8>(EXAMPLE_SEED, -100, 99).take(10).collect_vec(),
+///     random_signed_inclusive_range::<i8>(EXAMPLE_SEED, -100, 99)
+///         .take(10)
+///         .collect_vec(),
 ///     &[13, -31, 8, 68, 61, -13, -68, 10, -17, 88]
 /// )
 /// ```
@@ -819,11 +841,13 @@ pub fn random_signed_inclusive_range<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_unsigned_bit_chunks;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3).take(10).collect_vec(),
+///     random_unsigned_bit_chunks::<u8>(EXAMPLE_SEED, 3)
+///         .take(10)
+///         .collect_vec(),
 ///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
 /// )
 /// ```
@@ -863,11 +887,13 @@ pub fn random_unsigned_bit_chunks<T: PrimitiveUnsigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_signed_bit_chunks;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_signed_bit_chunks::<i8>(EXAMPLE_SEED, 3).take(10).collect_vec(),
+///     random_signed_bit_chunks::<i8>(EXAMPLE_SEED, 3)
+///         .take(10)
+///         .collect_vec(),
 ///     &[1, 6, 5, 7, 6, 3, 1, 2, 4, 5]
 /// )
 /// ```
@@ -902,11 +928,13 @@ pub fn random_signed_bit_chunks<T: PrimitiveSigned>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::random_highest_bit_set_unsigneds;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_highest_bit_set_unsigneds::<u8>(EXAMPLE_SEED).take(10).collect_vec(),
+///     random_highest_bit_set_unsigneds::<u8>(EXAMPLE_SEED)
+///         .take(10)
+///         .collect_vec(),
 ///     &[241, 222, 151, 226, 198, 220, 180, 212, 161, 175],
 /// )
 /// ```
@@ -985,17 +1013,31 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloatInclusiveRange<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_primitive_float_range;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     random_primitive_float_range::<f32>(EXAMPLE_SEED, -0.1, 0.1)
-///         .map(NiceFloat).take(10).collect_vec(),
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         5.664681e-11, 1.2492925e-35, 2.3242339e-29, 4.699183e-7, -2.8244436e-36, -2.264039e-37,
-///         -0.0000017299129, 1.40616e-23, 2.7418007e-27, 1.5418819e-16
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         5.664681e-11,
+///         1.2492925e-35,
+///         2.3242339e-29,
+///         4.699183e-7,
+///         -2.8244436e-36,
+///         -2.264039e-37,
+///         -0.0000017299129,
+///         1.40616e-23,
+///         2.7418007e-27,
+///         1.5418819e-16
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1051,17 +1093,31 @@ pub fn random_primitive_float_range<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_primitive_float_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     random_primitive_float_inclusive_range::<f32>(EXAMPLE_SEED, -0.1, 0.1)
-///         .map(NiceFloat).take(10).collect_vec(),
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         5.664681e-11, 1.2492925e-35, 2.3242339e-29, 4.699183e-7, -2.8244436e-36, -2.264039e-37,
-///         -0.0000017299129, 1.40616e-23, 2.7418007e-27, 1.5418819e-16
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         5.664681e-11,
+///         1.2492925e-35,
+///         2.3242339e-29,
+///         4.699183e-7,
+///         -2.8244436e-36,
+///         -2.264039e-37,
+///         -0.0000017299129,
+///         1.40616e-23,
+///         2.7418007e-27,
+///         1.5418819e-16
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1109,17 +1165,31 @@ pub fn random_primitive_float_inclusive_range<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_positive_finite_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat).take(10).collect_vec(),
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         9.5715654e26, 209.6476, 386935780.0, 7.965817e30, 0.00021030706, 0.0027270128,
-///         3.4398167e-34, 2.3397111e14, 44567765000.0, 2.3479653e21
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         9.5715654e26,
+///         209.6476,
+///         386935780.0,
+///         7.965817e30,
+///         0.00021030706,
+///         0.0027270128,
+///         3.4398167e-34,
+///         2.3397111e14,
+///         44567765000.0,
+///         2.3479653e21
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1149,17 +1219,31 @@ pub fn random_positive_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_negative_finite_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat).take(10).collect_vec(),
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         -2.3484663e-27, -0.010641626, -5.8060583e-9, -2.8182442e-31, -10462.532, -821.12994,
-///         -6.303163e33, -9.50376e-15, -4.9561126e-11, -8.565163e-22
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         -2.3484663e-27,
+///         -0.010641626,
+///         -5.8060583e-9,
+///         -2.8182442e-31,
+///         -10462.532,
+///         -821.12994,
+///         -6.303163e33,
+///         -9.50376e-15,
+///         -4.9561126e-11,
+///         -8.565163e-22
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1189,17 +1273,31 @@ pub fn random_negative_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_nonzero_finite_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED)
-///         .map(NiceFloat).take(10).collect_vec(),
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         -2.3484663e-27, 2.287989e-18, -2.0729893e-12, 3.360012e28, -9.021723e-32, 3564911.2,
-///         -0.0000133769445, -1.8855448e18, 8.2494555e-29, 2.2178014e-38
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         -2.3484663e-27,
+///         2.287989e-18,
+///         -2.0729893e-12,
+///         3.360012e28,
+///         -9.021723e-32,
+///         3564911.2,
+///         -0.0000133769445,
+///         -1.8855448e18,
+///         8.2494555e-29,
+///         2.2178014e-38
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1229,16 +1327,31 @@ pub fn random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_finite_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_finite_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     random_finite_primitive_floats::<f32>(EXAMPLE_SEED)
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         -2.3484663e-27, 2.287989e-18, -2.0729893e-12, 3.360012e28, -9.021723e-32, 3564911.2,
-///         -0.0000133769445, -1.8855448e18, 8.2494555e-29, 2.2178014e-38
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         -2.3484663e-27,
+///         2.287989e-18,
+///         -2.0729893e-12,
+///         3.360012e28,
+///         -9.021723e-32,
+///         3564911.2,
+///         -0.0000133769445,
+///         -1.8855448e18,
+///         8.2494555e-29,
+///         2.2178014e-38
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1268,16 +1381,31 @@ pub fn random_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_positive_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_positive_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     random_positive_primitive_floats::<f32>(EXAMPLE_SEED)
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         9.5715654e26, 209.6476, 386935780.0, 7.965817e30, 0.00021030706, 0.0027270128,
-///         3.4398167e-34, 2.3397111e14, 44567765000.0, 2.3479653e21
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         9.5715654e26,
+///         209.6476,
+///         386935780.0,
+///         7.965817e30,
+///         0.00021030706,
+///         0.0027270128,
+///         3.4398167e-34,
+///         2.3397111e14,
+///         44567765000.0,
+///         2.3479653e21
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1307,16 +1435,31 @@ pub fn random_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_negative_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_negative_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     random_negative_primitive_floats::<f32>(EXAMPLE_SEED)
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         -2.3484665e-27, -0.010641627, -5.8060587e-9, -2.8182444e-31, -10462.533, -821.13,
-///         -6.3031636e33, -9.5037605e-15, -4.956113e-11, -8.565164e-22
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         -2.3484665e-27,
+///         -0.010641627,
+///         -5.8060587e-9,
+///         -2.8182444e-31,
+///         -10462.533,
+///         -821.13,
+///         -6.3031636e33,
+///         -9.5037605e-15,
+///         -4.956113e-11,
+///         -8.565164e-22
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1346,16 +1489,31 @@ pub fn random_negative_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_nonzero_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED)
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         -2.3484665e-27, 2.2879888e-18, -2.0729896e-12, 3.3600117e28, -9.0217234e-32, 3564911.0,
-///         -0.000013376945, -1.885545e18, 8.249455e-29, 2.2178013e-38
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         -2.3484665e-27,
+///         2.2879888e-18,
+///         -2.0729896e-12,
+///         3.3600117e28,
+///         -9.0217234e-32,
+///         3564911.0,
+///         -0.000013376945,
+///         -1.885545e18,
+///         8.249455e-29,
+///         2.2178013e-38
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1410,16 +1568,31 @@ impl<T: PrimitiveFloat> Iterator for RandomPrimitiveFloats<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::random_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     random_primitive_floats::<f32>(EXAMPLE_SEED).map(NiceFloat).take(10).collect_vec(),
+///     random_primitive_floats::<f32>(EXAMPLE_SEED)
+///         .map(NiceFloat)
+///         .take(10)
+///         .collect_vec(),
 ///     [
-///         -2.3484665e-27, 2.2879888e-18, -2.0729896e-12, 3.3600117e28, -9.0217234e-32, 3564911.0,
-///         -0.000013376945, -1.885545e18, 8.249455e-29, 2.2178013e-38
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         -2.3484665e-27,
+///         2.2879888e-18,
+///         -2.0729896e-12,
+///         3.3600117e28,
+///         -9.0217234e-32,
+///         3564911.0,
+///         -0.000013376945,
+///         -1.885545e18,
+///         8.249455e-29,
+///         2.2178013e-38
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1510,18 +1683,41 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomPositiveFiniteFloats<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_positive_finite_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_positive_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
-///         .map(NiceFloat).take(20).collect_vec(),
+///         .map(NiceFloat)
+///         .take(20)
+///         .collect_vec(),
 ///     [
-///         0.80126953, 0.0000013709068, 0.015609741, 0.98552704, 65536.0, 0.008257866,
-///         0.017333984, 2.25, 7.7089844, 0.00004425831, 0.40625, 24576.0, 37249.0, 1.1991882,
-///         32.085938, 0.4375, 0.0012359619, 1536.0, 0.22912993, 0.0015716553
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         0.80126953,
+///         0.0000013709068,
+///         0.015609741,
+///         0.98552704,
+///         65536.0,
+///         0.008257866,
+///         0.017333984,
+///         2.25,
+///         7.7089844,
+///         0.00004425831,
+///         0.40625,
+///         24576.0,
+///         37249.0,
+///         1.1991882,
+///         32.085938,
+///         0.4375,
+///         0.0012359619,
+///         1536.0,
+///         0.22912993,
+///         0.0015716553
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 pub fn special_random_positive_finite_primitive_floats<T: PrimitiveFloat>(
@@ -1596,18 +1792,41 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNegativeFiniteFloats<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_negative_finite_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_negative_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
-///         .map(NiceFloat).take(20).collect_vec(),
+///         .map(NiceFloat)
+///         .take(20)
+///         .collect_vec(),
 ///     [
-///         -0.80126953, -0.0000013709068, -0.015609741, -0.98552704, -65536.0, -0.008257866,
-///         -0.017333984, -2.25, -7.7089844, -0.00004425831, -0.40625, -24576.0, -37249.0,
-///         -1.1991882, -32.085938, -0.4375, -0.0012359619, -1536.0, -0.22912993, -0.0015716553
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         -0.80126953,
+///         -0.0000013709068,
+///         -0.015609741,
+///         -0.98552704,
+///         -65536.0,
+///         -0.008257866,
+///         -0.017333984,
+///         -2.25,
+///         -7.7089844,
+///         -0.00004425831,
+///         -0.40625,
+///         -24576.0,
+///         -37249.0,
+///         -1.1991882,
+///         -32.085938,
+///         -0.4375,
+///         -0.0012359619,
+///         -1536.0,
+///         -0.22912993,
+///         -0.0015716553
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1675,18 +1894,41 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomNonzeroFiniteFloats<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_nonzero_finite_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_nonzero_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1)
-///         .map(NiceFloat).take(20).collect_vec(),
+///         .map(NiceFloat)
+///         .take(20)
+///         .collect_vec(),
 ///     [
-///         -0.6328125, -9.536743e-7, -0.013671875, 0.6875, -70208.0, 0.01550293, -0.028625488,
-///         -3.3095703, -5.775879, 0.000034958124, 0.4375, 31678.0, -49152.0, -1.0, 49.885254,
-///         -0.40625, -0.0015869141, -1889.5625, -0.14140439, -0.001449585
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         -0.6328125,
+///         -9.536743e-7,
+///         -0.013671875,
+///         0.6875,
+///         -70208.0,
+///         0.01550293,
+///         -0.028625488,
+///         -3.3095703,
+///         -5.775879,
+///         0.000034958124,
+///         0.4375,
+///         31678.0,
+///         -49152.0,
+///         -1.0,
+///         49.885254,
+///         -0.40625,
+///         -0.0015869141,
+///         -1889.5625,
+///         -0.14140439,
+///         -0.001449585
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1738,19 +1980,42 @@ pub fn special_random_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_finite_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_finite_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat).take(20).collect_vec(),
+///         .map(NiceFloat)
+///         .take(20)
+///         .collect_vec(),
 ///     [
-///         0.65625, 0.0000014255784, 0.013183594, 0.0, -0.8125, -74240.0, -0.0078125, -0.03060913,
-///         3.331552, 4.75, -0.000038146973, -0.3125, -27136.0, -0.0, -59392.0, -1.75, -41.1875,
-///         0.0, 0.30940247, -0.0009765625
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///         0.65625,
+///         0.0000014255784,
+///         0.013183594,
+///         0.0,
+///         -0.8125,
+///         -74240.0,
+///         -0.0078125,
+///         -0.03060913,
+///         3.331552,
+///         4.75,
+///         -0.000038146973,
+///         -0.3125,
+///         -27136.0,
+///         -0.0,
+///         -59392.0,
+///         -1.75,
+///         -41.1875,
+///         0.0,
+///         0.30940247,
+///         -0.0009765625
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1809,20 +2074,42 @@ pub fn special_random_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_positive_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_positive_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat).take(20).collect_vec(),
+///         .map(NiceFloat)
+///         .take(20)
+///         .collect_vec(),
 ///     [
-///         0.6328125, 9.536743e-7, 0.013671875, f32::POSITIVE_INFINITY, 0.6875, 70208.0,
-///         0.01550293, 0.028625488, 3.3095703, 5.775879, 0.000034958124, 0.4375, 31678.0,
-///         f32::POSITIVE_INFINITY, 49152.0, 1.0, 49.885254, f32::POSITIVE_INFINITY, 0.40625,
+///         0.6328125,
+///         9.536743e-7,
+///         0.013671875,
+///         f32::POSITIVE_INFINITY,
+///         0.6875,
+///         70208.0,
+///         0.01550293,
+///         0.028625488,
+///         3.3095703,
+///         5.775879,
+///         0.000034958124,
+///         0.4375,
+///         31678.0,
+///         f32::POSITIVE_INFINITY,
+///         49152.0,
+///         1.0,
+///         49.885254,
+///         f32::POSITIVE_INFINITY,
+///         0.40625,
 ///         0.0015869141
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1881,20 +2168,42 @@ pub fn special_random_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_negative_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_negative_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat).take(20).collect_vec(),
+///         .map(NiceFloat)
+///         .take(20)
+///         .collect_vec(),
 ///     [
-///         -0.6328125, -9.536743e-7, -0.013671875, f32::NEGATIVE_INFINITY, -0.6875, -70208.0,
-///         -0.01550293, -0.028625488, -3.3095703, -5.775879, -0.000034958124, -0.4375, -31678.0,
-///         f32::NEGATIVE_INFINITY, -49152.0, -1.0, -49.885254, f32::NEGATIVE_INFINITY, -0.40625,
+///         -0.6328125,
+///         -9.536743e-7,
+///         -0.013671875,
+///         f32::NEGATIVE_INFINITY,
+///         -0.6875,
+///         -70208.0,
+///         -0.01550293,
+///         -0.028625488,
+///         -3.3095703,
+///         -5.775879,
+///         -0.000034958124,
+///         -0.4375,
+///         -31678.0,
+///         f32::NEGATIVE_INFINITY,
+///         -49152.0,
+///         -1.0,
+///         -49.885254,
+///         f32::NEGATIVE_INFINITY,
+///         -0.40625,
 ///         -0.0015869141
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1953,20 +2262,42 @@ pub fn special_random_negative_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_nonzero_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_nonzero_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat).take(20).collect_vec(),
+///         .map(NiceFloat)
+///         .take(20)
+///         .collect_vec(),
 ///     [
-///         0.65625, 0.0000014255784, 0.013183594, f32::POSITIVE_INFINITY, -0.8125, -74240.0,
-///         -0.0078125, -0.03060913, 3.331552, 4.75, -0.000038146973, -0.3125, -27136.0,
-///         f32::NEGATIVE_INFINITY, -59392.0, -1.75, -41.1875, f32::POSITIVE_INFINITY, 0.30940247,
+///         0.65625,
+///         0.0000014255784,
+///         0.013183594,
+///         f32::POSITIVE_INFINITY,
+///         -0.8125,
+///         -74240.0,
+///         -0.0078125,
+///         -0.03060913,
+///         3.331552,
+///         4.75,
+///         -0.000038146973,
+///         -0.3125,
+///         -27136.0,
+///         f32::NEGATIVE_INFINITY,
+///         -59392.0,
+///         -1.75,
+///         -41.1875,
+///         f32::POSITIVE_INFINITY,
+///         0.30940247,
 ///         -0.0009765625
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -2023,20 +2354,42 @@ pub fn special_random_nonzero_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_primitive_floats;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_primitive_floats::<f32>(EXAMPLE_SEED, 10, 1, 10, 1, 1, 10)
-///         .map(NiceFloat).take(20).collect_vec(),
+///         .map(NiceFloat)
+///         .take(20)
+///         .collect_vec(),
 ///     [
-///         0.65625, 0.0000014255784, 0.013183594, f32::POSITIVE_INFINITY, -0.8125, -74240.0,
-///         -0.0078125, -0.03060913, 3.331552, 4.75, -0.000038146973, -0.3125, -27136.0,
-///         f32::POSITIVE_INFINITY, -59392.0, -1.75, -41.1875, f32::POSITIVE_INFINITY, 0.30940247,
+///         0.65625,
+///         0.0000014255784,
+///         0.013183594,
+///         f32::POSITIVE_INFINITY,
+///         -0.8125,
+///         -74240.0,
+///         -0.0078125,
+///         -0.03060913,
+///         3.331552,
+///         4.75,
+///         -0.000038146973,
+///         -0.3125,
+///         -27136.0,
+///         f32::POSITIVE_INFINITY,
+///         -59392.0,
+///         -1.75,
+///         -41.1875,
+///         f32::POSITIVE_INFINITY,
+///         0.30940247,
 ///         -0.0009765625
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -2051,13 +2404,7 @@ pub fn special_random_primitive_floats<T: PrimitiveFloat>(
 ) -> WithSpecialValues<SpecialRandomNonzeroFiniteFloats<T>> {
     with_special_values(
         seed,
-        vec![
-            T::ZERO,
-            T::NEGATIVE_ZERO,
-            T::POSITIVE_INFINITY,
-            T::NEGATIVE_INFINITY,
-            T::NAN,
-        ],
+        vec![T::ZERO, T::NEGATIVE_ZERO, T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY, T::NAN],
         mean_special_p_numerator,
         mean_special_p_denominator,
         &|seed_2| {
@@ -2370,10 +2717,10 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_primitive_float_range;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_primitive_float_range::<f32>(
@@ -2386,11 +2733,18 @@ impl<T: PrimitiveFloat> Iterator for SpecialRandomFloatInclusiveRange<T> {
 ///         1,
 ///         1,
 ///         100
-///     ).map(NiceFloat).take(20).collect_vec(),
+///     )
+///     .map(NiceFloat)
+///     .take(20)
+///     .collect_vec(),
 ///     [
 ///         2.9238281, 2.953125, 3.0, 2.8671875, 2.8125, 3.125, 3.015625, 2.8462658, 3.140625,
 ///         2.875, 3.0, 2.75, 3.0, 2.71875, 2.75, 3.0214844, 2.970642, 3.0179443, 2.968872, 2.75
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
@@ -2457,10 +2811,10 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::float::NiceFloat;
 /// use malachite_base::num::random::special_random_primitive_float_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
 ///     special_random_primitive_float_inclusive_range::<f32>(
@@ -2473,11 +2827,18 @@ pub fn special_random_primitive_float_range<T: PrimitiveFloat>(
 ///         1,
 ///         1,
 ///         100
-///     ).map(NiceFloat).take(20).collect_vec(),
+///     )
+///     .map(NiceFloat)
+///     .take(20)
+///     .collect_vec(),
 ///     [
 ///         2.9238281, 2.953125, 3.0, 2.8671875, 2.8125, 3.125, 3.015625, 2.8462658, 3.140625,
 ///         2.875, 3.0, 2.75, 3.0, 2.71875, 2.75, 3.0214844, 2.970642, 3.0179443, 2.968872, 2.75
-///     ].iter().cloned().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .cloned()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 pub fn special_random_primitive_float_inclusive_range<T: PrimitiveFloat>(
@@ -2586,8 +2947,8 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
     /// let mut generator = variable_range_generator(EXAMPLE_SEED);
@@ -2645,8 +3006,8 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
     /// let mut generator = variable_range_generator(EXAMPLE_SEED);
@@ -2690,8 +3051,8 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
     /// let mut generator = variable_range_generator(EXAMPLE_SEED);
@@ -2723,8 +3084,8 @@ impl VariableRangeGenerator {
     ///
     /// # Examples
     /// ```
-    /// use malachite_base::random::EXAMPLE_SEED;
     /// use malachite_base::num::random::variable_range_generator;
+    /// use malachite_base::random::EXAMPLE_SEED;
     ///
     /// let mut xs = Vec::with_capacity(10);
     /// let mut generator = variable_range_generator(EXAMPLE_SEED);
@@ -2753,8 +3114,8 @@ impl VariableRangeGenerator {
 ///
 /// # Examples
 /// ```
-/// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::num::random::variable_range_generator;
+/// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// let mut generator = variable_range_generator(EXAMPLE_SEED);
 /// assert_eq!(generator.next_bit_chunk::<u16>(10), 881);

@@ -68,14 +68,8 @@ fn test_geometric_random_unsigned_range() {
 
     // u16, 1, 7, um = 3
     let values = &[2, 5, 2, 3, 4, 2, 5, 6, 1, 2, 4, 3, 3, 2, 4, 2, 5, 1, 5, 4];
-    let common_values = &[
-        (1, 365286),
-        (2, 243368),
-        (3, 162008),
-        (4, 108422),
-        (5, 72522),
-        (6, 48394),
-    ];
+    let common_values =
+        &[(1, 365286), (2, 243368), (3, 162008), (4, 108422), (5, 72522), (6, 48394)];
     let pop_median = (2, None);
     let sample_median = (2, None);
     let pop_moment_stats = MomentStats {
@@ -104,9 +98,7 @@ fn test_geometric_random_unsigned_range() {
     );
 
     // u32, 10, 20, um = 30
-    let values = &[
-        18, 13, 12, 14, 11, 14, 16, 12, 12, 12, 11, 11, 12, 16, 10, 12, 13, 17, 19, 18,
-    ];
+    let values = &[18, 13, 12, 14, 11, 14, 16, 12, 12, 12, 11, 11, 12, 16, 10, 12, 13, 17, 19, 18];
     let common_values = &[
         (10, 123089),
         (11, 117792),

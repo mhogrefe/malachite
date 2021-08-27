@@ -1305,14 +1305,7 @@ custom_tuples!(
     unwrap_triple,
     exhaustive_triples_xxy,
     exhaustive_triples_xxy_custom_output,
-    [
-        X,
-        I,
-        xs,
-        xs_done,
-        [0, output_type_xs_0],
-        [1, output_type_xs_1]
-    ],
+    [X, I, xs, xs_done, [0, output_type_xs_0], [1, output_type_xs_1]],
     [Y, J, ys, ys_done, [2, output_type_ys_2]]
 );
 custom_tuples!(
@@ -1322,14 +1315,7 @@ custom_tuples!(
     unwrap_triple,
     exhaustive_triples_xyx,
     exhaustive_triples_xyx_custom_output,
-    [
-        X,
-        I,
-        xs,
-        xs_done,
-        [0, output_type_xs_0],
-        [2, output_type_ys_1]
-    ],
+    [X, I, xs, xs_done, [0, output_type_xs_0], [2, output_type_ys_1]],
     [Y, J, ys, ys_done, [1, output_type_xs_2]]
 );
 custom_tuples!(
@@ -1340,14 +1326,7 @@ custom_tuples!(
     exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output,
     [X, I, xs, xs_done, [0, output_type_xs_0]],
-    [
-        Y,
-        J,
-        ys,
-        ys_done,
-        [1, output_type_ys_1],
-        [2, output_type_ys_2]
-    ]
+    [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]]
 );
 custom_tuples!(
     ExhaustiveQuadruplesXXXY,
@@ -1356,15 +1335,7 @@ custom_tuples!(
     unwrap_quadruple,
     exhaustive_quadruples_xxxy,
     exhaustive_quadruples_xxxy_custom_output,
-    [
-        X,
-        I,
-        xs,
-        xs_done,
-        [0, output_type_xs_0],
-        [1, output_type_xs_1],
-        [2, output_type_xs_2]
-    ],
+    [X, I, xs, xs_done, [0, output_type_xs_0], [1, output_type_xs_1], [2, output_type_xs_2]],
     [Y, J, ys, ys_done, [3, output_type_ys_3]]
 );
 custom_tuples!(
@@ -1375,14 +1346,7 @@ custom_tuples!(
     exhaustive_quadruples_xyyz,
     exhaustive_quadruples_xyyz_custom_output,
     [X, I, xs, xs_done, [0, output_type_xs_0]],
-    [
-        Y,
-        J,
-        ys,
-        ys_done,
-        [1, output_type_ys_1],
-        [2, output_type_ys_2]
-    ],
+    [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]],
     [Z, K, zs, zs_done, [3, output_type_zs_3]]
 );
 custom_tuples!(
@@ -1392,15 +1356,7 @@ custom_tuples!(
     unwrap_quadruple,
     exhaustive_quadruples_xxyx,
     exhaustive_quadruples_xxyx_custom_output,
-    [
-        X,
-        I,
-        xs,
-        xs_done,
-        [0, output_type_xs_0],
-        [1, output_type_xs_1],
-        [3, output_type_xs_3]
-    ],
+    [X, I, xs, xs_done, [0, output_type_xs_0], [1, output_type_xs_1], [3, output_type_xs_3]],
     [Y, J, ys, ys_done, [2, output_type_ys_2]]
 );
 custom_tuples!(
@@ -1410,22 +1366,8 @@ custom_tuples!(
     unwrap_quadruple,
     exhaustive_quadruples_xyyx,
     exhaustive_quadruples_xyyx_custom_output,
-    [
-        X,
-        I,
-        xs,
-        xs_done,
-        [0, output_type_xs_0],
-        [3, output_type_xs_3]
-    ],
-    [
-        Y,
-        J,
-        ys,
-        ys_done,
-        [1, output_type_ys_1],
-        [2, output_type_ys_2]
-    ]
+    [X, I, xs, xs_done, [0, output_type_xs_0], [3, output_type_xs_3]],
+    [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]]
 );
 
 /// A trait used by dependent-pairs structs.
@@ -1545,8 +1487,7 @@ impl<
 /// use std::slice::Iter;
 ///
 /// use malachite_base::tuples::exhaustive::{
-///     ExhaustiveDependentPairsYsGenerator,
-///     lex_dependent_pairs
+///     lex_dependent_pairs, ExhaustiveDependentPairsYsGenerator,
 /// };
 ///
 /// #[derive(Clone, Debug)]
@@ -1573,14 +1514,24 @@ impl<
 ///                 "cat" => &[2, 3, 4][..],
 ///                 "dog" => &[20][..],
 ///                 "mouse" => &[30, 40][..]
-///             }
-///         }
-///     ).take(20).collect_vec();
+///             },
+///         },
+///     )
+///     .take(20)
+///     .collect_vec();
 ///     assert_eq!(
 ///         xss.as_slice(),
 ///         &[
-///             ("cat", 2), ("cat", 3), ("cat", 4), ("dog", 20), ("mouse", 30), ("mouse", 40),
-///             ("dog", 20), ("cat", 2), ("cat", 3), ("cat", 4)
+///             ("cat", 2),
+///             ("cat", 3),
+///             ("cat", 4),
+///             ("dog", 20),
+///             ("mouse", 30),
+///             ("mouse", 40),
+///             ("dog", 20),
+///             ("cat", 2),
+///             ("cat", 3),
+///             ("cat", 4)
 ///         ]
 ///     );
 ///
@@ -1588,13 +1539,26 @@ impl<
 ///     let xss = lex_dependent_pairs(
 ///         xs,
 ///         DPGeneratorFromMap {
-///             map: hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] }
-///         }
-///     ).take(20).collect_vec();
+///             map: hashmap! {
+///                 1 => &[100, 101, 102][..],
+///                 2 => &[][..],
+///                 3 => &[300, 301, 302][..]
+///             },
+///         },
+///     )
+///     .take(20)
+///     .collect_vec();
 ///     assert_eq!(
 ///         xss.as_slice(),
 ///         &[
-///             (1, 100), (1, 101), (1, 102), (3, 300), (3, 301), (3, 302), (3, 300), (3, 301),
+///             (1, 100),
+///             (1, 101),
+///             (1, 102),
+///             (3, 300),
+///             (3, 301),
+///             (3, 302),
+///             (3, 300),
+///             (3, 301),
 ///             (3, 302),
 ///         ]
 ///     );
@@ -1644,8 +1608,7 @@ pub fn lex_dependent_pairs<
 /// use std::slice::Iter;
 ///
 /// use malachite_base::tuples::exhaustive::{
-///     ExhaustiveDependentPairsYsGenerator,
-///     lex_dependent_pairs_stop_after_empty_ys
+///     lex_dependent_pairs_stop_after_empty_ys, ExhaustiveDependentPairsYsGenerator,
 /// };
 ///
 /// #[derive(Clone, Debug)]
@@ -1668,9 +1631,15 @@ pub fn lex_dependent_pairs<
 ///     let xss = lex_dependent_pairs_stop_after_empty_ys(
 ///         xs,
 ///         DPGeneratorFromMap {
-///             map: hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] }
-///         }
-///     ).take(20).collect_vec();
+///             map: hashmap! {
+///                 1 => &[100, 101, 102][..],
+///                 2 => &[][..],
+///                 3 => &[300, 301, 302][..]
+///             },
+///         },
+///     )
+///     .take(20)
+///     .collect_vec();
 ///     // Stops after seeing 2, which maps to an empty iterator
 ///     assert_eq!(xss.as_slice(), &[(1, 100), (1, 101), (1, 102)]);
 /// }
@@ -1808,8 +1777,7 @@ impl<
 /// use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
 /// use malachite_base::num::iterators::ruler_sequence;
 /// use malachite_base::tuples::exhaustive::{
-///     ExhaustiveDependentPairsYsGenerator,
-///     exhaustive_dependent_pairs
+///     exhaustive_dependent_pairs, ExhaustiveDependentPairsYsGenerator,
 /// };
 ///
 /// #[derive(Clone, Debug)]
@@ -1870,12 +1838,56 @@ impl<
 ///     assert_eq!(
 ///         xss.as_slice(),
 ///         &[
-///             (1, 1), (2, 2), (1, 2), (3, 3), (1, 3), (2, 4), (1, 4), (4, 4), (1, 5), (2, 6),
-///             (1, 6), (3, 6), (1, 7), (2, 8), (1, 8), (5, 5), (1, 9), (2, 10), (1, 10), (3, 9),
-///             (1, 11), (2, 12), (1, 12), (4, 8), (1, 13), (2, 14), (1, 14), (3, 12), (1, 15),
-///             (2, 16), (1, 16), (6, 6), (1, 17), (2, 18), (1, 18), (3, 15), (1, 19), (2, 20),
-///             (1, 20), (4, 12), (1, 21), (2, 22), (1, 22), (3, 18), (1, 23), (2, 24), (1, 24),
-///             (5, 10), (1, 25), (2, 26)
+///             (1, 1),
+///             (2, 2),
+///             (1, 2),
+///             (3, 3),
+///             (1, 3),
+///             (2, 4),
+///             (1, 4),
+///             (4, 4),
+///             (1, 5),
+///             (2, 6),
+///             (1, 6),
+///             (3, 6),
+///             (1, 7),
+///             (2, 8),
+///             (1, 8),
+///             (5, 5),
+///             (1, 9),
+///             (2, 10),
+///             (1, 10),
+///             (3, 9),
+///             (1, 11),
+///             (2, 12),
+///             (1, 12),
+///             (4, 8),
+///             (1, 13),
+///             (2, 14),
+///             (1, 14),
+///             (3, 12),
+///             (1, 15),
+///             (2, 16),
+///             (1, 16),
+///             (6, 6),
+///             (1, 17),
+///             (2, 18),
+///             (1, 18),
+///             (3, 15),
+///             (1, 19),
+///             (2, 20),
+///             (1, 20),
+///             (4, 12),
+///             (1, 21),
+///             (2, 22),
+///             (1, 22),
+///             (3, 18),
+///             (1, 23),
+///             (2, 24),
+///             (1, 24),
+///             (5, 10),
+///             (1, 25),
+///             (2, 26)
 ///         ]
 ///     );
 ///
@@ -1890,7 +1902,14 @@ impl<
 ///     assert_eq!(
 ///         xss.as_slice(),
 ///         &[
-///             (1, 100), (3, 300), (1, 101), (3, 300), (1, 102), (3, 301), (3, 302), (3, 301),
+///             (1, 100),
+///             (3, 300),
+///             (1, 101),
+///             (3, 300),
+///             (1, 102),
+///             (3, 301),
+///             (3, 302),
+///             (3, 301),
 ///             (3, 302)
 ///         ]
 ///     );
@@ -1944,8 +1963,7 @@ pub fn exhaustive_dependent_pairs<
 ///
 /// use malachite_base::num::iterators::ruler_sequence;
 /// use malachite_base::tuples::exhaustive::{
-///     ExhaustiveDependentPairsYsGenerator,
-///     exhaustive_dependent_pairs_stop_after_empty_ys
+///     exhaustive_dependent_pairs_stop_after_empty_ys, ExhaustiveDependentPairsYsGenerator,
 /// };
 ///
 /// #[derive(Clone, Debug)]
@@ -1985,9 +2003,15 @@ pub fn exhaustive_dependent_pairs<
 ///         ruler_sequence(),
 ///         xs,
 ///         DPGeneratorFromMap {
-///             map: hashmap! { 1 => &[100, 101, 102][..], 2 => &[][..], 3 => &[300, 301, 302][..] }
-///         }
-///     ).take(20).collect_vec();
+///             map: hashmap! {
+///                 1 => &[100, 101, 102][..],
+///                 2 => &[][..],
+///                 3 => &[300, 301, 302][..]
+///             },
+///         },
+///     )
+///     .take(20)
+///     .collect_vec();
 ///     assert_eq!(xss.as_slice(), &[(1, 100)]);
 /// }
 /// ```

@@ -49,14 +49,8 @@ fn get_sample_output_types(len: usize) -> Vec<Vec<BitDistributorOutputType>> {
         vec![
             vec![BitDistributorOutputType::normal(1); 2],
             vec![BitDistributorOutputType::normal(2); 2],
-            vec![
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::normal(2),
-            ],
-            vec![
-                BitDistributorOutputType::normal(1),
-                BitDistributorOutputType::tiny(),
-            ],
+            vec![BitDistributorOutputType::normal(1), BitDistributorOutputType::normal(2)],
+            vec![BitDistributorOutputType::normal(1), BitDistributorOutputType::tiny()],
         ]
     } else if len == 3 {
         vec![
@@ -196,6 +190,7 @@ pub mod num {
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
         pub mod floor;
+        pub mod is_power_of_2;
         pub mod log_base;
         pub mod log_base_2;
         pub mod log_base_power_of_2;
@@ -234,6 +229,7 @@ pub mod num {
         pub mod parity;
         pub mod pow;
         pub mod power_of_2;
+        pub mod root;
         pub mod round_to_multiple;
         pub mod round_to_multiple_of_power_of_2;
         pub mod saturating_abs;

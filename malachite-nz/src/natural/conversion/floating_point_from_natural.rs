@@ -33,15 +33,32 @@ macro_rules! float_impls {
             /// use malachite_nz::natural::Natural;
             /// use std::str::FromStr;
             ///
-            /// assert_eq!(f32::rounding_from(&Natural::from_str("123").unwrap(),
-            ///     RoundingMode::Exact), 123.0);
-            /// assert_eq!(f32::rounding_from(&Natural::from_str("1000000001").unwrap(),
-            ///     RoundingMode::Floor), 1.0e9);
-            /// assert_eq!(f32::rounding_from(&Natural::from_str("1000000001").unwrap(),
-            ///     RoundingMode::Ceiling), 1.00000006e9);
-            /// assert_eq!(f32::rounding_from(
-            ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
-            ///     .unwrap(), RoundingMode::Nearest), 3.4028235e38);
+            /// assert_eq!(
+            ///     f32::rounding_from(&Natural::from_str("123").unwrap(), RoundingMode::Exact),
+            ///     123.0
+            /// );
+            /// assert_eq!(
+            ///     f32::rounding_from(
+            ///         &Natural::from_str("1000000001").unwrap(),
+            ///         RoundingMode::Floor
+            ///     ),
+            ///     1.0e9
+            /// );
+            /// assert_eq!(
+            ///     f32::rounding_from(
+            ///         &Natural::from_str("1000000001").unwrap(),
+            ///         RoundingMode::Ceiling
+            ///     ),
+            ///     1.00000006e9
+            /// );
+            /// assert_eq!(
+            ///     f32::rounding_from(
+            ///         &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap(),
+            ///         RoundingMode::Nearest
+            ///     ),
+            ///     3.4028235e38
+            /// );
             /// ```
             fn rounding_from(value: &'a Natural, rm: RoundingMode) -> $f {
                 if *value == 0 {
@@ -88,9 +105,13 @@ macro_rules! float_impls {
             ///
             /// assert_eq!(f32::from(&Natural::from_str("123").unwrap()), 123.0);
             /// assert_eq!(f32::from(&Natural::from_str("1000000001").unwrap()), 1.0e9);
-            /// assert_eq!(f32::from(
-            ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
-            ///     .unwrap()), 3.4028235e38);
+            /// assert_eq!(
+            ///     f32::from(
+            ///         &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     3.4028235e38
+            /// );
             /// ```
             #[inline]
             fn from(value: &'a Natural) -> $f {
@@ -115,13 +136,25 @@ macro_rules! float_impls {
             /// use malachite_nz::natural::Natural;
             /// use std::str::FromStr;
             ///
-            /// assert_eq!(f32::checked_from(&Natural::from_str("123").unwrap()), Some(123.0));
-            /// assert_eq!(f32::checked_from(&Natural::from_str("1000000000").unwrap()),
-            ///     Some(1.0e9));
-            /// assert_eq!(f32::checked_from(&Natural::from_str("1000000001").unwrap()), None);
-            /// assert_eq!(f32::checked_from(
-            ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
-            ///     .unwrap()), None);
+            /// assert_eq!(
+            ///     f32::checked_from(&Natural::from_str("123").unwrap()),
+            ///     Some(123.0)
+            /// );
+            /// assert_eq!(
+            ///     f32::checked_from(&Natural::from_str("1000000000").unwrap()),
+            ///     Some(1.0e9)
+            /// );
+            /// assert_eq!(
+            ///     f32::checked_from(&Natural::from_str("1000000001").unwrap()),
+            ///     None
+            /// );
+            /// assert_eq!(
+            ///     f32::checked_from(
+            ///         &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     None
+            /// );
             /// ```
             fn checked_from(value: &'a Natural) -> Option<$f> {
                 if *value == 0 {
@@ -151,12 +184,25 @@ macro_rules! float_impls {
             /// use malachite_nz::natural::Natural;
             /// use std::str::FromStr;
             ///
-            /// assert_eq!(f32::convertible_from(&Natural::from_str("123").unwrap()), true);
-            /// assert_eq!(f32::convertible_from(&Natural::from_str("1000000000").unwrap()), true);
-            /// assert_eq!(f32::convertible_from(&Natural::from_str("1000000001").unwrap()), false);
-            /// assert_eq!(f32::convertible_from(
-            ///     &Natural::from_str("10000000000000000000000000000000000000000000000000000")
-            ///     .unwrap()), false);
+            /// assert_eq!(
+            ///     f32::convertible_from(&Natural::from_str("123").unwrap()),
+            ///     true
+            /// );
+            /// assert_eq!(
+            ///     f32::convertible_from(&Natural::from_str("1000000000").unwrap()),
+            ///     true
+            /// );
+            /// assert_eq!(
+            ///     f32::convertible_from(&Natural::from_str("1000000001").unwrap()),
+            ///     false
+            /// );
+            /// assert_eq!(
+            ///     f32::convertible_from(
+            ///         &Natural::from_str("10000000000000000000000000000000000000000000000000000")
+            ///             .unwrap()
+            ///     ),
+            ///     false
+            /// );
             /// ```
             fn convertible_from(value: &'a Natural) -> bool {
                 //TODO

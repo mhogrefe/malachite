@@ -9,7 +9,6 @@ pub trait EqAbs<Rhs: ?Sized = Self> {
     ///
     /// # Worst-case complexity
     /// Same as the time and additional memory complexity of `eq_abs`.
-    ///
     #[inline]
     fn ne_abs(&self, other: &Rhs) -> bool {
         !self.eq_abs(other)
@@ -28,7 +27,6 @@ pub trait PartialOrdAbs<Rhs: ?Sized = Self> {
     ///
     /// # Worst-case complexity
     /// Same as the time and additional memory complexity of `partial_cmp_abs`.
-    ///
     #[inline]
     fn lt_abs(&self, other: &Rhs) -> bool {
         matches!(self.partial_cmp_abs(other), Some(Ordering::Less))

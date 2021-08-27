@@ -45,7 +45,10 @@ impl<T> BaseFmtWrapper<T> {
     /// use malachite_nz::natural::conversion::string::BaseFmtWrapper;
     /// use malachite_nz::natural::Natural;
     ///
-    /// assert_eq!(BaseFmtWrapper::new(Natural::from(1000000000u32), 36).unwrap(), 1000000000);
+    /// assert_eq!(
+    ///     BaseFmtWrapper::new(Natural::from(1000000000u32), 36).unwrap(),
+    ///     1000000000
+    /// );
     /// ```
     #[allow(clippy::missing_const_for_fn)]
     pub fn unwrap(self) -> T {

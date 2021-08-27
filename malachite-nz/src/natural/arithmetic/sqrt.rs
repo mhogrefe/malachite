@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
-    ShrRound, SqrtRem, SqrtRemAssign, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
+    ShrRound, SqrtRem, SqrtAssignRem, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
@@ -924,7 +924,7 @@ impl<'a> CheckedSqrt for &'a Natural {
     }
 }
 
-impl SqrtRemAssign for Natural {
+impl SqrtAssignRem for Natural {
     type RemOutput = Natural;
 
     /// Replaces a `Natural` with the floor of its square root, and returns the remainder (the
@@ -942,31 +942,31 @@ impl SqrtRemAssign for Natural {
     /// extern crate malachite_base;
     /// extern crate malachite_nz;
     ///
-    /// use malachite_base::num::arithmetic::traits::SqrtRemAssign;
+    /// use malachite_base::num::arithmetic::traits::SqrtAssignRem;
     /// use malachite_nz::natural::Natural;
     ///
     /// let mut x = Natural::from(99u8);
-    /// assert_eq!(x.sqrt_rem_assign(), 18);
+    /// assert_eq!(x.sqrt_assign_rem(), 18);
     /// assert_eq!(x, 9);
     ///
     /// let mut x = Natural::from(100u8);
-    /// assert_eq!(x.sqrt_rem_assign(), 0);
+    /// assert_eq!(x.sqrt_assign_rem(), 0);
     /// assert_eq!(x, 10);
     ///
     /// let mut x = Natural::from(101u8);
-    /// assert_eq!(x.sqrt_rem_assign(), 1);
+    /// assert_eq!(x.sqrt_assign_rem(), 1);
     /// assert_eq!(x, 10);
     ///
     /// let mut x = Natural::from(1000000000u32);
-    /// assert_eq!(x.sqrt_rem_assign(), 49116);
+    /// assert_eq!(x.sqrt_assign_rem(), 49116);
     /// assert_eq!(x, 31622);
     ///
     /// let mut x = Natural::from(10000000000u64);
-    /// assert_eq!(x.sqrt_rem_assign(), 0);
+    /// assert_eq!(x.sqrt_assign_rem(), 0);
     /// assert_eq!(x, 100000);
     /// ```
     #[inline]
-    fn sqrt_rem_assign(&mut self) -> Natural {
+    fn sqrt_assign_rem(&mut self) -> Natural {
         let (sqrt, rem) = (&*self).sqrt_rem();
         *self = sqrt;
         rem
@@ -1045,7 +1045,7 @@ impl<'a> SqrtRem for &'a Natural {
                     Natural::from_owned_limbs_asc(sqrt_limbs),
                     Natural::from_owned_limbs_asc(rem_limbs),
                 )
-            } 
+            }
         }
     }
 }

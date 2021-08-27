@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign,
-    RoundToMultipleOfPowerOf2, ShrRound, SqrtRem, SqrtRemAssign,
+    RoundToMultipleOfPowerOf2, ShrRound, Sqrt, SqrtAssign, SqrtAssignRem, SqrtRem,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -10,9 +10,7 @@ use num::logic::traits::SignificantBits;
 use rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 
-const U8_SQUARES: [u8; 16] = [
-    0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225,
-];
+const U8_SQUARES: [u8; 16] = [0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169, 196, 225];
 
 impl FloorSqrt for u8 {
     type Output = u8;
@@ -110,7 +108,7 @@ impl SqrtRem for u8 {
     }
 }
 
-fn floor_inverse_checked_binary<T: PrimitiveUnsigned, F: Fn(T) -> Option<T>>(
+pub(crate) fn floor_inverse_checked_binary<T: PrimitiveUnsigned, F: Fn(T) -> Option<T>>(
     f: F,
     x: T,
     mut low: T,
@@ -1098,67 +1096,13 @@ macro_rules! impl_sqrt_signed {
                 }
             }
         }
-
-        impl SqrtRem for $s {
-            type SqrtOutput = $s;
-            type RemOutput = $u;
-
-            /// Returns the floor of the square root of an integer, and the remainder (the
-            /// difference between the integer and the square of the floor).
-            ///
-            /// $f(x) = (\lfloor\sqrt{x}\rfloor, x - \lfloor\sqrt{x}\rfloor^2)$.
-            ///
-            /// # Worst-case complexity
-            /// Constant time and additional memory.
-            ///
-            /// # Panics
-            /// Panics if `self` is negative.
-            ///
-            /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
-            #[inline]
-            fn sqrt_rem(self) -> ($s, $u) {
-                if self >= 0 {
-                    let (sqrt, rem) = self.unsigned_abs().sqrt_rem();
-                    ($s::wrapping_from(sqrt), rem)
-                } else {
-                    panic!("Cannot take square root of {}", self)
-                }
-            }
-        }
-
-        impl SqrtRemAssign for $s {
-            type RemOutput = $u;
-
-            /// Replaces an integer with the floor of its square root, and returns the remainder
-            /// (the difference between the original integer and the square of the floor).
-            ///
-            /// $f(x) = x - \lfloor\sqrt{x}\rfloor^2$,
-            ///
-            /// $x \gets \lfloor\sqrt{x}\rfloor$.
-            ///
-            /// # Worst-case complexity
-            /// Constant time and additional memory.
-            ///
-            /// # Panics
-            /// Panics if `self` is negative.
-            ///
-            /// # Examples
-            /// See the documentation of the `num::arithmetic::sqrt` module.
-            #[inline]
-            fn sqrt_rem_assign(&mut self) -> $u {
-                let (sqrt, rem) = self.sqrt_rem();
-                *self = sqrt;
-                rem
-            }
-        }
     };
 }
 apply_to_unsigned_signed_pairs!(impl_sqrt_signed);
 
-macro_rules! impl_sqrt_rem_assign_unsigned {
+macro_rules! impl_sqrt_assign_rem_unsigned {
     ($t: ident) => {
-        impl SqrtRemAssign for $t {
+        impl SqrtAssignRem for $t {
             type RemOutput = $t;
 
             /// Replaces an integer with the floor of its square root, and returns the remainder
@@ -1174,7 +1118,7 @@ macro_rules! impl_sqrt_rem_assign_unsigned {
             /// # Examples
             /// See the documentation of the `num::arithmetic::sqrt` module.
             #[inline]
-            fn sqrt_rem_assign(&mut self) -> $t {
+            fn sqrt_assign_rem(&mut self) -> $t {
                 let (sqrt, rem) = self.sqrt_rem();
                 *self = sqrt;
                 rem
@@ -1182,7 +1126,7 @@ macro_rules! impl_sqrt_rem_assign_unsigned {
         }
     };
 }
-apply_to_unsigneds!(impl_sqrt_rem_assign_unsigned);
+apply_to_unsigneds!(impl_sqrt_assign_rem_unsigned);
 
 macro_rules! impl_sqrt_assign {
     ($t: ident) => {
@@ -1226,3 +1170,33 @@ macro_rules! impl_sqrt_assign {
     };
 }
 apply_to_primitive_ints!(impl_sqrt_assign);
+
+macro_rules! impl_sqrt_primitive_float {
+    ($f:ident) => {
+        impl Sqrt for $f {
+            type Output = Self;
+
+            #[inline]
+            fn sqrt(self) -> $f {
+                $f::sqrt(self)
+            }
+        }
+
+        impl SqrtAssign for $f {
+            /// Replaces `self` with its square root.
+            ///
+            /// $x \gets \sqrt x$.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See the documentation of the `num::arithmetic::sqrt` module.
+            #[inline]
+            fn sqrt_assign(&mut self) {
+                *self = self.sqrt();
+            }
+        }
+    };
+}
+apply_to_primitive_floats!(impl_sqrt_primitive_float);

@@ -621,75 +621,27 @@ fn limbs_eq_mod_ref_ref_ref_fail_6() {
     limbs_eq_mod_ref_ref_ref(&[1, 1, 1], &[1, 0, 3], &[7, 0]);
 }
 
-//TODO clean from_str
-
 #[test]
 fn test_eq_mod() {
-    let test = |x, y, m, out| {
-        assert_eq!(
-            Natural::from_str(x)
-                .unwrap()
-                .eq_mod(Natural::from_str(y).unwrap(), Natural::from_str(m).unwrap()),
-            out
-        );
-        assert_eq!(
-            Natural::from_str(x).unwrap().eq_mod(
-                Natural::from_str(y).unwrap(),
-                &Natural::from_str(m).unwrap()
-            ),
-            out
-        );
-        assert_eq!(
-            Natural::from_str(x).unwrap().eq_mod(
-                &Natural::from_str(y).unwrap(),
-                Natural::from_str(m).unwrap()
-            ),
-            out
-        );
-        assert_eq!(
-            Natural::from_str(x).unwrap().eq_mod(
-                &Natural::from_str(y).unwrap(),
-                &Natural::from_str(m).unwrap()
-            ),
-            out
-        );
-        assert_eq!(
-            (&Natural::from_str(x).unwrap())
-                .eq_mod(Natural::from_str(y).unwrap(), Natural::from_str(m).unwrap()),
-            out
-        );
-        assert_eq!(
-            (&Natural::from_str(x).unwrap()).eq_mod(
-                Natural::from_str(y).unwrap(),
-                &Natural::from_str(m).unwrap()
-            ),
-            out
-        );
-        assert_eq!(
-            (&Natural::from_str(x).unwrap()).eq_mod(
-                &Natural::from_str(y).unwrap(),
-                Natural::from_str(m).unwrap()
-            ),
-            out
-        );
-        assert_eq!(
-            (&Natural::from_str(x).unwrap()).eq_mod(
-                &Natural::from_str(y).unwrap(),
-                &Natural::from_str(m).unwrap()
-            ),
-            out
-        );
+    let test = |r, s, t, out| {
+        let x = Natural::from_str(r).unwrap();
+        let y = Natural::from_str(s).unwrap();
+        let m = Natural::from_str(t).unwrap();
 
+        assert_eq!(x.clone().eq_mod(y.clone(), m.clone()), out);
+        assert_eq!(x.clone().eq_mod(y.clone(), &m), out);
+        assert_eq!(x.clone().eq_mod(&y, m.clone()), out);
+        assert_eq!(x.clone().eq_mod(&y, &m), out);
+        assert_eq!((&x).eq_mod(y.clone(), m.clone()), out);
+        assert_eq!((&x).eq_mod(y.clone(), &m), out);
+        assert_eq!((&x).eq_mod(&y, m.clone()), out);
+        assert_eq!((&x).eq_mod(&y, &m), out);
+
+        assert_eq!(y.eq_mod(x, m), out);
         assert_eq!(
-            Natural::from_str(y)
-                .unwrap()
-                .eq_mod(Natural::from_str(x).unwrap(), Natural::from_str(m).unwrap()),
-            out
-        );
-        assert_eq!(
-            rug::Integer::from_str(x).unwrap().is_congruent(
-                &rug::Integer::from_str(y).unwrap(),
-                &rug::Integer::from_str(m).unwrap()
+            rug::Integer::from_str(r).unwrap().is_congruent(
+                &rug::Integer::from_str(s).unwrap(),
+                &rug::Integer::from_str(t).unwrap()
             ),
             out
         );

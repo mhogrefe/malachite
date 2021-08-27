@@ -1,3 +1,4 @@
+use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -55,6 +56,9 @@ fn pow_assign_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         if x > T::ONE {
             assert_eq!(power.checked_log_base(x), Some(y));
         }
+        if y != 0 {
+            assert_eq!(power.checked_root(y), Some(x));
+        }
     });
 }
 
@@ -63,6 +67,12 @@ fn pow_assign_properties_helper_signed<T: PrimitiveSigned>() {
         let mut power = x;
         power.pow_assign(y);
         assert_eq!(power, x.pow(y));
+        if y != 0 {
+            assert_eq!(
+                power.checked_root(y),
+                Some(if y.even() { x.abs() } else { x })
+            );
+        }
     });
 }
 

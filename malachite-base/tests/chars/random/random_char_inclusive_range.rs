@@ -29,7 +29,7 @@ fn test_random_char_inclusive_range() {
         aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\
         aaaaaaaaaaaaaaaaaaa",
         &[('a', 1000000)],
-        ('a', None)
+        ('a', None),
     );
     random_char_inclusive_range_helper(
         'a',
@@ -38,7 +38,7 @@ fn test_random_char_inclusive_range() {
         bccccccbacabaacbcababbaabcacabbbabaaacbccccbccabbaaacabaabccacabccccabbcacccaaccaccaccbbbca\
         abcbaabcccbccbbbabc",
         &[('b', 333784), ('c', 333516), ('a', 332700)],
-        ('b', None)
+        ('b', None),
     );
     random_char_inclusive_range_helper(
         'a',
@@ -46,9 +46,19 @@ fn test_random_char_inclusive_range() {
         "rlewrsgkdlbeouylrelopxqkoonftexoshqulgvonioatekqesxybqjsrbsajhpzzvzpcxcuyfkcsrexwwcjymyxhj\
         pxkbyhasvvkwucaopwwpxyncdkvllxbdavqlxlsaxglzyhrulnqvqdipeklnnbgdhejggrhwgjjmmpndcjsvlqypdqq\
         odasmavfvcmxcvoopcr",
-        &[('x', 38904), ('q', 38795), ('s', 38687), ('w', 38660), ('d', 38655), ('f', 38647),
-          ('a', 38592), ('n', 38569), ('j', 38531), ('z', 38530)],
-        ('n', None)
+        &[
+            ('x', 38904),
+            ('q', 38795),
+            ('s', 38687),
+            ('w', 38660),
+            ('d', 38655),
+            ('f', 38647),
+            ('a', 38592),
+            ('n', 38569),
+            ('j', 38531),
+            ('z', 38530),
+        ],
+        ('n', None),
     );
     random_char_inclusive_range_helper(
         '!',
@@ -56,9 +66,19 @@ fn test_random_char_inclusive_range() {
         "2,%723\'+$,\"%/59,2%,/081+//.&4%8/3(15,\'6/.)/!4%+1%389\"1*32\"3!*(060#8#59&+#32%877#*9-98\
         (*08+\"9(!366+75#!/077089.#$+6,,8\"$!61,8,3!8\',9(25,.161$)0%+,..\"\'$(%*\'\'2(7\'**--0.$#*\
         36,190$11/$!3-!6&6#-8#6//0#2#5\"!",
-        &[('8', 40444), ('1', 40300), ('7', 40244), ('3', 40201), ('&', 40174), ('$', 40171),
-          ('.', 40117), ('*', 40111), ('!', 40107), ('#', 40076)],
-        ('-', None)
+        &[
+            ('8', 40444),
+            ('1', 40300),
+            ('7', 40244),
+            ('3', 40201),
+            ('&', 40174),
+            ('$', 40171),
+            ('.', 40117),
+            ('*', 40111),
+            ('!', 40107),
+            ('#', 40076),
+        ],
+        ('-', None),
     );
     random_char_inclusive_range_helper(
         '\u{D7FF}',

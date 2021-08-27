@@ -1,12 +1,13 @@
 use crate::generators::common::{
-    integer_nrm, integer_pair_1_nrm, integer_rm, natural_nrm, natural_pair_1_nrm, natural_pair_nrm,
-    natural_pair_rm, natural_rm,
+    integer_nrm, integer_pair_1_nrm, integer_pair_nrm, integer_rm, natural_nrm, natural_pair_1_nrm,
+    natural_pair_1_rm, natural_pair_nrm, natural_pair_rm, natural_rm,
 };
 use crate::generators::exhaustive::*;
 use crate::generators::random::*;
 use crate::generators::special_random::*;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
 use malachite_base::rounding_modes::RoundingMode;
@@ -23,6 +24,14 @@ pub fn integer_gen() -> Generator<Integer> {
         &exhaustive_integer_gen,
         &random_integer_gen,
         &special_random_integer_gen,
+    )
+}
+
+pub fn integer_gen_rm() -> Generator<(rug::Integer, Integer)> {
+    Generator::new(
+        &|| integer_rm(exhaustive_integer_gen()),
+        &|config| integer_rm(random_integer_gen(config)),
+        &|config| integer_rm(special_random_integer_gen(config)),
     )
 }
 
@@ -67,6 +76,7 @@ where
     )
 }
 
+// All `Integer`s that are natural (non-negative).
 pub fn integer_gen_var_4() -> Generator<Integer> {
     Generator::new(
         &exhaustive_integer_gen_var_4,
@@ -91,6 +101,53 @@ pub fn integer_gen_var_4_nrm() -> Generator<(BigInt, rug::Integer, Integer)> {
     )
 }
 
+// All `Integer`s that are exactly equal to an unsigned value of type `T`.
+pub fn integer_gen_var_5<T: PrimitiveUnsigned>() -> Generator<Integer>
+where
+    Integer: From<T>,
+{
+    Generator::new(
+        &exhaustive_integer_gen_var_5::<T>,
+        &random_integer_gen_var_5::<T>,
+        &special_random_integer_gen_var_4::<T>,
+    )
+}
+
+// All `Integer`s that are exactly equal to a signed value of type `T`.
+pub fn integer_gen_var_6<T: PrimitiveSigned>() -> Generator<Integer>
+where
+    Integer: From<T>,
+{
+    Generator::new(
+        &exhaustive_integer_gen_var_6::<T>,
+        &random_integer_gen_var_5::<T>,
+        &special_random_integer_gen_var_5::<T>,
+    )
+}
+
+// -- (Integer, Integer) --
+
+pub fn integer_pair_gen() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen,
+        &random_integer_pair_gen,
+        &special_random_integer_pair_gen,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_pair_gen_nrm() -> Generator<(
+    (BigInt, BigInt),
+    (rug::Integer, rug::Integer),
+    (Integer, Integer),
+)> {
+    Generator::new(
+        &|| integer_pair_nrm(exhaustive_integer_pair_gen()),
+        &|config| integer_pair_nrm(random_integer_pair_gen(config)),
+        &|config| integer_pair_nrm(special_random_integer_pair_gen(config)),
+    )
+}
+
 // -- (Integer, PrimitiveUnsigned) --
 
 // All `(Integer, T)` where `T` is unsigned and between 2 and 36, inclusive.
@@ -98,7 +155,7 @@ pub fn integer_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(Int
     Generator::new(
         &exhaustive_integer_unsigned_pair_gen_var_1,
         &random_integer_unsigned_pair_gen_var_1,
-        &special_random_integer_unsigned_pair_gen_var_3,
+        &special_random_integer_unsigned_pair_gen_var_1,
     )
 }
 
@@ -108,7 +165,7 @@ pub fn integer_unsigned_pair_gen_var_1_nrm<T: PrimitiveUnsigned>(
     Generator::new(
         &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen_var_1()),
         &|config| integer_pair_1_nrm(random_integer_unsigned_pair_gen_var_1(config)),
-        &|config| integer_pair_1_nrm(special_random_integer_unsigned_pair_gen_var_3(config)),
+        &|config| integer_pair_1_nrm(special_random_integer_unsigned_pair_gen_var_1(config)),
     )
 }
 
@@ -118,6 +175,26 @@ pub fn integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Int
         &exhaustive_integer_unsigned_pair_gen_var_2,
         &random_integer_unsigned_pair_gen_var_2,
         &special_random_integer_unsigned_pair_gen_var_2,
+    )
+}
+
+// All `(Integer, T)` where `T` is unsigned, small, and positive, and either the `Integer` is
+// non-negative or the `T` is odd.
+pub fn integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_pair_gen_var_3,
+        &random_integer_unsigned_pair_gen_var_3,
+        &special_random_integer_unsigned_pair_gen_var_3,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_unsigned_pair_gen_var_3_nrm<T: PrimitiveUnsigned>(
+) -> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
+    Generator::new(
+        &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen_var_3()),
+        &|config| integer_pair_1_nrm(random_integer_unsigned_pair_gen_var_3(config)),
+        &|config| integer_pair_1_nrm(special_random_integer_unsigned_pair_gen_var_3(config)),
     )
 }
 
@@ -144,6 +221,18 @@ pub fn integer_rounding_mode_pair_gen_var_1<
         &exhaustive_integer_rounding_mode_pair_gen_var_1::<T>,
         &random_integer_rounding_mode_pair_gen_var_1::<T>,
         &special_random_integer_rounding_mode_pair_gen_var_1::<T>,
+    )
+}
+
+// -- (Integer, Vec<bool>) --
+
+// All `(Integer, Vec<bool>)` pairs where the length of the `Vec` is the twos' complement limb
+// count of the `Integer`, including sign extension limbs if necessary.
+pub fn integer_bool_vec_pair_gen_var_1() -> Generator<(Integer, Vec<bool>)> {
+    Generator::new(
+        &exhaustive_integer_bool_vec_pair_gen_var_1,
+        &random_integer_bool_vec_pair_gen_var_1,
+        &special_random_integer_bool_vec_pair_gen_var_1,
     )
 }
 
@@ -219,6 +308,30 @@ where
         &exhaustive_natural_gen_var_5::<T>,
         &random_natural_gen_var_5::<T>,
         &special_random_natural_gen_var_3::<T>,
+    )
+}
+
+// All `Natural`s that are exactly equal to an unsigned value of type `T`.
+pub fn natural_gen_var_6<T: PrimitiveUnsigned>() -> Generator<Natural>
+where
+    Natural: From<T>,
+{
+    Generator::new(
+        &exhaustive_natural_gen_var_6::<T>,
+        &random_natural_gen_var_6::<T>,
+        &special_random_natural_gen_var_4::<T>,
+    )
+}
+
+// All `Natural`s that are exactly equal to a signed value of type `T`.
+pub fn natural_gen_var_7<T: PrimitiveSigned>() -> Generator<Natural>
+where
+    Natural: ExactFrom<T>,
+{
+    Generator::new(
+        &exhaustive_natural_gen_var_7::<T>,
+        &random_natural_gen_var_7::<T>,
+        &special_random_natural_gen_var_5::<T>,
     )
 }
 
@@ -367,6 +480,25 @@ pub fn natural_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(Nat
     )
 }
 
+pub fn natural_unsigned_pair_gen_var_7_rm<T: PrimitiveUnsigned>(
+) -> Generator<((rug::Integer, T), (Natural, T))> {
+    Generator::new(
+        &|| natural_pair_1_rm(exhaustive_natural_primitive_int_pair_gen_var_3()),
+        &|config| natural_pair_1_rm(random_natural_unsigned_pair_gen_var_7(config)),
+        &|config| natural_pair_1_rm(special_random_natural_unsigned_pair_gen_var_6(config)),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn natural_unsigned_pair_gen_var_7_nrm<T: PrimitiveUnsigned>(
+) -> Generator<((BigUint, T), (rug::Integer, T), (Natural, T))> {
+    Generator::new(
+        &|| natural_pair_1_nrm(exhaustive_natural_primitive_int_pair_gen_var_3()),
+        &|config| natural_pair_1_nrm(random_natural_unsigned_pair_gen_var_7(config)),
+        &|config| natural_pair_1_nrm(special_random_natural_unsigned_pair_gen_var_6(config)),
+    )
+}
+
 // All `(Natural, T)` where the `Natural` is positive and the `T` is unsigned, positive, and small.
 pub fn natural_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>() -> Generator<(Natural, T)> {
     Generator::new(
@@ -454,6 +586,18 @@ pub fn natural_rounding_mode_pair_gen_var_2() -> Generator<(Natural, RoundingMod
         &exhaustive_natural_rounding_mode_pair_gen_var_2,
         &random_natural_rounding_mode_pair_gen_var_2,
         &special_random_natural_rounding_mode_pair_gen_var_2,
+    )
+}
+
+// -- (Natural, Vec<bool>) --
+
+// All `(Natural, Vec<bool>)` pairs where the length of the `Vec` is the number of limbs of the
+// `Natural`.
+pub fn natural_bool_vec_pair_gen_var_1() -> Generator<(Natural, Vec<bool>)> {
+    Generator::new(
+        &exhaustive_natural_bool_vec_pair_gen_var_1,
+        &random_natural_bool_vec_pair_gen_var_1,
+        &special_random_natural_bool_vec_pair_gen_var_1,
     )
 }
 

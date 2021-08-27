@@ -41,9 +41,7 @@ fn geometric_random_negative_signeds_helper<
 #[test]
 fn test_geometric_random_negative_signeds() {
     // i64, um = -65 / 64
-    let values = &[
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2,
-    ];
+    let values = &[-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -2];
     let common_values = &[(-1, 984537), (-2, 15210), (-3, 253)];
     let pop_median = (-1, None);
     let sample_median = (-1, None);
@@ -71,9 +69,7 @@ fn test_geometric_random_negative_signeds() {
     );
 
     // i64, um = -12345/10000
-    let values = &[
-        -1, -1, -1, -1, -1, -1, -1, -1, -2, -1, -1, -1, -1, -1, -2, -2, -1, -1, -1, -1,
-    ];
+    let values = &[-1, -1, -1, -1, -1, -1, -1, -1, -2, -1, -1, -1, -1, -1, -2, -2, -1, -1, -1, -1];
     let common_values = &[
         (-1, 809395),
         (-2, 154707),
@@ -111,9 +107,7 @@ fn test_geometric_random_negative_signeds() {
     );
 
     // i64, um = -2
-    let values = &[
-        -2, -1, -1, -4, -5, -5, -2, -1, -1, -2, -1, -1, -3, -3, -1, -1, -2, -1, -4, -2,
-    ];
+    let values = &[-2, -1, -1, -4, -5, -5, -2, -1, -1, -2, -1, -1, -3, -3, -1, -1, -2, -1, -4, -2];
     let common_values = &[
         (-1, 500085),
         (-2, 249510),

@@ -117,11 +117,23 @@ pub mod digits;
 /// assert_eq!(f32::rounding_from(100, RoundingMode::Nearest), 100.0);
 /// assert_eq!(f32::rounding_from(100, RoundingMode::Exact), 100.0);
 ///
-/// assert_eq!(f32::rounding_from(i32::MAX, RoundingMode::Floor), 2147483500.0);
-/// assert_eq!(f32::rounding_from(i32::MAX, RoundingMode::Down), 2147483500.0);
-/// assert_eq!(f32::rounding_from(i32::MAX, RoundingMode::Ceiling), 2147483600.0);
+/// assert_eq!(
+///     f32::rounding_from(i32::MAX, RoundingMode::Floor),
+///     2147483500.0
+/// );
+/// assert_eq!(
+///     f32::rounding_from(i32::MAX, RoundingMode::Down),
+///     2147483500.0
+/// );
+/// assert_eq!(
+///     f32::rounding_from(i32::MAX, RoundingMode::Ceiling),
+///     2147483600.0
+/// );
 /// assert_eq!(f32::rounding_from(i32::MAX, RoundingMode::Up), 2147483600.0);
-/// assert_eq!(f32::rounding_from(i32::MAX, RoundingMode::Nearest), 2147483600.0);
+/// assert_eq!(
+///     f32::rounding_from(i32::MAX, RoundingMode::Nearest),
+///     2147483600.0
+/// );
 ///
 /// assert_eq!(u32::rounding_from(100.0f32, RoundingMode::Floor), 100);
 /// assert_eq!(u32::rounding_from(100.0f32, RoundingMode::Down), 100);
@@ -179,8 +191,8 @@ pub mod half;
 ///
 /// # is_integer
 /// ```
-/// use malachite_base::num::conversion::traits::IsInteger;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::IsInteger;
 ///
 /// assert_eq!(0.0.is_integer(), true);
 /// assert_eq!(1.0.is_integer(), true);
@@ -202,8 +214,8 @@ pub mod is_integer;
 ///
 /// # raw_mantissa_and_exponent
 /// ```
-/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 ///
 /// assert_eq!(0.0f32.raw_mantissa_and_exponent(), (0, 0));
 /// assert_eq!((-0.0f32).raw_mantissa_and_exponent(), (0, 0));
@@ -211,14 +223,17 @@ pub mod is_integer;
 /// assert_eq!(f32::POSITIVE_INFINITY.raw_mantissa_and_exponent(), (0, 255));
 /// assert_eq!(f32::NEGATIVE_INFINITY.raw_mantissa_and_exponent(), (0, 255));
 /// assert_eq!(1.0f32.raw_mantissa_and_exponent(), (0, 127));
-/// assert_eq!(core::f32::consts::PI.raw_mantissa_and_exponent(), (4788187, 128));
+/// assert_eq!(
+///     core::f32::consts::PI.raw_mantissa_and_exponent(),
+///     (4788187, 128)
+/// );
 /// assert_eq!(0.1f32.raw_mantissa_and_exponent(), (5033165, 123));
 /// ```
 ///
 /// # raw_mantissa
 /// ```
-/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 ///
 /// assert_eq!(0.0f32.raw_mantissa(), 0);
 /// assert_eq!((-0.0f32).raw_mantissa(), 0);
@@ -233,8 +248,8 @@ pub mod is_integer;
 /// # raw_exponent
 ///
 /// ```
-/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 ///
 /// assert_eq!(0.0f32.raw_exponent(), 0);
 /// assert_eq!((-0.0f32).raw_exponent(), 0);
@@ -248,48 +263,78 @@ pub mod is_integer;
 ///
 /// # from_raw_mantissa_and_exponent;
 /// ```
-/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::RawMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
 ///
-/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(0, 0)), NiceFloat(0.0));
-/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(0x400000, 255)), NiceFloat(f32::NAN));
+/// assert_eq!(
+///     NiceFloat(f32::from_raw_mantissa_and_exponent(0, 0)),
+///     NiceFloat(0.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(f32::from_raw_mantissa_and_exponent(0x400000, 255)),
+///     NiceFloat(f32::NAN)
+/// );
 /// assert_eq!(
 ///     NiceFloat(f32::from_raw_mantissa_and_exponent(0, 255)),
 ///     NiceFloat(f32::POSITIVE_INFINITY)
 /// );
-/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(0, 127)), NiceFloat(1.0));
+/// assert_eq!(
+///     NiceFloat(f32::from_raw_mantissa_and_exponent(0, 127)),
+///     NiceFloat(1.0)
+/// );
 /// assert_eq!(
 ///     NiceFloat(f32::from_raw_mantissa_and_exponent(4788187, 128)),
 ///     NiceFloat(core::f32::consts::PI)
 /// );
-/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(5033165, 123)), NiceFloat(0.1));
-/// assert_eq!(NiceFloat(f32::from_raw_mantissa_and_exponent(2097152, 130)), NiceFloat(10.0));
+/// assert_eq!(
+///     NiceFloat(f32::from_raw_mantissa_and_exponent(5033165, 123)),
+///     NiceFloat(0.1)
+/// );
+/// assert_eq!(
+///     NiceFloat(f32::from_raw_mantissa_and_exponent(2097152, 130)),
+///     NiceFloat(10.0)
+/// );
 /// ```
 ///
 /// # integer_mantissa_and_exponent
 /// ```
-/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
 ///
 /// assert_eq!(1u8.integer_mantissa_and_exponent(), (1, 0));
 /// assert_eq!(2u8.integer_mantissa_and_exponent(), (1, 1));
 /// assert_eq!(3u8.integer_mantissa_and_exponent(), (3, 0));
 /// assert_eq!(100u8.integer_mantissa_and_exponent(), (25, 2));
 ///
-/// assert_eq!(core::f32::consts::PI.integer_mantissa_and_exponent(), (13176795, -22));
+/// assert_eq!(
+///     core::f32::consts::PI.integer_mantissa_and_exponent(),
+///     (13176795, -22)
+/// );
 /// assert_eq!(0.1f32.integer_mantissa_and_exponent(), (13421773, -27));
 /// assert_eq!(10.0f32.integer_mantissa_and_exponent(), (5, 1));
-/// assert_eq!(f32::MIN_POSITIVE_SUBNORMAL.integer_mantissa_and_exponent(), (1, -149));
-/// assert_eq!(f32::MAX_SUBNORMAL.integer_mantissa_and_exponent(), (0x7fffff, -149));
-/// assert_eq!(f32::MIN_POSITIVE_NORMAL.integer_mantissa_and_exponent(), (1, -126));
-/// assert_eq!(f32::MAX_FINITE.integer_mantissa_and_exponent(), (0xffffff, 104));
+/// assert_eq!(
+///     f32::MIN_POSITIVE_SUBNORMAL.integer_mantissa_and_exponent(),
+///     (1, -149)
+/// );
+/// assert_eq!(
+///     f32::MAX_SUBNORMAL.integer_mantissa_and_exponent(),
+///     (0x7fffff, -149)
+/// );
+/// assert_eq!(
+///     f32::MIN_POSITIVE_NORMAL.integer_mantissa_and_exponent(),
+///     (1, -126)
+/// );
+/// assert_eq!(
+///     f32::MAX_FINITE.integer_mantissa_and_exponent(),
+///     (0xffffff, 104)
+/// );
 /// ```
 ///
 /// # integer_mantissa
 /// ```
-/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
 ///
 /// assert_eq!(1u8.integer_mantissa(), 1);
 /// assert_eq!(2u8.integer_mantissa(), 1);
@@ -308,8 +353,8 @@ pub mod is_integer;
 ///
 /// # integer_exponent
 /// ```
-/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::IntegerMantissaAndExponent;
 ///
 /// assert_eq!(1u8.integer_exponent(), 0);
 /// assert_eq!(2u8.integer_exponent(), 1);
@@ -337,8 +382,14 @@ pub mod is_integer;
 /// assert_eq!(u8::from_integer_mantissa_and_exponent(3, 0), Some(3));
 /// assert_eq!(u8::from_integer_mantissa_and_exponent(25, 2), Some(100));
 ///
-/// assert_eq!(f32::from_integer_mantissa_and_exponent(0, 5).map(NiceFloat), Some(NiceFloat(0.0)));
-/// assert_eq!(f32::from_integer_mantissa_and_exponent(1, 0).map(NiceFloat), Some(NiceFloat(1.0)));
+/// assert_eq!(
+///     f32::from_integer_mantissa_and_exponent(0, 5).map(NiceFloat),
+///     Some(NiceFloat(0.0))
+/// );
+/// assert_eq!(
+///     f32::from_integer_mantissa_and_exponent(1, 0).map(NiceFloat),
+///     Some(NiceFloat(1.0))
+/// );
 /// assert_eq!(
 ///     f32::from_integer_mantissa_and_exponent(4, -2).map(NiceFloat),
 ///     Some(NiceFloat(1.0))
@@ -366,8 +417,8 @@ pub mod is_integer;
 ///
 /// # sci_mantissa_and_exponent
 /// ```
-/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// let test = |n: u32, mantissa: f32, exponent: u64| {
@@ -396,24 +447,39 @@ pub mod is_integer;
 ///
 /// # sci_mantissa
 /// ```
-/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(NiceFloat(1.0f32.sci_mantissa()), NiceFloat(1.0));
-/// assert_eq!(NiceFloat(core::f32::consts::PI.sci_mantissa()), NiceFloat(1.5707964));
+/// assert_eq!(
+///     NiceFloat(core::f32::consts::PI.sci_mantissa()),
+///     NiceFloat(1.5707964)
+/// );
 /// assert_eq!(NiceFloat(0.1f32.sci_mantissa()), NiceFloat(1.6));
 /// assert_eq!(NiceFloat(10.0f32.sci_mantissa()), NiceFloat(1.25));
-/// assert_eq!(NiceFloat(f32::MIN_POSITIVE_SUBNORMAL.sci_mantissa()), NiceFloat(1.0));
-/// assert_eq!(NiceFloat(f32::MAX_SUBNORMAL.sci_mantissa()), NiceFloat(1.9999998));
-/// assert_eq!(NiceFloat(f32::MIN_POSITIVE_NORMAL.sci_mantissa()), NiceFloat(1.0));
-/// assert_eq!(NiceFloat(f32::MAX_FINITE.sci_mantissa()), NiceFloat(1.9999999));
+/// assert_eq!(
+///     NiceFloat(f32::MIN_POSITIVE_SUBNORMAL.sci_mantissa()),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(f32::MAX_SUBNORMAL.sci_mantissa()),
+///     NiceFloat(1.9999998)
+/// );
+/// assert_eq!(
+///     NiceFloat(f32::MIN_POSITIVE_NORMAL.sci_mantissa()),
+///     NiceFloat(1.0)
+/// );
+/// assert_eq!(
+///     NiceFloat(f32::MAX_FINITE.sci_mantissa()),
+///     NiceFloat(1.9999999)
+/// );
 /// ```
 ///
 /// # sci_exponent
 /// ```
-/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 ///
 /// assert_eq!(1.0f32.sci_exponent(), 0);
 /// assert_eq!(core::f32::consts::PI.sci_exponent(), 1);
@@ -427,22 +493,34 @@ pub mod is_integer;
 ///
 /// # from_sci_mantissa_and_exponent;
 /// ```
-/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(u32::from_sci_mantissa_and_exponent(1.5, 1u64), Some(3u32));
 /// assert_eq!(u32::from_sci_mantissa_and_exponent(1.51, 1u64), Some(3u32));
-/// assert_eq!(u32::from_sci_mantissa_and_exponent(1.921875, 6u64), Some(123u32));
+/// assert_eq!(
+///     u32::from_sci_mantissa_and_exponent(1.921875, 6u64),
+///     Some(123u32)
+/// );
 /// assert_eq!(u32::from_sci_mantissa_and_exponent(1.5, 1u64), Some(3u32));
 ///
-/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.0, 0).map(NiceFloat), Some(NiceFloat(1.0)));
+/// assert_eq!(
+///     f32::from_sci_mantissa_and_exponent(1.0, 0).map(NiceFloat),
+///     Some(NiceFloat(1.0))
+/// );
 /// assert_eq!(
 ///     f32::from_sci_mantissa_and_exponent(1.5707964, 1).map(NiceFloat),
 ///     Some(NiceFloat(core::f32::consts::PI))
 /// );
-/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.6, -4).map(NiceFloat), Some(NiceFloat(0.1)));
-/// assert_eq!(f32::from_sci_mantissa_and_exponent(1.25, 3).map(NiceFloat), Some(NiceFloat(10.0)));
+/// assert_eq!(
+///     f32::from_sci_mantissa_and_exponent(1.6, -4).map(NiceFloat),
+///     Some(NiceFloat(0.1))
+/// );
+/// assert_eq!(
+///     f32::from_sci_mantissa_and_exponent(1.25, 3).map(NiceFloat),
+///     Some(NiceFloat(10.0))
+/// );
 /// assert_eq!(
 ///     f32::from_sci_mantissa_and_exponent(1.0, -149).map(NiceFloat),
 ///     Some(NiceFloat(f32::MIN_POSITIVE_SUBNORMAL))

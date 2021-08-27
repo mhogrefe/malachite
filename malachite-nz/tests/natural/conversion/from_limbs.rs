@@ -1,6 +1,9 @@
-#[cfg(feature = "32_bit_limbs")]
+use itertools::Itertools;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::slices::slice_test_zero;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::unsigned_vec_gen;
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -50,4 +53,59 @@ fn test_from_limbs_desc() {
         vec![5, 4, 3, 2, 1],
         "1701411834921604967429270619762735448065",
     );
+}
+
+#[test]
+fn from_limbs_asc_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen().test_properties_with_config(&config, |xs| {
+        let x = Natural::from_limbs_asc(&xs);
+        assert!(x.is_valid());
+        assert_eq!(Natural::from_owned_limbs_asc(xs.clone()), x);
+        let mut trimmed_limbs = xs
+            .iter()
+            .cloned()
+            .rev()
+            .skip_while(|&limb| limb == 0)
+            .collect_vec();
+        trimmed_limbs.reverse();
+        assert_eq!(x.to_limbs_asc(), trimmed_limbs);
+        assert_eq!(
+            Natural::from_limbs_desc(&xs.iter().cloned().rev().collect_vec()),
+            x
+        );
+        if !xs.is_empty() && *xs.last().unwrap() != 0 {
+            assert_eq!(x.to_limbs_asc(), xs);
+        }
+        assert_eq!(slice_test_zero(&xs), x == 0);
+    });
+}
+
+#[test]
+fn from_limbs_desc_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen().test_properties_with_config(&config, |xs| {
+        let x = Natural::from_limbs_desc(&xs);
+        assert!(x.is_valid());
+        assert_eq!(Natural::from_owned_limbs_desc(xs.clone()), x);
+        assert_eq!(
+            x.to_limbs_desc(),
+            xs.iter()
+                .cloned()
+                .skip_while(|&limb| limb == 0)
+                .collect_vec()
+        );
+        assert_eq!(
+            Natural::from_limbs_asc(&xs.iter().cloned().rev().collect_vec()),
+            x
+        );
+        if !xs.is_empty() && xs[0] != 0 {
+            assert_eq!(x.to_limbs_desc(), xs);
+        }
+        assert_eq!(slice_test_zero(&xs), x == 0);
+    });
 }

@@ -2,8 +2,8 @@ use crate::bench::bucketers::{
     natural_bit_bucketer, pair_2_natural_bit_bucketer, triple_3_natural_bit_bucketer,
 };
 use malachite_base::num::arithmetic::traits::{
-    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, SqrtRem,
-    SqrtRemAssign, Square,
+    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, SqrtAssignRem,
+    SqrtRem, Square,
 };
 use malachite_base_test_util::bench::bucketers::{
     pair_2_vec_len_bucketer, pair_max_bit_bucketer, quadruple_2_vec_len_bucketer,
@@ -46,7 +46,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_checked_sqrt_ref);
     register_demo!(runner, demo_natural_sqrt_rem);
     register_demo!(runner, demo_natural_sqrt_rem_ref);
-    register_demo!(runner, demo_natural_sqrt_rem_assign);
+    register_demo!(runner, demo_natural_sqrt_assign_rem);
     register_bench!(runner, benchmark_sqrt_rem_2_newton);
     register_bench!(runner, benchmark_limbs_sqrt_rem_helper);
     register_bench!(runner, benchmark_limbs_sqrt_helper);
@@ -68,7 +68,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_sqrt_rem_evaluation_strategy);
     register_bench!(runner, benchmark_natural_sqrt_rem_algorithms);
     register_bench!(runner, benchmark_natural_sqrt_rem_library_comparison);
-    register_bench!(runner, benchmark_natural_sqrt_rem_assign);
+    register_bench!(runner, benchmark_natural_sqrt_assign_rem);
 }
 
 fn demo_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize) {
@@ -232,35 +232,12 @@ fn demo_natural_sqrt_rem_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
-fn demo_natural_sqrt_rem_assign(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_sqrt_assign_rem(gm: GenMode, config: GenConfig, limit: usize) {
     for mut x in natural_gen().get(gm, &config).take(limit) {
         let old_x = x.clone();
-        let rem = x.sqrt_rem_assign();
-        println!("x := {}; x.sqrt_rem_assign() = {}; x = {}", old_x, rem, x);
+        let rem = x.sqrt_assign_rem();
+        println!("x := {}; x.sqrt_assign_rem() = {}; x = {}", old_x, rem, x);
     }
-}
-
-fn benchmark_natural_floor_sqrt_evaluation_strategy(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-    file_name: &str,
-) {
-    run_benchmark(
-        "Natural.floor_sqrt()",
-        BenchmarkType::EvaluationStrategy,
-        natural_gen().get(gm, &config),
-        gm.name(),
-        limit,
-        file_name,
-        &natural_bit_bucketer("x"),
-        &mut [
-            ("Natural.floor_sqrt()", &mut |x| no_out!(x.floor_sqrt())),
-            ("(&Natural).floor_sqrt()", &mut |x| {
-                no_out!((&x).floor_sqrt())
-            }),
-        ],
-    );
 }
 
 fn benchmark_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
@@ -406,6 +383,29 @@ fn benchmark_limbs_sqrt_rem(gm: GenMode, config: GenConfig, limit: usize, file_n
         &mut [("limbs_sqrt_rem(&[Limb])", &mut |xs| {
             no_out!(limbs_sqrt_rem(&xs))
         })],
+    );
+}
+
+fn benchmark_natural_floor_sqrt_evaluation_strategy(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Natural.floor_sqrt()",
+        BenchmarkType::EvaluationStrategy,
+        natural_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &natural_bit_bucketer("x"),
+        &mut [
+            ("Natural.floor_sqrt()", &mut |x| no_out!(x.floor_sqrt())),
+            ("(&Natural).floor_sqrt()", &mut |x| {
+                no_out!((&x).floor_sqrt())
+            }),
+        ],
     );
 }
 
@@ -648,20 +648,20 @@ fn benchmark_natural_sqrt_rem_library_comparison(
     );
 }
 
-fn benchmark_natural_sqrt_rem_assign(
+fn benchmark_natural_sqrt_assign_rem(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        "Natural.sqrt_rem_assign()",
+        "Natural.sqrt_assign_rem()",
         BenchmarkType::Single,
         natural_gen().get(gm, &config),
         gm.name(),
         limit,
         file_name,
         &natural_bit_bucketer("x"),
-        &mut [("Malachite", &mut |mut x| no_out!(x.sqrt_rem_assign()))],
+        &mut [("Malachite", &mut |mut x| no_out!(x.sqrt_assign_rem()))],
     );
 }

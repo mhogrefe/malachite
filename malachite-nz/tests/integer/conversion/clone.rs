@@ -1,4 +1,10 @@
+use malachite_base_test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::common::{
+    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
+};
+use malachite_nz_test_util::generators::{integer_gen, integer_pair_gen};
 use num::BigInt;
 use rug;
 use std::str::FromStr;
@@ -24,7 +30,6 @@ fn test_clone() {
 #[test]
 fn test_clone_and_clone_from() {
     let test = |u, v| {
-        // clone_from
         let mut x = Integer::from_str(u).unwrap();
         x.clone_from(&Integer::from_str(v).unwrap());
         assert_eq!(x.to_string(), v);
@@ -42,4 +47,46 @@ fn test_clone_and_clone_from() {
     test("-123", "1000000000000");
     test("1000000000000", "-123");
     test("1000000000000", "2000000000000");
+}
+
+#[allow(clippy::redundant_clone)]
+#[test]
+fn clone_and_clone_from_properties() {
+    integer_gen().test_properties(|x| {
+        let mut_x = x.clone();
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, x);
+
+        assert_eq!(bigint_to_integer(&integer_to_bigint(&x).clone()), x);
+        assert_eq!(
+            rug_integer_to_integer(&integer_to_rug_integer(&x).clone()),
+            x
+        );
+    });
+
+    integer_pair_gen().test_properties(|(x, y)| {
+        let mut mut_x = x.clone();
+        mut_x.clone_from(&y);
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, y);
+
+        let mut num_x = integer_to_bigint(&x);
+        num_x.clone_from(&integer_to_bigint(&y));
+        assert_eq!(bigint_to_integer(&num_x), y);
+
+        let mut rug_x = integer_to_rug_integer(&x);
+        rug_x.clone_from(&integer_to_rug_integer(&y));
+        assert_eq!(rug_integer_to_integer(&rug_x), y);
+    });
+
+    signed_pair_gen::<SignedLimb>().test_properties(|(i, j)| {
+        let x = Integer::from(i);
+        let y = Integer::from(j);
+
+        let mut mut_i = i;
+        let mut mut_x = x.clone();
+        mut_i.clone_from(&j);
+        mut_x.clone_from(&y);
+        assert_eq!(mut_x, mut_i);
+    });
 }

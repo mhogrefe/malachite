@@ -329,7 +329,8 @@ where
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     with_special_value(EXAMPLE_SEED, -1i16, 1, 2, &random_primitive_ints::<i16>).take(20)
+///     with_special_value(EXAMPLE_SEED, -1i16, 1, 2, &random_primitive_ints::<i16>)
+///         .take(20)
 ///         .collect_vec(),
 ///     &[
 ///         -1, -1, -1, 2901, -1, -14200, -1, -1, -1, -30997, -8245, -5338, -1, -1, -20007, -1, -1,
@@ -408,8 +409,15 @@ where
 /// use malachite_base::random::EXAMPLE_SEED;
 ///
 /// assert_eq!(
-///     with_special_values(EXAMPLE_SEED, vec![1, 2, 3], 1, 2, &random_primitive_ints::<i16>)
-///         .take(20) .collect_vec(),
+///     with_special_values(
+///         EXAMPLE_SEED,
+///         vec![1, 2, 3],
+///         1,
+///         2,
+///         &random_primitive_ints::<i16>
+///     )
+///     .take(20)
+///     .collect_vec(),
 ///     &[3, 1, 3, 2901, 1, -14200, 2, 3, 1, -30997, -8245, -5338, 1, 1, -20007, 3, 1, 1, 1, 1]
 /// );
 /// ```
@@ -491,7 +499,9 @@ where
 /// use malachite_base::iterators::iter_windows;
 ///
 /// let xs = 0..=5;
-/// let windows = iter_windows(3, xs).map(|ws| ws.iter().cloned().collect_vec()).collect_vec();
+/// let windows = iter_windows(3, xs)
+///     .map(|ws| ws.iter().cloned().collect_vec())
+///     .collect_vec();
 /// assert_eq!(
 ///     windows.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[&[0, 1, 2], &[1, 2, 3], &[2, 3, 4], &[3, 4, 5]]

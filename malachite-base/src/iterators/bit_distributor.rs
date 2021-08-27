@@ -143,9 +143,10 @@ impl BitDistributor {
     /// ```
     /// use malachite_base::iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
     ///
-    /// let bd = BitDistributor::new(
-    ///     &[BitDistributorOutputType::normal(2), BitDistributorOutputType::tiny()]
-    /// );
+    /// let bd = BitDistributor::new(&[
+    ///     BitDistributorOutputType::normal(2),
+    ///     BitDistributorOutputType::tiny(),
+    /// ]);
     /// assert_eq!(
     ///     bd.bit_map_as_slice(),
     ///     &[
@@ -318,15 +319,10 @@ impl BitDistributor {
     ///     outputs.push((0..2).map(|i| bd.get_output(i)).collect_vec());
     ///     bd.increment_counter();
     /// }
-    /// let expected_outputs: &[&[usize]] =
-    ///     &[
-    ///         &[0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 2], &[0, 3], &[1, 2], &[1, 3], &[2, 0],
-    ///         &[2, 1]
-    ///     ];
-    /// assert_eq!(
-    ///     outputs,
-    ///     expected_outputs,
-    /// );
+    /// let expected_outputs: &[&[usize]] = &[
+    ///     &[0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 2], &[0, 3], &[1, 2], &[1, 3], &[2, 0], &[2, 1]
+    /// ];
+    /// assert_eq!(outputs, expected_outputs,);
     /// ```
     pub fn get_output(&self, index: usize) -> usize {
         assert!(index < self.output_types.len());

@@ -101,6 +101,7 @@ impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T> for FILIterator<'a, T> {
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct SizeOfLimbIterator<'a, T>(SOLIterator<'a, T>);
 
@@ -166,6 +167,7 @@ impl<'a, T: PrimitiveUnsigned> SOLIterator<'a, T> {
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct MultipleOfLimbIterator<'a, T>(MOLIterator<'a, T>);
 
@@ -214,6 +216,7 @@ impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T> for MOLIterator<'a, T> {
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct IrregularIterator<'a, T>(IIterator<'a, T>);
 
@@ -306,6 +309,7 @@ impl<'a, T: PrimitiveUnsigned> IIterator<'a, T> {
 ///
 /// This struct also supports retrieving digits by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading zero digits is allowed.
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub enum NaturalPowerOf2DigitPrimitiveIterator<'a, T: PrimitiveUnsigned> {
     Small(PrimitivePowerOf2DigitIterator<Limb, T>),
@@ -335,7 +339,10 @@ impl<'a, T: PrimitiveUnsigned> Iterator for NaturalPowerOf2DigitPrimitiveIterato
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert_eq!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next(), None);
+    /// assert_eq!(
+    ///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next(),
+    ///     None
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
@@ -417,7 +424,10 @@ impl<'a, T: PrimitiveUnsigned> DoubleEndedIterator
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert_eq!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next(), None);
+    /// assert_eq!(
+    ///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next(),
+    ///     None
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
@@ -459,14 +469,14 @@ impl<'a, T: PrimitiveUnsigned> PowerOf2DigitIterator<T>
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::{
-    ///     PowerOf2DigitIterable,
-    ///     PowerOf2DigitIterator
-    /// };
+    /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert_eq!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).get(0), 0);
+    /// assert_eq!(
+    ///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).get(0),
+    ///     0
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
@@ -625,7 +635,9 @@ macro_rules! iterables {
             /// use malachite_nz::natural::Natural;
             ///
             /// let n = Natural::ZERO;
-            /// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next().is_none());
+            /// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
+            ///     .next()
+            ///     .is_none());
             ///
             /// // 107 = 1223_4
             /// let n = Natural::from(107u32);
@@ -635,14 +647,16 @@ macro_rules! iterables {
             /// );
             ///
             /// let n = Natural::ZERO;
-            /// assert!(
-            ///     PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2).next_back().is_none()
-            /// );
+            /// assert!(PowerOf2DigitIterable::<u8>::power_of_2_digits(&n, 2)
+            ///     .next_back()
+            ///     .is_none());
             ///
             /// // 107 = 1223_4
             /// let n = Natural::from(107u32);
             /// assert_eq!(
-            ///     PowerOf2DigitIterable::<u32>::power_of_2_digits(&n, 2).rev().collect_vec(),
+            ///     PowerOf2DigitIterable::<u32>::power_of_2_digits(&n, 2)
+            ///         .rev()
+            ///         .collect_vec(),
             ///     vec![1, 2, 2, 3]
             /// );
             /// ```
@@ -658,6 +672,7 @@ macro_rules! iterables {
 }
 apply_to_unsigneds!(iterables);
 
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub struct NaturalMultipleOfLimbIterator<'a>(NMOLIterator<'a>);
 
@@ -705,6 +720,7 @@ impl<'a> PowerOf2DigitIterator<Natural> for NMOLIterator<'a> {
     }
 }
 
+#[doc(hidden)]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct NaturalIrregularIterator<'a>(NIIterator<'a>);
 
@@ -778,6 +794,7 @@ impl<'a> NIIterator<'a> {
 ///
 /// This struct also supports retrieving digits by index. This functionality is completely
 /// independent of the iterator's state. Indexing the implicit leading zero digits is allowed.
+#[doc(hidden)]
 #[derive(Clone, Debug)]
 pub enum NaturalPowerOf2DigitIterator<'a> {
     Small(PrimitivePowerOf2DigitIterator<Limb, Limb>),
@@ -808,7 +825,10 @@ impl<'a> Iterator for NaturalPowerOf2DigitIterator<'a> {
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert_eq!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next(), None);
+    /// assert_eq!(
+    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next(),
+    ///     None
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
@@ -890,7 +910,10 @@ impl<'a> DoubleEndedIterator for NaturalPowerOf2DigitIterator<'a> {
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert_eq!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next(), None);
+    /// assert_eq!(
+    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next(),
+    ///     None
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
@@ -932,14 +955,14 @@ impl<'a> PowerOf2DigitIterator<Natural> for NaturalPowerOf2DigitIterator<'a> {
     /// extern crate malachite_nz;
     ///
     /// use malachite_base::num::basic::traits::Zero;
-    /// use malachite_base::num::conversion::traits::{
-    ///     PowerOf2DigitIterable,
-    ///     PowerOf2DigitIterator
-    /// };
+    /// use malachite_base::num::conversion::traits::{PowerOf2DigitIterable, PowerOf2DigitIterator};
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert_eq!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).get(0), 0);
+    /// assert_eq!(
+    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).get(0),
+    ///     0
+    /// );
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
@@ -1012,25 +1035,39 @@ impl<'a> PowerOf2DigitIterable<Natural> for &'a Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// let n = Natural::ZERO;
-    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next().is_none());
+    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
+    ///     .next()
+    ///     .is_none());
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
     /// assert_eq!(
     ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).collect_vec(),
-    ///     vec![Natural::from(3u32), Natural::from(2u32), Natural::from(2u32), Natural::from(1u32)]
+    ///     vec![
+    ///         Natural::from(3u32),
+    ///         Natural::from(2u32),
+    ///         Natural::from(2u32),
+    ///         Natural::from(1u32)
+    ///     ]
     /// );
     ///
     /// let n = Natural::ZERO;
-    /// assert!(
-    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).next_back().is_none()
-    /// );
+    /// assert!(PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
+    ///     .next_back()
+    ///     .is_none());
     ///
     /// // 107 = 1223_4
     /// let n = Natural::from(107u32);
     /// assert_eq!(
-    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2).rev().collect_vec(),
-    ///     vec![Natural::from(1u32), Natural::from(2u32), Natural::from(2u32), Natural::from(3u32)]
+    ///     PowerOf2DigitIterable::<Natural>::power_of_2_digits(&n, 2)
+    ///         .rev()
+    ///         .collect_vec(),
+    ///     vec![
+    ///         Natural::from(1u32),
+    ///         Natural::from(2u32),
+    ///         Natural::from(2u32),
+    ///         Natural::from(3u32)
+    ///     ]
     /// );
     /// ```
     fn power_of_2_digits(self, log_base: u64) -> NaturalPowerOf2DigitIterator<'a> {

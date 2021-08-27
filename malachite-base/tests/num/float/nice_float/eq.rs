@@ -5,15 +5,7 @@ use malachite_base_test_util::generators::{
     primitive_float_gen, primitive_float_pair_gen, primitive_float_triple_gen,
 };
 
-const TEST_STRINGS: [&str; 7] = [
-    "-Infinity",
-    "-5.0e5",
-    "-0.0",
-    "NaN",
-    "0.0",
-    "0.123",
-    "Infinity",
-];
+const TEST_STRINGS: [&str; 7] = ["-Infinity", "-5.0e5", "-0.0", "NaN", "0.0", "0.123", "Infinity"];
 
 #[test]
 pub fn test_eq() {

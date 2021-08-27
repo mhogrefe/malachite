@@ -30,9 +30,7 @@ pub fn test_from_bits_asc() {
     test_unsigned(&[true, true], 3u64);
     test_unsigned(&[true, true, false, true, true, true, true], 123u16);
     test_unsigned(
-        &[
-            true, true, false, true, true, true, true, false, false, false,
-        ],
+        &[true, true, false, true, true, true, true, false, false, false],
         123u16,
     );
     test_unsigned(&[true; 8], u8::MAX);
@@ -59,9 +57,7 @@ pub fn test_from_bits_asc() {
     test_signed(&[true, false, true], -3i64);
     test_signed(&[true, true, false, true, true, true, true, false], 123i16);
     test_signed(
-        &[
-            true, true, false, true, true, true, true, false, false, false, false,
-        ],
+        &[true, true, false, true, true, true, true, false, false, false, false],
         123i16,
     );
     test_signed(
@@ -69,9 +65,7 @@ pub fn test_from_bits_asc() {
         -123i16,
     );
     test_signed(
-        &[
-            true, false, true, false, false, false, false, true, true, true, true,
-        ],
+        &[true, false, true, false, false, false, false, true, true, true, true],
         -123i16,
     );
     test_signed(&[true, true, true, true, true, true, true, false], i8::MAX);
@@ -113,9 +107,7 @@ pub fn test_from_bits_desc() {
     test_unsigned(&[true, true], 3u64);
     test_unsigned(&[true, true, true, true, false, true, true], 123u16);
     test_unsigned(
-        &[
-            false, false, false, true, true, true, true, false, true, true,
-        ],
+        &[false, false, false, true, true, true, true, false, true, true],
         123u16,
     );
     test_unsigned(&[true; 8], u8::MAX);
@@ -138,9 +130,7 @@ pub fn test_from_bits_desc() {
     test_signed(&[true, false, true], -3i64);
     test_signed(&[false, true, true, true, true, false, true, true], 123i16);
     test_signed(
-        &[
-            false, false, false, false, true, true, true, true, false, true, true,
-        ],
+        &[false, false, false, false, true, true, true, true, false, true, true],
         123i16,
     );
     test_signed(
@@ -148,9 +138,7 @@ pub fn test_from_bits_desc() {
         -123i16,
     );
     test_signed(
-        &[
-            true, true, true, true, false, false, false, false, true, false, true,
-        ],
+        &[true, true, true, true, false, false, false, false, true, false, true],
         -123i16,
     );
     test_signed(&[false, true, true, true, true, true, true, true], i8::MAX);

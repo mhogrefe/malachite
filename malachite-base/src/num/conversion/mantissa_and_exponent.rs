@@ -222,17 +222,17 @@ fn _from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
 /// ```
 /// extern crate malachite_base;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 /// use malachite_base::num::conversion::mantissa_and_exponent::*;
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::rounding_modes::RoundingMode;
 ///
 /// fn test<T: PrimitiveUnsigned, U: PrimitiveFloat>(
 ///     n: T,
 ///     rm: RoundingMode,
-///     out: Option<(U, u64)>
+///     out: Option<(U, u64)>,
 /// ) {
 ///     assert_eq!(
 ///         sci_mantissa_and_exponent_with_rounding(n, rm).map(|(m, e)| (NiceFloat(m), e)),
@@ -308,10 +308,10 @@ pub fn sci_mantissa_and_exponent_with_rounding<T: PrimitiveUnsigned, U: Primitiv
 /// ```
 /// extern crate malachite_base;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 /// use malachite_base::num::conversion::mantissa_and_exponent::*;
 /// use malachite_base::num::conversion::traits::SciMantissaAndExponent;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::rounding_modes::RoundingMode;
 /// use std::str::FromStr;
 ///
@@ -319,7 +319,7 @@ pub fn sci_mantissa_and_exponent_with_rounding<T: PrimitiveUnsigned, U: Primitiv
 ///     mantissa: U,
 ///     exponent: u64,
 ///     rm: RoundingMode,
-///     out: Option<T>
+///     out: Option<T>,
 /// ) {
 ///     assert_eq!(
 ///         from_sci_mantissa_and_exponent_with_rounding::<T, U>(mantissa, exponent, rm),

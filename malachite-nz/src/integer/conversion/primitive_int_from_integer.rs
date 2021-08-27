@@ -137,10 +137,22 @@ macro_rules! impl_from {
             /// use malachite_base::num::conversion::traits::CheckedFrom;
             /// use malachite_nz::integer::Integer;
             ///
-            /// assert_eq!(format!("{:?}", u32::checked_from(&Integer::from(123))), "Some(123)");
-            /// assert_eq!(format!("{:?}", u32::checked_from(&Integer::from(-123))), "None");
-            /// assert_eq!(format!("{:?}", u32::checked_from(&Integer::trillion())), "None");
-            /// assert_eq!(format!("{:?}", u32::checked_from(&-Integer::trillion())), "None");
+            /// assert_eq!(
+            ///     format!("{:?}", u32::checked_from(&Integer::from(123))),
+            ///     "Some(123)"
+            /// );
+            /// assert_eq!(
+            ///     format!("{:?}", u32::checked_from(&Integer::from(-123))),
+            ///     "None"
+            /// );
+            /// assert_eq!(
+            ///     format!("{:?}", u32::checked_from(&Integer::trillion())),
+            ///     "None"
+            /// );
+            /// assert_eq!(
+            ///     format!("{:?}", u32::checked_from(&-Integer::trillion())),
+            ///     "None"
+            /// );
             /// ```
             #[inline]
             fn checked_from(value: &Integer) -> Option<$u> {
@@ -221,9 +233,18 @@ macro_rules! impl_from {
             /// use malachite_nz::integer::Integer;
             ///
             /// assert_eq!(u32::overflowing_from(&Integer::from(123)), (123, false));
-            /// assert_eq!(u32::overflowing_from(&Integer::from(-123)), (4294967173, true));
-            /// assert_eq!(u32::overflowing_from(&Integer::trillion()), (3567587328, true));
-            /// assert_eq!(u32::overflowing_from(&-Integer::trillion()), (727379968, true));
+            /// assert_eq!(
+            ///     u32::overflowing_from(&Integer::from(-123)),
+            ///     (4294967173, true)
+            /// );
+            /// assert_eq!(
+            ///     u32::overflowing_from(&Integer::trillion()),
+            ///     (3567587328, true)
+            /// );
+            /// assert_eq!(
+            ///     u32::overflowing_from(&-Integer::trillion()),
+            ///     (727379968, true)
+            /// );
             /// ```
             #[inline]
             fn overflowing_from(value: &Integer) -> ($u, bool) {
@@ -360,8 +381,14 @@ macro_rules! impl_from {
             ///
             /// assert_eq!(i32::overflowing_from(&Integer::from(123)), (123, false));
             /// assert_eq!(i32::overflowing_from(&Integer::from(-123)), (-123, false));
-            /// assert_eq!(i32::overflowing_from(&Integer::trillion()), (-727379968, true));
-            /// assert_eq!(i32::overflowing_from(&-Integer::trillion()), (727379968, true));
+            /// assert_eq!(
+            ///     i32::overflowing_from(&Integer::trillion()),
+            ///     (-727379968, true)
+            /// );
+            /// assert_eq!(
+            ///     i32::overflowing_from(&-Integer::trillion()),
+            ///     (727379968, true)
+            /// );
             /// ```
             #[inline]
             fn overflowing_from(value: &Integer) -> ($s, bool) {

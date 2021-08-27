@@ -41,13 +41,7 @@ fn test_exhaustive_union2s() {
         once('a'),
         0..4,
         5,
-        &[
-            Union2::A('a'),
-            Union2::B(0),
-            Union2::B(1),
-            Union2::B(2),
-            Union2::B(3),
-        ],
+        &[Union2::A('a'), Union2::B(0), Union2::B(1), Union2::B(2), Union2::B(3)],
     );
     exhaustive_union2s_helper(
         'a'..'e',
@@ -171,14 +165,7 @@ fn test_exhaustive_union3s() {
         once(false),
         0..4,
         6,
-        &[
-            Union3::A('a'),
-            Union3::B(false),
-            Union3::C(0),
-            Union3::C(1),
-            Union3::C(2),
-            Union3::C(3),
-        ],
+        &[Union3::A('a'), Union3::B(false), Union3::C(0), Union3::C(1), Union3::C(2), Union3::C(3)],
     );
     exhaustive_union3s_helper(
         exhaustive_bools(),

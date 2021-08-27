@@ -267,7 +267,10 @@ impl<'a, T> Iterator for RandomValuesFromSlice<'a, T> {
 ///
 /// let xs = &[2, 3, 5, 7, 11];
 /// assert_eq!(
-///     random_values_from_slice(EXAMPLE_SEED, xs).cloned().take(10).collect_vec(),
+///     random_values_from_slice(EXAMPLE_SEED, xs)
+///         .cloned()
+///         .take(10)
+///         .collect_vec(),
 ///     &[3, 7, 3, 5, 11, 3, 5, 11, 2, 2]
 /// );
 /// ```
@@ -360,7 +363,8 @@ impl<'a, T> Iterator for ExhaustiveSlicePermutations<'a, T> {
 /// use malachite_base::slices::exhaustive_slice_permutations;
 ///
 /// let css: Vec<String> = exhaustive_slice_permutations(&['a', 'b', 'c', 'd'])
-///     .map(|ds| ds.into_iter().copied().collect()).collect();
+///     .map(|ds| ds.into_iter().copied().collect())
+///     .collect();
 /// assert_eq!(
 ///     css.iter().map(String::as_str).collect_vec().as_slice(),
 ///     [
@@ -420,8 +424,10 @@ impl<'a, T> Iterator for RandomSlicePermutations<'a, T> {
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::slices::random_slice_permutations;
 ///
-/// let css: Vec<String> = random_slice_permutations(EXAMPLE_SEED, &['a', 'b', 'c', 'd']).take(20)
-///     .map(|ds| ds.into_iter().copied().collect()).collect();
+/// let css: Vec<String> = random_slice_permutations(EXAMPLE_SEED, &['a', 'b', 'c', 'd'])
+///     .take(20)
+///     .map(|ds| ds.into_iter().copied().collect())
+///     .collect();
 /// assert_eq!(
 ///     css.iter().map(String::as_str).collect_vec().as_slice(),
 ///     [

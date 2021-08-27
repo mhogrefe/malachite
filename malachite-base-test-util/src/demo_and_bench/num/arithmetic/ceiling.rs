@@ -14,7 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_ceiling_assign<T: PrimitiveFloat>(gm: GenMode, config: GenConfig, limit: usize) {
     for mut f in primitive_float_gen::<T>().get(gm, &config).take(limit) {
         let old_f = f;
-        f.abs_assign();
+        f.ceiling_assign();
         println!(
             "i := {}; i.ceiling_assign(); i = {}",
             NiceFloat(old_f),

@@ -1,11 +1,14 @@
+use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_base_test_util::generators::{unsigned_gen_var_15, unsigned_gen_var_16};
+use malachite_base_test_util::generators::{
+    signed_gen_var_11, unsigned_gen_var_15, unsigned_gen_var_16,
+};
 use std::panic::catch_unwind;
 
-fn power_of_2_primitive_helper<T: PrimitiveInt>() {
+fn power_of_2_primitive_int_helper<T: PrimitiveInt>() {
     let test = |pow, out| {
         assert_eq!(T::power_of_2(pow), out);
     };
@@ -22,10 +25,23 @@ fn power_of_2_unsigned_helper<T: PrimitiveUnsigned>() {
     test(T::WIDTH - 1, T::ONE << (T::WIDTH - 1));
 }
 
+fn power_of_2_primitive_float_helper<T: PrimitiveFloat>() {
+    let test = |pow, out| {
+        assert_eq!(T::power_of_2(pow), out);
+    };
+    test(0, T::ONE);
+    test(1, T::TWO);
+    test(-1, T::from(0.5f32));
+    test(2, T::from(4.0f32));
+    test(-2, T::from(0.25f32));
+    test(T::MIN_EXPONENT, T::MIN_POSITIVE_SUBNORMAL);
+}
+
 #[test]
 fn test_power_of_2() {
-    apply_fn_to_primitive_ints!(power_of_2_primitive_helper);
+    apply_fn_to_primitive_ints!(power_of_2_primitive_int_helper);
     apply_fn_to_unsigneds!(power_of_2_unsigned_helper);
+    apply_fn_to_primitive_floats!(power_of_2_primitive_float_helper);
 }
 
 fn power_of_2_unsigned_fail_helper<T: PrimitiveUnsigned>() {
@@ -36,10 +52,18 @@ fn power_of_2_signed_fail_helper<T: PrimitiveSigned>() {
     assert_panic!(T::power_of_2(T::WIDTH - 1));
 }
 
+fn power_of_2_primitive_float_fail_helper<T: PrimitiveFloat>() {
+    assert_panic!(T::power_of_2(T::MAX_EXPONENT + 1));
+    assert_panic!(T::power_of_2(T::MIN_EXPONENT - 1));
+    assert_panic!(T::power_of_2(10000));
+    assert_panic!(T::power_of_2(-10000));
+}
+
 #[test]
 fn power_of_2_fail() {
     apply_fn_to_unsigneds!(power_of_2_unsigned_fail_helper);
     apply_fn_to_signeds!(power_of_2_signed_fail_helper);
+    apply_fn_to_primitive_floats!(power_of_2_primitive_float_fail_helper);
 }
 
 fn power_of_2_properties_helper_unsigned<T: PrimitiveUnsigned>() {
@@ -64,8 +88,17 @@ fn power_of_2_properties_helper_signed<
     });
 }
 
+fn power_of_2_properties_helper_primitive_float<T: PrimitiveFloat>() {
+    signed_gen_var_11::<T>().test_properties(|pow| {
+        let n = T::power_of_2(pow);
+        assert!(n > T::ZERO);
+        assert!(n.is_power_of_2());
+    });
+}
+
 #[test]
 fn power_of_2_properties() {
     apply_fn_to_unsigneds!(power_of_2_properties_helper_unsigned);
     apply_fn_to_unsigned_signed_pairs!(power_of_2_properties_helper_signed);
+    apply_fn_to_primitive_floats!(power_of_2_properties_helper_primitive_float);
 }

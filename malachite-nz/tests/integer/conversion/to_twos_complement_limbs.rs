@@ -1,43 +1,25 @@
-#[cfg(feature = "32_bit_limbs")]
 use itertools::Itertools;
+use malachite_base::num::arithmetic::traits::Sign;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_gen_var_5, unsigned_vec_gen, unsigned_vec_gen_var_2,
+};
+use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    integer_bool_vec_pair_gen_var_1, integer_gen, integer_unsigned_pair_gen_var_2,
+};
+use malachite_nz_test_util::integer::conversion::to_twos_complement_limbs::{
+    limbs_twos_complement_in_place_alt_1, limbs_twos_complement_in_place_alt_2,
+};
+use std::cmp::Ordering;
 #[cfg(feature = "32_bit_limbs")]
 use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
-use malachite_base::num::arithmetic::traits::WrappingNegAssign;
-
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::integer::Integer;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_in_place;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::logic::not::limbs_not_in_place;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::platform::Limb;
-
-#[cfg(feature = "32_bit_limbs")]
-fn limbs_twos_complement_in_place_alt_1(xs: &mut [Limb]) -> bool {
-    let i = xs.iter().cloned().take_while(|&x| x == 0).count();
-    let len = xs.len();
-    if i == len {
-        return true;
-    }
-    xs[i].wrapping_neg_assign();
-    let j = i + 1;
-    if j != len {
-        limbs_not_in_place(&mut xs[j..]);
-    }
-    false
-}
-
-#[cfg(feature = "32_bit_limbs")]
-fn limbs_twos_complement_in_place_alt_2(xs: &mut [Limb]) -> bool {
-    let carry = limbs_sub_limb_in_place(xs, 1);
-    limbs_not_in_place(xs);
-    carry
-}
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -126,13 +108,7 @@ fn test_twos_complement_limbs_asc() {
     );
     test(
         "-1701411834921604967429270619762735448065",
-        vec![
-            u32::MAX,
-            u32::MAX - 2,
-            u32::MAX - 3,
-            u32::MAX - 4,
-            u32::MAX - 5,
-        ],
+        vec![u32::MAX, u32::MAX - 2, u32::MAX - 3, u32::MAX - 4, u32::MAX - 5],
     );
     test("4294967295", vec![u32::MAX, 0]);
     test("-4294967295", vec![1, u32::MAX]);
@@ -190,13 +166,7 @@ fn test_twos_complement_limbs_desc() {
     );
     test(
         "-1701411834921604967429270619762735448065",
-        vec![
-            u32::MAX - 5,
-            u32::MAX - 4,
-            u32::MAX - 3,
-            u32::MAX - 2,
-            u32::MAX,
-        ],
+        vec![u32::MAX - 5, u32::MAX - 4, u32::MAX - 3, u32::MAX - 2, u32::MAX],
     );
     test("4294967295", vec![0, u32::MAX]);
     test("-4294967295", vec![u32::MAX, 1]);
@@ -206,4 +176,169 @@ fn test_twos_complement_limbs_desc() {
     test("-18446744073709551615", vec![u32::MAX, 0, 1]);
     test("18446744073709551616", vec![1, 0, 0]);
     test("-18446744073709551616", vec![u32::MAX, 0, 0]);
+}
+
+#[test]
+fn limbs_twos_complement_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_2().test_properties_with_config(&config, |xs| {
+        let out_xs = limbs_twos_complement(&xs);
+        if *xs.last().unwrap() != 0 && out_xs.last().unwrap().get_highest_bit() {
+            let n = -Natural::from_limbs_asc(&xs);
+            assert_eq!(n.to_twos_complement_limbs_asc(), out_xs);
+        }
+    });
+}
+
+#[test]
+fn limbs_maybe_sign_extend_non_negative_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen().test_properties_with_config(&config, |xs| {
+        let mut mut_xs = xs.clone();
+        limbs_maybe_sign_extend_non_negative_in_place(&mut mut_xs);
+        if !xs.is_empty() && *xs.last().unwrap() != 0 {
+            let n = Integer::from(Natural::from_owned_limbs_asc(xs));
+            assert_eq!(n.to_twos_complement_limbs_asc(), mut_xs);
+        }
+    });
+}
+
+#[test]
+fn limbs_twos_complement_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen().test_properties_with_config(&config, |xs| {
+        let mut mut_xs = xs.clone();
+        limbs_twos_complement_in_place(&mut mut_xs);
+        let mut mut_xs_alt = xs.clone();
+        limbs_twos_complement_in_place_alt_1(&mut mut_xs_alt);
+        assert_eq!(mut_xs_alt, mut_xs);
+        let mut mut_xs_alt = xs.clone();
+        limbs_twos_complement_in_place_alt_2(&mut mut_xs_alt);
+        assert_eq!(mut_xs_alt, mut_xs);
+        if !xs.is_empty() && *xs.last().unwrap() != 0 && mut_xs.last().unwrap().get_highest_bit() {
+            let n = -Natural::from_owned_limbs_asc(xs);
+            assert_eq!(n.to_twos_complement_limbs_asc(), mut_xs);
+        }
+    });
+}
+
+#[test]
+fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_2().test_properties_with_config(&config, |xs| {
+        let mut mut_xs = xs.clone();
+        limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut mut_xs);
+        if !xs.is_empty() && *xs.last().unwrap() != 0 {
+            let n = -Natural::from_owned_limbs_asc(xs);
+            assert_eq!(n.to_twos_complement_limbs_asc(), mut_xs);
+        }
+    });
+}
+
+#[test]
+fn to_twos_complement_limbs_asc_properties() {
+    integer_gen().test_properties(|x| {
+        let xs = x.to_twos_complement_limbs_asc();
+        assert_eq!(x.clone().into_twos_complement_limbs_asc(), xs);
+        assert_eq!(x.twos_complement_limbs().collect_vec(), xs);
+        assert_eq!(Integer::from_twos_complement_limbs_asc(&xs), x);
+        assert_eq!(
+            x.to_twos_complement_limbs_desc(),
+            xs.iter().cloned().rev().collect_vec()
+        );
+        match x.sign() {
+            Ordering::Equal => assert!(xs.is_empty()),
+            Ordering::Greater => {
+                let last = *xs.last().unwrap();
+                assert!(!last.get_highest_bit());
+                if last == 0 {
+                    assert!(xs[xs.len() - 2].get_highest_bit());
+                }
+            }
+            Ordering::Less => {
+                let last = *xs.last().unwrap();
+                assert!(last.get_highest_bit());
+                if last == !0 && xs.len() > 1 {
+                    assert!(!xs[xs.len() - 2].get_highest_bit());
+                }
+            }
+        }
+    });
+}
+
+#[test]
+fn to_twos_complement_limbs_desc_properties() {
+    integer_gen().test_properties(|x| {
+        let xs = x.to_twos_complement_limbs_desc();
+        assert_eq!(x.clone().into_twos_complement_limbs_desc(), xs);
+        assert_eq!(x.twos_complement_limbs().rev().collect_vec(), xs);
+        assert_eq!(Integer::from_twos_complement_limbs_desc(&xs), x);
+        assert_eq!(
+            x.to_twos_complement_limbs_asc(),
+            xs.iter().cloned().rev().collect_vec()
+        );
+        match x.sign() {
+            Ordering::Equal => assert!(xs.is_empty()),
+            Ordering::Greater => {
+                let first = xs[0];
+                assert!(!first.get_highest_bit());
+                if first == 0 {
+                    assert!(xs[1].get_highest_bit());
+                }
+            }
+            Ordering::Less => {
+                let first = xs[0];
+                assert!(first.get_highest_bit());
+                if first == !0 && xs.len() > 1 {
+                    assert!(!xs[1].get_highest_bit());
+                }
+            }
+        }
+    });
+}
+
+#[test]
+fn twos_complement_limbs_properties() {
+    integer_bool_vec_pair_gen_var_1().test_properties(|(n, bs)| {
+        let mut limbs = n.twos_complement_limbs();
+        let mut xs = Vec::new();
+        let mut i = 0;
+        for b in bs {
+            if b {
+                xs.insert(i, limbs.next().unwrap());
+                i += 1;
+            } else {
+                xs.insert(i, limbs.next_back().unwrap())
+            }
+        }
+        assert!(limbs.next().is_none());
+        assert!(limbs.next_back().is_none());
+        assert_eq!(n.to_twos_complement_limbs_asc(), xs);
+    });
+
+    integer_unsigned_pair_gen_var_2().test_properties(|(n, u)| {
+        if u < n.unsigned_abs_ref().limb_count() {
+            assert_eq!(
+                n.twos_complement_limbs().get(u),
+                n.to_twos_complement_limbs_asc()[usize::exact_from(u)]
+            );
+        } else {
+            assert_eq!(
+                n.twos_complement_limbs().get(u),
+                if n >= 0 { 0 } else { Limb::MAX }
+            );
+        }
+    });
+
+    unsigned_gen_var_5().test_properties(|u| {
+        assert_eq!(Integer::ZERO.twos_complement_limbs().get(u), 0);
+    });
 }

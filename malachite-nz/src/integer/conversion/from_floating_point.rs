@@ -26,31 +26,83 @@ macro_rules! float_impls {
             /// use malachite_base::rounding_modes::RoundingMode;
             /// use malachite_nz::integer::Integer;
             ///
-            /// assert_eq!(Integer::rounding_from(0.0, RoundingMode::Exact).to_string(), "0");
-            /// assert_eq!(Integer::rounding_from(-0.0, RoundingMode::Exact).to_string(), "0");
-            /// assert_eq!(Integer::rounding_from(123.0, RoundingMode::Exact).to_string(), "123");
-            /// assert_eq!(Integer::rounding_from(1.0e9, RoundingMode::Exact).to_string(),
-            ///     "1000000000");
-            /// assert_eq!(Integer::rounding_from(1.0e9, RoundingMode::Exact).to_string(),
-            ///     "1000000000");
-            /// assert_eq!(Integer::rounding_from(4294967295.0, RoundingMode::Exact).to_string(),
-            ///     "4294967295");
-            /// assert_eq!(Integer::rounding_from(4294967296.0, RoundingMode::Exact).to_string(),
-            ///     "4294967296");
-            /// assert_eq!(Integer::rounding_from(1.0e100, RoundingMode::Exact).to_string(),
+            /// assert_eq!(
+            ///     Integer::rounding_from(0.0, RoundingMode::Exact).to_string(),
+            ///     "0"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(-0.0, RoundingMode::Exact).to_string(),
+            ///     "0"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(123.0, RoundingMode::Exact).to_string(),
+            ///     "123"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(1.0e9, RoundingMode::Exact).to_string(),
+            ///     "1000000000"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(1.0e9, RoundingMode::Exact).to_string(),
+            ///     "1000000000"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(4294967295.0, RoundingMode::Exact).to_string(),
+            ///     "4294967295"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(4294967296.0, RoundingMode::Exact).to_string(),
+            ///     "4294967296"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(1.0e100, RoundingMode::Exact).to_string(),
             ///     "100000000000000001590289110975991804683608085639452813897813275577478387721703\
-            ///     81060813469985856815104");
-            /// assert_eq!(Integer::rounding_from(123.1, RoundingMode::Floor).to_string(), "123");
-            /// assert_eq!(Integer::rounding_from(123.1, RoundingMode::Ceiling).to_string(), "124");
-            /// assert_eq!(Integer::rounding_from(123.1, RoundingMode::Nearest).to_string(), "123");
-            /// assert_eq!(Integer::rounding_from(123.9, RoundingMode::Floor).to_string(), "123");
-            /// assert_eq!(Integer::rounding_from(123.9, RoundingMode::Ceiling).to_string(), "124");
-            /// assert_eq!(Integer::rounding_from(123.9, RoundingMode::Nearest).to_string(), "124");
-            /// assert_eq!(Integer::rounding_from(123.5, RoundingMode::Nearest).to_string(), "124");
-            /// assert_eq!(Integer::rounding_from(124.5, RoundingMode::Nearest).to_string(), "124");
-            /// assert_eq!(Integer::rounding_from(-0.99, RoundingMode::Ceiling).to_string(), "0");
-            /// assert_eq!(Integer::rounding_from(-0.499, RoundingMode::Nearest).to_string(), "0");
-            /// assert_eq!(Integer::rounding_from(-0.5, RoundingMode::Nearest).to_string(), "0");
+            ///     81060813469985856815104"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(123.1, RoundingMode::Floor).to_string(),
+            ///     "123"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(123.1, RoundingMode::Ceiling).to_string(),
+            ///     "124"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(123.1, RoundingMode::Nearest).to_string(),
+            ///     "123"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(123.9, RoundingMode::Floor).to_string(),
+            ///     "123"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(123.9, RoundingMode::Ceiling).to_string(),
+            ///     "124"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(123.9, RoundingMode::Nearest).to_string(),
+            ///     "124"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(123.5, RoundingMode::Nearest).to_string(),
+            ///     "124"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(124.5, RoundingMode::Nearest).to_string(),
+            ///     "124"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(-0.99, RoundingMode::Ceiling).to_string(),
+            ///     "0"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(-0.499, RoundingMode::Nearest).to_string(),
+            ///     "0"
+            /// );
+            /// assert_eq!(
+            ///     Integer::rounding_from(-0.5, RoundingMode::Nearest).to_string(),
+            ///     "0"
+            /// );
             /// ```
             fn rounding_from(value: $f, rm: RoundingMode) -> Self {
                 if value >= 0.0 {
@@ -86,9 +138,11 @@ macro_rules! float_impls {
             /// assert_eq!(Integer::from(1.0e9).to_string(), "1000000000");
             /// assert_eq!(Integer::from(4294967295.0).to_string(), "4294967295");
             /// assert_eq!(Integer::from(4294967296.0).to_string(), "4294967296");
-            /// assert_eq!(Integer::from(1.0e100).to_string(),
-            ///         "10000000000000000159028911097599180468360808563945281389781327557747838772\
-            ///         170381060813469985856815104");
+            /// assert_eq!(
+            ///     Integer::from(1.0e100).to_string(),
+            ///     "10000000000000000159028911097599180468360808563945281389781327557747838772\
+            ///         170381060813469985856815104"
+            /// );
             /// assert_eq!(Integer::from(123.1).to_string(), "123");
             /// assert_eq!(Integer::from(123.9).to_string(), "124");
             /// assert_eq!(Integer::from(123.5).to_string(), "124");
@@ -118,25 +172,40 @@ macro_rules! float_impls {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::num::conversion::traits::CheckedFrom;
             /// use malachite_base::num::basic::floats::PrimitiveFloat;
+            /// use malachite_base::num::conversion::traits::CheckedFrom;
             /// use malachite_nz::integer::Integer;
             ///
             /// assert_eq!(format!("{:?}", Integer::checked_from(f64::NAN)), "None");
-            /// assert_eq!(format!("{:?}", Integer::checked_from(f64::POSITIVE_INFINITY)), "None");
-            /// assert_eq!(format!("{:?}", Integer::checked_from(f64::NEGATIVE_INFINITY)), "None");
+            /// assert_eq!(
+            ///     format!("{:?}", Integer::checked_from(f64::POSITIVE_INFINITY)),
+            ///     "None"
+            /// );
+            /// assert_eq!(
+            ///     format!("{:?}", Integer::checked_from(f64::NEGATIVE_INFINITY)),
+            ///     "None"
+            /// );
             /// assert_eq!(format!("{:?}", Integer::checked_from(0.0)), "Some(0)");
             /// assert_eq!(format!("{:?}", Integer::checked_from(-0.0)), "Some(0)");
             /// assert_eq!(format!("{:?}", Integer::checked_from(123.0)), "Some(123)");
             /// assert_eq!(format!("{:?}", Integer::checked_from(-123.0)), "Some(-123)");
-            /// assert_eq!(format!("{:?}", Integer::checked_from(1.0e9)), "Some(1000000000)");
-            /// assert_eq!(format!("{:?}", Integer::checked_from(4294967295.0)),
-            ///     "Some(4294967295)");
-            /// assert_eq!(format!("{:?}", Integer::checked_from(4294967296.0)),
-            ///     "Some(4294967296)");
-            /// assert_eq!(format!("{:?}", Integer::checked_from(1.0e100)),
+            /// assert_eq!(
+            ///     format!("{:?}", Integer::checked_from(1.0e9)),
+            ///     "Some(1000000000)"
+            /// );
+            /// assert_eq!(
+            ///     format!("{:?}", Integer::checked_from(4294967295.0)),
+            ///     "Some(4294967295)"
+            /// );
+            /// assert_eq!(
+            ///     format!("{:?}", Integer::checked_from(4294967296.0)),
+            ///     "Some(4294967296)"
+            /// );
+            /// assert_eq!(
+            ///     format!("{:?}", Integer::checked_from(1.0e100)),
             ///     "Some(1000000000000000015902891109759918046836080856394528138978132755774783877\
-            ///     2170381060813469985856815104)");
+            ///     2170381060813469985856815104)"
+            /// );
             /// assert_eq!(format!("{:?}", Integer::checked_from(123.1)), "None");
             /// assert_eq!(format!("{:?}", Integer::checked_from(123.9)), "None");
             /// assert_eq!(format!("{:?}", Integer::checked_from(123.5)), "None");
@@ -164,8 +233,8 @@ macro_rules! float_impls {
             /// extern crate malachite_base;
             /// extern crate malachite_nz;
             ///
-            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
             /// use malachite_base::num::basic::floats::PrimitiveFloat;
+            /// use malachite_base::num::conversion::traits::ConvertibleFrom;
             /// use malachite_nz::integer::Integer;
             ///
             /// assert_eq!(Integer::convertible_from(f64::NAN), false);

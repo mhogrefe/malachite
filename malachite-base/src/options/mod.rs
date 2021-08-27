@@ -47,8 +47,14 @@ pub fn option_from_str<T: FromStr>(src: &str) -> Option<Option<T>> {
 ///     option_from_str_custom::<Option<bool>>(&option_from_str, "Some(Some(false))"),
 ///     Some(Some(Some(false)))
 /// );
-/// assert_eq!(option_from_str_custom::<Ordering>(&ordering_from_str, "Some(hi)"), None);
-/// assert_eq!(option_from_str_custom::<Ordering>(&ordering_from_str, "abc"), None);
+/// assert_eq!(
+///     option_from_str_custom::<Ordering>(&ordering_from_str, "Some(hi)"),
+///     None
+/// );
+/// assert_eq!(
+///     option_from_str_custom::<Ordering>(&ordering_from_str, "abc"),
+///     None
+/// );
 /// ```
 pub fn option_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Option<Option<T>> {
     if src == "None" {

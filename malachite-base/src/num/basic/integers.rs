@@ -1,26 +1,26 @@
 use comparison::traits::{Max, Min};
 use named::Named;
 use num::arithmetic::traits::{
-    AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CeilingSqrt,
-    CeilingSqrtAssign, CheckedAdd, CheckedAddMul, CheckedDiv, CheckedMul, CheckedNeg, CheckedPow,
-    CheckedSqrt, CheckedSquare, CheckedSub, CheckedSubMul, DivAssignMod, DivAssignRem, DivExact,
-    DivExactAssign, DivMod, DivRem, DivRound, DivRoundAssign, DivisibleBy, DivisibleByPowerOf2,
-    EqMod, EqModPowerOf2, FloorSqrt, FloorSqrtAssign, Mod, ModAssign, ModPowerOf2,
-    ModPowerOf2Assign, OverflowingAdd, OverflowingAddAssign, OverflowingAddMul,
-    OverflowingAddMulAssign, OverflowingDiv, OverflowingDivAssign, OverflowingMul,
-    OverflowingMulAssign, OverflowingNeg, OverflowingNegAssign, OverflowingPow,
-    OverflowingPowAssign, OverflowingSquare, OverflowingSquareAssign, OverflowingSub,
-    OverflowingSubAssign, OverflowingSubMul, OverflowingSubMulAssign, Parity, Pow, PowAssign,
-    PowerOf2, RemPowerOf2, RemPowerOf2Assign, RoundToMultiple, RoundToMultipleAssign,
-    RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, SaturatingAdd, SaturatingAddAssign,
-    SaturatingAddMul, SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow,
-    SaturatingPowAssign, SaturatingSquare, SaturatingSquareAssign, SaturatingSub,
-    SaturatingSubAssign, SaturatingSubMul, SaturatingSubMulAssign, ShlRound, ShlRoundAssign,
-    ShrRound, ShrRoundAssign, Sign, SqrtRem, SqrtRemAssign, Square, SquareAssign, SubMul,
-    SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul, WrappingAddMulAssign,
-    WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign, WrappingNeg, WrappingNegAssign,
-    WrappingPow, WrappingPowAssign, WrappingSquare, WrappingSquareAssign, WrappingSub,
-    WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
+    AddMul, AddMulAssign, ArithmeticCheckedShl, ArithmeticCheckedShr, CeilingRoot,
+    CeilingRootAssign, CeilingSqrt, CeilingSqrtAssign, CheckedAdd, CheckedAddMul, CheckedDiv,
+    CheckedMul, CheckedNeg, CheckedPow, CheckedRoot, CheckedSqrt, CheckedSquare, CheckedSub,
+    CheckedSubMul, DivAssignMod, DivAssignRem, DivExact, DivExactAssign, DivMod, DivRem, DivRound,
+    DivRoundAssign, DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, FloorRoot,
+    FloorRootAssign, FloorSqrt, FloorSqrtAssign, Mod, ModAssign, ModPowerOf2, ModPowerOf2Assign,
+    OverflowingAdd, OverflowingAddAssign, OverflowingAddMul, OverflowingAddMulAssign,
+    OverflowingDiv, OverflowingDivAssign, OverflowingMul, OverflowingMulAssign, OverflowingNeg,
+    OverflowingNegAssign, OverflowingPow, OverflowingPowAssign, OverflowingSquare,
+    OverflowingSquareAssign, OverflowingSub, OverflowingSubAssign, OverflowingSubMul,
+    OverflowingSubMulAssign, Parity, Pow, PowAssign, PowerOf2, RemPowerOf2, RemPowerOf2Assign,
+    RoundToMultiple, RoundToMultipleAssign, RoundToMultipleOfPowerOf2,
+    RoundToMultipleOfPowerOf2Assign, SaturatingAdd, SaturatingAddAssign, SaturatingAddMul,
+    SaturatingAddMulAssign, SaturatingMul, SaturatingMulAssign, SaturatingPow, SaturatingPowAssign,
+    SaturatingSquare, SaturatingSquareAssign, SaturatingSub, SaturatingSubAssign, SaturatingSubMul,
+    SaturatingSubMulAssign, ShlRound, ShlRoundAssign, ShrRound, ShrRoundAssign, Sign, Square,
+    SquareAssign, SubMul, SubMulAssign, WrappingAdd, WrappingAddAssign, WrappingAddMul,
+    WrappingAddMulAssign, WrappingDiv, WrappingDivAssign, WrappingMul, WrappingMulAssign,
+    WrappingNeg, WrappingNegAssign, WrappingPow, WrappingPowAssign, WrappingSquare,
+    WrappingSquareAssign, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
 use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
@@ -87,6 +87,8 @@ pub trait PrimitiveInt:
     + BitScan
     + BitXor<Self, Output = Self>
     + BitXorAssign<Self>
+    + CeilingRoot<Output = Self>
+    + CeilingRootAssign
     + CeilingSqrt<Output = Self>
     + CeilingSqrtAssign
     + CheckedAdd<Self, Output = Self>
@@ -121,6 +123,7 @@ pub trait PrimitiveInt:
     + CheckedMul<Self, Output = Self>
     + CheckedNeg<Output = Self>
     + CheckedPow<u64, Output = Self>
+    + CheckedRoot<Output = Self>
     + CheckedSqrt<Output = Self>
     + CheckedSquare<Output = Self>
     + CheckedSub<Self, Output = Self>
@@ -186,6 +189,8 @@ pub trait PrimitiveInt:
     + ExactInto<i64>
     + ExactInto<i128>
     + ExactInto<isize>
+    + FloorRoot<Output = Self>
+    + FloorRootAssign
     + FloorSqrt<Output = Self>
     + FloorSqrtAssign
     + FromStr
@@ -260,7 +265,7 @@ pub trait PrimitiveInt:
     + PartialOrdAbs<Self>
     + Pow<u64, Output = Self>
     + PowAssign<u64>
-    + PowerOf2
+    + PowerOf2<u64>
     + Product
     + Rem<Self, Output = Self>
     + RemAssign<Self>
@@ -397,8 +402,6 @@ pub trait PrimitiveInt:
     + Sign
     + SignificantBits
     + Sized
-    + SqrtRem<SqrtOutput = Self>
-    + SqrtRemAssign
     + Square<Output = Self>
     + SquareAssign
     + Sub<Self, Output = Self>

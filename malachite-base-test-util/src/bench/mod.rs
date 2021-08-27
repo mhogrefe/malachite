@@ -116,10 +116,7 @@ where
             axes.lines(
                 &sizes,
                 &durations,
-                &[
-                    Caption(&escape_label_string(options.name)),
-                    Color(options.color),
-                ],
+                &[Caption(&escape_label_string(options.name)), Color(options.color)],
             );
         }
     }
@@ -164,9 +161,7 @@ pub fn run_benchmark<'a, I: Iterator>(
         BenchmarkType::Algorithms => format!("{} algorithms", title),
     };
     println!("benchmarking {} {}", generation_mode_name, title);
-    let colors = vec![
-        "green", "blue", "red", "black", "orange", "yellow", "gray", "purple",
-    ];
+    let colors = vec!["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
     if series.len() > colors.len() {
         panic!("not enough available colors");
     }
@@ -222,9 +217,7 @@ pub fn run_benchmark_old<'a, I: Iterator>(
         BenchmarkType::Algorithms => format!("{} algorithms", title),
     };
     println!("benchmarking {} {}", generation_mode_name, title);
-    let colors = vec![
-        "green", "blue", "red", "black", "orange", "yellow", "gray", "purple",
-    ];
+    let colors = vec!["green", "blue", "red", "black", "orange", "yellow", "gray", "purple"];
     if series.len() > colors.len() {
         panic!("not enough available colors");
     }

@@ -238,12 +238,7 @@ fn test_lex_triples() {
         once(false),
         0..4,
         4,
-        &[
-            ('a', false, 0),
-            ('a', false, 1),
-            ('a', false, 2),
-            ('a', false, 3),
-        ],
+        &[('a', false, 0), ('a', false, 1), ('a', false, 2), ('a', false, 3)],
     );
     lex_triples_helper(
         exhaustive_unsigneds::<u8>(),

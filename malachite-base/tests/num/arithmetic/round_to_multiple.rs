@@ -1100,8 +1100,12 @@ fn round_to_multiple_properties_helper_unsigned<T: PrimitiveUnsigned>() {
 
         assert!(rounded.divisible_by(y));
         match rm {
-            RoundingMode::Floor | RoundingMode::Down => assert!(rounded <= x),
-            RoundingMode::Ceiling | RoundingMode::Up => assert!(rounded >= x),
+            RoundingMode::Floor | RoundingMode::Down => {
+                assert!(rounded <= x)
+            }
+            RoundingMode::Ceiling | RoundingMode::Up => {
+                assert!(rounded >= x)
+            }
             RoundingMode::Exact => assert_eq!(rounded, x),
             RoundingMode::Nearest => {
                 if y == T::ZERO {

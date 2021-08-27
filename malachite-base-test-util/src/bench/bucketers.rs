@@ -67,6 +67,21 @@ pub fn triple_1_primitive_float_bucketer<'a, T: PrimitiveFloat, U, V>(
     }
 }
 
+pub fn triple_max_primitive_float_bucketer<'a, T: PrimitiveFloat>(
+    x_name: &str,
+    y_name: &str,
+    z_name: &str,
+) -> Bucketer<'a, (T, T, T)> {
+    Bucketer {
+        bucketing_function: &|&(f, g, h)| max!(float_size(f), float_size(g), float_size(h)),
+        bucketing_label: format!(
+            "max(precision({}) + |exponent({})|, precision({}) + |exponent({})|, \
+            precision({}) + |exponent({})|)",
+            x_name, x_name, y_name, y_name, z_name, z_name
+        ),
+    }
+}
+
 pub fn usize_convertible_direct_bucketer<T: Copy>(var_name: &str) -> Bucketer<T>
 where
     usize: ExactFrom<T>,
@@ -96,6 +111,16 @@ where
     usize: ExactFrom<T>,
 {
     usize_convertible_direct_bucketer("i")
+}
+
+pub fn signed_abs_bucketer<T: PrimitiveSigned>(var_name: &str) -> Bucketer<T>
+where
+    usize: ExactFrom<<T as UnsignedAbs>::Output>,
+{
+    Bucketer {
+        bucketing_function: &|&x| usize::exact_from(x.unsigned_abs()),
+        bucketing_label: var_name.to_string(),
+    }
 }
 
 pub fn bit_bucketer<T: Copy + SignificantBits>(var_name: &str) -> Bucketer<T> {

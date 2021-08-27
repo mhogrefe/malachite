@@ -30,9 +30,8 @@ fn random_natural_signeds_helper<T: CheckedToF64 + PrimitiveSigned>(
 #[test]
 fn test_random_natural_signeds() {
     // i8
-    let values = &[
-        113, 94, 23, 98, 70, 92, 52, 84, 33, 47, 1, 113, 54, 10, 47, 17, 89, 92, 119, 66,
-    ];
+    let values =
+        &[113, 94, 23, 98, 70, 92, 52, 84, 33, 47, 1, 113, 54, 10, 47, 17, 89, 92, 119, 66];
     let common_values = &[
         (2, 8077),
         (121, 8039),

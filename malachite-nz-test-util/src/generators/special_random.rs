@@ -6,6 +6,7 @@ use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, Parity, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
@@ -14,13 +15,14 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::num::random::geometric::{
     geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_unsigneds,
-    GeometricRandomNaturalValues, GeometricRandomSignedRange,
+    GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
 };
 use malachite_base::num::random::striped::{
-    get_striped_bool_vec, get_striped_unsigned_vec, striped_random_unsigned_bit_chunks,
-    striped_random_unsigned_vecs, striped_random_unsigned_vecs_length_range,
-    striped_random_unsigned_vecs_min_length, striped_random_unsigneds, StripedBitSource,
-    StripedRandomUnsignedBitChunks, StripedRandomUnsignedVecs,
+    get_striped_bool_vec, get_striped_unsigned_vec, striped_random_natural_signeds,
+    striped_random_signeds, striped_random_unsigned_bit_chunks, striped_random_unsigned_vecs,
+    striped_random_unsigned_vecs_length_range, striped_random_unsigned_vecs_min_length,
+    striped_random_unsigneds, StripedBitSource, StripedRandomUnsignedBitChunks,
+    StripedRandomUnsignedVecs,
 };
 use malachite_base::num::random::{
     random_unsigned_inclusive_range, random_unsigneds_less_than, RandomUnsignedRange,
@@ -33,13 +35,18 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
     random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
 };
+use malachite_base::unions::random::random_union2s;
+use malachite_base::unions::Union2;
 use malachite_base::vecs::random::random_vecs;
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{GenConfig, It};
 use malachite_base_test_util::generators::special_random::{
     UnsignedVecTripleLenGenerator, UnsignedVecTripleXYYLenGenerator,
 };
-use malachite_nz::integer::random::{striped_random_integers, striped_random_natural_integers};
+use malachite_nz::integer::random::{
+    striped_random_integers, striped_random_natural_integers, striped_random_negative_integers,
+    StripedRandomIntegers,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
@@ -152,9 +159,49 @@ pub fn special_random_integer_gen_var_3(config: &GenConfig) -> It<Integer> {
     ))
 }
 
+pub fn special_random_integer_gen_var_4<T: PrimitiveUnsigned>(config: &GenConfig) -> It<Integer>
+where
+    Integer: From<T>,
+{
+    Box::new(
+        striped_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .map(Integer::from),
+    )
+}
+
+pub fn special_random_integer_gen_var_5<T: PrimitiveSigned>(config: &GenConfig) -> It<Integer>
+where
+    Integer: From<T>,
+{
+    Box::new(
+        striped_random_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .map(Integer::from),
+    )
+}
+
+// -- (Integer, Integer) --
+
+pub fn special_random_integer_pair_gen(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(random_pairs_from_single(striped_random_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 // -- (Integer, PrimitiveUnsigned) --
 
-pub fn special_random_integer_unsigned_pair_gen_var_3<T: ExactFrom<u8> + PrimitiveUnsigned>(
+pub fn special_random_integer_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
     config: &GenConfig,
 ) -> It<(Integer, T)> {
     Box::new(random_pairs(
@@ -194,6 +241,60 @@ pub fn special_random_integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
             )
         },
     ))
+}
+
+pub fn special_random_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(
+        random_union2s(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        striped_random_natural_integers(
+                            seed_2,
+                            config.get_or("mean_stripe_n", 32),
+                            config.get_or("mean_stripe_d", 1),
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_positive_unsigneds(
+                            seed_2,
+                            config.get_or("small_unsigned_mean_n", 32),
+                            config.get_or("small_unsigned_mean_d", 1),
+                        )
+                    },
+                )
+            },
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        striped_random_negative_integers(
+                            seed_2,
+                            config.get_or("mean_stripe_n", 32),
+                            config.get_or("mean_stripe_d", 1),
+                            config.get_or("mean_bits_n", 64),
+                            config.get_or("mean_bits_d", 1),
+                        )
+                    },
+                    &|seed_2| {
+                        geometric_random_unsigneds::<T>(
+                            seed_2,
+                            config.get_or("small_unsigned_mean_n", 32),
+                            config.get_or("small_unsigned_mean_d", 1),
+                        )
+                        .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE))
+                    },
+                )
+            },
+        )
+        .map(Union2::unwrap),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -249,6 +350,45 @@ pub fn special_random_integer_rounding_mode_pair_gen_var_1<
         )
         .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
     )
+}
+
+// --(Integer, Vec<bool>) --
+
+struct IntegerBoolVecPairGenerator {
+    xs: StripedRandomIntegers<GeometricRandomSigneds<i64>>,
+    striped_bit_source: StripedBitSource,
+}
+
+impl Iterator for IntegerBoolVecPairGenerator {
+    type Item = (Integer, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Integer, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let bs = get_striped_bool_vec(
+            &mut self.striped_bit_source,
+            u64::exact_from(x.to_twos_complement_limbs_asc().len()),
+        );
+        Some((x, bs))
+    }
+}
+
+pub fn special_random_integer_bool_vec_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Integer, Vec<bool>)> {
+    Box::new(IntegerBoolVecPairGenerator {
+        xs: striped_random_integers(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", 4),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
 }
 
 // -- Natural --
@@ -364,6 +504,34 @@ where
                 None
             }
         }),
+    )
+}
+
+pub fn special_random_natural_gen_var_4<T: PrimitiveUnsigned>(config: &GenConfig) -> It<Natural>
+where
+    Natural: From<T>,
+{
+    Box::new(
+        striped_random_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .map(Natural::from),
+    )
+}
+
+pub fn special_random_natural_gen_var_5<T: PrimitiveSigned>(config: &GenConfig) -> It<Natural>
+where
+    Natural: ExactFrom<T>,
+{
+    Box::new(
+        striped_random_natural_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .map(Natural::exact_from),
     )
 }
 
@@ -790,6 +958,42 @@ pub fn special_random_natural_rounding_mode_pair_gen_var_2(
         },
         &random_rounding_modes,
     ))
+}
+
+// --(Natural, Vec<bool>) --
+
+struct NaturalBoolVecPairGenerator {
+    xs: StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
+    striped_bit_source: StripedBitSource,
+}
+
+impl Iterator for NaturalBoolVecPairGenerator {
+    type Item = (Natural, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let bs = get_striped_bool_vec(&mut self.striped_bit_source, x.limb_count());
+        Some((x, bs))
+    }
+}
+
+pub fn special_random_natural_bool_vec_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Vec<bool>)> {
+    Box::new(NaturalBoolVecPairGenerator {
+        xs: striped_random_naturals(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", 4),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
 }
 
 // -- (String, String, String) --

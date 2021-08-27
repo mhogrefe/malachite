@@ -1,5 +1,4 @@
 use malachite_base::num::conversion::traits::IsInteger;
-use malachite_base_test_util::generators::common::GenConfig;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::generators::natural_gen;
 use std::str::FromStr;
@@ -16,10 +15,7 @@ fn test_is_integer() {
 
 #[test]
 fn is_integer_properties() {
-    let mut config = GenConfig::new();
-    config.insert("mean_bits_n", 256);
-    config.insert("mean_stripe_n", 128);
-    natural_gen().test_properties_with_config(&config, |n| {
+    natural_gen().test_properties(|n| {
         assert!(n.is_integer());
     });
 }

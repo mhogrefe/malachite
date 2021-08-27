@@ -253,12 +253,7 @@ fn test_random_primitive_float_inclusive_range() {
         -0.0, -1.0e-45, 1.0e-45, -0.0, 1.0e-45, 1.0e-45, 0.0, 1.0e-45, -0.0, -0.0, -1.0e-45, -0.0,
         -1.0e-45, 1.0e-45, 0.0, -0.0, -1.0e-45, -0.0, 0.0, 1.0e-45,
     ];
-    let common_values = &[
-        (-0.0, 250314),
-        (1.0e-45, 250015),
-        (0.0, 249955),
-        (-1.0e-45, 249716),
-    ];
+    let common_values = &[(-0.0, 250314), (1.0e-45, 250015), (0.0, 249955), (-1.0e-45, 249716)];
     let sample_median = (-0.0, None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(4.18988240833055e-49),
@@ -687,12 +682,7 @@ fn test_random_primitive_float_inclusive_range() {
         -0.0, -5.0e-324, 5.0e-324, -0.0, 5.0e-324, 5.0e-324, 0.0, 5.0e-324, -0.0, -0.0, -5.0e-324,
         -0.0, -5.0e-324, 5.0e-324, 0.0, -0.0, -5.0e-324, -0.0, 0.0, 5.0e-324,
     ];
-    let common_values = &[
-        (-0.0, 250314),
-        (5.0e-324, 250015),
-        (0.0, 249955),
-        (-5.0e-324, 249716),
-    ];
+    let common_values = &[(-0.0, 250314), (5.0e-324, 250015), (0.0, 249955), (-5.0e-324, 249716)];
     let sample_median = (-0.0, None);
     let sample_moment_stats = MomentStats {
         mean: NiceFloat(0.0),

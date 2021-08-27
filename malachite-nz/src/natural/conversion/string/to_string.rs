@@ -182,7 +182,10 @@ impl Display for Natural {
     ///
     /// assert_eq!(Natural::ZERO.to_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_string(), "123");
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_string(), "1000000000000");
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000").unwrap().to_string(),
+    ///     "1000000000000"
+    /// );
     /// assert_eq!(format!("{:05}", Natural::from(123u32)), "00123");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
@@ -221,7 +224,12 @@ impl Debug for Natural {
     ///
     /// assert_eq!(Natural::ZERO.to_debug_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_debug_string(), "123");
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_debug_string(), "1000000000000");
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_debug_string(),
+    ///     "1000000000000"
+    /// );
     /// assert_eq!(format!("{:05?}", Natural::from(123u32)), "00123");
     /// ```
     #[inline]
@@ -311,15 +319,17 @@ impl Binary for Natural {
     /// ```
     /// extern crate malachite_base;
     ///
-    /// use malachite_base::strings::ToBinaryString;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToBinaryString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_binary_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_binary_string(), "1111011");
     /// assert_eq!(
-    ///     Natural::from_str("1000000000000").unwrap().to_binary_string(),
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_binary_string(),
     ///     "1110100011010100101001010001000000000000"
     /// );
     /// assert_eq!(format!("{:011b}", Natural::from(123u32)), "00001111011");
@@ -493,14 +503,19 @@ impl Octal for Natural {
     /// ```
     /// extern crate malachite_base;
     ///
-    /// use malachite_base::strings::ToOctalString;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToOctalString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_octal_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_octal_string(), "173");
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_octal_string(), "16432451210000");
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_octal_string(),
+    ///     "16432451210000"
+    /// );
     /// assert_eq!(format!("{:07o}", Natural::from(123u32)), "0000173");
     ///
     /// assert_eq!(format!("{:#o}", Natural::ZERO), "0o0");
@@ -646,19 +661,27 @@ impl LowerHex for Natural {
     /// ```
     /// extern crate malachite_base;
     ///
-    /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToLowerHexString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_lower_hex_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_lower_hex_string(), "7b");
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_lower_hex_string(), "e8d4a51000");
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_lower_hex_string(),
+    ///     "e8d4a51000"
+    /// );
     /// assert_eq!(format!("{:07x}", Natural::from(123u32)), "000007b");
     ///
     /// assert_eq!(format!("{:#x}", Natural::ZERO), "0x0");
     /// assert_eq!(format!("{:#x}", Natural::from(123u32)), "0x7b");
-    /// assert_eq!(format!("{:#x}", Natural::from_str("1000000000000").unwrap()), "0xe8d4a51000");
+    /// assert_eq!(
+    ///     format!("{:#x}", Natural::from_str("1000000000000").unwrap()),
+    ///     "0xe8d4a51000"
+    /// );
     /// assert_eq!(format!("{:#07x}", Natural::from(123u32)), "0x0007b");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
@@ -706,19 +729,27 @@ impl UpperHex for Natural {
     /// ```
     /// extern crate malachite_base;
     ///
-    /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToUpperHexString;
     /// use malachite_nz::natural::Natural;
     /// use std::str::FromStr;
     ///
     /// assert_eq!(Natural::ZERO.to_upper_hex_string(), "0");
     /// assert_eq!(Natural::from(123u32).to_upper_hex_string(), "7B");
-    /// assert_eq!(Natural::from_str("1000000000000").unwrap().to_upper_hex_string(), "E8D4A51000");
+    /// assert_eq!(
+    ///     Natural::from_str("1000000000000")
+    ///         .unwrap()
+    ///         .to_upper_hex_string(),
+    ///     "E8D4A51000"
+    /// );
     /// assert_eq!(format!("{:07X}", Natural::from(123u32)), "000007B");
     ///
     /// assert_eq!(format!("{:#X}", Natural::ZERO), "0x0");
     /// assert_eq!(format!("{:#X}", Natural::from(123u32)), "0x7B");
-    /// assert_eq!(format!("{:#X}", Natural::from_str("1000000000000").unwrap()), "0xE8D4A51000");
+    /// assert_eq!(
+    ///     format!("{:#X}", Natural::from_str("1000000000000").unwrap()),
+    ///     "0xE8D4A51000"
+    /// );
     /// assert_eq!(format!("{:#07X}", Natural::from(123u32)), "0x0007B");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {

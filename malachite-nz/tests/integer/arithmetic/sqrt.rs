@@ -1,11 +1,10 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, SqrtRem,
-    SqrtRemAssign, Square,
+    CeilingRoot, CeilingSqrt, CeilingSqrtAssign, CheckedRoot, CheckedSqrt, FloorRoot, FloorSqrt,
+    FloorSqrtAssign, Square,
 };
 use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base_test_util::generators::signed_gen_var_2;
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
 use malachite_nz_test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
@@ -125,52 +124,6 @@ pub fn checked_sqrt_fail() {
 }
 
 #[test]
-fn test_sqrt_rem() {
-    let test = |s, sqrt_out, rem_out| {
-        let n = Integer::from_str(s).unwrap();
-
-        let (sqrt, rem) = n.clone().sqrt_rem();
-        assert_eq!(sqrt.to_string(), sqrt_out);
-        assert_eq!(rem.to_string(), rem_out);
-
-        let (sqrt, rem) = (&n).sqrt_rem();
-        assert_eq!(sqrt.to_string(), sqrt_out);
-        assert_eq!(rem.to_string(), rem_out);
-
-        let mut n = n;
-        assert_eq!(n.sqrt_rem_assign().to_string(), rem_out);
-        assert_eq!(n.to_string(), sqrt_out);
-    };
-    test("0", "0", "0");
-    test("1", "1", "0");
-    test("2", "1", "1");
-    test("3", "1", "2");
-    test("4", "2", "0");
-    test("5", "2", "1");
-    test("10", "3", "1");
-    test("100", "10", "0");
-    test("1000000000", "31622", "49116");
-    test("152415765279683", "12345677", "24691354");
-    test("152415765279684", "12345678", "0");
-    test("152415765279685", "12345678", "1");
-    test(
-        "10000000000000000000000000000000000000000",
-        "100000000000000000000",
-        "0",
-    );
-    test(
-        "100000000000000000000000000000000000000000",
-        "316227766016837933199",
-        "562477137586013626399",
-    );
-}
-
-#[test]
-pub fn sqrt_rem_fail() {
-    assert_panic!(Integer::NEGATIVE_ONE.sqrt_rem());
-}
-
-#[test]
 fn floor_sqrt_properties() {
     integer_gen_var_4().test_properties(|n| {
         let sqrt = n.clone().floor_sqrt();
@@ -178,6 +131,7 @@ fn floor_sqrt_properties() {
         let mut n_alt = n.clone();
         n_alt.floor_sqrt_assign();
         assert_eq!(n_alt, sqrt);
+        assert_eq!((&n).floor_root(2), sqrt);
         assert_eq!(bigint_to_integer(&integer_to_bigint(&n).sqrt()), sqrt);
         assert_eq!(
             rug_integer_to_integer(&integer_to_rug_integer(&n).sqrt()),
@@ -212,6 +166,7 @@ fn ceiling_sqrt_properties() {
         let mut n_alt = n.clone();
         n_alt.ceiling_sqrt_assign();
         assert_eq!(n_alt, sqrt);
+        assert_eq!((&n).ceiling_root(2), sqrt);
         let square = (&sqrt).square();
         let floor_sqrt = (&n).floor_sqrt();
         if square == n {
@@ -239,6 +194,7 @@ fn checked_sqrt_properties() {
     integer_gen_var_4().test_properties(|n| {
         let sqrt = n.clone().checked_sqrt();
         assert_eq!((&n).checked_sqrt(), sqrt);
+        assert_eq!((&n).checked_root(2), sqrt);
         if let Some(sqrt) = sqrt {
             assert_eq!((&sqrt).square(), n);
             assert_eq!((&n).floor_sqrt(), sqrt);
@@ -257,38 +213,6 @@ fn checked_sqrt_properties() {
         assert_eq!(
             i.checked_sqrt().map(Integer::from),
             Integer::from(i).checked_sqrt()
-        );
-    });
-}
-
-#[test]
-fn sqrt_rem_properties() {
-    integer_gen_var_4().test_properties(|n| {
-        let (sqrt, rem) = n.clone().sqrt_rem();
-        assert_eq!((&n).sqrt_rem(), (sqrt.clone(), rem.clone()));
-        let mut n_alt = n.clone();
-        assert_eq!(n_alt.sqrt_rem_assign(), rem);
-        assert_eq!(n_alt, sqrt);
-        let (rug_sqrt, rug_rem) = integer_to_rug_integer(&n).sqrt_rem(rug::Integer::new());
-        assert_eq!(rug_integer_to_integer(&rug_sqrt), sqrt);
-        assert_eq!(rug_integer_to_integer(&rug_rem), rem);
-
-        assert_eq!((&n).floor_sqrt(), sqrt);
-        let rem = Integer::from(rem);
-        assert!(rem <= &sqrt << 1);
-        assert_eq!(sqrt.square() + rem, n);
-    });
-
-    natural_gen().test_properties(|n| {
-        let (sqrt, rem) = (&n).sqrt_rem();
-        assert_eq!((Integer::from(sqrt), rem), Integer::from(n).sqrt_rem());
-    });
-
-    signed_gen_var_2::<SignedLimb>().test_properties(|i| {
-        let (sqrt, rem) = i.sqrt_rem();
-        assert_eq!(
-            (Integer::from(sqrt), Natural::from(rem)),
-            Integer::from(i).sqrt_rem()
         );
     });
 }

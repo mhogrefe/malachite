@@ -34,9 +34,9 @@ use natural::Natural;
 /// ```
 /// extern crate malachite_base;
 ///
+/// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::get_random_natural_with_up_to_bits;
-/// use malachite_base::num::random::random_primitive_ints;
 ///
 /// assert_eq!(
 ///     get_random_natural_with_up_to_bits(&mut random_primitive_ints(EXAMPLE_SEED), 100)
@@ -83,9 +83,9 @@ pub fn get_random_natural_with_up_to_bits(xs: &mut RandomPrimitiveInts<u64>, bit
 /// ```
 /// extern crate malachite_base;
 ///
+/// use malachite_base::num::random::random_primitive_ints;
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_nz::natural::random::get_random_natural_with_bits;
-/// use malachite_base::num::random::random_primitive_ints;
 ///
 /// assert_eq!(
 ///     get_random_natural_with_bits(&mut random_primitive_ints(EXAMPLE_SEED), 100).to_string(),
@@ -245,14 +245,25 @@ impl<I: Iterator<Item = u64>> Iterator for RandomNaturals<I> {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::random_naturals;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
-///     random_naturals(EXAMPLE_SEED, 32, 1).take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///     random_naturals(EXAMPLE_SEED, 32, 1)
+///         .take(10)
+///         .map(|x| Natural::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "20431208470830262", "2777240", "114", "12184833305054", "1121025855008623490210",
-///         "13478874522577592", "115311695", "7", "18", "54522366353"
+///         "20431208470830262",
+///         "2777240",
+///         "114",
+///         "12184833305054",
+///         "1121025855008623490210",
+///         "13478874522577592",
+///         "115311695",
+///         "7",
+///         "18",
+///         "54522366353"
 ///     ]
 /// )
 /// ```
@@ -310,15 +321,25 @@ pub fn random_naturals(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::random_positive_naturals;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     random_positive_naturals(EXAMPLE_SEED, 32, 1)
-///         .take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Natural::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "22", "4", "178", "55845661150", "93254818", "7577967529619388", "8", "11316951483471",
-///         "11", "1005760138411689342464923704482"
+///         "22",
+///         "4",
+///         "178",
+///         "55845661150",
+///         "93254818",
+///         "7577967529619388",
+///         "8",
+///         "11316951483471",
+///         "11",
+///         "1005760138411689342464923704482"
 ///     ]
 /// )
 /// ```
@@ -387,15 +408,25 @@ impl<I: Iterator<Item = u64>> Iterator for StripedRandomNaturals<I> {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::striped_random_naturals;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     striped_random_naturals(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Natural::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "18014656207519744", "2228160", "64", "17592184995840", "1179440951012584587264",
-///         "9007749010526207", "67108864", "5", "24", "34359738879"
+///         "18014656207519744",
+///         "2228160",
+///         "64",
+///         "17592184995840",
+///         "1179440951012584587264",
+///         "9007749010526207",
+///         "67108864",
+///         "5",
+///         "24",
+///         "34359738879"
 ///     ]
 /// )
 /// ```
@@ -451,15 +482,25 @@ pub fn striped_random_naturals(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::striped_random_positive_naturals;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     striped_random_positive_naturals(EXAMPLE_SEED, 16, 1, 32, 1)
-///         .take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Natural::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "16", "4", "128", "34391195648", "75493376", "9007199120523391", "8", "8796094070783",
-///         "8", "950737950171027935941967741439"
+///         "16",
+///         "4",
+///         "128",
+///         "34391195648",
+///         "75493376",
+///         "9007199120523391",
+///         "8",
+///         "8796094070783",
+///         "8",
+///         "950737950171027935941967741439"
 ///     ]
 /// )
 /// ```
@@ -535,12 +576,14 @@ impl Iterator for RandomNaturalsLessThan {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::random_naturals_less_than;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
-///     random_naturals_less_than(EXAMPLE_SEED, Natural::from(10u32)).take(10)
-///         .map(|x| Natural::to_string(&x)).collect_vec(),
+///     random_naturals_less_than(EXAMPLE_SEED, Natural::from(10u32))
+///         .take(10)
+///         .map(|x| Natural::to_string(&x))
+///         .collect_vec(),
 ///     &["1", "7", "5", "7", "9", "2", "8", "2", "4", "6"]
 /// )
 /// ```
@@ -599,15 +642,14 @@ impl Iterator for UniformRandomNaturalRange {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::uniform_random_natural_range;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
-///     uniform_random_natural_range(
-///         EXAMPLE_SEED,
-///         Natural::from(10u32),
-///         Natural::from(100u32)
-///     ).take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///     uniform_random_natural_range(EXAMPLE_SEED, Natural::from(10u32), Natural::from(100u32))
+///         .take(10)
+///         .map(|x| Natural::to_string(&x))
+///         .collect_vec(),
 ///     &["97", "17", "94", "37", "56", "32", "96", "11", "17", "39"]
 /// )
 /// ```
@@ -654,15 +696,18 @@ pub fn uniform_random_natural_range(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::uniform_random_natural_inclusive_range;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     uniform_random_natural_inclusive_range(
 ///         EXAMPLE_SEED,
 ///         Natural::from(10u32),
 ///         Natural::from(99u32)
-///     ).take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///     )
+///     .take(10)
+///     .map(|x| Natural::to_string(&x))
+///     .collect_vec(),
 ///     &["97", "17", "94", "37", "56", "32", "96", "11", "17", "39"]
 /// )
 /// ```
@@ -742,15 +787,25 @@ impl Iterator for RandomNaturalRangeToInfinity {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::random_natural_range_to_infinity;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     random_natural_range_to_infinity(EXAMPLE_SEED, Natural::from(1000u32), 20, 1)
-///         .take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///         .take(10)
+///         .map(|x| Natural::to_string(&x))
+///         .collect_vec(),
 ///     &[
-///         "3254", "4248", "163506", "1189717027294", "5282", "12220", "60088", "1016911",
-///         "5772451", "5473099750562"
+///         "3254",
+///         "4248",
+///         "163506",
+///         "1189717027294",
+///         "5282",
+///         "12220",
+///         "60088",
+///         "1016911",
+///         "5772451",
+///         "5473099750562"
 ///     ]
 /// )
 /// ```
@@ -865,8 +920,8 @@ impl Iterator for RandomNaturalRange {
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::random_natural_range;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     random_natural_range(
@@ -875,7 +930,10 @@ impl Iterator for RandomNaturalRange {
 ///         Natural::from(1000000000u32),
 ///         20,
 ///         1
-///     ).take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///     )
+///     .take(10)
+///     .map(|x| Natural::to_string(&x))
+///     .collect_vec(),
 ///     &[
 ///         "3254", "4248", "163506", "600542", "5282", "12220", "60088", "1016911", "5772451",
 ///         "2792610"
@@ -964,8 +1022,8 @@ pub fn random_natural_range(
 /// use itertools::Itertools;
 ///
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_nz::natural::Natural;
 /// use malachite_nz::natural::random::random_natural_inclusive_range;
+/// use malachite_nz::natural::Natural;
 ///
 /// assert_eq!(
 ///     random_natural_inclusive_range(
@@ -974,7 +1032,10 @@ pub fn random_natural_range(
 ///         Natural::from(1000000000u32),
 ///         20,
 ///         1
-///     ).take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///     )
+///     .take(10)
+///     .map(|x| Natural::to_string(&x))
+///     .collect_vec(),
 ///     &[
 ///         "3254", "4248", "163506", "600542", "5282", "12220", "60088", "1016911", "5772451",
 ///         "2792610"

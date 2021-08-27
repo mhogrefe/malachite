@@ -85,9 +85,19 @@ fn test_graphic_weighted_random_ascii_chars() {
         "x14N(bcXr$g)7/E+fYPoo.$V2R.$V=6=DqS<CMW_%OX?b}rJaD`o635Q:w3mY=8nq\u{1b}fR:/26zr<<aAZ<$2/2)\
         jCz!r{%(rN?X< !:z*KWArQ1-#AJCW-/}v,m`xKpzt5?u\u{8}IJN\'wYe9f\".RmqMxz7l7qOjs`$-%s5LO`L{G5y\
         \r8%7/J ZD!4!Gq.kQb>pr\u{2}+UFFc;8P:",
-        &[('d', 10548), ('C', 10506), ('7', 10501), ('R', 10486), ('D', 10484), ('q', 10476),
-          ('1', 10468), ('6', 10463), ('\'', 10452), ('$', 10448)],
-        ('N', None)
+        &[
+            ('d', 10548),
+            ('C', 10506),
+            ('7', 10501),
+            ('R', 10486),
+            ('D', 10484),
+            ('q', 10476),
+            ('1', 10468),
+            ('6', 10463),
+            ('\'', 10452),
+            ('$', 10448),
+        ],
+        ('N', None),
     );
 }
 #[test]

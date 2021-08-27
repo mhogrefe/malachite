@@ -107,7 +107,10 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(u32::overflowing_from(&Natural::from(123u32)), (123, false));
-            /// assert_eq!(u32::overflowing_from(&Natural::trillion()), (3567587328, true));
+            /// assert_eq!(
+            ///     u32::overflowing_from(&Natural::trillion()),
+            ///     (3567587328, true)
+            /// );
             /// ```
             fn overflowing_from(value: &Natural) -> ($u, bool) {
                 match *value {
@@ -239,7 +242,10 @@ macro_rules! impl_from_limb {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i32::overflowing_from(&Natural::from(123u32)), (123, false));
-            /// assert_eq!(i32::overflowing_from(&Natural::trillion()), (-727379968, true));
+            /// assert_eq!(
+            ///     i32::overflowing_from(&Natural::trillion()),
+            ///     (-727379968, true)
+            /// );
             /// ```
             fn overflowing_from(value: &Natural) -> ($s, bool) {
                 let (result, overflow_1) = $u::overflowing_from(value);
@@ -653,7 +659,10 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// use malachite_nz::natural::Natural;
             ///
             /// assert_eq!(i64::saturating_from(&Natural::from(123u32)), 123);
-            /// assert_eq!(i64::saturating_from(&(Natural::ONE << 100)), 9223372036854775807);
+            /// assert_eq!(
+            ///     i64::saturating_from(&(Natural::ONE << 100)),
+            ///     9223372036854775807
+            /// );
             /// ```
             #[inline]
             fn saturating_from(value: &Natural) -> $s {

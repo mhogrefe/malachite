@@ -1,19 +1,21 @@
 use crate::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
 };
+use itertools::Itertools;
 use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
 use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, Parity, PowerOf2};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
-    exhaustive_positive_primitive_ints, exhaustive_unsigneds,
+    exhaustive_natural_signeds, exhaustive_positive_primitive_ints, exhaustive_unsigneds,
     primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
     PrimitiveIntIncreasingRange,
 };
@@ -38,7 +40,9 @@ use malachite_base_test_util::generators::exhaustive::{
     UnsignedVecTripleLenGenerator, UnsignedVecTripleXYYLenGenerator,
 };
 use malachite_base_test_util::generators::exhaustive_pairs_big_tiny;
-use malachite_nz::integer::exhaustive::{exhaustive_integers, exhaustive_natural_integers};
+use malachite_nz::integer::exhaustive::{
+    exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
+};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
@@ -111,6 +115,26 @@ pub fn exhaustive_integer_gen_var_4() -> It<Integer> {
     Box::new(exhaustive_natural_integers())
 }
 
+pub fn exhaustive_integer_gen_var_5<T: PrimitiveUnsigned>() -> It<Integer>
+where
+    Integer: From<T>,
+{
+    Box::new(exhaustive_unsigneds::<T>().map(Integer::from))
+}
+
+pub fn exhaustive_integer_gen_var_6<T: PrimitiveSigned>() -> It<Integer>
+where
+    Integer: From<T>,
+{
+    Box::new(exhaustive_natural_signeds::<T>().map(Integer::from))
+}
+
+// -- (Integer, Integer) --
+
+pub fn exhaustive_integer_pair_gen() -> It<(Integer, Integer)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_integers()))
+}
+
 // -- (Integer, PrimitiveUnsigned) --
 
 pub fn exhaustive_integer_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
@@ -126,6 +150,20 @@ pub fn exhaustive_integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> It<
         exhaustive_integers(),
         exhaustive_unsigneds(),
     ))
+}
+
+pub fn exhaustive_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_natural_integers(),
+            exhaustive_positive_primitive_ints(),
+        )
+        .interleave(exhaustive_pairs_big_tiny(
+            exhaustive_negative_integers(),
+            exhaustive_positive_primitive_ints::<T>()
+                .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE)),
+        )),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -149,6 +187,37 @@ pub fn exhaustive_integer_rounding_mode_pair_gen_var_1<
         lex_pairs(exhaustive_integers(), exhaustive_rounding_modes())
             .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
     )
+}
+
+// -- (Integer, Vec<bool>) --
+
+struct IntegerBoolVecPairGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        Integer,
+        Vec<bool>,
+        LexFixedLengthVecsFromSingle<ExhaustiveBools>,
+    > for IntegerBoolVecPairGenerator
+{
+    #[inline]
+    fn get_ys(&self, x: &Integer) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
+        lex_fixed_length_vecs_from_single(
+            u64::exact_from(x.to_twos_complement_limbs_asc().len()),
+            exhaustive_bools(),
+        )
+    }
+}
+
+pub fn exhaustive_integer_bool_vec_pair_gen_var_1() -> It<(Integer, Vec<bool>)> {
+    Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_integers(),
+        IntegerBoolVecPairGenerator,
+    ))
 }
 
 // -- Natural --
@@ -258,6 +327,20 @@ where
             }
         }),
     )
+}
+
+pub fn exhaustive_natural_gen_var_6<T: PrimitiveUnsigned>() -> It<Natural>
+where
+    Natural: From<T>,
+{
+    Box::new(exhaustive_unsigneds::<T>().map(Natural::from))
+}
+
+pub fn exhaustive_natural_gen_var_7<T: PrimitiveSigned>() -> It<Natural>
+where
+    Natural: ExactFrom<T>,
+{
+    Box::new(exhaustive_natural_signeds::<T>().map(Natural::exact_from))
 }
 
 // -- (Natural, Natural) --
@@ -456,6 +539,34 @@ pub fn exhaustive_natural_rounding_mode_pair_gen_var_2() -> It<(Natural, Roundin
     Box::new(lex_pairs(
         exhaustive_positive_naturals(),
         exhaustive_rounding_modes(),
+    ))
+}
+
+// -- (Natural, Vec<bool>) --
+
+struct NaturalBoolVecPairGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        Natural,
+        Vec<bool>,
+        LexFixedLengthVecsFromSingle<ExhaustiveBools>,
+    > for NaturalBoolVecPairGenerator
+{
+    #[inline]
+    fn get_ys(&self, x: &Natural) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
+        lex_fixed_length_vecs_from_single(x.limb_count(), exhaustive_bools())
+    }
+}
+
+pub fn exhaustive_natural_bool_vec_pair_gen_var_1() -> It<(Natural, Vec<bool>)> {
+    Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_naturals(),
+        NaturalBoolVecPairGenerator,
     ))
 }
 

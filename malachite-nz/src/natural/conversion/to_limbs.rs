@@ -344,12 +344,18 @@ impl Natural {
     /// assert!(Natural::ZERO.limbs().next().is_none());
     /// assert_eq!(Natural::from(123u32).limbs().collect_vec(), &[123]);
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::trillion().limbs().collect_vec(), &[3567587328, 232]);
+    /// assert_eq!(
+    ///     Natural::trillion().limbs().collect_vec(),
+    ///     &[3567587328, 232]
+    /// );
     ///
     /// assert!(Natural::ZERO.limbs().rev().next().is_none());
     /// assert_eq!(Natural::from(123u32).limbs().rev().collect_vec(), &[123]);
     /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(Natural::trillion().limbs().rev().collect_vec(), &[232, 3567587328]);
+    /// assert_eq!(
+    ///     Natural::trillion().limbs().rev().collect_vec(),
+    ///     &[232, 3567587328]
+    /// );
     /// ```
     pub fn limbs(&self) -> LimbIterator {
         let limb_count = self.limb_count();

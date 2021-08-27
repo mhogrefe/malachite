@@ -1,7 +1,15 @@
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, PowerOf2};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, OverflowingFrom, SaturatingFrom, WrappingFrom,
 };
+use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_nz_test_util::generators::integer_gen;
 use rug;
 use std::str::FromStr;
 
@@ -521,4 +529,88 @@ fn test_i64_convertible_from_integer() {
     test("-1000000000000000000000000", false);
     test("-9223372036854775808", true);
     test("-9223372036854775809", false);
+}
+
+fn unsigned_from_integer_properties_helper<
+    T: for<'a> CheckedFrom<&'a Integer>
+        + for<'a> CheckedFrom<&'a Natural>
+        + for<'a> OverflowingFrom<&'a Integer>
+        + PrimitiveUnsigned
+        + for<'a> WrappingFrom<&'a Integer>,
+>()
+where
+    Integer: From<T>,
+{
+    integer_gen().test_properties(|x| {
+        let result = T::checked_from(&x);
+        if x >= 0 && x.significant_bits() <= T::WIDTH {
+            assert_eq!(Integer::from(result.unwrap()), x);
+            assert_eq!(result, Some(T::wrapping_from(&x)));
+            assert_eq!(result, Some(T::exact_from(&x)));
+        } else {
+            assert!(result.is_none());
+        }
+        assert_eq!(result.is_none(), T::overflowing_from(&x).1);
+
+        let result = T::wrapping_from(&x);
+        assert_eq!(result, T::exact_from(&(&x).mod_power_of_2(T::WIDTH)));
+    });
+}
+
+fn signed_from_integer_properties_helper<
+    T: for<'a> CheckedFrom<&'a Integer>
+        + for<'a> OverflowingFrom<&'a Integer>
+        + PrimitiveSigned
+        + for<'a> WrappingFrom<&'a Integer>,
+>()
+where
+    Integer: From<T>,
+{
+    let min = -Integer::power_of_2(T::WIDTH - 1);
+    integer_gen().test_properties(|x| {
+        let result = T::checked_from(&x);
+        if x.significant_bits() < T::WIDTH || x == min {
+            assert_eq!(Integer::from(result.unwrap()), x);
+            assert_eq!(result, Some(T::wrapping_from(&x)));
+            assert_eq!(result, Some(T::exact_from(&x)));
+        } else {
+            assert!(result.is_none());
+        }
+        assert_eq!(result.is_none(), T::overflowing_from(&x).1);
+    });
+}
+
+fn primitive_int_from_integer_properties_helper<
+    T: for<'a> ConvertibleFrom<&'a Integer>
+        + for<'a> OverflowingFrom<&'a Integer>
+        + PrimitiveInt
+        + for<'a> SaturatingFrom<&'a Integer>
+        + PartialEq<Integer>
+        + PartialOrdAbs<Integer>
+        + for<'a> WrappingFrom<&'a Integer>,
+>()
+where
+    Integer: PartialOrd<T>,
+{
+    integer_gen().test_properties(|x| {
+        let result = T::wrapping_from(&x);
+        assert_eq!(result, T::overflowing_from(&x).0);
+
+        let result = T::saturating_from(&x);
+        assert!(result.le_abs(&x));
+        assert_eq!(result == x, T::convertible_from(&x));
+
+        let result = T::overflowing_from(&x);
+        assert_eq!(result, (T::wrapping_from(&x), !T::convertible_from(&x)));
+
+        let convertible = T::convertible_from(&x);
+        assert_eq!(convertible, x >= T::MIN && x <= T::MAX);
+    });
+}
+
+#[test]
+fn primitive_int_from_integer_properties() {
+    apply_fn_to_primitive_ints!(primitive_int_from_integer_properties_helper);
+    apply_fn_to_unsigneds!(unsigned_from_integer_properties_helper);
+    apply_fn_to_signeds!(signed_from_integer_properties_helper);
 }

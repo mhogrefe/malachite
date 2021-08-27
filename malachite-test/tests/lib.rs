@@ -55,16 +55,6 @@ pub mod integer {
         pub mod partial_ord_primitive_int;
     }
 
-    pub mod conversion {
-        pub mod clone;
-        pub mod from_natural;
-        pub mod from_primitive_int;
-        pub mod from_twos_complement_limbs;
-        pub mod natural_from_integer;
-        pub mod primitive_int_from_integer;
-        pub mod to_twos_complement_limbs;
-    }
-
     pub mod logic {
         pub mod and;
         pub mod assign_bit;
@@ -151,13 +141,6 @@ pub mod natural {
         pub mod partial_eq_primitive_int;
         pub mod partial_ord_abs_primitive_int_and_comparators;
         pub mod partial_ord_primitive_int;
-    }
-
-    pub mod conversion {
-        pub mod clone;
-        pub mod from_limbs;
-        pub mod primitive_int_from_natural;
-        pub mod to_limbs;
     }
 
     pub mod logic {

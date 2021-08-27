@@ -128,7 +128,9 @@ pub fn exhaustive_unsigneds<T: PrimitiveUnsigned>() -> PrimitiveIntIncreasingRan
 /// use malachite_base::num::exhaustive::exhaustive_positive_primitive_ints;
 ///
 /// assert_eq!(
-///     exhaustive_positive_primitive_ints::<u8>().take(10).collect_vec(),
+///     exhaustive_positive_primitive_ints::<u8>()
+///         .take(10)
+///         .collect_vec(),
 ///     &[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 /// )
 /// ```
@@ -500,16 +502,26 @@ impl<T: PrimitiveFloat> DoubleEndedIterator for PrimitiveFloatIncreasingRange<T>
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     primitive_float_increasing_range::<f32>(1.0, 2.0).take(20).map(NiceFloat).collect_vec(),
+///     primitive_float_increasing_range::<f32>(1.0, 2.0)
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         1.0, 1.0000001, 1.0000002, 1.0000004, 1.0000005, 1.0000006, 1.0000007, 1.0000008,
 ///         1.000001, 1.0000011, 1.0000012, 1.0000013, 1.0000014, 1.0000015, 1.0000017, 1.0000018,
 ///         1.0000019, 1.000002, 1.0000021, 1.0000023
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = primitive_float_increasing_range::<f32>(1.0, 2.0).rev().take(20).map(NiceFloat)
-///         .collect_vec();
+/// let mut end = primitive_float_increasing_range::<f32>(1.0, 2.0)
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
@@ -517,7 +529,11 @@ impl<T: PrimitiveFloat> DoubleEndedIterator for PrimitiveFloatIncreasingRange<T>
 ///         1.9999976, 1.9999977, 1.9999979, 1.999998, 1.9999981, 1.9999982, 1.9999983, 1.9999985,
 ///         1.9999986, 1.9999987, 1.9999988, 1.9999989, 1.999999, 1.9999992, 1.9999993, 1.9999994,
 ///         1.9999995, 1.9999996, 1.9999998, 1.9999999
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
@@ -572,17 +588,26 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     primitive_float_increasing_inclusive_range::<f32>(1.0, 2.0).take(20).map(NiceFloat)
+///     primitive_float_increasing_inclusive_range::<f32>(1.0, 2.0)
+///         .take(20)
+///         .map(NiceFloat)
 ///         .collect_vec(),
 ///     [
 ///         1.0, 1.0000001, 1.0000002, 1.0000004, 1.0000005, 1.0000006, 1.0000007, 1.0000008,
 ///         1.000001, 1.0000011, 1.0000012, 1.0000013, 1.0000014, 1.0000015, 1.0000017, 1.0000018,
 ///         1.0000019, 1.000002, 1.0000021, 1.0000023
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = primitive_float_increasing_inclusive_range::<f32>(1.0, 2.0).rev().take(20)
-///         .map(NiceFloat).collect_vec();
+/// let mut end = primitive_float_increasing_inclusive_range::<f32>(1.0, 2.0)
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
@@ -590,7 +615,11 @@ pub fn primitive_float_increasing_range<T: PrimitiveFloat>(
 ///         1.9999977, 1.9999979, 1.999998, 1.9999981, 1.9999982, 1.9999983, 1.9999985, 1.9999986,
 ///         1.9999987, 1.9999988, 1.9999989, 1.999999, 1.9999992, 1.9999993, 1.9999994, 1.9999995,
 ///         1.9999996, 1.9999998, 1.9999999, 2.0
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
@@ -643,25 +672,55 @@ pub fn primitive_float_increasing_inclusive_range<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     positive_finite_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
+///     positive_finite_primitive_floats_increasing::<f32>()
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         1.0e-45, 3.0e-45, 4.0e-45, 6.0e-45, 7.0e-45, 8.0e-45, 1.0e-44, 1.1e-44, 1.3e-44,
 ///         1.4e-44, 1.5e-44, 1.7e-44, 1.8e-44, 2.0e-44, 2.1e-44, 2.2e-44, 2.4e-44, 2.5e-44,
 ///         2.7e-44, 2.8e-44
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = positive_finite_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
-///         .collect_vec();
+/// let mut end = positive_finite_primitive_floats_increasing::<f32>()
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
 ///     [
-///         3.4028196e38, 3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38,
-///         3.4028208e38, 3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38,
-///         3.402822e38, 3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38,
-///         3.4028233e38, 3.4028235e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         3.4028196e38,
+///         3.4028198e38,
+///         3.40282e38,
+///         3.4028202e38,
+///         3.4028204e38,
+///         3.4028206e38,
+///         3.4028208e38,
+///         3.402821e38,
+///         3.4028212e38,
+///         3.4028214e38,
+///         3.4028216e38,
+///         3.4028218e38,
+///         3.402822e38,
+///         3.4028222e38,
+///         3.4028225e38,
+///         3.4028227e38,
+///         3.4028229e38,
+///         3.402823e38,
+///         3.4028233e38,
+///         3.4028235e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -698,17 +757,43 @@ pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     negative_finite_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
+///     negative_finite_primitive_floats_increasing::<f32>()
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, -3.4028225e38,
-///         -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, -3.4028212e38,
-///         -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, -3.40282e38,
-///         -3.4028198e38, -3.4028196e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         -3.4028235e38,
+///         -3.4028233e38,
+///         -3.402823e38,
+///         -3.4028229e38,
+///         -3.4028227e38,
+///         -3.4028225e38,
+///         -3.4028222e38,
+///         -3.402822e38,
+///         -3.4028218e38,
+///         -3.4028216e38,
+///         -3.4028214e38,
+///         -3.4028212e38,
+///         -3.402821e38,
+///         -3.4028208e38,
+///         -3.4028206e38,
+///         -3.4028204e38,
+///         -3.4028202e38,
+///         -3.40282e38,
+///         -3.4028198e38,
+///         -3.4028196e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = negative_finite_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
-///         .collect_vec();
+/// let mut end = negative_finite_primitive_floats_increasing::<f32>()
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
@@ -716,7 +801,11 @@ pub fn positive_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 ///         -2.8e-44, -2.7e-44, -2.5e-44, -2.4e-44, -2.2e-44, -2.1e-44, -2.0e-44, -1.8e-44,
 ///         -1.7e-44, -1.5e-44, -1.4e-44, -1.3e-44, -1.1e-44, -1.0e-44, -8.0e-45, -7.0e-45,
 ///         -6.0e-45, -4.0e-45, -3.0e-45, -1.0e-45
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -756,26 +845,72 @@ pub fn negative_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     nonzero_finite_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
+///     nonzero_finite_primitive_floats_increasing::<f32>()
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, -3.4028225e38,
-///         -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, -3.4028212e38,
-///         -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, -3.40282e38,
-///         -3.4028198e38, -3.4028196e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         -3.4028235e38,
+///         -3.4028233e38,
+///         -3.402823e38,
+///         -3.4028229e38,
+///         -3.4028227e38,
+///         -3.4028225e38,
+///         -3.4028222e38,
+///         -3.402822e38,
+///         -3.4028218e38,
+///         -3.4028216e38,
+///         -3.4028214e38,
+///         -3.4028212e38,
+///         -3.402821e38,
+///         -3.4028208e38,
+///         -3.4028206e38,
+///         -3.4028204e38,
+///         -3.4028202e38,
+///         -3.40282e38,
+///         -3.4028198e38,
+///         -3.4028196e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = nonzero_finite_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
-///         .collect_vec();
+/// let mut end = nonzero_finite_primitive_floats_increasing::<f32>()
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
 ///     [
-///         3.4028196e38, 3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38,
-///         3.4028208e38, 3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38,
-///         3.402822e38, 3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38,
-///         3.4028233e38, 3.4028235e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         3.4028196e38,
+///         3.4028198e38,
+///         3.40282e38,
+///         3.4028202e38,
+///         3.4028204e38,
+///         3.4028206e38,
+///         3.4028208e38,
+///         3.402821e38,
+///         3.4028212e38,
+///         3.4028214e38,
+///         3.4028216e38,
+///         3.4028218e38,
+///         3.402822e38,
+///         3.4028222e38,
+///         3.4028225e38,
+///         3.4028227e38,
+///         3.4028229e38,
+///         3.402823e38,
+///         3.4028233e38,
+///         3.4028235e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -812,26 +947,72 @@ pub fn nonzero_finite_primitive_floats_increasing<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     finite_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
+///     finite_primitive_floats_increasing::<f32>()
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38, -3.4028227e38, -3.4028225e38,
-///         -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38, -3.4028214e38, -3.4028212e38,
-///         -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38, -3.4028202e38, -3.40282e38,
-///         -3.4028198e38, -3.4028196e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         -3.4028235e38,
+///         -3.4028233e38,
+///         -3.402823e38,
+///         -3.4028229e38,
+///         -3.4028227e38,
+///         -3.4028225e38,
+///         -3.4028222e38,
+///         -3.402822e38,
+///         -3.4028218e38,
+///         -3.4028216e38,
+///         -3.4028214e38,
+///         -3.4028212e38,
+///         -3.402821e38,
+///         -3.4028208e38,
+///         -3.4028206e38,
+///         -3.4028204e38,
+///         -3.4028202e38,
+///         -3.40282e38,
+///         -3.4028198e38,
+///         -3.4028196e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = finite_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
-///         .collect_vec();
+/// let mut end = finite_primitive_floats_increasing::<f32>()
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
 ///     [
-///         3.4028196e38, 3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38,
-///         3.4028208e38, 3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38,
-///         3.402822e38, 3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38,
-///         3.4028233e38, 3.4028235e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         3.4028196e38,
+///         3.4028198e38,
+///         3.40282e38,
+///         3.4028202e38,
+///         3.4028204e38,
+///         3.4028206e38,
+///         3.4028208e38,
+///         3.402821e38,
+///         3.4028212e38,
+///         3.4028214e38,
+///         3.4028216e38,
+///         3.4028218e38,
+///         3.402822e38,
+///         3.4028222e38,
+///         3.4028225e38,
+///         3.4028227e38,
+///         3.4028229e38,
+///         3.402823e38,
+///         3.4028233e38,
+///         3.4028235e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -863,30 +1044,60 @@ pub fn finite_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloat
 ///
 /// use itertools::Itertools;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::positive_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
-///     positive_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
+///     positive_primitive_floats_increasing::<f32>()
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         1.0e-45, 3.0e-45, 4.0e-45, 6.0e-45, 7.0e-45, 8.0e-45, 1.0e-44, 1.1e-44, 1.3e-44,
 ///         1.4e-44, 1.5e-44, 1.7e-44, 1.8e-44, 2.0e-44, 2.1e-44, 2.2e-44, 2.4e-44, 2.5e-44,
 ///         2.7e-44, 2.8e-44
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = positive_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
+/// let mut end = positive_primitive_floats_increasing::<f32>()
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
 ///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
 ///     [
-///         3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38, 3.4028208e38,
-///         3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38, 3.402822e38,
-///         3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38, 3.4028233e38,
-///         3.4028235e38, f32::POSITIVE_INFINITY
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         3.4028198e38,
+///         3.40282e38,
+///         3.4028202e38,
+///         3.4028204e38,
+///         3.4028206e38,
+///         3.4028208e38,
+///         3.402821e38,
+///         3.4028212e38,
+///         3.4028214e38,
+///         3.4028216e38,
+///         3.4028218e38,
+///         3.402822e38,
+///         3.4028222e38,
+///         3.4028225e38,
+///         3.4028227e38,
+///         3.4028229e38,
+///         3.402823e38,
+///         3.4028233e38,
+///         3.4028235e38,
+///         f32::POSITIVE_INFINITY
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -919,22 +1130,48 @@ pub fn positive_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///
 /// use itertools::Itertools;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::negative_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
-///     negative_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
+///     negative_primitive_floats_increasing::<f32>()
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         f32::NEGATIVE_INFINITY, -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38,
-///         -3.4028227e38, -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38,
-///         -3.4028214e38, -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38,
-///         -3.4028202e38, -3.40282e38, -3.4028198e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         f32::NEGATIVE_INFINITY,
+///         -3.4028235e38,
+///         -3.4028233e38,
+///         -3.402823e38,
+///         -3.4028229e38,
+///         -3.4028227e38,
+///         -3.4028225e38,
+///         -3.4028222e38,
+///         -3.402822e38,
+///         -3.4028218e38,
+///         -3.4028216e38,
+///         -3.4028214e38,
+///         -3.4028212e38,
+///         -3.402821e38,
+///         -3.4028208e38,
+///         -3.4028206e38,
+///         -3.4028204e38,
+///         -3.4028202e38,
+///         -3.40282e38,
+///         -3.4028198e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = negative_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
-///         .collect_vec();
+/// let mut end = negative_primitive_floats_increasing::<f32>()
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
@@ -942,7 +1179,11 @@ pub fn positive_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///         -2.8e-44, -2.7e-44, -2.5e-44, -2.4e-44, -2.2e-44, -2.1e-44, -2.0e-44, -1.8e-44,
 ///         -1.7e-44, -1.5e-44, -1.4e-44, -1.3e-44, -1.1e-44, -1.0e-44, -8.0e-45, -7.0e-45,
 ///         -6.0e-45, -4.0e-45, -3.0e-45, -1.0e-45
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -978,31 +1219,77 @@ pub fn negative_primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFlo
 ///
 /// use itertools::Itertools;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::nonzero_primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
-///     nonzero_primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
+///     nonzero_primitive_floats_increasing::<f32>()
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         f32::NEGATIVE_INFINITY, -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38,
-///         -3.4028227e38, -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38,
-///         -3.4028214e38, -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38,
-///         -3.4028202e38, -3.40282e38, -3.4028198e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         f32::NEGATIVE_INFINITY,
+///         -3.4028235e38,
+///         -3.4028233e38,
+///         -3.402823e38,
+///         -3.4028229e38,
+///         -3.4028227e38,
+///         -3.4028225e38,
+///         -3.4028222e38,
+///         -3.402822e38,
+///         -3.4028218e38,
+///         -3.4028216e38,
+///         -3.4028214e38,
+///         -3.4028212e38,
+///         -3.402821e38,
+///         -3.4028208e38,
+///         -3.4028206e38,
+///         -3.4028204e38,
+///         -3.4028202e38,
+///         -3.40282e38,
+///         -3.4028198e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = nonzero_primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat)
-///         .collect_vec();
+/// let mut end = nonzero_primitive_floats_increasing::<f32>()
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
 ///     [
-///         3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38, 3.4028208e38,
-///         3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38, 3.402822e38,
-///         3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38, 3.4028233e38,
-///         3.4028235e38, f32::POSITIVE_INFINITY
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         3.4028198e38,
+///         3.40282e38,
+///         3.4028202e38,
+///         3.4028204e38,
+///         3.4028206e38,
+///         3.4028208e38,
+///         3.402821e38,
+///         3.4028212e38,
+///         3.4028214e38,
+///         3.4028216e38,
+///         3.4028218e38,
+///         3.402822e38,
+///         3.4028222e38,
+///         3.4028225e38,
+///         3.4028227e38,
+///         3.4028229e38,
+///         3.402823e38,
+///         3.4028233e38,
+///         3.4028235e38,
+///         f32::POSITIVE_INFINITY
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1035,30 +1322,77 @@ pub fn nonzero_primitive_floats_increasing<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::primitive_floats_increasing;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
-///     primitive_floats_increasing::<f32>().take(20).map(NiceFloat).collect_vec(),
+///     primitive_floats_increasing::<f32>()
+///         .take(20)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         f32::NEGATIVE_INFINITY, -3.4028235e38, -3.4028233e38, -3.402823e38, -3.4028229e38,
-///         -3.4028227e38, -3.4028225e38, -3.4028222e38, -3.402822e38, -3.4028218e38, -3.4028216e38,
-///         -3.4028214e38, -3.4028212e38, -3.402821e38, -3.4028208e38, -3.4028206e38, -3.4028204e38,
-///         -3.4028202e38, -3.40282e38, -3.4028198e38
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         f32::NEGATIVE_INFINITY,
+///         -3.4028235e38,
+///         -3.4028233e38,
+///         -3.402823e38,
+///         -3.4028229e38,
+///         -3.4028227e38,
+///         -3.4028225e38,
+///         -3.4028222e38,
+///         -3.402822e38,
+///         -3.4028218e38,
+///         -3.4028216e38,
+///         -3.4028214e38,
+///         -3.4028212e38,
+///         -3.402821e38,
+///         -3.4028208e38,
+///         -3.4028206e38,
+///         -3.4028204e38,
+///         -3.4028202e38,
+///         -3.40282e38,
+///         -3.4028198e38
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 ///
-/// let mut end = primitive_floats_increasing::<f32>().rev().take(20).map(NiceFloat).collect_vec();
+/// let mut end = primitive_floats_increasing::<f32>()
+///     .rev()
+///     .take(20)
+///     .map(NiceFloat)
+///     .collect_vec();
 /// end.reverse();
 /// assert_eq!(
 ///     end,
 ///     [
-///         3.4028198e38, 3.40282e38, 3.4028202e38, 3.4028204e38, 3.4028206e38, 3.4028208e38,
-///         3.402821e38, 3.4028212e38, 3.4028214e38, 3.4028216e38, 3.4028218e38, 3.402822e38,
-///         3.4028222e38, 3.4028225e38, 3.4028227e38, 3.4028229e38, 3.402823e38, 3.4028233e38,
-///         3.4028235e38, f32::POSITIVE_INFINITY
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         3.4028198e38,
+///         3.40282e38,
+///         3.4028202e38,
+///         3.4028204e38,
+///         3.4028206e38,
+///         3.4028208e38,
+///         3.402821e38,
+///         3.4028212e38,
+///         3.4028214e38,
+///         3.4028216e38,
+///         3.4028218e38,
+///         3.402822e38,
+///         3.4028222e38,
+///         3.4028225e38,
+///         3.4028227e38,
+///         3.4028229e38,
+///         3.402823e38,
+///         3.4028233e38,
+///         3.4028235e38,
+///         f32::POSITIVE_INFINITY
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 pub fn primitive_floats_increasing<T: PrimitiveFloat>() -> PrimitiveFloatIncreasingRange<T> {
@@ -1128,20 +1462,29 @@ impl<T: PrimitiveFloat> Iterator for ConstantPrecisionPrimitiveFloats<T> {
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(0, 3).map(NiceFloat)
+///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(0, 3)
+///         .map(NiceFloat)
 ///         .collect_vec(),
 ///     [1.25, 1.75].iter().copied().map(NiceFloat).collect_vec()
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(0, 5).map(NiceFloat)
+///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(0, 5)
+///         .map(NiceFloat)
 ///         .collect_vec(),
-///     [1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375].iter().copied()
-///         .map(NiceFloat).collect_vec()
+///     [1.0625, 1.1875, 1.3125, 1.4375, 1.5625, 1.6875, 1.8125, 1.9375]
+///         .iter()
+///         .copied()
+///         .map(NiceFloat)
+///         .collect_vec()
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(6, 5).map(NiceFloat)
+///     exhaustive_primitive_floats_with_sci_exponent_and_precision::<f32>(6, 5)
+///         .map(NiceFloat)
 ///         .collect_vec(),
-///     [68.0, 76.0, 84.0, 92.0, 100.0, 108.0, 116.0, 124.0].iter().copied().map(NiceFloat)
+///     [68.0, 76.0, 84.0, 92.0, 100.0, 108.0, 116.0, 124.0]
+///         .iter()
+///         .copied()
+///         .map(NiceFloat)
 ///         .collect_vec()
 /// );
 /// ```
@@ -1272,24 +1615,42 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatsWithExponent<T> {
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_sci_exponent::<f32>(0).take(20).map(NiceFloat)
+///     exhaustive_primitive_floats_with_sci_exponent::<f32>(0)
+///         .take(20)
+///         .map(NiceFloat)
 ///         .collect_vec(),
 ///     [
 ///         1.0, 1.5, 1.25, 1.75, 1.125, 1.375, 1.625, 1.875, 1.0625, 1.1875, 1.3125, 1.4375,
 ///         1.5625, 1.6875, 1.8125, 1.9375, 1.03125, 1.09375, 1.15625, 1.21875
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_sci_exponent::<f32>(4).take(20).map(NiceFloat)
+///     exhaustive_primitive_floats_with_sci_exponent::<f32>(4)
+///         .take(20)
+///         .map(NiceFloat)
 ///         .collect_vec(),
 ///     [
 ///         16.0, 24.0, 20.0, 28.0, 18.0, 22.0, 26.0, 30.0, 17.0, 19.0, 21.0, 23.0, 25.0, 27.0,
 ///         29.0, 31.0, 16.5, 17.5, 18.5, 19.5
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// assert_eq!(
-///     exhaustive_primitive_floats_with_sci_exponent::<f32>(-147).map(NiceFloat).collect_vec(),
-///     [6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44].iter().copied().map(NiceFloat).collect_vec()
+///     exhaustive_primitive_floats_with_sci_exponent::<f32>(-147)
+///         .map(NiceFloat)
+///         .collect_vec(),
+///     [6.0e-45, 8.0e-45, 7.0e-45, 1.0e-44]
+///         .iter()
+///         .copied()
+///         .map(NiceFloat)
+///         .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1382,14 +1743,21 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePositiveFinitePrimitiveFloats<T> 
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     exhaustive_positive_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_positive_finite_primitive_floats::<f32>()
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         1.0, 2.0, 1.5, 0.5, 1.25, 3.0, 1.75, 4.0, 1.125, 2.5, 1.375, 0.75, 1.625, 3.5, 1.875,
 ///         0.25, 1.0625, 2.25, 1.1875, 0.625, 1.3125, 2.75, 1.4375, 6.0, 1.5625, 3.25, 1.6875,
 ///         0.875, 1.8125, 3.75, 1.9375, 8.0, 1.03125, 2.125, 1.09375, 0.5625, 1.15625, 2.375,
 ///         1.21875, 5.0, 1.28125, 2.625, 1.34375, 0.6875, 1.40625, 2.875, 1.46875, 0.375, 1.53125,
 ///         3.125
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1437,14 +1805,21 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNegativeFinitePrimitiveFloats<T> 
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     exhaustive_negative_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_negative_finite_primitive_floats::<f32>()
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         -1.0, -2.0, -1.5, -0.5, -1.25, -3.0, -1.75, -4.0, -1.125, -2.5, -1.375, -0.75, -1.625,
 ///         -3.5, -1.875, -0.25, -1.0625, -2.25, -1.1875, -0.625, -1.3125, -2.75, -1.4375, -6.0,
 ///         -1.5625, -3.25, -1.6875, -0.875, -1.8125, -3.75, -1.9375, -8.0, -1.03125, -2.125,
 ///         -1.09375, -0.5625, -1.15625, -2.375, -1.21875, -5.0, -1.28125, -2.625, -1.34375,
 ///         -0.6875, -1.40625, -2.875, -1.46875, -0.375, -1.53125, -3.125
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1500,13 +1875,20 @@ impl<T: PrimitiveFloat> Iterator for ExhaustiveNonzeroFinitePrimitiveFloats<T> {
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     exhaustive_nonzero_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_nonzero_finite_primitive_floats::<f32>()
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0,
 ///         -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5,
 ///         1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625,
 ///         -0.625, 1.3125, -1.3125, 2.75, -2.75, 1.4375, -1.4375, 6.0, -6.0, 1.5625, -1.5625
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1543,13 +1925,20 @@ pub fn exhaustive_nonzero_finite_primitive_floats<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///     exhaustive_finite_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_finite_primitive_floats::<f32>()
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         0.0, -0.0, 1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75,
 ///         -1.75, 4.0, -4.0, 1.125, -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625,
 ///         3.5, -3.5, 1.875, -1.875, 0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875,
 ///         0.625, -0.625, 1.3125, -1.3125, 2.75, -2.75, 1.4375, -1.4375, 6.0, -6.0
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1580,19 +1969,71 @@ pub fn exhaustive_finite_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::exhaustive_positive_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
-///     exhaustive_positive_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_positive_primitive_floats::<f32>()
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         f32::POSITIVE_INFINITY, 1.0, 2.0, 1.5, 0.5, 1.25, 3.0, 1.75, 4.0, 1.125, 2.5, 1.375,
-///         0.75, 1.625, 3.5, 1.875, 0.25, 1.0625, 2.25, 1.1875, 0.625, 1.3125, 2.75, 1.4375, 6.0,
-///         1.5625, 3.25, 1.6875, 0.875, 1.8125, 3.75, 1.9375, 8.0, 1.03125, 2.125, 1.09375, 0.5625,
-///         1.15625, 2.375, 1.21875, 5.0, 1.28125, 2.625, 1.34375, 0.6875, 1.40625, 2.875, 1.46875,
-///         0.375, 1.53125
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         f32::POSITIVE_INFINITY,
+///         1.0,
+///         2.0,
+///         1.5,
+///         0.5,
+///         1.25,
+///         3.0,
+///         1.75,
+///         4.0,
+///         1.125,
+///         2.5,
+///         1.375,
+///         0.75,
+///         1.625,
+///         3.5,
+///         1.875,
+///         0.25,
+///         1.0625,
+///         2.25,
+///         1.1875,
+///         0.625,
+///         1.3125,
+///         2.75,
+///         1.4375,
+///         6.0,
+///         1.5625,
+///         3.25,
+///         1.6875,
+///         0.875,
+///         1.8125,
+///         3.75,
+///         1.9375,
+///         8.0,
+///         1.03125,
+///         2.125,
+///         1.09375,
+///         0.5625,
+///         1.15625,
+///         2.375,
+///         1.21875,
+///         5.0,
+///         1.28125,
+///         2.625,
+///         1.34375,
+///         0.6875,
+///         1.40625,
+///         2.875,
+///         1.46875,
+///         0.375,
+///         1.53125
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1621,19 +2062,71 @@ pub fn exhaustive_positive_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::exhaustive_negative_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
-///     exhaustive_negative_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_negative_primitive_floats::<f32>()
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         f32::NEGATIVE_INFINITY, -1.0, -2.0, -1.5, -0.5, -1.25, -3.0, -1.75, -4.0, -1.125, -2.5,
-///         -1.375, -0.75, -1.625, -3.5, -1.875, -0.25, -1.0625, -2.25, -1.1875, -0.625, -1.3125,
-///         -2.75, -1.4375, -6.0, -1.5625, -3.25, -1.6875, -0.875, -1.8125, -3.75, -1.9375, -8.0,
-///         -1.03125, -2.125, -1.09375, -0.5625, -1.15625, -2.375, -1.21875, -5.0, -1.28125, -2.625,
-///         -1.34375, -0.6875, -1.40625, -2.875, -1.46875, -0.375, -1.53125
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         f32::NEGATIVE_INFINITY,
+///         -1.0,
+///         -2.0,
+///         -1.5,
+///         -0.5,
+///         -1.25,
+///         -3.0,
+///         -1.75,
+///         -4.0,
+///         -1.125,
+///         -2.5,
+///         -1.375,
+///         -0.75,
+///         -1.625,
+///         -3.5,
+///         -1.875,
+///         -0.25,
+///         -1.0625,
+///         -2.25,
+///         -1.1875,
+///         -0.625,
+///         -1.3125,
+///         -2.75,
+///         -1.4375,
+///         -6.0,
+///         -1.5625,
+///         -3.25,
+///         -1.6875,
+///         -0.875,
+///         -1.8125,
+///         -3.75,
+///         -1.9375,
+///         -8.0,
+///         -1.03125,
+///         -2.125,
+///         -1.09375,
+///         -0.5625,
+///         -1.15625,
+///         -2.375,
+///         -1.21875,
+///         -5.0,
+///         -1.28125,
+///         -2.625,
+///         -1.34375,
+///         -0.6875,
+///         -1.40625,
+///         -2.875,
+///         -1.46875,
+///         -0.375,
+///         -1.53125
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1662,19 +2155,71 @@ pub fn exhaustive_negative_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::exhaustive_nonzero_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
-///     exhaustive_nonzero_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_nonzero_primitive_floats::<f32>()
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         f32::POSITIVE_INFINITY, f32::NEGATIVE_INFINITY, 1.0, -1.0, 2.0, -2.0, 1.5, -1.5, 0.5,
-///         -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0, -4.0, 1.125, -1.125, 2.5, -2.5, 1.375,
-///         -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5, 1.875, -1.875, 0.25, -0.25, 1.0625,
-///         -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625, -0.625, 1.3125, -1.3125, 2.75, -2.75,
-///         1.4375, -1.4375, 6.0, -6.0
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         f32::POSITIVE_INFINITY,
+///         f32::NEGATIVE_INFINITY,
+///         1.0,
+///         -1.0,
+///         2.0,
+///         -2.0,
+///         1.5,
+///         -1.5,
+///         0.5,
+///         -0.5,
+///         1.25,
+///         -1.25,
+///         3.0,
+///         -3.0,
+///         1.75,
+///         -1.75,
+///         4.0,
+///         -4.0,
+///         1.125,
+///         -1.125,
+///         2.5,
+///         -2.5,
+///         1.375,
+///         -1.375,
+///         0.75,
+///         -0.75,
+///         1.625,
+///         -1.625,
+///         3.5,
+///         -3.5,
+///         1.875,
+///         -1.875,
+///         0.25,
+///         -0.25,
+///         1.0625,
+///         -1.0625,
+///         2.25,
+///         -2.25,
+///         1.1875,
+///         -1.1875,
+///         0.625,
+///         -0.625,
+///         1.3125,
+///         -1.3125,
+///         2.75,
+///         -2.75,
+///         1.4375,
+///         -1.4375,
+///         6.0,
+///         -6.0
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -1705,33 +2250,79 @@ pub fn exhaustive_nonzero_primitive_floats<T: PrimitiveFloat>(
 ///
 /// use itertools::Itertools;
 ///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
 /// use malachite_base::num::exhaustive::exhaustive_primitive_floats;
 /// use malachite_base::num::float::NiceFloat;
-/// use malachite_base::num::basic::floats::PrimitiveFloat;
 ///
 /// assert_eq!(
-///     exhaustive_primitive_floats::<f32>().take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_primitive_floats::<f32>()
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
-///         f32::NAN, f32::POSITIVE_INFINITY, f32::NEGATIVE_INFINITY, 0.0, -0.0, 1.0, -1.0, 2.0,
-///         -2.0, 1.5, -1.5, 0.5, -0.5, 1.25, -1.25, 3.0, -3.0, 1.75, -1.75, 4.0, -4.0, 1.125,
-///         -1.125, 2.5, -2.5, 1.375, -1.375, 0.75, -0.75, 1.625, -1.625, 3.5, -3.5, 1.875, -1.875,
-///         0.25, -0.25, 1.0625, -1.0625, 2.25, -2.25, 1.1875, -1.1875, 0.625, -0.625, 1.3125,
-///         -1.3125, 2.75, -2.75, 1.4375
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///         f32::NAN,
+///         f32::POSITIVE_INFINITY,
+///         f32::NEGATIVE_INFINITY,
+///         0.0,
+///         -0.0,
+///         1.0,
+///         -1.0,
+///         2.0,
+///         -2.0,
+///         1.5,
+///         -1.5,
+///         0.5,
+///         -0.5,
+///         1.25,
+///         -1.25,
+///         3.0,
+///         -3.0,
+///         1.75,
+///         -1.75,
+///         4.0,
+///         -4.0,
+///         1.125,
+///         -1.125,
+///         2.5,
+///         -2.5,
+///         1.375,
+///         -1.375,
+///         0.75,
+///         -0.75,
+///         1.625,
+///         -1.625,
+///         3.5,
+///         -3.5,
+///         1.875,
+///         -1.875,
+///         0.25,
+///         -0.25,
+///         1.0625,
+///         -1.0625,
+///         2.25,
+///         -2.25,
+///         1.1875,
+///         -1.1875,
+///         0.625,
+///         -0.625,
+///         1.3125,
+///         -1.3125,
+///         2.75,
+///         -2.75,
+///         1.4375
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
 pub fn exhaustive_primitive_floats<T: PrimitiveFloat>(
 ) -> Chain<IntoIter<T>, ExhaustiveNonzeroFinitePrimitiveFloats<T>> {
-    vec![
-        T::NAN,
-        T::POSITIVE_INFINITY,
-        T::NEGATIVE_INFINITY,
-        T::ZERO,
-        T::NEGATIVE_ZERO,
-    ]
-    .into_iter()
-    .chain(exhaustive_nonzero_finite_primitive_floats())
+    vec![T::NAN, T::POSITIVE_INFINITY, T::NEGATIVE_INFINITY, T::ZERO, T::NEGATIVE_ZERO]
+        .into_iter()
+        .chain(exhaustive_nonzero_finite_primitive_floats())
 }
 
 #[doc(hidden)]
@@ -2100,15 +2691,14 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatInclusiveRange<T> {
 ///
 /// use itertools::Itertools;
 ///
-///
 /// use malachite_base::num::exhaustive::exhaustive_primitive_float_range;
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///      exhaustive_primitive_float_range::<f32>(
-///         core::f32::consts::E,
-///         core::f32::consts::PI
-///     ).take(50).map(NiceFloat).collect_vec(),
+///     exhaustive_primitive_float_range::<f32>(core::f32::consts::E, core::f32::consts::PI)
+///         .take(50)
+///         .map(NiceFloat)
+///         .collect_vec(),
 ///     [
 ///         3.0, 2.75, 2.875, 3.125, 2.8125, 2.9375, 3.0625, 2.71875, 2.78125, 2.84375, 2.90625,
 ///         2.96875, 3.03125, 3.09375, 2.734375, 2.765625, 2.796875, 2.828125, 2.859375, 2.890625,
@@ -2116,7 +2706,11 @@ impl<T: PrimitiveFloat> Iterator for ExhaustivePrimitiveFloatInclusiveRange<T> {
 ///         2.7265625, 2.7421875, 2.7578125, 2.7734375, 2.7890625, 2.8046875, 2.8203125, 2.8359375,
 ///         2.8515625, 2.8671875, 2.8828125, 2.8984375, 2.9140625, 2.9296875, 2.9453125, 2.9609375,
 ///         2.9765625, 2.9921875, 3.0078125, 3.0234375, 3.0390625, 3.0546875
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]
@@ -2166,10 +2760,13 @@ pub fn exhaustive_primitive_float_range<T: PrimitiveFloat>(
 /// use malachite_base::num::float::NiceFloat;
 ///
 /// assert_eq!(
-///      exhaustive_primitive_float_inclusive_range::<f32>(
+///     exhaustive_primitive_float_inclusive_range::<f32>(
 ///         core::f32::consts::E,
 ///         core::f32::consts::PI
-///     ).take(50).map(NiceFloat).collect_vec(),
+///     )
+///     .take(50)
+///     .map(NiceFloat)
+///     .collect_vec(),
 ///     [
 ///         3.0, 2.75, 2.875, 3.125, 2.8125, 2.9375, 3.0625, 2.71875, 2.78125, 2.84375, 2.90625,
 ///         2.96875, 3.03125, 3.09375, 2.734375, 2.765625, 2.796875, 2.828125, 2.859375, 2.890625,
@@ -2177,7 +2774,11 @@ pub fn exhaustive_primitive_float_range<T: PrimitiveFloat>(
 ///         2.7265625, 2.7421875, 2.7578125, 2.7734375, 2.7890625, 2.8046875, 2.8203125, 2.8359375,
 ///         2.8515625, 2.8671875, 2.8828125, 2.8984375, 2.9140625, 2.9296875, 2.9453125, 2.9609375,
 ///         2.9765625, 2.9921875, 3.0078125, 3.0234375, 3.0390625, 3.0546875
-///     ].iter().copied().map(NiceFloat).collect_vec()
+///     ]
+///     .iter()
+///     .copied()
+///     .map(NiceFloat)
+///     .collect_vec()
 /// );
 /// ```
 #[inline]

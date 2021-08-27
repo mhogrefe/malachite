@@ -166,7 +166,14 @@ union!(
 /// let u2s = lex_union2s(exhaustive_bools(), 0..4).collect_vec();
 /// assert_eq!(
 ///     u2s.as_slice(),
-///     &[Union2::A(false), Union2::A(true), Union2::B(0), Union2::B(1), Union2::B(2), Union2::B(3)]
+///     &[
+///         Union2::A(false),
+///         Union2::A(true),
+///         Union2::B(0),
+///         Union2::B(1),
+///         Union2::B(2),
+///         Union2::B(3)
+///     ]
 /// );
 /// ```
 ///
@@ -183,7 +190,14 @@ union!(
 /// let u2s = exhaustive_union2s(exhaustive_bools(), 0..4).collect_vec();
 /// assert_eq!(
 ///     u2s.as_slice(),
-///     &[Union2::A(false), Union2::B(0), Union2::A(true), Union2::B(1), Union2::B(2), Union2::B(3)]
+///     &[
+///         Union2::A(false),
+///         Union2::B(0),
+///         Union2::A(true),
+///         Union2::B(1),
+///         Union2::B(2),
+///         Union2::B(3)
+///     ]
 /// );
 /// ```
 pub mod exhaustive;
