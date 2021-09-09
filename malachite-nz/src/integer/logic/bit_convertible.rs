@@ -7,7 +7,7 @@ use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::{BitConvertible, LowMask, NotAssign};
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::Natural;
-use platform::{Limb, SignedLimb};
+use platform::{Limb, SignedLimb}; 
 
 /// Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
 /// significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s
@@ -15,7 +15,7 @@ use platform::{Limb, SignedLimb};
 ///
 /// Time: worst case O(1)
 ///
-/// Additional memory: worst case O(1)
+/// Additional memory: worst case O(1) 
 ///
 /// # Examples
 /// ```

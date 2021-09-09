@@ -9,7 +9,7 @@ use natural::arithmetic::sub::limbs_sub_limb_in_place;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::cmp::Ordering;
+use std::cmp::Ordering; 
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
 /// action equivalent to taking the two's complement of the limbs and getting the bit at the
@@ -36,7 +36,7 @@ use std::cmp::Ordering;
 /// ```
 ///
 /// This is mpz_tstbit from mpz/tstbit.c, GMP 6.2.1, where d is negative.
-pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
+pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool { 
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     if x_i >= xs.len() {
         // We're indexing into the infinite suffix of 1s

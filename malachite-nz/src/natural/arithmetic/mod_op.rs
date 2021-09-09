@@ -30,7 +30,7 @@ use natural::arithmetic::sub::{
     limbs_sub_same_length_to_out,
 };
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
-use natural::comparison::ord::limbs_cmp_same_length;
+use natural::comparison::cmp::limbs_cmp_same_length;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{

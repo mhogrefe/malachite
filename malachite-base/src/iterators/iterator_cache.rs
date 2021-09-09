@@ -69,6 +69,33 @@ impl<I: Iterator> IteratorCache<I> {
         self.cache.get(index)
     }
 
+    /// Retrieves the $n$th element of an iterator (the first element is at index 0), while
+    /// asserting that the iterator has already reached that element.
+    ///
+    /// If the iterator has not advanced that far, or if it has fewer than $n + 1$ element, this
+    /// function panics.
+    ///
+    /// The purpose of this function is to allow the caller to get an element immutably, assuming
+    /// that the caller knows that the element is present.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::iterators::iterator_cache::IteratorCache;
+    ///
+    /// let mut xs = IteratorCache::new([1, 2, 3].iter().cloned());
+    /// // Force the iterator to iterate to completion
+    /// xs.get(3);
+    /// assert_eq!(xs.assert_get(1), &2);
+    /// assert_eq!(xs.assert_get(0), &1);
+    /// assert_eq!(xs.assert_get(2), &3);
+    /// ```
+    pub fn assert_get(&self, index: usize) -> &I::Item {
+        self.cache.get(index).unwrap()
+    }
+
     /// Returns the total number of elements in the iterator, if the iterator has been completely
     /// consumed.
     ///

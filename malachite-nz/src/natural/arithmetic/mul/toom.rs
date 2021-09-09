@@ -42,7 +42,7 @@ use natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
-use natural::comparison::ord::limbs_cmp_same_length;
+use natural::comparison::cmp::limbs_cmp_same_length;
 use platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
     MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,

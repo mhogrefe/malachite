@@ -1,5 +1,5 @@
 use common::GenerationMode;
-use inputs::base::{natural_signeds, unsigneds, RandomValueAndVecOfBool};
+use inputs::base::RandomValueAndVecOfBool;
 use inputs::common::{
     permute_1_3_4_2, permute_2_1, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
 };
@@ -11,7 +11,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::exhaustive::{
     exhaustive_natural_signeds, exhaustive_signeds, exhaustive_unsigneds,
 };
@@ -84,22 +84,6 @@ pub fn positive_naturals(gm: GenerationMode) -> It<Natural> {
             Box::new(special_random_positive_naturals(&EXAMPLE_SEED, scale))
         }
     }
-}
-
-pub fn naturals_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Natural>
-where
-    Natural: From<T>,
-{
-    Box::new(unsigneds::<T>(gm).map(Natural::from))
-}
-
-pub fn naturals_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Natural>
-where
-    Natural: ExactFrom<T>,
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(natural_signeds::<T>(gm).map(Natural::exact_from))
 }
 
 pub fn pairs_of_naturals(gm: GenerationMode) -> It<(Natural, Natural)> {
@@ -1463,46 +1447,6 @@ impl Iterator for RandomNaturalAndVecOfBoolVar1 {
             bools.push(self.rng.gen::<bool>());
         }
         Some((n, bools))
-    }
-}
-
-fn random_pairs_of_natural_and_vec_of_bool_var_1(
-    seed: &[u32],
-    scale: u32,
-) -> RandomNaturalAndVecOfBoolVar1 {
-    RandomNaturalAndVecOfBoolVar1 {
-        naturals: Box::new(random_naturals(&scramble(seed, "naturals"), scale)),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-fn special_random_pairs_of_natural_and_vec_of_bool_var_1(
-    seed: &[u32],
-    scale: u32,
-) -> RandomNaturalAndVecOfBoolVar1 {
-    RandomNaturalAndVecOfBoolVar1 {
-        naturals: Box::new(special_random_naturals(&scramble(seed, "naturals"), scale)),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-// All pairs of `Natural` and `Vec<bool>` where the length of the `Vec` is equal to the limb count
-// of the `Natural`.
-pub fn pairs_of_natural_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Natural, Vec<bool>)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            let f = move |n: &Natural| {
-                exhaustive_fixed_length_vecs_from_single(n.limb_count(), exhaustive_bools())
-            };
-            Box::new(dependent_pairs(exhaustive_naturals(), f))
-        }
-        GenerationMode::Random(scale) => Box::new(random_pairs_of_natural_and_vec_of_bool_var_1(
-            &EXAMPLE_SEED,
-            scale,
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(
-            special_random_pairs_of_natural_and_vec_of_bool_var_1(&EXAMPLE_SEED, scale),
-        ),
     }
 }
 

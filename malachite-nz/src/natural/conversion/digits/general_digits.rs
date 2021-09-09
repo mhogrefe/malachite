@@ -25,7 +25,7 @@ use natural::arithmetic::mul::limb::{limbs_mul_limb_to_out, limbs_slice_mul_limb
 use natural::arithmetic::mul::limbs_mul_to_out;
 use natural::arithmetic::mul::toom::TUNE_PROGRAM_BUILD;
 use natural::arithmetic::square::limbs_square_to_out;
-use natural::comparison::ord::limbs_cmp_same_length;
+use natural::comparison::cmp::limbs_cmp_same_length;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{

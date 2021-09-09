@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use natural::arithmetic::mul::limbs_mul;
 use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
-use natural::comparison::ord::limbs_cmp;
+use natural::comparison::cmp::limbs_cmp;
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
 use std::cmp::Ordering;

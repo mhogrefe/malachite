@@ -675,6 +675,15 @@ pub fn signed_pair_gen_var_6<T: PrimitiveSigned>() -> Generator<(T, T)> {
     )
 }
 
+// All pairs of natural (non-negative) signeds.
+pub fn signed_pair_gen_var_7<T: PrimitiveSigned>() -> Generator<(T, T)> {
+    Generator::new(
+        &exhaustive_signed_pair_gen_var_8,
+        &random_signed_pair_gen_var_6,
+        &special_random_signed_pair_gen_var_7,
+    )
+}
+
 // -- (PrimitiveSigned, PrimitiveSigned, PrimitiveSigned) --
 
 pub fn signed_triple_gen<T: PrimitiveSigned>() -> Generator<(T, T, T)> {
@@ -2429,6 +2438,15 @@ pub fn unsigned_vec_gen_var_2<T: PrimitiveUnsigned>() -> Generator<Vec<T>> {
     )
 }
 
+// All nonempty `Vec`s of unsigneds that do not end in a nonzero value.
+pub fn unsigned_vec_gen_var_3<T: PrimitiveUnsigned>() -> Generator<Vec<T>> {
+    Generator::new(
+        &exhaustive_unsigned_vec_gen_var_3,
+        &random_primitive_int_vec_gen_var_3,
+        &special_random_unsigned_vec_gen_var_3,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 pub fn unsigned_vec_unsigned_pair_gen<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
@@ -2660,6 +2678,24 @@ pub fn unsigned_vec_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(Vec<T>,
     )
 }
 
+// All `(Vec<T>, Vec<T>)` where `T` is unsigned and both `Vec`s have the same length.
+pub fn unsigned_vec_pair_gen_var_6<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_pair_gen_var_7,
+        &random_primitive_int_vec_pair_gen_var_5,
+        &special_random_unsigned_vec_pair_gen_var_7,
+    )
+}
+
+// All `(Vec<T>, Vec<T>)` where `T` is unsigned and neither `Vec` ends with zero.
+pub fn unsigned_vec_pair_gen_var_7<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_pair_gen_var_8,
+        &random_primitive_int_vec_pair_gen_var_6,
+        &special_random_unsigned_vec_pair_gen_var_8,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // All `(Vec<T>, Vec<T>, T)` where `T` is unsigned and the first `Vec` is at least as long as the
@@ -2764,6 +2800,26 @@ pub fn unsigned_vec_triple_gen_var_28<T: PrimitiveUnsigned>() -> Generator<(Vec<
         &exhaustive_unsigned_vec_triple_gen_var_28::<T>,
         &random_unsigned_vec_triple_gen_var_1::<T>,
         &special_random_unsigned_vec_triple_gen_var_28::<T>,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` where `T` is unsigned and all three `Vec`s have the same length.
+pub fn unsigned_vec_triple_gen_var_29<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_29,
+        &random_primitive_int_vec_triple_gen_var_28,
+        &special_random_unsigned_vec_triple_gen_var_29,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` where `T` is unsigned and no `Vec` ends with zero.
+pub fn unsigned_vec_triple_gen_var_30<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_30,
+        &random_primitive_int_vec_triple_gen_var_29,
+        &special_random_unsigned_vec_triple_gen_var_30,
     )
 }
 

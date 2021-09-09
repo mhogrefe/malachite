@@ -34,7 +34,7 @@ use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_to_out,
 };
-use natural::comparison::ord::limbs_cmp_same_length;
+use natural::comparison::cmp::limbs_cmp_same_length;
 use natural::logic::bit_access::limbs_get_bit;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::Small;

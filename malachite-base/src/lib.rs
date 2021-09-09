@@ -110,6 +110,8 @@ pub mod random;
 /// floating-point number, in which case further explanation of its behavior is provided at the
 /// usage site.
 pub mod rounding_modes;
+/// This module contains functions for working with `HashSet`s and `BTreeSet`s.
+pub mod sets;
 /// This module contains functions for working with slices.
 #[macro_use]
 pub mod slices;

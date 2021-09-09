@@ -7,6 +7,7 @@ use std::cmp::max;
 use std::fmt::Debug;
 use std::iter::{once, Once};
 use std::marker::PhantomData;
+use vecs::exhaustive::fixed_length_ordered_unique_indices_helper;
 
 /// Generates the only unit: `()`.
 ///
@@ -2038,3 +2039,177 @@ pub fn exhaustive_dependent_pairs_stop_after_empty_ys<
         ys_generator,
     }
 }
+
+macro_rules! lex_ordered_unique_tuples {
+    (
+        $struct: ident,
+        $k: expr,
+        $out_t: ty,
+        $fn: ident,
+        [$($i: expr),*]
+    ) => {
+        /// Generates all $k$-tuples of elements from an iterator, where the tuples have no
+        /// repetitions and are ordered the same way as in the iterator.
+        ///
+        /// This struct is macro-generated.
+        #[derive(Clone, Debug)]
+        pub struct $struct<I: Iterator>
+        where
+            I::Item: Clone,
+        {
+            first: bool,
+            done: bool,
+            xs: IteratorCache<I>,
+            indices: Vec<usize>,
+            phantom: PhantomData<*const I::Item>,
+        }
+
+        #[allow(clippy::type_complexity)]
+        impl<I: Iterator> Iterator
+            for $struct<I>
+        where
+            I::Item: Clone,
+        {
+            type Item = $out_t;
+
+            fn next(&mut self) -> Option<Self::Item> {
+                if self.done {
+                    return None;
+                }
+                if self.first {
+                    self.first = false;
+                    self.xs.get($k);
+                    if let Some(n) = self.xs.known_len() {
+                        if n < $k {
+                            self.done = true;
+                            return None;
+                        }
+                    }
+                } else {
+                    if let Some(n) = self.xs.known_len() {
+                        if fixed_length_ordered_unique_indices_helper(n, $k, &mut self.indices) {
+                            self.done = true;
+                            return None;
+                        }
+                    } else {
+                        *self.indices.last_mut().unwrap() += 1;
+                    }
+                }
+                if let Some(&last_index) = self.indices.last() {
+                    // Give known len a chance to be set
+                    self.xs.get(last_index + 1);
+                }
+                Some(($(self.xs.assert_get(self.indices[$i]).clone(),)*))
+            }
+        }
+
+        /// Generates $k$-tuples of with elements from a single iterator, such that each tuple has
+        /// no repeated elements, and the elements in each `Vec` are ordered the same way as they
+        /// are in the source iterator.
+        ///
+        /// The source iterator should not repeat any elements, but this is not enforced.
+        ///
+        /// The order is lexicographic with respect to the order of the element iterator.
+        ///
+        /// If the input iterator is infinite, the output length is also infinite.
+        ///
+        /// If the input iterator length is $n$, the output length is $\binom{n}{k}$.
+        ///
+        /// If `xs` is empty, the output is also empty.
+        ///
+        /// # Complexity per iteration
+        /// $$
+        /// T(i, k) = O(k + T^\prime (i))
+        /// $$
+        ///
+        /// $$
+        /// M(i, k) = O(k + M^\prime (i))
+        /// $$
+        ///
+        /// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time
+        /// and additional memory functions of `xs`.
+        ///
+        /// # Examples
+        /// See the documentation of the `tuples::exhaustive` module.
+        pub fn $fn<I: Iterator>(
+            xs: I,
+        ) -> $struct<I>
+        where
+            I::Item: Clone,
+        {
+            $struct {
+                first: true,
+                done: false,
+                xs: IteratorCache::new(xs),
+                indices: (0..$k).collect(),
+                phantom: PhantomData,
+            }
+        }
+    }
+}
+lex_ordered_unique_tuples!(
+    LexOrderedUniquePairs,
+    2,
+    (I::Item, I::Item),
+    lex_ordered_unique_pairs,
+    [0, 1]
+);
+lex_ordered_unique_tuples!(
+    LexOrderedUniqueTriples,
+    3,
+    (I::Item, I::Item, I::Item),
+    lex_ordered_unique_triples,
+    [0, 1, 2]
+);
+lex_ordered_unique_tuples!(
+    LexOrderedUniqueQuadruples,
+    4,
+    (I::Item, I::Item, I::Item, I::Item),
+    lex_ordered_unique_quadruples,
+    [0, 1, 2, 3]
+);
+lex_ordered_unique_tuples!(
+    LexOrderedUniqueQuintuples,
+    5,
+    (I::Item, I::Item, I::Item, I::Item, I::Item),
+    lex_ordered_unique_quintuples,
+    [0, 1, 2, 3, 4]
+);
+lex_ordered_unique_tuples!(
+    LexOrderedUniqueSextuples,
+    6,
+    (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
+    lex_ordered_unique_sextuples,
+    [0, 1, 2, 3, 4, 5]
+);
+lex_ordered_unique_tuples!(
+    LexOrderedUniqueSeptuples,
+    7,
+    (
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item
+    ),
+    lex_ordered_unique_septuples,
+    [0, 1, 2, 3, 4, 5, 6]
+);
+lex_ordered_unique_tuples!(
+    LexOrderedUniqueOctuples,
+    8,
+    (
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item
+    ),
+    lex_ordered_unique_octuples,
+    [0, 1, 2, 3, 4, 5, 6, 7]
+);

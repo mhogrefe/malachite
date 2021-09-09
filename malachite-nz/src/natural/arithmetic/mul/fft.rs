@@ -25,7 +25,7 @@ use natural::arithmetic::sub::{
     limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
-use natural::comparison::ord::limbs_cmp_same_length;
+use natural::comparison::cmp::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
 use platform::{Limb, SQR_TOOM3_THRESHOLD};
 use std::cmp::{max, Ordering};
@@ -610,7 +610,7 @@ fn _limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
         1 // r[n] - carry = 1
     } else {
         carry
-    };
+    }; 
     if sub {
         assert!(!limbs_sub_limb_in_place(xs, carry - 1));
     }

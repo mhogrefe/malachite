@@ -17,7 +17,7 @@ where
     assert_eq!(xss.iter().map(Vec::as_slice).collect_vec().as_slice(), out);
 }
 
-fn exhaustive_fixed_length_vecs_from_single_finite_helper<I: Clone + Iterator>(
+fn exhaustive_fixed_length_vecs_from_single_small_helper<I: Clone + Iterator>(
     len: u64,
     xs: I,
     out_len: usize,
@@ -41,20 +41,20 @@ fn exhaustive_fixed_length_vecs_from_single_finite_helper<I: Clone + Iterator>(
 #[test]
 fn test_exhaustive_fixed_length_vecs_from_single() {
     // This demonstrates that 0 ^ 0 == 1:
-    exhaustive_fixed_length_vecs_from_single_finite_helper(0, nevers(), 1, &[&[]]);
-    exhaustive_fixed_length_vecs_from_single_finite_helper(1, nevers(), 0, &[]);
-    exhaustive_fixed_length_vecs_from_single_finite_helper(2, nevers(), 0, &[]);
-    exhaustive_fixed_length_vecs_from_single_finite_helper(5, nevers(), 0, &[]);
-    exhaustive_fixed_length_vecs_from_single_finite_helper(1, exhaustive_units(), 1, &[&[()]]);
-    exhaustive_fixed_length_vecs_from_single_finite_helper(2, exhaustive_units(), 1, &[&[(), ()]]);
-    exhaustive_fixed_length_vecs_from_single_finite_helper(5, exhaustive_units(), 1, &[&[(); 5]]);
-    exhaustive_fixed_length_vecs_from_single_finite_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(0, nevers(), 1, &[&[]]);
+    exhaustive_fixed_length_vecs_from_single_small_helper(1, nevers(), 0, &[]);
+    exhaustive_fixed_length_vecs_from_single_small_helper(2, nevers(), 0, &[]);
+    exhaustive_fixed_length_vecs_from_single_small_helper(5, nevers(), 0, &[]);
+    exhaustive_fixed_length_vecs_from_single_small_helper(1, exhaustive_units(), 1, &[&[()]]);
+    exhaustive_fixed_length_vecs_from_single_small_helper(2, exhaustive_units(), 1, &[&[(), ()]]);
+    exhaustive_fixed_length_vecs_from_single_small_helper(5, exhaustive_units(), 1, &[&[(); 5]]);
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         0,
         exhaustive_unsigneds::<u8>(),
         1,
         &[&[]],
     );
-    exhaustive_fixed_length_vecs_from_single_finite_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         1,
         exhaustive_unsigneds::<u8>(),
         256,
@@ -107,9 +107,10 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &[19],
         ],
     );
-    exhaustive_fixed_length_vecs_from_single_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         2,
         exhaustive_unsigneds::<u8>(),
+        0x10000,
         &[
             &[0, 0],
             &[0, 1],
@@ -159,7 +160,7 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &[0, 3, 1],
         ],
     );
-    exhaustive_fixed_length_vecs_from_single_finite_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         2,
         exhaustive_ascii_chars(),
         0x4000,
@@ -186,19 +187,19 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &['b', 'f'],
         ],
     );
-    exhaustive_fixed_length_vecs_from_single_finite_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         1,
         exhaustive_bools(),
         2,
         &[&[false], &[true]],
     );
-    exhaustive_fixed_length_vecs_from_single_finite_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         2,
         exhaustive_bools(),
         4,
         &[&[false, false], &[false, true], &[true, false], &[true, true]],
     );
-    exhaustive_fixed_length_vecs_from_single_finite_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         4,
         exhaustive_bools(),
         16,
@@ -221,7 +222,7 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &[true, true, true, true],
         ],
     );
-    exhaustive_fixed_length_vecs_from_single_finite_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         10,
         exhaustive_bools(),
         1024,
@@ -248,7 +249,7 @@ fn test_exhaustive_fixed_length_vecs_from_single() {
             &[false, false, false, false, false, true, false, false, true, true],
         ],
     );
-    exhaustive_fixed_length_vecs_from_single_finite_helper(
+    exhaustive_fixed_length_vecs_from_single_small_helper(
         10,
         0..3,
         59049,

@@ -15,8 +15,8 @@ use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
-    exhaustive_natural_signeds, exhaustive_positive_primitive_ints, exhaustive_unsigneds,
-    primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
+    exhaustive_natural_signeds, exhaustive_positive_primitive_ints, exhaustive_signeds,
+    exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
     PrimitiveIntIncreasingRange,
 };
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
@@ -25,8 +25,8 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_triples_custom_output, exhaustive_triples_from_single, lex_pairs,
-    ExhaustiveDependentPairsYsGenerator,
+    exhaustive_triples_custom_output, exhaustive_triples_from_single, exhaustive_triples_xyx,
+    lex_pairs, ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, exhaustive_vecs_length_range,
@@ -135,7 +135,57 @@ pub fn exhaustive_integer_pair_gen() -> It<(Integer, Integer)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_integers()))
 }
 
+// -- (Integer, Integer, Integer) --
+
+pub fn exhaustive_integer_triple_gen() -> It<(Integer, Integer, Integer)> {
+    Box::new(exhaustive_triples_from_single(exhaustive_integers()))
+}
+
+// -- (Integer, Natural) --
+
+pub fn exhaustive_integer_natural_pair_gen() -> It<(Integer, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integers(),
+        exhaustive_naturals(),
+    ))
+}
+
+// -- (Integer, Natural, Integer) --
+
+pub fn exhaustive_integer_natural_integer_triple_gen() -> It<(Integer, Natural, Integer)> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_integers(),
+        exhaustive_naturals(),
+    ))
+}
+
+// -- (Integer, PrimitiveSigned) --
+
+pub fn exhaustive_integer_signed_pair_gen<T: PrimitiveSigned>() -> It<(Integer, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integers(),
+        exhaustive_signeds(),
+    ))
+}
+
+// -- (Integer, PrimitiveSigned, Integer) --
+
+pub fn exhaustive_integer_signed_integer_triple_gen<T: PrimitiveSigned>(
+) -> It<(Integer, T, Integer)> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_integers(),
+        exhaustive_signeds(),
+    ))
+}
+
 // -- (Integer, PrimitiveUnsigned) --
+
+pub fn exhaustive_integer_unsigned_pair_gen<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integers(),
+        exhaustive_unsigneds(),
+    ))
+}
 
 pub fn exhaustive_integer_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
 ) -> It<(Integer, T)> {
@@ -164,6 +214,16 @@ pub fn exhaustive_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> It<
                 .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE)),
         )),
     )
+}
+
+// -- (Integer, PrimitiveUnsigned, Integer) --
+
+pub fn exhaustive_integer_unsigned_integer_triple_gen<T: PrimitiveUnsigned>(
+) -> It<(Integer, T, Integer)> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_integers(),
+        exhaustive_unsigneds(),
+    ))
 }
 
 // -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -343,6 +403,15 @@ where
     Box::new(exhaustive_natural_signeds::<T>().map(Natural::exact_from))
 }
 
+// -- (Natural, Integer, Natural) --
+
+pub fn exhaustive_natural_integer_natural_triple_gen() -> It<(Natural, Integer, Natural)> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_naturals(),
+        exhaustive_integers(),
+    ))
+}
+
 // -- (Natural, Natural) --
 
 pub fn exhaustive_natural_pair_gen() -> It<(Natural, Natural)> {
@@ -425,7 +494,40 @@ pub fn exhaustive_natural_primitive_int_unsigned_triple_gen_var_3<
     ))
 }
 
+// -- (Natural, PrimitiveSigned) --
+
+pub fn exhaustive_natural_signed_pair_gen<T: PrimitiveSigned>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_naturals(),
+        exhaustive_signeds(),
+    ))
+}
+
+pub fn exhaustive_natural_signed_pair_gen_var_1<T: PrimitiveSigned>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_naturals(),
+        exhaustive_natural_signeds(),
+    ))
+}
+
+// -- (Natural, PrimitiveSigned, Natural) --
+
+pub fn exhaustive_natural_signed_natural_triple_gen<T: PrimitiveSigned>(
+) -> It<(Natural, T, Natural)> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_naturals(),
+        exhaustive_signeds(),
+    ))
+}
+
 // -- (Natural, PrimitiveUnsigned) --
+
+pub fn exhaustive_natural_unsigned_pair_gen<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_naturals(),
+        exhaustive_unsigneds(),
+    ))
+}
 
 pub fn exhaustive_natural_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
 ) -> It<(Natural, T)> {
@@ -453,6 +555,16 @@ pub fn exhaustive_natural_unsigned_pair_gen_var_4<T: PrimitiveInt>() -> It<(Natu
     Box::new(exhaustive_pairs_big_tiny(
         exhaustive_naturals(),
         primitive_int_increasing_inclusive_range(1, T::WIDTH),
+    ))
+}
+
+// -- (Natural, PrimitiveUnsigned, Natural) --
+
+pub fn exhaustive_natural_unsigned_natural_triple_gen<T: PrimitiveUnsigned>(
+) -> It<(Natural, T, Natural)> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_naturals(),
+        exhaustive_unsigneds(),
     ))
 }
 
@@ -567,6 +679,44 @@ pub fn exhaustive_natural_bool_vec_pair_gen_var_1() -> It<(Natural, Vec<bool>)> 
         ),
         exhaustive_naturals(),
         NaturalBoolVecPairGenerator,
+    ))
+}
+
+// -- (PrimitiveSigned, Integer, PrimitiveSigned) --
+
+pub fn exhaustive_signed_integer_signed_triple_gen<T: PrimitiveSigned>() -> It<(T, Integer, T)> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_signeds(),
+        exhaustive_integers(),
+    ))
+}
+
+// -- (PrimitiveSigned, Natural, PrimitiveSigned) --
+
+pub fn exhaustive_signed_natural_signed_triple_gen<T: PrimitiveSigned>() -> It<(T, Natural, T)> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_signeds(),
+        exhaustive_naturals(),
+    ))
+}
+
+// -- (PrimitiveUnsigned, Integer, PrimitiveUnsigned) --
+
+type T1<T> = It<(T, Integer, T)>;
+pub fn exhaustive_unsigned_integer_unsigned_triple_gen<T: PrimitiveUnsigned>() -> T1<T> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_unsigneds(),
+        exhaustive_integers(),
+    ))
+}
+
+// -- (PrimitiveUnsigned, Natural, PrimitiveUnsigned) --
+
+type T2<T> = It<(T, Natural, T)>;
+pub fn exhaustive_unsigned_natural_unsigned_triple_gen<T: PrimitiveUnsigned>() -> T2<T> {
+    Box::new(exhaustive_triples_xyx(
+        exhaustive_unsigneds(),
+        exhaustive_naturals(),
     ))
 }
 

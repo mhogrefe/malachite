@@ -1,5 +1,5 @@
 use common::GenerationMode;
-use inputs::base::{signeds, unsigneds, RandomValueAndVecOfBool};
+use inputs::base::RandomValueAndVecOfBool;
 use inputs::common::{permute_1_3_4_2, reshape_2_1_to_3, reshape_2_2_to_4};
 use malachite_base::bools::exhaustive::exhaustive_bools;
 use malachite_base::num::arithmetic::traits::{
@@ -77,22 +77,6 @@ pub fn nonzero_integers(gm: GenerationMode) -> It<Integer> {
             Box::new(special_random_nonzero_integers(&EXAMPLE_SEED, scale))
         }
     }
-}
-
-pub fn integers_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Integer>
-where
-    Integer: From<T>,
-{
-    Box::new(unsigneds::<T>(gm).map(Integer::from))
-}
-
-pub fn integers_var_2<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<Integer>
-where
-    Integer: From<T>,
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    Box::new(signeds::<T>(gm).map(Integer::from))
 }
 
 pub fn pairs_of_integers(gm: GenerationMode) -> It<(Integer, Integer)> {
@@ -1090,49 +1074,6 @@ impl Iterator for RandomIntegerAndVecOfBoolVar1 {
             bools.push(self.rng.gen::<bool>());
         }
         Some((n, bools))
-    }
-}
-
-fn random_pairs_of_integer_and_vec_of_bool_var_1(
-    seed: &[u32],
-    scale: u32,
-) -> RandomIntegerAndVecOfBoolVar1 {
-    RandomIntegerAndVecOfBoolVar1 {
-        integers: Box::new(random_integers(&scramble(seed, "integers"), scale)),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-fn special_random_pairs_of_integer_and_vec_of_bool_var_1(
-    seed: &[u32],
-    scale: u32,
-) -> RandomIntegerAndVecOfBoolVar1 {
-    RandomIntegerAndVecOfBoolVar1 {
-        integers: Box::new(special_random_integers(&scramble(seed, "integers"), scale)),
-        rng: Box::new(IsaacRng::from_seed(&scramble(seed, "bools"))),
-    }
-}
-
-// All pairs of `Integer` and `Vec<bool>` where the length of the `Vec` is equal to the twos'
-// complement limb count of the `Integer` (including sign extension limbs, if necessary).
-pub fn pairs_of_integer_and_vec_of_bool_var_1(gm: GenerationMode) -> It<(Integer, Vec<bool>)> {
-    match gm {
-        GenerationMode::Exhaustive => {
-            let f = move |i: &Integer| {
-                exhaustive_fixed_length_vecs_from_single(
-                    u64::exact_from(i.to_twos_complement_limbs_asc().len()),
-                    exhaustive_bools(),
-                )
-            };
-            Box::new(dependent_pairs(exhaustive_integers(), f))
-        }
-        GenerationMode::Random(scale) => Box::new(random_pairs_of_integer_and_vec_of_bool_var_1(
-            &EXAMPLE_SEED,
-            scale,
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(
-            special_random_pairs_of_integer_and_vec_of_bool_var_1(&EXAMPLE_SEED, scale),
-        ),
     }
 }
 

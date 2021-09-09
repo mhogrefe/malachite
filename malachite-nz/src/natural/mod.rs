@@ -230,10 +230,10 @@ pub mod arithmetic {
 }
 pub mod conversion;
 pub mod comparison {
-    pub mod ord;
+    pub mod cmp;
+    pub mod partial_cmp_abs_primitive_int;
+    pub mod partial_cmp_primitive_int;
     pub mod partial_eq_primitive_int;
-    pub mod partial_ord_abs_primitive_int;
-    pub mod partial_ord_primitive_int;
 }
 /// This module contains iterators that generate `Natural`s without repetition.
 pub mod exhaustive;

@@ -521,6 +521,28 @@ pub mod rounding_modes {
     pub mod size;
     pub mod to_string;
 }
+pub mod sets {
+    pub mod exhaustive {
+        pub mod lex_b_tree_sets;
+        pub mod lex_b_tree_sets_length_inclusive_range;
+        pub mod lex_b_tree_sets_length_range;
+        pub mod lex_b_tree_sets_min_length;
+        pub mod lex_fixed_length_b_tree_sets;
+        pub mod lex_fixed_length_hash_sets;
+        pub mod lex_hash_sets;
+        pub mod lex_hash_sets_length_inclusive_range;
+        pub mod lex_hash_sets_length_range;
+        pub mod lex_hash_sets_min_length;
+        pub mod shortlex_b_tree_sets;
+        pub mod shortlex_b_tree_sets_length_inclusive_range;
+        pub mod shortlex_b_tree_sets_length_range;
+        pub mod shortlex_b_tree_sets_min_length;
+        pub mod shortlex_hash_sets;
+        pub mod shortlex_hash_sets_length_inclusive_range;
+        pub mod shortlex_hash_sets_length_range;
+        pub mod shortlex_hash_sets_min_length;
+    }
+}
 pub mod slices {
     pub mod exhaustive_slice_permutations;
     pub mod random_slice_permutations;
@@ -568,6 +590,7 @@ pub mod tuples {
         pub mod exhaustive_units;
         pub mod lex_custom_tuples;
         pub mod lex_dependent_pairs;
+        pub mod lex_ordered_unique_tuples;
         pub mod lex_tuples;
         pub mod lex_tuples_from_single;
     }
@@ -605,9 +628,18 @@ pub mod vecs {
         pub mod exhaustive_vecs_length_inclusive_range;
         pub mod exhaustive_vecs_length_range;
         pub mod exhaustive_vecs_min_length;
+        pub mod lex_fixed_length_ordered_unique_vecs;
         pub mod lex_fixed_length_vecs_from_single;
         pub mod lex_fixed_length_vecs_m_inputs;
         pub mod lex_length_n_vecs;
+        pub mod lex_ordered_unique_vecs;
+        pub mod lex_ordered_unique_vecs_length_inclusive_range;
+        pub mod lex_ordered_unique_vecs_length_range;
+        pub mod lex_ordered_unique_vecs_min_length;
+        pub mod shortlex_ordered_unique_vecs;
+        pub mod shortlex_ordered_unique_vecs_length_inclusive_range;
+        pub mod shortlex_ordered_unique_vecs_length_range;
+        pub mod shortlex_ordered_unique_vecs_min_length;
         pub mod shortlex_vecs;
         pub mod shortlex_vecs_from_length_iterator;
         pub mod shortlex_vecs_length_inclusive_range;

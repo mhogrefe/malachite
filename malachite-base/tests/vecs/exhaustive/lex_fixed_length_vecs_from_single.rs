@@ -102,9 +102,10 @@ fn test_lex_fixed_length_vecs_from_single() {
             &[19],
         ],
     );
-    lex_fixed_length_vecs_from_single_helper(
+    lex_fixed_length_vecs_from_single_small_helper(
         2,
         exhaustive_unsigneds::<u8>(),
+        0x10000,
         &[
             &[0, 0],
             &[0, 1],

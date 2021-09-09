@@ -42,19 +42,6 @@ pub mod integer {
         pub mod sub_mul;
     }
 
-    pub mod comparison {
-        pub mod eq;
-        pub mod hash;
-        pub mod ord;
-        pub mod ord_abs;
-        pub mod partial_eq_natural;
-        pub mod partial_eq_primitive_int;
-        pub mod partial_ord_abs_natural_and_comparators;
-        pub mod partial_ord_abs_primitive_int_and_comparators;
-        pub mod partial_ord_natural;
-        pub mod partial_ord_primitive_int;
-    }
-
     pub mod logic {
         pub mod and;
         pub mod assign_bit;
@@ -132,15 +119,6 @@ pub mod natural {
         pub mod square;
         pub mod sub;
         pub mod sub_mul;
-    }
-
-    pub mod comparison {
-        pub mod eq;
-        pub mod hash;
-        pub mod ord;
-        pub mod partial_eq_primitive_int;
-        pub mod partial_ord_abs_primitive_int_and_comparators;
-        pub mod partial_ord_primitive_int;
     }
 
     pub mod logic {

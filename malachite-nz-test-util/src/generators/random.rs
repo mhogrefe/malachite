@@ -30,6 +30,7 @@ use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
     random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
+    random_triples_xyx,
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
@@ -185,6 +186,98 @@ pub fn random_integer_pair_gen(config: &GenConfig) -> It<(Integer, Integer)> {
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     )))
+}
+
+// -- (Integer, Integer, Integer) --
+
+pub fn random_integer_triple_gen(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
+    Box::new(random_triples_from_single(random_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
+// -- (Integer, Natural) --
+
+pub fn random_integer_natural_pair_gen(config: &GenConfig) -> It<(Integer, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Integer, Natural, Integer) --
+
+pub fn random_integer_natural_integer_triple_gen(
+    config: &GenConfig,
+) -> It<(Integer, Natural, Integer)> {
+    Box::new(random_triples_xyx(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Integer, PrimitiveInt) --
+
+pub fn random_integer_primitive_int_pair_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+// -- (Integer, PrimitiveInt, Integer) --
+
+pub fn random_integer_primitive_int_integer_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Integer, T, Integer)> {
+    Box::new(random_triples_xyx(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
 }
 
 // -- (Integer, PrimitiveUnsigned) --
@@ -499,6 +592,30 @@ where
     Box::new(random_natural_signeds(EXAMPLE_SEED).map(Natural::exact_from))
 }
 
+// -- (Natural, Integer, Natural) --
+
+pub fn random_natural_integer_natural_triple_gen(
+    config: &GenConfig,
+) -> It<(Natural, Integer, Natural)> {
+    Box::new(random_triples_xyx(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Natural, Natural) --
 
 pub fn random_natural_pair_gen(config: &GenConfig) -> It<(Natural, Natural)> {
@@ -581,6 +698,60 @@ pub fn random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Natural, Na
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     )))
+}
+
+// -- (Natural, PrimitiveInt) --
+
+pub fn random_natural_primitive_int_pair_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+// -- (Natural, PrimitiveInt, Natural) --
+
+pub fn random_natural_primitive_int_natural_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Natural, T, Natural)> {
+    Box::new(random_triples_xyx(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+// -- (Natural, PrimitiveSigned) --
+
+pub fn random_natural_signed_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_natural_signeds,
+    ))
 }
 
 // -- (Natural, PrimitiveUnsigned) --
@@ -951,6 +1122,42 @@ pub fn random_natural_bool_vec_pair_gen_var_1(config: &GenConfig) -> It<(Natural
         ),
         bs: random_bools(EXAMPLE_SEED.fork("bs")),
     })
+}
+
+// -- (PrimitiveInt, Integer, PrimitiveInt) --
+
+pub fn random_primitive_int_integer_primitive_int_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(T, Integer, T)> {
+    Box::new(random_triples_xyx(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (PrimitiveInt, Natural, PrimitiveInt) --
+
+pub fn random_primitive_int_natural_primitive_int_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(T, Natural, T)> {
+    Box::new(random_triples_xyx(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (String, String, String) --

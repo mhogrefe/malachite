@@ -210,14 +210,14 @@ pub mod arithmetic {
     pub mod sub_mul;
 }
 pub mod comparison {
-    pub mod ord;
-    pub mod ord_abs;
+    pub mod cmp;
+    pub mod cmp_abs;
+    pub mod partial_cmp_abs_natural;
+    pub mod partial_cmp_abs_primitive_int;
+    pub mod partial_cmp_natural;
+    pub mod partial_cmp_primitive_int;
     pub mod partial_eq_natural;
     pub mod partial_eq_primitive_int;
-    pub mod partial_ord_abs_natural;
-    pub mod partial_ord_abs_primitive_int;
-    pub mod partial_ord_natural;
-    pub mod partial_ord_primitive_int;
 }
 pub mod conversion;
 /// This module contains iterators that generate `Integer`s without repetition.

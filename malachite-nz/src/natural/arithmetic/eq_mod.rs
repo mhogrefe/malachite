@@ -15,7 +15,7 @@ use natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out, limbs_sub_to_out,
 };
-use natural::comparison::ord::limbs_cmp;
+use natural::comparison::cmp::limbs_cmp;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};

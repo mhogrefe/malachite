@@ -34,7 +34,7 @@ use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::{
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
 };
-use natural::comparison::ord::limbs_cmp_same_length;
+use natural::comparison::cmp::limbs_cmp_same_length;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{

@@ -27,7 +27,7 @@ use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::square::limbs_square_to_out;
 use natural::arithmetic::sub::{limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left};
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
-use natural::comparison::ord::limbs_cmp_same_length;
+use natural::comparison::cmp::limbs_cmp_same_length;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, SignedLimb, DC_DIVAPPR_Q_THRESHOLD, MU_DIVAPPR_Q_THRESHOLD};

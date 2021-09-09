@@ -16,7 +16,7 @@ use natural::arithmetic::sub::{
 use natural::arithmetic::sub_mul::{
     limbs_sub_mul_limb_same_length_in_place_left, limbs_sub_mul_limb_same_length_in_place_right,
 };
-use natural::comparison::ord::limbs_cmp;
+use natural::comparison::cmp::limbs_cmp;
 use natural::logic::not::limbs_not_in_place;
 use platform::Limb;
 use std::cmp::Ordering;

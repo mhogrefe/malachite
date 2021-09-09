@@ -10,7 +10,7 @@ use num::exhaustive::{
 use num::iterators::{ruler_sequence, RulerSequence};
 use num::logic::traits::SignificantBits;
 use std::cmp::max;
-use std::iter::{once, Once};
+use std::iter::{once, FromIterator, Once};
 use std::marker::PhantomData;
 use tuples::exhaustive::{
     exhaustive_dependent_pairs_stop_after_empty_ys, lex_dependent_pairs_stop_after_empty_ys,
@@ -438,7 +438,7 @@ where
 ///
 /// The output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
 ///
-/// If `len` is 0, the output consists of one empty list.
+/// If `len` is 0, the output consists of one empty `Vec`.
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
@@ -959,7 +959,7 @@ where
 /// If `xs` is finite, the output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
 /// If `xs` is infinite, the output is also infinite.
 ///
-/// If `len` is 0, the output consists of one empty list.
+/// If `len` is 0, the output consists of one empty `Vec`.
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
@@ -1063,7 +1063,7 @@ where
 /// If `xs` is finite, the output length is $\ell^n$, where $\ell$ is `xs.count()` and $n$ is `len`.
 /// If `xs` is infinite, the output is also infinite.
 ///
-/// If `len` is 0, the output consists of one empty list.
+/// If `len` is 0, the output consists of one empty `Vec`.
 ///
 /// If `xs` is empty, the output is also empty, unless `len` is 0.
 ///
@@ -1927,4 +1927,907 @@ where
     I::Item: Clone,
 {
     exhaustive_vecs_from_length_iterator(primitive_int_increasing_inclusive_range(a, b), xs)
+}
+
+/// Generates all collections of elements from an iterator, where the collections are of a fixed
+/// length, have no repetitions, and are ordered the same way as in the iterator.
+#[derive(Clone, Debug)]
+pub struct LexFixedLengthOrderedUniqueCollections<I: Iterator, C: FromIterator<I::Item>>
+where
+    I::Item: Clone,
+{
+    pub(crate) first: bool,
+    pub(crate) done: bool,
+    pub(crate) xs: IteratorCache<I>,
+    pub(crate) indices: Vec<usize>,
+    pub(crate) phantom_i: PhantomData<*const I::Item>,
+    pub(crate) phantom_c: PhantomData<*const C>,
+}
+
+pub(crate) fn fixed_length_ordered_unique_indices_helper(
+    n: usize,
+    k: usize,
+    indices: &mut [usize],
+) -> bool {
+    let mut expected_j = n - 1;
+    let mut i = k - 1;
+    // Find longest suffix of the form [..., n - 3, n - 2, n - 1].
+    // After this loop, i is index right before this longest suffix.
+    loop {
+        if expected_j != indices[i] {
+            break;
+        }
+        if i == 0 {
+            return true;
+        }
+        i -= 1;
+        expected_j -= 1;
+    }
+    let mut j = indices[i] + 1;
+    for index in &mut indices[i..] {
+        *index = j;
+        j += 1;
+    }
+    false
+}
+
+impl<I: Iterator, C: FromIterator<I::Item>> Iterator
+    for LexFixedLengthOrderedUniqueCollections<I, C>
+where
+    I::Item: Clone,
+{
+    type Item = C;
+
+    fn next(&mut self) -> Option<C> {
+        if self.done {
+            return None;
+        }
+        let k = self.indices.len();
+        if self.first {
+            self.first = false;
+            self.xs.get(k);
+            if let Some(n) = self.xs.known_len() {
+                if n < k {
+                    self.done = true;
+                    return None;
+                }
+            }
+        } else {
+            if k == 0 {
+                self.done = true;
+                return None;
+            }
+            if let Some(n) = self.xs.known_len() {
+                if fixed_length_ordered_unique_indices_helper(n, k, &mut self.indices) {
+                    self.done = true;
+                    return None;
+                }
+            } else {
+                *self.indices.last_mut().unwrap() += 1;
+            }
+        }
+        if let Some(&last_index) = self.indices.last() {
+            // Give known len a chance to be set
+            self.xs.get(last_index + 1);
+        }
+        Some(
+            (&self.indices)
+                .iter()
+                .map(|&i| self.xs.assert_get(i).clone())
+                .collect(),
+        )
+    }
+}
+
+/// Generates `Vec`s of a given length with elements from a single iterator, such that each `Vec`
+/// has no repeated elements, and the elements in each `Vec` are ordered the same way as they are
+/// in the source iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The order is lexicographic with respect to the order of the element iterator.
+///
+/// If $k$ is 0, the output length is 1.
+///
+/// If $k$ is nonzero and the input iterator is infinite, the output length is also infinite.
+///
+/// If $k$ is nonzero and the input iterator length is $n$, the output length is $\binom{n}{k}$.
+///
+/// If $k$ is 0, the output consists of one empty `Vec`.
+///
+/// If `xs` is empty, the output is also empty, unless $k$ is 0.
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::lex_fixed_length_ordered_unique_vecs;
+///
+/// let xss = lex_fixed_length_ordered_unique_vecs(4, 1..=6).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2, 3, 4],
+///         &[1, 2, 3, 5],
+///         &[1, 2, 3, 6],
+///         &[1, 2, 4, 5],
+///         &[1, 2, 4, 6],
+///         &[1, 2, 5, 6],
+///         &[1, 3, 4, 5],
+///         &[1, 3, 4, 6],
+///         &[1, 3, 5, 6],
+///         &[1, 4, 5, 6],
+///         &[2, 3, 4, 5],
+///         &[2, 3, 4, 6],
+///         &[2, 3, 5, 6],
+///         &[2, 4, 5, 6],
+///         &[3, 4, 5, 6]
+///     ]
+/// );
+/// ```
+pub fn lex_fixed_length_ordered_unique_vecs<I: Iterator>(
+    k: u64,
+    xs: I,
+) -> LexFixedLengthOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    LexFixedLengthOrderedUniqueCollections {
+        first: true,
+        done: false,
+        xs: IteratorCache::new(xs),
+        indices: (0..usize::exact_from(k)).collect(),
+        phantom_i: PhantomData,
+        phantom_c: PhantomData,
+    }
+}
+
+/// Generates all collections of elements from an iterator in shortlex order, where the collections
+/// have no repetitions and are ordered the same way as in the iterator.
+#[derive(Clone)]
+pub struct ShortlexOrderedUniqueCollections<I: Clone + Iterator, C: FromIterator<I::Item>>
+where
+    I::Item: Clone,
+{
+    pub(crate) current_len: u64,
+    pub(crate) max_len: u64,
+    pub(crate) xs: I,
+    pub(crate) current_xss: LexFixedLengthOrderedUniqueCollections<I, C>,
+}
+
+impl<I: Clone + Iterator, C: FromIterator<I::Item>> Iterator
+    for ShortlexOrderedUniqueCollections<I, C>
+where
+    I::Item: Clone,
+{
+    type Item = C;
+
+    fn next(&mut self) -> Option<C> {
+        if self.current_len > self.max_len {
+            return None;
+        }
+        if let Some(next) = self.current_xss.next() {
+            Some(next)
+        } else {
+            self.current_len += 1;
+            if self.current_len > self.max_len {
+                return None;
+            }
+            self.current_xss = LexFixedLengthOrderedUniqueCollections {
+                first: true,
+                done: false,
+                xs: IteratorCache::new(self.xs.clone()),
+                indices: (0..usize::exact_from(self.current_len)).collect(),
+                phantom_i: PhantomData,
+                phantom_c: PhantomData,
+            };
+            if let Some(next) = self.current_xss.next() {
+                Some(next)
+            } else {
+                // Prevent any further iteration
+                self.max_len = 0;
+                self.current_len = 1;
+                None
+            }
+        }
+    }
+}
+
+/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
+/// elements, and the elements in each `Vec` are ordered the same way as they are in the source
+/// iterator.
+///
+/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
+/// lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, `Vec`s of length 2 and above will never be
+/// generated.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is $2^n$.
+///
+/// If `xs` is empty, the output consists of a single empty `Vec`.
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs;
+///
+/// let xss = shortlex_ordered_unique_vecs(1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[1],
+///         &[2],
+///         &[3],
+///         &[4],
+///         &[1, 2],
+///         &[1, 3],
+///         &[1, 4],
+///         &[2, 3],
+///         &[2, 4],
+///         &[3, 4],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3, 4],
+///         &[2, 3, 4],
+///         &[1, 2, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_ordered_unique_vecs<I: Clone + Iterator>(
+    xs: I,
+) -> ShortlexOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    shortlex_ordered_unique_vecs_length_inclusive_range(0, u64::MAX, xs)
+}
+
+/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
+/// `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same way as
+/// they are in the source iterator.
+///
+/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
+/// lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, \ell + 1)` and above
+/// will never be generated.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$ and the `min_length` is $\ell$, the output length is
+/// $$
+/// \sum_{i=\ell}^n \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_min_length;
+///
+/// let xss = shortlex_ordered_unique_vecs_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[1, 4],
+///         &[2, 3],
+///         &[2, 4],
+///         &[3, 4],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3, 4],
+///         &[2, 3, 4],
+///         &[1, 2, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_ordered_unique_vecs_min_length<I: Clone + Iterator>(
+    min_length: u64,
+    xs: I,
+) -> ShortlexOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    shortlex_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
+}
+
+/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
+/// way as they are in the source iterator.
+///
+/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
+/// lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, a + 1)` and above
+/// will never be generated.
+///
+/// If $a \leq b$, the output is empty.
+///
+/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+///
+/// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^b - 1 \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_length_range;
+///
+/// let xss = shortlex_ordered_unique_vecs_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[1, 4],
+///         &[2, 3],
+///         &[2, 4],
+///         &[3, 4],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3, 4],
+///         &[2, 3, 4],
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn shortlex_ordered_unique_vecs_length_range<I: Clone + Iterator>(
+    mut a: u64,
+    mut b: u64,
+    xs: I,
+) -> ShortlexOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    if b == 0 {
+        // Transform an empty (x, 0) range into (2, 1), which is also empty but doesn't cause
+        // overflow
+        a = 2;
+        b = 1;
+    }
+    shortlex_ordered_unique_vecs_length_inclusive_range(a, b - 1, xs)
+}
+
+/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
+/// way as they are in the source iterator.
+///
+/// The `Vec`s are generated in order of increasing length, and within each length they are ordered
+/// lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, `Vec`s of length `\max(2, a + 1)` and above
+/// will never be generated.
+///
+/// If $a < b$, the output is empty.
+///
+/// If $a = b = 0$, the output consists of a single empty `Vec`.
+///
+/// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^b \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::shortlex_ordered_unique_vecs_length_inclusive_range;
+///
+/// let xss = shortlex_ordered_unique_vecs_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[1, 4],
+///         &[2, 3],
+///         &[2, 4],
+///         &[3, 4],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3, 4],
+///         &[2, 3, 4],
+///     ]
+/// );
+/// ```
+pub fn shortlex_ordered_unique_vecs_length_inclusive_range<I: Clone + Iterator>(
+    a: u64,
+    b: u64,
+    xs: I,
+) -> ShortlexOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    ShortlexOrderedUniqueCollections {
+        current_len: a,
+        max_len: b,
+        xs: xs.clone(),
+        current_xss: lex_fixed_length_ordered_unique_vecs(a, xs),
+    }
+}
+
+/// Generates all collections of elements from an iterator in lexicographic order, where the
+/// collections have no repetitions and are ordered the same way as in the iterator.
+#[derive(Clone, Debug)]
+pub struct LexOrderedUniqueCollections<I: Iterator, C: FromIterator<I::Item>>
+where
+    I::Item: Clone,
+{
+    pub(crate) done: bool,
+    pub(crate) first: bool,
+    pub(crate) min_len: usize,
+    pub(crate) max_len: usize,
+    pub(crate) xs: IteratorCache<I>,
+    pub(crate) indices: Vec<usize>,
+    pub(crate) phantom_i: PhantomData<*const I::Item>,
+    pub(crate) phantom_c: PhantomData<*const C>,
+}
+
+impl<I: Iterator, C: FromIterator<I::Item>> Iterator for LexOrderedUniqueCollections<I, C>
+where
+    I::Item: Clone,
+{
+    type Item = C;
+
+    fn next(&mut self) -> Option<C> {
+        if self.done {
+            return None;
+        }
+        let k = self.indices.len();
+        if self.first {
+            self.first = false;
+            self.xs.get(k);
+            if let Some(n) = self.xs.known_len() {
+                if n < k {
+                    self.done = true;
+                    return None;
+                }
+            }
+        } else if k == 0 {
+            if self.xs.get(0).is_none() {
+                self.done = true;
+                return None;
+            }
+            self.indices.push(0);
+        } else {
+            let last_i = *self.indices.last().unwrap();
+            let next_i = last_i + 1;
+            if k < self.max_len && self.xs.get(next_i).is_some() {
+                // For example, if xs is [0, 1, 2, 3] and max_len is 4, then the next set of
+                // indices after [0, 1] is [0, 1, 2].
+                self.indices.push(next_i);
+            } else if k == self.min_len {
+                // For example, if xs is [0, 1, 2, 3] and min_len is 2, then the next set of
+                // indices after [1, 3] is [2, 3].
+                if let Some(n) = self.xs.known_len() {
+                    if fixed_length_ordered_unique_indices_helper(n, k, &mut self.indices) {
+                        self.done = true;
+                        return None;
+                    }
+                } else {
+                    *self.indices.last_mut().unwrap() += 1;
+                }
+            } else if self.xs.get(next_i).is_some() {
+                // For example, if xs is [0, 1, 2, 3] and max_len is 3, then the next set of
+                // indices after [1, 2, 3] is [1, 2, 4].
+                *self.indices.last_mut().unwrap() = next_i;
+            } else {
+                let x = self.indices.pop();
+                if let Some(last) = self.indices.last_mut() {
+                    // For example, if xs is [0, 1, 2, 3] and max_len is 3, then the next set of
+                    // indices after [0, 1, 2] is [0, 1, 3].
+                    *last += 1;
+                } else {
+                    let next_x = x.unwrap() + 1;
+                    if self.xs.get(next_x).is_none() {
+                        // For example, if xs is [0, 1, 2, 3], then nothing comes after the indices
+                        // [3].
+                        self.done = true;
+                        return None;
+                    } else {
+                        // For example, if xs is [0, 1, 2, 3] and max_len is 1, then the next set
+                        // of indices after [0] is [1].
+                        self.indices.push(next_x);
+                    }
+                }
+            }
+        }
+        if let Some(&last_index) = self.indices.last() {
+            // Give known len a chance to be set
+            self.xs.get(last_index + 1);
+        }
+        Some(
+            (&self.indices)
+                .iter()
+                .map(|&i| self.xs.assert_get(i).clone())
+                .collect(),
+        )
+    }
+}
+
+/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
+/// elements, and the elements in each `Vec` are ordered the same way as they are in the source
+/// iterator.
+///
+/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
+/// generated.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is $2^n$.
+///
+/// If `xs` is empty, the output consists of a single empty `Vec`.
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
+///
+/// let xss = lex_ordered_unique_vecs(1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[1],
+///         &[1, 2],
+///         &[1, 2, 3],
+///         &[1, 2, 3, 4],
+///         &[1, 2, 4],
+///         &[1, 3],
+///         &[1, 3, 4],
+///         &[1, 4],
+///         &[2],
+///         &[2, 3],
+///         &[2, 3, 4],
+///         &[2, 4],
+///         &[3],
+///         &[3, 4],
+///         &[4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn lex_ordered_unique_vecs<I: Clone + Iterator>(
+    xs: I,
+) -> LexOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    lex_ordered_unique_vecs_length_inclusive_range(0, u64::MAX, xs)
+}
+
+/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
+/// `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same way as
+/// they are in the source iterator.
+///
+/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
+/// generated.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$ and the `min_length` is $\ell$, the output length is
+/// $$
+/// \sum_{i=\ell}^n \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_min_length;
+///
+/// let xss = lex_ordered_unique_vecs_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 2, 3],
+///         &[1, 2, 3, 4],
+///         &[1, 2, 4],
+///         &[1, 3],
+///         &[1, 3, 4],
+///         &[1, 4],
+///         &[2, 3],
+///         &[2, 3, 4],
+///         &[2, 4],
+///         &[3, 4],
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn lex_ordered_unique_vecs_min_length<I: Clone + Iterator>(
+    min_length: u64,
+    xs: I,
+) -> LexOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    lex_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
+}
+
+/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
+/// way as they are in the source iterator.
+///
+/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
+/// generated.
+///
+/// If $a \leq b$, the output is empty.
+///
+/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+///
+/// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^b - 1 \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_length_range;
+///
+/// let xss = lex_ordered_unique_vecs_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3],
+///         &[1, 3, 4],
+///         &[1, 4],
+///         &[2, 3],
+///         &[2, 3, 4],
+///         &[2, 4],
+///         &[3, 4],
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn lex_ordered_unique_vecs_length_range<I: Clone + Iterator>(
+    mut a: u64,
+    mut b: u64,
+    xs: I,
+) -> LexOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    if b == 0 {
+        // Transform an empty (x, 0) range into (2, 1), which is also empty but doesn't cause
+        // overflow
+        a = 2;
+        b = 1;
+    }
+    lex_ordered_unique_vecs_length_inclusive_range(a, b - 1, xs)
+}
+
+/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
+/// way as they are in the source iterator.
+///
+/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
+/// generated.
+///
+/// If $a < b$, the output is empty.
+///
+/// If $a = b = 0$, the output consists of a single empty `Vec`.
+///
+/// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^b \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_length_inclusive_range;
+///
+/// let xss = lex_ordered_unique_vecs_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3],
+///         &[1, 3, 4],
+///         &[1, 4],
+///         &[2, 3],
+///         &[2, 3, 4],
+///         &[2, 4],
+///         &[3, 4],
+///     ]
+/// );
+/// ```
+pub fn lex_ordered_unique_vecs_length_inclusive_range<I: Clone + Iterator>(
+    a: u64,
+    b: u64,
+    xs: I,
+) -> LexOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    LexOrderedUniqueCollections {
+        done: a > b,
+        first: true,
+        min_len: usize::exact_from(a),
+        max_len: usize::exact_from(b),
+        xs: IteratorCache::new(xs),
+        indices: (0..usize::exact_from(a)).collect(),
+        phantom_i: PhantomData,
+        phantom_c: PhantomData,
+    }
 }

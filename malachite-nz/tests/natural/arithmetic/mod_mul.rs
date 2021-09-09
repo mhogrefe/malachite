@@ -53,103 +53,68 @@ fn test_limbs_mod_mul_two_limbs() {
 
 #[test]
 fn test_mod_mul() {
-    let test = |u, v, m, out| {
-        assert!(Natural::from_str(u)
-            .unwrap()
-            .mod_is_reduced(&Natural::from_str(m).unwrap()));
-        assert!(Natural::from_str(v)
-            .unwrap()
-            .mod_is_reduced(&Natural::from_str(m).unwrap()));
+    let test = |r, s, t, out| {
+        let u = Natural::from_str(r).unwrap();
+        let v = Natural::from_str(s).unwrap();
+        let m = Natural::from_str(t).unwrap();
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_mul_assign(Natural::from_str(v).unwrap(), Natural::from_str(m).unwrap());
+        assert!(u.mod_is_reduced(&m));
+        assert!(v.mod_is_reduced(&m));
+
+        let mut n = u.clone();
+        n.mod_mul_assign(v.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
-        assert!(n.mod_is_reduced(&Natural::from_str(m).unwrap()));
+        assert!(n.mod_is_reduced(&m));
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_mul_assign(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_mul_assign(&v, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_mul_assign(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_mul_assign(v.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_mul_assign(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_mul_assign(&v, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_mul(Natural::from_str(v).unwrap(), Natural::from_str(m).unwrap());
+        let n = u.clone().mod_mul(v.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap())
-            .mod_mul(Natural::from_str(v).unwrap(), Natural::from_str(m).unwrap());
+        let n = (&u).mod_mul(v.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_mul(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_mul(&v, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_mul(
-            &Natural::from_str(v).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_mul(&v, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_mul(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_mul(v.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_mul(
-            Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_mul(v.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_mul(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_mul(&v, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_mul(
-            &Natural::from_str(v).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_mul(&v, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        assert_eq!(
-            (Natural::from_str(u).unwrap() * Natural::from_str(v).unwrap()
-                % Natural::from_str(m).unwrap())
-            .to_string(),
-            out
-        );
+        assert_eq!((u * v % m).to_string(), out);
     };
     test("0", "0", "1", "0");
     test("1", "0", "32", "0");

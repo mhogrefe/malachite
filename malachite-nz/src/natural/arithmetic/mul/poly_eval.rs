@@ -11,7 +11,7 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::sub::limbs_sub_same_length_to_out;
-use natural::comparison::ord::limbs_cmp_same_length;
+use natural::comparison::cmp::limbs_cmp_same_length;
 use platform::Limb;
 use std::cmp::Ordering;
 

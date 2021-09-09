@@ -84,15 +84,16 @@ pub mod integer {
         pub mod size;
     }
     pub mod comparison {
+        pub mod cmp;
+        pub mod cmp_abs;
         pub mod eq;
-        pub mod ord;
-        pub mod ord_abs;
+        pub mod hash;
+        pub mod partial_cmp_abs_natural;
+        pub mod partial_cmp_abs_primitive_int;
+        pub mod partial_cmp_natural;
+        pub mod partial_cmp_primitive_int;
         pub mod partial_eq_natural;
         pub mod partial_eq_primitive_int;
-        pub mod partial_ord_abs_natural_and_comparators;
-        pub mod partial_ord_abs_primitive_int_and_comparators;
-        pub mod partial_ord_natural;
-        pub mod partial_ord_primitive_int;
     }
     pub mod conversion {
         pub mod clone;
@@ -234,11 +235,12 @@ pub mod natural {
         pub mod size;
     }
     pub mod comparison {
+        pub mod cmp;
         pub mod eq;
-        pub mod ord;
+        pub mod hash;
+        pub mod partial_cmp_abs_primitive_int;
+        pub mod partial_cmp_primitive_int;
         pub mod partial_eq_primitive_int;
-        pub mod partial_ord_abs_primitive_int_and_comparators;
-        pub mod partial_ord_primitive_int;
     }
     pub mod conversion {
         pub mod clone;

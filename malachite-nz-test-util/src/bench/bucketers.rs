@@ -122,6 +122,73 @@ pub fn pair_2_integer_bit_bucketer<T>(var_name: &str) -> Bucketer<(T, Integer)> 
     }
 }
 
+pub fn pair_integer_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Integer, Integer)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn pair_2_pair_integer_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, (Integer, Integer))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y))| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn integer_natural_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Integer, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn pair_2_pair_1_integer_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, (Integer, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, _))| usize::exact_from(x.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
+pub fn pair_2_integer_natural_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, (Integer, Natural))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y))| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
 pub fn triple_1_integer_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(Integer, T, U)> {
     Bucketer {
         bucketing_function: &|(x, _, _)| usize::exact_from(x.significant_bits()),
