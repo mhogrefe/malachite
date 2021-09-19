@@ -22,8 +22,8 @@ use natural::arithmetic::mul::square_mod::{
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
 use natural::arithmetic::square::limbs_square_to_out;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_to_out,
+    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_greater_to_out,
 };
 use natural::comparison::cmp::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
@@ -610,7 +610,7 @@ fn _limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
         1 // r[n] - carry = 1
     } else {
         carry
-    }; 
+    };
     if sub {
         assert!(!limbs_sub_limb_in_place(xs, carry - 1));
     }
@@ -784,7 +784,7 @@ fn _limbs_mul_fft_decompose<'a>(
         // difference <= k_times_n, i.e. len <= 2 * k_times_n
         let (xs_lo, xs_hi) = xs.split_at(k_times_n);
         scratch2[k_times_n] = Limb::iverson(
-            limbs_sub_to_out(&mut scratch2, xs_lo, &xs_hi[..diff])
+            limbs_sub_greater_to_out(&mut scratch2, xs_lo, &xs_hi[..diff])
                 && limbs_slice_add_limb_in_place(&mut scratch2[..k_times_n], 1),
         );
         len = k_times_n + 1;
@@ -980,12 +980,12 @@ pub fn _limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -
             limbs_sub_same_length_in_place_left(out, xs_1);
             true
         } else {
-            limbs_sub_in_place_left(out, xs_1) && limbs_slice_add_limb_in_place(out, 1)
+            limbs_sub_greater_in_place_left(out, xs_1) && limbs_slice_add_limb_in_place(out, 1)
         }
     } else {
         let (xs_lo, xs_hi) = xs.split_at(n);
         out.copy_from_slice(xs_lo);
-        limbs_sub_in_place_left(out, xs_hi) && limbs_slice_add_limb_in_place(out, 1)
+        limbs_sub_greater_in_place_left(out, xs_hi) && limbs_slice_add_limb_in_place(out, 1)
     }
 }
 

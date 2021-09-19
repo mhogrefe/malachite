@@ -67,7 +67,9 @@ use malachite_nz::natural::arithmetic::square::{
     _limbs_square_to_out_toom_3_input_size_valid, _limbs_square_to_out_toom_4_input_size_valid,
     _limbs_square_to_out_toom_6_input_size_valid, _limbs_square_to_out_toom_8_input_size_valid,
 };
-use malachite_nz::natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
+use malachite_nz::natural::arithmetic::sub::{
+    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use rand::distributions::range::SampleRange;
@@ -576,24 +578,6 @@ where
                 &scramble(&EXAMPLE_SEED, "triples"),
             ))),
             Box::new(IsaacRng::from_seed(&scramble(&EXAMPLE_SEED, "reducer"))),
-        )),
-    }
-}
-
-pub fn pairs_of_natural_signeds<T: PrimitiveSigned + Rand>(gm: GenerationMode) -> It<(T, T)>
-where
-    T::UnsignedOfEqualWidth: Rand,
-    T: WrappingFrom<<T as PrimitiveSigned>::UnsignedOfEqualWidth>,
-{
-    match gm {
-        GenerationMode::Exhaustive => {
-            Box::new(exhaustive_pairs_from_single(exhaustive_natural_signeds()))
-        }
-        GenerationMode::Random(_) => Box::new(random_pairs_from_single(random_natural_signed(
-            &EXAMPLE_SEED,
-        ))),
-        GenerationMode::SpecialRandom(_) => Box::new(random_pairs_from_single(
-            special_random_natural_signed(&EXAMPLE_SEED),
         )),
     }
 }
@@ -1371,7 +1355,7 @@ pub fn vecs_of_unsigned_var_1<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -
 }
 
 // All `Vec<T>`, where `T` is unsigned and either the `Vec` is empty, or its last `T` is nonzero.
-pub fn vecs_of_unsigned_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Vec<T>> {
+fn vecs_of_unsigned_var_2<T: PrimitiveUnsigned + Rand>(gm: GenerationMode) -> It<Vec<T>> {
     Box::new(
         vecs_of_unsigned(gm).filter(|limbs| limbs.is_empty() || *limbs.last().unwrap() != T::ZERO),
     )
@@ -1879,40 +1863,6 @@ pub fn quadruples_of_unsigned_vec_var_2(
                 && *ms.last().unwrap() != 0
         }),
     )
-}
-
-// All triples of `Vec<T>`, T being unsigned, where the three components of the triple have the same
-// length.
-pub fn triples_of_unsigned_vec_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(
-        vecs_of_unsigned(gm)
-            .filter(|xs| xs.len() % 3 == 0)
-            .map(|xs| {
-                let third_length = xs.len() / 3;
-                let two_thirds_length = third_length << 1;
-                (
-                    xs[..third_length].to_vec(),
-                    xs[third_length..two_thirds_length].to_vec(),
-                    xs[two_thirds_length..].to_vec(),
-                )
-            }),
-    )
-}
-
-// All triples of `Vec<T>`, where `T` is unsigned and each `Vec` is either empty or the last `T` is
-// nonzero.
-pub fn triples_of_unsigned_vec_var_2<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_triples_from_single(
-            exhaustive_vecs(exhaustive_unsigneds())
-                .filter(|limbs| limbs.is_empty() || *limbs.last().unwrap() != T::ZERO),
-        )),
-        _ => Box::new(random_triples_from_single(vecs_of_unsigned_var_2(gm))),
-    }
 }
 
 // All triples of `Vec<T>`, where `T` is unsigned, the first `Vec` is at least as long as the
@@ -2452,7 +2402,7 @@ pub fn triples_of_limb_vec_var_58(gm: GenerationMode) -> It<(Vec<Limb>, Vec<Limb
                 product_limbs.pop();
             }
             if product_limbs.len() < ys.len()
-                || limbs_sub_in_place_left(&mut product_limbs, &ys)
+                || limbs_sub_greater_in_place_left(&mut product_limbs, &ys)
                 || *product_limbs.last().unwrap() == 0
             {
                 None
@@ -3851,7 +3801,7 @@ pub fn triples_of_limb_vec_limb_vec_and_limb_var_11(
                 product_limbs.pop();
             }
             if product_limbs.len() < ys.len()
-                || limbs_sub_in_place_left(&mut product_limbs, &ys)
+                || limbs_sub_greater_in_place_left(&mut product_limbs, &ys)
                 || *product_limbs.last().unwrap() == 0
             {
                 None

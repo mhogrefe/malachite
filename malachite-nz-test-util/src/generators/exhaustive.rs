@@ -25,12 +25,13 @@ use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_triples_custom_output, exhaustive_triples_from_single, exhaustive_triples_xyx,
-    lex_pairs, ExhaustiveDependentPairsYsGenerator,
+    exhaustive_quadruples_xyyx, exhaustive_triples_custom_output, exhaustive_triples_from_single,
+    exhaustive_triples_xyx, exhaustive_triples_xyy_custom_output, lex_pairs,
+    ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
-    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, exhaustive_vecs_length_range,
-    exhaustive_vecs_min_length, lex_fixed_length_vecs_from_single, ExhaustiveVecs,
+    exhaustive_vecs, exhaustive_vecs_fixed_length_from_single, exhaustive_vecs_length_range,
+    exhaustive_vecs_min_length, lex_vecs_fixed_length_from_single, ExhaustiveVecs,
     LexFixedLengthVecsFromSingle,
 };
 use malachite_base_test_util::generators::common::{
@@ -262,7 +263,7 @@ impl
 {
     #[inline]
     fn get_ys(&self, x: &Integer) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
-        lex_fixed_length_vecs_from_single(
+        lex_vecs_fixed_length_from_single(
             u64::exact_from(x.to_twos_complement_limbs_asc().len()),
             exhaustive_bools(),
         )
@@ -558,6 +559,20 @@ pub fn exhaustive_natural_unsigned_pair_gen_var_4<T: PrimitiveInt>() -> It<(Natu
     ))
 }
 
+// -- (Natural, PrimitiveUnsigned, bool) --
+
+pub fn exhaustive_natural_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(Natural, T, bool)> {
+    Box::new(exhaustive_triples_custom_output(
+        exhaustive_naturals(),
+        exhaustive_unsigneds(),
+        exhaustive_bools(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::normal(1),
+    ))
+}
+
 // -- (Natural, PrimitiveUnsigned, Natural) --
 
 pub fn exhaustive_natural_unsigned_natural_triple_gen<T: PrimitiveUnsigned>(
@@ -590,6 +605,30 @@ pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_2<
     ))))
 }
 
+pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+) -> It<(Natural, T, T)> {
+    Box::new(
+        exhaustive_triples_xyy_custom_output(
+            exhaustive_naturals(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        )
+        .filter_map(|(x, y, z): (Natural, T, T)| y.checked_add(z).map(|new_z| (x, y, new_z))),
+    )
+}
+
+// -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
+
+pub fn exhaustive_natural_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(Natural, T, T, Natural)> {
+    Box::new(
+        exhaustive_quadruples_xyyx(exhaustive_naturals(), exhaustive_unsigneds())
+            .filter(|(_, y, z, _)| y < z),
+    )
+}
+
 // -- (Natural, PrimitiveUnsigned, Vec<bool>) --
 
 struct NaturalUnsignedBoolVecPairGenerator;
@@ -603,7 +642,7 @@ impl
 {
     #[inline]
     fn get_ys(&self, p: &(Natural, u64)) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
-        lex_fixed_length_vecs_from_single(
+        lex_vecs_fixed_length_from_single(
             p.0.significant_bits().div_round(p.1, RoundingMode::Up),
             exhaustive_bools(),
         )
@@ -656,18 +695,18 @@ pub fn exhaustive_natural_rounding_mode_pair_gen_var_2() -> It<(Natural, Roundin
 
 // -- (Natural, Vec<bool>) --
 
-struct NaturalBoolVecPairGenerator;
+struct NaturalBoolVecPairGenerator1;
 
 impl
     ExhaustiveDependentPairsYsGenerator<
         Natural,
         Vec<bool>,
         LexFixedLengthVecsFromSingle<ExhaustiveBools>,
-    > for NaturalBoolVecPairGenerator
+    > for NaturalBoolVecPairGenerator1
 {
     #[inline]
     fn get_ys(&self, x: &Natural) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
-        lex_fixed_length_vecs_from_single(x.limb_count(), exhaustive_bools())
+        lex_vecs_fixed_length_from_single(x.limb_count(), exhaustive_bools())
     }
 }
 
@@ -678,7 +717,33 @@ pub fn exhaustive_natural_bool_vec_pair_gen_var_1() -> It<(Natural, Vec<bool>)> 
             BitDistributorOutputType::normal(1),
         ),
         exhaustive_naturals(),
-        NaturalBoolVecPairGenerator,
+        NaturalBoolVecPairGenerator1,
+    ))
+}
+
+struct NaturalBoolVecPairGenerator2;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        Natural,
+        Vec<bool>,
+        LexFixedLengthVecsFromSingle<ExhaustiveBools>,
+    > for NaturalBoolVecPairGenerator2
+{
+    #[inline]
+    fn get_ys(&self, x: &Natural) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
+        lex_vecs_fixed_length_from_single(x.significant_bits(), exhaustive_bools())
+    }
+}
+
+pub fn exhaustive_natural_bool_vec_pair_gen_var_2() -> It<(Natural, Vec<bool>)> {
+    Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_naturals(),
+        NaturalBoolVecPairGenerator2,
     ))
 }
 
@@ -963,7 +1028,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     #[inline]
     fn get_ys(&self, p: &(u64, usize)) -> It<(Vec<T>, Vec<U>)> {
         Box::new(exhaustive_pairs(
-            exhaustive_fixed_length_vecs_from_single(
+            exhaustive_vecs_fixed_length_from_single(
                 u64::wrapping_from(p.1),
                 primitive_int_increasing_range(T::ZERO, T::wrapping_from(p.0)),
             ),
@@ -1009,7 +1074,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned>
     #[inline]
     fn get_ys(&self, p: &(u64, usize)) -> It<(Vec<T>, Vec<U>)> {
         Box::new(exhaustive_pairs(
-            exhaustive_fixed_length_vecs_from_single(
+            exhaustive_vecs_fixed_length_from_single(
                 u64::wrapping_from(p.1),
                 exhaustive_unsigneds(),
             ),

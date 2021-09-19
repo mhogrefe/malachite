@@ -1,9 +1,9 @@
-use malachite_base::num::logic::traits::LowMask;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::logic::traits::{BitScan, CountOnes, LowMask};
+use malachite_base_test_util::generators::{unsigned_gen_var_5, unsigned_gen_var_9};
 use malachite_nz::natural::logic::low_mask::limbs_low_mask;
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
 #[cfg(feature = "32_bit_limbs")]
@@ -27,4 +27,29 @@ fn test_low_mask() {
     test(3, "7");
     test(32, "4294967295");
     test(100, "1267650600228229401496703205375");
+}
+
+#[test]
+fn limbs_low_mask_properties() {
+    unsigned_gen_var_5().test_properties(|bits| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_low_mask(bits)),
+            Natural::low_mask(bits)
+        );
+    });
+}
+
+#[test]
+fn low_mask_properties() {
+    unsigned_gen_var_5().test_properties(|bits| {
+        let n = Natural::low_mask(bits);
+        assert!(n.is_valid());
+        assert_eq!(n, Natural::power_of_2(bits) - Natural::ONE);
+        assert_eq!(n.count_ones(), bits);
+        assert_eq!(n.index_of_next_false_bit(0), Some(bits));
+    });
+
+    unsigned_gen_var_9::<Limb>().test_properties(|bits| {
+        assert_eq!(Limb::low_mask(bits), Natural::low_mask(bits));
+    });
 }

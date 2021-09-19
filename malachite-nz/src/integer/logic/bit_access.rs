@@ -11,6 +11,8 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering; 
 
+//TODO doc hidden
+
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
 /// action equivalent to taking the two's complement of the limbs and getting the bit at the
 /// specified index. Sufficiently high indices will return `true`. The slice cannot be empty or
@@ -22,7 +24,7 @@ use std::cmp::Ordering;
 ///
 /// where n = `xs.len()`
 ///
-/// # Examples
+/// # Examples 
 /// ```
 /// use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 /// use std::cmp::Ordering;

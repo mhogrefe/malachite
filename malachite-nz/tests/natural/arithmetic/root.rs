@@ -2,19 +2,200 @@ use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, FloorRoot,
     FloorRootAssign, FloorSqrt, Pow, RootAssignRem, RootRem, SqrtRem,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::unsigned_pair_gen_var_32;
-use malachite_nz::natural::arithmetic::root::{
-    _ceiling_root_binary, _checked_root_binary, _floor_root_binary, _root_rem_binary,
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_gen, unsigned_pair_gen_var_32, unsigned_vec_unsigned_pair_gen_var_14,
 };
+use malachite_nz::natural::arithmetic::root::{limbs_floor_root, limbs_root_rem};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
 use malachite_nz_test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_7};
+use malachite_nz_test_util::natural::arithmetic::root::{
+    _ceiling_root_binary, _checked_root_binary, _floor_root_binary, _root_rem_binary,
+};
+use std::panic::catch_unwind;
 use std::str::FromStr;
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_floor_root() {
+    let test = |xs: &[Limb], exp: u64, root: &[Limb], inexact: bool| {
+        let (actual_root, actual_inexact) = limbs_floor_root(xs, exp);
+        assert_eq!(actual_root, root);
+        assert_eq!(actual_inexact, inexact);
+        let n = Natural::from_limbs_asc(xs);
+        let r = Natural::from_limbs_asc(root);
+        let pow = (&r).pow(exp);
+        assert!(pow <= n);
+        assert!((r + Natural::ONE).pow(exp) > n);
+        assert_eq!(pow == n, !inexact);
+    };
+    // (xs_len + 2) / 3 <= u_exp
+    // bit_count < exp in _limbs_root_to_out_internal
+    // !out_rem_is_some in _limbs_root_to_out_internal
+    test(&[1], 3, &[1], false);
+    // bit_count >= exp in _limbs_root_to_out_internal
+    // leading_zeros != Limb::WIDTH in _limbs_root_to_out_internal
+    // bit_count.significant_bits() > LOGROOT_USED_BITS_COMP in log_based_root
+    // !approx || ss[0] <= 1 in _limbs_root_to_out_internal
+    // need_adjust || qs_len != xs_len in _limbs_root_to_out_internal
+    // rs_len == 0 || !out_rem_is_some in _limbs_root_to_out_internal
+    test(&[1000], 3, &[10], false);
+    // root_bits > log_exp in _limbs_root_to_out_internal
+    // need_adjust || qs_len != rs_len in _limbs_root_to_out_internal
+    // pow_cmp != Ordering::Equal in _limbs_root_to_out_internal
+    // carry == 0 first time in _limbs_root_to_out_internal
+    // n_len - 1 <= next_len in _limbs_root_to_out_internal
+    // carry == 0 second time in _limbs_root_to_out_internal
+    // rs_len >= ws_len in _limbs_root_to_out_internal
+    // qs_len <= b_rem in _limbs_root_to_out_internal
+    // qs_len <= b_rem && ... in _limbs_root_to_out_internal
+    // carry != 0 first time in _limbs_root_to_out_internal
+    // n_len - 1 > next_len in _limbs_root_to_out_internal
+    test(&[123, 456, 789], 3, &[24415497], true);
+    // leading_zeros == Limb::WIDTH in _limbs_root_to_out_internal
+    test(&[0, 1], 3, &[1625], true);
+    // pow_cmp == Ordering::Equal in _limbs_root_to_out_internal
+    // rs_len < ws_len in _limbs_root_to_out_internal
+    test(&[0, 0, 1], 4, &[65536], false);
+    // !need_adjust && qs_len == rs_len in _limbs_root_to_out_internal
+    // !need_adjust && qs_len == xs_len in _limbs_root_to_out_internal
+    // carry != 0 second time in _limbs_root_to_out_internal
+    test(&[0, 0, 1], 5, &[7131], true);
+    // (xs_len + 2) / 3 > u_exp
+    // approx && ss[0] > 1 in _limbs_root_to_out_internal
+    test(
+        &[
+            10045114, 111940252, 2181719322, 1883679021, 2601294413, 1872079876, 578360935,
+            2248016248, 1648448409, 589499551, 573051942, 3101629567, 486103882, 3213846717,
+            2339835332, 2340868500, 3988971200,
+        ],
+        5,
+        &[2416867165, 2555201003, 3891828300, 7026],
+        true,
+    );
+    // qs_len > b_rem || ... in _limbs_root_to_out_internal
+    test(
+        &[
+            2055929154, 2630529572, 271121346, 1501542260, 1183697298, 2075827756, 4275724366,
+            1648161837, 3297263182, 4114641001, 1962106184, 3607497617, 561001103, 1137290806,
+            2335506779, 1869248612,
+        ],
+        3,
+        &[2524001878, 2377965049, 719885555, 160379071, 3624665804, 1231],
+        true,
+    );
+}
+
+#[test]
+fn limbs_floor_root_fail() {
+    // xs too short
+    assert_panic!(limbs_floor_root(&[], 3));
+    // last element of xs zero
+    assert_panic!(limbs_floor_root(&[1, 0], 3));
+    // exp is 0
+    assert_panic!(limbs_floor_root(&[1, 1], 0));
+    // exp is 1
+    assert_panic!(limbs_floor_root(&[1, 1], 1));
+    // exp is 2
+    assert_panic!(limbs_floor_root(&[1, 1], 2));
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_root_rem() {
+    let test = |xs: &[Limb], exp: u64, root: &[Limb], rem: &[Limb]| {
+        let (actual_root, actual_rem) = limbs_root_rem(xs, exp);
+        assert_eq!(actual_root, root);
+        assert_eq!(actual_rem, rem);
+        let n = Natural::from_limbs_asc(xs);
+        let r_1 = Natural::from_limbs_asc(root);
+        let r_2 = Natural::from_limbs_asc(rem);
+        assert_eq!((&r_1).pow(exp) + r_2, n);
+        assert!((r_1 + Natural::ONE).pow(exp) > n);
+    };
+    // bit_count < exp in _limbs_root_to_out_internal
+    // out_rem_is_some in _limbs_root_to_out_internal
+    test(&[1], 3, &[1], &[]);
+    // bit_count >= exp in _limbs_root_to_out_internal
+    // leading_zeros != Limb::WIDTH in _limbs_root_to_out_internal
+    // bit_count.significant_bits() <= LOGROOT_USED_BITS_COMP in log_based_root
+    // !approx || ss[0] <= 1 in _limbs_root_to_out_internal
+    // !need_adjust && qs_len == xs_len in _limbs_root_to_out_internal
+    // rs_len == 0 || !out_rem_is_some in _limbs_root_to_out_internal
+    test(&[1000], 3, &[10], &[]);
+    // root_bits > log_exp in _limbs_root_to_out_internal
+    // need_adjust || qs_len != rs_len in _limbs_root_to_out_internal
+    // pow_cmp != Ordering::Equal in _limbs_root_to_out_internal
+    // carry == 0 first time in _limbs_root_to_out_internal
+    // n_len - 1 <= next_len in _limbs_root_to_out_internal
+    // carry == 0 second time in _limbs_root_to_out_internal
+    // rs_len >= ws_len in _limbs_root_to_out_internal
+    // qs_len <= b_rem in _limbs_root_to_out_internal
+    // qs_len <= b_rem && ... in _limbs_root_to_out_internal
+    // carry != 0 first time in _limbs_root_to_out_internal
+    // n_len - 1 > next_len in _limbs_root_to_out_internal
+    // rs_len != 0 && out_rem_is_some in _limbs_root_to_out_internal
+    test(&[123, 456, 789], 3, &[24415497], &[1082861218, 142292]);
+    // leading_zeros == Limb::WIDTH in _limbs_root_to_out_internal
+    test(&[0, 1], 3, &[1625], &[3951671]);
+    // pow_cmp == Ordering::Equal in _limbs_root_to_out_internal
+    // rs_len < ws_len in _limbs_root_to_out_internal
+    test(&[0, 0, 1], 4, &[65536], &[]);
+    // !need_adjust && qs_len == rs_len in _limbs_root_to_out_internal
+    test(&[0, 0, 1], 5, &[7131], &[1889423061, 1656574]);
+    // carry != 0 second time in _limbs_root_to_out_internal
+    test(
+        &[
+            10045114, 111940252, 2181719322, 1883679021, 2601294413, 1872079876, 578360935,
+            2248016248, 1648448409, 589499551, 573051942, 3101629567, 486103882, 3213846717,
+            2339835332, 2340868500, 3988971200,
+        ],
+        5,
+        &[2416867165, 2555201003, 3891828300, 7026],
+        &[
+            3289703629, 3644089536, 1993609161, 1739315193, 2220455044, 1795995908, 3261364903,
+            2481515404, 3316729739, 227499169, 1205565253, 3882526697, 534818167, 1092514,
+        ],
+    );
+    test(
+        &[
+            2055929154, 2630529572, 271121346, 1501542260, 1183697298, 2075827756, 4275724366,
+            1648161837, 3297263182, 4114641001, 1962106184, 3607497617, 561001103, 1137290806,
+            2335506779, 1869248612,
+        ],
+        3,
+        &[2524001878, 2377965049, 719885555, 160379071, 3624665804, 1231],
+        &[
+            1938096298, 2492483757, 416851523, 4009456064, 358434376, 1470400066, 2808049667,
+            1641457454, 3086626670, 2101663143, 3655678,
+        ],
+    );
+    // !need_adjust && qs_len == xs_len in _limbs_root_to_out_internal
+    test(&[0, 2], 4, &[304], &[49217536]);
+    // qs_len > b_rem || ... in _limbs_root_to_out_internal
+    test(&[1002403925, 303302627], 4, &[33783], &[188673716, 30155]);
+}
+
+#[test]
+fn limbs_root_rem_fail() {
+    // xs too short
+    assert_panic!(limbs_root_rem(&[], 3));
+    // last element of xs zero
+    assert_panic!(limbs_root_rem(&[1, 0], 3));
+    // exp is 0
+    assert_panic!(limbs_root_rem(&[1, 1], 0));
+    // exp is 1
+    assert_panic!(limbs_root_rem(&[1, 1], 1));
+    // exp is 2
+    assert_panic!(limbs_root_rem(&[1, 1], 2));
+}
 
 #[test]
 fn test_floor_root() {
@@ -218,6 +399,147 @@ fn test_root_rem() {
 #[should_panic]
 fn root_rem_fail() {
     Natural::ONE.root_rem(0);
+}
+
+#[test]
+fn limbs_floor_root_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_14().test_properties_with_config(&config, |(xs, exp)| {
+        let n = Natural::from_limbs_asc(&xs);
+        let actual_root = (&n).floor_root(exp);
+        let (root, inexact) = limbs_floor_root(&xs, exp);
+        assert_eq!(Natural::from_owned_limbs_asc(root), actual_root);
+        let pow = (&actual_root).pow(exp);
+        assert_eq!(pow == n, !inexact);
+        assert!(pow <= n);
+        assert!((actual_root + Natural::ONE).pow(exp) > n);
+    });
+}
+
+#[test]
+fn limbs_root_rem_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_14().test_properties_with_config(&config, |(xs, exp)| {
+        let n = Natural::from_limbs_asc(&xs);
+        let (actual_root, actual_rem) = (&n).root_rem(exp);
+        let (root, rem) = limbs_root_rem(&xs, exp);
+        assert_eq!(Natural::from_owned_limbs_asc(root), actual_root);
+        assert_eq!(Natural::from_owned_limbs_asc(rem), actual_rem);
+        assert_eq!((&actual_root).pow(exp) + actual_rem, n);
+        assert!((actual_root + Natural::ONE).pow(exp) > n);
+    });
+}
+
+#[test]
+fn floor_cbrt_properties() {
+    natural_gen().test_properties(|n| {
+        let cbrt = n.clone().floor_root(3);
+        assert_eq!((&n).floor_root(3), cbrt);
+        let mut n_alt = n.clone();
+        n_alt.floor_root_assign(3);
+        assert_eq!(n_alt, cbrt);
+        assert_eq!(_floor_root_binary(&n, 3), cbrt);
+        assert_eq!(
+            biguint_to_natural(&natural_to_biguint(&n).nth_root(3)),
+            cbrt
+        );
+        assert_eq!(
+            rug_integer_to_natural(&natural_to_rug_integer(&n).root(3)),
+            cbrt
+        );
+
+        let cube = (&cbrt).pow(3);
+        let ceiling_cbrt = (&n).ceiling_root(3);
+        if cube == n {
+            assert_eq!(ceiling_cbrt, cbrt);
+        } else {
+            assert_eq!(ceiling_cbrt, &cbrt + Natural::ONE);
+        }
+        assert!(cube <= n);
+        assert!((cbrt + Natural::ONE).pow(3) > n);
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        assert_eq!(u.floor_root(3), Natural::from(u).floor_root(3));
+    });
+}
+
+#[test]
+fn ceiling_cbrt_properties() {
+    natural_gen().test_properties(|n| {
+        let cbrt = n.clone().ceiling_root(3);
+        assert_eq!((&n).ceiling_root(3), cbrt);
+        let mut n_alt = n.clone();
+        n_alt.ceiling_root_assign(3);
+        assert_eq!(n_alt, cbrt);
+        assert_eq!(_ceiling_root_binary(&n, 3), cbrt);
+        let cube = (&cbrt).pow(3);
+        let floor_cbrt = (&n).floor_root(3);
+        if cube == n {
+            assert_eq!(floor_cbrt, cbrt);
+        } else {
+            assert_eq!(floor_cbrt, &cbrt - Natural::ONE);
+        }
+        assert!(cube >= n);
+        if n != 0 {
+            assert!((cbrt - Natural::ONE).pow(3) < n);
+        }
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        assert_eq!(u.ceiling_root(3), Natural::from(u).ceiling_root(3));
+    });
+}
+
+#[test]
+fn checked_cbrt_properties() {
+    natural_gen().test_properties(|n| {
+        let cbrt = n.clone().checked_root(3);
+        assert_eq!((&n).checked_root(3), cbrt);
+        assert_eq!(_checked_root_binary(&n, 3), cbrt);
+        if let Some(cbrt) = cbrt {
+            assert_eq!((&cbrt).pow(3), n);
+            assert_eq!((&n).floor_root(3), cbrt);
+            assert_eq!(n.ceiling_root(3), cbrt);
+        }
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        assert_eq!(
+            u.checked_root(3).map(Natural::from),
+            Natural::from(u).checked_root(3)
+        );
+    });
+}
+
+#[test]
+fn cbrt_rem_properties() {
+    natural_gen().test_properties(|n| {
+        let (cbrt, rem) = n.clone().root_rem(3);
+        assert_eq!((&n).root_rem(3), (cbrt.clone(), rem.clone()));
+        let mut n_alt = n.clone();
+        assert_eq!(n_alt.root_assign_rem(3), rem);
+        assert_eq!(n_alt, cbrt);
+        assert_eq!(_root_rem_binary(&n, 3), (cbrt.clone(), rem.clone()));
+        let (rug_cbrt, rug_rem) = natural_to_rug_integer(&n).root_rem(rug::Integer::new(), 3);
+        assert_eq!(rug_integer_to_natural(&rug_cbrt), cbrt);
+        assert_eq!(rug_integer_to_natural(&rug_rem), rem);
+
+        assert_eq!((&n).floor_root(3), cbrt);
+        assert_eq!(cbrt.pow(3) + rem, n);
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        let (cbrt, rem) = u.root_rem(3);
+        assert_eq!(
+            (Natural::from(cbrt), Natural::from(rem)),
+            Natural::from(u).root_rem(3)
+        );
+    });
 }
 
 #[test]

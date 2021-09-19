@@ -3,7 +3,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::bucketers::Bucketer;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use std::cmp::max;
+use std::cmp::{max, min};
 
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<Natural> {
     Bucketer {
@@ -27,6 +27,21 @@ pub fn pair_natural_max_bit_bucketer<'a>(
     }
 }
 
+pub fn pair_natural_min_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Natural, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| {
+            usize::exact_from(min(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "min({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
 pub fn pair_2_pair_natural_max_bit_bucketer<'a, T>(
     x_name: &'a str,
     y_name: &'a str,
@@ -42,6 +57,21 @@ pub fn pair_2_pair_natural_max_bit_bucketer<'a, T>(
     }
 }
 
+pub fn pair_2_pair_natural_min_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, (Natural, Natural))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y))| {
+            usize::exact_from(min(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "min({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
 pub fn triple_3_pair_natural_max_bit_bucketer<'a, T, U>(
     x_name: &'a str,
     y_name: &'a str,
@@ -52,6 +82,21 @@ pub fn triple_3_pair_natural_max_bit_bucketer<'a, T, U>(
         },
         bucketing_label: format!(
             "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn triple_3_pair_natural_min_bit_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U, (Natural, Natural))> {
+    Bucketer {
+        bucketing_function: &|(_, _, (x, y))| {
+            usize::exact_from(min(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "min({}.significant_bits(), {}.significant_bits())",
             x_name, y_name
         ),
     }

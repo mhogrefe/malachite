@@ -4,11 +4,11 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::sub::{
-    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_in_place_left, limbs_sub_limb,
-    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
-    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap, limbs_sub_to_out,
-    limbs_vec_sub_in_place_right,
+    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_greater_in_place_left,
+    limbs_sub_greater_to_out, limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out,
+    limbs_sub_same_length_to_out_with_overlap, limbs_vec_sub_in_place_right,
 };
 use malachite_nz_test_util::natural::arithmetic::sub::{
     limbs_sub_same_length_in_place_with_overlap_naive,
@@ -33,9 +33,9 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_sub_limb_in_place);
     register_demo!(registry, demo_limbs_sub);
     register_demo!(registry, demo_limbs_sub_same_length_to_out);
-    register_demo!(registry, demo_limbs_sub_to_out);
+    register_demo!(registry, demo_limbs_sub_greater_to_out);
     register_demo!(registry, demo_limbs_sub_same_length_in_place_left);
-    register_demo!(registry, demo_limbs_sub_in_place_left);
+    register_demo!(registry, demo_limbs_sub_greater_in_place_left);
     register_demo!(registry, demo_limbs_sub_same_length_in_place_right);
     register_demo!(registry, demo_limbs_slice_sub_in_place_right);
     register_demo!(registry, demo_limbs_vec_sub_in_place_right);
@@ -52,13 +52,13 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_bench!(registry, Small, benchmark_limbs_sub_limb_in_place);
     register_bench!(registry, Small, benchmark_limbs_sub);
     register_bench!(registry, Small, benchmark_limbs_sub_same_length_to_out);
-    register_bench!(registry, Small, benchmark_limbs_sub_to_out);
+    register_bench!(registry, Small, benchmark_limbs_sub_greater_to_out);
     register_bench!(
         registry,
         Small,
         benchmark_limbs_sub_same_length_in_place_left
     );
-    register_bench!(registry, Small, benchmark_limbs_sub_in_place_left);
+    register_bench!(registry, Small, benchmark_limbs_sub_greater_in_place_left);
     register_bench!(
         registry,
         Small,
@@ -147,13 +147,13 @@ fn demo_limbs_sub_same_length_to_out(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_limbs_sub_to_out(gm: GenerationMode, limit: usize) {
+fn demo_limbs_sub_greater_to_out(gm: GenerationMode, limit: usize) {
     for (xs, ys, zs) in triples_of_unsigned_vec_var_9(gm).take(limit) {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
-        let borrow = limbs_sub_to_out(&mut xs, &ys, &zs);
+        let borrow = limbs_sub_greater_to_out(&mut xs, &ys, &zs);
         println!(
-            "out := {:?}; limbs_sub_to_out(&mut out, {:?}, {:?}) = {}; \
+            "out := {:?}; limbs_sub_greater_to_out(&mut out, {:?}, {:?}) = {}; \
              out = {:?}",
             xs_old, ys, zs, borrow, xs
         );
@@ -172,13 +172,13 @@ fn demo_limbs_sub_same_length_in_place_left(gm: GenerationMode, limit: usize) {
     }
 }
 
-fn demo_limbs_sub_in_place_left(gm: GenerationMode, limit: usize) {
+fn demo_limbs_sub_greater_in_place_left(gm: GenerationMode, limit: usize) {
     for (xs, ys) in pairs_of_unsigned_vec_var_3(gm).take(limit) {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
-        let borrow = limbs_sub_in_place_left(&mut xs, &ys);
+        let borrow = limbs_sub_greater_in_place_left(&mut xs, &ys);
         println!(
-            "xs := {:?}; limbs_sub_in_place_left(&mut xs, {:?}) = {}; xs = {:?}",
+            "xs := {:?}; limbs_sub_greater_in_place_left(&mut xs, {:?}) = {}; xs = {:?}",
             xs_old, ys, borrow, xs
         );
     }
@@ -373,9 +373,9 @@ fn benchmark_limbs_sub_same_length_to_out(gm: GenerationMode, limit: usize, file
     );
 }
 
-fn benchmark_limbs_sub_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_sub_greater_to_out(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark_old(
-        "limbs_sub_to_out(&mut [Limb], &[Limb], &[Limb])",
+        "limbs_sub_greater_to_out(&mut [Limb], &[Limb], &[Limb])",
         BenchmarkType::Single,
         triples_of_unsigned_vec_var_9(gm),
         gm.name(),
@@ -385,7 +385,7 @@ fn benchmark_limbs_sub_to_out(gm: GenerationMode, limit: usize, file_name: &str)
         "xs.len() = ys.len()",
         &mut [(
             "Malachite",
-            &mut (|(mut xs, ys, zs)| no_out!(limbs_sub_to_out(&mut xs, &ys, &zs))),
+            &mut (|(mut xs, ys, zs)| no_out!(limbs_sub_greater_to_out(&mut xs, &ys, &zs))),
         )],
     );
 }
@@ -411,9 +411,9 @@ fn benchmark_limbs_sub_same_length_in_place_left(
     );
 }
 
-fn benchmark_limbs_sub_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
+fn benchmark_limbs_sub_greater_in_place_left(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark_old(
-        "limbs_sub_in_place_left(&Vec<Limb>, &[Limb])",
+        "limbs_sub_greater_in_place_left(&Vec<Limb>, &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_3(gm),
         gm.name(),
@@ -423,7 +423,7 @@ fn benchmark_limbs_sub_in_place_left(gm: GenerationMode, limit: usize, file_name
         "min(xs.len(), ys.len())",
         &mut [(
             "Malachite",
-            &mut (|(mut xs, ys)| no_out!(limbs_sub_in_place_left(&mut xs, &ys))),
+            &mut (|(mut xs, ys)| no_out!(limbs_sub_greater_in_place_left(&mut xs, &ys))),
         )],
     );
 }

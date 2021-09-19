@@ -1,15 +1,22 @@
+use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_vec_unsigned_pair_gen_var_16, unsigned_vec_unsigned_pair_gen_var_17,
+};
+use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_4;
 use malachite_nz_test_util::natural::logic::set_bit::num_set_bit;
 use num::BigUint;
 use rug;
 use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::logic::bit_access::{limbs_slice_set_bit, limbs_vec_set_bit};
-use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::platform::Limb;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -71,4 +78,71 @@ fn test_set_bit() {
     test("1000000000000", 10, "1000000001024");
     test("1000000000000", 100, "1267650600228229402496703205376");
     test("5", 100, "1267650600228229401496703205381");
+}
+
+#[test]
+fn limbs_slice_set_bit_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_17().test_properties_with_config(
+        &config,
+        |(mut xs, index)| {
+            let mut n = Natural::from_limbs_asc(&xs);
+            limbs_slice_set_bit(&mut xs, index);
+            n.set_bit(index);
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_vec_set_bit_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16().test_properties_with_config(
+        &config,
+        |(mut xs, index)| {
+            let mut n = Natural::from_limbs_asc(&xs);
+            limbs_vec_set_bit(&mut xs, index);
+            n.set_bit(index);
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        },
+    );
+}
+
+#[test]
+fn natural_set_bit_properties() {
+    natural_unsigned_pair_gen_var_4().test_properties(|(n, index)| {
+        let mut mut_n = n.clone();
+        mut_n.set_bit(index);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
+
+        let mut mut_n = n.clone();
+        mut_n.assign_bit(index, true);
+        assert_eq!(mut_n, result);
+
+        let mut num_n = natural_to_biguint(&n);
+        num_set_bit(&mut num_n, index);
+        assert_eq!(biguint_to_natural(&num_n), result);
+
+        let mut rug_n = natural_to_rug_integer(&n);
+        rug_n.set_bit(u32::exact_from(index), true);
+        assert_eq!(rug_integer_to_natural(&rug_n), result);
+
+        assert_eq!(&n | Natural::power_of_2(index), result);
+
+        assert_ne!(result, 0);
+        assert!(result >= n);
+        if n.get_bit(index) {
+            assert_eq!(result, n);
+        } else {
+            assert_ne!(result, n);
+            let mut mut_result = result;
+            mut_result.clear_bit(index);
+            assert_eq!(mut_result, n);
+        }
+    });
 }

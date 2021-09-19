@@ -29,9 +29,9 @@ use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
     _limbs_sub_same_length_with_borrow_in_in_place_right,
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left, limbs_sub_limb_in_place,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_to_out,
+    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_greater_in_place_left,
+    limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::cmp::limbs_cmp_same_length;
@@ -1249,7 +1249,7 @@ pub fn _limbs_div_barrett_large_product(
     _limbs_mul_mod_base_pow_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
     if d_len + i_len > scratch_len {
         let (rs_hi_lo, rs_hi_hi) = rs_hi.split_at(scratch_len - d_len);
-        let carry_1 = limbs_sub_in_place_left(scratch, rs_hi_hi);
+        let carry_1 = limbs_sub_greater_in_place_left(scratch, rs_hi_hi);
         let carry_2 = limbs_cmp_same_length(rs_hi_lo, &scratch[d_len..]) == Ordering::Less;
         if !carry_1 && carry_2 {
             assert!(!limbs_slice_add_limb_in_place(scratch, 1));
@@ -1842,7 +1842,8 @@ pub(crate) fn _limbs_div_mod_balanced(
     }
     if do_extra_cleanup {
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len_alt);
-        q_too_large |= limbs_sub_in_place_left(&mut ns_shifted[..r_len], &scratch_hi[..q_len]);
+        q_too_large |=
+            limbs_sub_greater_in_place_left(&mut ns_shifted[..r_len], &scratch_hi[..q_len]);
         let (rs_lo, rs_hi) = rs.split_at_mut(i_len_alt);
         let rs_hi_len = rs_hi.len();
         rs_hi.copy_from_slice(&ns_shifted[..rs_hi_len]);

@@ -31,7 +31,7 @@ use natural::arithmetic::mul::{
 use natural::arithmetic::shr::limbs_shr_to_out;
 use natural::arithmetic::square::{_limbs_square_to_out_basecase, limbs_square_to_out};
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_to_out,
 };
 use natural::comparison::cmp::limbs_cmp_same_length;
@@ -466,7 +466,7 @@ pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
         let (scratch_0, scratch_1) = scratch_0_1.split_at_mut(ms_len);
         let scratch_0 = &mut scratch_0[..ms_zero_len];
         limbs_modular_invert(scratch_1, &ms[..ms_zero_len], scratch_2);
-        limbs_sub_in_place_left(scratch_0, &out[..min(ms_zero_len, ms_nonzero_len)]);
+        limbs_sub_greater_in_place_left(scratch_0, &out[..min(ms_zero_len, ms_nonzero_len)]);
         limbs_mul_low_same_length(scratch_2, &scratch_1[..ms_zero_len], scratch_0);
         if ms_twos != 0 {
             scratch_2[ms_zero_len - 1].mod_power_of_2_assign(ms_twos);

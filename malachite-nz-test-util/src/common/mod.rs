@@ -34,6 +34,7 @@ pub fn natural_to_biguint(n: &Natural) -> BigUint {
     BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc()))
 }
 
+#[inline]
 pub fn rug_integer_to_natural(n: &rug::Integer) -> Natural {
     assert!(*n >= 0);
     Natural::from_owned_limbs_asc(n.to_digits(Order::Lsf))
@@ -44,6 +45,7 @@ pub fn natural_to_rug_integer(n: &Natural) -> rug::Integer {
     rug::Integer::from_digits(&n.to_limbs_asc(), Order::Lsf)
 }
 
+#[inline]
 pub fn bigint_to_integer(n: &BigInt) -> Integer {
     Integer::from_sign_and_abs(n.sign() != Sign::Minus, biguint_to_natural(n.magnitude()))
 }

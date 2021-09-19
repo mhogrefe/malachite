@@ -16,7 +16,7 @@ use natural::arithmetic::mul::toom::BIT_CORRECTION;
 use natural::arithmetic::shl::limbs_shl_to_out;
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
     limbs_sub_same_length_to_out,
 };
@@ -477,12 +477,12 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     }
     assert!(w1[0].even());
     limbs_slice_shr_in_place(w1, 1);
-    limbs_sub_in_place_left(w4, w0);
+    limbs_sub_greater_in_place_left(w4, w0);
     limbs_sub_same_length_in_place_left(w4, w1);
     assert!(w4[0].divisible_by_power_of_2(2));
     limbs_slice_shr_in_place(w4, 2); // w4 >= 0
     scratch[n_high] = limbs_shl_to_out(scratch, w6, 4);
-    limbs_sub_in_place_left(w4, &scratch[..=n_high]);
+    limbs_sub_greater_in_place_left(w4, &scratch[..=n_high]);
     if w3_neg {
         limbs_slice_add_same_length_in_place_left(w3, w2);
     } else {
@@ -492,8 +492,8 @@ pub(crate) fn _limbs_mul_toom_interpolate_7_points(
     limbs_slice_shr_in_place(w3, 1);
     limbs_sub_same_length_in_place_left(w2, w3);
     limbs_sub_mul_limb_same_length_in_place_left(w5, w2, 65);
-    limbs_sub_in_place_left(w2, w6);
-    limbs_sub_in_place_left(w2, w0);
+    limbs_sub_greater_in_place_left(w2, w6);
+    limbs_sub_greater_in_place_left(w2, w0);
     limbs_slice_add_mul_limb_same_length_in_place_left(w5, w2, 45);
     assert!(w5[0].even());
     limbs_slice_shr_in_place(w5, 1);
@@ -1200,7 +1200,7 @@ pub fn _limbs_mul_toom_interpolate_16_points<'a>(
     assert!(!limbs_sub_same_length_in_place_left(r4, r2));
     limbs_slice_add_same_length_in_place_left(r6, r2);
     assert_eq!(limbs_slice_shr_in_place(r6, 1), 0);
-    assert!(!limbs_sub_in_place_left(r2, r6));
+    assert!(!limbs_sub_greater_in_place_left(r2, r6));
     limbs_sub_same_length_in_place_right(r3, r5);
     assert_eq!(limbs_slice_shr_in_place(r5, 1), 0);
     assert!(!limbs_sub_same_length_in_place_left(r3, r5));

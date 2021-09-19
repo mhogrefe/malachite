@@ -12,7 +12,7 @@ use vecs::exhaustive::validate_oi_map;
 
 /// Generates random `Vec`s of a given length using elements from a single iterator.
 ///
-/// This `struct` is created by the `random_fixed_length_vecs_from_single` function. See its
+/// This `struct` is created by the `random_vecs_fixed_length_from_single` function. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub struct RandomFixedLengthVecsFromSingle<I: Iterator> {
@@ -54,9 +54,9 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 ///
 /// use malachite_base::num::random::random_unsigned_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::vecs::random::random_fixed_length_vecs_from_single;
+/// use malachite_base::vecs::random::random_vecs_fixed_length_from_single;
 ///
-/// let xss = random_fixed_length_vecs_from_single(
+/// let xss = random_vecs_fixed_length_from_single(
 ///     2,
 ///     random_unsigned_inclusive_range::<u32>(EXAMPLE_SEED, 1, 100),
 /// )
@@ -79,14 +79,14 @@ impl<I: Iterator> Iterator for RandomFixedLengthVecsFromSingle<I> {
 /// );
 /// ```
 #[inline]
-pub fn random_fixed_length_vecs_from_single<I: Iterator>(
+pub fn random_vecs_fixed_length_from_single<I: Iterator>(
     len: u64,
     xs: I,
 ) -> RandomFixedLengthVecsFromSingle<I> {
     RandomFixedLengthVecsFromSingle { len, xs }
 }
 
-macro_rules! random_fixed_length_vecs {
+macro_rules! random_vecs_fixed_length {
     (
         $exhaustive_struct: ident,
         $exhaustive_fn: ident,
@@ -214,44 +214,44 @@ macro_rules! random_fixed_length_vecs {
     }
 }
 
-random_fixed_length_vecs!(
+random_vecs_fixed_length!(
     RandomFixedLengthVecs2Inputs,
-    random_fixed_length_vecs_2_inputs,
-    random_length_2_vecs,
+    random_vecs_fixed_length_2_inputs,
+    random_vecs_length_2,
     [0, I, xs, xs_gen],
     [1, J, ys, ys_gen]
 );
-random_fixed_length_vecs!(
+random_vecs_fixed_length!(
     RandomFixedLengthVecs3Inputs,
-    random_fixed_length_vecs_3_inputs,
-    random_length_3_vecs,
+    random_vecs_fixed_length_3_inputs,
+    random_vecs_length_3,
     [0, I, xs, xs_gen],
     [1, J, ys, ys_gen],
     [2, K, zs, zs_gen]
 );
-random_fixed_length_vecs!(
+random_vecs_fixed_length!(
     RandomFixedLengthVecs4Inputs,
-    random_fixed_length_vecs_4_inputs,
-    random_length_4_vecs,
+    random_vecs_fixed_length_4_inputs,
+    random_vecs_length_4,
     [0, I, xs, xs_gen],
     [1, J, ys, ys_gen],
     [2, K, zs, zs_gen],
     [3, L, ws, ws_gen]
 );
-random_fixed_length_vecs!(
+random_vecs_fixed_length!(
     RandomFixedLengthVecs5Inputs,
-    random_fixed_length_vecs_5_inputs,
-    random_length_5_vecs,
+    random_vecs_fixed_length_5_inputs,
+    random_vecs_length_5,
     [0, I, xs, xs_gen],
     [1, J, ys, ys_gen],
     [2, K, zs, zs_gen],
     [3, L, ws, ws_gen],
     [4, M, vs, vs_gen]
 );
-random_fixed_length_vecs!(
+random_vecs_fixed_length!(
     RandomFixedLengthVecs6Inputs,
-    random_fixed_length_vecs_6_inputs,
-    random_length_6_vecs,
+    random_vecs_fixed_length_6_inputs,
+    random_vecs_length_6,
     [0, I, xs, xs_gen],
     [1, J, ys, ys_gen],
     [2, K, zs, zs_gen],
@@ -259,10 +259,10 @@ random_fixed_length_vecs!(
     [4, M, vs, vs_gen],
     [5, N, us, us_gen]
 );
-random_fixed_length_vecs!(
+random_vecs_fixed_length!(
     RandomFixedLengthVecs7Inputs,
-    random_fixed_length_vecs_7_inputs,
-    random_length_7_vecs,
+    random_vecs_fixed_length_7_inputs,
+    random_vecs_length_7,
     [0, I, xs, xs_gen],
     [1, J, ys, ys_gen],
     [2, K, zs, zs_gen],
@@ -271,10 +271,10 @@ random_fixed_length_vecs!(
     [5, N, us, us_gen],
     [6, O, ts, ts_gen]
 );
-random_fixed_length_vecs!(
+random_vecs_fixed_length!(
     RandomFixedLengthVecs8Inputs,
-    random_fixed_length_vecs_8_inputs,
-    random_length_8_vecs,
+    random_vecs_fixed_length_8_inputs,
+    random_vecs_length_8,
     [0, I, xs, xs_gen],
     [1, J, ys, ys_gen],
     [2, K, zs, zs_gen],

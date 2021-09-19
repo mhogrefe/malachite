@@ -28,6 +28,7 @@ use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where the result is returned.
+#[doc(hidden)]
 pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
     let mut out = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
@@ -76,6 +77,7 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -113,6 +115,7 @@ pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 /// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up.
+#[doc(hidden)]
 pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -153,6 +156,7 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up and the carry is
 /// appended to rp.
+#[doc(hidden)]
 pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let small_bits = bits & Limb::WIDTH_MASK;
     let remaining_bits = if small_bits == 0 {
@@ -196,6 +200,7 @@ pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 /// ```
 ///
 /// This is mpn_lshiftc from mpn/generic/mpn_lshiftc, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let n = xs.len();
     assert_ne!(n, 0);
@@ -224,7 +229,7 @@ where
         (_, bits) if bits == T::ZERO => x.clone(),
         (Natural(Small(small)), bits) => {
             Natural(if let Some(shifted) = small.arithmetic_checked_shl(bits) {
-                Small(shifted)
+                Small(shifted) 
             } else {
                 Large(limbs_shl(&[*small], u64::exact_from(bits)))
             })

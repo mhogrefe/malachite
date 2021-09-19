@@ -2,7 +2,7 @@ use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use iterators::iterator_cache::IteratorCache;
 use itertools::{repeat_n, Itertools};
 use num::arithmetic::traits::CheckedPow;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::conversion::traits::{ExactFrom, SaturatingFrom, WrappingFrom};
 use num::exhaustive::{
     exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
     PrimitiveIntIncreasingRange,
@@ -10,7 +10,7 @@ use num::exhaustive::{
 use num::iterators::{ruler_sequence, RulerSequence};
 use num::logic::traits::SignificantBits;
 use std::cmp::max;
-use std::iter::{once, FromIterator, Once};
+use std::iter::{empty, once, FromIterator, Once};
 use std::marker::PhantomData;
 use tuples::exhaustive::{
     exhaustive_dependent_pairs_stop_after_empty_ys, lex_dependent_pairs_stop_after_empty_ys,
@@ -248,23 +248,23 @@ macro_rules! lex_fixed_length_vecs {
 
 lex_fixed_length_vecs!(
     LexFixedLengthVecs2Inputs,
-    lex_fixed_length_vecs_2_inputs,
-    lex_length_2_vecs,
+    lex_vecs_fixed_length_2_inputs,
+    lex_vecs_length_2,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs]
 );
 lex_fixed_length_vecs!(
     LexFixedLengthVecs3Inputs,
-    lex_fixed_length_vecs_3_inputs,
-    lex_length_3_vecs,
+    lex_vecs_fixed_length_3_inputs,
+    lex_vecs_length_3,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs]
 );
 lex_fixed_length_vecs!(
     LexFixedLengthVecs4Inputs,
-    lex_fixed_length_vecs_4_inputs,
-    lex_length_4_vecs,
+    lex_vecs_fixed_length_4_inputs,
+    lex_vecs_length_4,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
@@ -272,8 +272,8 @@ lex_fixed_length_vecs!(
 );
 lex_fixed_length_vecs!(
     LexFixedLengthVecs5Inputs,
-    lex_fixed_length_vecs_5_inputs,
-    lex_length_5_vecs,
+    lex_vecs_fixed_length_5_inputs,
+    lex_vecs_length_5,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
@@ -282,8 +282,8 @@ lex_fixed_length_vecs!(
 );
 lex_fixed_length_vecs!(
     LexFixedLengthVecs6Inputs,
-    lex_fixed_length_vecs_6_inputs,
-    lex_length_6_vecs,
+    lex_vecs_fixed_length_6_inputs,
+    lex_vecs_length_6,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
@@ -293,8 +293,8 @@ lex_fixed_length_vecs!(
 );
 lex_fixed_length_vecs!(
     LexFixedLengthVecs7Inputs,
-    lex_fixed_length_vecs_7_inputs,
-    lex_length_7_vecs,
+    lex_vecs_fixed_length_7_inputs,
+    lex_vecs_length_7,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
@@ -305,8 +305,8 @@ lex_fixed_length_vecs!(
 );
 lex_fixed_length_vecs!(
     LexFixedLengthVecs8Inputs,
-    lex_fixed_length_vecs_8_inputs,
-    lex_length_8_vecs,
+    lex_vecs_fixed_length_8_inputs,
+    lex_vecs_length_8,
     [0, I, xs, xs_outputs],
     [1, J, ys, ys_outputs],
     [2, K, zs, zs_outputs],
@@ -381,7 +381,7 @@ where
     }
 }
 
-fn lex_fixed_length_vecs_from_single_g<I: Iterator>(
+fn lex_vecs_fixed_length_from_single_g<I: Iterator>(
     len: u64,
     xs: I,
 ) -> LexFixedLengthVecsFromSingleG<I>
@@ -402,7 +402,7 @@ where
 ///
 /// The order is lexicographic with respect to the order of the element iterator.
 ///
-/// This `struct` is created by the `lex_fixed_length_vecs_from_single` function. See its
+/// This `struct` is created by the `lex_vecs_fixed_length_from_single` function. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub enum LexFixedLengthVecsFromSingle<I: Iterator>
@@ -460,9 +460,9 @@ where
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_from_single;
+/// use malachite_base::vecs::exhaustive::lex_vecs_fixed_length_from_single;
 ///
-/// let xss = lex_fixed_length_vecs_from_single(2, 0..4).collect_vec();
+/// let xss = lex_vecs_fixed_length_from_single(2, 0..4).collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -485,7 +485,7 @@ where
 ///     ]
 /// );
 /// ```
-pub fn lex_fixed_length_vecs_from_single<I: Iterator>(
+pub fn lex_vecs_fixed_length_from_single<I: Iterator>(
     len: u64,
     xs: I,
 ) -> LexFixedLengthVecsFromSingle<I>
@@ -495,7 +495,7 @@ where
     match len {
         0 => LexFixedLengthVecsFromSingle::Zero(once(Vec::new())),
         1 => LexFixedLengthVecsFromSingle::One(xs),
-        len => LexFixedLengthVecsFromSingle::GreaterThanOne(lex_fixed_length_vecs_from_single_g(
+        len => LexFixedLengthVecsFromSingle::GreaterThanOne(lex_vecs_fixed_length_from_single_g(
             len, xs,
         )),
     }
@@ -766,23 +766,23 @@ macro_rules! exhaustive_fixed_length_vecs {
 
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs2Inputs,
-    exhaustive_fixed_length_vecs_2_inputs,
-    exhaustive_length_2_vecs,
+    exhaustive_vecs_fixed_length_2_inputs,
+    exhaustive_vecs_length_2,
     [0, I, xs, xs_done, xs_outputs],
     [1, J, ys, ys_done, ys_outputs]
 );
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs3Inputs,
-    exhaustive_fixed_length_vecs_3_inputs,
-    exhaustive_length_3_vecs,
+    exhaustive_vecs_fixed_length_3_inputs,
+    exhaustive_vecs_length_3,
     [0, I, xs, xs_done, xs_outputs],
     [1, J, ys, ys_done, ys_outputs],
     [2, K, zs, zs_done, zs_outputs]
 );
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs4Inputs,
-    exhaustive_fixed_length_vecs_4_inputs,
-    exhaustive_length_4_vecs,
+    exhaustive_vecs_fixed_length_4_inputs,
+    exhaustive_vecs_length_4,
     [0, I, xs, xs_done, xs_outputs],
     [1, J, ys, ys_done, ys_outputs],
     [2, K, zs, zs_done, zs_outputs],
@@ -790,8 +790,8 @@ exhaustive_fixed_length_vecs!(
 );
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs5Inputs,
-    exhaustive_fixed_length_vecs_5_inputs,
-    exhaustive_length_5_vecs,
+    exhaustive_vecs_fixed_length_5_inputs,
+    exhaustive_vecs_length_5,
     [0, I, xs, xs_done, xs_outputs],
     [1, J, ys, ys_done, ys_outputs],
     [2, K, zs, zs_done, zs_outputs],
@@ -800,8 +800,8 @@ exhaustive_fixed_length_vecs!(
 );
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs6Inputs,
-    exhaustive_fixed_length_vecs_6_inputs,
-    exhaustive_length_6_vecs,
+    exhaustive_vecs_fixed_length_6_inputs,
+    exhaustive_vecs_length_6,
     [0, I, xs, xs_done, xs_outputs],
     [1, J, ys, ys_done, ys_outputs],
     [2, K, zs, zs_done, zs_outputs],
@@ -811,8 +811,8 @@ exhaustive_fixed_length_vecs!(
 );
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs7,
-    exhaustive_fixed_length_vecs_7_inputs,
-    exhaustive_length_7_vecs,
+    exhaustive_vecs_fixed_length_7_inputs,
+    exhaustive_vecs_length_7,
     [0, I, xs, xs_done, xs_outputs],
     [1, J, ys, ys_done, ys_outputs],
     [2, K, zs, zs_done, zs_outputs],
@@ -823,8 +823,8 @@ exhaustive_fixed_length_vecs!(
 );
 exhaustive_fixed_length_vecs!(
     ExhaustiveFixedLengthVecs8Inputs,
-    exhaustive_fixed_length_vecs_8_inputs,
-    exhaustive_length_8_vecs,
+    exhaustive_vecs_fixed_length_8_inputs,
+    exhaustive_vecs_length_8,
     [0, I, xs, xs_done, xs_outputs],
     [1, J, ys, ys_done, ys_outputs],
     [2, K, zs, zs_done, zs_outputs],
@@ -899,7 +899,7 @@ where
     }
 }
 
-fn exhaustive_fixed_length_vecs_1_input_g<I: Iterator>(
+fn exhaustive_vecs_fixed_length_1_input_g<I: Iterator>(
     xs: I,
     output_types: &[BitDistributorOutputType],
 ) -> ExhaustiveFixedLengthVecs1InputG<I>
@@ -919,7 +919,7 @@ where
 
 /// Generates all `Vec`s of a given length with elements from a single iterator.
 ///
-/// This `struct` is created by the `exhaustive_fixed_length_vecs_from_single` function. See its
+/// This `struct` is created by the `exhaustive_vecs_fixed_length_from_single` function. See its
 /// documentation for more.
 #[derive(Clone, Debug)]
 pub enum ExhaustiveFixedLengthVecs1Input<I: Iterator>
@@ -948,7 +948,7 @@ where
 
 /// Generates all length-$n$ `Vec`s with elements from a single iterator.
 ///
-/// This function differs from `exhaustive_fixed_length_vecs_from_single` in that different
+/// This function differs from `exhaustive_vecs_fixed_length_from_single` in that different
 /// `BitDistributorOutputType`s may be specified for each output element.
 ///
 /// The $i$th element of `output_types` is a `BitDistributorOutputType` that determines how quickly
@@ -998,12 +998,12 @@ where
 ///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-/// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_1_input;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_fixed_length_1_input;
 ///
 /// // We are generating length-3 `Vec`s of chars using one input iterator, which produces all ASCII
 /// // chars. The third element has a tiny output type, so it will grow more slowly than the other
 /// // two elements (though it doesn't look that way from the first few `Vec`s).
-/// let xss = exhaustive_fixed_length_vecs_1_input(
+/// let xss = exhaustive_vecs_fixed_length_1_input(
 ///     exhaustive_ascii_chars(),
 ///     &[
 ///         BitDistributorOutputType::normal(1),
@@ -1042,7 +1042,7 @@ where
 ///     ]
 /// );
 /// ```
-pub fn exhaustive_fixed_length_vecs_1_input<I: Iterator>(
+pub fn exhaustive_vecs_fixed_length_1_input<I: Iterator>(
     xs: I,
     output_types: &[BitDistributorOutputType],
 ) -> ExhaustiveFixedLengthVecs1Input<I>
@@ -1053,7 +1053,7 @@ where
         0 => ExhaustiveFixedLengthVecs1Input::Zero(once(Vec::new())),
         1 => ExhaustiveFixedLengthVecs1Input::One(xs),
         _ => ExhaustiveFixedLengthVecs1Input::GreaterThanOne(
-            exhaustive_fixed_length_vecs_1_input_g(xs, output_types),
+            exhaustive_vecs_fixed_length_1_input_g(xs, output_types),
         ),
     }
 }
@@ -1089,9 +1089,9 @@ where
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_from_single;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_fixed_length_from_single;
 ///
-/// let xss = exhaustive_fixed_length_vecs_from_single(2, 0..4).collect_vec();
+/// let xss = exhaustive_vecs_fixed_length_from_single(2, 0..4).collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -1115,14 +1115,14 @@ where
 /// );
 /// ```
 #[inline]
-pub fn exhaustive_fixed_length_vecs_from_single<I: Iterator>(
+pub fn exhaustive_vecs_fixed_length_from_single<I: Iterator>(
     len: u64,
     xs: I,
 ) -> ExhaustiveFixedLengthVecs1Input<I>
 where
     I::Item: Clone,
 {
-    exhaustive_fixed_length_vecs_1_input(
+    exhaustive_vecs_fixed_length_1_input(
         xs,
         &vec![BitDistributorOutputType::normal(1); usize::exact_from(len)],
     )
@@ -1140,7 +1140,7 @@ impl<Y: Clone, J: Clone + Iterator<Item = Y>>
 {
     #[inline]
     fn get_ys(&self, &x: &u64) -> LexFixedLengthVecsFromSingle<J> {
-        lex_fixed_length_vecs_from_single(x, self.ys.clone())
+        lex_vecs_fixed_length_from_single(x, self.ys.clone())
     }
 }
 
@@ -1532,7 +1532,7 @@ impl<Y: Clone, J: Clone + Iterator<Item = Y>>
 {
     #[inline]
     fn get_ys(&self, &x: &u64) -> ExhaustiveFixedLengthVecs1Input<J> {
-        exhaustive_fixed_length_vecs_1_input(
+        exhaustive_vecs_fixed_length_1_input(
             self.ys.clone(),
             &vec![BitDistributorOutputType::normal(1); usize::exact_from(x)],
         )
@@ -1936,12 +1936,28 @@ pub struct LexFixedLengthOrderedUniqueCollections<I: Iterator, C: FromIterator<I
 where
     I::Item: Clone,
 {
-    pub(crate) first: bool,
-    pub(crate) done: bool,
-    pub(crate) xs: IteratorCache<I>,
-    pub(crate) indices: Vec<usize>,
-    pub(crate) phantom_i: PhantomData<*const I::Item>,
-    pub(crate) phantom_c: PhantomData<*const C>,
+    first: bool,
+    done: bool,
+    xs: IteratorCache<I>,
+    indices: Vec<usize>,
+    phantom_i: PhantomData<*const I::Item>,
+    phantom_c: PhantomData<*const C>,
+}
+
+impl<I: Iterator, C: FromIterator<I::Item>> LexFixedLengthOrderedUniqueCollections<I, C>
+where
+    I::Item: Clone,
+{
+    pub fn new(k: u64, xs: I) -> LexFixedLengthOrderedUniqueCollections<I, C> {
+        LexFixedLengthOrderedUniqueCollections {
+            first: true,
+            done: false,
+            xs: IteratorCache::new(xs),
+            indices: (0..usize::exact_from(k)).collect(),
+            phantom_i: PhantomData,
+            phantom_c: PhantomData,
+        }
+    }
 }
 
 pub(crate) fn fixed_length_ordered_unique_indices_helper(
@@ -2055,9 +2071,9 @@ where
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::vecs::exhaustive::lex_fixed_length_ordered_unique_vecs;
+/// use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs_fixed_length;
 ///
-/// let xss = lex_fixed_length_ordered_unique_vecs(4, 1..=6).collect_vec();
+/// let xss = lex_ordered_unique_vecs_fixed_length(4, 1..=6).collect_vec();
 /// assert_eq!(
 ///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
 ///     &[
@@ -2079,21 +2095,15 @@ where
 ///     ]
 /// );
 /// ```
-pub fn lex_fixed_length_ordered_unique_vecs<I: Iterator>(
+#[inline]
+pub fn lex_ordered_unique_vecs_fixed_length<I: Iterator>(
     k: u64,
     xs: I,
 ) -> LexFixedLengthOrderedUniqueCollections<I, Vec<I::Item>>
 where
     I::Item: Clone,
 {
-    LexFixedLengthOrderedUniqueCollections {
-        first: true,
-        done: false,
-        xs: IteratorCache::new(xs),
-        indices: (0..usize::exact_from(k)).collect(),
-        phantom_i: PhantomData,
-        phantom_c: PhantomData,
-    }
+    LexFixedLengthOrderedUniqueCollections::new(k, xs)
 }
 
 /// Generates all collections of elements from an iterator in shortlex order, where the collections
@@ -2103,10 +2113,24 @@ pub struct ShortlexOrderedUniqueCollections<I: Clone + Iterator, C: FromIterator
 where
     I::Item: Clone,
 {
-    pub(crate) current_len: u64,
-    pub(crate) max_len: u64,
-    pub(crate) xs: I,
-    pub(crate) current_xss: LexFixedLengthOrderedUniqueCollections<I, C>,
+    current_len: u64,
+    max_len: u64,
+    xs: I,
+    current_xss: LexFixedLengthOrderedUniqueCollections<I, C>,
+}
+
+impl<I: Clone + Iterator, C: FromIterator<I::Item>> ShortlexOrderedUniqueCollections<I, C>
+where
+    I::Item: Clone,
+{
+    pub(crate) fn new(a: u64, b: u64, xs: I) -> ShortlexOrderedUniqueCollections<I, C> {
+        ShortlexOrderedUniqueCollections {
+            current_len: a,
+            max_len: b,
+            xs: xs.clone(),
+            current_xss: LexFixedLengthOrderedUniqueCollections::new(a, xs),
+        }
+    }
 }
 
 impl<I: Clone + Iterator, C: FromIterator<I::Item>> Iterator
@@ -2424,6 +2448,7 @@ where
 ///     ]
 /// );
 /// ```
+#[inline]
 pub fn shortlex_ordered_unique_vecs_length_inclusive_range<I: Clone + Iterator>(
     a: u64,
     b: u64,
@@ -2432,12 +2457,7 @@ pub fn shortlex_ordered_unique_vecs_length_inclusive_range<I: Clone + Iterator>(
 where
     I::Item: Clone,
 {
-    ShortlexOrderedUniqueCollections {
-        current_len: a,
-        max_len: b,
-        xs: xs.clone(),
-        current_xss: lex_fixed_length_ordered_unique_vecs(a, xs),
-    }
+    ShortlexOrderedUniqueCollections::new(a, b, xs)
 }
 
 /// Generates all collections of elements from an iterator in lexicographic order, where the
@@ -2447,14 +2467,32 @@ pub struct LexOrderedUniqueCollections<I: Iterator, C: FromIterator<I::Item>>
 where
     I::Item: Clone,
 {
-    pub(crate) done: bool,
-    pub(crate) first: bool,
-    pub(crate) min_len: usize,
-    pub(crate) max_len: usize,
-    pub(crate) xs: IteratorCache<I>,
-    pub(crate) indices: Vec<usize>,
-    pub(crate) phantom_i: PhantomData<*const I::Item>,
-    pub(crate) phantom_c: PhantomData<*const C>,
+    done: bool,
+    first: bool,
+    min_len: usize,
+    max_len: usize,
+    xs: IteratorCache<I>,
+    indices: Vec<usize>,
+    phantom_i: PhantomData<*const I::Item>,
+    phantom_c: PhantomData<*const C>,
+}
+
+impl<I: Iterator, C: FromIterator<I::Item>> LexOrderedUniqueCollections<I, C>
+where
+    I::Item: Clone,
+{
+    pub(crate) fn new(a: u64, b: u64, xs: I) -> LexOrderedUniqueCollections<I, C> {
+        LexOrderedUniqueCollections {
+            done: a > b,
+            first: true,
+            min_len: usize::exact_from(a),
+            max_len: usize::exact_from(b),
+            xs: IteratorCache::new(xs),
+            indices: (0..usize::exact_from(a)).collect(),
+            phantom_i: PhantomData,
+            phantom_c: PhantomData,
+        }
+    }
 }
 
 impl<I: Iterator, C: FromIterator<I::Item>> Iterator for LexOrderedUniqueCollections<I, C>
@@ -2812,6 +2850,7 @@ where
 ///     ]
 /// );
 /// ```
+#[inline]
 pub fn lex_ordered_unique_vecs_length_inclusive_range<I: Clone + Iterator>(
     a: u64,
     b: u64,
@@ -2820,14 +2859,585 @@ pub fn lex_ordered_unique_vecs_length_inclusive_range<I: Clone + Iterator>(
 where
     I::Item: Clone,
 {
-    LexOrderedUniqueCollections {
-        done: a > b,
-        first: true,
-        min_len: usize::exact_from(a),
-        max_len: usize::exact_from(b),
-        xs: IteratorCache::new(xs),
-        indices: (0..usize::exact_from(a)).collect(),
-        phantom_i: PhantomData,
-        phantom_c: PhantomData,
+    LexOrderedUniqueCollections::new(a, b, xs)
+}
+
+/// This function is used for iterating through all bit patterns with a specified number of minimum
+/// and maximum `true` bits.
+///
+/// Given an existing bit pattern, and a reference `bit_count`, which must equal the number of
+/// `true`s in the pattern, mutates the pattern into the next pattern with a valid number of `true`
+/// bits. See the unit tests for many examples.
+///
+/// # Worst-case complexity
+/// $$
+/// T(k) = O(k)
+/// $$
+///
+/// $$
+/// M(k) = O(k)
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $k$ is the length of `pattern`. The memory
+/// usage is only linear when the pattern vector needs to be reallocated, which happens rarely.
+///
+/// # Panics
+/// Panics if `max_bits` is zero. (However, `min_bits` may be zero.)
+///
+/// /// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use malachite_base::vecs::exhaustive::next_bit_pattern;
+///
+/// // Suppose we are generating all bit patterns with 2 to 4 true bits, inclusive. Suppose our
+/// // current pattern is `1111000`. Then, the lexicographically next largest valid pattern is
+/// // `10000001`. (All patterns of the form `1111xxx`, where the `x`s are not all zero, have too
+/// // many ones. That brings us to `10000000`, which has too few ones, and then `10000001`.)
+/// //
+/// // The patterns are represented "in reverse", with least-significant bits appearing first.
+/// let mut pattern = vec![false, false, false, true, true, true, true];
+/// let mut bit_count = 4;
+/// next_bit_pattern(&mut pattern, &mut bit_count, 2, 4);
+/// assert_eq!(pattern, &[true, false, false, false, false, false, false, true]);
+/// assert_eq!(bit_count, 2);
+/// ```
+pub fn next_bit_pattern(
+    pattern: &mut Vec<bool>,
+    bit_count: &mut usize,
+    min_bits: usize,
+    max_bits: usize,
+) {
+    assert_ne!(max_bits, 0);
+    match pattern.first() {
+        None => {
+            pattern.push(true);
+            *bit_count = 1;
+        }
+        Some(&false) => {
+            if *bit_count < max_bits {
+                pattern[0] = true;
+                *bit_count += 1;
+            } else {
+                let leading_false_count = pattern.iter().take_while(|&&b| !b).count();
+                let true_after_false_count = pattern[leading_false_count..]
+                    .iter()
+                    .take_while(|&&b| b)
+                    .count();
+                let tf_count = leading_false_count + true_after_false_count;
+                if tf_count == pattern.len() {
+                    for b in pattern.iter_mut() {
+                        *b = false;
+                    }
+                    pattern.push(true);
+                    *bit_count = 1;
+                } else {
+                    for b in &mut pattern[leading_false_count..tf_count] {
+                        *b = false;
+                    }
+                    pattern[tf_count] = true;
+                    *bit_count -= true_after_false_count - 1;
+                }
+                if *bit_count < min_bits {
+                    let diff = min_bits - *bit_count;
+                    for b in &mut pattern[..diff] {
+                        *b = true;
+                    }
+                    *bit_count += diff;
+                }
+            }
+        }
+        Some(&true) => {
+            let leading_true_count = pattern.iter().take_while(|&&b| b).count();
+            for b in &mut pattern[..leading_true_count] {
+                *b = false;
+            }
+            if leading_true_count == pattern.len() {
+                pattern.push(true);
+            } else {
+                pattern[leading_true_count] = true;
+            }
+            *bit_count -= leading_true_count - 1;
+            if *bit_count < min_bits {
+                let diff = min_bits - *bit_count;
+                for b in &mut pattern[..diff] {
+                    *b = true;
+                }
+                *bit_count += diff;
+            }
+        }
     }
+}
+
+#[derive(Clone)]
+#[doc(hidden)]
+pub struct ExhaustiveOrderedUniqueCollectionsGreaterThanOne<I: Iterator, C: FromIterator<I::Item>>
+where
+    I::Item: Clone,
+{
+    done: bool,
+    first: bool,
+    min_bits: usize,
+    max_bits: usize,
+    xs: IteratorCache<I>,
+    pattern: Vec<bool>,
+    bit_count: usize,
+    phantom: PhantomData<*const C>,
+}
+
+impl<I: Iterator, C: FromIterator<I::Item>> Iterator
+    for ExhaustiveOrderedUniqueCollectionsGreaterThanOne<I, C>
+where
+    I::Item: Clone,
+{
+    type Item = C;
+
+    fn next(&mut self) -> Option<C> {
+        if self.done {
+            return None;
+        } else if self.first {
+            self.first = false;
+        } else {
+            next_bit_pattern(
+                &mut self.pattern,
+                &mut self.bit_count,
+                self.min_bits,
+                self.max_bits,
+            );
+        }
+        if !self.pattern.is_empty() && self.xs.get(self.pattern.len() - 1).is_none() {
+            self.done = true;
+            return None;
+        }
+        Some(
+            self.pattern
+                .iter()
+                .enumerate()
+                .filter_map(|(i, &b)| {
+                    if b {
+                        Some(self.xs.assert_get(i).clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
+        )
+    }
+}
+
+#[derive(Clone)]
+pub enum ExhaustiveOrderedUniqueCollections<I: Iterator, C: FromIterator<I::Item>>
+where
+    I::Item: Clone,
+{
+    None,
+    Zero(bool),
+    ZeroOne(bool, I),
+    One(I),
+    GreaterThanOne(ExhaustiveOrderedUniqueCollectionsGreaterThanOne<I, C>),
+}
+
+impl<I: Iterator, C: FromIterator<I::Item>> ExhaustiveOrderedUniqueCollections<I, C>
+where
+    I::Item: Clone,
+{
+    pub(crate) fn new(a: u64, b: u64, xs: I) -> ExhaustiveOrderedUniqueCollections<I, C> {
+        match (a, b) {
+            (a, b) if a > b => ExhaustiveOrderedUniqueCollections::None,
+            (0, 0) => ExhaustiveOrderedUniqueCollections::Zero(false),
+            (0, 1) => ExhaustiveOrderedUniqueCollections::ZeroOne(true, xs),
+            (1, 1) => ExhaustiveOrderedUniqueCollections::One(xs),
+            (a, b) => ExhaustiveOrderedUniqueCollections::GreaterThanOne(
+                ExhaustiveOrderedUniqueCollectionsGreaterThanOne {
+                    done: false,
+                    first: true,
+                    min_bits: usize::saturating_from(a),
+                    max_bits: usize::saturating_from(b),
+                    xs: IteratorCache::new(xs),
+                    pattern: vec![true; usize::saturating_from(a)],
+                    bit_count: usize::saturating_from(a),
+                    phantom: PhantomData,
+                },
+            ),
+        }
+    }
+}
+
+impl<I: Iterator, C: FromIterator<I::Item>> Iterator for ExhaustiveOrderedUniqueCollections<I, C>
+where
+    I::Item: Clone,
+{
+    type Item = C;
+
+    fn next(&mut self) -> Option<C> {
+        match self {
+            ExhaustiveOrderedUniqueCollections::None => None,
+            ExhaustiveOrderedUniqueCollections::Zero(ref mut done) => {
+                if *done {
+                    None
+                } else {
+                    *done = true;
+                    Some(empty().collect())
+                }
+            }
+            ExhaustiveOrderedUniqueCollections::ZeroOne(ref mut first, ref mut xs) => {
+                if *first {
+                    *first = false;
+                    Some(empty().collect())
+                } else {
+                    xs.next().map(|x| once(x).collect())
+                }
+            }
+            ExhaustiveOrderedUniqueCollections::One(ref mut xs) => {
+                xs.next().map(|x| once(x).collect())
+            }
+            ExhaustiveOrderedUniqueCollections::GreaterThanOne(ref mut xs) => xs.next(),
+        }
+    }
+}
+
+/// Generates `Vec`s of a given length with elements from a single iterator, such that each `Vec`
+/// has no repeated elements, and the elements in each `Vec` are ordered the same way as they are
+/// in the source iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// If $k$ is 0, the output length is 1.
+///
+/// If $k$ is nonzero and the input iterator is infinite, the output length is also infinite.
+///
+/// If $k$ is nonzero and the input iterator length is $n$, the output length is $\binom{n}{k}$.
+///
+/// If $k$ is 0, the output consists of one empty `Vec`.
+///
+/// If `xs` is empty, the output is also empty, unless $k$ is 0.
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_fixed_length;
+///
+/// let xss = exhaustive_ordered_unique_vecs_fixed_length(4, 1..=6).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2, 3, 4],
+///         &[1, 2, 3, 5],
+///         &[1, 2, 4, 5],
+///         &[1, 3, 4, 5],
+///         &[2, 3, 4, 5],
+///         &[1, 2, 3, 6],
+///         &[1, 2, 4, 6],
+///         &[1, 3, 4, 6],
+///         &[2, 3, 4, 6],
+///         &[1, 2, 5, 6],
+///         &[1, 3, 5, 6],
+///         &[2, 3, 5, 6],
+///         &[1, 4, 5, 6],
+///         &[2, 4, 5, 6],
+///         &[3, 4, 5, 6]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_ordered_unique_vecs_fixed_length<I: Iterator>(
+    k: u64,
+    xs: I,
+) -> ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    exhaustive_ordered_unique_vecs_length_inclusive_range(k, k, xs)
+}
+
+/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
+/// elements, and the elements in each `Vec` are ordered the same way as they are in the source
+/// iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
+/// generated.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is $2^n$.
+///
+/// If `xs` is empty, the output consists of a single empty `Vec`.
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs;
+///
+/// let xss = exhaustive_ordered_unique_vecs(1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[1],
+///         &[2],
+///         &[1, 2],
+///         &[3],
+///         &[1, 3],
+///         &[2, 3],
+///         &[1, 2, 3],
+///         &[4],
+///         &[1, 4],
+///         &[2, 4],
+///         &[1, 2, 4],
+///         &[3, 4],
+///         &[1, 3, 4],
+///         &[2, 3, 4],
+///         &[1, 2, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_ordered_unique_vecs<I: Iterator>(
+    xs: I,
+) -> ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    exhaustive_ordered_unique_vecs_length_inclusive_range(0, u64::MAX, xs)
+}
+
+/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
+/// `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same way as
+/// they are in the source iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
+/// generated.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$ and the `min_length` is $\ell$, the output length is
+/// $$
+/// \sum_{i=\ell}^n \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_min_length;
+///
+/// let xss = exhaustive_ordered_unique_vecs_min_length(2, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[2, 3],
+///         &[1, 2, 3],
+///         &[1, 4],
+///         &[2, 4],
+///         &[1, 2, 4],
+///         &[3, 4],
+///         &[1, 3, 4],
+///         &[2, 3, 4],
+///         &[1, 2, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_ordered_unique_vecs_min_length<I: Iterator>(
+    min_length: u64,
+    xs: I,
+) -> ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    exhaustive_ordered_unique_vecs_length_inclusive_range(min_length, u64::MAX, xs)
+}
+
+/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
+/// way as they are in the source iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
+/// generated.
+///
+/// If $a \leq b$, the output is empty.
+///
+/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+///
+/// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^b - 1 \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_length_range;
+///
+/// let xss = exhaustive_ordered_unique_vecs_length_range(2, 4, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[2, 3],
+///         &[1, 2, 3],
+///         &[1, 4],
+///         &[2, 4],
+///         &[1, 2, 4],
+///         &[3, 4],
+///         &[1, 3, 4],
+///         &[2, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_ordered_unique_vecs_length_range<I: Iterator>(
+    a: u64,
+    b: u64,
+    xs: I,
+) -> ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    if a >= b {
+        ExhaustiveOrderedUniqueCollections::None
+    } else {
+        exhaustive_ordered_unique_vecs_length_inclusive_range(a, b - 1, xs)
+    }
+}
+
+/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each `Vec` has no repeated elements, and the elements in each `Vec` are ordered the same
+/// way as they are in the source iterator.
+///
+/// The `Vec`s are ordered lexicographically with respect to the order of the element iterator.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// The iterator should be finite; if it is infinite, only prefixes of the iterator will be
+/// generated.
+///
+/// If $a < b$, the output is empty.
+///
+/// If $a = b = 0$, the output consists of a single empty `Vec`.
+///
+/// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^b \binom{n}{i}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_ordered_unique_vecs_length_inclusive_range;
+///
+/// let xss = exhaustive_ordered_unique_vecs_length_inclusive_range(2, 3, 1..=4).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[2, 3],
+///         &[1, 2, 3],
+///         &[1, 4],
+///         &[2, 4],
+///         &[1, 2, 4],
+///         &[3, 4],
+///         &[1, 3, 4],
+///         &[2, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_ordered_unique_vecs_length_inclusive_range<I: Iterator>(
+    a: u64,
+    b: u64,
+    xs: I,
+) -> ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>
+where
+    I::Item: Clone,
+{
+    ExhaustiveOrderedUniqueCollections::new(a, b, xs)
 }

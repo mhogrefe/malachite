@@ -48,6 +48,12 @@ pub fn natural_pair_1_rm<T: 'static + Clone>(
     Box::new(ps.map(|(x, y)| ((natural_to_rug_integer(&x), y.clone()), (x, y))))
 }
 
+pub fn natural_pair_1_nm<T: 'static + Clone>(
+    ps: It<(Natural, T)>,
+) -> It<((BigUint, T), (Natural, T))> {
+    Box::new(ps.map(|(x, y)| ((natural_to_biguint(&x), y.clone()), (x, y))))
+}
+
 #[allow(clippy::type_complexity)]
 pub fn natural_pair_1_nrm<T: 'static + Clone>(
     ps: It<(Natural, T)>,
@@ -57,6 +63,18 @@ pub fn natural_pair_1_nrm<T: 'static + Clone>(
             (natural_to_biguint(&x), y.clone()),
             (natural_to_rug_integer(&x), y.clone()),
             (x, y),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn natural_triple_1_rm<T: 'static + Clone, U: 'static + Clone>(
+    ts: It<(Natural, T, U)>,
+) -> It<((rug::Integer, T, U), (Natural, T, U))> {
+    Box::new(ts.map(|(x, y, z)| {
+        (
+            (natural_to_rug_integer(&x), y.clone(), z.clone()),
+            (x, y, z),
         )
     }))
 }

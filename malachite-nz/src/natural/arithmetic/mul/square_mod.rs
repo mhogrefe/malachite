@@ -18,8 +18,8 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::square::limbs_square_to_out;
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_in_place_left,
-    limbs_sub_limb_in_place, limbs_sub_same_length_to_out, limbs_sub_to_out,
+    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_greater_in_place_left,
+    limbs_sub_limb_in_place, limbs_sub_same_length_to_out, limbs_sub_greater_to_out,
 };
 use platform::Limb;
 use std::cmp::min;
@@ -97,7 +97,7 @@ fn _limbs_square_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], n
 ///
 /// S(n) <= n / 2 + MAX (n + 4, S(half_n / 2)) <= 3 / 2 * n + 4
 ///
-/// This is mpn_sqrmod_bnm1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2.  
+/// This is mpn_sqrmod_bnm1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2.
 pub fn _limbs_square_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,
@@ -147,7 +147,7 @@ pub fn _limbs_square_mod_base_pow_n_minus_1(
             _limbs_square_mod_base_pow_n_minus_1(out, half_n, xp_lo, xp_hi);
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
             scratch_hi[half_n] = 0;
-            if limbs_sub_to_out(scratch_hi, xs_lo, xs_hi) {
+            if limbs_sub_greater_to_out(scratch_hi, xs_lo, xs_hi) {
                 assert!(!limbs_slice_add_limb_in_place(&mut scratch_hi[..m], 1));
             }
             if k >= FFT_FIRST_K {
@@ -164,7 +164,7 @@ pub fn _limbs_square_mod_base_pow_n_minus_1(
                 assert!(xs_len <= half_n);
                 limbs_square_to_out(scratch, xs);
                 let (scratch_lo, scratch_hi) = scratch[..two_xs_len].split_at_mut(half_n);
-                let carry = limbs_sub_in_place_left(scratch_lo, scratch_hi);
+                let carry = limbs_sub_greater_in_place_left(scratch_lo, scratch_hi);
                 scratch_hi[0] = 0;
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(&mut scratch[..m], 1));

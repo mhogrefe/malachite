@@ -42,13 +42,14 @@ use malachite_base::slices::slice_test_zero;
 use malachite_base::strings::exhaustive::{exhaustive_strings, exhaustive_strings_using_chars};
 use malachite_base::strings::{strings_from_char_vecs, StringsFromCharVecs};
 use malachite_base::tuples::exhaustive::{
-    exhaustive_dependent_pairs, exhaustive_octuples_from_single, exhaustive_pairs,
-    exhaustive_pairs_from_single, exhaustive_quadruples, exhaustive_quadruples_from_single,
-    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xxyx,
-    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz_custom_output,
-    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_custom_output,
-    exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
-    exhaustive_triples_xyx, exhaustive_triples_xyx_custom_output, exhaustive_triples_xyy,
+    exhaustive_dependent_pairs, exhaustive_octuples_from_single, exhaustive_ordered_unique_pairs,
+    exhaustive_pairs, exhaustive_pairs_from_single, exhaustive_quadruples,
+    exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy_custom_output,
+    exhaustive_quadruples_xxyx, exhaustive_quadruples_xyyx,
+    exhaustive_quadruples_xyyz_custom_output, exhaustive_sextuples_from_single, exhaustive_triples,
+    exhaustive_triples_custom_output, exhaustive_triples_from_single, exhaustive_triples_xxy,
+    exhaustive_triples_xxy_custom_output, exhaustive_triples_xyx,
+    exhaustive_triples_xyx_custom_output, exhaustive_triples_xyy,
     exhaustive_triples_xyy_custom_output, lex_pairs, lex_pairs_from_single,
     lex_triples_from_single, ExhaustiveDependentPairsYsGenerator, ExhaustivePairs,
     ExhaustivePairs1Input, ExhaustiveTriples, ExhaustiveTriples1Input, ExhaustiveTriplesXXY,
@@ -57,9 +58,9 @@ use malachite_base::tuples::exhaustive::{
 use malachite_base::unions::exhaustive::lex_union3s;
 use malachite_base::unions::Union3;
 use malachite_base::vecs::exhaustive::{
-    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs,
+    exhaustive_vecs, exhaustive_vecs_fixed_length_from_single,
     exhaustive_vecs_length_inclusive_range, exhaustive_vecs_min_length,
-    lex_fixed_length_vecs_from_single, shortlex_vecs_length_inclusive_range,
+    lex_vecs_fixed_length_from_single, shortlex_vecs, shortlex_vecs_length_inclusive_range,
     ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle, ShortlexVecs,
 };
 use num::arithmetic::mod_mul::limbs_invert_limb_naive;
@@ -1519,7 +1520,7 @@ impl<T: PrimitiveSigned>
 {
     #[inline]
     fn get_ys(&self, &x: &T) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
-        lex_fixed_length_vecs_from_single(
+        lex_vecs_fixed_length_from_single(
             u64::exact_from(x.to_bits_asc().len()),
             exhaustive_bools(),
         )
@@ -2008,12 +2009,8 @@ pub fn exhaustive_unsigned_pair_gen_var_12<T: PrimitiveUnsigned>() -> It<(T, u64
     )))
 }
 
-//TODO make better
 pub fn exhaustive_unsigned_pair_gen_var_13<T: PrimitiveUnsigned>() -> It<(T, T)> {
-    Box::new(
-        exhaustive_pairs_from_single(exhaustive_unsigneds::<T>())
-            .flat_map(|(x, y)| Some((x, x.checked_add(y)?.checked_add(T::ONE)?))),
-    )
+    Box::new(exhaustive_ordered_unique_pairs(exhaustive_unsigneds()))
 }
 
 struct ModPowerOfTwoSingleGenerator<T: PrimitiveUnsigned> {
@@ -2771,7 +2768,7 @@ impl<T: PrimitiveUnsigned>
 {
     #[inline]
     fn get_ys(&self, &(x, log_base): &(T, u64)) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
-        lex_fixed_length_vecs_from_single(
+        lex_vecs_fixed_length_from_single(
             x.significant_bits()
                 .div_round(log_base, RoundingMode::Ceiling),
             exhaustive_bools(),
@@ -2915,7 +2912,7 @@ impl<T: PrimitiveUnsigned>
 {
     #[inline]
     fn get_ys(&self, &x: &T) -> LexFixedLengthVecsFromSingle<ExhaustiveBools> {
-        lex_fixed_length_vecs_from_single(x.significant_bits(), exhaustive_bools())
+        lex_vecs_fixed_length_from_single(x.significant_bits(), exhaustive_bools())
     }
 }
 
@@ -3078,11 +3075,15 @@ pub fn exhaustive_string_pair_gen_var_1() -> It<(String, String)> {
 
 // -- Vec<bool> --
 
+pub fn exhaustive_bool_vec_gen() -> It<Vec<bool>> {
+    Box::new(shortlex_vecs(exhaustive_bools()))
+}
+
 pub fn exhaustive_bool_vec_gen_var_1<T: PrimitiveUnsigned>() -> It<Vec<bool>> {
     Box::new(
         shortlex_vecs_length_inclusive_range(0, T::WIDTH, exhaustive_bools()).interleave(
             exhaustive_pairs_big_tiny(
-                lex_fixed_length_vecs_from_single(T::WIDTH, exhaustive_bools()),
+                lex_vecs_fixed_length_from_single(T::WIDTH, exhaustive_bools()),
                 exhaustive_positive_primitive_ints(),
             )
             .map(|(bs, n)| bs.into_iter().chain(repeat_n(false, n)).collect()),
@@ -3094,7 +3095,7 @@ pub fn exhaustive_bool_vec_gen_var_2<T: PrimitiveSigned>() -> It<Vec<bool>> {
     Box::new(
         shortlex_vecs_length_inclusive_range(0, T::WIDTH - 1, exhaustive_bools()).interleave(
             exhaustive_pairs_big_tiny(
-                lex_fixed_length_vecs_from_single(T::WIDTH - 1, exhaustive_bools()),
+                lex_vecs_fixed_length_from_single(T::WIDTH - 1, exhaustive_bools()),
                 exhaustive_nonzero_signeds::<isize>(),
             )
             .map(|(bs, n)| {
@@ -3110,7 +3111,7 @@ pub fn exhaustive_bool_vec_gen_var_3<T: PrimitiveUnsigned>() -> It<Vec<bool>> {
     Box::new(
         shortlex_vecs_length_inclusive_range(0, T::WIDTH, exhaustive_bools()).interleave(
             exhaustive_pairs_big_tiny(
-                lex_fixed_length_vecs_from_single(T::WIDTH, exhaustive_bools()),
+                lex_vecs_fixed_length_from_single(T::WIDTH, exhaustive_bools()),
                 exhaustive_positive_primitive_ints(),
             )
             .map(|(bs, n)| repeat_n(false, n).chain(bs.into_iter()).collect()),
@@ -3122,7 +3123,7 @@ pub fn exhaustive_bool_vec_gen_var_4<T: PrimitiveSigned>() -> It<Vec<bool>> {
     Box::new(
         shortlex_vecs_length_inclusive_range(0, T::WIDTH - 1, exhaustive_bools()).interleave(
             exhaustive_pairs_big_tiny(
-                lex_fixed_length_vecs_from_single(T::WIDTH - 1, exhaustive_bools()),
+                lex_vecs_fixed_length_from_single(T::WIDTH - 1, exhaustive_bools()),
                 exhaustive_nonzero_signeds::<isize>(),
             )
             .map(|(bs, n)| {
@@ -3170,6 +3171,17 @@ pub fn exhaustive_unsigned_vec_primitive_int_pair_gen_var_1<
     ))
 }
 
+pub fn exhaustive_unsigned_vec_primitive_int_pair_gen_var_2<
+    T: PrimitiveUnsigned,
+    U: PrimitiveInt,
+>() -> It<(Vec<T>, U)> {
+    Box::new(exhaustive_pairs_big_small(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds())
+            .filter(|xs| *xs.last().unwrap() != T::ZERO),
+        primitive_int_increasing_inclusive_range(U::exact_from(3), U::MAX),
+    ))
+}
+
 // --(Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 pub fn exhaustive_unsigned_vec_unsigned_pair_gen<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
@@ -3194,7 +3206,7 @@ impl<T: PrimitiveUnsigned>
         &self,
         &p: &(usize, usize),
     ) -> ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>> {
-        exhaustive_fixed_length_vecs_from_single(u64::exact_from(p.1), exhaustive_unsigneds())
+        exhaustive_vecs_fixed_length_from_single(u64::exact_from(p.1), exhaustive_unsigneds())
     }
 }
 
@@ -3431,6 +3443,39 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_12<
     ))
 }
 
+pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_13<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Vec<T>, U)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds()),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_14<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Vec<T>, U)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_vecs(exhaustive_unsigneds()),
+        exhaustive_unsigneds(),
+    ))
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_15<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Vec<T>, U)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_vecs(exhaustive_unsigneds()),
+            exhaustive_unsigneds(),
+        )
+        .filter(|(xs, y)| *y < U::exact_from(xs.len() << T::LOG_WIDTH)),
+    )
+}
+
 // --(Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>(
@@ -3486,7 +3531,29 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUn
     ))))
 }
 
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(Vec<T>, U, U)> {
+    Box::new(
+        exhaustive_triples_xyy_custom_output(
+            exhaustive_vecs(exhaustive_unsigneds()),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        )
+        .filter_map(|(xs, y, z): (Vec<T>, U, U)| y.checked_add(z).map(|new_z| (xs, y, new_z))),
+    )
+}
+
 // --(Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
+
+pub fn exhaustive_unsigned_vec_pair_gen<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>)> {
+    Box::new(exhaustive_pairs_from_single(exhaustive_vecs(
+        exhaustive_unsigneds(),
+    )))
+}
 
 struct UnsignedVecPairLenGenerator;
 
@@ -3514,8 +3581,8 @@ impl<T: PrimitiveUnsigned>
         ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
     > {
         exhaustive_pairs(
-            exhaustive_fixed_length_vecs_from_single(i, exhaustive_unsigneds()),
-            exhaustive_fixed_length_vecs_from_single(j, exhaustive_unsigneds()),
+            exhaustive_vecs_fixed_length_from_single(i, exhaustive_unsigneds()),
+            exhaustive_vecs_fixed_length_from_single(j, exhaustive_unsigneds()),
         )
     }
 }
@@ -3581,8 +3648,8 @@ impl<T: PrimitiveUnsigned>
     fn get_ys(&self, &(out_len, len): &(u64, u64)) -> It<(Vec<T>, Vec<T>)> {
         Box::new(
             exhaustive_triples(
-                exhaustive_fixed_length_vecs_from_single(out_len, exhaustive_unsigneds()),
-                exhaustive_fixed_length_vecs_from_single(len - 1, exhaustive_unsigneds()),
+                exhaustive_vecs_fixed_length_from_single(out_len, exhaustive_unsigneds()),
+                exhaustive_vecs_fixed_length_from_single(len - 1, exhaustive_unsigneds()),
                 primitive_int_increasing_inclusive_range(T::power_of_2(T::WIDTH - 2), T::MAX),
             )
             .map(move |(out, mut ns, n_hi)| {
@@ -3623,8 +3690,8 @@ impl<T: PrimitiveUnsigned>
     fn get_ys(&self, &(out_len, len): &(u64, u64)) -> It<(Vec<T>, Vec<T>)> {
         Box::new(
             exhaustive_triples(
-                exhaustive_fixed_length_vecs_from_single(out_len, exhaustive_unsigneds()),
-                exhaustive_fixed_length_vecs_from_single(len - 1, exhaustive_unsigneds()),
+                exhaustive_vecs_fixed_length_from_single(out_len, exhaustive_unsigneds()),
+                exhaustive_vecs_fixed_length_from_single(len - 1, exhaustive_unsigneds()),
                 exhaustive_positive_primitive_ints(),
             )
             .map(move |(out, mut ns, n_hi)| {
@@ -3670,7 +3737,7 @@ impl<T: PrimitiveUnsigned>
         &len: &u64,
     ) -> ExhaustivePairs1Input<ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>>
     {
-        exhaustive_pairs_from_single(exhaustive_fixed_length_vecs_from_single(
+        exhaustive_pairs_from_single(exhaustive_vecs_fixed_length_from_single(
             len,
             exhaustive_unsigneds(),
         ))
@@ -3718,6 +3785,24 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1<T: Primiti
 
 // var 2 and 3 are in malachite-nz
 
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, T)> {
+    reshape_2_1_to_3(Box::new(exhaustive_pairs(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            //TODO
+            exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
+                .filter(|(x, y)| x >= y),
+            UnsignedVecPairLenGenerator,
+        )
+        .map(|p| p.1),
+        exhaustive_unsigneds(),
+    )))
+}
+
 // --(Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
 pub struct UnsignedVecTripleXYYLenGenerator;
@@ -3746,8 +3831,8 @@ impl<T: PrimitiveUnsigned>
         ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
     > {
         exhaustive_triples_xyy(
-            exhaustive_fixed_length_vecs_from_single(i, exhaustive_unsigneds()),
-            exhaustive_fixed_length_vecs_from_single(j, exhaustive_unsigneds()),
+            exhaustive_vecs_fixed_length_from_single(i, exhaustive_unsigneds()),
+            exhaustive_vecs_fixed_length_from_single(j, exhaustive_unsigneds()),
         )
     }
 }
@@ -3801,9 +3886,9 @@ impl<T: PrimitiveUnsigned>
         ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>,
     > {
         exhaustive_triples(
-            exhaustive_fixed_length_vecs_from_single(i, exhaustive_unsigneds()),
-            exhaustive_fixed_length_vecs_from_single(j, exhaustive_unsigneds()),
-            exhaustive_fixed_length_vecs_from_single(k, exhaustive_unsigneds()),
+            exhaustive_vecs_fixed_length_from_single(i, exhaustive_unsigneds()),
+            exhaustive_vecs_fixed_length_from_single(j, exhaustive_unsigneds()),
+            exhaustive_vecs_fixed_length_from_single(k, exhaustive_unsigneds()),
         )
     }
 }
@@ -3922,7 +4007,7 @@ impl<T: PrimitiveUnsigned>
         &i: &u64,
     ) -> ExhaustiveTriples1Input<ExhaustiveFixedLengthVecs1Input<PrimitiveIntIncreasingRange<T>>>
     {
-        exhaustive_triples_from_single(exhaustive_fixed_length_vecs_from_single(
+        exhaustive_triples_from_single(exhaustive_vecs_fixed_length_from_single(
             i,
             exhaustive_unsigneds(),
         ))
@@ -3958,9 +4043,9 @@ impl<T: PrimitiveUnsigned>
     fn get_ys(&self, &(out_len, rem_len, len): &(u64, u64, u64)) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
         Box::new(
             exhaustive_quadruples(
-                exhaustive_fixed_length_vecs_from_single(out_len, exhaustive_unsigneds()),
-                exhaustive_fixed_length_vecs_from_single(rem_len, exhaustive_unsigneds()),
-                exhaustive_fixed_length_vecs_from_single(len - 1, exhaustive_unsigneds()),
+                exhaustive_vecs_fixed_length_from_single(out_len, exhaustive_unsigneds()),
+                exhaustive_vecs_fixed_length_from_single(rem_len, exhaustive_unsigneds()),
+                exhaustive_vecs_fixed_length_from_single(len - 1, exhaustive_unsigneds()),
                 exhaustive_positive_primitive_ints(),
             )
             .map(move |(out, rs, mut ns, n_hi)| {
@@ -4014,6 +4099,42 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_30<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn exhaustive_unsigned_vec_triple_gen_var_31<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y)| {
+                let x = x.checked_add(y)?;
+                Some((x, y))
+            }),
+            UnsignedVecTripleXYYLenGenerator,
+        )
+        .map(|p| p.1),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_32<T: PrimitiveUnsigned>(
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(o, x, y)| {
+                let o = max(x, y).checked_add(o)?;
+                Some((o, x, y))
+            }),
+            UnsignedVecTripleLenGenerator,
+        )
+        .map(|p| p.1),
+    )
+}
+
 // -- large types --
 
 pub fn exhaustive_large_type_gen_var_1<T: PrimitiveUnsigned>() -> It<(Vec<T>, Vec<T>, T, T)> {
@@ -4046,8 +4167,8 @@ impl<T: PrimitiveUnsigned>
     fn get_ys(&self, &(n, len): &(u64, u64)) -> It<(Vec<T>, Vec<T>, u64, bool)> {
         Box::new(
             exhaustive_pairs(
-                exhaustive_fixed_length_vecs_from_single(n, exhaustive_unsigneds()),
-                exhaustive_fixed_length_vecs_from_single(len, exhaustive_unsigneds::<T>())
+                exhaustive_vecs_fixed_length_from_single(n, exhaustive_unsigneds()),
+                exhaustive_vecs_fixed_length_from_single(len, exhaustive_unsigneds::<T>())
                     .filter(|xs| *xs.last().unwrap() != T::ZERO),
             )
             .map(move |(out, ns)| {
@@ -4073,5 +4194,16 @@ pub fn exhaustive_large_type_gen_var_2<T: PrimitiveUnsigned>() -> It<(Vec<T>, Ve
             UnsignedVecSqrtRemGenerator2,
         )
         .map(|p| p.1),
+    )
+}
+
+pub fn exhaustive_large_type_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> It<(Vec<T>, U, U, Vec<T>)> {
+    Box::new(
+        exhaustive_quadruples_xyyx::<Vec<T>, _, U, _>(
+            exhaustive_vecs(exhaustive_unsigneds()),
+            exhaustive_unsigneds(),
+        )
+        .filter_map(|(x, y, z, w)| Some((x, y, y.checked_add(U::ONE)?.checked_add(z)?, w))),
     )
 }

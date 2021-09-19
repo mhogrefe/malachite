@@ -38,9 +38,9 @@ use natural::arithmetic::square::{
 };
 use natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left, limbs_sub_limb_in_place,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_to_out, limbs_sub_to_out,
+    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_greater_in_place_left,
+    limbs_sub_greater_to_out, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
 use natural::comparison::cmp::limbs_cmp_same_length;
 use platform::{
@@ -294,7 +294,7 @@ pub fn _limbs_mul_greater_to_out_toom_22(
             slice_set_zero(&mut bsm1[t..]);
             v_neg_1_neg.not_assign();
         } else {
-            limbs_sub_to_out(bsm1, ys_0, ys_1);
+            limbs_sub_greater_to_out(bsm1, ys_0, ys_1);
         }
     }
     let (v_neg_1, scratch_out) = scratch.split_at_mut(n << 1); // v_neg_1: length 2 * n
@@ -484,7 +484,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
             slice_set_zero(bm1_hi);
             v_neg_1_neg.not_assign();
         } else {
-            assert!(!limbs_sub_to_out(bm1, ys_0, ys_1));
+            assert!(!limbs_sub_greater_to_out(bm1, ys_0, ys_1));
         }
     }
     _limbs_mul_same_length_to_out_toom_32_recursive(scratch, ap1, bp1);
@@ -614,7 +614,7 @@ pub fn _limbs_mul_greater_to_out_toom_32(
     if s + t > n {
         split_into_chunks_mut!(out, n << 1, [_unused, out_lo], out_hi);
         let out_hi = &mut out_hi[..s + t - n];
-        if limbs_sub_in_place_left(out_lo, out_hi) {
+        if limbs_sub_greater_in_place_left(out_lo, out_hi) {
             hi.wrapping_sub_assign(1);
         }
         if hi.get_highest_bit() {
@@ -1048,7 +1048,7 @@ pub fn _limbs_mul_greater_to_out_toom_42(
             slice_set_zero(&mut bsm1[t..]);
             v_neg_1_neg.not_assign();
         } else {
-            limbs_sub_to_out(bsm1, ys_0, ys_1);
+            limbs_sub_greater_to_out(bsm1, ys_0, ys_1);
         }
     }
     // Compute bs2, recycling bs1. bs2 = bs1 + ys_1
@@ -1630,7 +1630,7 @@ pub fn _limbs_mul_greater_to_out_toom_52(
             slice_set_zero(bsm1_hi);
             v_neg_1_neg.not_assign();
         } else {
-            limbs_sub_to_out(bsm1, ys_0, ys_1);
+            limbs_sub_greater_to_out(bsm1, ys_0, ys_1);
         }
     }
     // Compute bs2 and bsm2, recycling bs1 and bsm1. bs2 = bs1 + ys_1; bsm2 = bsm1 - ys_1
@@ -1656,7 +1656,7 @@ pub fn _limbs_mul_greater_to_out_toom_52(
             slice_set_zero(&mut bsm2_init[t..]);
             v_neg_2_neg.not_assign();
         } else {
-            limbs_sub_to_out(bsm2_init, bsm1, ys_1);
+            limbs_sub_greater_to_out(bsm2_init, bsm1, ys_1);
         }
     }
     // Compute as1 and asm1.
@@ -2301,7 +2301,7 @@ pub fn _limbs_mul_greater_to_out_toom_62(
             slice_set_zero(bsm1_hi);
             true
         } else {
-            limbs_sub_to_out(bsm1, ys_0, ys_1);
+            limbs_sub_greater_to_out(bsm1, ys_0, ys_1);
             false
         }
     };
@@ -2318,7 +2318,7 @@ pub fn _limbs_mul_greater_to_out_toom_62(
             slice_set_zero(bsm2_hi);
             true
         } else {
-            assert!(!limbs_sub_to_out(bsm2, bsm1, ys_1));
+            assert!(!limbs_sub_greater_to_out(bsm2, bsm1, ys_1));
             bsm2[n] = 0;
             false
         }

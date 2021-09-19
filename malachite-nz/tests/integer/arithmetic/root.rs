@@ -3,14 +3,14 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::signed_unsigned_pair_gen_var_18;
+use malachite_base_test_util::generators::{signed_gen, signed_unsigned_pair_gen_var_18};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
 use malachite_nz_test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_nz_test_util::generators::{
-    integer_unsigned_pair_gen_var_3, natural_unsigned_pair_gen_var_7,
+    integer_gen, integer_unsigned_pair_gen_var_3, natural_gen, natural_unsigned_pair_gen_var_7,
 };
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -211,6 +211,108 @@ fn checked_root_fail() {
     assert_panic!(Integer::NEGATIVE_ONE.checked_root(2));
     assert_panic!(Integer::NEGATIVE_ONE.checked_root(4));
     assert_panic!(Integer::NEGATIVE_ONE.checked_root(100));
+}
+
+#[test]
+fn floor_cbrt_properties() {
+    integer_gen().test_properties(|n| {
+        let cbrt = n.clone().floor_root(3);
+        assert_eq!((&n).floor_root(3), cbrt);
+        let mut n_alt = n.clone();
+        n_alt.floor_root_assign(3);
+        assert_eq!(n_alt, cbrt);
+        if n >= 0 {
+            assert_eq!(bigint_to_integer(&integer_to_bigint(&n).nth_root(3)), cbrt);
+            assert_eq!(
+                rug_integer_to_integer(&integer_to_rug_integer(&n).root(3)),
+                cbrt
+            );
+        }
+
+        let cube = (&cbrt).pow(3);
+        let ceiling_cbrt = (&n).ceiling_root(3);
+        if cube == n {
+            assert_eq!(ceiling_cbrt, cbrt);
+        } else {
+            assert_eq!(ceiling_cbrt, &cbrt + Integer::ONE);
+        }
+        assert!(cube <= n);
+        assert!((&cbrt + Integer::ONE).pow(3) > n);
+        assert_eq!(-(-n).ceiling_root(3), cbrt);
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!((&n).floor_root(3), Integer::from(n).floor_root(3));
+    });
+
+    signed_gen::<SignedLimb>().test_properties(|i| {
+        assert_eq!(i.floor_root(3), Integer::from(i).floor_root(3));
+    });
+}
+
+#[test]
+fn ceiling_cbrt_properties() {
+    integer_gen().test_properties(|n| {
+        let cbrt = n.clone().ceiling_root(3);
+        assert_eq!((&n).ceiling_root(3), cbrt);
+        let mut n_alt = n.clone();
+        n_alt.ceiling_root_assign(3);
+        assert_eq!(n_alt, cbrt);
+        if n < 0 {
+            assert_eq!(bigint_to_integer(&integer_to_bigint(&n).nth_root(3)), cbrt);
+            assert_eq!(
+                rug_integer_to_integer(&integer_to_rug_integer(&n).root(3)),
+                cbrt
+            );
+        }
+        let cube = (&cbrt).pow(3);
+        let floor_cbrt = (&n).floor_root(3);
+        if cube == n {
+            assert_eq!(floor_cbrt, cbrt);
+        } else {
+            assert_eq!(floor_cbrt, &cbrt - Integer::ONE);
+        }
+        assert!(cube >= n);
+        if n != 0 {
+            assert!((&cbrt - Integer::ONE).pow(3) < n);
+        }
+        assert_eq!(-(-n).floor_root(3), cbrt);
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!((&n).ceiling_root(3), Integer::from(n).ceiling_root(3));
+    });
+
+    signed_gen::<SignedLimb>().test_properties(|i| {
+        assert_eq!(i.ceiling_root(3), Integer::from(i).ceiling_root(3));
+    });
+}
+
+#[test]
+fn checked_cbrt_properties() {
+    integer_gen().test_properties(|n| {
+        let cbrt = n.clone().checked_root(3);
+        assert_eq!((&n).checked_root(3), cbrt);
+        if let Some(cbrt) = cbrt {
+            assert_eq!((&cbrt).pow(3), n);
+            assert_eq!((&n).floor_root(3), cbrt);
+            assert_eq!(n.ceiling_root(3), cbrt);
+        }
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!(
+            (&n).checked_root(3).map(Integer::from),
+            Integer::from(n).checked_root(3)
+        );
+    });
+
+    signed_gen::<SignedLimb>().test_properties(|i| {
+        assert_eq!(
+            i.checked_root(3).map(Integer::from),
+            Integer::from(i).checked_root(3)
+        );
+    });
 }
 
 #[test]

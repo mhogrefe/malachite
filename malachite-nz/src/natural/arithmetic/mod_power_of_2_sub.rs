@@ -11,7 +11,7 @@ use natural::arithmetic::mod_power_of_2::{
 };
 use natural::arithmetic::mod_power_of_2_add::limbs_vec_mod_power_of_2_add_limb_in_place;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
+    limbs_sub_greater_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
     limbs_sub_same_length_in_place_right, limbs_vec_sub_in_place_right,
 };
 use natural::logic::low_mask::limbs_low_mask;
@@ -101,7 +101,7 @@ pub fn limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb>
     if ys_len > xs.len() {
         out_limbs.resize(ys_len, 0);
     }
-    if limbs_sub_in_place_left(&mut out_limbs, ys) {
+    if limbs_sub_greater_in_place_left(&mut out_limbs, ys) {
         extend_with_ones(&mut out_limbs, pow);
         limbs_slice_mod_power_of_2_in_place(&mut out_limbs, pow);
     }
@@ -134,7 +134,7 @@ pub fn limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], p
     if ys_len > xs.len() {
         xs.resize(ys_len, 0);
     }
-    if limbs_sub_in_place_left(xs, ys) {
+    if limbs_sub_greater_in_place_left(xs, ys) {
         extend_with_ones(xs, pow);
         limbs_slice_mod_power_of_2_in_place(xs, pow);
     }

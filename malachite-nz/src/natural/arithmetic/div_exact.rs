@@ -27,9 +27,9 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_in_place_left, limbs_sub_limb_in_place,
-    limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
-    limbs_sub_same_length_to_out_with_overlap,
+    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_greater_in_place_left,
+    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap,
 };
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::cmp::limbs_cmp_same_length;
@@ -651,7 +651,7 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
         assert!(!limbs_slice_add_limb_in_place(&mut scratch[lo..], 1));
     }
     let ns = &mut ns[lo..];
-    let highest_r = limbs_sub_in_place_left(ns, scratch);
+    let highest_r = limbs_sub_greater_in_place_left(ns, scratch);
     let (ds_lo, ds_hi) = ds.split_at(hi);
     let carry = if hi < DC_BDIV_QR_THRESHOLD {
         _limbs_modular_div_mod_schoolbook(qs_hi, &mut ns[..hi << 1], ds_lo, d_inv)
@@ -727,7 +727,7 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
                     1
                 ));
             }
-            borrow = limbs_sub_in_place_left(&mut ns[q_len_mod_d_len..], &scratch[..d_len]);
+            borrow = limbs_sub_greater_in_place_left(&mut ns[q_len_mod_d_len..], &scratch[..d_len]);
             carry = false;
         }
         let mut q_len_s = q_len - q_len_mod_d_len; // q_len_s is a multiple of d_len
@@ -759,7 +759,7 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
             if carry {
                 assert!(!limbs_slice_add_limb_in_place(&mut scratch[q_len..], 1));
             }
-            borrow = limbs_sub_in_place_left(&mut ns[q_len..], &scratch[..d_len]);
+            borrow = limbs_sub_greater_in_place_left(&mut ns[q_len..], &scratch[..d_len]);
             carry = false;
         }
     }
@@ -1178,7 +1178,7 @@ pub fn _limbs_modular_div_divide_and_conquer(
                     1
                 ));
             }
-            limbs_sub_in_place_left(&mut ns[n_len_mod_d_len..], &scratch[..d_len]);
+            limbs_sub_greater_in_place_left(&mut ns[n_len_mod_d_len..], &scratch[..d_len]);
             carry = false;
         }
         let mut m = n_len_mod_d_len;

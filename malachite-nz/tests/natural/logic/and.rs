@@ -1,17 +1,28 @@
-use malachite_nz_test_util::natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
-use num::BigUint;
-use rug;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::CountOnes;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_pair_gen_var_27, unsigned_vec_pair_gen, unsigned_vec_pair_gen_var_6,
+    unsigned_vec_triple_gen_var_31, unsigned_vec_triple_gen_var_32,
+    unsigned_vec_unsigned_pair_gen_var_15,
+};
 use malachite_nz::natural::logic::and::{
     limbs_and, limbs_and_in_place_either, limbs_and_limb, limbs_and_same_length_to_out,
     limbs_and_to_out, limbs_slice_and_in_place_left, limbs_slice_and_same_length_in_place_left,
     limbs_vec_and_in_place_left,
 };
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_nz_test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
+use malachite_nz_test_util::natural::logic::and::{natural_and_alt_1, natural_and_alt_2};
+use num::BigUint;
+use rug;
+use std::cmp::max;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -245,4 +256,200 @@ fn test_and() {
     test("12345678987654321", "987654321", "579887281");
     test("1000000000000", "999999999999", "999999995904");
     test("12345678987654321", "314159265358979", "312331665941633");
+}
+
+#[test]
+fn limbs_and_limb_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_15().test_properties_with_config(&config, |(xs, y)| {
+        assert_eq!(
+            limbs_and_limb(&xs, y),
+            Natural::from_owned_limbs_asc(xs) & Natural::from(y)
+        );
+    });
+}
+
+#[test]
+fn limbs_and_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen().test_properties_with_config(&config, |(xs, ys)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_and(&xs, &ys)),
+            Natural::from_owned_limbs_asc(xs) & Natural::from_owned_limbs_asc(ys)
+        )
+    });
+}
+
+#[test]
+fn limbs_and_same_length_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_31().test_properties_with_config(&config, |(mut out, xs, ys)| {
+        let out_old = out.clone();
+        limbs_and_same_length_to_out(&mut out, &xs, &ys);
+        let len = xs.len();
+        assert_eq!(
+            Natural::from_limbs_asc(&out[..len]),
+            Natural::from_owned_limbs_asc(xs) & Natural::from_owned_limbs_asc(ys)
+        );
+        assert_eq!(&out[len..], &out_old[len..]);
+    });
+}
+
+#[test]
+fn limbs_and_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_32().test_properties_with_config(&config, |(mut out, xs, ys)| {
+        let out_old = out.clone();
+        limbs_and_to_out(&mut out, &xs, &ys);
+        let len = max(xs.len(), ys.len());
+        assert_eq!(
+            Natural::from_limbs_asc(&out[..len]),
+            Natural::from_owned_limbs_asc(xs) & Natural::from_owned_limbs_asc(ys)
+        );
+        assert_eq!(&out[len..], &out_old[len..]);
+    });
+}
+
+#[test]
+fn limbs_slice_and_same_length_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_6().test_properties_with_config(&config, |(mut xs, ys)| {
+        let xs_old = xs.clone();
+        limbs_slice_and_same_length_in_place_left(&mut xs, &ys);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(xs),
+            Natural::from_owned_limbs_asc(xs_old) & Natural::from_owned_limbs_asc(ys)
+        );
+    });
+}
+
+#[test]
+fn limbs_slice_and_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen().test_properties_with_config(&config, |(mut xs, ys)| {
+        let xs_old = xs.clone();
+        let truncate_size = limbs_slice_and_in_place_left(&mut xs, &ys);
+        let n = Natural::from_limbs_asc(&xs_old) & Natural::from_owned_limbs_asc(ys);
+        if let Some(truncate_size) = truncate_size {
+            assert_eq!(Natural::from_limbs_asc(&xs[..truncate_size]), n);
+            assert_eq!(&xs[truncate_size..], &xs_old[truncate_size..]);
+        } else {
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        }
+    });
+}
+
+#[test]
+fn limbs_vec_and_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen().test_properties_with_config(&config, |(mut xs, ys)| {
+        let xs_old = xs.clone();
+        limbs_vec_and_in_place_left(&mut xs, &ys);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(xs),
+            Natural::from_owned_limbs_asc(xs_old) & Natural::from_owned_limbs_asc(ys)
+        );
+    });
+}
+
+#[test]
+fn limbs_and_in_place_either_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen().test_properties_with_config(&config, |(mut xs, mut ys)| {
+        let xs_old = xs.clone();
+        let ys_old = ys.clone();
+        let right = limbs_and_in_place_either(&mut xs, &mut ys);
+        let n = Natural::from_limbs_asc(&xs_old) & Natural::from_limbs_asc(&ys_old);
+        if right {
+            assert_eq!(xs, xs_old);
+            assert_eq!(Natural::from_owned_limbs_asc(ys), n);
+        } else {
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+            assert_eq!(ys, ys_old);
+        }
+    });
+}
+
+#[allow(clippy::eq_op)]
+#[test]
+fn and_properties() {
+    natural_pair_gen().test_properties(|(x, y)| {
+        let result_val_val = x.clone() & y.clone();
+        let result_val_ref = x.clone() & &y;
+        let result_ref_val = &x & y.clone();
+        let result = &x & &y;
+        assert!(result_val_val.is_valid());
+        assert!(result_val_ref.is_valid());
+        assert!(result_ref_val.is_valid());
+        assert!(result.is_valid());
+        assert_eq!(result_val_val, result);
+        assert_eq!(result_val_ref, result);
+        assert_eq!(result_ref_val, result);
+
+        let mut mut_x = x.clone();
+        mut_x &= y.clone();
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, result);
+        let mut mut_x = x.clone();
+        mut_x &= &y;
+        assert_eq!(mut_x, result);
+        assert!(mut_x.is_valid());
+
+        let mut mut_x = natural_to_rug_integer(&x);
+        mut_x &= natural_to_rug_integer(&y);
+        assert_eq!(rug_integer_to_natural(&mut_x), result);
+
+        assert_eq!(
+            biguint_to_natural(&(natural_to_biguint(&x) & natural_to_biguint(&y))),
+            result
+        );
+        assert_eq!(
+            rug_integer_to_natural(&(natural_to_rug_integer(&x) & natural_to_rug_integer(&y))),
+            result
+        );
+
+        assert_eq!(natural_and_alt_1(&x, &y), result);
+        assert_eq!(natural_and_alt_2(&x, &y), result);
+
+        assert_eq!(&y & &x, result);
+        assert_eq!(&result & &x, result);
+        assert_eq!(&result & &y, result);
+
+        assert!(result <= x);
+        assert!(result <= y);
+
+        let ones = result.count_ones();
+        assert!(ones <= x.count_ones());
+        assert!(ones <= y.count_ones());
+    });
+
+    natural_gen().test_properties(|x| {
+        assert_eq!(&x & Natural::ZERO, 0);
+        assert_eq!(Natural::ZERO & &x, 0);
+        assert_eq!(&x & &x, x);
+    });
+
+    natural_triple_gen().test_properties(|(x, y, z)| {
+        assert_eq!((&x & &y) & &z, x & (y & z));
+    });
+
+    unsigned_pair_gen_var_27::<Limb>().test_properties(|(x, y)| {
+        assert_eq!(Natural::from(x) & Natural::from(y), x & y);
+    });
 }

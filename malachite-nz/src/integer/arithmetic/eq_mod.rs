@@ -39,6 +39,7 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 /// ```
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.2.1, where a is negative.
+#[doc(hidden)]
 pub fn limbs_eq_neg_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
     limbs_eq_limb_mod_limb(xs, y.neg_mod(m), m)
 }
@@ -75,6 +76,7 @@ const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
 /// and d are one limb long, and c is longer than one limb.
+#[doc(hidden)]
 pub const fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bool {
     // We are checking whether x === -y mod m; that is, whether x + y = k * m for some k in Z. But
     // because of the preconditions on m, the lowest possible value of m is 2<sup>Limb::WIDTH</sup>,
@@ -151,6 +153,7 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
 /// and d are longer than one limb, and c is one limb long.
+#[doc(hidden)]
 pub fn limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_pos_eq_neg_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -186,6 +189,7 @@ pub fn limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool 
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
 /// and d are longer than one limb, and c is one limb long.
+#[doc(hidden)]
 pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_pos_eq_neg_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -221,6 +225,7 @@ pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool 
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
 /// and c are longer than one limb, and m is one limb long.
+#[doc(hidden)]
 pub fn limbs_pos_eq_neg_mod_limb(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_mod_neg_limb_greater(xs, ys, m)
@@ -292,6 +297,7 @@ fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], ms: &[Limb]) ->
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
 /// and each is longer than one limb.
+#[doc(hidden)]
 pub fn limbs_pos_eq_neg_mod_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_neg_mod_greater_ref(xs, ys, ms)
@@ -337,6 +343,7 @@ fn limbs_pos_eq_neg_mod_greater_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
 /// and each is longer than one limb.
+#[doc(hidden)]
 pub fn limbs_pos_eq_neg_mod(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_neg_mod_greater(xs, ys, ms)

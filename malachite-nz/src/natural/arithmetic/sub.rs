@@ -236,19 +236,19 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_to_out;
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_greater_to_out;
 ///
 /// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_to_out(&mut out, &[123, 456], &[789]), false);
+/// assert_eq!(limbs_sub_greater_to_out(&mut out, &[123, 456], &[789]), false);
 /// assert_eq!(out, &[4294966630, 455, 0]);
 ///
 /// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_to_out(&mut out, &[123, 456], &[456, 789]), true);
+/// assert_eq!(limbs_sub_greater_to_out(&mut out, &[123, 456], &[456, 789]), true);
 /// assert_eq!(out, &[4294966963, 4294966962, 0]);
 /// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.2.1.
-pub fn limbs_sub_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+pub fn limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
@@ -318,19 +318,19 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 ///
 /// # Examples
 /// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_in_place_left;
+/// use malachite_nz::natural::arithmetic::sub::limbs_sub_greater_in_place_left;
 ///
 /// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_in_place_left(xs, &[789]), false);
+/// assert_eq!(limbs_sub_greater_in_place_left(xs, &[789]), false);
 /// assert_eq!(xs, &[4294966630, 455]);
 ///
 /// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_in_place_left(xs, &[456, 789]), true);
+/// assert_eq!(limbs_sub_greater_in_place_left(xs, &[456, 789]), true);
 /// assert_eq!(xs, &[4294966963, 4294966962]);
 /// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is written to the first input.
-pub fn limbs_sub_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+pub fn limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let (xs_lo, xs_hi) = xs.split_at_mut(ys_len);

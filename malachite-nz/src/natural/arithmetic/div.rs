@@ -667,7 +667,7 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
-                    fail_on_untested_path("_limbs_div_barrett, limbs_sub_to_out 1");
+                    fail_on_untested_path("_limbs_div_barrett, limbs_sub_greater_to_out 1");
                     assert!(highest_q);
                     return false;
                 }
@@ -703,7 +703,7 @@ pub fn _limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &m
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
-                    fail_on_untested_path("_limbs_div_barrett, limbs_sub_to_out 2");
+                    fail_on_untested_path("_limbs_div_barrett, limbs_sub_greater_to_out 2");
                     assert!(highest_q);
                     return false;
                 }

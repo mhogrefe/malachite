@@ -7,10 +7,11 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
     _limbs_sub_same_length_with_borrow_in_to_out, limbs_slice_sub_in_place_right, limbs_sub,
-    limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out,
-    limbs_sub_same_length_to_out_with_overlap, limbs_sub_to_out, limbs_vec_sub_in_place_right,
+    limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb,
+    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
+    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap,
+    limbs_vec_sub_in_place_right,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -123,7 +124,7 @@ fn limbs_sub_properties() {
     });
 }
 
-fn limbs_sub_to_out_helper(
+fn limbs_sub_greater_to_out_helper(
     f: &mut dyn FnMut(&mut [Limb], &[Limb], &[Limb]) -> bool,
     out: &Vec<Limb>,
     xs: &Vec<Limb>,
@@ -151,22 +152,22 @@ fn limbs_sub_same_length_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_var_3,
         |&(ref out, ref xs, ref ys)| {
-            limbs_sub_to_out_helper(&mut limbs_sub_same_length_to_out, out, xs, ys);
+            limbs_sub_greater_to_out_helper(&mut limbs_sub_same_length_to_out, out, xs, ys);
         },
     );
 }
 
 #[test]
-fn limbs_sub_to_out_properties() {
+fn limbs_sub_greater_to_out_properties() {
     test_properties(
         triples_of_unsigned_vec_var_9,
         |&(ref out, ref xs, ref ys)| {
-            limbs_sub_to_out_helper(&mut limbs_sub_to_out, out, xs, ys);
+            limbs_sub_greater_to_out_helper(&mut limbs_sub_greater_to_out, out, xs, ys);
         },
     );
 }
 
-fn limbs_sub_in_place_left_helper(
+fn limbs_sub_greater_in_place_left_helper(
     f: &mut dyn FnMut(&mut [Limb], &[Limb]) -> bool,
     xs: &Vec<Limb>,
     ys: &Vec<Limb>,
@@ -194,14 +195,14 @@ fn limbs_sub_in_place_left_helper(
 #[test]
 fn limbs_sub_same_length_in_place_left_properties() {
     test_properties(pairs_of_unsigned_vec_var_1, |&(ref xs, ref ys)| {
-        limbs_sub_in_place_left_helper(&mut limbs_sub_same_length_in_place_left, xs, ys);
+        limbs_sub_greater_in_place_left_helper(&mut limbs_sub_same_length_in_place_left, xs, ys);
     });
 }
 
 #[test]
-fn limbs_sub_in_place_left_properties() {
+fn limbs_sub_greater_in_place_left_properties() {
     test_properties(pairs_of_unsigned_vec_var_3, |&(ref xs, ref ys)| {
-        limbs_sub_in_place_left_helper(&mut limbs_sub_in_place_left, xs, ys);
+        limbs_sub_greater_in_place_left_helper(&mut limbs_sub_greater_in_place_left, xs, ys);
     });
 }
 

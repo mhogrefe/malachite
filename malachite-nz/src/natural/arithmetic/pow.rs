@@ -329,7 +329,7 @@ fn _limbs_pow_alt_estimated_scratch_len(xs: &[Limb], exp: u64) -> usize {
 ///
 /// This is mpn_pow_1 from mpn/generic/pow_1.c, GMP 6.1.2, where exp > 1, bn > 1, and the last
 /// element of xs is nonzero.
-fn limbs_pow_to_out_alt<'a>(
+pub(crate) fn limbs_pow_to_out_alt<'a>(
     mut out: &'a mut [Limb],
     xs: &[Limb],
     exp: u64,

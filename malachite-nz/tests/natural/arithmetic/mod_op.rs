@@ -12354,88 +12354,82 @@ fn limbs_mod_to_out_fail_3() {
 
 #[test]
 fn test_mod() {
-    let test = |u, v, remainder| {
-        let mut x = Natural::from_str(u).unwrap();
-        x.mod_assign(Natural::from_str(v).unwrap());
+    let test = |s, t, remainder| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x.mod_assign(v.clone());
         assert!(x.is_valid());
-        assert!(x.mod_is_reduced(&Natural::from_str(v).unwrap()));
+        assert!(x.mod_is_reduced(&v));
         assert_eq!(x.to_string(), remainder);
 
-        let mut x = Natural::from_str(u).unwrap();
-        x.mod_assign(&Natural::from_str(v).unwrap());
-        assert!(x.is_valid());
-        assert_eq!(x.to_string(), remainder);
-
-        let r = Natural::from_str(u)
-            .unwrap()
-            .mod_op(Natural::from_str(v).unwrap());
-        assert!(r.is_valid());
-        assert_eq!(r.to_string(), remainder);
-
-        let r = Natural::from_str(u)
-            .unwrap()
-            .mod_op(&Natural::from_str(v).unwrap());
-        assert!(r.is_valid());
-        assert_eq!(r.to_string(), remainder);
-
-        let r = (&Natural::from_str(u).unwrap()).mod_op(Natural::from_str(v).unwrap());
-        assert!(r.is_valid());
-        assert_eq!(r.to_string(), remainder);
-
-        let r = (&Natural::from_str(u).unwrap()).mod_op(&Natural::from_str(v).unwrap());
-        assert!(r.is_valid());
-        assert_eq!(r.to_string(), remainder);
-
-        let mut x = Natural::from_str(u).unwrap();
-        x %= Natural::from_str(v).unwrap();
+        let mut x = u.clone();
+        x.mod_assign(&v);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let mut x = Natural::from_str(u).unwrap();
-        x %= &Natural::from_str(v).unwrap();
+        let r = u.clone().mod_op(v.clone());
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+
+        let r = u.clone().mod_op(&v);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+
+        let r = (&u).mod_op(v.clone());
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+
+        let r = (&u).mod_op(&v);
+        assert!(r.is_valid());
+        assert_eq!(r.to_string(), remainder);
+
+        let mut x = u.clone();
+        x %= v.clone();
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let r = Natural::from_str(u).unwrap() % Natural::from_str(v).unwrap();
+        let mut x = u.clone();
+        x %= &v;
+        assert!(x.is_valid());
+        assert_eq!(x.to_string(), remainder);
+
+        let r = u.clone() % v.clone();
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = Natural::from_str(u).unwrap() % &Natural::from_str(v).unwrap();
+        let r = u.clone() % &v;
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = &Natural::from_str(u).unwrap() % Natural::from_str(v).unwrap();
+        let r = &u % v.clone();
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = &Natural::from_str(u).unwrap() % &Natural::from_str(v).unwrap();
+        let r = &u % &v;
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = BigUint::from_str(u)
-            .unwrap()
-            .mod_floor(&BigUint::from_str(v).unwrap());
+        let num_u = BigUint::from_str(s).unwrap();
+        let num_v = BigUint::from_str(t).unwrap();
+
+        let r = (&num_u).mod_floor(&num_v);
         assert_eq!(r.to_string(), remainder);
 
-        let r = BigUint::from_str(u).unwrap() % &BigUint::from_str(v).unwrap();
+        let r = num_u % num_v;
         assert_eq!(r.to_string(), remainder);
 
-        let r = rug::Integer::from_str(u)
-            .unwrap()
-            .rem_floor(rug::Integer::from_str(v).unwrap());
+        let rug_u = rug::Integer::from_str(s).unwrap();
+        let rug_v = rug::Integer::from_str(t).unwrap();
+
+        let r = (rug_u.clone()).rem_floor(rug_v.clone());
         assert_eq!(r.to_string(), remainder);
 
-        let r = rug::Integer::from_str(u).unwrap() % rug::Integer::from_str(v).unwrap();
+        let r = rug_u % rug_v;
         assert_eq!(r.to_string(), remainder);
 
-        assert_eq!(
-            Natural::from_str(u)
-                .unwrap()
-                .div_mod(Natural::from_str(v).unwrap())
-                .1
-                .to_string(),
-            remainder
-        );
+        assert_eq!(u.div_mod(v).1.to_string(), remainder);
     };
     test("0", "1", "0");
     test("0", "123", "0");
@@ -12577,52 +12571,44 @@ fn rem_ref_ref_fail() {
 
 #[test]
 fn test_neg_mod() {
-    let test = |u, v, remainder| {
-        let mut x = Natural::from_str(u).unwrap();
-        x.neg_mod_assign(Natural::from_str(v).unwrap());
+    let test = |s, t, remainder| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        let mut x = u.clone();
+        x.neg_mod_assign(v.clone());
         assert!(x.is_valid());
-        assert!(x.mod_is_reduced(&Natural::from_str(v).unwrap()));
+        assert!(x.mod_is_reduced(&v));
         assert_eq!(x.to_string(), remainder);
 
-        let mut x = Natural::from_str(u).unwrap();
-        x.neg_mod_assign(&Natural::from_str(v).unwrap());
+        let mut x = u.clone();
+        x.neg_mod_assign(&v);
         assert!(x.is_valid());
         assert_eq!(x.to_string(), remainder);
 
-        let r = Natural::from_str(u)
-            .unwrap()
-            .neg_mod(Natural::from_str(v).unwrap());
+        let r = u.clone().neg_mod(v.clone());
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = Natural::from_str(u)
-            .unwrap()
-            .neg_mod(&Natural::from_str(v).unwrap());
+        let r = u.clone().neg_mod(&v);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = (&Natural::from_str(u).unwrap()).neg_mod(Natural::from_str(v).unwrap());
+        let r = (&u).neg_mod(v.clone());
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
-        let r = (&Natural::from_str(u).unwrap()).neg_mod(&Natural::from_str(v).unwrap());
+        let r = (&u).neg_mod(&v);
         assert!(r.is_valid());
         assert_eq!(r.to_string(), remainder);
 
         let r = rug_neg_mod(
-            rug::Integer::from_str(u).unwrap(),
-            rug::Integer::from_str(v).unwrap(),
+            rug::Integer::from_str(s).unwrap(),
+            rug::Integer::from_str(t).unwrap(),
         );
         assert_eq!(r.to_string(), remainder);
 
-        assert_eq!(
-            Natural::from_str(u)
-                .unwrap()
-                .ceiling_div_neg_mod(Natural::from_str(v).unwrap())
-                .1
-                .to_string(),
-            remainder
-        );
+        assert_eq!(u.ceiling_div_neg_mod(v).1.to_string(), remainder);
     };
     test("0", "1", "0");
     test("0", "123", "0");

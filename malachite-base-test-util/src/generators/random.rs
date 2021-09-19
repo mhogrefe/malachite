@@ -28,7 +28,8 @@ use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::num::random::geometric::{
     geometric_random_natural_signeds, geometric_random_nonzero_signeds,
     geometric_random_positive_unsigneds, geometric_random_signed_inclusive_range,
-    geometric_random_signed_range, geometric_random_signeds, geometric_random_unsigned_range,
+    geometric_random_signed_range, geometric_random_signeds,
+    geometric_random_unsigned_inclusive_range, geometric_random_unsigned_range,
     geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
     GeometricRandomSigneds,
 };
@@ -60,14 +61,14 @@ use malachite_base::tuples::random::{
 use malachite_base::unions::random::{random_union2s, random_union3s};
 use malachite_base::unions::{Union2, Union3};
 use malachite_base::vecs::random::{
-    random_fixed_length_vecs_from_single, random_vecs, random_vecs_length_inclusive_range,
+    random_vecs, random_vecs_fixed_length_from_single, random_vecs_length_inclusive_range,
     random_vecs_min_length,
 };
 use malachite_base::vecs::random_values_from_vec;
 use num::arithmetic::mod_mul::limbs_invert_limb_naive;
 use num::float::PRIMITIVE_FLOAT_CHARS;
 use rounding_modes::ROUNDING_MODE_CHARS;
-use std::cmp::{min, Ordering};
+use std::cmp::{max, min, Ordering};
 use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::mem::swap;
@@ -549,8 +550,8 @@ pub fn random_primitive_float_signed_pair_gen<T: PrimitiveFloat, U: PrimitiveSig
         &|seed| {
             geometric_random_signeds(
                 seed,
-                config.get_or("small_signed_mean_n", 32),
-                config.get_or("small_signed_mean_d", 1),
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
             )
         },
     ))
@@ -573,8 +574,8 @@ pub fn random_primitive_float_signed_pair_gen_var_1<T: PrimitiveFloat, U: Primit
         &|seed| {
             geometric_random_signeds(
                 seed,
-                config.get_or("small_signed_mean_n", 32),
-                config.get_or("small_signed_mean_d", 1),
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
             )
         },
     ))
@@ -604,8 +605,8 @@ pub fn random_primitive_float_signed_pair_gen_var_2<T: PrimitiveFloat>(
                     seed,
                     T::MIN_EXPONENT,
                     T::MAX_EXPONENT,
-                    config.get_or("small_signed_mean_n", 32),
-                    config.get_or("small_signed_mean_d", 1),
+                    config.get_or("mean_small_signed_n", 32),
+                    config.get_or("mean_small_signed_d", 1),
                 )
             },
         )
@@ -632,8 +633,8 @@ pub fn random_primitive_float_unsigned_pair_gen_var_1<T: PrimitiveFloat, U: Prim
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_signed_mean_n", 32),
-                config.get_or("small_signed_mean_d", 1),
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
             )
         },
     ))
@@ -660,8 +661,8 @@ pub fn random_primitive_float_unsigned_pair_gen_var_2<T: PrimitiveFloat>(
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_signed_mean_n", 32),
-                config.get_or("small_signed_mean_d", 1),
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
             )
         },
     ))
@@ -684,8 +685,8 @@ pub fn random_primitive_float_unsigned_pair_gen_var_3<T: PrimitiveFloat, U: Prim
         &|seed| {
             geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("small_signed_mean_n", 32),
-                config.get_or("small_signed_mean_d", 1),
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
             )
         },
     ))
@@ -713,8 +714,8 @@ pub fn random_primitive_float_unsigned_rounding_mode_triple_gen_var_1<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_signed_mean_n", 32),
-                config.get_or("small_signed_mean_d", 1),
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
             )
         },
         &random_rounding_modes,
@@ -742,8 +743,8 @@ pub fn random_primitive_float_unsigned_rounding_mode_triple_gen_var_2<T: Primiti
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_signed_mean_n", 32),
-                config.get_or("small_signed_mean_d", 1),
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
             )
         },
         &random_rounding_modes,
@@ -1118,8 +1119,8 @@ pub fn random_primitive_int_primitive_int_unsigned_triple_gen_var_1<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -1139,8 +1140,8 @@ pub fn random_primitive_int_primitive_int_unsigned_triple_gen_var_2<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -1153,8 +1154,8 @@ pub fn random_primitive_int_primitive_int_unsigned_triple_gen_var_3<T: Primitive
         random_triples_xxy(EXAMPLE_SEED, &random_primitive_ints::<T>, &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         })
         .filter(|&(x, y, pow)| !x.eq_mod_power_of_2(y, pow)),
@@ -1175,8 +1176,8 @@ pub fn random_primitive_int_primitive_int_primitive_int_unsigned_quadruple_gen_v
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -1193,8 +1194,8 @@ pub fn random_primitive_int_signed_pair_gen_var_1<T: PrimitiveInt, U: PrimitiveS
         &|seed| {
             geometric_random_signeds(
                 seed,
-                config.get_or("small_signed_mean_n", 32),
-                config.get_or("small_signed_mean_d", 1),
+                config.get_or("mean_small_signed_n", 32),
+                config.get_or("mean_small_signed_d", 1),
             )
         },
     ))
@@ -1294,8 +1295,8 @@ pub fn random_primitive_int_unsigned_pair_gen_var_1<T: PrimitiveInt, U: Primitiv
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -1354,8 +1355,8 @@ pub fn random_primitive_int_unsigned_pair_gen_var_6<T: PrimitiveInt, U: Primitiv
         random_pairs(EXAMPLE_SEED, &random_primitive_ints::<T>, &|seed| {
             geometric_random_unsigneds::<U>(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         })
         .filter(|&(x, y)| !x.divisible_by_power_of_2(y.exact_into())),
@@ -1369,8 +1370,8 @@ pub fn random_primitive_int_unsigned_pair_gen_var_7<T: PrimitiveInt, U: Primitiv
         random_pairs(EXAMPLE_SEED, &random_primitive_ints::<T>, &|seed| {
             geometric_random_unsigneds::<U>(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         })
         .map(|(mut x, y)| {
@@ -1399,8 +1400,8 @@ pub fn random_primitive_int_unsigned_pair_gen_var_9<T: PrimitiveInt, U: Primitiv
         &|seed| {
             geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -1420,8 +1421,8 @@ pub fn random_primitive_int_unsigned_bool_triple_gen_var_1<T: PrimitiveInt>(
                 &|seed_2| {
                     geometric_random_unsigneds(
                         seed_2,
-                        config.get_or("small_unsigned_mean_n", 32),
-                        config.get_or("small_unsigned_mean_d", 1),
+                        config.get_or("mean_small_n", 32),
+                        config.get_or("mean_small_d", 1),
                     )
                     .map(|x| (x, false))
                 },
@@ -1442,8 +1443,8 @@ pub fn random_primitive_int_unsigned_bool_triple_gen_var_2<T: PrimitiveInt>(
                 random_pairs(seed, &random_primitive_ints, &|seed_2| {
                     geometric_random_unsigneds(
                         seed_2,
-                        config.get_or("small_unsigned_mean_n", 32),
-                        config.get_or("small_unsigned_mean_d", 1),
+                        config.get_or("mean_small_n", 32),
+                        config.get_or("mean_small_d", 1),
                     )
                 })
                 .map(|(x, y)| (x, y, x < T::ZERO))
@@ -1471,8 +1472,8 @@ pub fn random_primitive_int_unsigned_primitive_int_triple_gen_var_1<
         random_triples_xyx(EXAMPLE_SEED, &random_primitive_ints, &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         })
         .flat_map(|(x, y, z): (T, U, T)| match x.cmp(&z) {
@@ -1517,8 +1518,8 @@ pub fn random_primitive_int_unsigned_unsigned_triple_gen_var_1<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -1534,8 +1535,8 @@ pub fn random_primitive_int_unsigned_unsigned_triple_gen_var_2<
         random_triples_xyy(EXAMPLE_SEED, &random_primitive_ints, &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         })
         .map(|(x, y, z)| if y <= z { (x, y, z) } else { (x, z, y) }),
@@ -1556,8 +1557,8 @@ pub fn random_primitive_int_unsigned_unsigned_triple_gen_var_3<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 4),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 4),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -1575,8 +1576,8 @@ pub fn random_primitive_int_unsigned_unsigned_triple_gen_var_4<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -1597,8 +1598,8 @@ pub fn random_primitive_int_unsigned_unsigned_unsigned_quadruple_gen_var_1<
             &|seed| {
                 geometric_random_unsigneds(
                     seed,
-                    config.get_or("small_unsigned_mean_n", 32),
-                    config.get_or("small_unsigned_mean_d", 1),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
                 )
             },
             &random_primitive_ints,
@@ -1740,8 +1741,8 @@ pub fn random_signed_gen_var_4<T: PrimitiveSigned>(_config: &GenConfig) -> It<T>
 pub fn random_signed_gen_var_5<T: PrimitiveSigned>(config: &GenConfig) -> It<T> {
     Box::new(geometric_random_signeds(
         EXAMPLE_SEED,
-        config.get_or("small_signed_mean_n", 32),
-        config.get_or("small_signed_mean_d", 1),
+        config.get_or("mean_small_signed_n", 32),
+        config.get_or("mean_small_signed_d", 1),
     ))
 }
 
@@ -2115,8 +2116,8 @@ pub fn random_signed_unsigned_pair_gen_var_1<T: PrimitiveSigned>(
                 random_pairs(seed, &random_negative_signeds, &|seed_2| {
                     geometric_random_unsigneds(
                         seed_2,
-                        config.get_or("small_unsigned_mean_n", 32),
-                        config.get_or("small_unsigned_mean_d", 1),
+                        config.get_or("mean_small_n", 32),
+                        config.get_or("mean_small_d", 1),
                     )
                 })
             },
@@ -2140,8 +2141,8 @@ pub fn random_signed_unsigned_pair_gen_var_2<T: PrimitiveSigned>(
                 random_pairs(seed, &random_natural_signeds, &|seed_2| {
                     geometric_random_unsigneds(
                         seed_2,
-                        config.get_or("small_unsigned_mean_n", 32),
-                        config.get_or("small_unsigned_mean_d", 1),
+                        config.get_or("mean_small_n", 32),
+                        config.get_or("mean_small_d", 1),
                     )
                 })
             },
@@ -2159,8 +2160,8 @@ pub fn random_signed_unsigned_pair_gen_var_3<T: PrimitiveSigned, U: PrimitiveUns
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -2189,8 +2190,8 @@ pub fn random_signed_unsigned_pair_gen_var_5<T: PrimitiveSigned>(
                 random_pairs(seed, &random_natural_signeds, &|seed_2| {
                     geometric_random_unsigneds(
                         seed_2,
-                        config.get_or("small_unsigned_mean_n", 32),
-                        config.get_or("small_unsigned_mean_d", 1),
+                        config.get_or("mean_small_n", 32),
+                        config.get_or("mean_small_d", 1),
                     )
                 })
             },
@@ -2217,8 +2218,8 @@ pub fn random_signed_unsigned_pair_gen_var_6<T: PrimitiveSigned>(
                     &|seed_2| {
                         geometric_random_unsigneds(
                             seed_2,
-                            config.get_or("small_unsigned_mean_n", 32),
-                            config.get_or("small_unsigned_mean_d", 1),
+                            config.get_or("mean_small_n", 32),
+                            config.get_or("mean_small_d", 1),
                         )
                     },
                 )
@@ -2261,15 +2262,15 @@ pub fn random_signed_unsigned_pair_gen_var_8<T: PrimitiveSigned, U: PrimitiveUns
         &|seed| {
             geometric_random_signeds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -2284,15 +2285,15 @@ pub fn random_signed_unsigned_pair_gen_var_9<T: PrimitiveSigned>(
             &|seed| {
                 geometric_random_signeds::<T>(
                     seed,
-                    config.get_or("small_unsigned_mean_n", 32),
-                    config.get_or("small_unsigned_mean_d", 1),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
                 )
             },
             &|seed| {
                 geometric_random_unsigneds(
                     seed,
-                    config.get_or("small_unsigned_mean_n", 32),
-                    config.get_or("small_unsigned_mean_d", 1),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
                 )
             },
         )
@@ -2309,8 +2310,8 @@ pub fn random_signed_unsigned_pair_gen_var_10<T: PrimitiveSigned, U: PrimitiveUn
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -2325,8 +2326,8 @@ pub fn random_signed_unsigned_pair_gen_var_11<T: PrimitiveSigned, U: PrimitiveUn
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -2342,8 +2343,8 @@ pub fn random_signed_unsigned_pair_gen_var_12<T: PrimitiveSigned, U: PrimitiveUn
                 random_pairs(seed, &random_natural_signeds, &|seed_2| {
                     geometric_random_positive_unsigneds(
                         seed_2,
-                        config.get_or("small_unsigned_mean_n", 32),
-                        config.get_or("small_unsigned_mean_d", 1),
+                        config.get_or("mean_small_n", 32),
+                        config.get_or("mean_small_d", 1),
                     )
                 })
             },
@@ -2351,8 +2352,8 @@ pub fn random_signed_unsigned_pair_gen_var_12<T: PrimitiveSigned, U: PrimitiveUn
                 random_pairs(seed, &random_negative_signeds, &|seed_2| {
                     geometric_random_unsigneds::<U>(
                         seed_2,
-                        config.get_or("small_unsigned_mean_n", 32),
-                        config.get_or("small_unsigned_mean_d", 1),
+                        config.get_or("mean_small_n", 32),
+                        config.get_or("mean_small_d", 1),
                     )
                     .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | U::ONE))
                 })
@@ -2377,8 +2378,8 @@ pub fn random_signed_unsigned_unsigned_triple_gen_var_1<
                 random_triples_xyy(seed, &random_positive_signeds, &|seed_2| {
                     geometric_random_unsigneds(
                         seed_2,
-                        config.get_or("small_unsigned_mean_n", 32),
-                        config.get_or("small_unsigned_mean_d", 1),
+                        config.get_or("mean_small_n", 32),
+                        config.get_or("mean_small_d", 1),
                     )
                 })
                 .map(|(x, y, z)| if y <= z { (x, y, z) } else { (x, z, y) })
@@ -2390,8 +2391,8 @@ pub fn random_signed_unsigned_unsigned_triple_gen_var_1<
                     &|seed_2| {
                         geometric_random_unsigneds(
                             seed_2,
-                            config.get_or("small_unsigned_mean_n", 32),
-                            config.get_or("small_unsigned_mean_d", 1),
+                            config.get_or("mean_small_n", 32),
+                            config.get_or("mean_small_d", 1),
                         )
                     },
                     &|seed_2| random_unsigned_range(seed_2, U::ZERO, U::exact_from(T::WIDTH)),
@@ -2418,8 +2419,8 @@ pub fn random_signed_unsigned_unsigned_unsigned_quadruple_gen_var_1<
             &|seed| {
                 geometric_random_unsigneds(
                     seed,
-                    config.get_or("small_unsigned_mean_n", 32),
-                    config.get_or("small_unsigned_mean_d", 1),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
                 )
             },
             &random_primitive_ints,
@@ -2520,8 +2521,8 @@ pub fn random_unsigned_gen_var_4<T: PrimitiveInt, U: PrimitiveUnsigned + Saturat
 pub fn random_unsigned_gen_var_5<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
     Box::new(geometric_random_unsigneds(
         EXAMPLE_SEED,
-        config.get_or("small_unsigned_mean_n", 32),
-        config.get_or("small_unsigned_mean_d", 1),
+        config.get_or("mean_small_n", 32),
+        config.get_or("mean_small_d", 1),
     ))
 }
 
@@ -2564,8 +2565,8 @@ pub fn random_unsigned_gen_var_10(_config: &GenConfig) -> It<u8> {
 pub fn random_unsigned_gen_var_11<T: PrimitiveUnsigned>(config: &GenConfig) -> It<T> {
     Box::new(geometric_random_positive_unsigneds(
         EXAMPLE_SEED,
-        config.get_or("small_unsigned_mean_n", 32),
-        config.get_or("small_unsigned_mean_d", 1),
+        config.get_or("mean_small_n", 32),
+        config.get_or("mean_small_d", 1),
     ))
 }
 
@@ -2890,8 +2891,8 @@ pub fn random_unsigned_pair_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveInt>(
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| random_unsigned_inclusive_range(seed, 1, U::WIDTH),
@@ -2909,8 +2910,8 @@ pub fn random_unsigned_pair_gen_var_3<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| random_unsigned_inclusive_range(seed, U::TWO, U::exact_from(36u8)),
@@ -2930,8 +2931,8 @@ pub fn random_unsigned_pair_gen_var_4<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -3016,15 +3017,15 @@ pub fn random_unsigned_pair_gen_var_9<T: PrimitiveUnsigned, U: PrimitiveUnsigned
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| {
             geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -3041,8 +3042,8 @@ pub fn random_unsigned_pair_gen_var_10<
         &|seed| {
             geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| random_unsigned_inclusive_range(seed, U::TWO, U::exact_from(36u8)),
@@ -3056,8 +3057,8 @@ pub fn random_unsigned_pair_gen_var_11<T: PrimitiveUnsigned>(config: &GenConfig)
             &|seed| {
                 geometric_random_unsigneds(
                     seed,
-                    config.get_or("small_unsigned_mean_n", 32),
-                    config.get_or("small_unsigned_mean_d", 1),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
                 )
                 .map(|x| (T::ZERO, x))
             },
@@ -3080,8 +3081,8 @@ pub fn random_unsigned_pair_gen_var_12<T: PrimitiveUnsigned, U: PrimitiveUnsigne
         &|seed| {
             geometric_random_positive_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -3105,8 +3106,8 @@ pub fn random_unsigned_pair_gen_var_14<T: PrimitiveUnsigned, U: PrimitiveUnsigne
                 seed,
                 U::TWO,
                 U::MAX,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -3138,15 +3139,15 @@ pub fn random_unsigned_pair_gen_var_17<T: PrimitiveUnsigned, U: PrimitiveUnsigne
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 32),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
             )
         },
     ))
@@ -3159,15 +3160,15 @@ pub fn random_unsigned_pair_gen_var_18<T: PrimitiveUnsigned>(config: &GenConfig)
             &|seed| {
                 geometric_random_unsigneds::<T>(
                     seed,
-                    config.get_or("small_unsigned_mean_n", 32),
-                    config.get_or("small_unsigned_mean_d", 1),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
                 )
             },
             &|seed| {
                 geometric_random_unsigneds(
                     seed,
-                    config.get_or("small_unsigned_mean_n", 32),
-                    config.get_or("small_unsigned_mean_d", 1),
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
                 )
             },
         )
@@ -3904,6 +3905,15 @@ pub fn random_string_pair_gen_var_1(config: &GenConfig) -> It<(String, String)> 
 
 // -- Vec<bool> --
 
+pub fn random_bool_vec_gen(config: &GenConfig) -> It<Vec<bool>> {
+    Box::new(random_vecs(
+        EXAMPLE_SEED,
+        &random_bools,
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
 pub fn random_bool_vec_gen_var_1<T: PrimitiveUnsigned>(config: &GenConfig) -> It<Vec<bool>> {
     Box::new(
         random_union2s(
@@ -3912,7 +3922,7 @@ pub fn random_bool_vec_gen_var_1<T: PrimitiveUnsigned>(config: &GenConfig) -> It
             &|seed| {
                 random_pairs(
                     seed,
-                    &|seed_2| random_fixed_length_vecs_from_single(T::WIDTH, random_bools(seed_2)),
+                    &|seed_2| random_vecs_fixed_length_from_single(T::WIDTH, random_bools(seed_2)),
                     &|seed_2| {
                         geometric_random_positive_unsigneds(
                             seed_2,
@@ -3937,7 +3947,7 @@ pub fn random_bool_vec_gen_var_2<T: PrimitiveSigned>(config: &GenConfig) -> It<V
                 random_pairs(
                     seed,
                     &|seed_2| {
-                        random_fixed_length_vecs_from_single(T::WIDTH - 1, random_bools(seed_2))
+                        random_vecs_fixed_length_from_single(T::WIDTH - 1, random_bools(seed_2))
                     },
                     &|seed_2| {
                         geometric_random_nonzero_signeds::<isize>(
@@ -3966,7 +3976,7 @@ pub fn random_bool_vec_gen_var_3<T: PrimitiveUnsigned>(config: &GenConfig) -> It
             &|seed| {
                 random_pairs(
                     seed,
-                    &|seed_2| random_fixed_length_vecs_from_single(T::WIDTH, random_bools(seed_2)),
+                    &|seed_2| random_vecs_fixed_length_from_single(T::WIDTH, random_bools(seed_2)),
                     &|seed_2| {
                         geometric_random_positive_unsigneds(
                             seed_2,
@@ -3991,7 +4001,7 @@ pub fn random_bool_vec_gen_var_4<T: PrimitiveSigned>(config: &GenConfig) -> It<V
                 random_pairs(
                     seed,
                     &|seed_2| {
-                        random_fixed_length_vecs_from_single(T::WIDTH - 1, random_bools(seed_2))
+                        random_vecs_fixed_length_from_single(T::WIDTH - 1, random_bools(seed_2))
                     },
                     &|seed_2| {
                         geometric_random_nonzero_signeds::<isize>(
@@ -4071,6 +4081,24 @@ pub fn random_primitive_int_vec_primitive_int_pair_gen<T: PrimitiveInt, U: Primi
         &|seed| {
             random_vecs(
                 seed,
+                &random_primitive_ints,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+pub fn random_primitive_int_vec_primitive_int_pair_gen_var_1<T: PrimitiveInt, U: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_vecs_min_length(
+                seed,
+                1,
                 &random_primitive_ints,
                 config.get_or("mean_length_n", 4),
                 config.get_or("mean_length_d", 1),
@@ -4208,6 +4236,82 @@ pub fn random_primitive_int_vec_unsigned_pair_gen_var_5<T: PrimitiveInt, U: Prim
     ))
 }
 
+pub fn random_primitive_int_vec_unsigned_pair_gen_var_6<T: PrimitiveInt, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_vecs_min_length(
+                seed,
+                1,
+                &random_primitive_ints,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|xs| *xs.last().unwrap() != T::ZERO)
+        },
+        &|seed| {
+            geometric_random_unsigned_inclusive_range(
+                seed,
+                U::exact_from(3),
+                U::MAX,
+                config.get_or("mean_small_unsigned_n", 4),
+                config.get_or("mean_small_unsigned_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_primitive_int_vec_unsigned_pair_gen_var_7<T: PrimitiveInt, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_vecs(
+                seed,
+                &random_primitive_ints,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_mean_n", 32),
+                config.get_or("small_mean_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_primitive_int_vec_unsigned_pair_gen_var_8<T: PrimitiveInt, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &random_primitive_ints,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_mean_n", 32),
+                    config.get_or("small_mean_d", 1),
+                )
+            },
+        )
+        .filter(|(xs, y)| *y < U::exact_from(xs.len() << T::LOG_WIDTH)),
+    )
+}
+
 // --(Vec<PrimitiveInt>, PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn random_primitive_int_vec_unsigned_primitive_int_triple_gen_var_1<
@@ -4230,8 +4334,8 @@ pub fn random_primitive_int_vec_unsigned_primitive_int_triple_gen_var_1<
         &|seed| {
             geometric_random_unsigneds(
                 seed,
-                config.get_or("small_unsigned_mean_n", 4),
-                config.get_or("small_unsigned_mean_d", 1),
+                config.get_or("mean_small_n", 4),
+                config.get_or("mean_small_d", 1),
             )
         },
         &random_primitive_ints,
@@ -4280,14 +4384,54 @@ pub fn random_primitive_int_vec_unsigned_unsigned_triple_gen_var_1<T: PrimitiveI
     Box::new(PrimitiveIntVecUnsignedUnsignedTripleGeneratorVar1 {
         is: geometric_random_unsigneds(
             EXAMPLE_SEED.fork("is"),
-            config.get_or("small_unsigned_mean_n", 2),
-            config.get_or("small_unsigned_mean_d", 1),
+            config.get_or("mean_small_n", 2),
+            config.get_or("mean_small_d", 1),
         ),
         xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
     })
 }
 
+pub fn random_primitive_int_vec_unsigned_unsigned_triple_gen_var_2<
+    T: PrimitiveInt,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U, U)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &random_primitive_ints,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(xs, y, z)| if y <= z { (xs, y, z) } else { (xs, z, y) }),
+    )
+}
+
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveInt>) --
+
+pub fn random_primitive_int_vec_pair_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(random_pairs_from_single(random_vecs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        config.get_or("mean_length_n", 4),
+        config.get_or("mean_length_d", 1),
+    )))
+}
 
 struct PrimitiveIntVecPairLenGenerator<T: PrimitiveInt, I: Iterator<Item = (usize, usize)>> {
     phantom: PhantomData<*const T>,
@@ -4435,6 +4579,34 @@ pub fn random_primitive_int_vec_primitive_int_vec_primitive_int_triple_gen_var_1
     reshape_2_1_to_3(Box::new(random_pairs(
         EXAMPLE_SEED,
         &|seed| random_primitive_int_vec_pair_gen_var_1_helper(config, seed),
+        &random_primitive_ints,
+    )))
+}
+
+fn random_primitive_int_vec_pair_gen_var_2_helper<T: PrimitiveInt>(
+    config: &GenConfig,
+    seed: Seed,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(PrimitiveIntVecPairLenGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_positive_unsigneds(
+            seed.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .map(|(x, y)| if x >= y { (x, y) } else { (y, x) }),
+        xs: random_primitive_ints(seed.fork("xs")),
+    })
+}
+
+pub fn random_primitive_int_vec_primitive_int_vec_primitive_int_triple_gen_var_2<
+    T: PrimitiveInt,
+>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, T)> {
+    reshape_2_1_to_3(Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| random_primitive_int_vec_pair_gen_var_2_helper(config, seed),
         &random_primitive_ints,
     )))
 }
@@ -4668,6 +4840,42 @@ pub fn random_primitive_int_vec_triple_gen_var_29<T: PrimitiveInt>(
         )
         .filter(|xs| xs.last() != Some(&T::ZERO)),
     ))
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_30<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(PrimitiveIntVecTripleXYYLenGenerator {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(|(x, y)| {
+            let x = x.checked_add(y)?;
+            Some((x, y))
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
+
+pub fn random_primitive_int_vec_triple_gen_var_31<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    Box::new(PrimitiveIntVecTripleLenGenerator {
+        phantom: PhantomData,
+        lengths: random_triples_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(|(o, x, y)| {
+            let o = max(x, y).checked_add(o)?;
+            Some((o, x, y))
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
 }
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
@@ -5077,4 +5285,34 @@ pub fn random_large_type_gen_var_2<T: PrimitiveUnsigned>(
         ),
         xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
     })
+}
+
+pub fn random_large_type_gen_var_3<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<T>, U, U, Vec<T>)> {
+    Box::new(
+        random_quadruples_xyyx::<_, _, U, _>(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &random_primitive_ints,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_mean_n", 32),
+                    config.get_or("small_mean_d", 1),
+                )
+            },
+        )
+        .filter_map(|(x, y, z, w)| match y.cmp(&z) {
+            Ordering::Less => Some((x, y, z, w)),
+            Ordering::Greater => Some((x, z, y, w)),
+            Ordering::Equal => None,
+        }),
+    )
 }

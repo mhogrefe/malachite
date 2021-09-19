@@ -2,7 +2,7 @@ use chars::exhaustive::{exhaustive_chars, ExhaustiveChars};
 use num::exhaustive::PrimitiveIntIncreasingRange;
 use strings::{strings_from_char_vecs, StringsFromCharVecs};
 use vecs::exhaustive::{
-    exhaustive_fixed_length_vecs_from_single, exhaustive_vecs, lex_fixed_length_vecs_from_single,
+    exhaustive_vecs, exhaustive_vecs_fixed_length_from_single, lex_vecs_fixed_length_from_single,
     shortlex_vecs, ExhaustiveFixedLengthVecs1Input, ExhaustiveVecs, LexFixedLengthVecsFromSingle,
     ShortlexVecs,
 };
@@ -51,7 +51,7 @@ pub fn lex_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
     len: u64,
     cs: I,
 ) -> StringsFromCharVecs<LexFixedLengthVecsFromSingle<I>> {
-    strings_from_char_vecs(lex_fixed_length_vecs_from_single(len, cs))
+    strings_from_char_vecs(lex_vecs_fixed_length_from_single(len, cs))
 }
 
 /// Generates all `String`s of a given length in lexicographic order.
@@ -140,7 +140,7 @@ pub fn exhaustive_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
     len: u64,
     cs: I,
 ) -> StringsFromCharVecs<ExhaustiveFixedLengthVecs1Input<I>> {
-    strings_from_char_vecs(exhaustive_fixed_length_vecs_from_single(len, cs))
+    strings_from_char_vecs(exhaustive_vecs_fixed_length_from_single(len, cs))
 }
 
 /// Generates all `String`s of a given length.

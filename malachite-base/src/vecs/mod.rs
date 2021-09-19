@@ -365,9 +365,9 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::vecs::exhaustive::lex_length_2_vecs;
+/// use malachite_base::vecs::exhaustive::lex_vecs_length_2;
 ///
-/// let xss = lex_length_2_vecs(
+/// let xss = lex_vecs_length_2(
 ///     ['a', 'b', 'c'].iter().cloned(),
 ///     ['x', 'y', 'z'].iter().cloned(),
 /// )
@@ -396,14 +396,14 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-/// use malachite_base::vecs::exhaustive::lex_fixed_length_vecs_2_inputs;
+/// use malachite_base::vecs::exhaustive::lex_vecs_fixed_length_2_inputs;
 ///
 /// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator
 /// // (with index 0) produces all ASCII `char`s, and the second (index 1) produces the three
 /// // `char`s `'x'`, `'y'`, and `'z'`. The elements of `output_types` are 0, 1, and 0, meaning that
 /// // the first element of the output `Vec`s will be taken from iterator 0, the second element from
 /// // iterator 1, and the third also from iterator 0.
-/// let xss = lex_fixed_length_vecs_2_inputs(
+/// let xss = lex_vecs_fixed_length_2_inputs(
 ///     exhaustive_ascii_chars(),
 ///     ['x', 'y', 'z'].iter().cloned(),
 ///     &[0, 1, 0],
@@ -446,9 +446,9 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// use itertools::Itertools;
 ///
-/// use malachite_base::vecs::exhaustive::exhaustive_length_2_vecs;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_length_2;
 ///
-/// let xss = exhaustive_length_2_vecs(
+/// let xss = exhaustive_vecs_length_2(
 ///     ['a', 'b', 'c'].iter().cloned(),
 ///     ['x', 'y', 'z'].iter().cloned(),
 /// )
@@ -477,7 +477,7 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 ///
 /// use malachite_base::chars::exhaustive::exhaustive_ascii_chars;
 /// use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
-/// use malachite_base::vecs::exhaustive::exhaustive_fixed_length_vecs_2_inputs;
+/// use malachite_base::vecs::exhaustive::exhaustive_vecs_fixed_length_2_inputs;
 ///
 /// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator
 /// // (with index 0) produces all ASCII `char`s, and the second (index 1) produces the three
@@ -486,7 +486,7 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
 /// // element from iterator 1, and the third also from iterator 0. The third element has a tiny
 /// // output type, so it will grow more slowly than the other two elements (though it doesn't look
 /// // that way from the first few `Vec`s).
-/// let xss = exhaustive_fixed_length_vecs_2_inputs(
+/// let xss = exhaustive_vecs_fixed_length_2_inputs(
 ///     exhaustive_ascii_chars(),
 ///     ['x', 'y', 'z'].iter().cloned(),
 ///     &[
@@ -539,9 +539,9 @@ pub mod exhaustive;
 ///
 /// use malachite_base::chars::random::random_char_inclusive_range;
 /// use malachite_base::random::EXAMPLE_SEED;
-/// use malachite_base::vecs::random::random_length_2_vecs;
+/// use malachite_base::vecs::random::random_vecs_length_2;
 ///
-/// let xss = random_length_2_vecs(
+/// let xss = random_vecs_length_2(
 ///     EXAMPLE_SEED,
 ///     &|seed| random_char_inclusive_range(seed, 'a', 'c'),
 ///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),
@@ -575,7 +575,7 @@ pub mod exhaustive;
 /// );
 /// ```
 ///
-/// # random_fixed_length_vecs_\[m\]_inputs
+/// # random_vecs_fixed_length_\[m\]_inputs
 /// ```
 /// extern crate itertools;
 ///
@@ -584,14 +584,14 @@ pub mod exhaustive;
 /// use malachite_base::chars::random::{random_ascii_chars, random_char_inclusive_range};
 /// use malachite_base::random::EXAMPLE_SEED;
 /// use malachite_base::strings::ToDebugString;
-/// use malachite_base::vecs::random::random_fixed_length_vecs_2_inputs;
+/// use malachite_base::vecs::random::random_vecs_fixed_length_2_inputs;
 ///
 /// // We are generating length-3 `Vec`s of `char`s using two input iterators. The first iterator
 /// // (with index 0) produces random ASCII `char`s, and the second (index 1) produces the three
 /// // `char`s `'x'`, `'y'`, and `'z'`, uniformly at random. The elements of `output_types` are 0,
 /// // 1, and 0, meaning that the first element of the output `Vec`s will be taken from iterator 0,
 /// // the second element from iterator 1, and the third also from iterator 0.
-/// let xss = random_fixed_length_vecs_2_inputs(
+/// let xss = random_vecs_fixed_length_2_inputs(
 ///     EXAMPLE_SEED,
 ///     &random_ascii_chars,
 ///     &|seed| random_char_inclusive_range(seed, 'x', 'z'),

@@ -13,7 +13,7 @@ use malachite_test::inputs::base::{
 };
 use malachite_test::inputs::natural::triples_of_naturals_var_5;
 
-pub fn register(registry: &mut DemoBenchRegistry) {
+pub(crate) fn register(registry: &mut DemoBenchRegistry) {
     register_demo!(registry, demo_limbs_mod_pow_odd);
     register_demo!(registry, demo_limbs_mod_pow);
     register_demo!(registry, demo_natural_mod_pow_assign);

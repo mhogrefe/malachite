@@ -1,9 +1,13 @@
-use malachite_nz_test_util::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::unsigned_vec_gen_var_2;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz_test_util::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -46,4 +50,34 @@ fn test_trailing_zeros() {
     test("4294967296", Some(32));
     test("18446744073709551615", Some(0));
     test("18446744073709551616", Some(64));
+}
+
+#[test]
+fn limbs_trailing_zeros_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_2().test_properties_with_config(&config, |xs| {
+        assert_eq!(
+            Some(limbs_trailing_zeros(&xs)),
+            Natural::from_owned_limbs_asc(xs).trailing_zeros()
+        );
+    });
+}
+
+#[allow(clippy::cmp_owned, clippy::useless_conversion)]
+#[test]
+fn trailing_zeros_properties() {
+    natural_gen().test_properties(|x| {
+        let trailing_zeros = x.trailing_zeros();
+        assert_eq!(natural_trailing_zeros_alt(&x), trailing_zeros);
+        assert_eq!(trailing_zeros.is_none(), x == 0);
+        if x != 0 {
+            let trailing_zeros = trailing_zeros.unwrap();
+            if trailing_zeros <= u64::from(Limb::MAX) {
+                assert!((&x >> trailing_zeros).odd());
+                assert_eq!(&x >> trailing_zeros << trailing_zeros, x);
+            }
+        }
+    });
 }

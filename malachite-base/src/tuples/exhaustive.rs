@@ -7,7 +7,7 @@ use std::cmp::max;
 use std::fmt::Debug;
 use std::iter::{once, Once};
 use std::marker::PhantomData;
-use vecs::exhaustive::fixed_length_ordered_unique_indices_helper;
+use vecs::exhaustive::{fixed_length_ordered_unique_indices_helper, next_bit_pattern};
 
 /// Generates the only unit: `()`.
 ///
@@ -2051,6 +2051,9 @@ macro_rules! lex_ordered_unique_tuples {
         /// Generates all $k$-tuples of elements from an iterator, where the tuples have no
         /// repetitions and are ordered the same way as in the iterator.
         ///
+        /// The tuples are generated in lexicographic order with respect to the order of the
+        /// element iterator.
+        ///
         /// This struct is macro-generated.
         #[derive(Clone, Debug)]
         pub struct $struct<I: Iterator>
@@ -2211,5 +2214,165 @@ lex_ordered_unique_tuples!(
         I::Item
     ),
     lex_ordered_unique_octuples,
+    [0, 1, 2, 3, 4, 5, 6, 7]
+);
+
+macro_rules! exhaustive_ordered_unique_tuples {
+    (
+        $struct: ident,
+        $k: expr,
+        $out_t: ty,
+        $fn: ident,
+        [$($i: expr),*]
+    ) => {
+        /// Generates all $k$-tuples of elements from an iterator, where the tuples have no
+        /// repetitions and are ordered the same way as in the iterator.
+        ///
+        /// This struct is macro-generated.
+        #[derive(Clone)]
+        pub struct $struct<I: Iterator>
+        where
+            I::Item: Clone,
+        {
+            done: bool,
+            first: bool,
+            xs: IteratorCache<I>,
+            pattern: Vec<bool>,
+        }
+
+        #[allow(clippy::type_complexity)]
+        impl<I: Iterator> Iterator for $struct<I>
+        where
+            I::Item: Clone,
+        {
+            type Item = $out_t;
+
+            fn next(&mut self) -> Option<Self::Item> {
+                if self.done {
+                    return None;
+                } else if self.first {
+                    self.first = false;
+                } else {
+                    let mut c = $k;
+                    next_bit_pattern(&mut self.pattern, &mut c, $k, $k);
+                }
+                if !self.pattern.is_empty() && self.xs.get(self.pattern.len() - 1).is_none() {
+                    self.done = true;
+                    return None;
+                }
+                let mut results = self.pattern.iter().enumerate().filter_map(|(i, &b)| {
+                    if b {
+                        Some(self.xs.assert_get(i).clone())
+                    } else {
+                        None
+                    }
+                });
+                Some(($(((results.next().unwrap(), $i).0)),*))
+            }
+        }
+
+        /// Generates $k$-tuples of with elements from a single iterator, such that each tuple has
+        /// no repeated elements, and the elements in each `Vec` are ordered the same way as they
+        /// are in the source iterator.
+        ///
+        /// The source iterator should not repeat any elements, but this is not enforced.
+        ///
+        /// If the input iterator is infinite, the output length is also infinite.
+        ///
+        /// If the input iterator length is $n$, the output length is $\binom{n}{k}$.
+        ///
+        /// If `xs` is empty, the output is also empty.
+        ///
+        /// # Complexity per iteration
+        /// $$
+        /// T(i, k) = O(k + T^\prime (i))
+        /// $$
+        ///
+        /// $$
+        /// M(i, k) = O(k + M^\prime (i))
+        /// $$
+        ///
+        /// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time
+        /// and additional memory functions of `xs`.
+        ///
+        /// # Examples
+        /// See the documentation of the `tuples::exhaustive` module.
+        pub fn $fn<I: Iterator>(xs: I) -> $struct<I>
+        where
+            I::Item: Clone,
+        {
+            $struct {
+                done: false,
+                first: true,
+                xs: IteratorCache::new(xs),
+                pattern: vec![true; $k],
+            }
+        }
+    }
+}
+exhaustive_ordered_unique_tuples!(
+    ExhaustiveOrderedUniquePairs,
+    2,
+    (I::Item, I::Item),
+    exhaustive_ordered_unique_pairs,
+    [0, 1]
+);
+exhaustive_ordered_unique_tuples!(
+    ExhaustiveOrderedUniqueTriples,
+    3,
+    (I::Item, I::Item, I::Item),
+    exhaustive_ordered_unique_triples,
+    [0, 1, 2]
+);
+exhaustive_ordered_unique_tuples!(
+    ExhaustiveOrderedUniqueQuadruples,
+    4,
+    (I::Item, I::Item, I::Item, I::Item),
+    exhaustive_ordered_unique_quadruples,
+    [0, 1, 2, 3]
+);
+exhaustive_ordered_unique_tuples!(
+    ExhaustiveOrderedUniqueQuintuples,
+    5,
+    (I::Item, I::Item, I::Item, I::Item, I::Item),
+    exhaustive_ordered_unique_quintuples,
+    [0, 1, 2, 3, 4]
+);
+exhaustive_ordered_unique_tuples!(
+    ExhaustiveOrderedUniqueSextuples,
+    6,
+    (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
+    exhaustive_ordered_unique_sextuples,
+    [0, 1, 2, 3, 4, 5]
+);
+exhaustive_ordered_unique_tuples!(
+    ExhaustiveOrderedUniqueSeptuples,
+    7,
+    (
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item
+    ),
+    exhaustive_ordered_unique_septuples,
+    [0, 1, 2, 3, 4, 5, 6]
+);
+exhaustive_ordered_unique_tuples!(
+    ExhaustiveOrderedUniqueOctuples,
+    8,
+    (
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item
+    ),
+    exhaustive_ordered_unique_octuples,
     [0, 1, 2, 3, 4, 5, 6, 7]
 );

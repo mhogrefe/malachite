@@ -30,6 +30,7 @@ use platform::Limb;
 ///     &[1, 2, 3]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
     let i = slice_leading_zeros(xs);
     let mut result = vec![0; i];
@@ -62,6 +63,7 @@ pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
 /// limbs_maybe_sign_extend_non_negative_in_place(&mut xs);
 /// assert_eq!(xs, &[1, 2, u32::MAX, 0]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
     if let Some(last) = xs.last() {
         if last.get_highest_bit() {
@@ -93,6 +95,7 @@ pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
 /// assert!(limbs_twos_complement_in_place(xs));
 /// assert_eq!(xs, &[0, 0, 0]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
     limbs_not_in_place(xs);
     limbs_slice_add_limb_in_place(xs, 1)
@@ -124,6 +127,7 @@ pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
 /// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
 /// assert_eq!(xs, &[0, 1, u32::MAX]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
     assert!(!limbs_twos_complement_in_place(xs));
     if let Some(last) = xs.last() {

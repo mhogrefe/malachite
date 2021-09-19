@@ -13,9 +13,9 @@ use natural::arithmetic::mul::fft::{_limbs_mul_fft, _limbs_mul_fft_best_k};
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_in_place_left,
+    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_greater_in_place_left,
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
-    limbs_sub_to_out,
+    limbs_sub_greater_to_out,
 };
 use platform::Limb;
 use std::cmp::min;
@@ -252,7 +252,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 }
                 let carry = {
                     let (scratch_lo, scratch_hi) = scratch.split_at_mut(half_n);
-                    limbs_sub_in_place_left(scratch_lo, &scratch_hi[..limit])
+                    limbs_sub_greater_in_place_left(scratch_lo, &scratch_hi[..limit])
                 };
                 scratch[half_n] = 0;
                 if carry {
@@ -269,7 +269,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
             if ys_len <= half_n {
                 _limbs_mul_mod_base_pow_n_minus_1(out, half_n, scratch_lo, ys, scratch_hi);
                 let scratch_2 = &mut scratch[m << 1..3 * m];
-                let carry = limbs_sub_to_out(scratch_2, xs_0, xs_1);
+                let carry = limbs_sub_greater_to_out(scratch_2, xs_0, xs_1);
                 *scratch_2.last_mut().unwrap() = 0;
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_2, 1));
@@ -293,7 +293,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                     }
                     let carry = {
                         let (scratch_lo, scratch_hi) = scratch.split_at_mut(half_n);
-                        limbs_sub_in_place_left(scratch_lo, &scratch_hi[..a])
+                        limbs_sub_greater_in_place_left(scratch_lo, &scratch_hi[..a])
                     };
                     scratch[half_n] = 0;
                     if carry {
@@ -309,7 +309,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 }
                 _limbs_mul_mod_base_pow_n_minus_1(out, half_n, scratch_lo, scratch_1, scratch_2);
                 let (scratch_2, scratch_3) = scratch[m << 1..].split_at_mut(m);
-                let carry = limbs_sub_to_out(scratch_2, xs_0, xs_1);
+                let carry = limbs_sub_greater_to_out(scratch_2, xs_0, xs_1);
                 *scratch_2.last_mut().unwrap() = 0;
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_2, 1));
@@ -317,7 +317,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 let limit_1 = half_n + usize::exact_from(*scratch_2.last_mut().unwrap());
                 let scratch_3 = &mut scratch_3[..m];
                 let (ys_0, ys_1) = ys.split_at(half_n);
-                let carry = limbs_sub_to_out(scratch_3, ys_0, ys_1);
+                let carry = limbs_sub_greater_to_out(scratch_3, ys_0, ys_1);
                 *scratch_3.last_mut().unwrap() = 0;
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_3, 1));

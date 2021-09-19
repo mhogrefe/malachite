@@ -321,97 +321,63 @@ fn limbs_mod_pow_fail_6() {
 
 #[test]
 fn test_mod_pow() {
-    let test = |u, exp, m, out| {
-        assert!(Natural::from_str(u)
-            .unwrap()
-            .mod_is_reduced(&Natural::from_str(m).unwrap()));
+    let test = |r, s, t, out| {
+        let u = Natural::from_str(r).unwrap();
+        let exp = Natural::from_str(s).unwrap();
+        let m = Natural::from_str(t).unwrap();
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_pow_assign(
-            Natural::from_str(exp).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        assert!(u.mod_is_reduced(&m));
+
+        let mut n = u.clone();
+        n.mod_pow_assign(exp.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
-        assert!(n.mod_is_reduced(&Natural::from_str(m).unwrap()));
+        assert!(n.mod_is_reduced(&m));
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_pow_assign(
-            &Natural::from_str(exp).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_pow_assign(&exp, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_pow_assign(
-            Natural::from_str(exp).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_pow_assign(exp.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_pow_assign(
-            &Natural::from_str(exp).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let mut n = u.clone();
+        n.mod_pow_assign(&exp, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_pow(
-            Natural::from_str(exp).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_pow(exp.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_pow(
-            Natural::from_str(exp).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_pow(exp.clone(), m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_pow(
-            &Natural::from_str(exp).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_pow(&exp, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_pow(
-            &Natural::from_str(exp).unwrap(),
-            Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_pow(&exp, m.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_pow(
-            Natural::from_str(exp).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_pow(exp.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_pow(
-            Natural::from_str(exp).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_pow(exp.clone(), &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().mod_pow(
-            &Natural::from_str(exp).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = u.clone().mod_pow(&exp, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_pow(
-            &Natural::from_str(exp).unwrap(),
-            &Natural::from_str(m).unwrap(),
-        );
+        let n = (&u).mod_pow(&exp, &m);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

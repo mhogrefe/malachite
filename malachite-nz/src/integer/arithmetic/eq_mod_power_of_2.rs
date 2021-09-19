@@ -32,6 +32,7 @@ use platform::Limb;
 /// assert_eq!(limbs_eq_mod_power_of_2_neg_limb(&[1, 1], u32::MAX, 33), true);
 /// assert_eq!(limbs_eq_mod_power_of_2_neg_limb(&[1, 2], u32::MAX, 33), false);
 /// ```
+#[doc(hidden)]
 pub fn limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> bool {
     if y == 0 {
         return limbs_divisible_by_power_of_2(xs, pow);
@@ -121,6 +122,7 @@ fn limbs_eq_mod_power_of_2_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -
 ///
 /// This is mpz_congruent_2exp_p from mpz/cong_2exp.c, GMP 6.2.1, where a is negative and c is
 /// positive.
+#[doc(hidden)]
 pub fn limbs_eq_mod_power_of_2_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_power_of_2_neg_pos_greater(xs, ys, pow)

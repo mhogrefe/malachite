@@ -10,7 +10,7 @@ use natural::arithmetic::mul::limb::{
 };
 use natural::arithmetic::mul::limbs_mul_greater_to_out;
 use natural::arithmetic::sub::{
-    limbs_slice_sub_in_place_right, limbs_sub_in_place_left, limbs_sub_limb_in_place,
+    limbs_slice_sub_in_place_right, limbs_sub_greater_in_place_left, limbs_sub_limb_in_place,
     limbs_sub_limb_to_out,
 };
 use natural::arithmetic::sub_mul::{
@@ -45,6 +45,7 @@ use std::cmp::Ordering;
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
+#[doc(hidden)]
 pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], z: Limb) -> (Vec<Limb>, bool) {
     let mut result;
     let sign = if xs.len() >= ys.len() {
@@ -89,6 +90,7 @@ pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], z: Limb) -> (Vec
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, and w_sign is returned.
+#[doc(hidden)]
 pub fn limbs_overflowing_sub_mul_limb_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
@@ -188,6 +190,7 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, the limbs of the result are written to the second input rather than the first, and
 /// w_sign is returned.
+#[doc(hidden)]
 pub fn limbs_overflowing_sub_mul_limb_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
@@ -291,6 +294,7 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, the result is written to the longer input, and w_sign is returned.
+#[doc(hidden)]
 pub fn limbs_overflowing_sub_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
@@ -335,6 +339,7 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_either(
 ///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
+#[doc(hidden)]
 pub fn limbs_overflowing_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> (Vec<Limb>, bool) {
     let mut xs = xs.to_vec();
     let sign = limbs_overflowing_sub_mul_in_place_left(&mut xs, ys, zs);
@@ -370,6 +375,7 @@ pub fn limbs_overflowing_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> (Vec<
 ///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// negative, and w_sign is returned.
+#[doc(hidden)]
 pub fn limbs_overflowing_sub_mul_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
@@ -406,7 +412,7 @@ fn limbs_overflowing_sub_mul_greater_in_place_left(
         ));
         false
     } else {
-        assert!(!limbs_sub_in_place_left(xs, &product));
+        assert!(!limbs_sub_greater_in_place_left(xs, &product));
         !slice_test_zero(xs)
     }
 }

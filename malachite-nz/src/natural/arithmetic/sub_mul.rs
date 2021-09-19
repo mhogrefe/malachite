@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::SplitInHalf;
 use natural::arithmetic::mul::limbs_mul;
-use natural::arithmetic::sub::{limbs_sub_in_place_left, limbs_sub_limb_in_place};
+use natural::arithmetic::sub::{limbs_sub_greater_in_place_left, limbs_sub_limb_in_place};
 use natural::comparison::cmp::limbs_cmp;
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
@@ -328,7 +328,7 @@ pub fn limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) ->
     }
     let borrow = limbs_cmp(xs, &scratch) == Ordering::Less;
     if !borrow {
-        assert!(!limbs_sub_in_place_left(xs, &scratch));
+        assert!(!limbs_sub_greater_in_place_left(xs, &scratch));
     }
     borrow
 }

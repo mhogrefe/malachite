@@ -11,9 +11,9 @@ use natural::arithmetic::divisible_by::{
 };
 use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::arithmetic::sub::{
-    limbs_sub_in_place_left, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_to_out, limbs_sub_to_out,
+    limbs_sub_same_length_to_out, limbs_sub_greater_to_out,
 };
 use natural::comparison::cmp::limbs_cmp;
 use natural::InnerNatural::{Large, Small};
@@ -387,7 +387,7 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - ys|
     if limbs_cmp(xs, ys) >= Ordering::Equal {
-        assert!(!limbs_sub_to_out(&mut scratch, xs, ys));
+        assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
@@ -443,7 +443,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> b
     // calculate |xs - ys|
     let scratch = if limbs_cmp(xs, ys) >= Ordering::Equal {
         scratch = vec![0; xs.len()];
-        assert!(!limbs_sub_to_out(&mut scratch, xs, ys));
+        assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
         &mut scratch
     } else {
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
@@ -499,7 +499,7 @@ fn limbs_eq_mod_limb_val_ref_greater(xs: &mut [Limb], ys: &[Limb], m: Limb) -> b
     }
     // calculate |xs - ys|
     if limbs_cmp(xs, ys) >= Ordering::Equal {
-        assert!(!limbs_sub_in_place_left(xs, ys));
+        assert!(!limbs_sub_greater_in_place_left(xs, ys));
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
@@ -578,7 +578,7 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - ys|
     if limbs_cmp(xs, ys) >= Ordering::Equal {
-        assert!(!limbs_sub_to_out(&mut scratch, xs, ys));
+        assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
@@ -629,7 +629,7 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -
     let mut scratch = vec![0; xs.len()];
     // calculate |xs - ys|
     if limbs_cmp(xs, ys) >= Ordering::Equal {
-        assert!(!limbs_sub_to_out(&mut scratch, xs, ys));
+        assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
     } else {
         assert!(!limbs_sub_same_length_to_out(&mut scratch, ys, xs));
     }
@@ -681,7 +681,7 @@ fn limbs_eq_mod_greater_ref_val_ref(xs: &[Limb], ys: &mut [Limb], ms: &[Limb]) -
     // calculate |xs - ys|
     let scratch = if limbs_cmp(xs, ys) >= Ordering::Equal {
         scratch = vec![0; xs.len()];
-        assert!(!limbs_sub_to_out(&mut scratch, xs, ys));
+        assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
         &mut scratch
     } else {
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
@@ -698,7 +698,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], ms: &[Limb]) -
     }
     // calculate |xs - ys|
     if limbs_cmp(xs, ys) >= Ordering::Equal {
-        assert!(!limbs_sub_in_place_left(xs, ys));
+        assert!(!limbs_sub_greater_in_place_left(xs, ys));
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }
@@ -750,7 +750,7 @@ fn limbs_eq_mod_greater_ref_val_val(xs: &[Limb], ys: &mut [Limb], ms: &mut [Limb
     // calculate |xs - ys|
     let scratch = if limbs_cmp(xs, ys) >= Ordering::Equal {
         scratch = vec![0; xs.len()];
-        assert!(!limbs_sub_to_out(&mut scratch, xs, ys));
+        assert!(!limbs_sub_greater_to_out(&mut scratch, xs, ys));
         &mut scratch
     } else {
         assert!(!limbs_sub_same_length_in_place_left(ys, xs));
@@ -767,7 +767,7 @@ fn limbs_eq_mod_greater_val_ref_val(xs: &mut [Limb], ys: &[Limb], ms: &mut [Limb
     }
     // calculate |xs - ys|
     if limbs_cmp(xs, ys) >= Ordering::Equal {
-        assert!(!limbs_sub_in_place_left(xs, ys));
+        assert!(!limbs_sub_greater_in_place_left(xs, ys));
     } else {
         assert!(!limbs_sub_same_length_in_place_right(ys, xs));
     }

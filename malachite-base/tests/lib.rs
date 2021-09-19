@@ -523,13 +523,23 @@ pub mod rounding_modes {
 }
 pub mod sets {
     pub mod exhaustive {
+        pub mod exhaustive_b_tree_sets;
+        pub mod exhaustive_b_tree_sets_fixed_length;
+        pub mod exhaustive_b_tree_sets_length_inclusive_range;
+        pub mod exhaustive_b_tree_sets_length_range;
+        pub mod exhaustive_b_tree_sets_min_length;
+        pub mod exhaustive_hash_sets;
+        pub mod exhaustive_hash_sets_fixed_length;
+        pub mod exhaustive_hash_sets_length_inclusive_range;
+        pub mod exhaustive_hash_sets_length_range;
+        pub mod exhaustive_hash_sets_min_length;
         pub mod lex_b_tree_sets;
+        pub mod lex_b_tree_sets_fixed_length;
         pub mod lex_b_tree_sets_length_inclusive_range;
         pub mod lex_b_tree_sets_length_range;
         pub mod lex_b_tree_sets_min_length;
-        pub mod lex_fixed_length_b_tree_sets;
-        pub mod lex_fixed_length_hash_sets;
         pub mod lex_hash_sets;
+        pub mod lex_hash_sets_fixed_length;
         pub mod lex_hash_sets_length_inclusive_range;
         pub mod lex_hash_sets_length_range;
         pub mod lex_hash_sets_min_length;
@@ -584,6 +594,7 @@ pub mod tuples {
     pub mod exhaustive {
         pub mod exhaustive_custom_tuples;
         pub mod exhaustive_dependent_pairs;
+        pub mod exhaustive_ordered_unique_tuples;
         pub mod exhaustive_tuples_1_input;
         pub mod exhaustive_tuples_custom_output;
         pub mod exhaustive_tuples_from_single;
@@ -620,22 +631,28 @@ pub mod unions {
 }
 pub mod vecs {
     pub mod exhaustive {
-        pub mod exhaustive_fixed_length_vecs_from_single;
-        pub mod exhaustive_fixed_length_vecs_m_inputs;
-        pub mod exhaustive_length_n_vecs;
+        pub mod exhaustive_ordered_unique_vecs;
+        pub mod exhaustive_ordered_unique_vecs_fixed_length;
+        pub mod exhaustive_ordered_unique_vecs_length_inclusive_range;
+        pub mod exhaustive_ordered_unique_vecs_length_range;
+        pub mod exhaustive_ordered_unique_vecs_min_length;
         pub mod exhaustive_vecs;
+        pub mod exhaustive_vecs_fixed_length_from_single;
+        pub mod exhaustive_vecs_fixed_length_m_inputs;
         pub mod exhaustive_vecs_from_length_iterator;
         pub mod exhaustive_vecs_length_inclusive_range;
+        pub mod exhaustive_vecs_length_n;
         pub mod exhaustive_vecs_length_range;
         pub mod exhaustive_vecs_min_length;
-        pub mod lex_fixed_length_ordered_unique_vecs;
-        pub mod lex_fixed_length_vecs_from_single;
-        pub mod lex_fixed_length_vecs_m_inputs;
-        pub mod lex_length_n_vecs;
         pub mod lex_ordered_unique_vecs;
+        pub mod lex_ordered_unique_vecs_fixed_length;
         pub mod lex_ordered_unique_vecs_length_inclusive_range;
         pub mod lex_ordered_unique_vecs_length_range;
         pub mod lex_ordered_unique_vecs_min_length;
+        pub mod lex_vecs_fixed_length_from_single;
+        pub mod lex_vecs_fixed_length_m_inputs;
+        pub mod lex_vecs_length_n;
+        pub mod next_bit_pattern;
         pub mod shortlex_ordered_unique_vecs;
         pub mod shortlex_ordered_unique_vecs_length_inclusive_range;
         pub mod shortlex_ordered_unique_vecs_length_range;
@@ -648,10 +665,10 @@ pub mod vecs {
     }
     pub mod exhaustive_vec_permutations;
     pub mod random {
-        pub mod random_fixed_length_vecs;
-        pub mod random_fixed_length_vecs_from_single;
-        pub mod random_fixed_length_vecs_m_inputs;
         pub mod random_vecs;
+        pub mod random_vecs_fixed_length;
+        pub mod random_vecs_fixed_length_from_single;
+        pub mod random_vecs_fixed_length_m_inputs;
         pub mod random_vecs_from_length_iterator;
         pub mod random_vecs_length_inclusive_range;
         pub mod random_vecs_length_range;

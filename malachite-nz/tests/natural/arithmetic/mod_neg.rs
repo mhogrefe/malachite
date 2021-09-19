@@ -2,42 +2,37 @@ use malachite_base::num::arithmetic::traits::{ModIsReduced, ModNeg, ModNegAssign
 use malachite_nz::natural::Natural;
 use std::str::FromStr;
 
-//TODO clean from_str
-
 #[test]
 fn test_mod_neg() {
-    let test = |u, v, out| {
-        assert!(Natural::from_str(u)
-            .unwrap()
-            .mod_is_reduced(&Natural::from_str(v).unwrap()));
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_neg(Natural::from_str(v).unwrap());
+    let test = |s, t, out| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
+
+        assert!(u.mod_is_reduced(&v));
+        let n = u.clone().mod_neg(v.clone());
         assert!(n.is_valid());
-        assert!(n.mod_is_reduced(&Natural::from_str(v).unwrap()));
+        assert!(n.mod_is_reduced(&v));
         assert_eq!(n.to_string(), out);
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_neg(&Natural::from_str(v).unwrap());
+        let n = u.clone().mod_neg(&v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_neg(Natural::from_str(v).unwrap());
+        let n = (&u).mod_neg(v.clone());
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_neg(&Natural::from_str(v).unwrap());
+        let n = (&u).mod_neg(&v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_neg_assign(Natural::from_str(v).unwrap());
+        let mut n = u.clone();
+        n.mod_neg_assign(v.clone());
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_neg_assign(&Natural::from_str(v).unwrap());
+        let mut n = u;
+        n.mod_neg_assign(&v);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
     };

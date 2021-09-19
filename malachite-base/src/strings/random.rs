@@ -3,7 +3,7 @@ use num::random::geometric::GeometricRandomNaturalValues;
 use random::Seed;
 use strings::StringsFromCharVecs;
 use vecs::random::{
-    random_fixed_length_vecs_from_single, random_vecs, RandomFixedLengthVecsFromSingle, RandomVecs,
+    random_vecs, random_vecs_fixed_length_from_single, RandomFixedLengthVecsFromSingle, RandomVecs,
 };
 
 /// Randomly generates `String`s of a given length using `char`s from a single iterator.
@@ -50,7 +50,7 @@ pub fn random_fixed_length_strings_using_chars<I: Iterator<Item = char>>(
     cs: I,
 ) -> StringsFromCharVecs<RandomFixedLengthVecsFromSingle<I>> {
     StringsFromCharVecs {
-        css: random_fixed_length_vecs_from_single(len, cs),
+        css: random_vecs_fixed_length_from_single(len, cs),
     }
 }
 

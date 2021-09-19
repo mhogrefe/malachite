@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::CheckedSub;
 use malachite_base::num::basic::traits::Zero;
 use natural::arithmetic::sub::{
-    limbs_sub, limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
+    limbs_sub, limbs_sub_greater_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
     limbs_vec_sub_in_place_right,
 };
 use natural::InnerNatural::{Large, Small};
@@ -61,7 +61,7 @@ impl Natural {
             (x, Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
             (Natural(Small(_)), _) => true,
             (&mut Natural(Large(ref mut xs)), Natural(Large(ref ys))) => {
-                let borrow = xs.len() < ys.len() || limbs_sub_in_place_left(xs, ys);
+                let borrow = xs.len() < ys.len() || limbs_sub_greater_in_place_left(xs, ys);
                 if !borrow {
                     self.trim();
                 }
@@ -81,7 +81,7 @@ impl Natural {
             (x, &Natural(Small(y))) => x.sub_assign_limb_no_panic(y),
             (Natural(Small(_)), _) => true,
             (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys))) => {
-                let borrow = xs.len() < ys.len() || limbs_sub_in_place_left(xs, ys);
+                let borrow = xs.len() < ys.len() || limbs_sub_greater_in_place_left(xs, ys);
                 if !borrow {
                     self.trim();
                 }

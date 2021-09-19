@@ -12,10 +12,11 @@ use rug;
 use malachite_nz::natural::arithmetic::sub::{
     _limbs_sub_same_length_with_borrow_in_in_place_left,
     _limbs_sub_same_length_with_borrow_in_to_out, limbs_slice_sub_in_place_right, limbs_sub,
-    limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out,
-    limbs_sub_same_length_to_out_with_overlap, limbs_sub_to_out, limbs_vec_sub_in_place_right,
+    limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb,
+    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
+    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap,
+    limbs_vec_sub_in_place_right,
 };
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
@@ -206,10 +207,10 @@ fn limbs_sub_same_length_to_out_fail_2() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_sub_to_out() {
+fn test_limbs_sub_greater_to_out() {
     let test = |xs, ys, out_before: &[Limb], borrow, out_after| {
         let mut out = out_before.to_vec();
-        assert_eq!(limbs_sub_to_out(&mut out, xs, ys), borrow);
+        assert_eq!(limbs_sub_greater_to_out(&mut out, xs, ys), borrow);
         assert_eq!(out, out_after);
     };
     test(&[], &[], &[0, 0], false, vec![0, 0]);
@@ -263,17 +264,17 @@ fn test_limbs_sub_to_out() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_sub_to_out_fail_1() {
+fn limbs_sub_greater_to_out_fail_1() {
     let mut out = vec![10, 10];
-    limbs_sub_to_out(&mut out, &[6, 7, 8], &[1, 2]);
+    limbs_sub_greater_to_out(&mut out, &[6, 7, 8], &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_sub_to_out_fail_2() {
+fn limbs_sub_greater_to_out_fail_2() {
     let mut out = vec![10, 10, 10];
-    limbs_sub_to_out(&mut out, &[6, 7], &[1, 2, 3]);
+    limbs_sub_greater_to_out(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -318,10 +319,10 @@ fn limbs_sub_same_length_in_place_left_fail() {
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
-fn test_limbs_sub_in_place_left() {
+fn test_limbs_sub_greater_in_place_left() {
     let test = |xs_before: &[Limb], ys, borrow, xs_after| {
         let mut xs = xs_before.to_vec();
-        assert_eq!(limbs_sub_in_place_left(&mut xs, ys), borrow);
+        assert_eq!(limbs_sub_greater_in_place_left(&mut xs, ys), borrow);
         assert_eq!(xs, xs_after);
     };
     test(&[], &[], false, vec![]);
@@ -349,8 +350,8 @@ fn test_limbs_sub_in_place_left() {
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
-fn limbs_sub_in_place_left_fail() {
-    limbs_sub_in_place_left(&mut [6, 7], &[1, 2, 3]);
+fn limbs_sub_greater_in_place_left_fail() {
+    limbs_sub_greater_in_place_left(&mut [6, 7], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]

@@ -33,8 +33,8 @@ use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
-    random_pairs, random_pairs_from_single, random_triples, random_triples_from_single,
-    random_triples_xyx,
+    random_pairs, random_pairs_from_single, random_quadruples_xyyx, random_triples,
+    random_triples_from_single, random_triples_xyx, random_triples_xyy,
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
@@ -74,6 +74,7 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
@@ -1051,6 +1052,33 @@ pub fn special_random_natural_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     ))
 }
 
+// -- (Natural, PrimitiveUnsigned, bool) --
+
+pub fn special_random_natural_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, bool)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &random_bools,
+    ))
+}
+
 // -- (Natural, PrimitiveUnsigned, Natural) --
 
 pub fn special_random_natural_unsigned_natural_triple_gen<T: PrimitiveUnsigned>(
@@ -1169,6 +1197,68 @@ pub fn special_random_natural_unsigned_unsigned_triple_gen_var_3<
     ))
 }
 
+pub fn special_random_natural_unsigned_unsigned_triple_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, T)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 32),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .map(|(xs, y, z)| if y <= z { (xs, y, z) } else { (xs, z, y) }),
+    )
+}
+
+// -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
+
+pub fn special_random_natural_unsigned_unsigned_natural_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Natural, T, T, Natural)> {
+    Box::new(
+        random_quadruples_xyyx::<_, _, T, _>(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter_map(|(x, y, z, w)| match y.cmp(&z) {
+            Ordering::Less => Some((x, y, z, w)),
+            Ordering::Greater => Some((x, z, y, w)),
+            Ordering::Equal => None,
+        }),
+    )
+}
+
 // --(Natural, PrimitiveUnsigned, Vec<bool>) --
 
 struct NaturalUnsignedBoolVecTripleGenerator {
@@ -1285,12 +1375,12 @@ pub fn special_random_natural_rounding_mode_pair_gen_var_2(
 
 // --(Natural, Vec<bool>) --
 
-struct NaturalBoolVecPairGenerator {
+struct NaturalBoolVecPairGenerator1 {
     xs: StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
     striped_bit_source: StripedBitSource,
 }
 
-impl Iterator for NaturalBoolVecPairGenerator {
+impl Iterator for NaturalBoolVecPairGenerator1 {
     type Item = (Natural, Vec<bool>);
 
     fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
@@ -1303,7 +1393,41 @@ impl Iterator for NaturalBoolVecPairGenerator {
 pub fn special_random_natural_bool_vec_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(Natural, Vec<bool>)> {
-    Box::new(NaturalBoolVecPairGenerator {
+    Box::new(NaturalBoolVecPairGenerator1 {
+        xs: striped_random_naturals(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", 4),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
+struct NaturalBoolVecPairGenerator2 {
+    xs: StripedRandomNaturals<GeometricRandomNaturalValues<u64>>,
+    striped_bit_source: StripedBitSource,
+}
+
+impl Iterator for NaturalBoolVecPairGenerator2 {
+    type Item = (Natural, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let bs = get_striped_bool_vec(&mut self.striped_bit_source, x.significant_bits());
+        Some((x, bs))
+    }
+}
+
+pub fn special_random_natural_bool_vec_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(Natural, Vec<bool>)> {
+    Box::new(NaturalBoolVecPairGenerator2 {
         xs: striped_random_naturals(
             EXAMPLE_SEED.fork("xs"),
             config.get_or("mean_stripe_n", 32),

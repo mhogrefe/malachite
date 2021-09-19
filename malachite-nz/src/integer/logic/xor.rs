@@ -6,8 +6,8 @@ use natural::arithmetic::add::{
     limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
 };
 use natural::arithmetic::sub::{
-    limbs_sub, limbs_sub_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
-    limbs_sub_limb_to_out, limbs_sub_to_out, limbs_vec_sub_in_place_right,
+    limbs_sub, limbs_sub_greater_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
+    limbs_sub_limb_to_out, limbs_sub_greater_to_out, limbs_vec_sub_in_place_right,
 };
 use natural::logic::not::limbs_not_in_place;
 use natural::InnerNatural::{Large, Small};
@@ -1043,10 +1043,10 @@ pub fn limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        assert!(!limbs_sub_to_out(out, ys, xs));
+        assert!(!limbs_sub_greater_to_out(out, ys, xs));
         return;
     } else if x_i >= ys_len {
-        assert!(!limbs_sub_to_out(out, xs, ys));
+        assert!(!limbs_sub_greater_to_out(out, xs, ys));
         return;
     }
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
@@ -1139,7 +1139,7 @@ pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if y_i >= xs_len {
         assert!(!limbs_vec_sub_in_place_right(ys, xs));
     } else if x_i >= ys_len {
-        assert!(!limbs_sub_in_place_left(xs, ys));
+        assert!(!limbs_sub_greater_in_place_left(xs, ys));
     } else {
         limbs_xor_neg_neg_in_place_helper(xs, ys, x_i, y_i);
         if xs_len < ys_len {
@@ -1195,10 +1195,10 @@ pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
     assert!(x_i < xs_len);
     assert!(y_i < ys_len);
     if y_i >= xs_len {
-        assert!(!limbs_sub_in_place_left(ys, xs));
+        assert!(!limbs_sub_greater_in_place_left(ys, xs));
         true
     } else if x_i >= ys_len {
-        assert!(!limbs_sub_in_place_left(xs, ys));
+        assert!(!limbs_sub_greater_in_place_left(xs, ys));
         false
     } else if xs_len >= ys_len {
         limbs_xor_neg_neg_in_place_helper(xs, ys, x_i, y_i);
