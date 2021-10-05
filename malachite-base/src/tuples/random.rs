@@ -1,4 +1,6 @@
 use random::Seed;
+use sets::random::{random_b_tree_sets_fixed_length, RandomBTreeSetsFixedLength};
+use std::cmp::Ordering;
 use std::iter::{repeat, Repeat};
 
 /// Generates random units; repeats `()`.
@@ -364,4 +366,212 @@ random_custom_tuples!(
     [X, I, xs, xs_gen, [x_0, x_0]],
     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]],
     [Z, K, zs, zs_gen, [z_3, z_3]]
+);
+
+/// Generates random pairs using elements from a single iterator, where the first element is less
+/// than the second.
+#[derive(Clone, Debug)]
+pub struct RandomOrderedUniquePairs<I: Iterator>
+where
+    I::Item: Ord,
+{
+    xs: I,
+}
+
+impl<I: Iterator> Iterator for RandomOrderedUniquePairs<I>
+where
+    I::Item: Ord,
+{
+    type Item = (I::Item, I::Item);
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut out_0 = None;
+        let out_1;
+        loop {
+            let x = self.xs.next().unwrap();
+            if out_0.is_none() {
+                out_0 = Some(x);
+            } else {
+                match x.cmp(out_0.as_ref().unwrap()) {
+                    Ordering::Equal => {}
+                    Ordering::Greater => {
+                        out_1 = Some(x);
+                        break;
+                    }
+                    Ordering::Less => {
+                        out_1 = out_0;
+                        out_0 = Some(x);
+                        break;
+                    }
+                }
+            }
+        }
+        Some((out_0.unwrap(), out_1.unwrap()))
+    }
+}
+
+/// Generates random pairs using elements from a single iterator, where the first element of each
+/// pair is less than the second.
+///
+/// The input iterator must generate at least `len` distinct elements; otherwise, this iterator
+/// will hang.
+///
+/// $$
+/// P((x\_0, x\_1)) = 2P(x\_0)P(x\_1).
+/// $$
+///
+/// The above formula assumes that the pair is valid, \emph{i.e.} its first element is less than
+/// its second. The probability of an invalid pair is zero.
+///
+/// `xs` must be infinite.
+///
+/// # Expected complexity per iteration
+/// $T = O(T^\prime)$
+///
+/// $M = O(M^\prime)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ is the tuple's width, and $T^\prime$ and
+/// $M^\prime$ are the time and additional memory of `xs`.
+///
+/// # Examples
+/// See the documentation of the `tuples::random` module.
+#[inline]
+pub fn random_ordered_unique_pairs<I: Iterator>(xs: I) -> RandomOrderedUniquePairs<I>
+where
+    I::Item: Ord,
+{
+    RandomOrderedUniquePairs { xs }
+}
+
+macro_rules! random_ordered_unique_tuples {
+    (
+        $struct: ident,
+        $k: expr,
+        $out_t: ty,
+        $fn: ident,
+        [$($i: expr),*]
+    ) => {
+        /// Generates random $n$-tuples using elements from a single iterator, where the tuples
+        /// have no repeated elements, and the elements are in ascending order.
+        ///
+        /// This struct is macro-generated. The value of $n$ is in the struct's name.
+        #[derive(Clone, Debug)]
+        pub struct $struct<I: Iterator>
+        where
+            I::Item: Ord,
+        {
+            xs: RandomBTreeSetsFixedLength<I>,
+        }
+
+        #[allow(clippy::type_complexity)]
+        impl<I: Iterator> Iterator for $struct<I>
+        where
+            I::Item: Ord,
+        {
+            type Item = $out_t;
+
+            #[inline]
+            fn next(&mut self) -> Option<Self::Item> {
+                let mut elements = self.xs.next().unwrap().into_iter();
+                Some(($(((elements.next().unwrap(), $i).0)),*))
+            }
+        }
+
+        /// Generates random $n$-tuples using elements from a single iterator, where the tuples
+        /// have no repeated elements, and the elements are in ascending order.
+        ///
+        /// This function is macro-generated. The value of $n$ is in the function's name.
+        ///
+        /// The input iterator must generate at least `len` distinct elements; otherwise, this
+        /// iterator will hang.
+        ///
+        /// $$
+        /// P((x\_i)\_{i=0}^{n-1}) = n!\prod\_{i=0}^{n-1}P(x\_i).
+        /// $$
+        ///
+        /// The above formula assumes that the tuple is valid, \emph{i.e.} its elements are
+        /// strictly increasing. The probability of an invalid tuple is zero.
+        ///
+        /// `xs` must be infinite.
+        ///
+        /// # Expected complexity per iteration
+        /// $T(n) = O(n\log n T^\prime)$
+        ///
+        /// $M(n) = O(nM^\prime)$
+        ///
+        /// where $T$ is time, $M$ is additional memory, $n$ is the tuple's width, and $T^\prime$
+        /// and $M^\prime$ are the time and additional memory of `xs`.
+        ///
+        /// # Examples
+        /// See the documentation of the `tuples::random` module.
+        #[inline]
+        pub fn $fn<I: Iterator>(xs: I) -> $struct<I>
+        where
+            I::Item: Ord,
+        {
+            $struct {
+                xs: random_b_tree_sets_fixed_length($k, xs),
+            }
+        }
+    }
+}
+random_ordered_unique_tuples!(
+    RandomOrderedUniqueTriples,
+    3,
+    (I::Item, I::Item, I::Item),
+    random_ordered_unique_triples,
+    [0, 1, 2]
+);
+random_ordered_unique_tuples!(
+    RandomOrderedUniqueQuadruples,
+    4,
+    (I::Item, I::Item, I::Item, I::Item),
+    random_ordered_unique_quadruples,
+    [0, 1, 2, 3]
+);
+random_ordered_unique_tuples!(
+    RandomOrderedUniqueQuintuples,
+    5,
+    (I::Item, I::Item, I::Item, I::Item, I::Item),
+    random_ordered_unique_quintuples,
+    [0, 1, 2, 3, 4]
+);
+random_ordered_unique_tuples!(
+    RandomOrderedUniqueSextuples,
+    6,
+    (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
+    random_ordered_unique_sextuples,
+    [0, 1, 2, 3, 4, 5]
+);
+random_ordered_unique_tuples!(
+    RandomOrderedUniqueSeptuples,
+    7,
+    (
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item
+    ),
+    random_ordered_unique_septuples,
+    [0, 1, 2, 3, 4, 5, 6]
+);
+random_ordered_unique_tuples!(
+    RandomOrderedUniqueOctuples,
+    8,
+    (
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item
+    ),
+    random_ordered_unique_octuples,
+    [0, 1, 2, 3, 4, 5, 6, 7]
 );

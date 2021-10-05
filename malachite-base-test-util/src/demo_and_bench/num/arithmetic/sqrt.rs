@@ -1,6 +1,5 @@
 use malachite_base::num::arithmetic::sqrt::{
-    _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _sqrt_rem_binary,
-    sqrt_rem_newton,
+    ceiling_sqrt_binary, checked_sqrt_binary, floor_sqrt_binary, sqrt_rem_binary, sqrt_rem_newton,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -176,7 +175,7 @@ fn benchmark_floor_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.floor_sqrt())),
-            ("binary", &mut |n| no_out!(_floor_sqrt_binary(n))),
+            ("binary", &mut |n| no_out!(floor_sqrt_binary(n))),
         ],
     );
 }
@@ -251,7 +250,7 @@ fn benchmark_ceiling_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.ceiling_sqrt())),
-            ("binary", &mut |n| no_out!(_ceiling_sqrt_binary(n))),
+            ("binary", &mut |n| no_out!(ceiling_sqrt_binary(n))),
         ],
     );
 }
@@ -326,7 +325,7 @@ fn benchmark_checked_sqrt_algorithms_unsigned<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.checked_sqrt())),
-            ("binary", &mut |n| no_out!(_checked_sqrt_binary(n))),
+            ("binary", &mut |n| no_out!(checked_sqrt_binary(n))),
         ],
     );
 }
@@ -365,7 +364,7 @@ fn benchmark_sqrt_rem_algorithms<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.sqrt_rem())),
-            ("binary", &mut |n| no_out!(_sqrt_rem_binary(n))),
+            ("binary", &mut |n| no_out!(sqrt_rem_binary(n))),
         ],
     );
 }

@@ -563,7 +563,7 @@ pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -
 /// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp, up, and vp are disjoint.
-pub fn _limbs_sub_same_length_with_borrow_in_to_out(
+pub fn limbs_sub_same_length_with_borrow_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -591,7 +591,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_to_out(
 /// Panics if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
-pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
+pub fn limbs_sub_same_length_with_borrow_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     borrow_in: bool,
@@ -618,7 +618,7 @@ pub fn _limbs_sub_same_length_with_borrow_in_in_place_left(
 /// Panics if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as vp.
-pub fn _limbs_sub_same_length_with_borrow_in_in_place_right(
+pub fn limbs_sub_same_length_with_borrow_in_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     borrow_in: bool,

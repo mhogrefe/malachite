@@ -7,7 +7,7 @@ use num::conversion::traits::WrappingFrom;
 use num::logic::traits::{BitConvertible, LeadingZeros};
 use std::ops::{BitOr, BitOrAssign, ShlAssign, ShrAssign};
 
-fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
+fn to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();
     let mut x = *x;
     while x != T::ZERO {
@@ -17,7 +17,7 @@ fn _to_bits_asc_unsigned<T: Copy + Eq + Parity + ShrAssign<u64> + Zero>(x: &T) -
     bits
 }
 
-fn _to_bits_desc_unsigned<T: PrimitiveInt>(x: &T) -> Vec<bool> {
+fn to_bits_desc_unsigned<T: PrimitiveInt>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();
     if *x == T::ZERO {
         return bits;
@@ -34,7 +34,7 @@ fn _to_bits_desc_unsigned<T: PrimitiveInt>(x: &T) -> Vec<bool> {
     bits
 }
 
-fn _from_bits_asc_unsigned<
+fn from_bits_asc_unsigned<
     T: BitOrAssign<T> + Copy + Eq + Named + One + ShlAssign<u64> + Zero,
     I: Iterator<Item = bool>,
 >(
@@ -56,7 +56,7 @@ fn _from_bits_asc_unsigned<
 }
 
 #[inline]
-fn _from_bits_desc_unsigned<T: PrimitiveInt, I: Iterator<Item = bool>>(bits: I) -> T {
+fn from_bits_desc_unsigned<T: PrimitiveInt, I: Iterator<Item = bool>>(bits: I) -> T {
     let mut n = T::ZERO;
     let high_mask = T::power_of_2(T::WIDTH - 1);
     for bit in bits {
@@ -91,7 +91,7 @@ macro_rules! impl_bit_convertible_unsigned {
             /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn to_bits_asc(&self) -> Vec<bool> {
-                _to_bits_asc_unsigned(self)
+                to_bits_asc_unsigned(self)
             }
 
             /// Returns a `Vec` containing the bits of `self` in descending order: most- to least-
@@ -111,7 +111,7 @@ macro_rules! impl_bit_convertible_unsigned {
             /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn to_bits_desc(&self) -> Vec<bool> {
-                _to_bits_desc_unsigned(self)
+                to_bits_desc_unsigned(self)
             }
 
             /// Converts an iterator of bits into a value. The bits should be in ascending order
@@ -138,7 +138,7 @@ macro_rules! impl_bit_convertible_unsigned {
             /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> $t {
-                _from_bits_asc_unsigned(bits)
+                from_bits_asc_unsigned(bits)
             }
 
             /// Converts an iterator of bits into a value. The bits should be in descending order
@@ -165,14 +165,14 @@ macro_rules! impl_bit_convertible_unsigned {
             /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> $t {
-                _from_bits_desc_unsigned(bits)
+                from_bits_desc_unsigned(bits)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_bit_convertible_unsigned);
 
-fn _to_bits_asc_signed<T: Copy + Eq + NegativeOne + Ord + Parity + ShrAssign<u64> + Zero>(
+fn to_bits_asc_signed<T: Copy + Eq + NegativeOne + Ord + Parity + ShrAssign<u64> + Zero>(
     x: &T,
 ) -> Vec<bool> {
     let mut bits = Vec::new();
@@ -195,7 +195,7 @@ fn _to_bits_asc_signed<T: Copy + Eq + NegativeOne + Ord + Parity + ShrAssign<u64
     bits
 }
 
-fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInt>(x: &T) -> Vec<bool> {
+fn to_bits_desc_signed<T: NegativeOne + PrimitiveInt>(x: &T) -> Vec<bool> {
     let mut bits = Vec::new();
     if *x >= T::ZERO {
         if *x == T::ZERO {
@@ -229,7 +229,7 @@ fn _to_bits_desc_signed<T: NegativeOne + PrimitiveInt>(x: &T) -> Vec<bool> {
     bits
 }
 
-fn _from_bits_asc_signed<
+fn from_bits_asc_signed<
     U: BitOr<U, Output = U>
         + BitOrAssign<U>
         + Copy
@@ -271,7 +271,7 @@ fn _from_bits_asc_signed<
 }
 
 #[inline]
-fn _from_bits_desc_signed<U: PrimitiveInt, S: Named + WrappingFrom<U>, I: Iterator<Item = bool>>(
+fn from_bits_desc_signed<U: PrimitiveInt, S: Named + WrappingFrom<U>, I: Iterator<Item = bool>>(
     bits: I,
 ) -> S {
     let mut n = U::ZERO;
@@ -320,7 +320,7 @@ macro_rules! impl_bit_convertible_signed {
             /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn to_bits_asc(&self) -> Vec<bool> {
-                _to_bits_asc_signed(self)
+                to_bits_asc_signed(self)
             }
 
             /// Returns a `Vec` containing the bits of `self` in ascending order: most- to least-
@@ -341,7 +341,7 @@ macro_rules! impl_bit_convertible_signed {
             /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn to_bits_desc(&self) -> Vec<bool> {
-                _to_bits_desc_signed(self)
+                to_bits_desc_signed(self)
             }
 
             /// Converts an iterator of bits into a value. The bits should be in ascending order
@@ -378,7 +378,7 @@ macro_rules! impl_bit_convertible_signed {
             /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn from_bits_asc<I: Iterator<Item = bool>>(bits: I) -> $s {
-                _from_bits_asc_signed::<$u, $s, _>(bits)
+                from_bits_asc_signed::<$u, $s, _>(bits)
             }
 
             /// Converts an iterator of bits into a value. The bits should be in descending order
@@ -405,7 +405,7 @@ macro_rules! impl_bit_convertible_signed {
             /// See the documentation of the `num::logic::bit_convertible` module.
             #[inline]
             fn from_bits_desc<I: Iterator<Item = bool>>(bits: I) -> $s {
-                _from_bits_desc_signed::<$u, $s, _>(bits)
+                from_bits_desc_signed::<$u, $s, _>(bits)
             }
         }
     };

@@ -46,6 +46,7 @@ use platform::Limb;
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_neg_limb_get_bits(0x12345678, 10, 10), empty);
 /// ```
+#[doc(hidden)]
 pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = TrailingZeros::trailing_zeros(x);
@@ -102,6 +103,7 @@ pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 10, 10), empty);
 /// ```
+#[doc(hidden)]
 pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = limbs_trailing_zeros(xs);
@@ -171,6 +173,7 @@ pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> 
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 10, 10), empty);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = limbs_trailing_zeros(&xs);
@@ -239,6 +242,7 @@ pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
 /// limbs_neg_assign_bits(&mut xs, 80, 100, &[789, 321]);
 /// assert_eq!(xs, &[123, 456, 4243193856, 15]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
     assert!(!limbs_sub_limb_in_place(xs, 1));

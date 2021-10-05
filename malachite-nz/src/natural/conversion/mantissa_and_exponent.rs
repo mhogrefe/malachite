@@ -26,7 +26,8 @@ impl Natural {
     /// conversion might not be exact, so we round to the nearest float using the provided rounding
     /// mode. If the rounding mode is `Exact` but the conversion is not exact, `None` is returned.
     /// $$
-    /// f(x, r) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
+    /// f(x, r) \approx \left (\frac{x}{2^{\lfloor \log_2 x \rfloor}},
+    ///     \lfloor \log_2 x \rfloor\right ).
     /// $$
     ///
     /// # Worst-case complexity

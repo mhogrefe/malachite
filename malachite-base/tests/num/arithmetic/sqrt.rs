@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::sqrt::{
-    _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _sqrt_rem_binary,
+    ceiling_sqrt_binary, checked_sqrt_binary, floor_sqrt_binary, sqrt_rem_binary,
 };
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -44,7 +44,7 @@ fn sqrt_rem_newton_fail() {
 fn test_floor_sqrt() {
     fn test_u<T: PrimitiveUnsigned>(n: T, out: T) {
         assert_eq!(n.floor_sqrt(), out);
-        assert_eq!(_floor_sqrt_binary(n), out);
+        assert_eq!(floor_sqrt_binary(n), out);
 
         let mut n = n;
         n.floor_sqrt_assign();
@@ -97,7 +97,7 @@ pub fn floor_sqrt_fail() {
 fn test_ceiling_sqrt() {
     fn test_u<T: PrimitiveUnsigned>(n: T, out: T) {
         assert_eq!(n.ceiling_sqrt(), out);
-        assert_eq!(_ceiling_sqrt_binary(n), out);
+        assert_eq!(ceiling_sqrt_binary(n), out);
 
         let mut n = n;
         n.ceiling_sqrt_assign();
@@ -150,7 +150,7 @@ pub fn ceiling_sqrt_fail() {
 fn test_checked_sqrt() {
     fn test_u<T: PrimitiveUnsigned>(n: T, out: Option<T>) {
         assert_eq!(n.checked_sqrt(), out);
-        assert_eq!(_checked_sqrt_binary(n), out);
+        assert_eq!(checked_sqrt_binary(n), out);
     }
     test_u::<u8>(0, Some(0));
     test_u::<u8>(1, Some(1));
@@ -197,7 +197,7 @@ fn test_sqrt_rem() {
         let (actual_sqrt, actual_rem) = n.sqrt_rem();
         assert_eq!(actual_sqrt, sqrt);
         assert_eq!(actual_rem, rem);
-        assert_eq!(_sqrt_rem_binary(n), (sqrt, rem));
+        assert_eq!(sqrt_rem_binary(n), (sqrt, rem));
 
         let mut n = n;
         assert_eq!(n.sqrt_assign_rem(), rem);
@@ -241,7 +241,7 @@ fn floor_sqrt_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         n_alt.floor_sqrt_assign();
         assert_eq!(n_alt, sqrt);
-        assert_eq!(_floor_sqrt_binary(n), sqrt);
+        assert_eq!(floor_sqrt_binary(n), sqrt);
         assert_eq!(n.floor_root(2), sqrt);
         let square = sqrt.square();
         let ceiling_sqrt = n.ceiling_sqrt();
@@ -290,7 +290,7 @@ fn ceiling_sqrt_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         n_alt.ceiling_sqrt_assign();
         assert_eq!(n_alt, sqrt);
-        assert_eq!(_ceiling_sqrt_binary(n), sqrt);
+        assert_eq!(ceiling_sqrt_binary(n), sqrt);
         assert_eq!(n.ceiling_root(2), sqrt);
         if let Some(square) = sqrt.checked_square() {
             let floor_sqrt = n.floor_sqrt();
@@ -338,7 +338,7 @@ fn ceiling_sqrt_properties() {
 fn checked_sqrt_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_gen::<T>().test_properties(|n| {
         let sqrt = n.checked_sqrt();
-        assert_eq!(_checked_sqrt_binary(n), sqrt);
+        assert_eq!(checked_sqrt_binary(n), sqrt);
         assert_eq!(n.checked_root(2), sqrt);
         if let Some(sqrt) = sqrt {
             assert_eq!(sqrt.square(), n);
@@ -372,7 +372,7 @@ fn sqrt_rem_properties_helper<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         assert_eq!(n_alt.sqrt_assign_rem(), rem);
         assert_eq!(n_alt, sqrt);
-        assert_eq!(_sqrt_rem_binary(n), (sqrt, rem));
+        assert_eq!(sqrt_rem_binary(n), (sqrt, rem));
         assert_eq!(n.root_rem(2), (sqrt, rem));
         assert_eq!(n.floor_sqrt(), sqrt);
         assert!(rem <= sqrt << 1);

@@ -12,11 +12,10 @@ use malachite_base_test_util::generators::{
     unsigned_vec_unsigned_pair_gen, unsigned_vec_unsigned_unsigned_triple_gen,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
 };
-use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
+use malachite_nz::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 #[cfg(not(feature = "32_bit_limbs"))]
 use malachite_nz::natural::arithmetic::mul::fft::{
-    _limbs_mul_fft_fft, _limbs_mul_fft_internal, _limbs_mul_fft_inverse,
-    _limbs_mul_fft_normalize_mod_f,
+    limbs_mul_fft_fft, limbs_mul_fft_internal, limbs_mul_fft_inverse, limbs_mul_fft_normalize_mod_f,
 };
 use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_mul_limb, limbs_mul_limb_to_out, limbs_mul_limb_with_carry_to_out,
@@ -24,29 +23,29 @@ use malachite_nz::natural::arithmetic::mul::limb::{
     limbs_vec_mul_limb_in_place,
 };
 use malachite_nz::natural::arithmetic::mul::mul_low::{
-    _limbs_mul_low_same_length_basecase, _limbs_mul_low_same_length_basecase_alt,
-    _limbs_mul_low_same_length_divide_and_conquer,
-    _limbs_mul_low_same_length_divide_and_conquer_shared_scratch, limbs_mul_low_same_length,
+    limbs_mul_low_same_length, limbs_mul_low_same_length_basecase,
+    limbs_mul_low_same_length_basecase_alt, limbs_mul_low_same_length_divide_and_conquer,
+    limbs_mul_low_same_length_divide_and_conquer_shared_scratch,
 };
 #[cfg(not(feature = "32_bit_limbs"))]
-use malachite_nz::natural::arithmetic::mul::mul_mod::_limbs_mul_mod_base_pow_n_minus_1;
+use malachite_nz::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_22, _limbs_mul_greater_to_out_toom_22_scratch_len,
-    _limbs_mul_greater_to_out_toom_32, _limbs_mul_greater_to_out_toom_32_scratch_len,
-    _limbs_mul_greater_to_out_toom_33, _limbs_mul_greater_to_out_toom_33_scratch_len,
-    _limbs_mul_greater_to_out_toom_42, _limbs_mul_greater_to_out_toom_42_scratch_len,
-    _limbs_mul_greater_to_out_toom_43, _limbs_mul_greater_to_out_toom_43_scratch_len,
-    _limbs_mul_greater_to_out_toom_44, _limbs_mul_greater_to_out_toom_44_scratch_len,
-    _limbs_mul_greater_to_out_toom_52, _limbs_mul_greater_to_out_toom_52_scratch_len,
-    _limbs_mul_greater_to_out_toom_53, _limbs_mul_greater_to_out_toom_53_scratch_len,
-    _limbs_mul_greater_to_out_toom_54, _limbs_mul_greater_to_out_toom_54_scratch_len,
-    _limbs_mul_greater_to_out_toom_62, _limbs_mul_greater_to_out_toom_62_scratch_len,
-    _limbs_mul_greater_to_out_toom_63, _limbs_mul_greater_to_out_toom_63_scratch_len,
-    _limbs_mul_greater_to_out_toom_6h, _limbs_mul_greater_to_out_toom_6h_scratch_len,
-    _limbs_mul_greater_to_out_toom_8h, _limbs_mul_greater_to_out_toom_8h_scratch_len,
+    limbs_mul_greater_to_out_toom_22, limbs_mul_greater_to_out_toom_22_scratch_len,
+    limbs_mul_greater_to_out_toom_32, limbs_mul_greater_to_out_toom_32_scratch_len,
+    limbs_mul_greater_to_out_toom_33, limbs_mul_greater_to_out_toom_33_scratch_len,
+    limbs_mul_greater_to_out_toom_42, limbs_mul_greater_to_out_toom_42_scratch_len,
+    limbs_mul_greater_to_out_toom_43, limbs_mul_greater_to_out_toom_43_scratch_len,
+    limbs_mul_greater_to_out_toom_44, limbs_mul_greater_to_out_toom_44_scratch_len,
+    limbs_mul_greater_to_out_toom_52, limbs_mul_greater_to_out_toom_52_scratch_len,
+    limbs_mul_greater_to_out_toom_53, limbs_mul_greater_to_out_toom_53_scratch_len,
+    limbs_mul_greater_to_out_toom_54, limbs_mul_greater_to_out_toom_54_scratch_len,
+    limbs_mul_greater_to_out_toom_62, limbs_mul_greater_to_out_toom_62_scratch_len,
+    limbs_mul_greater_to_out_toom_63, limbs_mul_greater_to_out_toom_63_scratch_len,
+    limbs_mul_greater_to_out_toom_6h, limbs_mul_greater_to_out_toom_6h_scratch_len,
+    limbs_mul_greater_to_out_toom_8h, limbs_mul_greater_to_out_toom_8h_scratch_len,
 };
 use malachite_nz::natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out,
+    limbs_mul, limbs_mul_greater, limbs_mul_greater_to_out, limbs_mul_greater_to_out_basecase,
     limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use malachite_nz::natural::Natural;
@@ -62,7 +61,7 @@ use malachite_nz_test_util::generators::{
     unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
     unsigned_vec_triple_gen_var_9,
 };
-use malachite_nz_test_util::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase_mem_opt;
+use malachite_nz_test_util::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase_mem_opt;
 use num::BigUint;
 use rug;
 use std::str::FromStr;
@@ -504,7 +503,7 @@ fn test_limbs_mul_greater_to_out() {
     let test =
         |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, highest_result_limb, out_after| {
             let mut out = out_before.clone();
-            _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+            limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
             assert_eq!(out, out_after);
             let mut out = out_before;
             assert_eq!(
@@ -567,7 +566,7 @@ fn test_limbs_mul_greater_to_out() {
                 highest_result_limb,
                 out_after: Vec<Limb>| {
         let mut out = out_before.clone();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before;
         assert_eq!(
@@ -1340,7 +1339,7 @@ fn test_limbs_mul_greater_to_out() {
 fn limbs_mul_greater_to_out_fail_1() {
     let mut out = vec![10; 4];
     let xs = series(6, 3);
-    _limbs_mul_greater_to_out_basecase(&mut out, &xs, &[1, 2]);
+    limbs_mul_greater_to_out_basecase(&mut out, &xs, &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1349,7 +1348,7 @@ fn limbs_mul_greater_to_out_fail_1() {
 fn limbs_mul_greater_to_out_fail_2() {
     let mut out = vec![10; 5];
     let ys = series(1, 3);
-    _limbs_mul_greater_to_out_basecase(&mut out, &[6, 7], &ys);
+    limbs_mul_greater_to_out_basecase(&mut out, &[6, 7], &ys);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1357,13 +1356,13 @@ fn limbs_mul_greater_to_out_fail_2() {
 #[should_panic]
 fn limbs_mul_greater_to_out_fail_3() {
     let mut out = vec![10; 3];
-    _limbs_mul_greater_to_out_basecase(&mut out, &[6, 7], &[]);
+    limbs_mul_greater_to_out_basecase(&mut out, &[6, 7], &[]);
 }
 
 fn limbs_mul_basecase_helper(out: &[Limb], xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let mut out = out.to_vec();
     let old_out = out.clone();
-    _limbs_mul_greater_to_out_basecase(&mut out, xs, ys);
+    limbs_mul_greater_to_out_basecase(&mut out, xs, ys);
     let n = Natural::from_limbs_asc(xs) * Natural::from_limbs_asc(ys);
     let len = xs.len() + ys.len();
     let mut limbs = n.into_limbs_asc();
@@ -1385,7 +1384,7 @@ fn limbs_mul_greater_to_out_properties() {
         assert_eq!(highest_result_limb, out[xs.len() + ys.len() - 1]);
         assert_eq!(out, expected_out);
         let mut out = old_out;
-        _limbs_mul_greater_to_out_basecase_mem_opt(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase_mem_opt(&mut out, &xs, &ys);
         assert_eq!(out, expected_out);
     });
 }
@@ -1474,12 +1473,12 @@ fn limbs_mul_to_out_properties() {
 #[test]
 fn test_limbs_mul_greater_to_out_toom_22() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_22_scratch_len(xs.len())];
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
+        limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // s != n
@@ -1787,7 +1786,7 @@ fn test_limbs_mul_greater_to_out_toom_22() {
 fn limbs_mul_greater_to_out_toom_22_fail_1() {
     let mut scratch = vec![];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_22(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_22(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1798,7 +1797,7 @@ fn limbs_mul_greater_to_out_toom_22_fail_2() {
     let mut out = vec![10; 7];
     let xs = series(6, 3);
     let ys = series(1, 4);
-    _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1808,7 +1807,7 @@ fn limbs_mul_greater_to_out_toom_22_fail_3() {
     let mut scratch = vec![];
     let mut out = vec![10; 7];
     let xs = series(6, 4);
-    _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &[1, 2], &mut scratch);
+    limbs_mul_greater_to_out_toom_22(&mut out, &xs, &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1818,7 +1817,7 @@ fn limbs_mul_greater_to_out_toom_22_fail_4() {
     let mut scratch = vec![];
     let mut out = vec![10; 7];
     let xs = series(6, 3);
-    _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &[1, 2], &mut scratch);
+    limbs_mul_greater_to_out_toom_22(&mut out, &xs, &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1829,7 +1828,7 @@ fn limbs_mul_greater_to_out_toom_22_fail_5() {
     let mut out = vec![10; 4];
     let xs = series(6, 3);
     let ys = series(1, 3);
-    _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1839,7 +1838,7 @@ fn limbs_mul_greater_to_out_toom_22_fail_6() {
     let mut scratch = vec![];
     let mut out = vec![10; 4];
     let xs = series(6, 3);
-    _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_22(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -1850,7 +1849,7 @@ fn limbs_mul_greater_to_out_toom_22_fail_7() {
     let mut out = vec![10; 4];
     let xs = series(6, 3);
     let ys = series(1, 4);
-    _limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_22(&mut out, &xs, &ys, &mut scratch);
 }
 
 macro_rules! mul_properties_helper_1 {
@@ -1888,80 +1887,80 @@ macro_rules! mul_properties_helper_2 {
 }
 mul_properties_helper_1!(
     limbs_mul_greater_to_out_toom_22_properties,
-    _limbs_mul_greater_to_out_toom_22,
-    _limbs_mul_greater_to_out_toom_22_scratch_len,
+    limbs_mul_greater_to_out_toom_22,
+    limbs_mul_greater_to_out_toom_22_scratch_len,
     unsigned_vec_triple_gen_var_4
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_32_properties,
-    _limbs_mul_greater_to_out_toom_32,
-    _limbs_mul_greater_to_out_toom_32_scratch_len,
+    limbs_mul_greater_to_out_toom_32,
+    limbs_mul_greater_to_out_toom_32_scratch_len,
     unsigned_vec_triple_gen_var_5
 );
 mul_properties_helper_1!(
     limbs_mul_greater_to_out_toom_33_properties,
-    _limbs_mul_greater_to_out_toom_33,
-    _limbs_mul_greater_to_out_toom_33_scratch_len,
+    limbs_mul_greater_to_out_toom_33,
+    limbs_mul_greater_to_out_toom_33_scratch_len,
     unsigned_vec_triple_gen_var_6
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_42_properties,
-    _limbs_mul_greater_to_out_toom_42,
-    _limbs_mul_greater_to_out_toom_42_scratch_len,
+    limbs_mul_greater_to_out_toom_42,
+    limbs_mul_greater_to_out_toom_42_scratch_len,
     unsigned_vec_triple_gen_var_7
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_43_properties,
-    _limbs_mul_greater_to_out_toom_43,
-    _limbs_mul_greater_to_out_toom_43_scratch_len,
+    limbs_mul_greater_to_out_toom_43,
+    limbs_mul_greater_to_out_toom_43_scratch_len,
     unsigned_vec_triple_gen_var_8
 );
 mul_properties_helper_1!(
     limbs_mul_greater_to_out_toom_44_properties,
-    _limbs_mul_greater_to_out_toom_44,
-    _limbs_mul_greater_to_out_toom_44_scratch_len,
+    limbs_mul_greater_to_out_toom_44,
+    limbs_mul_greater_to_out_toom_44_scratch_len,
     unsigned_vec_triple_gen_var_9
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_52_properties,
-    _limbs_mul_greater_to_out_toom_52,
-    _limbs_mul_greater_to_out_toom_52_scratch_len,
+    limbs_mul_greater_to_out_toom_52,
+    limbs_mul_greater_to_out_toom_52_scratch_len,
     unsigned_vec_triple_gen_var_10
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_53_properties,
-    _limbs_mul_greater_to_out_toom_53,
-    _limbs_mul_greater_to_out_toom_53_scratch_len,
+    limbs_mul_greater_to_out_toom_53,
+    limbs_mul_greater_to_out_toom_53_scratch_len,
     unsigned_vec_triple_gen_var_11
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_54_properties,
-    _limbs_mul_greater_to_out_toom_54,
-    _limbs_mul_greater_to_out_toom_54_scratch_len,
+    limbs_mul_greater_to_out_toom_54,
+    limbs_mul_greater_to_out_toom_54_scratch_len,
     unsigned_vec_triple_gen_var_12
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_62_properties,
-    _limbs_mul_greater_to_out_toom_62,
-    _limbs_mul_greater_to_out_toom_62_scratch_len,
+    limbs_mul_greater_to_out_toom_62,
+    limbs_mul_greater_to_out_toom_62_scratch_len,
     unsigned_vec_triple_gen_var_13
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_63_properties,
-    _limbs_mul_greater_to_out_toom_63,
-    _limbs_mul_greater_to_out_toom_63_scratch_len,
+    limbs_mul_greater_to_out_toom_63,
+    limbs_mul_greater_to_out_toom_63_scratch_len,
     unsigned_vec_triple_gen_var_14
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_6h_properties,
-    _limbs_mul_greater_to_out_toom_6h,
-    _limbs_mul_greater_to_out_toom_6h_scratch_len,
+    limbs_mul_greater_to_out_toom_6h,
+    limbs_mul_greater_to_out_toom_6h_scratch_len,
     unsigned_vec_triple_gen_var_15
 );
 mul_properties_helper_2!(
     limbs_mul_greater_to_out_toom_8h_properties,
-    _limbs_mul_greater_to_out_toom_8h,
-    _limbs_mul_greater_to_out_toom_8h_scratch_len,
+    limbs_mul_greater_to_out_toom_8h,
+    limbs_mul_greater_to_out_toom_8h_scratch_len,
     unsigned_vec_triple_gen_var_16
 );
 
@@ -1970,12 +1969,11 @@ mul_properties_helper_2!(
 fn test_limbs_mul_greater_to_out_toom_32() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_32_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // !(ap1hi == 0 && limbs_cmp_same_length(ap1, xs1) == Ordering::Less)
@@ -2060,63 +2058,63 @@ fn test_limbs_mul_greater_to_out_toom_32() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_32_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_32(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_32(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(3, 4)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_32_scratch_len(3, 4)];
     let mut out = vec![10; 7];
     let xs = series(6, 3);
     let ys = series(1, 4);
-    _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(5, 4)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_32_scratch_len(5, 4)];
     let mut out = vec![10; 9];
     let xs = series(6, 5);
     let ys = series(1, 4);
-    _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(6, 3)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_32_scratch_len(6, 3)];
     let mut out = vec![10; 9];
     let xs = series(6, 6);
     let ys = series(1, 3);
-    _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(3, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_32_scratch_len(3, 0)];
     let mut out = vec![10; 4];
     let xs = series(6, 3);
-    _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_32(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_32_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_32_scratch_len(6, 4)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_32_scratch_len(6, 4)];
     let mut out = vec![10; 9];
     let xs = series(6, 6);
     let ys = series(1, 4);
-    _limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_32(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -2124,11 +2122,11 @@ fn limbs_mul_greater_to_out_toom_32_fail_6() {
 fn test_limbs_mul_greater_to_out_toom_33() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
-        _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_33_scratch_len(xs.len())];
+        limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // carry == 0 && limbs_cmp_same_length(&gp[..n], xs_1) == Ordering::Less
@@ -2179,52 +2177,52 @@ fn test_limbs_mul_greater_to_out_toom_33() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_33_scratch_len(1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_33(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_33(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(5)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_33_scratch_len(5)];
     let mut out = vec![10; 11];
     let xs = series(6, 5);
     let ys = series(1, 6);
-    _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(5)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_33_scratch_len(5)];
     let mut out = vec![10; 9];
     let xs = series(6, 5);
     let ys = series(1, 4);
-    _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(5)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_33_scratch_len(5)];
     let mut out = vec![10; 5];
     let xs = series(6, 5);
-    _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_33(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_33_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_33_scratch_len(6)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_33_scratch_len(6)];
     let mut out = vec![10; 9];
     let xs = series(6, 6);
     let ys = series(1, 5);
-    _limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_33(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -2232,12 +2230,11 @@ fn limbs_mul_greater_to_out_toom_33_fail_5() {
 fn test_limbs_mul_greater_to_out_toom_42() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_42_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // v_neg_1_neg
@@ -2423,50 +2420,50 @@ fn test_limbs_mul_greater_to_out_toom_42() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_42_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_42(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_42(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(5, 6)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_42_scratch_len(5, 6)];
     let mut out = vec![10; 11];
     let xs = series(6, 5);
     let ys = series(1, 6);
-    _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_42(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(3, 2)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_42_scratch_len(3, 2)];
     let mut out = vec![10; 9];
     let xs = series(6, 3);
-    _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[1, 2], &mut scratch);
+    limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(5, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_42_scratch_len(5, 0)];
     let mut out = vec![10; 5];
     let xs = series(6, 5);
-    _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_42_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_42_scratch_len(4, 2)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_42_scratch_len(4, 2)];
     let mut out = vec![10; 4];
     let xs = series(6, 4);
-    _limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[1, 2], &mut scratch);
+    limbs_mul_greater_to_out_toom_42(&mut out, &xs, &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -2474,21 +2471,20 @@ fn limbs_mul_greater_to_out_toom_42_fail_5() {
 fn test_limbs_mul_greater_to_out_toom_43() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // n_high < n in _limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
-    // !v_neg_2neg in _limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
+    // n_high < n in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
+    // !v_neg_2neg in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
     // limbs_cmp_same_length(small_scratch, bsm1) != Ordering::Less
     // s <= t
-    // !v_neg_2neg in _limbs_mul_toom_interpolate_6points
-    // !v_neg_1_neg in _limbs_mul_toom_interpolate_6points
-    // n_high > n in _limbs_mul_toom_interpolate_6points
+    // !v_neg_2neg in limbs_mul_toom_interpolate_6points
+    // !v_neg_1_neg in limbs_mul_toom_interpolate_6points
+    // n_high > n in limbs_mul_toom_interpolate_6points
     // special_carry_1 <= special_carry_2
     test(
         series(2, 11),
@@ -2499,8 +2495,8 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             132, 0,
         ],
     );
-    // n_high >= n in _limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
-    // v_neg_2neg in _limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
+    // n_high >= n in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
+    // v_neg_2neg in limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2
     // t != n
     // limbs_cmp_same_length(small_scratch, bsm1) == Ordering::Less
     // *bsm1last == 0 && limbs_cmp_same_length(bsm1init, ys_1) == Ordering::Less
@@ -2514,9 +2510,9 @@ fn test_limbs_mul_greater_to_out_toom_43() {
             130, 0,
         ],
     );
-    // v_neg_2neg in _limbs_mul_toom_interpolate_6points
-    // v_neg_1_neg in _limbs_mul_toom_interpolate_6points
-    // n_high <= n in _limbs_mul_toom_interpolate_6points
+    // v_neg_2neg in limbs_mul_toom_interpolate_6points
+    // v_neg_1_neg in limbs_mul_toom_interpolate_6points
+    // n_high <= n in limbs_mul_toom_interpolate_6points
     test(
         series(2, 19),
         series(3, 11),
@@ -2629,12 +2625,11 @@ fn test_limbs_mul_greater_to_out_toom_43() {
 fn test_limbs_mul_greater_to_out_toom_43() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_43_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(
@@ -2734,52 +2729,52 @@ fn test_limbs_mul_greater_to_out_toom_43() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_43_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_43(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_43(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(11, 12)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_43_scratch_len(11, 12)];
     let mut out = vec![10; 23];
     let xs = series(3, 11);
     let ys = series(2, 12);
-    _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(11, 8)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_43_scratch_len(11, 8)];
     let mut out = vec![10; 19];
     let xs = series(3, 11);
     let ys = series(2, 8);
-    _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(12, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_43_scratch_len(12, 0)];
     let mut out = vec![10; 12];
     let xs = series(3, 11);
-    _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_43(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_43_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_43_scratch_len(4, 2)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_43_scratch_len(4, 2)];
     let mut out = vec![10; 5];
     let xs = series(3, 10);
     let ys = series(2, 10);
-    _limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_43(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -2787,20 +2782,20 @@ fn limbs_mul_greater_to_out_toom_43_fail_5() {
 fn test_limbs_mul_greater_to_out_toom_44() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
-        _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
+        limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // _limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2(bpx, bmx, ys, n, t, &mut tp[..n + 1])
-    // _limbs_mul_toom_evaluate_deg_3poly_in_1and_neg_1(bpx, bmx, ys, n, t, &mut tp[..n + 1])
+    // limbs_mul_toom_evaluate_deg_3poly_in_2and_neg_2(bpx, bmx, ys, n, t, &mut tp[..n + 1])
+    // limbs_mul_toom_evaluate_deg_3poly_in_1and_neg_1(bpx, bmx, ys, n, t, &mut tp[..n + 1])
     // s <= t
     // !w1_neg
     // !w3neg
     // w6n <= n + 1
-    // _limbs_mul_greater_to_out_basecase in _limbs_mul_same_length_to_out_toom_44recursive
+    // limbs_mul_greater_to_out_basecase in limbs_mul_same_length_to_out_toom_44recursive
     test(
         series(2, 4),
         series(3, 4),
@@ -2880,11 +2875,11 @@ fn test_limbs_mul_greater_to_out_toom_44() {
 fn test_limbs_mul_greater_to_out_toom_44() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
-        _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_44_scratch_len(xs.len())];
+        limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(
@@ -2899,52 +2894,52 @@ fn test_limbs_mul_greater_to_out_toom_44() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_44_scratch_len(1)];
     let mut out = vec![10; 10];
-    _limbs_mul_greater_to_out_toom_44(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_44(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(4)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_44_scratch_len(4)];
     let mut out = vec![10; 9];
     let xs = series(3, 4);
     let ys = series(2, 5);
-    _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(3)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_44_scratch_len(3)];
     let mut out = vec![10; 6];
     let xs = series(3, 3);
     let ys = series(2, 3);
-    _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(11)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_44_scratch_len(11)];
     let mut out = vec![10; 11];
     let xs = series(3, 11);
-    _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_44(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_44_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_44_scratch_len(4)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_44_scratch_len(4)];
     let mut out = vec![10; 7];
     let xs = series(3, 4);
     let ys = series(2, 4);
-    _limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_44(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -2952,22 +2947,21 @@ fn limbs_mul_greater_to_out_toom_44_fail_5() {
 fn test_limbs_mul_greater_to_out_toom_52() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // degree.even() in _limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // !v_neg_2neg in _limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // degree.even() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // !v_neg_2neg in limbs_mul_toom_evaluate_poly_in_2and_neg_2
     // t != n
     // !(slice_test_zero(&ys_0[t..]) && limbs_cmp_same_length(&ys_0[..t], ys_1) == Ordering::Less)
     // !v_neg_1_neg
     // !(slice_test_zero(&bsm1[t..]) && limbs_cmp_same_length(&bsm1[..t], ys_1) == Ordering::Less)
-    // degree.even() in _limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // !v_neg_1_neg in _limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // degree.even() in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // !v_neg_1_neg in limbs_mul_toom_evaluate_poly_in_1and_neg_1
     test(
         series(2, 15),
         series(3, 5),
@@ -2983,7 +2977,7 @@ fn test_limbs_mul_greater_to_out_toom_52() {
         vec![10; 20],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
     );
-    // n_high != n in _limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // n_high != n in limbs_mul_toom_evaluate_poly_in_2and_neg_2
     // t == n
     // limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
     // v_neg_1_neg
@@ -3008,9 +3002,9 @@ fn test_limbs_mul_greater_to_out_toom_52() {
         vec![10; 20],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0],
     );
-    // v_neg_2neg in _limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // v_neg_1_neg in _limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // _limbs_mul_toom_evaluate_poly_in_1and_neg_1(as1, asm1, 4, xs, n, s, &mut v_neg_1[..m])
+    // v_neg_2neg in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // v_neg_1_neg in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // limbs_mul_toom_evaluate_poly_in_1and_neg_1(as1, asm1, 4, xs, n, s, &mut v_neg_1[..m])
     test(
         vec![
             281500646, 1572406350, 108746052, 4056047843, 89307364, 1006007374, 2902260577,
@@ -3117,12 +3111,11 @@ fn test_limbs_mul_greater_to_out_toom_52() {
 fn test_limbs_mul_greater_to_out_toom_52() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_52_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(
@@ -3137,52 +3130,52 @@ fn test_limbs_mul_greater_to_out_toom_52() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_52_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_52(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_52(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(15, 16)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_52_scratch_len(15, 16)];
     let mut out = vec![10; 9];
     let xs = series(3, 15);
     let ys = series(3, 16);
-    _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(14, 5)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_52_scratch_len(14, 5)];
     let mut out = vec![10; 6];
     let xs = series(3, 14);
     let ys = series(3, 5);
-    _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(15, 4)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_52_scratch_len(15, 4)];
     let mut out = vec![10; 7];
     let xs = series(3, 15);
     let ys = series(3, 4);
-    _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_52(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_52_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_52_scratch_len(11, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_52_scratch_len(11, 0)];
     let mut out = vec![10; 12];
     let xs = series(3, 11);
-    _limbs_mul_greater_to_out_toom_52(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_52(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -3190,12 +3183,11 @@ fn limbs_mul_greater_to_out_toom_52_fail_5() {
 fn test_limbs_mul_greater_to_out_toom_53() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // !(*bs1last == 0 && limbs_cmp_same_length(bs1init, ys_1) == Ordering::Less)
@@ -3298,12 +3290,11 @@ fn test_limbs_mul_greater_to_out_toom_53() {
 fn test_limbs_mul_greater_to_out_toom_53() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(
@@ -3318,62 +3309,62 @@ fn test_limbs_mul_greater_to_out_toom_53() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_53(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_53(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(5, 6)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(5, 6)];
     let mut out = vec![10; 11];
     let xs = series(3, 5);
     let ys = series(3, 6);
-    _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(5, 4)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(5, 4)];
     let mut out = vec![10; 9];
     let xs = series(3, 5);
     let ys = series(3, 4);
-    _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(4, 3)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(4, 3)];
     let mut out = vec![10; 6];
     let xs = series(3, 4);
     let ys = series(3, 3);
-    _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_53(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(5, 2)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(5, 2)];
     let mut out = vec![10; 7];
     let xs = series(3, 5);
-    _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &[3, 4], &mut scratch);
+    limbs_mul_greater_to_out_toom_53(&mut out, &xs, &[3, 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_53_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_53_scratch_len(5, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_53_scratch_len(5, 0)];
     let mut out = vec![10; 12];
     let xs = series(3, 5);
-    _limbs_mul_greater_to_out_toom_53(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_53(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -3381,24 +3372,23 @@ fn limbs_mul_greater_to_out_toom_53_fail_6() {
 fn test_limbs_mul_greater_to_out_toom_54() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_54_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // degree.even() in _limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
-    // !v_neg_2pow_neg in _limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
-    // degree.odd() in _limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
-    // !y_sign in _limbs_toom_couple_handling
-    // y_shift != 0 in _limbs_toom_couple_handling
-    // x_shift != 0 in _limbs_toom_couple_handling
+    // degree.even() in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
+    // !v_neg_2pow_neg in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
+    // degree.odd() in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
+    // !y_sign in limbs_toom_couple_handling
+    // y_shift != 0 in limbs_toom_couple_handling
+    // x_shift != 0 in limbs_toom_couple_handling
     // s > t
-    // carry_1 && !carry_2, first time, in _limbs_mul_toom_interpolate_8points
-    // carry_1 && !carry_2, second time, in _limbs_mul_toom_interpolate_8points
-    // s_plus_t != n in _limbs_mul_toom_interpolate_8points
+    // carry_1 && !carry_2, first time, in limbs_mul_toom_interpolate_8points
+    // carry_1 && !carry_2, second time, in limbs_mul_toom_interpolate_8points
+    // s_plus_t != n in limbs_mul_toom_interpolate_8points
     test(
         series(2, 15),
         series(3, 11),
@@ -3408,8 +3398,8 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             882, 833, 760, 662, 538, 387, 208, 0,
         ],
     );
-    // v_neg_2pow_neg in _limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
-    // y_sign in _limbs_toom_couple_handling
+    // v_neg_2pow_neg in limbs_mul_toom_evaluate_poly_in_2pow_and_neg_2pow
+    // y_sign in limbs_toom_couple_handling
     // s <= t
     test(
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -3417,7 +3407,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
         vec![10; 26],
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
     );
-    // !carry_1 && carry_2, first time, in _limbs_mul_toom_interpolate_8points
+    // !carry_1 && carry_2, first time, in limbs_mul_toom_interpolate_8points
     test(
         vec![
             281500646, 1572406350, 108746052, 4056047843, 89307364, 1006007374, 2902260577,
@@ -3435,7 +3425,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             3773463966, 3902311612, 4169089467, 614631841, 1314987876,
         ],
     );
-    // s_plus_t == n in _limbs_mul_toom_interpolate_8points
+    // s_plus_t == n in limbs_mul_toom_interpolate_8points
     test(
         vec![
             1372428912, 2999825770, 3824933735, 1252466299, 1644332514, 577056155, 267504800,
@@ -3458,7 +3448,7 @@ fn test_limbs_mul_greater_to_out_toom_54() {
             774831877, 3808631269, 3720895601, 1034939105, 474724830,
         ],
     );
-    // !carry_1 && carry_2, second time, in _limbs_mul_toom_interpolate_8points
+    // !carry_1 && carry_2, second time, in limbs_mul_toom_interpolate_8points
     test(
         vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xfffffff0, u32::MAX, u32::MAX, u32::MAX],
         vec![
@@ -3511,63 +3501,63 @@ fn test_limbs_mul_greater_to_out_toom_54() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_54_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_54(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_54(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(15, 16)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_54_scratch_len(15, 16)];
     let mut out = vec![10; 31];
     let xs = series(3, 14);
     let ys = series(3, 17);
-    _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(15, 10)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_54_scratch_len(15, 10)];
     let mut out = vec![10; 25];
     let xs = series(3, 14);
     let ys = series(3, 10);
-    _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(14, 11)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_54_scratch_len(14, 11)];
     let mut out = vec![10; 25];
     let xs = series(3, 14);
     let ys = series(3, 11);
-    _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(15, 11)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_54_scratch_len(15, 11)];
     let mut out = vec![10; 25];
     let xs = series(3, 15);
     let ys = series(3, 11);
-    _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_54(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_54_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_54_scratch_len(15, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_54_scratch_len(15, 0)];
     let mut out = vec![10; 15];
     let xs = series(3, 15);
-    _limbs_mul_greater_to_out_toom_54(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_54(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -3575,18 +3565,17 @@ fn limbs_mul_greater_to_out_toom_54_fail_6() {
 fn test_limbs_mul_greater_to_out_toom_62() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_62_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // degree.odd() in _limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // degree > 4 in _limbs_mul_toom_evaluate_poly_in_1and_neg_1
-    // degree_u >= 5 in _limbs_mul_toom_evaluate_poly_in_2and_neg_2
-    // degree.odd() in _limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // degree.odd() in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // degree > 4 in limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // degree_u >= 5 in limbs_mul_toom_evaluate_poly_in_2and_neg_2
+    // degree.odd() in limbs_mul_toom_evaluate_poly_in_2and_neg_2
     // t == n
     // limbs_cmp_same_length(ys_0, ys_1) == Ordering::Less
     // v_neg_1_neg_b
@@ -3834,60 +3823,60 @@ fn test_limbs_mul_greater_to_out_toom_62() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_62_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_62(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_62(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(6, 7)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_62_scratch_len(6, 7)];
     let mut out = vec![10; 13];
     let xs = series(3, 6);
     let ys = series(3, 7);
-    _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_62(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(6, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_62_scratch_len(6, 1)];
     let mut out = vec![10; 7];
     let xs = series(3, 6);
-    _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3], &mut scratch);
+    limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(5, 2)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_62_scratch_len(5, 2)];
     let mut out = vec![10; 7];
     let xs = series(3, 5);
-    _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3, 4], &mut scratch);
+    limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3, 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(6, 2)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_62_scratch_len(6, 2)];
     let mut out = vec![10; 7];
     let xs = series(3, 6);
-    _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3, 4], &mut scratch);
+    limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[3, 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_62_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_62_scratch_len(6, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_62_scratch_len(6, 0)];
     let mut out = vec![10; 6];
     let xs = series(3, 6);
-    _limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_62(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -3895,12 +3884,11 @@ fn limbs_mul_greater_to_out_toom_62_fail_6() {
 fn test_limbs_mul_greater_to_out_toom_63() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_63_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // n == t
@@ -3995,12 +3983,11 @@ fn test_limbs_mul_greater_to_out_toom_63() {
 fn test_limbs_mul_greater_to_out_toom_63() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_63_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(
@@ -4072,63 +4059,63 @@ fn test_limbs_mul_greater_to_out_toom_63() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_63_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_63(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_63(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(17, 18)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_63_scratch_len(17, 18)];
     let mut out = vec![10; 13];
     let xs = series(3, 17);
     let ys = series(3, 18);
-    _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(17, 8)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_63_scratch_len(17, 8)];
     let mut out = vec![10; 25];
     let xs = series(3, 17);
     let ys = series(3, 8);
-    _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(16, 9)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_63_scratch_len(16, 9)];
     let mut out = vec![10; 25];
     let xs = series(3, 17);
     let ys = series(3, 9);
-    _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(17, 9)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_63_scratch_len(17, 9)];
     let mut out = vec![10; 25];
     let xs = series(3, 17);
     let ys = series(3, 9);
-    _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_63(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_63_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_63_scratch_len(17, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_63_scratch_len(17, 0)];
     let mut out = vec![10; 6];
     let xs = series(3, 17);
-    _limbs_mul_greater_to_out_toom_63(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_63(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -4136,20 +4123,19 @@ fn limbs_mul_greater_to_out_toom_63_fail_6() {
 fn test_limbs_mul_greater_to_out_toom_6h() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         let out_after = out;
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // xs_len * LIMIT_DENOMINATOR < LIMIT_NUMERATOR * ys_len
-    // degree.odd() in _limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
-    // degree > 3 in _limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
-    // !neg in _limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // degree.odd() in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // degree > 3 in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // !neg in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
     // q != 3
-    // !half in _limbs_mul_toom_interpolate_12points
+    // !half in limbs_mul_toom_interpolate_12points
     test(series(2, 42), series(3, 42), vec![10; 84]);
     test(vec![0; 43], vec![0; 42], vec![10; 85]);
     let xs = vec![
@@ -4161,7 +4147,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
     ];
     let out_len = xs.len() + ys.len();
-    // v_2pow_neg_neg in _limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // v_2pow_neg_neg in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2176876728, 2496909862, 111654638, 4071443844, 1244732003, 1399710541, 3492272815,
@@ -4180,7 +4166,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         4000265982, 1287753121, 874311717, 2200865401, 21122981, 1507911002,
     ];
     let out_len = xs.len() + ys.len();
-    // r4last.leading_zeros() < 3 in _limbs_mul_toom_interpolate_12points
+    // r4last.leading_zeros() < 3 in limbs_mul_toom_interpolate_12points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2327202328, 3179332026, 2188958336, 2717879675, 130062885, 140536268, 2499125438,
@@ -4204,10 +4190,10 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
     // xs_len * LIMIT_DENOMINATOR >= LIMIT_NUMERATOR * ys_len
     // xs_len * 5 * LIMIT_NUMERATOR < LIMIT_DENOMINATOR * 7 * ys_len
     // half
-    // degree.even() in _limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
-    // degree > 5 in _limbs_mul_toom_evaluate_poly_in_1and_neg_1
+    // degree.even() in limbs_mul_toom_evaluate_poly_in_2pow_neg_and_neg_2pow_neg
+    // degree > 5 in limbs_mul_toom_evaluate_poly_in_1and_neg_1
     // s <= t
-    // half in _limbs_mul_toom_interpolate_12points
+    // half in limbs_mul_toom_interpolate_12points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         1940830933, 3780770129, 1587254032, 832573251, 1504418072, 4247592896, 317874907,
@@ -4270,7 +4256,7 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
         208671986, 2395250976, 1549715018, 2746690542, 1219103496, 256305249,
     ];
     let out_len = xs.len() + ys.len();
-    // s_plus_t > n in _limbs_mul_toom_interpolate_12points
+    // s_plus_t > n in limbs_mul_toom_interpolate_12points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         1976230069, 2821313230, 4002048052, 2248747478, 1208640865, 1469538686, 2438066233,
@@ -4400,12 +4386,11 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
 fn test_limbs_mul_greater_to_out_toom_6h() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         let out_after = out;
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(series(2, 42), series(3, 42), vec![10; 84]);
@@ -4415,63 +4400,63 @@ fn test_limbs_mul_greater_to_out_toom_6h() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_6h(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_6h(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(41, 42)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(41, 42)];
     let mut out = vec![10; 83];
     let xs = series(3, 41);
     let ys = series(3, 42);
-    _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(42, 41)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(42, 41)];
     let mut out = vec![10; 83];
     let xs = series(3, 42);
     let ys = series(3, 41);
-    _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(41, 41)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(41, 41)];
     let mut out = vec![10; 82];
     let xs = series(3, 41);
     let ys = series(3, 41);
-    _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(42, 42)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(42, 42)];
     let mut out = vec![10; 83];
     let xs = series(3, 42);
     let ys = series(3, 42);
-    _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_6h_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_6h_scratch_len(42, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(42, 0)];
     let mut out = vec![10; 42];
     let xs = series(3, 42);
-    _limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_6h(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -4479,19 +4464,18 @@ fn limbs_mul_greater_to_out_toom_6h_fail_6() {
 fn test_limbs_mul_greater_to_out_toom_8h() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         let out_after = out;
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     // xs_len == ys_len
     //        || xs_len * (TOOM_8H_LIMIT_DENOMINATOR >> 1) < TOOM_8H_LIMIT_NUMERATOR * (ys_len >> 1)
     // !(Limb::WIDTH > 36 && q == 3)
-    // r6last.leading_zeros() < 3 in _limbs_mul_toom_interpolate_16points
-    // !half in _limbs_mul_toom_interpolate_16points
+    // r6last.leading_zeros() < 3 in limbs_mul_toom_interpolate_16points
+    // !half in limbs_mul_toom_interpolate_16points
     test(series(2, 86), series(3, 86), vec![10; 172]);
     let xs = vec![
         3581553119, 2147449432, 208926434, 2037430803, 4143975728, 2356343321, 937192435,
@@ -4523,7 +4507,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
         3607511108, 2863853568, 1611642161, 1312857772, 1839433327, 567060478, 3139863681,
     ];
     let out_len = xs.len() + ys.len();
-    // r5last.leading_zeros() < 7 in _limbs_mul_toom_interpolate_16points
+    // r5last.leading_zeros() < 7 in limbs_mul_toom_interpolate_16points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         3998843185, 3237409891, 364765898, 887299373, 875693912, 790653310, 1949338310, 309040598,
@@ -4561,8 +4545,8 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
     // xs_len * 13 < 16 * ys_len
     // half
     // s <= t
-    // half in _limbs_mul_toom_interpolate_16points
-    // s_plus_t > n in _limbs_mul_toom_interpolate_16points
+    // half in limbs_mul_toom_interpolate_16points
+    // s_plus_t > n in limbs_mul_toom_interpolate_16points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2456061149, 2562918666, 2903450513, 1994190773, 99234624, 3722083920, 4262323306,
@@ -4598,7 +4582,7 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
     ];
     let out_len = xs.len() + ys.len();
     // s > t
-    // s_plus_t <= n in _limbs_mul_toom_interpolate_16points
+    // s_plus_t <= n in limbs_mul_toom_interpolate_16points
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2166912886, 3021127478, 1088026295, 863338925, 1902617744, 2706401163, 3211745137,
@@ -4885,12 +4869,11 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
 fn test_limbs_mul_greater_to_out_toom_8h() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         let out_after = out;
         let mut out = out_before.to_vec();
-        let mut scratch =
-            vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
-        _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+        let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(xs.len(), ys.len())];
+        limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(series(2, 86), series(3, 86), vec![10; 172]);
@@ -5087,63 +5070,63 @@ fn test_limbs_mul_greater_to_out_toom_8h() {
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_1() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(1, 1)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(1, 1)];
     let mut out = vec![10; 4];
-    _limbs_mul_greater_to_out_toom_8h(&mut out, &[6], &[1], &mut scratch);
+    limbs_mul_greater_to_out_toom_8h(&mut out, &[6], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_2() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(85, 86)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(85, 86)];
     let mut out = vec![10; 171];
     let xs = series(3, 85);
     let ys = series(3, 86);
-    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_3() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(86, 85)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(86, 85)];
     let mut out = vec![10; 171];
     let xs = series(3, 86);
     let ys = series(3, 85);
-    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_4() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(85, 85)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(85, 85)];
     let mut out = vec![10; 170];
     let xs = series(3, 85);
     let ys = series(3, 85);
-    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_5() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(86, 86)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(86, 86)];
     let mut out = vec![10; 171];
     let xs = series(3, 86);
     let ys = series(3, 86);
-    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
+    limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &ys, &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_mul_greater_to_out_toom_8h_fail_6() {
-    let mut scratch = vec![0; _limbs_mul_greater_to_out_toom_8h_scratch_len(86, 0)];
+    let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(86, 0)];
     let mut out = vec![10; 86];
     let xs = series(3, 42);
-    _limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &[], &mut scratch);
+    limbs_mul_greater_to_out_toom_8h(&mut out, &xs, &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -5151,16 +5134,16 @@ fn limbs_mul_greater_to_out_toom_8h_fail_6() {
 fn test_limbs_mul_greater_to_out_fft() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         let out_after = out;
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
     };
-    // n < MULMOD_BNM1_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1_next_size
-    // n.odd() || n < MULMOD_BNM1_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1
-    // ys_len < n in _limbs_mul_mod_base_pow_n_minus_1
-    // sum <= n in _limbs_mul_mod_base_pow_n_minus_1
+    // n < MULMOD_BNM1_THRESHOLD in limbs_mul_mod_base_pow_n_minus_1_next_size
+    // n.odd() || n < MULMOD_BNM1_THRESHOLD in limbs_mul_mod_base_pow_n_minus_1
+    // ys_len < n in limbs_mul_mod_base_pow_n_minus_1
+    // sum <= n in limbs_mul_mod_base_pow_n_minus_1
     test(vec![2], vec![3], vec![10; 2]);
     test(series(2, 3), series(3, 3), vec![10; 6]);
     let xs = vec![
@@ -5229,22 +5212,22 @@ fn test_limbs_mul_greater_to_out_fft() {
         875964411, 3988200888, 1056372570, 3344850714,
     ];
     let out_len = xs.len() + ys.len();
-    // ceiling_half_n < MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1_next_size
-    // !(n.odd() || n < MULMOD_BNM1_THRESHOLD) in _limbs_mul_mod_base_pow_n_minus_1
-    // xs_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // ys_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // ys_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // ys_len >= n in _limbs_mul_mod_base_pow_n_minus_1
-    // half_n < MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1
-    // k < FFT_FIRST_K and ys_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // k < FFT_FIRST_K and xs_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // sum >= n in _limbs_mul_mod_base_pow_n_minus_1
-    // k >= FFT_FIRST_K and ys_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // k < FFT_FIRST_K and ys_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // sum < n in _limbs_mul_mod_base_pow_n_minus_1
+    // ceiling_half_n < MUL_FFT_MODF_THRESHOLD in limbs_mul_mod_base_pow_n_minus_1_next_size
+    // !(n.odd() || n < MULMOD_BNM1_THRESHOLD) in limbs_mul_mod_base_pow_n_minus_1
+    // xs_len > half_n in limbs_mul_mod_base_pow_n_minus_1
+    // ys_len <= half_n in limbs_mul_mod_base_pow_n_minus_1
+    // ys_len > half_n in limbs_mul_mod_base_pow_n_minus_1
+    // ys_len >= n in limbs_mul_mod_base_pow_n_minus_1
+    // half_n < MUL_FFT_MODF_THRESHOLD in limbs_mul_mod_base_pow_n_minus_1
+    // k < FFT_FIRST_K and ys_len > half_n in limbs_mul_mod_base_pow_n_minus_1
+    // k < FFT_FIRST_K and xs_len > half_n in limbs_mul_mod_base_pow_n_minus_1
+    // sum >= n in limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K and ys_len <= half_n in limbs_mul_mod_base_pow_n_minus_1
+    // k < FFT_FIRST_K and ys_len <= half_n in limbs_mul_mod_base_pow_n_minus_1
+    // sum < n in limbs_mul_mod_base_pow_n_minus_1
     test(xs, ys, vec![10; out_len]);
-    // n <= (MULMOD_BNM1_THRESHOLD - 1) << 2 in _limbs_mul_mod_base_pow_n_minus_1_next_size
-    // sum > n in _limbs_mul_mod_base_pow_n_minus_1
+    // n <= (MULMOD_BNM1_THRESHOLD - 1) << 2 in limbs_mul_mod_base_pow_n_minus_1_next_size
+    // sum > n in limbs_mul_mod_base_pow_n_minus_1
     test(
         vec![
             823938137, 1528271032, 3754017422, 3733650953, 1787749760, 2772188495, 3146748967,
@@ -5253,7 +5236,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         vec![2220104467, 3431834219, 496531593, 2537836643, 2934054423, 2997129442],
         vec![10; 17],
     );
-    // xs_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
+    // xs_len <= half_n in limbs_mul_mod_base_pow_n_minus_1
     test(
         vec![2085137171, 1117546275, 1886156676, 98424960, 2074093393, 2154503198, 189860005],
         vec![2916276379, 1952025216, 3574945482, 3027541861, 3394630765, 3511855818, 3454027741],
@@ -5270,7 +5253,7 @@ fn test_limbs_mul_greater_to_out_fft() {
     ];
     let ys = vec![1970030099];
     let out_len = xs.len() + ys.len();
-    // n <= (MULMOD_BNM1_THRESHOLD - 1) << 3 in _limbs_mul_mod_base_pow_n_minus_1_next_size
+    // n <= (MULMOD_BNM1_THRESHOLD - 1) << 3 in limbs_mul_mod_base_pow_n_minus_1_next_size
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2543408782, 1266633745, 2743231472, 2766403608, 438908947, 3460789749, 3630408044,
@@ -5404,40 +5387,40 @@ fn test_limbs_mul_greater_to_out_fft() {
         2059617606, 1784567797, 1574115227, 81854142, 3500164071, 509026907,
     ];
     let out_len = xs.len() + ys.len();
-    // ceiling_half_n >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1_next_size
-    // half_n >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_mod_base_pow_n_minus_1
-    // k >= FFT_FIRST_K in _limbs_mul_mod_base_pow_n_minus_1
-    // k >= FFT_FIRST_K and ys_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // k >= FFT_FIRST_K and xs_len > half_n in _limbs_mul_mod_base_pow_n_minus_1
-    // len <= k_times_n in _limbs_mul_fft_decompose
-    // len != 0 in _limbs_mul_fft_decompose
-    // shift_limbs < n in _limbs_mul_fft_shl_mod_f_to_out
-    // shift_limbs < n and small_bits == 0 in _limbs_mul_fft_shl_mod_f_to_out
-    // shift_limbs < n and small_bits != 0 in _limbs_mul_fft_shl_mod_f_to_out
-    // shift_limbs != 0 in _limbs_mul_fft_shl_mod_f_to_out
-    // len == 0 in _limbs_mul_fft_decompose
-    // k != 2 in _limbs_mul_fft_fft
-    // k == 2 in _limbs_mul_fft_fft
+    // ceiling_half_n >= MUL_FFT_MODF_THRESHOLD in limbs_mul_mod_base_pow_n_minus_1_next_size
+    // half_n >= MUL_FFT_MODF_THRESHOLD in limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K in limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K and ys_len <= half_n in limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K and xs_len > half_n in limbs_mul_mod_base_pow_n_minus_1
+    // len <= k_times_n in limbs_mul_fft_decompose
+    // len != 0 in limbs_mul_fft_decompose
+    // shiftlimbs < n in limbs_mul_fft_shl_mod_f_to_out
+    // shiftlimbs < n and small_bits == 0 in limbs_mul_fft_shl_mod_f_to_out
+    // shiftlimbs < n and small_bits != 0 in limbs_mul_fft_shl_mod_f_to_out
+    // shiftlimbs != 0 in limbs_mul_fft_shl_mod_f_to_out
+    // len == 0 in limbs_mul_fft_decompose
+    // k != 2 in limbs_mul_fft_fft
+    // k == 2 in limbs_mul_fft_fft
     // limbs_sub_same_length_in_place_right(&scratch[..n + 1], &mut xss[increment])
-    //      in _limbs_mul_fft_fft
-    // carry.get_highest_bit() in _limbs_mul_fft_sub_mod_f_to_out
-    // carry <= 1 in _limbs_mul_fft_add_mod_f_in_place_left
-    // !carry.get_highest_bit() in _limbs_mul_fft_sub_mod_f_to_out
-    // carry > 1 in _limbs_mul_fft_add_mod_f_in_place_left
-    // n < MUL_FFT_MODF_THRESHOLD in _limbs_mul_fft_mul_mod_f_k
-    // carry != 0 in _limbs_mul_fft_mul_mod_f_k
-    // *ys_last != 0 in _limbs_mul_fft_mul_mod_f_k
-    // k != 2 in _limbs_mul_fft_inverse
-    // k == 2 in _limbs_mul_fft_inverse
+    //      in limbs_mul_fft_fft
+    // carry.get_highest_bit() in limbs_mul_fft_sub_mod_f_to_out
+    // carry <= 1 in limbs_mul_fft_add_mod_f_in_place_left
+    // !carry.get_highest_bit() in limbs_mul_fft_sub_mod_f_to_out
+    // carry > 1 in limbs_mul_fft_add_mod_f_in_place_left
+    // n < MUL_FFT_MODF_THRESHOLD in limbs_mul_fft_mul_mod_f_k
+    // carry != 0 in limbs_mul_fft_mul_mod_f_k
+    // *ys_last != 0 in limbs_mul_fft_mul_mod_f_k
+    // k != 2 in limbs_mul_fft_inverse
+    // k == 2 in limbs_mul_fft_inverse
     // limbs_sub_same_length_in_place_right(&scratch[..n + 1], &mut xss_tail[0])
-    //      in _limbs_mul_fft_inverse
-    // shift_limbs >= n in _limbs_mul_fft_shl_mod_f_to_out
-    // shift_limbs >= n and small_bits != 0 in _limbs_mul_fft_shl_mod_f_to_out
-    // xs[n] == 0 before sub in _limbs_mul_fft_normalize
-    // 2 * a < width in _limbs_mul_fft_internal
-    // limbs_cmp_same_length(&yss[j], scratch_lo) == Ordering::Greater in _limbs_mul_fft_internal
-    // |carry| != 1 in _limbs_mul_fft_internal
-    // xs_len < 2 * n in _limbs_mul_fft_normalize_mod_f
+    //      in limbs_mul_fft_inverse
+    // shiftlimbs >= n in limbs_mul_fft_shl_mod_f_to_out
+    // shiftlimbs >= n and small_bits != 0 in limbs_mul_fft_shl_mod_f_to_out
+    // xs[n] == 0 before sub in limbs_mul_fft_normalize
+    // 2 * a < width in limbs_mul_fft_internal
+    // limbs_cmp_same_length(&yss[j], scratch_lo) == Ordering::Greater in limbs_mul_fft_internal
+    // |carry| != 1 in limbs_mul_fft_internal
+    // xs_len < 2 * n in limbs_mul_fft_normalize_mod_f
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         536845695, 2558806929, 1489289365, 3329304370, 2717810433, 1612861178, 3032334508,
@@ -5558,11 +5541,11 @@ fn test_limbs_mul_greater_to_out_fft() {
         2280248233, 4226315124, 3634368382, 341615124,
     ];
     let out_len = xs.len() + ys.len();
-    // xs[n] != 0 before sub in _limbs_mul_fft_normalize
-    // xs[n] != 0 after sub in _limbs_mul_fft_normalize
+    // xs[n] != 0 before sub in limbs_mul_fft_normalize
+    // xs[n] != 0 after sub in limbs_mul_fft_normalize
     // with MUL_FFT_MODF_THRESHOLD = 4:
-    //      r >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_fft_mul_mod_f_k
-    //      r & (two_pow_best_k - 1) == 0 in _limbs_mul_fft_mul_mod_f_k
+    //      r >= MUL_FFT_MODF_THRESHOLD in limbs_mul_fft_mul_mod_f_k
+    //      r & (two_pow_best_k - 1) == 0 in limbs_mul_fft_mul_mod_f_k
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         2747852327, 3284222237, 2520745108, 2829584604, 463401376, 256649758, 3613822930,
@@ -5705,7 +5688,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         2437519330, 1543197978,
     ];
     let out_len = xs.len() + ys.len();
-    // k >= FFT_FIRST_K and xs_len <= half_n in _limbs_mul_mod_base_pow_n_minus_1
+    // k >= FFT_FIRST_K and xs_len <= half_n in limbs_mul_mod_base_pow_n_minus_1
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         0,
@@ -6618,7 +6601,7 @@ fn test_limbs_mul_greater_to_out_fft() {
     ];
     let out_len = xs.len() + ys.len();
     // limbs_slice_add_same_length_in_place_left(&mut ys[sh..sh + width], &yss[j])
-    //      in _limbs_mul_fft_internal
+    //      in limbs_mul_fft_internal
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         u32::MAX,
@@ -8330,7 +8313,7 @@ fn test_limbs_mul_greater_to_out_fft() {
         u32::MAX,
     ];
     let out_len = xs.len() + ys.len();
-    // carry == -1 in _limbs_mul_fft_internal
+    // carry == -1 in limbs_mul_fft_internal
     test(xs, ys, vec![10; out_len]);
     let xs = vec![
         0,
@@ -10295,7 +10278,7 @@ fn test_limbs_mul_greater_to_out_fft() {
     ];
     let out_len = xs.len() + ys.len();
     // This one is hard to trigger apparently!
-    // xs[n] == 0 after sub in _limbs_mul_fft_normalize
+    // xs[n] == 0 after sub in limbs_mul_fft_normalize
     test(xs, ys, vec![10; out_len]);
 
     // Test the following with MUL_FFT_MODF_THRESHOLD = 40
@@ -10487,13 +10470,13 @@ fn test_limbs_mul_greater_to_out_fft() {
         185151496, 4184737107, 2832913851, 3983319613, 288671578, 2550748832,
     ];
     let out_len = xs.len() + ys.len();
-    // width_minus_one >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_fft
-    // n >= MUL_FFT_MODF_THRESHOLD in _limbs_mul_fft_mul_mod_f_k
-    // len > k_times_n in _limbs_mul_fft_decompose
+    // width_minus_one >= MUL_FFT_MODF_THRESHOLD in limbs_mul_fft
+    // n >= MUL_FFT_MODF_THRESHOLD in limbs_mul_fft_mul_mod_f_k
+    // len > k_times_n in limbs_mul_fft_decompose
     test(xs, ys, vec![10; out_len]);
 
     // Test the following with MUL_FFT_MODF_THRESHOLD = 4
-    // carry != 0 in _limbs_mul_fft_internal
+    // carry != 0 in limbs_mul_fft_internal
     let xs = vec![
         0,
         0,
@@ -12007,7 +11990,7 @@ fn limbs_mul_greater_to_out_fft_properties() {
     config.insert("mean_stripe_n", 4 << Limb::LOG_WIDTH);
     unsigned_vec_triple_gen_var_2().test_properties_with_config(&config, |(mut out, xs, ys)| {
         let expected_out = limbs_mul_basecase_helper(&out, &xs, &ys);
-        _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
         assert_eq!(out, expected_out);
     });
 
@@ -12015,7 +11998,7 @@ fn limbs_mul_greater_to_out_fft_properties() {
     config.insert("mean_stripe_n", 32 << Limb::LOG_WIDTH);
     unsigned_vec_triple_gen_var_17().test_properties_with_config(&config, |(mut out, xs, ys)| {
         let expected_out = limbs_mul_basecase_helper(&out, &xs, &ys);
-        _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
         assert_eq!(out, expected_out);
     });
 }
@@ -12031,7 +12014,7 @@ fn test_limbs_mul_mod_base_pow_n_minus_1() {
                 out_after: Vec<Limb>| {
         let mut out = out_before;
         let mut tp = tp_before;
-        _limbs_mul_mod_base_pow_n_minus_1(&mut out, rn, &xs, &ys, &mut tp);
+        limbs_mul_mod_base_pow_n_minus_1(&mut out, rn, &xs, &ys, &mut tp);
         assert_eq!(out, out_after);
     };
     let out = vec![10; 905];
@@ -15935,10 +15918,10 @@ fn test_limbs_mul_mod_base_pow_n_minus_1() {
 fn test_limbs_mul_greater_to_out_fft() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>| {
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_basecase(&mut out, &xs, &ys);
         let out_after = out;
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
+        limbs_mul_greater_to_out_fft(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
     };
     let xs = vec![
@@ -17364,7 +17347,7 @@ fn test_limbs_mul_fft_fft() {
         }
         let ll = ll.iter().map(Vec::as_slice).collect_vec();
         let mut tp = tp_before;
-        _limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, inc, &mut tp);
+        limbs_mul_fft_fft(&mut ap, k, &ll, ll_offset, omega, inc, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(ap
             .iter()
@@ -17372,7 +17355,7 @@ fn test_limbs_mul_fft_fft() {
             .all(|(xs, ys)| &**xs == ys.as_slice()));
         assert_eq!(tp, tp_after);
     };
-    // *xss_0last > 1 in _limbs_mul_fft_fft
+    // *xss_0last > 1 in limbs_mul_fft_fft
     test(
         vec![vec![0, 0, 2], vec![0, 0, 0]],
         2,
@@ -17401,7 +17384,7 @@ fn test_limbs_mul_fft_inverse() {
             ap.push(a);
         }
         let mut tp = tp_before;
-        _limbs_mul_fft_inverse(&mut ap, k, omega, &mut tp);
+        limbs_mul_fft_inverse(&mut ap, k, omega, &mut tp);
         assert_eq!(ap.len(), ap_after.len());
         assert!(ap
             .iter()
@@ -17409,7 +17392,7 @@ fn test_limbs_mul_fft_inverse() {
             .all(|(xs, ys)| &**xs == ys.as_slice()));
         assert_eq!(tp, tp_after);
     };
-    // *xss_0last > 1 in _limbs_mul_fft_inverse
+    // *xss_0last > 1 in limbs_mul_fft_inverse
     test(
         vec![vec![0, 0, 2], vec![0, 0, 0]],
         2,
@@ -17425,10 +17408,10 @@ fn test_limbs_mul_fft_inverse() {
 fn test_limbs_mul_fft_normalize_mod_f() {
     let test = |rp_before: Vec<Limb>, n: usize, ap: Vec<Limb>, rp_after: Vec<Limb>| {
         let mut rp = rp_before;
-        _limbs_mul_fft_normalize_mod_f(&mut rp, n, &ap);
+        limbs_mul_fft_normalize_mod_f(&mut rp, n, &ap);
         assert_eq!(rp, rp_after);
     };
-    // xs_len >= 2 * n in _limbs_mul_fft_normalize_mod_f
+    // xs_len >= 2 * n in limbs_mul_fft_normalize_mod_f
     test(
         vec![1, 2, 3],
         2,
@@ -17462,7 +17445,7 @@ fn test_limbs_mul_fft_internal() {
         let mut b = b_before;
         let fft_l = fft_l.iter().map(Vec::as_slice).collect_vec();
         let mut t = t_before;
-        _limbs_mul_fft_internal(&mut op, pl, k, ap, &mut b, l, mp, &fft_l, &mut t, sqr);
+        limbs_mul_fft_internal(&mut op, pl, k, ap, &mut b, l, mp, &fft_l, &mut t, sqr);
         assert_eq!(op, op_after);
         assert_eq!(b, b_after);
         assert_eq!(t, t_after);
@@ -17498,11 +17481,11 @@ fn verify_mul_low_1(out_before: &[Limb], xs: &[Limb], ys: &[Limb], out_after: &[
 fn test_limbs_mul_low_same_length_basecase() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after: Vec<Limb>| {
         let mut out = out_before.clone();
-        _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys);
+        limbs_mul_low_same_length_basecase(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
 
         let mut out = out_before.clone();
-        _limbs_mul_low_same_length_basecase_alt(&mut out, &xs, &ys);
+        limbs_mul_low_same_length_basecase_alt(&mut out, &xs, &ys);
         assert_eq!(out, out_after);
 
         verify_mul_low_1(&out_before, &xs, &ys, &out_after);
@@ -17540,7 +17523,7 @@ fn test_limbs_mul_low_same_length_basecase() {
 #[should_panic]
 fn limbs_mul_low_same_length_basecase_fail_1() {
     let mut out = vec![10, 10, 10, 10, 10];
-    _limbs_mul_low_same_length_basecase(&mut out, &[6, 7], &[1, 2, 3]);
+    limbs_mul_low_same_length_basecase(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -17548,7 +17531,7 @@ fn limbs_mul_low_same_length_basecase_fail_1() {
 #[should_panic]
 fn limbs_mul_low_same_length_basecase_fail_2() {
     let mut out = vec![10];
-    _limbs_mul_low_same_length_basecase(&mut out, &[6, 7], &[1, 2]);
+    limbs_mul_low_same_length_basecase(&mut out, &[6, 7], &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -17556,7 +17539,7 @@ fn limbs_mul_low_same_length_basecase_fail_2() {
 #[should_panic]
 fn limbs_mul_low_same_length_basecase_fail_3() {
     let mut out = vec![10];
-    _limbs_mul_low_same_length_basecase(&mut out, &[], &[]);
+    limbs_mul_low_same_length_basecase(&mut out, &[], &[]);
 }
 
 #[test]
@@ -17568,11 +17551,11 @@ fn limbs_mul_low_same_length_basecase_properties() {
         &config,
         |(out_before, xs, ys)| {
             let mut out = out_before.to_vec();
-            _limbs_mul_low_same_length_basecase(&mut out, &xs, &ys);
+            limbs_mul_low_same_length_basecase(&mut out, &xs, &ys);
 
             let out_after = out;
             let mut out = out_before.to_vec();
-            _limbs_mul_low_same_length_basecase_alt(&mut out, &xs, &ys);
+            limbs_mul_low_same_length_basecase_alt(&mut out, &xs, &ys);
             assert_eq!(out, out_after);
 
             verify_mul_low_1(&out_before, &xs, &ys, &out_after);
@@ -17594,12 +17577,12 @@ fn test_limbs_mul_low_same_length_divide_and_conquer() {
     let test = |xs: Vec<Limb>, ys: Vec<Limb>, out_before: Vec<Limb>, out_after: &[Limb]| {
         let len = xs.len();
         let mut out = out_before.clone();
-        _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys);
+        limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys);
         assert_eq!(&out[..len], out_after);
 
         let mut out = out_before;
         let mut scratch = vec![0; xs.len() << 1];
-        _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch);
+        limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch);
         assert_eq!(&out[..len], out_after);
 
         verify_mul_low_2(&xs, &ys, out_after);
@@ -18701,7 +18684,7 @@ fn test_limbs_mul_low_same_length_divide_and_conquer() {
 #[should_panic]
 fn limbs_mul_low_same_length_divide_and_conquer_shared_scratch_fail_1() {
     let mut out = vec![10, 10, 10, 10, 10];
-    _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &[6, 7], &[1, 2, 3]);
+    limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &[6, 7], &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -18709,7 +18692,7 @@ fn limbs_mul_low_same_length_divide_and_conquer_shared_scratch_fail_1() {
 #[should_panic]
 fn limbs_mul_low_same_length_divide_and_conquer_shared_scratch_fail_2() {
     let mut out = vec![10];
-    _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &[6, 7], &[1, 2]);
+    limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &[6, 7], &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -18717,7 +18700,7 @@ fn limbs_mul_low_same_length_divide_and_conquer_shared_scratch_fail_2() {
 #[should_panic]
 fn limbs_mul_low_same_length_divide_and_conquer_shared_scratch_fail_3() {
     let mut out = vec![10];
-    _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &[2], &[3]);
+    limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &[2], &[3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -18726,7 +18709,7 @@ fn limbs_mul_low_same_length_divide_and_conquer_shared_scratch_fail_3() {
 fn limbs_mul_low_same_length_divide_and_conquer_fail_1() {
     let mut out = vec![10, 10, 10, 10, 10];
     let mut scratch = vec![0; 6];
-    _limbs_mul_low_same_length_divide_and_conquer(&mut out, &[6, 7], &[1, 2, 3], &mut scratch);
+    limbs_mul_low_same_length_divide_and_conquer(&mut out, &[6, 7], &[1, 2, 3], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -18735,7 +18718,7 @@ fn limbs_mul_low_same_length_divide_and_conquer_fail_1() {
 fn limbs_mul_low_same_length_divide_and_conquer_fail_2() {
     let mut out = vec![10];
     let mut scratch = vec![0; 4];
-    _limbs_mul_low_same_length_divide_and_conquer(&mut out, &[6, 7], &[1, 2], &mut scratch);
+    limbs_mul_low_same_length_divide_and_conquer(&mut out, &[6, 7], &[1, 2], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -18744,7 +18727,7 @@ fn limbs_mul_low_same_length_divide_and_conquer_fail_2() {
 fn limbs_mul_low_same_length_divide_and_conquer_fail_3() {
     let mut out = vec![10];
     let mut scratch = vec![0; 6];
-    _limbs_mul_low_same_length_divide_and_conquer(&mut out, &[2], &[3], &mut scratch);
+    limbs_mul_low_same_length_divide_and_conquer(&mut out, &[2], &[3], &mut scratch);
 }
 
 #[test]
@@ -18756,13 +18739,13 @@ fn limbs_mul_low_same_length_divide_and_conquer_properties() {
         &config,
         |(out_before, xs, ys)| {
             let mut out = out_before.to_vec();
-            _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys);
+            limbs_mul_low_same_length_divide_and_conquer_shared_scratch(&mut out, &xs, &ys);
 
             let len = xs.len();
             let out_after = out[..len].to_vec();
             let mut out = out_before.to_vec();
             let mut scratch = vec![0; xs.len() << 1];
-            _limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch);
+            limbs_mul_low_same_length_divide_and_conquer(&mut out, &xs, &ys, &mut scratch);
             let out_after: &[Limb] = &out_after;
             assert_eq!(&out[..len], out_after);
 

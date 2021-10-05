@@ -131,7 +131,7 @@ pub(crate) fn floor_inverse_checked_binary<T: PrimitiveUnsigned, F: Fn(T) -> Opt
 }
 
 #[doc(hidden)]
-pub fn _floor_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
+pub fn floor_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
     if x < T::TWO {
         x
     } else {
@@ -141,8 +141,8 @@ pub fn _floor_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
 }
 
 #[doc(hidden)]
-pub fn _ceiling_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
-    let floor_sqrt = _floor_sqrt_binary(x);
+pub fn ceiling_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
+    let floor_sqrt = floor_sqrt_binary(x);
     if floor_sqrt.square() == x {
         floor_sqrt
     } else {
@@ -151,8 +151,8 @@ pub fn _ceiling_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> T {
 }
 
 #[doc(hidden)]
-pub fn _checked_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> Option<T> {
-    let floor_sqrt = _floor_sqrt_binary(x);
+pub fn checked_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> Option<T> {
+    let floor_sqrt = floor_sqrt_binary(x);
     if floor_sqrt.square() == x {
         Some(floor_sqrt)
     } else {
@@ -161,8 +161,8 @@ pub fn _checked_sqrt_binary<T: PrimitiveUnsigned>(x: T) -> Option<T> {
 }
 
 #[doc(hidden)]
-pub fn _sqrt_rem_binary<T: PrimitiveUnsigned>(x: T) -> (T, T) {
-    let floor_sqrt = _floor_sqrt_binary(x);
+pub fn sqrt_rem_binary<T: PrimitiveUnsigned>(x: T) -> (T, T) {
+    let floor_sqrt = floor_sqrt_binary(x);
     (floor_sqrt, x - floor_sqrt.square())
 }
 
@@ -251,7 +251,7 @@ pub fn sqrt_rem_newton<
 }
 
 /// This is n_sqrt from ulong_extras/sqrt.c, FLINT 2.7.1.
-fn _floor_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
+fn floor_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
     max_square: T,
@@ -290,7 +290,7 @@ fn _floor_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f6
 }
 
 /// TODO clean up float conversion
-fn _ceiling_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
+fn ceiling_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
     max_square: T,
@@ -329,7 +329,7 @@ fn _ceiling_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(
 }
 
 /// TODO clean up float conversion
-fn _checked_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
+fn checked_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
     max_square: T,
@@ -371,7 +371,7 @@ fn _checked_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(
 
 /// TODO clean up float conversion
 /// This is n_sqrtrem from ulong_extras/sqrtrem.c, FLINT 2.7.1.
-fn _sqrt_rem_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
+fn sqrt_rem_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
     max_square: T,
@@ -413,7 +413,7 @@ fn _sqrt_rem_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64)
     }
 }
 
-fn _floor_sqrt_newton<
+fn floor_sqrt_newton_helper<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
@@ -428,7 +428,7 @@ fn _floor_sqrt_newton<
     sqrt_rem_newton::<U, S>(x << shift).0 >> (shift >> 1)
 }
 
-fn _ceiling_sqrt_newton<
+fn ceiling_sqrt_newton_helper<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
@@ -448,7 +448,7 @@ fn _ceiling_sqrt_newton<
     sqrt
 }
 
-fn _checked_sqrt_newton<
+fn checked_sqrt_newton_helper<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
@@ -468,7 +468,7 @@ fn _checked_sqrt_newton<
     }
 }
 
-fn _sqrt_rem_newton<
+fn sqrt_rem_newton_helper<
     U: PrimitiveUnsigned + WrappingFrom<S>,
     S: PrimitiveSigned + WrappingFrom<U>,
 >(
@@ -508,7 +508,7 @@ macro_rules! impl_sqrt_newton {
             /// For `u32` and `u64`, the square root is computed using Newton's method.
             #[inline]
             fn floor_sqrt(self) -> $u {
-                _floor_sqrt_newton::<$u, $s>(self)
+                floor_sqrt_newton_helper::<$u, $s>(self)
             }
         }
 
@@ -529,7 +529,7 @@ macro_rules! impl_sqrt_newton {
             /// For `u32` and `u64`, the square root is computed using Newton's method.
             #[inline]
             fn ceiling_sqrt(self) -> $u {
-                _ceiling_sqrt_newton::<$u, $s>(self)
+                ceiling_sqrt_newton_helper::<$u, $s>(self)
             }
         }
 
@@ -556,7 +556,7 @@ macro_rules! impl_sqrt_newton {
             /// For `u32` and `u64`, the square root is computed using Newton's method.
             #[inline]
             fn checked_sqrt(self) -> Option<$u> {
-                _checked_sqrt_newton::<$u, $s>(self)
+                checked_sqrt_newton_helper::<$u, $s>(self)
             }
         }
 
@@ -579,7 +579,7 @@ macro_rules! impl_sqrt_newton {
             /// For `u32` and `u64`, the square root is computed using Newton's method.
             #[inline]
             fn sqrt_rem(self) -> ($u, $u) {
-                _sqrt_rem_newton::<$u, $s>(self)
+                sqrt_rem_newton_helper::<$u, $s>(self)
             }
         }
     };
@@ -846,9 +846,9 @@ impl FloorSqrt for u128 {
     /// $2^{14} \leq \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
     fn floor_sqrt(self) -> u128 {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
-            _floor_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
+            floor_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
         } else {
-            _floor_sqrt_binary(self)
+            floor_sqrt_binary(self)
         }
     }
 }
@@ -897,9 +897,9 @@ impl CeilingSqrt for u128 {
     /// $2^{14} \leq \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
     fn ceiling_sqrt(self) -> u128 {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
-            _ceiling_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
+            ceiling_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
         } else {
-            _ceiling_sqrt_binary(self)
+            ceiling_sqrt_binary(self)
         }
     }
 }
@@ -954,9 +954,9 @@ impl CheckedSqrt for u128 {
     /// $2^{14} \leq \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
     fn checked_sqrt(self) -> Option<u128> {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
-            _checked_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
+            checked_sqrt_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
         } else {
-            _checked_sqrt_binary(self)
+            checked_sqrt_binary(self)
         }
     }
 }
@@ -1007,9 +1007,9 @@ impl SqrtRem for u128 {
     /// $2^{14} \leq \lfloor\sqrt{10^9}\rfloor \leq 2^{15}$.
     fn sqrt_rem(self) -> (u128, u128) {
         if self.significant_bits() < U128_SQRT_THRESHOLD {
-            _sqrt_rem_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
+            sqrt_rem_approx_and_refine(|x| x as f64, |x| x as u128, U128_MAX_SQUARE, self)
         } else {
-            _sqrt_rem_binary(self)
+            sqrt_rem_binary(self)
         }
     }
 }

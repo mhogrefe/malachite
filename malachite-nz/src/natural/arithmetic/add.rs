@@ -382,7 +382,7 @@ pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the second argument is at least as long as the
 /// first and the output pointer is the same as the first input pointer.
-pub fn _limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
+pub fn limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
     assert!(in_size <= ys_len);
@@ -627,7 +627,7 @@ pub fn limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> 
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
 /// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp and up are disjoint.
-pub fn _limbs_add_same_length_with_carry_in_to_out(
+pub fn limbs_add_same_length_with_carry_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -654,7 +654,7 @@ pub fn _limbs_add_same_length_with_carry_in_to_out(
 /// Panics if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
-pub fn _limbs_add_same_length_with_carry_in_in_place_left(
+pub fn limbs_add_same_length_with_carry_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     carry_in: bool,
@@ -757,8 +757,8 @@ impl<'a> Add<&'a Natural> for Natural {
     /// use malachite_nz::natural::Natural;
     ///
     /// assert_eq!((Natural::ZERO + &Natural::from(123u32)).to_string(), "123");
-    /// assert_eq!((Natural::from(123u32) +&Natural::ZERO).to_string(), "123");
-    /// assert_eq!((Natural::from(123u32) +&Natural::from(456u32)).to_string(), "579");
+    /// assert_eq!((Natural::from(123u32) + &Natural::ZERO).to_string(), "123");
+    /// assert_eq!((Natural::from(123u32) + &Natural::from(456u32)).to_string(), "579");
     /// assert_eq!(
     ///     (Natural::trillion() + &(Natural::trillion() * Natural::from(2u32))).to_string(),
     ///     "3000000000000"

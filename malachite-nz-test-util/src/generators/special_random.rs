@@ -12,7 +12,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
 };
-use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base::num::logic::traits::{BitAccess, BitConvertible, SignificantBits};
 use malachite_base::num::random::geometric::{
     geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_unsigneds,
     GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
@@ -33,8 +33,8 @@ use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
-    random_pairs, random_pairs_from_single, random_quadruples_xyyx, random_triples,
-    random_triples_from_single, random_triples_xyx, random_triples_xyy,
+    random_pairs, random_pairs_from_single, random_quadruples_xyyx, random_quadruples_xyyz,
+    random_triples, random_triples_from_single, random_triples_xyx, random_triples_xyy,
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
@@ -42,8 +42,10 @@ use malachite_base::vecs::random::random_vecs;
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{GenConfig, It};
 use malachite_base_test_util::generators::special_random::{
-    UnsignedVecTripleLenGenerator, UnsignedVecTripleXYYLenGenerator,
+    special_random_unsigned_vec_unsigned_pair_gen_var_17, UnsignedVecTripleLenGenerator1,
+    UnsignedVecTripleXYYLenGenerator,
 };
+use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::random::{
     striped_random_integers, striped_random_natural_integers, striped_random_negative_integers,
     StripedRandomIntegers,
@@ -51,19 +53,19 @@ use malachite_nz::integer::random::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
-    _limbs_mul_greater_to_out_toom_22_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_32_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_33_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_42_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_43_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_44_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_52_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_53_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_54_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_62_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_63_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
-    _limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_44_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_52_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_54_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_62_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+    limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
@@ -189,6 +191,16 @@ where
     )
 }
 
+pub fn special_random_integer_gen_var_6(config: &GenConfig) -> It<Integer> {
+    Box::new(striped_random_negative_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
 // -- (Integer, Integer) --
 
 pub fn special_random_integer_pair_gen(config: &GenConfig) -> It<(Integer, Integer)> {
@@ -205,6 +217,18 @@ pub fn special_random_integer_pair_gen(config: &GenConfig) -> It<(Integer, Integ
 
 pub fn special_random_integer_triple_gen(config: &GenConfig) -> It<(Integer, Integer, Integer)> {
     Box::new(random_triples_from_single(striped_random_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
+pub fn special_random_integer_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Integer, Integer, Integer)> {
+    Box::new(random_triples_from_single(striped_random_natural_integers(
         EXAMPLE_SEED,
         config.get_or("mean_stripe_n", 32),
         config.get_or("mean_stripe_d", 1),
@@ -441,6 +465,33 @@ pub fn special_random_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
     )
 }
 
+// -- (Integer, PrimitiveUnsigned, bool) --
+
+pub fn special_random_integer_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, bool)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+        &random_bools,
+    ))
+}
+
 // -- (Integer, PrimitiveUnsigned, Integer) --
 
 pub fn special_random_integer_unsigned_integer_triple_gen<T: PrimitiveUnsigned>(
@@ -462,6 +513,41 @@ pub fn special_random_integer_unsigned_integer_triple_gen<T: PrimitiveUnsigned>(
                 seed,
                 config.get_or("mean_stripe_n", 32),
                 config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Integer, PrimitiveUnsigned, Natural) --
+
+pub fn special_random_integer_unsigned_natural_triple_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, Natural)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
             )
         },
     ))
@@ -497,6 +583,77 @@ pub fn special_random_integer_unsigned_unsigned_triple_gen_var_1<
     ))
 }
 
+pub fn special_random_integer_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, T)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 32),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .map(|(xs, y, z)| if y <= z { (xs, y, z) } else { (xs, z, y) }),
+    )
+}
+
+// -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
+
+pub fn special_random_integer_unsigned_unsigned_natural_quadruple_gen_var_1<
+    T: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(Integer, T, T, Natural)> {
+    Box::new(
+        random_quadruples_xyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .filter_map(|(x, y, z, w)| match y.cmp(&z) {
+            Ordering::Less => Some((x, y, z, w)),
+            Ordering::Greater => Some((x, z, y, w)),
+            Ordering::Equal => None,
+        }),
+    )
+}
+
 // -- (Integer, RoundingMode) --
 
 pub fn special_random_integer_rounding_mode_pair_gen_var_1<
@@ -524,12 +681,12 @@ pub fn special_random_integer_rounding_mode_pair_gen_var_1<
 
 // --(Integer, Vec<bool>) --
 
-struct IntegerBoolVecPairGenerator {
+struct IntegerBoolVecPairGenerator1 {
     xs: StripedRandomIntegers<GeometricRandomSigneds<i64>>,
     striped_bit_source: StripedBitSource,
 }
 
-impl Iterator for IntegerBoolVecPairGenerator {
+impl Iterator for IntegerBoolVecPairGenerator1 {
     type Item = (Integer, Vec<bool>);
 
     fn next(&mut self) -> Option<(Integer, Vec<bool>)> {
@@ -545,7 +702,44 @@ impl Iterator for IntegerBoolVecPairGenerator {
 pub fn special_random_integer_bool_vec_pair_gen_var_1(
     config: &GenConfig,
 ) -> It<(Integer, Vec<bool>)> {
-    Box::new(IntegerBoolVecPairGenerator {
+    Box::new(IntegerBoolVecPairGenerator1 {
+        xs: striped_random_integers(
+            EXAMPLE_SEED.fork("xs"),
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", 4),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
+struct IntegerBoolVecPairGenerator2 {
+    xs: StripedRandomIntegers<GeometricRandomSigneds<i64>>,
+    striped_bit_source: StripedBitSource,
+}
+
+impl Iterator for IntegerBoolVecPairGenerator2 {
+    type Item = (Integer, Vec<bool>);
+
+    fn next(&mut self) -> Option<(Integer, Vec<bool>)> {
+        let x = self.xs.next().unwrap();
+        let bs = get_striped_bool_vec(
+            &mut self.striped_bit_source,
+            u64::exact_from(x.to_bits_asc().len()),
+        );
+        Some((x, bs))
+    }
+}
+
+pub fn special_random_integer_bool_vec_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(Integer, Vec<bool>)> {
+    Box::new(IntegerBoolVecPairGenerator2 {
         xs: striped_random_integers(
             EXAMPLE_SEED.fork("xs"),
             config.get_or("mean_stripe_n", 32),
@@ -1757,7 +1951,21 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_4<
     ))
 }
 
-// var 1 5 is in malachite-base
+// vars 5 through 17 are in malachite-base
+
+pub fn special_random_unsigned_vec_unsigned_pair_gen_var_18(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, u64)> {
+    Box::new(
+        special_random_unsigned_vec_unsigned_pair_gen_var_17(config).filter(|(xs, index)| {
+            let mut mut_xs = xs.clone();
+            limbs_vec_clear_bit_neg(&mut mut_xs, *index);
+            mut_xs.len() == xs.len()
+        }),
+    )
+}
+
+// var 19 is in malachite-base
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
 
@@ -2028,7 +2236,7 @@ fn special_random_mul_helper<T: PrimitiveUnsigned, F: Fn(usize, usize) -> bool>(
     min_x: u64,
     min_y: u64,
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
-    Box::new(UnsignedVecTripleLenGenerator {
+    Box::new(UnsignedVecTripleLenGenerator1 {
         phantom: PhantomData,
         lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
             EXAMPLE_SEED.fork("lengths"),
@@ -2058,7 +2266,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_4<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_22_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_22_input_sizes_valid,
         2,
         2,
     )
@@ -2069,7 +2277,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_5<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_32_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_32_input_sizes_valid,
         6,
         4,
     )
@@ -2080,7 +2288,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_6<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_33_input_sizes_valid,
         3,
         3,
     )
@@ -2091,7 +2299,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_7<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_42_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_42_input_sizes_valid,
         4,
         2,
     )
@@ -2102,7 +2310,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_8<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_43_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_43_input_sizes_valid,
         11,
         8,
     )
@@ -2113,7 +2321,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_9<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_44_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_44_input_sizes_valid,
         4,
         4,
     )
@@ -2124,7 +2332,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_10<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_52_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_52_input_sizes_valid,
         14,
         5,
     )
@@ -2135,7 +2343,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_11<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_53_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_53_input_sizes_valid,
         5,
         3,
     )
@@ -2146,7 +2354,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_12<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_54_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_54_input_sizes_valid,
         14,
         11,
     )
@@ -2157,7 +2365,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_13<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_62_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_62_input_sizes_valid,
         6,
         2,
     )
@@ -2168,7 +2376,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_14<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_63_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_63_input_sizes_valid,
         17,
         9,
     )
@@ -2179,7 +2387,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_15<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
         42,
         42,
     )
@@ -2190,7 +2398,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_16<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
         86,
         86,
     )
@@ -2201,7 +2409,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_17<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_helper(
         config,
-        &_limbs_mul_greater_to_out_fft_input_sizes_threshold,
+        &limbs_mul_greater_to_out_fft_input_sizes_threshold,
         15,
         15,
     )
@@ -2242,7 +2450,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_18<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_same_length_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_33_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_33_input_sizes_valid,
         5,
     )
 }
@@ -2252,7 +2460,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_19<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_same_length_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
         42,
     )
 }
@@ -2262,7 +2470,7 @@ pub fn special_random_unsigned_vec_triple_gen_var_20<T: PrimitiveUnsigned>(
 ) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
     special_random_mul_same_length_helper(
         config,
-        &_limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
+        &limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
         86,
     )
 }
@@ -2273,8 +2481,8 @@ pub fn special_random_unsigned_vec_triple_gen_var_21<T: PrimitiveUnsigned>(
     special_random_mul_same_length_helper(
         config,
         &|xs_len, ys_len| {
-            _limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len, ys_len)
-                && _limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len, ys_len)
+            limbs_mul_greater_to_out_toom_8h_input_sizes_valid(xs_len, ys_len)
+                && limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len, ys_len)
         },
         86,
     )
@@ -2286,8 +2494,8 @@ pub fn special_random_unsigned_vec_triple_gen_var_22<T: PrimitiveUnsigned>(
     special_random_mul_helper(
         config,
         &|xs_len, ys_len| {
-            _limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len, ys_len)
-                && _limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len, ys_len)
+            limbs_mul_greater_to_out_toom_32_input_sizes_valid(xs_len, ys_len)
+                && limbs_mul_greater_to_out_toom_43_input_sizes_valid(xs_len, ys_len)
         },
         11,
         8,
@@ -2300,8 +2508,8 @@ pub fn special_random_unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>(
     special_random_mul_helper(
         config,
         &|xs_len, ys_len| {
-            _limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len, ys_len)
-                && _limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len, ys_len)
+            limbs_mul_greater_to_out_toom_42_input_sizes_valid(xs_len, ys_len)
+                && limbs_mul_greater_to_out_toom_53_input_sizes_valid(xs_len, ys_len)
         },
         5,
         3,

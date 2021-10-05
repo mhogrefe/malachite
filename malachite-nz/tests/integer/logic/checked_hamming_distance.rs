@@ -1,16 +1,26 @@
-use malachite_base::num::logic::traits::CheckedHammingDistance;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
+use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    signed_pair_gen, unsigned_vec_pair_gen_var_8, unsigned_vec_unsigned_pair_gen_var_19,
+};
+use malachite_nz::integer::logic::checked_hamming_distance::{
+    limbs_hamming_distance_limb_neg, limbs_hamming_distance_neg,
+};
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::common::integer_to_rug_integer;
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_pair_gen, integer_triple_gen_var_1, natural_pair_gen,
+};
 use malachite_nz_test_util::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
     rug_checked_hamming_distance,
 };
 use rug;
 use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::integer::logic::checked_hamming_distance::{
-    limbs_hamming_distance_limb_neg, limbs_hamming_distance_neg,
-};
-use malachite_nz::integer::Integer;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -98,4 +108,98 @@ fn test_checked_hamming_distance() {
     test("4294967295", "-4294967295", None);
     test("4294967295", "-4294967296", None);
     test("1000000000000", "-1000000000001", None);
+}
+
+#[test]
+fn limbs_hamming_distance_limb_neg_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_19().test_properties_with_config(&config, |(xs, y)| {
+        assert_eq!(
+            Some(limbs_hamming_distance_limb_neg(&xs, y)),
+            (-Natural::from_owned_limbs_asc(xs)).checked_hamming_distance(&-Natural::from(y)),
+        );
+    });
+}
+
+#[test]
+fn limbs_hamming_distance_neg_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_8().test_properties_with_config(&config, |(xs, ys)| {
+        assert_eq!(
+            Some(limbs_hamming_distance_neg(&xs, &ys)),
+            (-Natural::from_owned_limbs_asc(xs))
+                .checked_hamming_distance(&-Natural::from_owned_limbs_asc(ys)),
+        );
+    });
+}
+
+#[test]
+fn checked_hamming_distance_properties() {
+    integer_pair_gen().test_properties(|(x, y)| {
+        let distance = x.checked_hamming_distance(&y);
+        assert_eq!(
+            rug_checked_hamming_distance(&integer_to_rug_integer(&x), &integer_to_rug_integer(&y)),
+            distance
+        );
+        assert_eq!(y.checked_hamming_distance(&x), distance);
+        assert_eq!(integer_checked_hamming_distance_alt_1(&x, &y), distance);
+        assert_eq!(integer_checked_hamming_distance_alt_2(&x, &y), distance);
+        assert_eq!(distance == Some(0), x == y);
+        assert_eq!((&x ^ &y).checked_count_ones(), distance);
+        assert_eq!((!x).checked_hamming_distance(&!y), distance);
+    });
+
+    integer_triple_gen_var_1().test_properties(|(x, y, z)| {
+        assert!(
+            x.checked_hamming_distance(&z).unwrap()
+                <= x.checked_hamming_distance(&y).unwrap()
+                    + y.checked_hamming_distance(&z).unwrap()
+        );
+        let x = !x;
+        let y = !y;
+        let z = !z;
+        assert!(
+            x.checked_hamming_distance(&z).unwrap()
+                <= x.checked_hamming_distance(&y).unwrap()
+                    + y.checked_hamming_distance(&z).unwrap()
+        );
+    });
+
+    integer_gen().test_properties(|n| {
+        assert_eq!(n.checked_hamming_distance(&n), Some(0));
+        assert_eq!(
+            n.checked_hamming_distance(&Integer::ZERO),
+            n.checked_count_ones()
+        );
+        assert_eq!(
+            n.checked_hamming_distance(&Integer::NEGATIVE_ONE),
+            n.checked_count_zeros()
+        );
+        assert_eq!(
+            Integer::ZERO.checked_hamming_distance(&n),
+            n.checked_count_ones()
+        );
+        assert_eq!(
+            Integer::NEGATIVE_ONE.checked_hamming_distance(&n),
+            n.checked_count_zeros()
+        );
+    });
+
+    natural_pair_gen().test_properties(|(x, y)| {
+        assert_eq!(
+            Some(x.hamming_distance(&y)),
+            Integer::from(x).checked_hamming_distance(&Integer::from(y)),
+        );
+    });
+
+    signed_pair_gen::<SignedLimb>().test_properties(|(x, y)| {
+        assert_eq!(
+            Integer::from(x).checked_hamming_distance(&Integer::from(y)),
+            x.checked_hamming_distance(y)
+        );
+    });
 }

@@ -11,8 +11,6 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering; 
 
-//TODO doc hidden
-
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
 /// action equivalent to taking the two's complement of the limbs and getting the bit at the
 /// specified index. Sufficiently high indices will return `true`. The slice cannot be empty or
@@ -38,6 +36,7 @@ use std::cmp::Ordering;
 /// ```
 ///
 /// This is mpz_tstbit from mpz/tstbit.c, GMP 6.2.1, where d is negative.
+#[doc(hidden)]
 pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool { 
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     if x_i >= xs.len() {
@@ -77,6 +76,7 @@ pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
 /// ```
 ///
 /// This is mpz_setbit from mpz/setbit.c, GMP 6.2.1, where d is negative.
+#[doc(hidden)]
 pub fn limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     if x_i >= xs.len() {
@@ -149,6 +149,7 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative and bit_idx small enough
 /// that no additional memory needs to be given to d.
+#[doc(hidden)]
 pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
@@ -180,6 +181,7 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 /// ```
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative.
+#[doc(hidden)]
 pub fn limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;

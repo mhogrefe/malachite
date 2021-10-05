@@ -136,6 +136,11 @@ pub trait CheckedSubMul<Y = Self, Z = Self> {
     fn checked_sub_mul(self, y: Y, z: Z) -> Option<Self::Output>;
 }
 
+/// Determines whether two numbers are coprime.
+pub trait CoprimeWith<RHS = Self> {
+    fn coprime_with(self, other: RHS) -> bool;
+}
+
 /// Divides a value by another value. The first value must be exactly divisible by the second.
 ///
 /// If it isn't, this function may crash or return a meaningless result.
@@ -280,9 +285,41 @@ pub trait FloorAssign {
     fn floor_assign(&mut self);
 }
 
+/// Calculates the GCD (greatest common divisor) of two numbers.
+pub trait Gcd<RHS = Self> {
+    type Output;
+
+    fn gcd(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces `self` with the GCD (greatest common divisor) of itself with another number.
+pub trait GcdAssign<RHS = Self> {
+    fn gcd_assign(&mut self, other: RHS);
+}
+
 /// Determines whether `self` == $2^k$ for some integer k.
 pub trait IsPowerOf2 {
     fn is_power_of_2(&self) -> bool;
+}
+
+/// Calculates the LCM (least common multiple) of two numbers.
+pub trait Lcm<RHS = Self> {
+    type Output;
+
+    fn lcm(self, other: RHS) -> Self::Output;
+}
+
+/// Replaces `self` with the LCM (least common multiple) of itself with another number.
+pub trait LcmAssign<RHS = Self> {
+    fn lcm_assign(&mut self, other: RHS);
+}
+
+/// Calculates the LCM (least common multiple) of two numbers, returning `None` if there is no
+/// valid result.
+pub trait CheckedLcm<RHS = Self> {
+    type Output;
+
+    fn checked_lcm(self, other: RHS) -> Option<Self::Output>;
 }
 
 /// Provides a function to get the base-`b` logarithm of `self`, or return `None` if the result is

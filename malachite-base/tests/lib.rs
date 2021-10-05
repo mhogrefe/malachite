@@ -182,6 +182,7 @@ pub mod num {
         pub mod checked_neg;
         pub mod checked_square;
         pub mod checked_sub_mul;
+        pub mod coprime_with;
         pub mod div_exact;
         pub mod div_mod;
         pub mod div_round;
@@ -190,7 +191,9 @@ pub mod num {
         pub mod eq_mod;
         pub mod eq_mod_power_of_2;
         pub mod floor;
+        pub mod gcd;
         pub mod is_power_of_2;
+        pub mod lcm;
         pub mod log_base;
         pub mod log_base_2;
         pub mod log_base_power_of_2;
@@ -552,6 +555,20 @@ pub mod sets {
         pub mod shortlex_hash_sets_length_range;
         pub mod shortlex_hash_sets_min_length;
     }
+    pub mod random {
+        pub mod random_b_tree_sets;
+        pub mod random_b_tree_sets_fixed_length;
+        pub mod random_b_tree_sets_from_length_iterator;
+        pub mod random_b_tree_sets_length_inclusive_range;
+        pub mod random_b_tree_sets_length_range;
+        pub mod random_b_tree_sets_min_length;
+        pub mod random_hash_sets;
+        pub mod random_hash_sets_fixed_length;
+        pub mod random_hash_sets_from_length_iterator;
+        pub mod random_hash_sets_length_inclusive_range;
+        pub mod random_hash_sets_length_range;
+        pub mod random_hash_sets_min_length;
+    }
 }
 pub mod slices {
     pub mod exhaustive_slice_permutations;
@@ -607,6 +624,7 @@ pub mod tuples {
     }
     pub mod random {
         pub mod random_custom_tuples;
+        pub mod random_ordered_unique_tuples;
         pub mod random_tuples;
         pub mod random_tuples_from_single;
         pub mod random_units;
@@ -665,6 +683,12 @@ pub mod vecs {
     }
     pub mod exhaustive_vec_permutations;
     pub mod random {
+        pub mod random_ordered_unique_vecs;
+        pub mod random_ordered_unique_vecs_fixed_length;
+        pub mod random_ordered_unique_vecs_from_length_iterator;
+        pub mod random_ordered_unique_vecs_length_inclusive_range;
+        pub mod random_ordered_unique_vecs_length_range;
+        pub mod random_ordered_unique_vecs_min_length;
         pub mod random_vecs;
         pub mod random_vecs_fixed_length;
         pub mod random_vecs_fixed_length_from_single;

@@ -1,6 +1,8 @@
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
+use malachite_nz_test_util::generators::integer_unsigned_bool_triple_gen_var_1;
 use rug;
 use std::str::FromStr;
 
@@ -39,4 +41,18 @@ fn test_assign_bit() {
         "1000000000000",
     );
     test("1267650600228229401496703205381", 100, false, "5");
+}
+
+#[test]
+fn assign_bit_properties() {
+    integer_unsigned_bool_triple_gen_var_1().test_properties(|(n, index, bit)| {
+        let mut mut_n = n.clone();
+        mut_n.assign_bit(index, bit);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
+
+        let mut rug_n = integer_to_rug_integer(&n);
+        rug_n.set_bit(u32::exact_from(index), bit);
+        assert_eq!(rug_integer_to_integer(&rug_n), result);
+    });
 }

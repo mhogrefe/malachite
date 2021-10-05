@@ -32,6 +32,7 @@ use std::cmp::Ordering;
 /// assert_eq!(limbs_hamming_distance_limb_neg(&[2], 2), 0);
 /// assert_eq!(limbs_hamming_distance_limb_neg(&[1, 1, 1], 1), 2);
 /// ```
+#[doc(hidden)]
 pub fn limbs_hamming_distance_limb_neg(xs: &[Limb], y: Limb) -> u64 {
     let x_lo = xs[0].wrapping_neg();
     limbs_count_zeros_neg(xs) - CountZeros::count_zeros(x_lo)
@@ -116,6 +117,7 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
 ///
 /// This is mpz_hamdist from mpz/hamdist.c, GMP 6.2.1, where both arguments are negative and have
 /// the same length.
+#[doc(hidden)]
 pub fn limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_i = slice_leading_zeros(xs);
     let ys_i = slice_leading_zeros(ys);
@@ -180,6 +182,6 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
             (true, true) => Some(self.abs.hamming_distance(&other.abs)),
             (false, false) => Some(self.abs.hamming_distance_neg(&other.abs)),
             _ => None,
-        }
+        } 
     }
 }

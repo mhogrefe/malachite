@@ -1,11 +1,16 @@
 use itertools::Itertools;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{bool_vec_gen, bool_vec_gen_var_5, signed_gen};
 use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
 use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
     bits_vec_to_twos_complement_bits_negative,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::generators::integer_gen;
 use malachite_nz_test_util::integer::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
 use std::str::FromStr;
 
@@ -303,4 +308,77 @@ fn test_to_bits_desc() {
             false, false, false, false, false,
         ],
     );
+}
+
+#[test]
+fn bits_to_twos_complement_bits_non_negative_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    bool_vec_gen().test_properties_with_config(&config, |mut bits| {
+        bits_to_twos_complement_bits_non_negative(&mut bits);
+    });
+}
+
+#[test]
+fn bits_slice_to_twos_complement_bits_negative_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    bool_vec_gen().test_properties_with_config(&config, |mut bits| {
+        bits_slice_to_twos_complement_bits_negative(&mut bits);
+    });
+}
+
+#[test]
+fn bits_vec_to_twos_complement_bits_negative_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    bool_vec_gen_var_5().test_properties_with_config(&config, |mut bits| {
+        bits_vec_to_twos_complement_bits_negative(&mut bits);
+    });
+}
+
+#[test]
+fn to_bits_asc_properties() {
+    integer_gen().test_properties(|x| {
+        let bits = x.to_bits_asc();
+        assert_eq!(to_bits_asc_naive(&x), bits);
+        assert_eq!(to_bits_asc_alt(&x), bits);
+        assert_eq!(x.bits().collect_vec(), bits);
+        assert_eq!(Integer::from_bits_asc(bits.iter().cloned()), x);
+        if x != 0 {
+            assert_eq!(*bits.last().unwrap(), x < 0);
+        }
+        let bit_len = bits.len();
+        if bit_len > 1 {
+            assert_ne!(bits[bit_len - 1], bits[bit_len - 2]);
+        }
+    });
+
+    signed_gen::<SignedLimb>().test_properties(|i| {
+        assert_eq!(i.to_bits_asc(), Integer::from(i).to_bits_asc());
+    });
+}
+
+#[test]
+fn to_bits_desc_properties() {
+    integer_gen().test_properties(|x| {
+        let bits = x.to_bits_desc();
+        assert_eq!(to_bits_desc_naive(&x), bits);
+        assert_eq!(to_bits_desc_alt(&x), bits);
+        assert_eq!(x.bits().rev().collect_vec(), bits);
+        assert_eq!(Integer::from_bits_desc(bits.iter().cloned()), x);
+        if x != 0 {
+            assert_eq!(bits[0], x < 0);
+        }
+        if bits.len() > 1 {
+            assert_ne!(bits[0], bits[1]);
+        }
+    });
+
+    signed_gen::<SignedLimb>().test_properties(|i| {
+        assert_eq!(i.to_bits_desc(), Integer::from(i).to_bits_desc());
+    });
 }

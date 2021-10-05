@@ -1,5 +1,5 @@
 use bools::random::{random_bools, weighted_random_bools, RandomBools, WeightedRandomBools};
-use num::arithmetic::traits::Parity;
+use num::arithmetic::traits::Gcd;
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -34,29 +34,6 @@ impl<T: PrimitiveInt> Iterator for GeometricRandomNaturalValues<T> {
     }
 }
 
-//TODO use actual gcd
-fn gcd(u: u64, v: u64) -> u64 {
-    if u == v {
-        u
-    } else if u == 0 {
-        v
-    } else if v == 0 {
-        u
-    } else if u.even() {
-        if v.odd() {
-            gcd(u >> 1, v)
-        } else {
-            gcd(u >> 1, v >> 1) << 1
-        }
-    } else if v.even() {
-        gcd(u, v >> 1)
-    } else if u > v {
-        gcd((u - v) >> 1, v)
-    } else {
-        gcd((v - u) >> 1, u)
-    }
-}
-
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub(crate) struct SimpleRational {
     pub(crate) n: u64,
@@ -66,7 +43,7 @@ pub(crate) struct SimpleRational {
 impl SimpleRational {
     pub(crate) fn new(n: u64, d: u64) -> SimpleRational {
         assert_ne!(d, 0);
-        let gcd = gcd(n, d);
+        let gcd = n.gcd(d);
         SimpleRational {
             n: n / gcd,
             d: d / gcd,

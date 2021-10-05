@@ -1,19 +1,19 @@
 use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
-use malachite_nz_test_util::natural::arithmetic::square::_limbs_square_to_out_basecase_unrestricted;
+use malachite_nz_test_util::natural::arithmetic::square::limbs_square_to_out_basecase_unrestricted;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
+use malachite_nz::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::square::{
-    _limbs_square_to_out_basecase, _limbs_square_to_out_toom_4,
-    _limbs_square_to_out_toom_4_scratch_len, _limbs_square_to_out_toom_6,
-    _limbs_square_to_out_toom_6_scratch_len, _limbs_square_to_out_toom_8,
-    _limbs_square_to_out_toom_8_scratch_len,
+    limbs_square_to_out_basecase, limbs_square_to_out_toom_4,
+    limbs_square_to_out_toom_4_scratch_len, limbs_square_to_out_toom_6,
+    limbs_square_to_out_toom_6_scratch_len, limbs_square_to_out_toom_8,
+    limbs_square_to_out_toom_8_scratch_len,
 };
 use malachite_nz::natural::arithmetic::square::{
-    _limbs_square_to_out_toom_2, _limbs_square_to_out_toom_2_scratch_len,
-    _limbs_square_to_out_toom_3, _limbs_square_to_out_toom_3_scratch_len,
+    limbs_square_to_out_toom_2, limbs_square_to_out_toom_2_scratch_len, limbs_square_to_out_toom_3,
+    limbs_square_to_out_toom_3_scratch_len,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -23,7 +23,7 @@ use malachite_nz::platform::SQR_TOOM2_THRESHOLD;
 fn limbs_square_basecase_helper(out_before: &[Limb], xs: &[Limb], out_after: &[Limb]) -> Vec<Limb> {
     let mut out = out_before.to_vec();
     let old_out = out.clone();
-    _limbs_square_to_out_basecase_unrestricted(&mut out, xs);
+    limbs_square_to_out_basecase_unrestricted(&mut out, xs);
     assert_eq!(out, out_after);
     let n = Natural::from_limbs_asc(xs).square();
     let len = xs.len() << 1;
@@ -40,7 +40,7 @@ fn test_limbs_square_to_out_basecase() {
     let test = |out_before: &[Limb], xs: &[Limb], out_after: &[Limb]| {
         limbs_square_basecase_helper(out_before, xs, out_after);
         let mut out = out_before.to_vec();
-        _limbs_square_to_out_basecase(&mut out, xs);
+        limbs_square_to_out_basecase(&mut out, xs);
         assert_eq!(out, out_after);
     };
     test(&[10; 3], &[0], &[0, 0, 10]);
@@ -58,7 +58,7 @@ fn test_limbs_square_to_out_basecase() {
 #[should_panic]
 fn limbs_square_to_out_basecase_fail_1() {
     let mut out = vec![10; 3];
-    _limbs_square_to_out_basecase(&mut out, &[]);
+    limbs_square_to_out_basecase(&mut out, &[]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -66,7 +66,7 @@ fn limbs_square_to_out_basecase_fail_1() {
 #[should_panic]
 fn limbs_square_to_out_basecase_fail_2() {
     let mut out = vec![10; 3];
-    _limbs_square_to_out_basecase(&mut out, &[1, 2]);
+    limbs_square_to_out_basecase(&mut out, &[1, 2]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -74,7 +74,7 @@ fn limbs_square_to_out_basecase_fail_2() {
 #[should_panic]
 fn limbs_square_to_out_basecase_fail_3() {
     let mut out = vec![0; (SQR_TOOM2_THRESHOLD + 1) << 1];
-    _limbs_square_to_out_basecase(&mut out, &[10; SQR_TOOM2_THRESHOLD + 1]);
+    limbs_square_to_out_basecase(&mut out, &[10; SQR_TOOM2_THRESHOLD + 1]);
 }
 
 #[test]
@@ -82,8 +82,8 @@ fn test_limbs_square_to_out_toom_2() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         limbs_square_basecase_helper(out_before, xs, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(xs.len())];
-        _limbs_square_to_out_toom_2(&mut out, xs, &mut scratch);
+        let mut scratch = vec![0; limbs_square_to_out_toom_2_scratch_len(xs.len())];
+        limbs_square_to_out_toom_2(&mut out, xs, &mut scratch);
         assert_eq!(out, out_after);
     };
     #[cfg(feature = "32_bit_limbs")]
@@ -92,7 +92,7 @@ fn test_limbs_square_to_out_toom_2() {
         // s == n
         // limbs_cmp_same_length(&a0[..n], &a1[..n]) != Ordering::Less
         // !TOOM2MAYBE_SQR_TOOM2 || a.len() < SQR_TOOM2_THRESHOLD
-        //      in _limbs_square_to_out_toom_2recursive
+        //      in limbs_square_to_out_toom_2recursive
         // cy <= 2
         test(&[1, 1], &[10; 5], &[1, 2, 1, 0, 10]);
         // limbs_cmp_same_length(&a0[..n], &a1[..n]) == Ordering::Less
@@ -103,7 +103,7 @@ fn test_limbs_square_to_out_toom_2() {
         // !(a0[s] == 0 && limbs_cmp_same_length(&a0[..s], &a1[..s]) == Ordering::Less)
         test(&[0, 1, 1], &[0, 0, 0, 0, 0, 0], &[0, 0, 1, 2, 1, 0]);
         // TOOM2MAYBE_SQR_TOOM2 && a.len() >= SQR_TOOM2_THRESHOLD
-        //      in _limbs_square_to_out_toom_2recursive
+        //      in limbs_square_to_out_toom_2recursive
         test(
             &[
                 315937763, 473311027, 567550122, 1916950171, 4059671672, 732330624, 3931833255,
@@ -1693,18 +1693,18 @@ fn test_limbs_square_to_out_toom_2() {
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_2_fail_1() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(1)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_2_scratch_len(1)];
     let mut out = vec![10; 3];
-    _limbs_square_to_out_toom_2(&mut out, &[5], &mut scratch);
+    limbs_square_to_out_toom_2(&mut out, &[5], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_2_fail_2() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(2)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_2_scratch_len(2)];
     let mut out = vec![10; 3];
-    _limbs_square_to_out_toom_2(&mut out, &[5, 5], &mut scratch);
+    limbs_square_to_out_toom_2(&mut out, &[5, 5], &mut scratch);
 }
 
 #[test]
@@ -1712,8 +1712,8 @@ fn test_limbs_square_to_out_toom_3() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         limbs_square_basecase_helper(out_before, xs, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_square_to_out_toom_3_scratch_len(xs.len())];
-        _limbs_square_to_out_toom_3(&mut out, xs, &mut scratch);
+        let mut scratch = vec![0; limbs_square_to_out_toom_3_scratch_len(xs.len())];
+        limbs_square_to_out_toom_3(&mut out, xs, &mut scratch);
         assert_eq!(out, out_after);
     };
     #[cfg(feature = "32_bit_limbs")]
@@ -1723,7 +1723,7 @@ fn test_limbs_square_to_out_toom_3() {
         // s == n
         // SMALLER_RECURSION_TOOM_3
         // TOOM3MAYBE_SQR_BASECASE && n < SQR_TOOM2_THRESHOLD in
-        //      _limbs_square_to_out_toom_3recursive
+        //      limbs_square_to_out_toom_3recursive
         // SMALLER_RECURSION_TOOM_3 && *asm1last == 0
         // SMALLER_RECURSION_TOOM_3 && *as1last == 0
         test(&[1; 3], &[10; 7], &[1, 2, 3, 2, 1, 0, 10]);
@@ -1783,7 +1783,7 @@ fn test_limbs_square_to_out_toom_3() {
             ],
         );
         // (!TOOM3MAYBE_SQR_BASECASE || n >= SQR_TOOM2_THRESHOLD) && TOOM3MAYBE_SQR_TOOM3 &&
-        //      n >= SQR_TOOM3THRESHOLD in _limbs_square_to_out_toom_3recursive
+        //      n >= SQR_TOOM3THRESHOLD in limbs_square_to_out_toom_3recursive
         test(
             &[
                 315937763, 473311027, 567550122, 1916950171, 4059671672, 732330624, 3931833255,
@@ -2123,7 +2123,7 @@ fn test_limbs_square_to_out_toom_3() {
     {
         // (!TOOM3MAYBE_SQR_BASECASE || n >= SQR_TOOM2_THRESHOLD) &&
         //      (!TOOM3MAYBE_SQR_TOOM3 || n < SQR_TOOM3THRESHOLD)
-        //      in _limbs_square_to_out_toom_3recursive
+        //      in limbs_square_to_out_toom_3recursive
         test(
             &[
                 9525251150715707485,
@@ -2395,18 +2395,18 @@ fn test_limbs_square_to_out_toom_3() {
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_3_fail_1() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_3_scratch_len(2)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_3_scratch_len(2)];
     let mut out = vec![10; 4];
-    _limbs_square_to_out_toom_3(&mut out, &[5, 5], &mut scratch);
+    limbs_square_to_out_toom_3(&mut out, &[5, 5], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_3_fail_2() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_3_scratch_len(2)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_3_scratch_len(2)];
     let mut out = vec![10; 5];
-    _limbs_square_to_out_toom_3(&mut out, &[5; 3], &mut scratch);
+    limbs_square_to_out_toom_3(&mut out, &[5; 3], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -2415,11 +2415,11 @@ fn test_limbs_square_to_out_toom_4() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         limbs_square_basecase_helper(out_before, xs, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_square_to_out_toom_4_scratch_len(xs.len())];
-        _limbs_square_to_out_toom_4(&mut out, xs, &mut scratch);
+        let mut scratch = vec![0; limbs_square_to_out_toom_4_scratch_len(xs.len())];
+        limbs_square_to_out_toom_4(&mut out, xs, &mut scratch);
         assert_eq!(out, out_after);
     };
-    // basecase in _limbs_square_to_out_toom_4recursive
+    // basecase in limbs_square_to_out_toom_4recursive
     test(&[0; 4], &[10; 10], &[0, 0, 0, 0, 0, 0, 0, 0, 10, 10]);
     test(&[1; 4], &[10; 10], &[1, 2, 3, 4, 3, 2, 1, 0, 10, 10]);
     test(
@@ -2427,7 +2427,7 @@ fn test_limbs_square_to_out_toom_4() {
         &[10; 10],
         &[15129, 112176, 402030, 962370, 1522665, 1557486, 974169, 0, 10, 10],
     );
-    // toom_4 in _limbs_square_to_out_toom_4recursive
+    // toom_4 in limbs_square_to_out_toom_4recursive
     test(
         &[
             4139948165, 1538275035, 3244920878, 2576965792, 584068468, 3054546876, 2629688518,
@@ -3100,18 +3100,18 @@ fn test_limbs_square_to_out_toom_4() {
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_4_fail_1() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_4_scratch_len(3)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_4_scratch_len(3)];
     let mut out = vec![10; 6];
-    _limbs_square_to_out_toom_4(&mut out, &[5; 3], &mut scratch);
+    limbs_square_to_out_toom_4(&mut out, &[5; 3], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_4_fail_2() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_4_scratch_len(4)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_4_scratch_len(4)];
     let mut out = vec![10; 7];
-    _limbs_square_to_out_toom_4(&mut out, &[5; 4], &mut scratch);
+    limbs_square_to_out_toom_4(&mut out, &[5; 4], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -3120,8 +3120,8 @@ fn test_limbs_square_to_out_toom_6() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         limbs_square_basecase_helper(out_before, xs, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_square_to_out_toom_6_scratch_len(xs.len())];
-        _limbs_square_to_out_toom_6(&mut out, xs, &mut scratch);
+        let mut scratch = vec![0; limbs_square_to_out_toom_6_scratch_len(xs.len())];
+        limbs_square_to_out_toom_6(&mut out, xs, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(
@@ -3818,18 +3818,18 @@ fn test_limbs_square_to_out_toom_6() {
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_6_fail_1() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_6_scratch_len(2)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_6_scratch_len(2)];
     let mut out = vec![10; 34];
-    _limbs_square_to_out_toom_6(&mut out, &[5; 17], &mut scratch);
+    limbs_square_to_out_toom_6(&mut out, &[5; 17], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_6_fail_2() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_6_scratch_len(2)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_6_scratch_len(2)];
     let mut out = vec![10; 35];
-    _limbs_square_to_out_toom_6(&mut out, &[5; 18], &mut scratch);
+    limbs_square_to_out_toom_6(&mut out, &[5; 18], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -3838,8 +3838,8 @@ fn test_limbs_square_to_out_toom_8() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
         limbs_square_basecase_helper(out_before, xs, out_after);
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_square_to_out_toom_8_scratch_len(xs.len())];
-        _limbs_square_to_out_toom_8(&mut out, xs, &mut scratch);
+        let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(xs.len())];
+        limbs_square_to_out_toom_8(&mut out, xs, &mut scratch);
         assert_eq!(out, out_after);
     };
     test(
@@ -4653,18 +4653,18 @@ fn test_limbs_square_to_out_toom_8() {
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_8_fail_1() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_8_scratch_len(2)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(2)];
     let mut out = vec![10; 78];
-    _limbs_square_to_out_toom_8(&mut out, &[5; 39], &mut scratch);
+    limbs_square_to_out_toom_8(&mut out, &[5; 39], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_square_to_out_toom_8_fail_2() {
-    let mut scratch = vec![0; _limbs_square_to_out_toom_8_scratch_len(2)];
+    let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(2)];
     let mut out = vec![10; 79];
-    _limbs_square_to_out_toom_8(&mut out, &[5; 40], &mut scratch);
+    limbs_square_to_out_toom_8(&mut out, &[5; 40], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -4672,30 +4672,30 @@ fn limbs_square_to_out_toom_8_fail_2() {
 fn test_limbs_mul_greater_to_out_fft_square() {
     let test = |xs, out_before: &[Limb], out_after: &[Limb]| {
         let mut out = out_before.to_vec();
-        _limbs_square_to_out_basecase_unrestricted(&mut out, xs);
+        limbs_square_to_out_basecase_unrestricted(&mut out, xs);
         assert_eq!(out, out_after);
         let mut out = out_before.to_vec();
-        _limbs_mul_greater_to_out_fft(&mut out, xs, xs);
+        limbs_mul_greater_to_out_fft(&mut out, xs, xs);
         assert_eq!(out, out_after);
     };
-    // n < SQRMOD_BNM1_THRESHOLD || n.odd() in _limbs_square_mod_base_pow_n_minus_1
-    // (n < SQRMOD_BNM1_THRESHOLD || n.odd()) && xs_len < n in _limbs_square_mod_base_pow_n_minus_1
+    // n < SQRMOD_BNM1_THRESHOLD || n.odd() in limbs_square_mod_base_pow_n_minus_1
+    // (n < SQRMOD_BNM1_THRESHOLD || n.odd()) && xs_len < n in limbs_square_mod_base_pow_n_minus_1
     // (n < SQRMOD_BNM1_THRESHOLD || n.odd()) && two_xs_len <= n
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     test(&[2], &[10; 2], &[4, 0]);
     test(&[2, 3, 4], &[10; 8], &[4, 12, 25, 24, 16, 0, 10, 10]);
-    // n >= SQRMOD_BNM1_THRESHOLD && n.even() in _limbs_square_mod_base_pow_n_minus_1
+    // n >= SQRMOD_BNM1_THRESHOLD && n.even() in limbs_square_mod_base_pow_n_minus_1
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     // (n < SQRMOD_BNM1_THRESHOLD || n.odd()) && xs_len >= n
     // !limbs_add_same_length_to_out(out, scratch_lo, scratch_hi)
-    //      in _limbs_square_mod_base_pow_n_minus_1_basecase
+    //      in limbs_square_mod_base_pow_n_minus_1_basecase
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n && half_n < MUL_FFT_MODF_THRESHOLD
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n && k < FFT_FIRST_K
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && 2 * xs_len >= n
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     test(
         &[
             2510345641, 2061778657, 3262197101, 3745690358, 4181391193, 2032164543, 2307575971,
@@ -4709,11 +4709,11 @@ fn test_limbs_mul_greater_to_out_fft_square() {
         ],
     );
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n && half_n < MUL_FFT_MODF_THRESHOLD
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n && k < FFT_FIRST_K
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     test(
         &[
             1915319002, 2416362936, 3736723910, 3840750694, 446742019, 856543868, 2711730470,
@@ -4730,7 +4730,7 @@ fn test_limbs_mul_greater_to_out_fft_square() {
         ],
     );
     // limbs_add_same_length_to_out(out, scratch_lo, scratch_hi)
-    //      in _limbs_square_mod_base_pow_n_minus_1_basecase
+    //      in limbs_square_mod_base_pow_n_minus_1_basecase
     test(
         &[
             2832963051, 2308786869, 221199257, 821529232, 1400097751, 3863608553, 3706117189,
@@ -4747,11 +4747,11 @@ fn test_limbs_mul_greater_to_out_fft_square() {
         ],
     );
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n &&
-    //      half_n >= MUL_FFT_MODF_THRESHOLD in _limbs_square_mod_base_pow_n_minus_1
+    //      half_n >= MUL_FFT_MODF_THRESHOLD in limbs_square_mod_base_pow_n_minus_1
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len <= half_n && k >= FFT_FIRST_K
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && two_xs_len <= n
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     test(
         &[
             315937763, 473311027, 567550122, 1916950171, 4059671672, 732330624, 3931833255,
@@ -5086,9 +5086,9 @@ fn test_limbs_mul_greater_to_out_fft_square() {
         ],
     );
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n && half_n >= MUL_FFT_MODF_THRESHOLD
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     // n >= SQRMOD_BNM1_THRESHOLD && n.even() && xs_len > half_n && k >= FFT_FIRST_K
-    //      in _limbs_square_mod_base_pow_n_minus_1
+    //      in limbs_square_mod_base_pow_n_minus_1
     test(
         &[
             2574317642, 729437319, 1682288870, 1482920833, 776000268, 3908963888, 214874919,

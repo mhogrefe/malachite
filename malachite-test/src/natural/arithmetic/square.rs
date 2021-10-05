@@ -2,17 +2,17 @@ use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
-use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
-use malachite_nz::natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
+use malachite_nz::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
+use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use malachite_nz::natural::arithmetic::square::{
-    _limbs_square_to_out_basecase, _limbs_square_to_out_toom_2,
-    _limbs_square_to_out_toom_2_scratch_len, _limbs_square_to_out_toom_3,
-    _limbs_square_to_out_toom_3_scratch_len, _limbs_square_to_out_toom_4,
-    _limbs_square_to_out_toom_4_scratch_len, _limbs_square_to_out_toom_6,
-    _limbs_square_to_out_toom_6_scratch_len, _limbs_square_to_out_toom_8,
-    _limbs_square_to_out_toom_8_scratch_len,
+    limbs_square_to_out_basecase, limbs_square_to_out_toom_2,
+    limbs_square_to_out_toom_2_scratch_len, limbs_square_to_out_toom_3,
+    limbs_square_to_out_toom_3_scratch_len, limbs_square_to_out_toom_4,
+    limbs_square_to_out_toom_4_scratch_len, limbs_square_to_out_toom_6,
+    limbs_square_to_out_toom_6_scratch_len, limbs_square_to_out_toom_8,
+    limbs_square_to_out_toom_8_scratch_len,
 };
-use malachite_nz_test_util::natural::arithmetic::square::_limbs_square_to_out_basecase_unrestricted;
+use malachite_nz_test_util::natural::arithmetic::square::limbs_square_to_out_basecase_unrestricted;
 
 use malachite_test::common::{DemoBenchRegistry, GenerationMode, ScaleType};
 use malachite_test::inputs::base::{
@@ -73,7 +73,7 @@ pub(crate) fn register(registry: &mut DemoBenchRegistry) {
 fn demo_limbs_square_to_out_basecase(gm: GenerationMode, limit: usize) {
     for (mut xs, ys) in pairs_of_unsigned_vec_var_17(gm).take(limit) {
         let xs_old = xs.clone();
-        _limbs_square_to_out_basecase(&mut xs, &ys);
+        limbs_square_to_out_basecase(&mut xs, &ys);
         println!(
             "out := {:?}; _limbs_square_to_out_basecase(&mut out, {:?}); out = {:?}",
             xs_old, ys, xs
@@ -118,11 +118,11 @@ fn benchmark_limbs_square_to_out_basecase_algorithms(
         &mut [
             (
                 "default",
-                &mut (|(mut xs, ys)| _limbs_square_to_out_basecase(&mut xs, &ys)),
+                &mut (|(mut xs, ys)| limbs_square_to_out_basecase(&mut xs, &ys)),
             ),
             (
                 "using _limbs_mul_greater_to_out_basecase",
-                &mut (|(mut xs, ys)| _limbs_mul_greater_to_out_basecase(&mut xs, &ys, &ys)),
+                &mut (|(mut xs, ys)| limbs_mul_greater_to_out_basecase(&mut xs, &ys, &ys)),
             ),
         ],
     );
@@ -145,13 +145,13 @@ fn benchmark_limbs_square_to_out_toom_2_algorithms(
         &mut [
             (
                 "basecase",
-                &mut (|(mut out, xs)| _limbs_square_to_out_basecase_unrestricted(&mut out, &xs)),
+                &mut (|(mut out, xs)| limbs_square_to_out_basecase_unrestricted(&mut out, &xs)),
             ),
             (
                 "Toom2",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_2(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_2_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_2(&mut out, &xs, &mut scratch)
                 }),
             ),
         ],
@@ -176,15 +176,15 @@ fn benchmark_limbs_square_to_out_toom_3_algorithms(
             (
                 "Toom2",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_2_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_2(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_2_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_2(&mut out, &xs, &mut scratch)
                 }),
             ),
             (
                 "Toom3",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_3_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_3(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_3_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_3(&mut out, &xs, &mut scratch)
                 }),
             ),
         ],
@@ -209,15 +209,15 @@ fn benchmark_limbs_square_to_out_toom_4_algorithms(
             (
                 "Toom3",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_3_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_3(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_3_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_3(&mut out, &xs, &mut scratch)
                 }),
             ),
             (
                 "Toom4",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_4_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_4(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_4_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_4(&mut out, &xs, &mut scratch)
                 }),
             ),
         ],
@@ -242,15 +242,15 @@ fn benchmark_limbs_square_to_out_toom_6_algorithms(
             (
                 "Toom4",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_4_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_4(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_4_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_4(&mut out, &xs, &mut scratch)
                 }),
             ),
             (
                 "Toom6",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_6_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_6(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_6_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_6(&mut out, &xs, &mut scratch)
                 }),
             ),
         ],
@@ -275,15 +275,15 @@ fn benchmark_limbs_square_to_out_toom_8_algorithms(
             (
                 "Toom6",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_6_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_6(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_6_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_6(&mut out, &xs, &mut scratch)
                 }),
             ),
             (
                 "Toom8",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_8_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_8(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_8(&mut out, &xs, &mut scratch)
                 }),
             ),
         ],
@@ -304,13 +304,13 @@ fn benchmark_limbs_square_to_out_fft_algorithms(gm: GenerationMode, limit: usize
             (
                 "Toom8",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_to_out_toom_8_scratch_len(xs.len())];
-                    _limbs_square_to_out_toom_8(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(xs.len())];
+                    limbs_square_to_out_toom_8(&mut out, &xs, &mut scratch)
                 }),
             ),
             (
                 "FFT",
-                &mut (|(mut out, xs)| _limbs_mul_greater_to_out_fft(&mut out, &xs, &xs)),
+                &mut (|(mut out, xs)| limbs_mul_greater_to_out_fft(&mut out, &xs, &xs)),
             ),
         ],
     );

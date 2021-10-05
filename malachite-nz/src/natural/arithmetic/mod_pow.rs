@@ -10,7 +10,7 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 use natural::arithmetic::add::{
-    _limbs_add_to_out_aliased, limbs_add_same_length_to_out,
+    limbs_add_to_out_aliased, limbs_add_same_length_to_out,
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
@@ -22,14 +22,14 @@ use natural::arithmetic::mod_op::limbs_mod_to_out;
 use natural::arithmetic::mod_power_of_2_pow::limbs_pow_low;
 use natural::arithmetic::mul::mul_low::limbs_mul_low_same_length;
 use natural::arithmetic::mul::mul_mod::{
-    _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
-    _limbs_mul_mod_base_pow_n_minus_1_scratch_len,
+    limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
+    limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
 use natural::arithmetic::mul::{
-    _limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out, limbs_mul_to_out,
+    limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use natural::arithmetic::shr::limbs_shr_to_out;
-use natural::arithmetic::square::{_limbs_square_to_out_basecase, limbs_square_to_out};
+use natural::arithmetic::square::{limbs_square_to_out_basecase, limbs_square_to_out};
 use natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_to_out,
@@ -105,13 +105,13 @@ pub(crate) fn get_window_size(width: u64) -> u64 {
 fn limbs_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb], is: &[Limb]) {
     let ms_len = ms.len();
     assert!(ms_len > 8);
-    let n = _limbs_mul_mod_base_pow_n_minus_1_next_size(ms_len);
+    let n = limbs_mul_mod_base_pow_n_minus_1_next_size(ms_len);
     let mut scratch =
-        vec![0; _limbs_mul_mod_base_pow_n_minus_1_scratch_len(n, ms_len, ms_len) + ms_len + n];
+        vec![0; limbs_mul_mod_base_pow_n_minus_1_scratch_len(n, ms_len, ms_len) + ms_len + n];
     let (scratch_0, scratch) = scratch.split_at_mut(ms_len);
     limbs_mul_low_same_length(scratch_0, &xs[..ms_len], &is[..ms_len]);
     let (scratch_1, scratch_2) = scratch.split_at_mut(n);
-    _limbs_mul_mod_base_pow_n_minus_1(scratch_1, n, scratch_0, ms, scratch_2);
+    limbs_mul_mod_base_pow_n_minus_1(scratch_1, n, scratch_0, ms, scratch_2);
     let two_ms_len = ms_len << 1;
     assert!(two_ms_len > n);
     let m = two_ms_len - n;
@@ -150,7 +150,7 @@ pub fn limbs_mod_pow_odd_scratch_len(n: usize) -> usize {
 }
 
 fn square_using_basecase_mul(out: &mut [Limb], xs: &[Limb]) {
-    _limbs_mul_greater_to_out_basecase(out, xs, xs)
+    limbs_mul_greater_to_out_basecase(out, xs, xs)
 }
 
 fn limbs_redc_limb_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[Limb]) {
@@ -174,27 +174,27 @@ fn select_fns(
     if REDC_1_TO_REDC_N_THRESHOLD < MUL_TOOM22_THRESHOLD {
         if ms_len < REDC_1_TO_REDC_N_THRESHOLD {
             (
-                &_limbs_mul_greater_to_out_basecase,
+                &limbs_mul_greater_to_out_basecase,
                 if REDC_1_TO_REDC_N_THRESHOLD < SQR_BASECASE_THRESHOLD
                     || ms_len < SQR_BASECASE_THRESHOLD
                     || ms_len > SQR_TOOM2_THRESHOLD
                 {
                     &square_using_basecase_mul
                 } else {
-                    &_limbs_square_to_out_basecase
+                    &limbs_square_to_out_basecase
                 },
                 &limbs_redc_limb_helper,
             )
         } else if ms_len < MUL_TOOM22_THRESHOLD {
             (
-                &_limbs_mul_greater_to_out_basecase,
+                &limbs_mul_greater_to_out_basecase,
                 if MUL_TOOM22_THRESHOLD < SQR_BASECASE_THRESHOLD
                     || ms_len < SQR_BASECASE_THRESHOLD
                     || ms_len > SQR_TOOM2_THRESHOLD
                 {
                     &square_using_basecase_mul
                 } else {
-                    &_limbs_square_to_out_basecase
+                    &limbs_square_to_out_basecase
                 },
                 &limbs_redc_helper,
             )
@@ -207,14 +207,14 @@ fn select_fns(
         }
     } else if ms_len < MUL_TOOM22_THRESHOLD {
         (
-            &_limbs_mul_greater_to_out_basecase,
+            &limbs_mul_greater_to_out_basecase,
             if MUL_TOOM22_THRESHOLD < SQR_BASECASE_THRESHOLD
                 || ms_len < SQR_BASECASE_THRESHOLD
                 || ms_len > SQR_TOOM2_THRESHOLD
             {
                 &square_using_basecase_mul
             } else {
-                &_limbs_square_to_out_basecase
+                &limbs_square_to_out_basecase
             },
             &limbs_redc_limb_helper,
         )
@@ -476,7 +476,7 @@ pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
             &scratch_2[..ms_zero_len],
             &ms[..ms_nonzero_len],
         );
-        _limbs_add_to_out_aliased(out, ms_nonzero_len, &scratch_0_1[..ms_len]);
+        limbs_add_to_out_aliased(out, ms_nonzero_len, &scratch_0_1[..ms_len]);
     }
 }
 

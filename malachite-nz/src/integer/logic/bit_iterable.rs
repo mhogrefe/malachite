@@ -323,7 +323,7 @@ impl Natural {
             bits,
             first_true_index: None,
             i: 0,
-            j: bits.significant_bits - 1,
+            j: bits.significant_bits - 1, 
         }
     }
 }

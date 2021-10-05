@@ -5,7 +5,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use natural::Natural;
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
-fn _shr_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
+fn shr_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
 where
     &'a Natural: Shr<T, Output = Natural> + ShrRound<T, Output = Natural>,
 {
@@ -34,7 +34,7 @@ where
     }
 }
 
-fn _shr_assign_unsigned<T>(x: &mut Integer, bits: T)
+fn shr_assign_unsigned<T>(x: &mut Integer, bits: T)
 where
     Natural: ShrAssign<T> + ShrRoundAssign<T>,
 {
@@ -112,7 +112,7 @@ macro_rules! impl_shr_unsigned {
             /// ```
             #[inline]
             fn shr(self, bits: $t) -> Integer {
-                _shr_unsigned_ref(self, bits)
+                shr_unsigned_ref(self, bits)
             }
         }
 
@@ -136,14 +136,14 @@ macro_rules! impl_shr_unsigned {
             /// ```
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
-                _shr_assign_unsigned(self, bits);
+                shr_assign_unsigned(self, bits);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_shr_unsigned);
 
-fn _shr_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Integer,
     bits: S,
 ) -> Integer
@@ -157,7 +157,7 @@ where
     }
 }
 
-fn _shr_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Integer, bits: S)
+fn shr_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Integer, bits: S)
 where
     Integer: ShlAssign<U> + ShrAssign<U>,
 {
@@ -245,7 +245,7 @@ macro_rules! impl_shr_signed {
             /// ```
             #[inline]
             fn shr(self, bits: $t) -> Integer {
-                _shr_signed_ref(self, bits)
+                shr_signed_ref(self, bits)
             }
         }
 
@@ -287,7 +287,7 @@ macro_rules! impl_shr_signed {
             /// ```
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
-                _shr_assign_signed(self, bits)
+                shr_assign_signed(self, bits)
             }
         }
     };

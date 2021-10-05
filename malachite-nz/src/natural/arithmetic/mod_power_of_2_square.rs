@@ -8,16 +8,16 @@ use malachite_base::rounding_modes::RoundingMode;
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
-use natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
-use natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
+use natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
+use natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use natural::arithmetic::mul::mul_low::{
-    _limbs_mul_low_same_length_basecase, limbs_mul_low_same_length,
+    limbs_mul_low_same_length_basecase, limbs_mul_low_same_length,
 };
 use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::square::{
-    _limbs_square_diagonal, _limbs_square_to_out_basecase, limbs_square, limbs_square_to_out,
+    limbs_square_diagonal, limbs_square_to_out_basecase, limbs_square, limbs_square_to_out,
     SQR_FFT_THRESHOLD,
 };
 use natural::InnerNatural::{Large, Small};
@@ -31,7 +31,7 @@ use platform::{
 fn _limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let half_n = n >> 1;
-    _limbs_square_diagonal(out, &xs[..half_n]);
+    limbs_square_diagonal(out, &xs[..half_n]);
     if n.odd() {
         out[n - 1] = xs[half_n].wrapping_square();
     }
@@ -154,9 +154,9 @@ pub fn _limbs_square_low_divide_and_conquer(out: &mut [Limb], xs: &[Limb], scrat
     out_lo.copy_from_slice(&scratch_lo[..len_big]);
     // x1 * x0 * 2^(n2 GMP_NUMB_BITS)
     if len_small < MULLO_BASECASE_THRESHOLD {
-        _limbs_mul_greater_to_out_basecase(scratch_hi, xs_hi, xs_lo);
+        limbs_mul_greater_to_out_basecase(scratch_hi, xs_hi, xs_lo);
     } else if len_small < MULLO_DC_THRESHOLD {
-        _limbs_mul_low_same_length_basecase(scratch_hi, xs_hi, xs_lo);
+        limbs_mul_low_same_length_basecase(scratch_hi, xs_hi, xs_lo);
     } else {
         limbs_mul_low_same_length(scratch_hi, xs_hi, xs_lo);
     }
@@ -190,7 +190,7 @@ pub fn limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
     if len < SQRLO_BASECASE_THRESHOLD {
         // Allocate workspace of fixed size on stack: fast!
         let scratch = &mut [0; SQR_BASECASE_ALLOC];
-        _limbs_square_to_out_basecase(scratch, xs);
+        limbs_square_to_out_basecase(scratch, xs);
         out.copy_from_slice(&scratch[..len]);
     } else if len < SQRLO_DC_THRESHOLD {
         _limbs_square_low_basecase(out, xs);
@@ -202,7 +202,7 @@ pub fn limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
             // For really large operands, use plain mpn_mul_n but throw away upper n limbs of the
             // result.
             if !TUNE_PROGRAM_BUILD && SQRLO_SQR_THRESHOLD > SQR_FFT_THRESHOLD {
-                _limbs_mul_greater_to_out_fft(&mut scratch, xs, xs);
+                limbs_mul_greater_to_out_fft(&mut scratch, xs, xs);
             } else {
                 limbs_square_to_out(&mut scratch, xs);
             }

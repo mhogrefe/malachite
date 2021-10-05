@@ -72,6 +72,26 @@ pub fn pair_2_pair_natural_min_bit_bucketer<'a, T>(
     }
 }
 
+pub fn pair_integer_bit_u64_max_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Integer, u64)> {
+    Bucketer {
+        bucketing_function: &|(x, y)| usize::exact_from(max(x.significant_bits(), *y)),
+        bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
+    }
+}
+
+pub fn pair_2_pair_integer_bit_u64_max_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, (Integer, u64))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y))| usize::exact_from(max(x.significant_bits(), *y)),
+        bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
+    }
+}
+
 pub fn triple_3_pair_natural_max_bit_bucketer<'a, T, U>(
     x_name: &'a str,
     y_name: &'a str,

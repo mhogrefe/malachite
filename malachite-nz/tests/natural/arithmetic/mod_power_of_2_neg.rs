@@ -4,6 +4,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_nz::natural::Natural;
 use std::str::FromStr;
 
+//TODO clean from_str
+
 #[test]
 fn test_mod_power_of_2_neg() {
     let test = |u, pow, out| {

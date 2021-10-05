@@ -10,13 +10,12 @@ use rug;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_in_place_left,
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_slice_sub_in_place_right, limbs_sub,
-    limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb,
-    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
-    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap,
-    limbs_vec_sub_in_place_right,
+    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_greater_in_place_left,
+    limbs_sub_greater_to_out, limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out,
+    limbs_sub_same_length_to_out_with_overlap, limbs_sub_same_length_with_borrow_in_in_place_left,
+    limbs_sub_same_length_with_borrow_in_to_out, limbs_vec_sub_in_place_right,
 };
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
@@ -473,7 +472,7 @@ fn test_limbs_sub_same_length_with_borrow_in_to_out() {
     let test = |xs, ys, borrow_in, out_before: &[Limb], borrow, out_after| {
         let mut out = out_before.to_vec();
         assert_eq!(
-            _limbs_sub_same_length_with_borrow_in_to_out(&mut out, xs, ys, borrow_in),
+            limbs_sub_same_length_with_borrow_in_to_out(&mut out, xs, ys, borrow_in),
             borrow
         );
         assert_eq!(out, out_after);
@@ -548,7 +547,7 @@ fn test_limbs_sub_same_length_with_borrow_in_to_out() {
 #[should_panic]
 fn limbs_sub_same_length_with_borrow_in_to_out_fail_1() {
     let mut out = vec![10, 10];
-    _limbs_sub_same_length_with_borrow_in_to_out(&mut out, &[6, 7, 8], &[1, 2, 3], false);
+    limbs_sub_same_length_with_borrow_in_to_out(&mut out, &[6, 7, 8], &[1, 2, 3], false);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -556,7 +555,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_fail_1() {
 #[should_panic]
 fn limbs_sub_same_length_with_borrow_in_to_out_fail_2() {
     let mut out = vec![10, 10, 10];
-    _limbs_sub_same_length_with_borrow_in_to_out(&mut out, &[6, 7, 8], &[1, 2], false);
+    limbs_sub_same_length_with_borrow_in_to_out(&mut out, &[6, 7, 8], &[1, 2], false);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -565,7 +564,7 @@ fn test_limbs_sub_same_length_with_borrow_in_in_place_left() {
     let test = |xs_before: &[Limb], ys, borrow_in, borrow, xs_after| {
         let mut xs = xs_before.to_vec();
         assert_eq!(
-            _limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs, ys, borrow_in),
+            limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs, ys, borrow_in),
             borrow
         );
         assert_eq!(xs, xs_after);
@@ -626,7 +625,7 @@ fn test_limbs_sub_same_length_with_borrow_in_in_place_left() {
 #[test]
 #[should_panic]
 fn limbs_sub_same_length_with_borrow_in_in_place_left_fail() {
-    _limbs_sub_same_length_with_borrow_in_in_place_left(&mut [6, 7], &[1, 2, 3], false);
+    limbs_sub_same_length_with_borrow_in_in_place_left(&mut [6, 7], &[1, 2, 3], false);
 }
 
 #[cfg(feature = "32_bit_limbs")]

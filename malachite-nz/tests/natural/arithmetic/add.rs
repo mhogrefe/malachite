@@ -4,13 +4,12 @@ use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::add::{
-    _limbs_add_same_length_with_carry_in_in_place_left,
-    _limbs_add_same_length_with_carry_in_to_out, _limbs_add_to_out_aliased, limbs_add,
-    limbs_add_greater, limbs_add_greater_to_out, limbs_add_limb, limbs_add_limb_to_out,
-    limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
-    limbs_slice_add_in_place_either, limbs_slice_add_limb_in_place,
-    limbs_slice_add_same_length_in_place_left, limbs_vec_add_in_place_either,
-    limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
+    limbs_add, limbs_add_greater, limbs_add_greater_to_out, limbs_add_limb, limbs_add_limb_to_out,
+    limbs_add_same_length_to_out, limbs_add_same_length_with_carry_in_in_place_left,
+    limbs_add_same_length_with_carry_in_to_out, limbs_add_to_out, limbs_add_to_out_aliased,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_in_place_either,
+    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
+    limbs_vec_add_in_place_either, limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
 };
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
@@ -376,7 +375,7 @@ fn limbs_add_to_out_fail() {
 fn test_limbs_add_to_out_aliased() {
     let test = |xs_before: &[Limb], in_size, ys: &[Limb], carry, xs_after| {
         let mut xs = xs_before.to_vec();
-        assert_eq!(_limbs_add_to_out_aliased(&mut xs, in_size, ys), carry);
+        assert_eq!(limbs_add_to_out_aliased(&mut xs, in_size, ys), carry);
         assert_eq!(xs, xs_after);
     };
     test(&[], 0, &[], false, vec![]);
@@ -392,7 +391,7 @@ fn test_limbs_add_to_out_aliased() {
 #[should_panic]
 fn limbs_add_to_out_aliased_fail_1() {
     let mut out = vec![6, 7];
-    _limbs_add_to_out_aliased(&mut out, 1, &[1, 2, 3]);
+    limbs_add_to_out_aliased(&mut out, 1, &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -400,7 +399,7 @@ fn limbs_add_to_out_aliased_fail_1() {
 #[should_panic]
 fn limbs_add_to_out_aliased_fail_2() {
     let mut out = vec![6, 7, 8, 9];
-    _limbs_add_to_out_aliased(&mut out, 4, &[1, 2, 3]);
+    limbs_add_to_out_aliased(&mut out, 4, &[1, 2, 3]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -573,7 +572,7 @@ fn test_limbs_add_same_length_with_carry_in_to_out() {
     let test = |xs, ys, carry_in, out_before: &[Limb], carry, out_after| {
         let mut out = out_before.to_vec();
         assert_eq!(
-            _limbs_add_same_length_with_carry_in_to_out(&mut out, xs, ys, carry_in),
+            limbs_add_same_length_with_carry_in_to_out(&mut out, xs, ys, carry_in),
             carry
         );
         assert_eq!(out, out_after);
@@ -661,7 +660,7 @@ fn test_limbs_add_same_length_with_carry_in_to_out() {
 #[should_panic]
 fn limbs_add_same_length_with_carry_in_to_out_fail_1() {
     let mut out = vec![10, 10, 10, 10];
-    _limbs_add_same_length_with_carry_in_to_out(&mut out, &[6, 7], &[1, 2, 3], false);
+    limbs_add_same_length_with_carry_in_to_out(&mut out, &[6, 7], &[1, 2, 3], false);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -669,7 +668,7 @@ fn limbs_add_same_length_with_carry_in_to_out_fail_1() {
 #[should_panic]
 fn limbs_add_same_length_with_carry_in_to_out_fail_2() {
     let mut out = vec![10];
-    _limbs_add_same_length_with_carry_in_to_out(&mut out, &[6, 7], &[1, 2], false);
+    limbs_add_same_length_with_carry_in_to_out(&mut out, &[6, 7], &[1, 2], false);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -678,7 +677,7 @@ fn test_limbs_add_same_length_with_carry_in_in_place_left() {
     let test = |xs_before: &[Limb], ys, carry_in, carry, xs_after| {
         let mut xs = xs_before.to_vec();
         assert_eq!(
-            _limbs_add_same_length_with_carry_in_in_place_left(&mut xs, ys, carry_in),
+            limbs_add_same_length_with_carry_in_in_place_left(&mut xs, ys, carry_in),
             carry
         );
         assert_eq!(xs, xs_after);
@@ -708,7 +707,7 @@ fn test_limbs_add_same_length_with_carry_in_in_place_left() {
 #[should_panic]
 fn limbs_add_same_length_with_carry_in_in_place_left_fail() {
     let mut out = vec![6, 7];
-    _limbs_add_same_length_with_carry_in_in_place_left(&mut out, &[1, 2, 3], false);
+    limbs_add_same_length_with_carry_in_in_place_left(&mut out, &[1, 2, 3], false);
 }
 
 #[test]

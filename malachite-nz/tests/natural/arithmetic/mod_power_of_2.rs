@@ -13,8 +13,6 @@ use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
 
-//TODO clean from_str
-
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_mod_power_of_2_and_limbs_vec_mod_power_of_2_in_place() {
@@ -84,31 +82,33 @@ fn test_limbs_neg_mod_power_of_2_and_limbs_neg_mod_power_of_2_in_place() {
 
 #[test]
 fn test_mod_power_of_2_and_rem_power_of_2() {
-    let test = |u, v: u64, out| {
-        let mut n = Natural::from_str(u).unwrap();
+    let test = |s, v: u64, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        let mut n = u.clone();
         n.mod_power_of_2_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
         assert!(n.mod_power_of_2_is_reduced(v));
 
-        let n = Natural::from_str(u).unwrap().mod_power_of_2(v);
+        let n = u.clone().mod_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).mod_power_of_2(v);
+        let n = (&u).mod_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let mut n = Natural::from_str(u).unwrap();
+        let mut n = u.clone();
         n.rem_power_of_2_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u).unwrap().rem_power_of_2(v);
+        let n = u.clone().rem_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).rem_power_of_2(v);
+        let n = (&u).rem_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };
@@ -137,18 +137,20 @@ fn test_mod_power_of_2_and_rem_power_of_2() {
 
 #[test]
 fn test_neg_mod_power_of_2() {
-    let test = |u, v: u64, out| {
-        let mut n = Natural::from_str(u).unwrap();
+    let test = |s, v: u64, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        let mut n = u.clone();
         n.neg_mod_power_of_2_assign(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
         assert!(n.mod_power_of_2_is_reduced(v));
 
-        let n = Natural::from_str(u).unwrap().neg_mod_power_of_2(v);
+        let n = u.clone().neg_mod_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap()).neg_mod_power_of_2(v);
+        let n = (&u).neg_mod_power_of_2(v);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

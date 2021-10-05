@@ -4,7 +4,7 @@ use malachite_base::num::basic::traits::Zero;
 use natural::Natural;
 use std::cmp::Ordering;
 
-fn _partial_cmp_unsigned<T>(x: &Integer, other: &T) -> Option<Ordering>
+fn partial_cmp_unsigned<T>(x: &Integer, other: &T) -> Option<Ordering>
 where
     Natural: PartialOrd<T>,
 {
@@ -39,7 +39,7 @@ macro_rules! impl_unsigned {
             /// ```
             #[inline]
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
-                _partial_cmp_unsigned(self, other)
+                partial_cmp_unsigned(self, other)
             }
         }
 
@@ -72,7 +72,7 @@ macro_rules! impl_unsigned {
 }
 apply_to_unsigneds!(impl_unsigned);
 
-fn _partial_cmp_signed<U: PartialOrd<Natural>, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn partial_cmp_signed<U: PartialOrd<Natural>, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &Integer,
     other: &S,
 ) -> Option<Ordering>
@@ -116,7 +116,7 @@ macro_rules! impl_signed {
             /// ```
             #[inline]
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
-                _partial_cmp_signed(self, other)
+                partial_cmp_signed(self, other)
             }
         }
 

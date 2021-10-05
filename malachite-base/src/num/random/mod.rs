@@ -67,7 +67,7 @@ impl_trivial_random_primitive_ints!(i64);
 impl_trivial_random_primitive_ints!(i128);
 impl_trivial_random_primitive_ints!(isize);
 
-fn _get_random<T: PrimitiveInt>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
+fn get_random<T: PrimitiveInt>(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> T {
     if state.bits_left == 0 {
         state.x = rng.gen();
         state.bits_left = u32::WIDTH - T::WIDTH;
@@ -90,7 +90,7 @@ macro_rules! impl_thrifty_random_primitive_ints {
 
             #[inline]
             fn get_random(rng: &mut ChaCha20Rng, state: &mut ThriftyRandomState) -> $t {
-                _get_random(rng, state)
+                get_random(rng, state)
             }
         }
     };

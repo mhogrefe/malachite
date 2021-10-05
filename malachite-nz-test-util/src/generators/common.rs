@@ -134,6 +134,18 @@ pub fn integer_pair_1_nrm<T: 'static + Clone>(
     }))
 }
 
+#[allow(clippy::type_complexity)]
+pub fn integer_triple_1_rm<T: 'static + Clone, U: 'static + Clone>(
+    ts: It<(Integer, T, U)>,
+) -> It<((rug::Integer, T, U), (Integer, T, U))> {
+    Box::new(ts.map(|(x, y, z)| {
+        (
+            (integer_to_rug_integer(&x), y.clone(), z.clone()),
+            (x, y, z),
+        )
+    }))
+}
+
 pub fn integer_natural_pair_rm(
     ps: It<(Integer, Natural)>,
 ) -> It<((rug::Integer, rug::Integer), (Integer, Natural))> {

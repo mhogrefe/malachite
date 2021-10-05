@@ -24,6 +24,7 @@ use platform::{DoubleLimb, Limb};
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the result is returned.
+#[doc(hidden)]
 pub fn limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut carry = 0;
     let y = DoubleLimb::from(y);
@@ -66,6 +67,7 @@ pub fn limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// ```
 ///
 /// This is mul_1c from gmp-impl.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_mul_limb_with_carry_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -108,6 +110,7 @@ pub fn limbs_mul_limb_with_carry_to_out(
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2.
+#[doc(hidden)]
 #[inline]
 pub fn limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
     limbs_mul_limb_with_carry_to_out(out, xs, y, 0)
@@ -137,6 +140,7 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
 /// ```
 ///
 /// This is mul_1c from gmp-impl.h, GMP 6.2.1, where the output is the same as the input.
+#[doc(hidden)]
 pub fn limbs_slice_mul_limb_with_carry_in_place(xs: &mut [Limb], y: Limb, mut carry: Limb) -> Limb {
     let y = DoubleLimb::from(y);
     for x in xs.iter_mut() {
@@ -168,6 +172,7 @@ pub fn limbs_slice_mul_limb_with_carry_in_place(xs: &mut [Limb], y: Limb, mut ca
 /// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where rp == up.
+#[doc(hidden)]
 #[inline]
 pub fn limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
     limbs_slice_mul_limb_with_carry_in_place(xs, y, 0)
@@ -195,6 +200,7 @@ pub fn limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the rp == up and instead of
 /// returning the carry, it is appended to rp.
+#[doc(hidden)]
 pub fn limbs_vec_mul_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     let carry = limbs_slice_mul_limb_in_place(xs, y);
     if carry != 0 {

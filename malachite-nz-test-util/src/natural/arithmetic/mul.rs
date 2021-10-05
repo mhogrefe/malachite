@@ -1,5 +1,5 @@
 use malachite_nz::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-use malachite_nz::natural::arithmetic::mul::_limbs_mul_greater_to_out_basecase;
+use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use malachite_nz::platform::{Limb, MUL_TOOM22_THRESHOLD};
 
 // In GMP this is hardcoded to 500
@@ -20,9 +20,9 @@ fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb
     for chunk in xs.chunks(MUL_BASECASE_MAX_UN) {
         let out = &mut out[offset..];
         if chunk.len() >= ys_len {
-            _limbs_mul_greater_to_out_basecase(out, chunk, ys);
+            limbs_mul_greater_to_out_basecase(out, chunk, ys);
         } else {
-            _limbs_mul_greater_to_out_basecase(out, ys, chunk);
+            limbs_mul_greater_to_out_basecase(out, ys, chunk);
         }
         if offset != 0 {
             limbs_slice_add_greater_in_place_left(out, &triangle_buffer[..ys_len]);
@@ -39,13 +39,13 @@ fn limbs_mul_greater_to_out_basecase_mem_opt_helper(out: &mut [Limb], xs: &[Limb
 
 /// A version of `limbs_mul_greater_to_out_basecase` that attempts to be more efficient by
 /// increasing cache locality. It is currently not measurably better than ordinary basecase.
-pub fn _limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+pub fn limbs_mul_greater_to_out_basecase_mem_opt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
     if ys_len > 1 && ys_len < MUL_TOOM22_THRESHOLD && xs.len() > MUL_BASECASE_MAX_UN {
         limbs_mul_greater_to_out_basecase_mem_opt_helper(out, xs, ys)
     } else {
-        _limbs_mul_greater_to_out_basecase(out, xs, ys);
+        limbs_mul_greater_to_out_basecase(out, xs, ys);
     }
 }

@@ -22,6 +22,7 @@ use platform::Limb;
 /// assert_eq!(limbs_count_zeros_neg(&[0, 1, 2]), 33);
 /// assert_eq!(limbs_count_zeros_neg(&[1, u32::MAX]), 32);
 /// ```
+#[doc(hidden)]
 pub fn limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
     let mut sum = 0;
     let mut nonzero_seen = false;

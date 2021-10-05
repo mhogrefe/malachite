@@ -10,7 +10,7 @@ use malachite_base::num::logic::traits::SignificantBits;
 use natural::Natural;
 use std::ops::Neg;
 
-fn _checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(value: &'a Integer) -> Option<T> {
+fn checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(value: &'a Integer) -> Option<T> {
     match *value {
         Integer { sign: false, .. } => None,
         Integer {
@@ -20,7 +20,7 @@ fn _checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(value: &'a Integer) -
     }
 }
 
-fn _wrapping_from_unsigned<'a, T: WrappingFrom<&'a Natural> + WrappingNeg<Output = T>>(
+fn wrapping_from_unsigned<'a, T: WrappingFrom<&'a Natural> + WrappingNeg<Output = T>>(
     value: &'a Integer,
 ) -> T {
     match *value {
@@ -35,7 +35,7 @@ fn _wrapping_from_unsigned<'a, T: WrappingFrom<&'a Natural> + WrappingNeg<Output
     }
 }
 
-fn _saturating_from_unsigned<'a, T: Copy + SaturatingFrom<&'a Natural> + Zero>(
+fn saturating_from_unsigned<'a, T: Copy + SaturatingFrom<&'a Natural> + Zero>(
     value: &'a Integer,
 ) -> T {
     match *value {
@@ -47,7 +47,7 @@ fn _saturating_from_unsigned<'a, T: Copy + SaturatingFrom<&'a Natural> + Zero>(
     }
 }
 
-fn _overflowing_from_unsigned<
+fn overflowing_from_unsigned<
     'a,
     T: OverflowingFrom<&'a Natural> + WrappingFrom<&'a Natural> + WrappingNeg<Output = T>,
 >(
@@ -65,7 +65,7 @@ fn _overflowing_from_unsigned<
     }
 }
 
-fn _checked_from_signed<'a, T: ConvertibleFrom<&'a Integer> + WrappingFrom<&'a Integer>>(
+fn checked_from_signed<'a, T: ConvertibleFrom<&'a Integer> + WrappingFrom<&'a Integer>>(
     value: &'a Integer,
 ) -> Option<T> {
     if T::convertible_from(value) {
@@ -75,7 +75,7 @@ fn _checked_from_signed<'a, T: ConvertibleFrom<&'a Integer> + WrappingFrom<&'a I
     }
 }
 
-fn _saturating_from_signed<
+fn saturating_from_signed<
     'a,
     U: PrimitiveInt + SaturatingFrom<&'a Natural>,
     S: Min + Neg<Output = S> + SaturatingFrom<U> + WrappingFrom<U>,
@@ -101,7 +101,7 @@ fn _saturating_from_signed<
     }
 }
 
-fn _convertible_from_signed<T: PrimitiveInt>(value: &Integer) -> bool {
+fn convertible_from_signed<T: PrimitiveInt>(value: &Integer) -> bool {
     match *value {
         Integer {
             sign: true,
@@ -156,7 +156,7 @@ macro_rules! impl_from {
             /// ```
             #[inline]
             fn checked_from(value: &Integer) -> Option<$u> {
-                _checked_from_unsigned(value)
+                checked_from_unsigned(value)
             }
         }
 
@@ -183,7 +183,7 @@ macro_rules! impl_from {
             /// ```
             #[inline]
             fn wrapping_from(value: &Integer) -> $u {
-                _wrapping_from_unsigned(value)
+                wrapping_from_unsigned(value)
             }
         }
 
@@ -211,7 +211,7 @@ macro_rules! impl_from {
             /// ```
             #[inline]
             fn saturating_from(value: &Integer) -> $u {
-                _saturating_from_unsigned(value)
+                saturating_from_unsigned(value)
             }
         }
 
@@ -248,7 +248,7 @@ macro_rules! impl_from {
             /// ```
             #[inline]
             fn overflowing_from(value: &Integer) -> ($u, bool) {
-                _overflowing_from_unsigned(value)
+                overflowing_from_unsigned(value)
             }
         }
 
@@ -303,7 +303,7 @@ macro_rules! impl_from {
             /// ```
             #[inline]
             fn checked_from(value: &Integer) -> Option<$s> {
-                _checked_from_signed(value)
+                checked_from_signed(value)
             }
         }
 
@@ -358,7 +358,7 @@ macro_rules! impl_from {
             /// ```
             #[inline]
             fn saturating_from(value: &Integer) -> $s {
-                _saturating_from_signed::<$u, $s>(value)
+                saturating_from_signed::<$u, $s>(value)
             }
         }
 
@@ -419,7 +419,7 @@ macro_rules! impl_from {
             /// ```
             #[inline]
             fn convertible_from(value: &Integer) -> bool {
-                _convertible_from_signed::<$u>(value)
+                convertible_from_signed::<$u>(value)
             }
         }
     };

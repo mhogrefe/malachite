@@ -9,8 +9,8 @@ use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::slices::{slice_move_left, slice_set_zero};
 use natural::arithmetic::add::{
-    _limbs_add_same_length_with_carry_in_in_place_left,
-    _limbs_add_same_length_with_carry_in_to_out, limbs_add_limb_to_out,
+    limbs_add_same_length_with_carry_in_in_place_left,
+    limbs_add_same_length_with_carry_in_to_out, limbs_add_limb_to_out,
     limbs_add_same_length_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
@@ -18,8 +18,8 @@ use natural::arithmetic::div::{
     _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook_approx,
 };
 use natural::arithmetic::mul::mul_mod::{
-    _limbs_mul_mod_base_pow_n_minus_1, _limbs_mul_mod_base_pow_n_minus_1_next_size,
-    _limbs_mul_mod_base_pow_n_minus_1_scratch_len,
+    limbs_mul_mod_base_pow_n_minus_1, limbs_mul_mod_base_pow_n_minus_1_next_size,
+    limbs_mul_mod_base_pow_n_minus_1_scratch_len,
 };
 use natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
@@ -27,9 +27,9 @@ use natural::arithmetic::mul::{
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_in_place_left,
-    _limbs_sub_same_length_with_borrow_in_in_place_right,
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_greater_in_place_left,
+    limbs_sub_same_length_with_borrow_in_in_place_left,
+    limbs_sub_same_length_with_borrow_in_in_place_right,
+    limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_greater_in_place_left,
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
@@ -1065,8 +1065,8 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
     let mut scratch2 = vec![];
     let mut mul_size = 0;
     if d_len >= INV_MULMOD_BNM1_THRESHOLD {
-        mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
-        scratch2 = vec![0; _limbs_mul_mod_base_pow_n_minus_1_scratch_len(mul_size, d_len, size)];
+        mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
+        scratch2 = vec![0; limbs_mul_mod_base_pow_n_minus_1_scratch_len(mul_size, d_len, size)];
     }
     while size >= INV_NEWTON_THRESHOLD {
         sizes.push(size);
@@ -1086,7 +1086,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
         // Compute i_j * d
         let ds_hi = &ds[d_len - size..];
         let condition = size < INV_MULMOD_BNM1_THRESHOLD || {
-            mul_size = _limbs_mul_mod_base_pow_n_minus_1_next_size(size + 1);
+            mul_size = limbs_mul_mod_base_pow_n_minus_1_next_size(size + 1);
             mul_size > size + previous_size
         };
         let diff = size - previous_size;
@@ -1101,7 +1101,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
             // Remember we truncated mod B ^ (d + 1)
             // We computed (truncated) xp of length d + 1 <- 1.is * 0.ds
             // Use B ^ mul_size - 1 wraparound
-            _limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds_hi, is_hi, &mut scratch2);
+            limbs_mul_mod_base_pow_n_minus_1(scratch, mul_size, ds_hi, is_hi, &mut scratch2);
             let scratch = &mut scratch[..mul_size + 1];
             // We computed {xp, mul_size} <- {is, previous_d} * {ds, d} mod (B ^ mul_size - 1)
             // We know that 2 * |is * ds + ds * B ^ previous_d - B ^ {previous_d + d}| <
@@ -1117,7 +1117,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
             // Subtract B ^ {previous_d + d}, maybe only compensate the carry
             scratch[mul_size] = 1; // set a limit for decrement
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(size - mul_diff);
-            if !_limbs_add_same_length_with_carry_in_in_place_left(scratch_lo, ds_hi_hi, carry) {
+            if !limbs_add_same_length_with_carry_in_in_place_left(scratch_lo, ds_hi_hi, carry) {
                 assert!(!limbs_sub_limb_in_place(scratch_hi, 1));
             }
             // if decrement eroded xp[mul_size]
@@ -1144,7 +1144,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
             let (scratch_lo, scratch_mid) = scratch_lo.split_at_mut(diff);
             let (ds_hi_lo, ds_hi_hi) = ds_hi.split_at(diff);
             let borrow = limbs_cmp_same_length(scratch_lo, ds_hi_lo) == Ordering::Greater;
-            assert!(!_limbs_sub_same_length_with_borrow_in_to_out(
+            assert!(!limbs_sub_same_length_with_borrow_in_to_out(
                 &mut scratch_hi[diff..],
                 ds_hi_hi,
                 scratch_mid,
@@ -1175,7 +1175,7 @@ pub fn _limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [
                 &scratch_hi[3 * diff - previous_size..diff << 1],
             )
         };
-        if _limbs_add_same_length_with_carry_in_to_out(
+        if limbs_add_same_length_with_carry_in_to_out(
             &mut is[d_len - size..],
             &scratch[a..previous_size << 1],
             &scratch[size + previous_size..size << 1],
@@ -1246,7 +1246,7 @@ pub fn _limbs_div_barrett_large_product(
 ) {
     let d_len = ds.len();
     let (scratch, scratch_out) = scratch.split_at_mut(scratch_len);
-    _limbs_mul_mod_base_pow_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
+    limbs_mul_mod_base_pow_n_minus_1(scratch, scratch_len, ds, qs, scratch_out);
     if d_len + i_len > scratch_len {
         let (rs_hi_lo, rs_hi_hi) = rs_hi.split_at(scratch_len - d_len);
         let carry_1 = limbs_sub_greater_in_place_left(scratch, rs_hi_hi);
@@ -1290,7 +1290,7 @@ fn _limbs_div_mod_barrett_preinverted(
     let scratch_len = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         0
     } else {
-        _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1)
+        limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1)
     };
     let mut n = d_len - i_len;
     for (ns, qs) in ns_lo.rchunks(i_len).zip(qs.rchunks_mut(i_len)) {
@@ -1329,7 +1329,7 @@ fn _limbs_div_mod_barrett_preinverted(
         } else {
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
             // Get next i_len limbs from n.
-            let carry = _limbs_sub_same_length_with_borrow_in_in_place_right(
+            let carry = limbs_sub_same_length_with_borrow_in_in_place_right(
                 rs_lo,
                 scratch_hi,
                 limbs_sub_same_length_in_place_right(ns, scratch_lo),
@@ -1440,8 +1440,8 @@ pub fn _limbs_div_mod_barrett_helper(
 /// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, but nn is omitted
 /// from the arguments as it is unused.
 fn _limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
-    let itch_local = _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
-    let itch_out = _limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, d_len, is_len);
+    let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
+    let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, d_len, is_len);
     itch_local + itch_out
 }
 
@@ -1496,7 +1496,7 @@ pub fn _limbs_div_mod_barrett_large_helper(
     );
     let (scratch_lo, scratch_hi) = scratch.split_at(n);
     let scratch_hi = &scratch_hi[..q_len_plus_one];
-    if _limbs_sub_same_length_with_borrow_in_in_place_left(
+    if limbs_sub_same_length_with_borrow_in_in_place_left(
         rs_hi,
         scratch_hi,
         limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),

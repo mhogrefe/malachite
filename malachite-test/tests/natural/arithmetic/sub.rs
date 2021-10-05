@@ -5,13 +5,12 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::slices::slice_test_zero;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_in_place_left,
-    _limbs_sub_same_length_with_borrow_in_to_out, limbs_slice_sub_in_place_right, limbs_sub,
-    limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb,
-    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_in_place_with_overlap,
-    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap,
-    limbs_vec_sub_in_place_right,
+    limbs_slice_sub_in_place_right, limbs_sub, limbs_sub_greater_in_place_left,
+    limbs_sub_greater_to_out, limbs_sub_limb, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_in_place_with_overlap, limbs_sub_same_length_to_out,
+    limbs_sub_same_length_to_out_with_overlap, limbs_sub_same_length_with_borrow_in_in_place_left,
+    limbs_sub_same_length_with_borrow_in_to_out, limbs_vec_sub_in_place_right,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -285,7 +284,7 @@ fn limbs_sub_same_length_with_borrow_in_to_out_properties() {
             let mut out = out.to_vec();
             let old_out = out.clone();
             let len = xs.len();
-            let n = if _limbs_sub_same_length_with_borrow_in_to_out(&mut out, xs, ys, borrow_in) {
+            let n = if limbs_sub_same_length_with_borrow_in_to_out(&mut out, xs, ys, borrow_in) {
                 let mut n = Integer::from(Natural::from_limbs_asc(xs))
                     - Integer::from(Natural::from_limbs_asc(ys));
                 if borrow_in {
@@ -316,8 +315,7 @@ fn limbs_sub_same_length_with_borrow_in_in_place_left_properties() {
             let mut xs = xs.to_vec();
             let xs_old = xs.clone();
             let len = xs.len();
-            let borrow =
-                _limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs, ys, borrow_in);
+            let borrow = limbs_sub_same_length_with_borrow_in_in_place_left(&mut xs, ys, borrow_in);
             let n = Natural::from_owned_limbs_asc(xs);
             let mut expected_result = if borrow {
                 let bit_len = u64::exact_from(len) << Limb::LOG_WIDTH;

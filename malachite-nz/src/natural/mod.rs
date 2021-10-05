@@ -175,6 +175,7 @@ pub mod arithmetic {
     pub mod add_mul;
     pub mod checked_sub;
     pub mod checked_sub_mul;
+    pub mod coprime_with;
     pub mod div;
     pub mod div_exact;
     pub mod div_mod;
@@ -183,7 +184,9 @@ pub mod arithmetic {
     pub mod divisible_by_power_of_2;
     pub mod eq_mod;
     pub mod eq_mod_power_of_2;
+    pub mod gcd;
     pub mod is_power_of_2;
+    pub mod lcm;
     pub mod log_base;
     pub mod log_base_2;
     pub mod log_base_power_of_2;

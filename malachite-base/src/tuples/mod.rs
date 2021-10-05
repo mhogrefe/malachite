@@ -535,4 +535,45 @@ pub mod exhaustive;
 ///     ]
 /// );
 /// ```
+///
+/// # random_ordered_unique_[n-tuples]
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::chars::random::random_char_inclusive_range;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::tuples::random::random_ordered_unique_pairs;
+///
+/// let ps = random_ordered_unique_pairs(
+///     random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 0, 3)
+/// );
+/// assert_eq!(
+///     ps.take(20).collect_vec().as_slice(),
+///     &[
+///         (0, 1),
+///         (1, 3),
+///         (2, 3),
+///         (1, 3),
+///         (0, 1),
+///         (0, 1),
+///         (2, 3),
+///         (0, 1),
+///         (1, 2),
+///         (2, 3),
+///         (0, 1),
+///         (0, 3),
+///         (1, 2),
+///         (0, 2),
+///         (2, 3),
+///         (0, 1),
+///         (0, 2),
+///         (0, 2),
+///         (2, 3),
+///         (1, 3)
+///     ]
+/// );
+/// ```
 pub mod random;

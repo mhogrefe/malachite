@@ -11,6 +11,8 @@ use natural::Natural;
 use platform::{DoubleLimb, Limb};
 use std::mem::swap;
 
+//TODO doc hidden
+
 /// Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`
 /// and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result
 /// will have no trailing zeros.

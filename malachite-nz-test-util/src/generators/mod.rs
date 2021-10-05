@@ -1,7 +1,8 @@
 use crate::generators::common::{
     integer_natural_pair_rm, integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm,
-    integer_pair_rm, integer_rm, natural_nrm, natural_pair_1_nm, natural_pair_1_nrm,
-    natural_pair_1_rm, natural_pair_nrm, natural_pair_rm, natural_rm, natural_triple_1_rm,
+    integer_pair_rm, integer_rm, integer_triple_1_rm, natural_nrm, natural_pair_1_nm,
+    natural_pair_1_nrm, natural_pair_1_rm, natural_pair_nrm, natural_pair_rm, natural_rm,
+    natural_triple_1_rm,
 };
 use crate::generators::exhaustive::*;
 use crate::generators::random::*;
@@ -126,6 +127,15 @@ where
     )
 }
 
+// All `Integer`s that are negative.
+pub fn integer_gen_var_7() -> Generator<Integer> {
+    Generator::new(
+        &exhaustive_integer_gen_var_7,
+        &random_integer_gen_var_6,
+        &special_random_integer_gen_var_6,
+    )
+}
+
 // -- (Integer, Integer) --
 
 pub fn integer_pair_gen() -> Generator<(Integer, Integer)> {
@@ -164,6 +174,15 @@ pub fn integer_triple_gen() -> Generator<(Integer, Integer, Integer)> {
         &exhaustive_integer_triple_gen,
         &random_integer_triple_gen,
         &special_random_integer_triple_gen,
+    )
+}
+
+// All triples of natural (non-negative) `Integer`s.
+pub fn integer_triple_gen_var_1() -> Generator<(Integer, Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_triple_gen_var_1,
+        &random_integer_triple_gen_var_1,
+        &special_random_integer_triple_gen_var_1,
     )
 }
 
@@ -282,6 +301,15 @@ pub fn integer_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(Int
     )
 }
 
+pub fn integer_unsigned_pair_gen_var_2_rm<T: PrimitiveUnsigned>(
+) -> Generator<((rug::Integer, T), (Integer, T))> {
+    Generator::new(
+        &|| integer_pair_1_rm(exhaustive_integer_unsigned_pair_gen_var_2()),
+        &|config| integer_pair_1_rm(random_integer_unsigned_pair_gen_var_2(config)),
+        &|config| integer_pair_1_rm(special_random_integer_unsigned_pair_gen_var_2(config)),
+    )
+}
+
 // All `(Integer, T)` where `T` is unsigned, small, and positive, and either the `Integer` is
 // non-negative or the `T` is odd.
 pub fn integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(Integer, T)> {
@@ -302,6 +330,32 @@ pub fn integer_unsigned_pair_gen_var_3_nrm<T: PrimitiveUnsigned>(
     )
 }
 
+// -- (Integer, PrimitiveUnsigned, bool) --
+
+// All `(Integer, T, bool)` where `T` is unsigned and small.
+pub fn integer_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, bool)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_bool_triple_gen_var_1,
+        &random_integer_unsigned_bool_triple_gen_var_1,
+        &special_random_integer_unsigned_bool_triple_gen_var_1,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_unsigned_bool_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
+) -> Generator<((rug::Integer, T, bool), (Integer, T, bool))> {
+    Generator::new(
+        &|| integer_triple_1_rm(exhaustive_integer_unsigned_bool_triple_gen_var_1()),
+        &|config| integer_triple_1_rm(random_integer_unsigned_bool_triple_gen_var_1(config)),
+        &|config| {
+            integer_triple_1_rm(special_random_integer_unsigned_bool_triple_gen_var_1(
+                config,
+            ))
+        },
+    )
+}
+
 // -- (Integer, PrimitiveUnsigned, Integer) --
 
 pub fn integer_unsigned_integer_triple_gen<T: PrimitiveUnsigned>(
@@ -310,6 +364,17 @@ pub fn integer_unsigned_integer_triple_gen<T: PrimitiveUnsigned>(
         &exhaustive_integer_unsigned_integer_triple_gen,
         &random_integer_primitive_int_integer_triple_gen,
         &special_random_integer_unsigned_integer_triple_gen,
+    )
+}
+
+// -- (Integer, PrimitiveUnsigned, Natural) --
+
+pub fn integer_unsigned_natural_triple_gen<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, Natural)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_natural_triple_gen,
+        &random_integer_primitive_int_natural_triple_gen,
+        &special_random_integer_unsigned_natural_triple_gen,
     )
 }
 
@@ -323,6 +388,30 @@ pub fn integer_unsigned_unsigned_triple_gen_var_1<T: PrimitiveUnsigned, U: Primi
         &exhaustive_integer_unsigned_unsigned_triple_gen_var_1,
         &random_integer_unsigned_unsigned_triple_gen_var_1,
         &special_random_integer_unsigned_unsigned_triple_gen_var_1,
+    )
+}
+
+// All `(Integer, T, T)` where `T` is unsigned, both `T`s are small, and the first `T` is less than
+// or equal to the second.
+pub fn integer_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, T)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_unsigned_triple_gen_var_2,
+        &random_integer_unsigned_unsigned_triple_gen_var_2,
+        &special_random_integer_unsigned_unsigned_triple_gen_var_2,
+    )
+}
+
+// -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
+
+// All `(Integer, T, T, Natural)` where `T` is unsigned and the first `T` is smaller than the
+// second.
+pub fn integer_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, T, Natural)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_unsigned_natural_quadruple_gen_var_1,
+        &random_integer_unsigned_unsigned_natural_triple_gen_var_1,
+        &special_random_integer_unsigned_unsigned_natural_quadruple_gen_var_1,
     )
 }
 
@@ -348,6 +437,16 @@ pub fn integer_bool_vec_pair_gen_var_1() -> Generator<(Integer, Vec<bool>)> {
         &exhaustive_integer_bool_vec_pair_gen_var_1,
         &random_integer_bool_vec_pair_gen_var_1,
         &special_random_integer_bool_vec_pair_gen_var_1,
+    )
+}
+
+// All `(Integer, Vec<bool>)` pairs where the length of the `Vec` is the twos' complement bit count
+// of the `Integer`, including sign extension bits if necessary.
+pub fn integer_bool_vec_pair_gen_var_2() -> Generator<(Integer, Vec<bool>)> {
+    Generator::new(
+        &exhaustive_integer_bool_vec_pair_gen_var_2,
+        &random_integer_bool_vec_pair_gen_var_2,
+        &special_random_integer_bool_vec_pair_gen_var_2,
     )
 }
 
@@ -1025,10 +1124,24 @@ pub fn unsigned_vec_unsigned_pair_gen_var_4<
 >() -> Generator<(Vec<T>, T)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_pair_gen_var_4::<T, U>,
-        &random_unsigned_vec_unsigned_pair_gen_var_1::<T, U>,
+        &random_unsigned_vec_unsigned_pair_gen_var_8::<T, U>,
         &special_random_unsigned_vec_unsigned_pair_gen_var_4::<T, U>,
     )
 }
+
+// vars 5 through 20 are in malachite-base
+
+// All `(Vec<Limb>, u64)` where the `u64` is small and `limbs_slice_clear_bit_neg` applied to the
+// `Vec` and `u64` doesn't panic.
+pub fn unsigned_vec_unsigned_pair_gen_var_21() -> Generator<(Vec<Limb>, u64)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_pair_gen_var_18,
+        &random_unsigned_vec_unsigned_pair_gen_var_9,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_18,
+    )
+}
+
+// var 22 is in malachite-base
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
 

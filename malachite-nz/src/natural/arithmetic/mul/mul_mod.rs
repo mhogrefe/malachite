@@ -9,11 +9,11 @@ use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
-use natural::arithmetic::mul::fft::{_limbs_mul_fft, _limbs_mul_fft_best_k};
+use natural::arithmetic::mul::fft::{limbs_mul_fft, limbs_mul_fft_best_k};
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_greater_in_place_left,
+    limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_greater_in_place_left,
     limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
     limbs_sub_greater_to_out,
 };
@@ -24,7 +24,7 @@ use std::cmp::min;
 pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
 pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
 
-pub(crate) fn _limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
+pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     n: usize,
     low_threshold: usize,
     high_threshold: usize,
@@ -42,7 +42,7 @@ pub(crate) fn _limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
             n.round_to_multiple_of_power_of_2(3, RoundingMode::Ceiling)
         } else {
             ceiling_half_n.round_to_multiple_of_power_of_2(
-                u64::exact_from(_limbs_mul_fft_best_k(ceiling_half_n, square)),
+                u64::exact_from(limbs_mul_fft_best_k(ceiling_half_n, square)),
                 RoundingMode::Ceiling,
             ) << 1
         }
@@ -56,9 +56,10 @@ pub(crate) fn _limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
 /// Result is O(`n`)
 ///
 /// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
+#[doc(hidden)]
 #[inline]
-pub fn _limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
-    _limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
+pub fn limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
+    limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
         n,
         MULMOD_BNM1_THRESHOLD,
         MUL_FFT_MODF_THRESHOLD,
@@ -73,7 +74,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
 /// Result is O(`n`)
 ///
 /// This is mpn_mulmod_bnm1_itch from gmp-impl.h, GMP 6.2.1.
-pub(crate) const fn _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
+pub(crate) const fn limbs_mul_mod_base_pow_n_minus_1_scratch_len(
     n: usize,
     xs_len: usize,
     ys_len: usize,
@@ -107,7 +108,7 @@ pub(crate) const fn _limbs_mul_mod_base_pow_n_minus_1_scratch_len(
 /// input slices are empty.
 ///
 /// This is mpn_bc_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
-fn _limbs_mul_mod_base_pow_n_minus_1_basecase(
+fn limbs_mul_mod_base_pow_n_minus_1_basecase(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -124,7 +125,7 @@ fn _limbs_mul_mod_base_pow_n_minus_1_basecase(
     }
 }
 
-pub(crate) fn _limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb], n: usize) {
+pub(crate) fn limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb], n: usize) {
     split_into_chunks_mut!(out, n, [out_0, out_1], out_2);
     assert_eq!(out_2[1], 0);
     let mut carry = out_2[0];
@@ -150,11 +151,11 @@ pub(crate) fn _limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out: &mut [Limb],
 /// Panics if `xs`, `ys`, or `out` are too short, or if n is zero.
 ///
 /// This is mpn_bc_mulmod_bnp1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2, where rp == tp.
-fn _limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
+fn limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb], n: usize) {
     assert_ne!(0, n);
     let m = n + 1;
     limbs_mul_same_length_to_out(out, &xs[..m], &ys[..m]);
-    _limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out, n);
+    limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out, n);
 }
 
 // First k to use for an FFT mod-F multiply. A mod-F FFT is an order log(2 ^ k) / log(2 ^ (k - 1))
@@ -168,10 +169,10 @@ pub(crate) const FFT_FIRST_K: usize = 4;
 ///
 /// The result is expected to be 0 if and only if one of the operands already is. Otherwise the
 /// class 0 mod (`Limb::WIDTH`<sup>n</sup> - 1) is represented by 2<sup>n * `Limb::WIDTH`</sup> - 1.
-/// This should not be a problem if `_limbs_mul_mod_base_pow_n_minus_1` is used to combine results
+/// This should not be a problem if `limbs_mul_mod_base_pow_n_minus_1` is used to combine results
 /// and obtain a natural number when one knows in advance that the final value is less than
 /// 2<sup>n * `Limb::WIDTH`</sup> - 1. Moreover it should not be a problem if
-/// `_limbs_mul_mod_base_pow_n_minus_1` is used to compute the full product with `xs.len()` +
+/// `limbs_mul_mod_base_pow_n_minus_1` is used to compute the full product with `xs.len()` +
 /// `ys.len()` <= n, because this condition implies
 /// (2<sup>`Limb::WIDTH` * `xs.len()`</sup> - 1)(2<sup>`Limb::WIDTH` * `ys.len()`</sup> - 1) <
 /// 2<sup>`Limb::WIDTH` * n</sup> - 1.
@@ -191,7 +192,8 @@ pub(crate) const FFT_FIRST_K: usize = 4;
 /// `scratch` are too short.
 ///
 /// This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
-pub fn _limbs_mul_mod_base_pow_n_minus_1(
+#[doc(hidden)]
+pub fn limbs_mul_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,
     xs: &[Limb],
@@ -215,7 +217,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 }
             }
         } else {
-            _limbs_mul_mod_base_pow_n_minus_1_basecase(out, &xs[..n], ys, scratch);
+            limbs_mul_mod_base_pow_n_minus_1_basecase(out, &xs[..n], ys, scratch);
         }
     } else {
         let half_n = n >> 1;
@@ -233,15 +235,15 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
             0
         } else {
             min(
-                _limbs_mul_fft_best_k(half_n, false),
+                limbs_mul_fft_best_k(half_n, false),
                 usize::wrapping_from(half_n.trailing_zeros()),
             )
         };
         let m = half_n + 1;
         if xs_len <= half_n {
-            _limbs_mul_mod_base_pow_n_minus_1(out, half_n, xs, ys, scratch);
+            limbs_mul_mod_base_pow_n_minus_1(out, half_n, xs, ys, scratch);
             if k >= FFT_FIRST_K {
-                scratch[half_n] = Limb::iverson(_limbs_mul_fft(scratch, half_n, xs, ys, k));
+                scratch[half_n] = Limb::iverson(limbs_mul_fft(scratch, half_n, xs, ys, k));
             } else {
                 assert!(sum <= (half_n << 1) | 1);
                 limbs_mul_greater_to_out(scratch, xs, ys);
@@ -267,7 +269,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 assert!(!limbs_slice_add_limb_in_place(scratch_lo, 1));
             }
             if ys_len <= half_n {
-                _limbs_mul_mod_base_pow_n_minus_1(out, half_n, scratch_lo, ys, scratch_hi);
+                limbs_mul_mod_base_pow_n_minus_1(out, half_n, scratch_lo, ys, scratch_hi);
                 let scratch_2 = &mut scratch[m << 1..3 * m];
                 let carry = limbs_sub_greater_to_out(scratch_2, xs_0, xs_1);
                 *scratch_2.last_mut().unwrap() = 0;
@@ -278,7 +280,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 if k >= FFT_FIRST_K {
                     let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
                     scratch_lo[half_n] =
-                        Limb::iverson(_limbs_mul_fft(scratch_lo, half_n, &scratch_hi[..a], ys, k));
+                        Limb::iverson(limbs_mul_fft(scratch_lo, half_n, &scratch_hi[..a], ys, k));
                 } else {
                     let sum_2 = a + ys_len;
                     assert!(sum_2 <= (half_n << 1) + 1);
@@ -307,7 +309,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 if carry {
                     assert!(!limbs_slice_add_limb_in_place(scratch_1, 1));
                 }
-                _limbs_mul_mod_base_pow_n_minus_1(out, half_n, scratch_lo, scratch_1, scratch_2);
+                limbs_mul_mod_base_pow_n_minus_1(out, half_n, scratch_lo, scratch_1, scratch_2);
                 let (scratch_2, scratch_3) = scratch[m << 1..].split_at_mut(m);
                 let carry = limbs_sub_greater_to_out(scratch_2, xs_0, xs_1);
                 *scratch_2.last_mut().unwrap() = 0;
@@ -325,7 +327,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                 let limit_2 = half_n + usize::exact_from(*scratch_3.last_mut().unwrap());
                 let (scratch_lo, scratch_hi) = scratch.split_at_mut(m << 1);
                 if k >= FFT_FIRST_K {
-                    scratch_lo[half_n] = Limb::iverson(_limbs_mul_fft(
+                    scratch_lo[half_n] = Limb::iverson(limbs_mul_fft(
                         scratch_lo,
                         half_n,
                         &scratch_hi[..limit_1],
@@ -333,7 +335,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
                         k,
                     ));
                 } else {
-                    _limbs_mul_mod_base_pow_n_plus_1_basecase(
+                    limbs_mul_mod_base_pow_n_plus_1_basecase(
                         scratch_lo,
                         scratch_hi,
                         &scratch_hi[m..],
@@ -386,7 +388,7 @@ pub fn _limbs_mul_mod_base_pow_n_minus_1(
             let borrow = limbs_sub_same_length_to_out(out_hi, &out_lo[..a], &scratch[..a]);
             let mut carry = scratch[half_n];
             let scratch = &mut scratch[..n - half_n];
-            if _limbs_sub_same_length_with_borrow_in_in_place_right(
+            if limbs_sub_same_length_with_borrow_in_in_place_right(
                 &out[a..n - half_n],
                 &mut scratch[a..],
                 borrow,

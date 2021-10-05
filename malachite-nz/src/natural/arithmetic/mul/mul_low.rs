@@ -3,10 +3,10 @@ use natural::arithmetic::add::{
     limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::fft::_limbs_mul_greater_to_out_fft;
+use natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
-use natural::arithmetic::mul::{_limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out};
+use natural::arithmetic::mul::{limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out};
 use platform::Limb;
 use platform::{
     MULLO_BASECASE_THRESHOLD, MULLO_DC_THRESHOLD, MULLO_MUL_N_THRESHOLD, MUL_FFT_THRESHOLD,
@@ -20,7 +20,8 @@ use platform::{
 /// where n = `xs.len()`
 ///
 /// This is mpn_mullo_basecase from mpn/generic/mullo_basecase.c, GMP 6.1.2, MULLO_VARIANT == 2.
-pub fn _limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+#[doc(hidden)]
+pub fn limbs_mul_low_same_length_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
     assert_ne!(n, 0);
     assert_eq!(ys.len(), n);
@@ -79,7 +80,7 @@ const fn get_n_lo(n: usize) -> usize {
     }
 }
 
-/// See `_limbs_mul_low_same_length_divide_and_conquer` documentation for more details.
+/// See `limbs_mul_low_same_length_divide_and_conquer` documentation for more details.
 ///
 /// Time: worst case O(n<sup>log<sub>8</sub>15</sup>)
 ///
@@ -88,8 +89,9 @@ const fn get_n_lo(n: usize) -> usize {
 /// where n = `xs.len()`
 ///
 /// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2, where rp == tp.
+#[doc(hidden)]
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
+pub fn limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -107,22 +109,22 @@ pub fn _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
     let (out_lo, out_hi) = out.split_at_mut(n);
     // x_1 * y_0 * 2 ^ (n_hi * Limb::WIDTH)
     if n_lo < MULLO_BASECASE_THRESHOLD {
-        _limbs_mul_greater_to_out_basecase(out_hi, xs_hi, ys_lo);
+        limbs_mul_greater_to_out_basecase(out_hi, xs_hi, ys_lo);
     } else if n_lo < MULLO_DC_THRESHOLD {
-        _limbs_mul_low_same_length_basecase(out_hi, xs_hi, ys_lo);
+        limbs_mul_low_same_length_basecase(out_hi, xs_hi, ys_lo);
     } else {
-        _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(out_hi, xs_hi, ys_lo);
+        limbs_mul_low_same_length_divide_and_conquer_shared_scratch(out_hi, xs_hi, ys_lo);
     }
     limbs_slice_add_same_length_in_place_left(&mut out_lo[n_hi..], &out_hi[..n_lo]);
     let xs_lo = &xs[..n_lo];
     let ys_hi = &ys[n_hi..];
     // x_0 * y_1 * 2 ^ (n_hi * Limb::WIDTH)
     if n_lo < MULLO_BASECASE_THRESHOLD {
-        _limbs_mul_greater_to_out_basecase(out_hi, xs_lo, ys_hi);
+        limbs_mul_greater_to_out_basecase(out_hi, xs_lo, ys_hi);
     } else if n_lo < MULLO_DC_THRESHOLD {
-        _limbs_mul_low_same_length_basecase(out_hi, xs_lo, ys_hi);
+        limbs_mul_low_same_length_basecase(out_hi, xs_lo, ys_hi);
     } else {
-        _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(out_hi, xs_lo, ys_hi);
+        limbs_mul_low_same_length_divide_and_conquer_shared_scratch(out_hi, xs_lo, ys_hi);
     }
     limbs_slice_add_same_length_in_place_left(&mut out_lo[n_hi..], &out_hi[..n_lo]);
 }
@@ -199,8 +201,9 @@ pub fn _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(
 /// where n = `xs.len()`
 ///
 /// This is mpn_dc_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2, where rp != tp.
+#[doc(hidden)]
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn _limbs_mul_low_same_length_divide_and_conquer(
+pub fn limbs_mul_low_same_length_divide_and_conquer(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -221,22 +224,22 @@ pub fn _limbs_mul_low_same_length_divide_and_conquer(
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(n);
     // x_1 * y_0 * 2 ^ (n_hi * Limb::WIDTH)
     if n_lo < MULLO_BASECASE_THRESHOLD {
-        _limbs_mul_greater_to_out_basecase(scratch_hi, xs_hi, ys_lo);
+        limbs_mul_greater_to_out_basecase(scratch_hi, xs_hi, ys_lo);
     } else if n_lo < MULLO_DC_THRESHOLD {
-        _limbs_mul_low_same_length_basecase(scratch_hi, xs_hi, ys_lo);
+        limbs_mul_low_same_length_basecase(scratch_hi, xs_hi, ys_lo);
     } else {
-        _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(scratch_hi, xs_hi, ys_lo);
+        limbs_mul_low_same_length_divide_and_conquer_shared_scratch(scratch_hi, xs_hi, ys_lo);
     }
     limbs_add_same_length_to_out(out_hi, &scratch_lo[n_hi..], &scratch_hi[..n_lo]);
     let xs_lo = &xs[..n_lo];
     let ys_hi = &ys[n_hi..];
     // x_0 * y_1 * 2 ^ (n_hi * Limb::WIDTH)
     if n_lo < MULLO_BASECASE_THRESHOLD {
-        _limbs_mul_greater_to_out_basecase(scratch_hi, xs_lo, ys_hi);
+        limbs_mul_greater_to_out_basecase(scratch_hi, xs_lo, ys_hi);
     } else if n_lo < MULLO_DC_THRESHOLD {
-        _limbs_mul_low_same_length_basecase(scratch_hi, xs_lo, ys_hi);
+        limbs_mul_low_same_length_basecase(scratch_hi, xs_lo, ys_hi);
     } else {
-        _limbs_mul_low_same_length_divide_and_conquer_shared_scratch(scratch_hi, xs_lo, ys_hi);
+        limbs_mul_low_same_length_divide_and_conquer_shared_scratch(scratch_hi, xs_lo, ys_hi);
     }
     limbs_slice_add_same_length_in_place_left(out_hi, &scratch_hi[..n_lo]);
 }
@@ -246,13 +249,15 @@ pub fn _limbs_mul_low_same_length_divide_and_conquer(
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_mullo_n_itch from mpn/generic/mullo_n.c, GMP 6.1.2.
-pub const fn _limbs_mul_low_same_length_divide_and_conquer_scratch_len(n: usize) -> usize {
+#[doc(hidden)]
+pub const fn limbs_mul_low_same_length_divide_and_conquer_scratch_len(n: usize) -> usize {
     n << 1
 }
 
 const MULLO_BASECASE_THRESHOLD_LIMIT: usize = MULLO_BASECASE_THRESHOLD;
 
-pub fn _limbs_mul_low_same_length_large(
+#[doc(hidden)]
+pub fn limbs_mul_low_same_length_large(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -262,7 +267,7 @@ pub fn _limbs_mul_low_same_length_large(
     // For really large operands, use plain limbs_mul_same_length_to_out but throw away
     // the upper n limbs of the result.
     if !TUNE_PROGRAM_BUILD && MULLO_MUL_N_THRESHOLD > MUL_FFT_THRESHOLD {
-        _limbs_mul_greater_to_out_fft(scratch, xs, ys);
+        limbs_mul_greater_to_out_fft(scratch, xs, ys);
     } else {
         limbs_mul_same_length_to_out(scratch, xs, ys);
     }
@@ -278,6 +283,7 @@ pub fn _limbs_mul_low_same_length_large(
 /// where n = `xs.len()`
 ///
 /// This is mpn_mullo_n from mpn/generic/mullo_n.c, GMP 6.1.2.
+#[doc(hidden)]
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
@@ -287,16 +293,16 @@ pub fn limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     if n < MULLO_BASECASE_THRESHOLD {
         // Allocate workspace of fixed size on stack: fast!
         let scratch = &mut [0; MULLO_BASECASE_THRESHOLD_LIMIT];
-        _limbs_mul_greater_to_out_basecase(scratch, xs, ys);
+        limbs_mul_greater_to_out_basecase(scratch, xs, ys);
         out.copy_from_slice(&scratch[..n]);
     } else if n < MULLO_DC_THRESHOLD {
-        _limbs_mul_low_same_length_basecase(out, xs, ys);
+        limbs_mul_low_same_length_basecase(out, xs, ys);
     } else {
-        let mut scratch = vec![0; _limbs_mul_low_same_length_divide_and_conquer_scratch_len(n)];
+        let mut scratch = vec![0; limbs_mul_low_same_length_divide_and_conquer_scratch_len(n)];
         if n < MULLO_MUL_N_THRESHOLD {
-            _limbs_mul_low_same_length_divide_and_conquer(out, xs, ys, &mut scratch);
+            limbs_mul_low_same_length_divide_and_conquer(out, xs, ys, &mut scratch);
         } else {
-            _limbs_mul_low_same_length_large(out, xs, ys, &mut scratch);
+            limbs_mul_low_same_length_large(out, xs, ys, &mut scratch);
         }
     }
 }
@@ -308,7 +314,8 @@ pub fn limbs_mul_low_same_length(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// where n = `xs.len()`
 ///
 /// This is mpn_mullo_basecase from mpn/generic/mullo_basecase.c, GMP 6.1.2, MULLO_VARIANT == 1.
-pub fn _limbs_mul_low_same_length_basecase_alt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+#[doc(hidden)]
+pub fn limbs_mul_low_same_length_basecase_alt(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len();
     assert_ne!(n, 0);
     assert_eq!(ys.len(), n);

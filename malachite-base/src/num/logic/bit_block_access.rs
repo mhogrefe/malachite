@@ -7,7 +7,7 @@ use std::ops::Neg;
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-fn _get_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: &T, start: u64, end: u64) -> T {
+fn get_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: &T, start: u64, end: u64) -> T {
     assert!(start <= end);
     if start >= T::WIDTH {
         T::ZERO
@@ -16,7 +16,7 @@ fn _get_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: &T, start: u
     }
 }
 
-fn _assign_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(
+fn assign_bits_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(
     x: &mut T,
     start: u64,
     end: u64,
@@ -64,7 +64,7 @@ macro_rules! impl_bit_block_access_unsigned {
             /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self {
-                _get_bits_unsigned(self, start, end)
+                get_bits_unsigned(self, start, end)
             }
 
             /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
@@ -108,14 +108,14 @@ macro_rules! impl_bit_block_access_unsigned {
             /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
-                _assign_bits_unsigned(self, start, end, bits)
+                assign_bits_unsigned(self, start, end, bits)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_bit_block_access_unsigned);
 
-fn _get_bits_signed<T: ModPowerOf2<Output = U> + Neg<Output = T> + PrimitiveInt, U>(
+fn get_bits_signed<T: ModPowerOf2<Output = U> + Neg<Output = T> + PrimitiveInt, U>(
     x: &T,
     start: u64,
     end: u64,
@@ -129,7 +129,7 @@ fn _get_bits_signed<T: ModPowerOf2<Output = U> + Neg<Output = T> + PrimitiveInt,
     .mod_power_of_2(end - start)
 }
 
-fn _assign_bits_signed<
+fn assign_bits_signed<
     T: PrimitiveInt + UnsignedAbs<Output = U> + WrappingFrom<U>,
     U: BitBlockAccess<Bits = U> + ModPowerOf2<Output = U> + PrimitiveInt,
 >(
@@ -214,7 +214,7 @@ macro_rules! impl_bit_block_access_signed {
             /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn get_bits(&self, start: u64, end: u64) -> Self::Bits {
-                _get_bits_signed(self, start, end)
+                get_bits_signed(self, start, end)
             }
 
             /// Assigns the least-significant `end - start` bits of `bits` to bits `start`
@@ -281,7 +281,7 @@ macro_rules! impl_bit_block_access_signed {
             /// See the documentation of the `num::logic::bit_block_access` module.
             #[inline]
             fn assign_bits(&mut self, start: u64, end: u64, bits: &Self::Bits) {
-                _assign_bits_signed(self, start, end, bits)
+                assign_bits_signed(self, start, end, bits)
             }
         }
     };

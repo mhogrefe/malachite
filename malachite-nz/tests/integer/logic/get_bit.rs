@@ -1,13 +1,19 @@
+use malachite_base::num::arithmetic::traits::PowerOf2;
+use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base::num::logic::traits::BitAccess;
-use rug;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    signed_unsigned_pair_gen_var_1, unsigned_vec_unsigned_pair_gen_var_18,
+};
 use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
 use malachite_nz::integer::Integer;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::platform::Limb;
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::common::integer_to_rug_integer;
+use malachite_nz_test_util::generators::{integer_gen_var_4, integer_unsigned_pair_gen_var_2};
+use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -72,4 +78,42 @@ fn test_get_bit() {
     test("-4294967296", 31, false);
     test("-4294967296", 32, true);
     test("-4294967296", 33, true);
+}
+
+#[test]
+fn limbs_get_bit_neg_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_18().test_properties_with_config(&config, |(xs, index)| {
+        assert_eq!(
+            (-Natural::from_limbs_asc(&xs)).get_bit(index),
+            limbs_get_bit_neg(&xs, index)
+        );
+    });
+}
+
+#[test]
+fn get_bit_properties() {
+    integer_unsigned_pair_gen_var_2().test_properties(|(n, index)| {
+        let bit = n.get_bit(index);
+        assert_eq!(
+            integer_to_rug_integer(&n).get_bit(u32::exact_from(index)),
+            bit
+        );
+        assert_eq!(&n & Integer::power_of_2(index) != 0, bit);
+        assert_eq!(!(!n).get_bit(index), bit);
+    });
+
+    integer_gen_var_4().test_properties(|n| {
+        let significant_bits = n.significant_bits();
+        assert!(!n.get_bit(significant_bits));
+        if n != 0 {
+            assert!(n.get_bit(significant_bits - 1));
+        }
+    });
+
+    signed_unsigned_pair_gen_var_1::<SignedLimb, u64>().test_properties(|(i, index)| {
+        assert_eq!(Integer::from(i).get_bit(index), i.get_bit(index));
+    });
 }

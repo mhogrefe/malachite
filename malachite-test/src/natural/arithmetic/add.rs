@@ -4,8 +4,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::add::{
-    _limbs_add_to_out_aliased, limbs_add, limbs_add_greater, limbs_add_greater_to_out,
-    limbs_add_limb, limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_add, limbs_add_greater, limbs_add_greater_to_out, limbs_add_limb, limbs_add_limb_to_out,
+    limbs_add_same_length_to_out, limbs_add_to_out, limbs_add_to_out_aliased,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_in_place_either,
     limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
     limbs_vec_add_in_place_either, limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
@@ -193,7 +193,7 @@ fn demo_limbs_add_to_out_aliased(gm: GenerationMode, limit: usize) {
     for (xs, in_size, ys) in triples_of_unsigned_vec_usize_and_unsigned_vec_var_1(gm).take(limit) {
         let mut xs = xs.to_vec();
         let xs_old = xs.clone();
-        let carry = _limbs_add_to_out_aliased(&mut xs, in_size, &ys);
+        let carry = limbs_add_to_out_aliased(&mut xs, in_size, &ys);
         println!(
             "xs := {:?}; _limbs_add_to_out_aliased(&mut xs, {}, {:?}) = {}; xs = {:?}",
             xs_old, in_size, ys, carry, xs
@@ -475,9 +475,7 @@ fn benchmark_limbs_add_to_out_aliased(gm: GenerationMode, limit: usize, file_nam
         "xs.len()",
         &mut [(
             "Malachite",
-            &mut (|(mut xs, in_size, ys)| {
-                no_out!(_limbs_add_to_out_aliased(&mut xs, in_size, &ys))
-            }),
+            &mut (|(mut xs, in_size, ys)| no_out!(limbs_add_to_out_aliased(&mut xs, in_size, &ys))),
         )],
     );
 }

@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
 use natural::arithmetic::add::{
-    _limbs_add_to_out_aliased, limbs_add_limb_to_out, limbs_add_same_length_to_out,
+    limbs_add_to_out_aliased, limbs_add_limb_to_out, limbs_add_same_length_to_out,
     limbs_add_to_out, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
@@ -26,7 +26,7 @@ use std::cmp::Ordering;
 ///
 /// This is mpn_toom_eval_dgr3_pm1 in mpn/generic/toom_eval_dgr3_pm1.c, GMP 6.1.2, where s is
 /// omitted from the inputs because it can be determined from ap and n.
-pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
+pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
     v_1: &mut [Limb],
     v_neg_1: &mut [Limb],
     poly: &[Limb],
@@ -64,7 +64,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1(
 ///
 /// This is mpn_toom_eval_dgr3_pm2 from mpn/generic/toom_eval_dg3_pm2.c, GMP 6.1.2, where s is
 /// omitted from the inputs because it can be determined from ap and n.
-pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
+pub(crate) fn limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     v_2: &mut [Limb],
     v_neg_2: &mut [Limb],
     poly: &[Limb],
@@ -84,7 +84,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
     }
     if n_high < n {
         scratch_init[n_high] = limbs_shl_to_out(scratch_init, poly_3, 2);
-        *scratch_last = Limb::iverson(_limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1));
+        *scratch_last = Limb::iverson(limbs_add_to_out_aliased(scratch_init, n_high + 1, poly_1));
     } else {
         *scratch_last = limbs_shl_to_out(scratch_init, poly_3, 2);
         if limbs_slice_add_same_length_in_place_left(scratch_init, poly_1) {
@@ -115,7 +115,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2(
 ///
 /// This is mpn_toom_eval_pm1 from mpn/generic/toom_eval_pm1.c, GMP 6.1.2, where hn is omitted from
 /// the inputs because it can be determined from xp and n.
-pub(crate) fn _limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
+pub(crate) fn limbs_mul_toom_evaluate_poly_in_1_and_neg_1(
     v_1: &mut [Limb],
     v_neg_1: &mut [Limb],
     degree: usize,
@@ -226,7 +226,7 @@ fn shl_2_and_add_with_carry_in_place_left(xs: &mut [Limb], ys: &[Limb], carry: &
 ///
 /// This is mpn_toom_eval_pm2 from mpn/generic/toom_eval_pm2.c, GMP 6.1.2, where hn is omitted from
 /// the inputs because it can be determined from xp and n.
-pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
+pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
     v_2: &mut [Limb],
     v_neg_2: &mut [Limb],
     degree: usize,
@@ -324,7 +324,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_and_neg_2(
 ///
 /// This is mpn_toom_eval_pm2exp from mpn/generic/toom_eval_pm2exp.c, GMP 6.1.2, where hn is omitted
 /// from the inputs because it can be determined from xp and n.
-pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
+pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     v_2_pow: &mut [Limb],
     v_neg_2_pow: &mut [Limb],
     degree: usize,
@@ -404,7 +404,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
 /// where n = `ys.len()`
 ///
 /// This is DO_mpn_addlsh_n from mpn/generic/toom_eval_pm2rexp.c, GMP 6.1.2.
-pub(crate) fn _limbs_shl_and_add_same_length_in_place_left(
+pub(crate) fn limbs_shl_and_add_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     shift: u64,
@@ -430,7 +430,7 @@ pub(crate) fn _limbs_shl_and_add_same_length_in_place_left(
 ///
 /// This is mpn_toom_eval_pm2rexp from mpn/generic/toom_eval_pm2rexp.c, GMP 6.1.2, where t is
 /// omitted from the inputs because it can be determined from ap and n.
-pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     v_2_pow_neg: &mut [Limb],
     v_neg_2_pow_neg: &mut [Limb],
     degree: usize,
@@ -439,7 +439,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     shift: u64,
     scratch: &mut [Limb],
 ) -> bool {
-    assert_ne!(shift, 0); // or `_limbs_mul_toom_evaluate_poly_in_1_and_neg_1` should be used
+    assert_ne!(shift, 0); // or `limbs_mul_toom_evaluate_poly_in_1_and_neg_1` should be used
     assert!(degree > 1);
     let degree_u64 = u64::exact_from(degree);
     assert_eq!(v_2_pow_neg.len(), n + 1);
@@ -458,7 +458,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
             scratch,
             coefficients[degree],
         ));
-        let carry = _limbs_shl_and_add_same_length_in_place_left(
+        let carry = limbs_shl_and_add_same_length_in_place_left(
             v_2_pow_neg,
             coefficients[degree - 1],
             shift,
@@ -469,7 +469,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
     let mut i = 2;
     let mut local_shift = shift * (degree_u64 - 2);
     while i < degree - 1 {
-        let carry = _limbs_shl_and_add_same_length_in_place_left(
+        let carry = limbs_shl_and_add_same_length_in_place_left(
             v_2_pow_neg,
             coefficients[i],
             local_shift,
@@ -478,7 +478,7 @@ pub(crate) fn _limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
         v_2_pow_neg[n].wrapping_add_assign(carry);
         i += 1;
         local_shift -= shift;
-        let carry = _limbs_shl_and_add_same_length_in_place_left(
+        let carry = limbs_shl_and_add_same_length_in_place_left(
             scratch,
             coefficients[i],
             local_shift,

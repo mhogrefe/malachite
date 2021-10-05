@@ -1,18 +1,18 @@
 use num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, CeilingLogBase, CeilingLogBase2,
-    CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2,
-    CheckedNextPowerOf2, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, IsPowerOf2, ModAdd,
-    ModAddAssign, ModIsReduced, ModMul, ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign,
-    ModNeg, ModNegAssign, ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign,
-    ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign, ModPowerOf2IsReduced, ModPowerOf2Mul,
-    ModPowerOf2MulAssign, ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow,
-    ModPowerOf2PowAssign, ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr,
-    ModPowerOf2ShrAssign, ModPowerOf2Square, ModPowerOf2SquareAssign, ModPowerOf2Sub,
-    ModPowerOf2SubAssign, ModSquare, ModSquareAssign, ModSquarePrecomputed,
-    ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign, NegModPowerOf2,
-    NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, RootAssignRem, RootRem, SqrtAssignRem,
-    SqrtRem, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ, XXXSubYYYIsZZZ,
-    XXXXAddYYYYIsZZZZ,
+    CeilingLogBasePowerOf2, CheckedLcm, CheckedLogBase, CheckedLogBase2, CheckedLogBasePowerOf2,
+    CheckedNextPowerOf2, CoprimeWith, FloorLogBase, FloorLogBase2, FloorLogBasePowerOf2, Gcd,
+    GcdAssign, IsPowerOf2, Lcm, LcmAssign, ModAdd, ModAddAssign, ModIsReduced, ModMul,
+    ModMulAssign, ModMulPrecomputed, ModMulPrecomputedAssign, ModNeg, ModNegAssign, ModPow,
+    ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign, ModPowerOf2, ModPowerOf2Add,
+    ModPowerOf2AddAssign, ModPowerOf2IsReduced, ModPowerOf2Mul, ModPowerOf2MulAssign,
+    ModPowerOf2Neg, ModPowerOf2NegAssign, ModPowerOf2Pow, ModPowerOf2PowAssign, ModPowerOf2Shl,
+    ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, ModPowerOf2Square,
+    ModPowerOf2SquareAssign, ModPowerOf2Sub, ModPowerOf2SubAssign, ModSquare, ModSquareAssign,
+    ModSquarePrecomputed, ModSquarePrecomputedAssign, ModSub, ModSubAssign, NegMod, NegModAssign,
+    NegModPowerOf2, NegModPowerOf2Assign, NextPowerOf2, NextPowerOf2Assign, RootAssignRem, RootRem,
+    SqrtAssignRem, SqrtRem, XMulYIsZZ, XXAddYYIsZZ, XXDivModYIsQR, XXSubYYIsZZ, XXXAddYYYIsZZZ,
+    XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
 use num::basic::signeds::PrimitiveSigned;
@@ -29,10 +29,12 @@ pub trait PrimitiveUnsigned:
     + CeilingLogBasePowerOf2<Output = u64>
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
     + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
+    + CheckedLcm<Self, Output = Self>
     + CheckedLogBase<Output = u64>
     + CheckedLogBase2<Output = u64>
     + CheckedLogBasePowerOf2<Output = u64>
     + CheckedNextPowerOf2<Output = Self>
+    + CoprimeWith<Self>
     + FloorLogBase<Output = u64>
     + FloorLogBase2<Output = u64>
     + FloorLogBasePowerOf2<Output = u64>
@@ -43,9 +45,13 @@ pub trait PrimitiveUnsigned:
     + FromOtherTypeSlice<u64>
     + FromOtherTypeSlice<u128>
     + FromOtherTypeSlice<usize>
+    + Gcd<Self, Output = Self>
+    + GcdAssign<Self>
     + HammingDistance
     + IntegerMantissaAndExponent<Self, u64>
     + IsPowerOf2
+    + Lcm<Self, Output = Self>
+    + LcmAssign<Self>
     + ModIsReduced<Self>
     + ModAdd<Self, Self, Output = Self>
     + ModAddAssign<Self, Self>

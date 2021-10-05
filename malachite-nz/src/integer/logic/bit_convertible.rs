@@ -29,6 +29,7 @@ use platform::{Limb, SignedLimb};
 /// bits_to_twos_complement_bits_non_negative(&mut bits);
 /// assert_eq!(bits, &[true, false, true, false]);
 /// ```
+#[doc(hidden)]
 pub fn bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
     if !bits.is_empty() && *bits.last().unwrap() {
         // Sign-extend with an extra false bit to indicate a positive Integer
@@ -58,6 +59,7 @@ pub fn bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
 /// assert!(bits_slice_to_twos_complement_bits_negative(bits));
 /// assert_eq!(bits, &[false, false, false]);
 /// ```
+#[doc(hidden)]
 pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
     let mut true_seen = false;
     for bit in bits.iter_mut() {
@@ -96,6 +98,7 @@ pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
 /// bits_vec_to_twos_complement_bits_negative(&mut bits);
 /// assert_eq!(bits, &[true, true, false, true]);
 /// ```
+#[doc(hidden)]
 pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
     assert!(!bits_slice_to_twos_complement_bits_negative(bits));
     if bits.last() == Some(&false) {

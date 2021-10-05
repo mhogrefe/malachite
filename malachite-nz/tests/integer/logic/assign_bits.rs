@@ -1,13 +1,21 @@
-use malachite_base::num::logic::traits::BitBlockAccess;
+use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Sub, NegModPowerOf2};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::large_type_gen_var_4;
 use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_gen_var_4, integer_gen_var_7, integer_unsigned_natural_triple_gen,
+    integer_unsigned_unsigned_natural_quadruple_gen_var_1, natural_gen,
+    natural_unsigned_pair_gen_var_4, natural_unsigned_unsigned_natural_quadruple_gen_var_1,
+};
 use std::str::FromStr;
 
-#[cfg(feature = "32_bit_limbs")]
 fn verify_limbs_neg_assign_bits(xs: &[Limb], start: u64, end: u64, bits: &[Limb], out: &[Limb]) {
     let old_n = -Natural::from_limbs_asc(xs);
     let mut n = old_n.clone();
@@ -173,4 +181,100 @@ fn test_assign_bits() {
 fn assign_bits_fail() {
     let mut n = Integer::from(123u32);
     n.assign_bits(10, 5, &Natural::from(456u32));
+}
+
+#[test]
+fn limbs_assign_neg_bits_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    large_type_gen_var_4().test_properties_with_config(&config, |(xs_in, start, end, ref bits)| {
+        let mut xs = xs_in.to_vec();
+        limbs_neg_assign_bits(&mut xs, start, end, bits);
+        verify_limbs_neg_assign_bits(&xs_in, start, end, bits, &xs);
+    });
+}
+
+#[test]
+fn assign_bits_properties() {
+    integer_unsigned_unsigned_natural_quadruple_gen_var_1().test_properties(
+        |(n, start, end, bits)| {
+            let old_n = n;
+            let mut n = old_n.clone();
+            n.assign_bits(start, end, &bits);
+            let result = n;
+            let mut n = old_n.clone();
+            assign_bits_naive(&mut n, start, end, &bits);
+            assert_eq!(n, result);
+            n.assign_bits(start, end, &bits);
+            assert_eq!(n, result);
+            let bits_width = end - start;
+            assert_eq!(n.get_bits(start, end), (&bits).mod_power_of_2(bits_width));
+            let mut n = !old_n;
+            let not_bits = bits
+                .neg_mod_power_of_2(bits_width)
+                .mod_power_of_2_sub(Natural::ONE, bits_width);
+            n.assign_bits(start, end, &not_bits);
+            assert_eq!(!n, result);
+        },
+    );
+
+    integer_unsigned_natural_triple_gen().test_properties(|(n, start, bits)| {
+        let old_n = n;
+        let mut n = old_n.clone();
+        n.assign_bits(start, start, &bits);
+        assert_eq!(n, old_n);
+    });
+
+    natural_unsigned_pair_gen_var_4().test_properties(|(bits, start)| {
+        let mut n = Integer::ZERO;
+        n.assign_bits(start, start + bits.significant_bits(), &bits);
+        assert_eq!(n, bits << start);
+    });
+
+    integer_gen().test_properties(|n| {
+        let old_n = n;
+        let mut n = old_n.clone();
+        let significant_bits = old_n.significant_bits();
+        n.assign_bits(
+            0,
+            significant_bits,
+            &(&old_n).mod_power_of_2(significant_bits),
+        );
+        assert_eq!(n, old_n);
+    });
+
+    integer_gen_var_4().test_properties(|n| {
+        let old_n = n;
+        let mut n = old_n.clone();
+        n.assign_bits(0, old_n.significant_bits(), &Natural::ZERO);
+        assert_eq!(n, 0);
+    });
+
+    integer_gen_var_7().test_properties(|n| {
+        let old_n = n;
+        let mut n = old_n.clone();
+        let significant_bits = old_n.significant_bits();
+        n.assign_bits(0, significant_bits, &Natural::low_mask(significant_bits));
+        assert_eq!(n, -1);
+    });
+
+    natural_gen().test_properties(|n| {
+        let old_n = n;
+        let mut n = Integer::ZERO;
+        n.assign_bits(0, old_n.significant_bits(), &old_n);
+        assert_eq!(n, old_n);
+    });
+
+    natural_unsigned_unsigned_natural_quadruple_gen_var_1().test_properties(
+        |(n, start, end, bits)| {
+            let old_n = n;
+            let mut n = old_n.clone();
+            n.assign_bits(start, end, &bits);
+            let result = n;
+            let mut n = Integer::from(old_n);
+            n.assign_bits(start, end, &bits);
+            assert_eq!(n, result);
+        },
+    );
 }

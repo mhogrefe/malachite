@@ -230,40 +230,37 @@ fn test_limbs_mod_power_of_2_add_in_place_either() {
 
 #[test]
 fn test_mod_power_of_2_add() {
-    let test = |u, v, pow, out| {
-        assert!(Natural::from_str(u).unwrap().mod_power_of_2_is_reduced(pow));
-        assert!(Natural::from_str(v).unwrap().mod_power_of_2_is_reduced(pow));
+    let test = |s, t, pow, out| {
+        let u = Natural::from_str(s).unwrap();
+        let v = Natural::from_str(t).unwrap();
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_power_of_2_add_assign(Natural::from_str(v).unwrap(), pow);
+        assert!(u.mod_power_of_2_is_reduced(pow));
+        assert!(v.mod_power_of_2_is_reduced(pow));
+
+        let mut n = u.clone();
+        n.mod_power_of_2_add_assign(v.clone(), pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
         assert!(n.mod_power_of_2_is_reduced(pow));
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_power_of_2_add_assign(&Natural::from_str(v).unwrap(), pow);
+        let mut n = u.clone();
+        n.mod_power_of_2_add_assign(&v, pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_power_of_2_add(Natural::from_str(v).unwrap(), pow);
+        let n = u.clone().mod_power_of_2_add(v.clone(), pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n =
-            (&Natural::from_str(u).unwrap()).mod_power_of_2_add(Natural::from_str(v).unwrap(), pow);
+        let n = (&u).mod_power_of_2_add(v.clone(), pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_power_of_2_add(&Natural::from_str(v).unwrap(), pow);
+        let n = u.clone().mod_power_of_2_add(&v, pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap())
-            .mod_power_of_2_add(&Natural::from_str(v).unwrap(), pow);
+        let n = (&u).mod_power_of_2_add(&v, pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

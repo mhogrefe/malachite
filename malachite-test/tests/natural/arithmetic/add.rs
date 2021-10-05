@@ -2,13 +2,12 @@ use std::cmp::max;
 
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::add::{
-    _limbs_add_same_length_with_carry_in_in_place_left,
-    _limbs_add_same_length_with_carry_in_to_out, _limbs_add_to_out_aliased, limbs_add,
-    limbs_add_greater, limbs_add_greater_to_out, limbs_add_limb, limbs_add_limb_to_out,
-    limbs_add_same_length_to_out, limbs_add_to_out, limbs_slice_add_greater_in_place_left,
-    limbs_slice_add_in_place_either, limbs_slice_add_limb_in_place,
-    limbs_slice_add_same_length_in_place_left, limbs_vec_add_in_place_either,
-    limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
+    limbs_add, limbs_add_greater, limbs_add_greater_to_out, limbs_add_limb, limbs_add_limb_to_out,
+    limbs_add_same_length_to_out, limbs_add_same_length_with_carry_in_in_place_left,
+    limbs_add_same_length_with_carry_in_to_out, limbs_add_to_out, limbs_add_to_out_aliased,
+    limbs_slice_add_greater_in_place_left, limbs_slice_add_in_place_either,
+    limbs_slice_add_limb_in_place, limbs_slice_add_same_length_in_place_left,
+    limbs_vec_add_in_place_either, limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -174,7 +173,7 @@ fn limbs_add_to_out_aliased_properties() {
         |&(ref xs, in_size, ref ys)| {
             let mut xs = xs.to_vec();
             let xs_old = xs.clone();
-            let carry = _limbs_add_to_out_aliased(&mut xs, in_size, ys);
+            let carry = limbs_add_to_out_aliased(&mut xs, in_size, ys);
             let n = Natural::from_limbs_asc(&xs_old[..in_size]) + Natural::from_limbs_asc(ys);
             let mut limbs = n.into_limbs_asc();
             let ys_len = ys.len();
@@ -292,7 +291,7 @@ fn limbs_add_same_length_with_carry_in_to_out_properties() {
         |&(ref out, ref xs, ref ys, carry_in)| {
             let mut out = out.to_vec();
             let old_out = out.clone();
-            let carry = _limbs_add_same_length_with_carry_in_to_out(&mut out, xs, ys, carry_in);
+            let carry = limbs_add_same_length_with_carry_in_to_out(&mut out, xs, ys, carry_in);
             let mut n = Natural::from_limbs_asc(xs) + Natural::from_limbs_asc(ys);
             if carry_in {
                 n += Natural::ONE;
@@ -314,7 +313,7 @@ fn limbs_add_same_length_with_carry_in_in_place_left_properties() {
         |&(ref xs, ref ys, carry_in)| {
             let mut xs = xs.to_vec();
             let xs_old = xs.clone();
-            let carry = _limbs_add_same_length_with_carry_in_in_place_left(&mut xs, ys, carry_in);
+            let carry = limbs_add_same_length_with_carry_in_in_place_left(&mut xs, ys, carry_in);
             let mut n = Natural::from_owned_limbs_asc(xs_old) + Natural::from_limbs_asc(ys);
             if carry_in {
                 n += Natural::ONE;

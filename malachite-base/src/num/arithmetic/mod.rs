@@ -218,6 +218,22 @@ pub mod checked_sub;
 /// assert_eq!((-127i8).checked_sub_mul(2, 100), None);
 /// ```
 pub mod checked_sub_mul;
+/// This module contains functions determining whether two numbers are coprime.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # coprime_with
+/// ```
+/// use malachite_base::num::arithmetic::traits::CoprimeWith;
+///
+/// assert_eq!(0u8.coprime_with(0), false);
+/// assert_eq!(0u8.coprime_with(1), true);
+/// assert_eq!(6u8.coprime_with(1), true);
+/// assert_eq!(3u8.coprime_with(5), true);
+/// assert_eq!(6u8.coprime_with(4), false);
+/// assert_eq!(6u8.coprime_with(35), true);
+/// ```
+pub mod coprime_with;
 /// This module contains functions for unchecked exact division.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -639,6 +655,31 @@ pub mod eq_mod_power_of_2;
 /// assert_eq!(x, -2.0);
 /// ```
 pub mod floor;
+/// This module contains functions for computing the GCD (greatest common divisor) of two numbers.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # gcd
+/// ```
+/// use malachite_base::num::arithmetic::traits::Gcd;
+///
+/// assert_eq!(3u8.gcd(5), 1);
+/// assert_eq!(12u16.gcd(90), 6);
+/// ```
+///
+/// # gcd_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::GcdAssign;
+///
+/// let mut x = 3u8;
+/// x.gcd_assign(5);
+/// assert_eq!(x, 1);
+///
+/// let mut x = 12u16;
+/// x.gcd_assign(90);
+/// assert_eq!(x, 6);
+/// ```
+pub mod gcd;
 /// This module contains functions for determining whether a number is an integer power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -653,6 +694,40 @@ pub mod floor;
 /// assert_eq!((-4.0).is_power_of_2(), false);
 /// ```
 pub mod is_power_of_2;
+/// This module contains functions for computing the LCM (least common multiple) of two numbers.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # lcm
+/// ```
+/// use malachite_base::num::arithmetic::traits::Lcm;
+///
+/// assert_eq!(3u8.lcm(5), 15);
+/// assert_eq!(12u16.lcm(90), 180);
+/// ```
+///
+/// # lcm_assign
+/// ```
+/// use malachite_base::num::arithmetic::traits::LcmAssign;
+///
+/// let mut x = 3u8;
+/// x.lcm_assign(5);
+/// assert_eq!(x, 15);
+///
+/// let mut x = 12u16;
+/// x.lcm_assign(90);
+/// assert_eq!(x, 180);
+/// ```
+///
+/// # lcm
+/// ```
+/// use malachite_base::num::arithmetic::traits::CheckedLcm;
+///
+/// assert_eq!(3u8.checked_lcm(5), Some(15));
+/// assert_eq!(12u16.checked_lcm(90), Some(180));
+/// assert_eq!(120u8.checked_lcm(90), None);
+/// ```
+pub mod lcm;
 /// This module contains functions for taking the base-$b$ logarithm of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -2445,7 +2520,7 @@ pub mod round_to_multiple_of_power_of_2;
 /// assert_eq!(x, 127);
 /// ```
 pub mod saturating_abs;
-/// This module contains functions adding two numbers, saturating at numeric bounds instead of
+/// This module contains functions for adding two numbers, saturating at numeric bounds instead of
 /// overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:

@@ -17,15 +17,15 @@ use natural::arithmetic::div_mod::{
     limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb, limbs_invert_limb,
     limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD,
 };
-use natural::arithmetic::mul::mul_mod::_limbs_mul_mod_base_pow_n_minus_1_next_size;
+use natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
 use natural::arithmetic::mul::{
     limbs_mul_greater_to_out, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use natural::arithmetic::shl::limbs_shl_to_out;
 use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
-    _limbs_sub_same_length_with_borrow_in_in_place_left,
-    _limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_limb_in_place,
+    limbs_sub_same_length_with_borrow_in_in_place_left,
+    limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_limb_in_place,
     limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
     limbs_sub_same_length_to_out,
 };
@@ -522,7 +522,7 @@ fn _limbs_mod_barrett_preinverted(
     let scratch_len = if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
         0
     } else {
-        _limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1)
+        limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1)
     };
     let mut n = d_len - i_len;
     for (ns, qs) in ns_lo.rchunks(i_len).zip(qs.rchunks_mut(i_len)) {
@@ -561,7 +561,7 @@ fn _limbs_mod_barrett_preinverted(
         } else {
             let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
             // Get next i_len limbs from n.
-            let carry = _limbs_sub_same_length_with_borrow_in_in_place_right(
+            let carry = limbs_sub_same_length_with_borrow_in_in_place_right(
                 rs_lo,
                 scratch_hi,
                 limbs_sub_same_length_in_place_right(ns, scratch_lo),
@@ -661,7 +661,7 @@ fn _limbs_mod_barrett_large_helper(
     );
     let (scratch_lo, scratch_hi) = scratch.split_at(n);
     let scratch_hi = &scratch_hi[..q_len_plus_one];
-    if _limbs_sub_same_length_with_borrow_in_in_place_left(
+    if limbs_sub_same_length_with_borrow_in_in_place_left(
         rs_hi,
         scratch_hi,
         limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),

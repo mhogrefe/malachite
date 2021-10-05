@@ -45,7 +45,7 @@ use vecs::exhaustive::{
 /// fn main() {
 ///     let xss = lex_hash_sets_fixed_length(4, 1..=6).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2, 3, 4},
 ///             hashset!{1, 2, 3, 5},
@@ -117,7 +117,7 @@ where
 /// fn main() {
 ///     let xss = shortlex_hash_sets(1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{},
 ///             hashset!{1},
@@ -190,7 +190,7 @@ where
 /// fn main() {
 ///     let xss = shortlex_hash_sets_min_length(2, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 3},
@@ -263,7 +263,7 @@ where
 /// fn main() {
 ///     let xss = shortlex_hash_sets_length_range(2, 4, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 3},
@@ -342,7 +342,7 @@ where
 /// fn main() {
 ///     let xss = shortlex_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 3},
@@ -409,7 +409,7 @@ where
 /// fn main() {
 ///     let xss = lex_hash_sets(1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{},
 ///             hashset!{1},
@@ -479,7 +479,7 @@ where
 /// fn main() {
 ///     let xss = lex_hash_sets_min_length(2, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 2, 3},
@@ -551,7 +551,7 @@ where
 /// fn main() {
 ///     let xss = lex_hash_sets_length_range(2, 4, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 2, 3},
@@ -629,7 +629,7 @@ where
 /// fn main() {
 ///     let xss = lex_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 2, 3},
@@ -695,7 +695,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_hash_sets_fixed_length(4, 1..=6).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///              hashset!{1, 2, 3, 4},
 ///              hashset!{1, 2, 3, 5},
@@ -764,7 +764,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_hash_sets(1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{},
 ///             hashset!{1},
@@ -834,7 +834,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_hash_sets_min_length(2, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 3},
@@ -904,7 +904,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_hash_sets_length_range(2, 4, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 3},
@@ -978,7 +978,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_hash_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             hashset!{1, 2},
 ///             hashset!{1, 3},
@@ -1047,7 +1047,7 @@ where
 /// fn main() {
 ///     let xss = lex_b_tree_sets_fixed_length(4, 1..=6).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2, 3, 4},
 ///             btreeset!{1, 2, 3, 5},
@@ -1119,7 +1119,7 @@ where
 /// fn main() {
 ///     let xss = shortlex_b_tree_sets(1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{},
 ///             btreeset!{1},
@@ -1192,7 +1192,7 @@ where
 /// fn main() {
 ///     let xss = shortlex_b_tree_sets_min_length(2, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 3},
@@ -1265,7 +1265,7 @@ where
 /// fn main() {
 ///     let xss = shortlex_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 3},
@@ -1344,7 +1344,7 @@ where
 /// fn main() {
 ///     let xss = shortlex_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 3},
@@ -1411,7 +1411,7 @@ where
 /// fn main() {
 ///     let xss = lex_b_tree_sets(1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{},
 ///             btreeset!{1},
@@ -1483,7 +1483,7 @@ where
 /// fn main() {
 ///     let xss = lex_b_tree_sets_min_length(2, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 2, 3},
@@ -1555,7 +1555,7 @@ where
 /// fn main() {
 ///     let xss = lex_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 2, 3},
@@ -1633,7 +1633,7 @@ where
 /// fn main() {
 ///     let xss = lex_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 2, 3},
@@ -1699,7 +1699,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_b_tree_sets_fixed_length(4, 1..=6).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2, 3, 4},
 ///             btreeset!{1, 2, 3, 5},
@@ -1768,7 +1768,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_b_tree_sets(1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{},
 ///             btreeset!{1},
@@ -1840,7 +1840,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_b_tree_sets_min_length(2, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 3},
@@ -1910,7 +1910,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_b_tree_sets_length_range(2, 4, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 3},
@@ -1984,7 +1984,7 @@ where
 /// fn main() {
 ///     let xss = exhaustive_b_tree_sets_length_inclusive_range(2, 3, 1..=4).collect_vec();
 ///     assert_eq!(
-///         xss.into_iter().collect_vec().as_slice(),
+///         xss,
 ///         &[
 ///             btreeset!{1, 2},
 ///             btreeset!{1, 3},
