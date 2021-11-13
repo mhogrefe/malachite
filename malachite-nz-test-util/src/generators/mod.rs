@@ -1,8 +1,8 @@
 use crate::generators::common::{
-    integer_natural_pair_rm, integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm,
-    integer_pair_rm, integer_rm, integer_triple_1_rm, natural_nrm, natural_pair_1_nm,
-    natural_pair_1_nrm, natural_pair_1_rm, natural_pair_nrm, natural_pair_rm, natural_rm,
-    natural_triple_1_rm,
+    integer_integer_natural_triple_rm, integer_integer_triple_1_2_rm, integer_natural_pair_rm,
+    integer_nrm, integer_pair_1_nrm, integer_pair_1_rm, integer_pair_nrm, integer_pair_rm,
+    integer_rm, integer_triple_1_rm, natural_nrm, natural_pair_1_nm, natural_pair_1_nrm,
+    natural_pair_1_rm, natural_pair_nrm, natural_pair_rm, natural_rm, natural_triple_1_rm,
 };
 use crate::generators::exhaustive::*;
 use crate::generators::random::*;
@@ -15,9 +15,11 @@ use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, Satura
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::common::Generator;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::arithmetic::gcd::half_gcd::{HalfGcdMatrix, HalfGcdMatrix1};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use num::{BigInt, BigUint};
+use std::ops::{Shl, Shr};
 
 // -- Integer --
 
@@ -136,6 +138,15 @@ pub fn integer_gen_var_7() -> Generator<Integer> {
     )
 }
 
+// All `Integer`s that are nonzero.
+pub fn integer_gen_var_8() -> Generator<Integer> {
+    Generator::new(
+        &exhaustive_integer_gen_var_8,
+        &random_integer_gen_var_7,
+        &special_random_integer_gen_var_7,
+    )
+}
+
 // -- (Integer, Integer) --
 
 pub fn integer_pair_gen() -> Generator<(Integer, Integer)> {
@@ -167,6 +178,70 @@ pub fn integer_pair_gen_nrm() -> Generator<(
     )
 }
 
+// All pairs of `Integer`s where the second `Integer` is nonzero.
+pub fn integer_pair_gen_var_1() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen_var_1,
+        &random_integer_pair_gen_var_1,
+        &special_random_integer_pair_gen_var_1,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_pair_gen_var_1_nrm() -> Generator<(
+    (BigInt, BigInt),
+    (rug::Integer, rug::Integer),
+    (Integer, Integer),
+)> {
+    Generator::new(
+        &|| integer_pair_nrm(exhaustive_integer_pair_gen_var_1()),
+        &|config| integer_pair_nrm(random_integer_pair_gen_var_1(config)),
+        &|config| integer_pair_nrm(special_random_integer_pair_gen_var_1(config)),
+    )
+}
+
+pub fn integer_pair_gen_var_1_rm() -> Generator<((rug::Integer, rug::Integer), (Integer, Integer))>
+{
+    Generator::new(
+        &|| integer_pair_rm(exhaustive_integer_pair_gen_var_1()),
+        &|config| integer_pair_rm(random_integer_pair_gen_var_1(config)),
+        &|config| integer_pair_rm(special_random_integer_pair_gen_var_1(config)),
+    )
+}
+
+// All pairs of `Integer`s where the first `Integer` is divisible by the second, and the second is
+// nonzero.
+pub fn integer_pair_gen_var_2() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen_var_2,
+        &random_integer_pair_gen_var_2,
+        &special_random_integer_pair_gen_var_2,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_pair_gen_var_2_nrm() -> Generator<(
+    (BigInt, BigInt),
+    (rug::Integer, rug::Integer),
+    (Integer, Integer),
+)> {
+    Generator::new(
+        &|| integer_pair_nrm(exhaustive_integer_pair_gen_var_2()),
+        &|config| integer_pair_nrm(random_integer_pair_gen_var_2(config)),
+        &|config| integer_pair_nrm(special_random_integer_pair_gen_var_2(config)),
+    )
+}
+
+// All pairs of `Integer`s where the first `Integer` is not divisible by the second, and the second
+// is nonzero.
+pub fn integer_pair_gen_var_3() -> Generator<(Integer, Integer)> {
+    Generator::new(
+        &exhaustive_integer_pair_gen_var_3,
+        &random_integer_pair_gen_var_3,
+        &special_random_integer_pair_gen_var_3,
+    )
+}
+
 // -- (Integer, Integer, Integer) --
 
 pub fn integer_triple_gen() -> Generator<(Integer, Integer, Integer)> {
@@ -183,6 +258,143 @@ pub fn integer_triple_gen_var_1() -> Generator<(Integer, Integer, Integer)> {
         &exhaustive_integer_triple_gen_var_1,
         &random_integer_triple_gen_var_1,
         &special_random_integer_triple_gen_var_1,
+    )
+}
+
+// -- (Integer, Integer, Integer, PrimitiveUnsigned) --
+
+// All `(Integer, Integer, Integer, T)` where `T` is unsigned and small.
+pub fn integer_integer_integer_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, Integer, Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_integer_integer_unsigned_quadruple_gen_var_1,
+        &random_integer_integer_integer_unsigned_quadruple_gen_var_1,
+        &special_random_integer_integer_integer_unsigned_quadruple_gen_var_1,
+    )
+}
+
+// -- (Integer, Integer, Natural) --
+
+pub fn integer_integer_natural_triple_gen() -> Generator<(Integer, Integer, Natural)> {
+    Generator::new(
+        &exhaustive_integer_integer_natural_triple_gen,
+        &random_integer_integer_natural_triple_gen,
+        &special_random_integer_integer_natural_triple_gen,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_integer_natural_triple_gen_rm() -> Generator<(
+    (rug::Integer, rug::Integer, rug::Integer),
+    (Integer, Integer, Natural),
+)> {
+    Generator::new(
+        &|| integer_integer_natural_triple_rm(exhaustive_integer_integer_natural_triple_gen()),
+        &|config| {
+            integer_integer_natural_triple_rm(random_integer_integer_natural_triple_gen(config))
+        },
+        &|config| {
+            integer_integer_natural_triple_rm(special_random_integer_integer_natural_triple_gen(
+                config,
+            ))
+        },
+    )
+}
+
+// All `(Integer, Integer, Natural)` triples where the first `Integer` is equal to the second mod
+// the `Natural`.
+pub fn integer_integer_natural_triple_gen_var_1() -> Generator<(Integer, Integer, Natural)> {
+    Generator::new(
+        &exhaustive_integer_integer_natural_triple_gen_var_1,
+        &random_integer_integer_natural_triple_gen_var_1,
+        &special_random_integer_integer_natural_triple_gen_var_1,
+    )
+}
+
+// All `(Integer, Integer, Natural)` triples where the first `Integer` is not equal to the second
+// mod the `Natural`.
+pub fn integer_integer_natural_triple_gen_var_2() -> Generator<(Integer, Integer, Natural)> {
+    Generator::new(
+        &exhaustive_integer_integer_natural_triple_gen_var_2,
+        &random_integer_integer_natural_triple_gen_var_2,
+        &special_random_integer_integer_natural_triple_gen_var_2,
+    )
+}
+
+// -- (Integer, Integer, PrimitiveUnsigned) --
+
+// All `(Integer, Integer, T)` where `T` is unsigned and small.
+pub fn integer_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_integer_unsigned_triple_gen_var_1,
+        &random_integer_integer_unsigned_triple_gen_var_1,
+        &special_random_integer_integer_unsigned_triple_gen_var_1,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_integer_unsigned_triple_gen_var_1_rm<T: PrimitiveUnsigned>(
+) -> Generator<((rug::Integer, rug::Integer, T), (Integer, Integer, T))> {
+    Generator::new(
+        &|| integer_integer_triple_1_2_rm(exhaustive_integer_integer_unsigned_triple_gen_var_1()),
+        &|config| {
+            integer_integer_triple_1_2_rm(random_integer_integer_unsigned_triple_gen_var_1(config))
+        },
+        &|config| {
+            integer_integer_triple_1_2_rm(special_random_integer_integer_unsigned_triple_gen_var_1(
+                config,
+            ))
+        },
+    )
+}
+
+// All `(Integer, Integer, T)` where `T` is unsigned and small, and the `Integer`s are equal mod 2
+// to the power of the `T`.
+pub fn integer_integer_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, Integer, T)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Generator::new(
+        &exhaustive_integer_integer_unsigned_triple_gen_var_2,
+        &random_integer_integer_unsigned_triple_gen_var_2,
+        &special_random_integer_integer_unsigned_triple_gen_var_2,
+    )
+}
+
+// All `(Integer, Integer, T)` where `T` is unsigned and small, and the `Integer`s are not equal
+// mod 2 to the power of the `T`.
+pub fn integer_integer_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_integer_unsigned_triple_gen_var_3,
+        &random_integer_integer_unsigned_triple_gen_var_3,
+        &special_random_integer_integer_unsigned_triple_gen_var_3,
+    )
+}
+
+// -- (Integer, Integer, RoundingMode) --
+
+// All `(Integer, Integer, RoundingMode)` triples where the second `Integer` is positive and if the
+// `RoundingMode` is `RoundingMode::Exact`, the first `Integer` is divisible by the second.
+pub fn integer_integer_rounding_mode_triple_gen_var_1(
+) -> Generator<(Integer, Integer, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_integer_rounding_mode_triple_gen_var_1,
+        &random_integer_integer_rounding_mode_triple_gen_var_1,
+        &special_random_integer_integer_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(Integer, Integer, RoundingMode)` triples that are a valid input to
+// `Integer::round_to_multiple`.
+pub fn integer_integer_rounding_mode_triple_gen_var_2(
+) -> Generator<(Integer, Integer, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_integer_rounding_mode_triple_gen_var_2,
+        &random_integer_integer_rounding_mode_triple_gen_var_2,
+        &special_random_integer_integer_rounding_mode_triple_gen_var_2,
     )
 }
 
@@ -234,6 +446,24 @@ pub fn integer_signed_pair_gen_rm<T: PrimitiveSigned>(
     )
 }
 
+// All `(Integer, T)` where `T` is signed and small.
+pub fn integer_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_signed_pair_gen_var_1,
+        &random_integer_signed_pair_gen_var_1,
+        &special_random_integer_signed_pair_gen_var_1,
+    )
+}
+
+pub fn integer_signed_pair_gen_var_1_rm<T: PrimitiveSigned>(
+) -> Generator<((rug::Integer, T), (Integer, T))> {
+    Generator::new(
+        &|| integer_pair_1_rm(exhaustive_integer_signed_pair_gen_var_1()),
+        &|config| integer_pair_1_rm(random_integer_signed_pair_gen_var_1(config)),
+        &|config| integer_pair_1_rm(special_random_integer_signed_pair_gen_var_1(config)),
+    )
+}
+
 // -- (Integer, PrimitiveSigned, Integer) --
 
 pub fn integer_signed_integer_triple_gen<T: PrimitiveSigned>() -> Generator<(Integer, T, Integer)> {
@@ -241,6 +471,36 @@ pub fn integer_signed_integer_triple_gen<T: PrimitiveSigned>() -> Generator<(Int
         &exhaustive_integer_signed_integer_triple_gen,
         &random_integer_primitive_int_integer_triple_gen,
         &special_random_integer_signed_integer_triple_gen,
+    )
+}
+
+// -- (Integer, PrimitiveSigned, RoundingMode) --
+
+// All `(Integer, T, RoundingMode)` where `T` is signed and the triple is a valid input to
+// `Integer::shl_round`.
+pub fn integer_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+) -> Generator<(Integer, T, RoundingMode)>
+where
+    Integer: Shr<T, Output = Integer>,
+{
+    Generator::new(
+        &exhaustive_integer_signed_rounding_mode_triple_gen_var_1,
+        &random_integer_signed_rounding_mode_triple_gen_var_1,
+        &special_random_integer_signed_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(Integer, T, RoundingMode)` where `T` is signed and the triple is a valid input to
+// `Integer::shr_round`.
+pub fn integer_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+) -> Generator<(Integer, T, RoundingMode)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Generator::new(
+        &exhaustive_integer_signed_rounding_mode_triple_gen_var_2,
+        &random_integer_signed_rounding_mode_triple_gen_var_2,
+        &special_random_integer_signed_rounding_mode_triple_gen_var_2,
     )
 }
 
@@ -310,6 +570,16 @@ pub fn integer_unsigned_pair_gen_var_2_rm<T: PrimitiveUnsigned>(
     )
 }
 
+#[allow(clippy::type_complexity)]
+pub fn integer_unsigned_pair_gen_var_2_nrm<T: PrimitiveUnsigned>(
+) -> Generator<((BigInt, T), (rug::Integer, T), (Integer, T))> {
+    Generator::new(
+        &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen_var_2()),
+        &|config| integer_pair_1_nrm(random_integer_unsigned_pair_gen_var_2(config)),
+        &|config| integer_pair_1_nrm(special_random_integer_unsigned_pair_gen_var_2(config)),
+    )
+}
+
 // All `(Integer, T)` where `T` is unsigned, small, and positive, and either the `Integer` is
 // non-negative or the `T` is odd.
 pub fn integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(Integer, T)> {
@@ -327,6 +597,26 @@ pub fn integer_unsigned_pair_gen_var_3_nrm<T: PrimitiveUnsigned>(
         &|| integer_pair_1_nrm(exhaustive_integer_unsigned_pair_gen_var_3()),
         &|config| integer_pair_1_nrm(random_integer_unsigned_pair_gen_var_3(config)),
         &|config| integer_pair_1_nrm(special_random_integer_unsigned_pair_gen_var_3(config)),
+    )
+}
+
+// All `(Integer, u64)`s where the `T` is unsigned and small, and the Integer is divisible by 2 to
+// the power of the `T`.
+pub fn integer_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>() -> Generator<(Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_pair_gen_var_4,
+        &random_integer_unsigned_pair_gen_var_4,
+        &special_random_integer_unsigned_pair_gen_var_4,
+    )
+}
+
+// All `(Integer, u64)`s where the `T` is unsigned and small, and the Integer is not divisible by 2
+// to the power of the `T`.
+pub fn integer_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> Generator<(Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_pair_gen_var_5,
+        &random_integer_unsigned_pair_gen_var_5,
+        &special_random_integer_unsigned_pair_gen_var_5,
     )
 }
 
@@ -402,6 +692,16 @@ pub fn integer_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
     )
 }
 
+// All `(Integer, T, T)` where `T` is unsigned and both `T`s are small.
+pub fn integer_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, T)> {
+    Generator::new(
+        &exhaustive_integer_unsigned_unsigned_triple_gen_var_3,
+        &random_integer_unsigned_unsigned_triple_gen_var_3,
+        &special_random_integer_unsigned_unsigned_triple_gen_var_3,
+    )
+}
+
 // -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
 
 // All `(Integer, T, T, Natural)` where `T` is unsigned and the first `T` is smaller than the
@@ -415,7 +715,42 @@ pub fn integer_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigne
     )
 }
 
+// -- (Integer, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Integer, u64, RoundingMode)` where the triple is a valid input to
+// `Integer::round_to_multiple_of_power_of_2`.
+pub fn integer_unsigned_rounding_mode_triple_gen_var_1() -> Generator<(Integer, u64, RoundingMode)>
+{
+    Generator::new(
+        &exhaustive_integer_unsigned_rounding_mode_triple_gen_var_1,
+        &random_integer_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_integer_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(Integer, T, RoundingMode)` where `T` is unsigned and the triple is a valid input to
+// `Integer::shr_round`.
+pub fn integer_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>(
+) -> Generator<(Integer, T, RoundingMode)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Generator::new(
+        &exhaustive_integer_unsigned_rounding_mode_triple_gen_var_2,
+        &random_integer_unsigned_rounding_mode_triple_gen_var_2,
+        &special_random_integer_unsigned_rounding_mode_triple_gen_var_2,
+    )
+}
+
 // -- (Integer, RoundingMode) --
+
+pub fn integer_rounding_mode_pair_gen() -> Generator<(Integer, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_rounding_mode_pair_gen,
+        &random_integer_rounding_mode_pair_gen,
+        &special_random_integer_rounding_mode_pair_gen,
+    )
+}
 
 // All `(Integer, RoundingMode)` pairs that are valid inputs to `T::rounding_from`.
 pub fn integer_rounding_mode_pair_gen_var_1<
@@ -425,6 +760,15 @@ pub fn integer_rounding_mode_pair_gen_var_1<
         &exhaustive_integer_rounding_mode_pair_gen_var_1::<T>,
         &random_integer_rounding_mode_pair_gen_var_1::<T>,
         &special_random_integer_rounding_mode_pair_gen_var_1::<T>,
+    )
+}
+
+// All `(Integer, RoundingMode)` pairs where the `Integer` is nonzero.
+pub fn integer_rounding_mode_pair_gen_var_2() -> Generator<(Integer, RoundingMode)> {
+    Generator::new(
+        &exhaustive_integer_rounding_mode_pair_gen_var_2,
+        &random_integer_rounding_mode_pair_gen_var_2,
+        &special_random_integer_rounding_mode_pair_gen_var_2,
     )
 }
 
@@ -617,6 +961,57 @@ pub fn natural_pair_gen_var_3() -> Generator<(Natural, Natural)> {
     )
 }
 
+// All pairs of `Natural`s that tend to have large GCDs.
+pub fn natural_pair_gen_var_4() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_4,
+        &random_natural_pair_gen_var_4,
+        &special_random_natural_pair_gen_var_3,
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn natural_pair_gen_var_4_nrm() -> Generator<(
+    (BigUint, BigUint),
+    (rug::Integer, rug::Integer),
+    (Natural, Natural),
+)> {
+    Generator::new(
+        &|| natural_pair_nrm(exhaustive_natural_pair_gen_var_4()),
+        &|config| natural_pair_nrm(random_natural_pair_gen_var_4(config)),
+        &|config| natural_pair_nrm(special_random_natural_pair_gen_var_3(config)),
+    )
+}
+
+// All pairs of `Natural`s where the second `Natural` is positive.
+pub fn natural_pair_gen_var_5() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_5,
+        &random_natural_pair_gen_var_5,
+        &special_random_natural_pair_gen_var_4,
+    )
+}
+
+// All pairs of `Natural`s where the first `Natural` is divisible by the second, and the second is
+// positive.
+pub fn natural_pair_gen_var_6() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_6,
+        &random_natural_pair_gen_var_6,
+        &special_random_natural_pair_gen_var_5,
+    )
+}
+
+// All pairs of `Natural`s where the first `Natural` is not divisible by the second, and the second
+// is positive.
+pub fn natural_pair_gen_var_7() -> Generator<(Natural, Natural)> {
+    Generator::new(
+        &exhaustive_natural_pair_gen_var_7,
+        &random_natural_pair_gen_var_7,
+        &special_random_natural_pair_gen_var_6,
+    )
+}
+
 // -- (Natural, Natural, Natural) --
 
 pub fn natural_triple_gen() -> Generator<(Natural, Natural, Natural)> {
@@ -624,6 +1019,42 @@ pub fn natural_triple_gen() -> Generator<(Natural, Natural, Natural)> {
         &exhaustive_natural_triple_gen,
         &random_natural_triple_gen,
         &special_random_natural_triple_gen,
+    )
+}
+
+// -- (Natural, Natural, PrimitiveUnsigned) --
+
+// All `(Natural, Natural, T)` where `T` is unsigned and small.
+pub fn natural_natural_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(Natural, Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_natural_unsigned_pair_gen_var_1,
+        &random_natural_natural_unsigned_triple_gen_var_1,
+        &special_random_natural_natural_unsigned_triple_gen_var_1,
+    )
+}
+
+// -- (Natural, Natural, RoundingMode) --
+
+// All `(Natural, Natural, RoundingMode)` triples where the second `Natural` is positive and if the
+// `RoundingMode` is `RoundingMode::Exact`, the first `Natural` is divisible by the second.
+pub fn natural_natural_rounding_mode_triple_gen_var_1(
+) -> Generator<(Natural, Natural, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_natural_rounding_mode_triple_gen_var_1,
+        &random_natural_natural_rounding_mode_triple_gen_var_1,
+        &special_random_natural_natural_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(Natural, Natural, RoundingMode)` triples that are a valid input to
+// `Natural::round_to_multiple`.
+pub fn natural_natural_rounding_mode_triple_gen_var_2(
+) -> Generator<(Natural, Natural, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_natural_rounding_mode_triple_gen_var_2,
+        &random_natural_natural_rounding_mode_triple_gen_var_2,
+        &special_random_natural_natural_rounding_mode_triple_gen_var_2,
     )
 }
 
@@ -655,6 +1086,15 @@ pub fn natural_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(Natural
     )
 }
 
+// All `(Natural, T)` where `T` is signed and small.
+pub fn natural_signed_pair_gen_var_2<T: PrimitiveSigned>() -> Generator<(Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_signed_pair_gen_var_2,
+        &random_natural_signed_pair_gen_var_2,
+        &special_random_natural_signed_pair_gen_var_2,
+    )
+}
+
 // -- (Natural, PrimitiveSigned, Natural) --
 
 pub fn natural_signed_natural_triple_gen<T: PrimitiveSigned>() -> Generator<(Natural, T, Natural)> {
@@ -662,6 +1102,36 @@ pub fn natural_signed_natural_triple_gen<T: PrimitiveSigned>() -> Generator<(Nat
         &exhaustive_natural_signed_natural_triple_gen,
         &random_natural_primitive_int_natural_triple_gen,
         &special_random_natural_signed_natural_triple_gen,
+    )
+}
+
+// -- (Natural, PrimitiveSigned, RoundingMode) --
+
+// All `(Natural, T, RoundingMode)` where `T` is signed and the triple is a valid input to
+// `Natural::shl_round`.
+pub fn natural_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+) -> Generator<(Natural, T, RoundingMode)>
+where
+    Natural: Shr<T, Output = Natural>,
+{
+    Generator::new(
+        &exhaustive_natural_signed_rounding_mode_triple_gen_var_1,
+        &random_natural_signed_rounding_mode_triple_gen_var_1,
+        &special_random_natural_signed_rounding_mode_triple_gen_var_1,
+    )
+}
+
+// All `(Natural, T, RoundingMode)` where `T` is signed and the triple is a valid input to
+// `Natural::shr_round`.
+pub fn natural_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+) -> Generator<(Natural, T, RoundingMode)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Generator::new(
+        &exhaustive_natural_signed_rounding_mode_triple_gen_var_2,
+        &random_natural_signed_rounding_mode_triple_gen_var_2,
+        &special_random_natural_signed_rounding_mode_triple_gen_var_2,
     )
 }
 
@@ -921,6 +1391,22 @@ pub fn natural_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigne
     )
 }
 
+// -- (Natural, PrimitiveUnsigned, RoundingMode) --
+
+// All `(Natural, T, RoundingMode)` where `T` is unsigned and the triple is a valid input to
+// `Natural::shr_round`.
+pub fn natural_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(Natural, T, RoundingMode)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Generator::new(
+        &exhaustive_natural_unsigned_rounding_mode_triple_gen_var_1,
+        &random_natural_unsigned_rounding_mode_triple_gen_var_1,
+        &special_random_natural_unsigned_rounding_mode_triple_gen_var_1,
+    )
+}
+
 // -- (Natural, PrimitiveUnsigned, Vec<bool>) --
 
 // All `(Natural, u64, Vec<bool>)` where the `u64` is small and the `Vec<bool>` has as many elements
@@ -946,6 +1432,14 @@ pub fn natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>(
 }
 
 // -- (Natural, RoundingMode) --
+
+pub fn natural_rounding_mode_pair_gen() -> Generator<(Natural, RoundingMode)> {
+    Generator::new(
+        &exhaustive_natural_rounding_mode_pair_gen,
+        &random_natural_rounding_mode_pair_gen,
+        &special_random_natural_rounding_mode_pair_gen,
+    )
+}
 
 // All `(Natural, RoundingMode)` pairs that are valid inputs to `T::rounding_from`.
 pub fn natural_rounding_mode_pair_gen_var_1<
@@ -1143,6 +1637,23 @@ pub fn unsigned_vec_unsigned_pair_gen_var_21() -> Generator<(Vec<Limb>, u64)> {
 
 // var 22 is in malachite-base
 
+// -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// vars 1 through 5 are in malachite-base
+
+// All `(Vec<Limb>, Limb, Limb)`s where both `Limb`s are positive, the `Vec` contains at least two
+// elements, its last element is nonzero, and the first `Limb` is not equal to the second `Limb`
+// mod the `Natural` represented by the `Vec`.
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_6() -> Generator<(Vec<Limb>, Limb, Limb)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_6,
+        &random_unsigned_vec_unsigned_unsigned_triple_gen_var_1,
+        &special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_6,
+    )
+}
+
+// vars 7 through 8 are in malachite-base
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
 
 // All `(Vec<T>, u64, Vec<Limb>)` that are valid inputs to `_limbs_to_digits_small_base`.
@@ -1150,8 +1661,32 @@ pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1<T: PrimitiveUnsigned>
 ) -> Generator<(Vec<T>, u64, Vec<Limb>)> {
     Generator::new(
         &exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1,
-        &random_primitive_int_vec_unsigned_unsigned_vec_triple_gen_var_1,
+        &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1,
         &special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1,
+    )
+}
+
+// All triples of `Vec<Limb>`, `Limb`, and `Vec<Limb>` that meet the preconditions for
+// `limbs_eq_limb_mod`, where the `Natural` represented by the first `Vec` is equal to the negative
+// of the `Limb` mod the `Natural` represented by the second `Vec`.
+pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2(
+) -> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2,
+        &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2,
+        &special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2,
+    )
+}
+
+// All triples of `Vec<Limb>`, `Limb`, and `Vec<Limb>` that meet the preconditions for
+// `limbs_eq_limb_mod`, where the `Natural` represented by the first `Vec` is not equal to the
+// negative of the `Limb` mod the `Natural` represented by the second `Vec`.
+pub fn unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3(
+) -> Generator<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3,
+        &random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3,
+        &special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3,
     )
 }
 
@@ -1197,6 +1732,34 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3<
         &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3,
     )
 }
+
+// vars 4 through 6 are in malachite-base.
+
+// All triples of `Vec<Limb>`, and `Vec<Limb>`, and `Limb` that meet the preconditions for
+// `limbs_eq_mod_limb`, where the `Natural` represented by the first `Vec` is equal to the
+// negative of the `Natural` represented by the second `Vec` mod the `Limb`.
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7(
+) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7,
+        &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7,
+    )
+}
+
+// All triples of `Vec<Limb>`, and `Vec<Limb>`, and `Limb` that meet the preconditions for
+// `limbs_eq_mod_limb`, where the `Natural` represented by the first `Vec` is not equal to the
+// negative of the `Natural` represented by the second `Vec` mod the `Limb`.
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8(
+) -> Generator<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8,
+        &random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8,
+    )
+}
+
+// var 9 is in malachite-base.
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned> --
 
@@ -1410,7 +1973,73 @@ pub fn unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>() -> Generator<(Vec<
     )
 }
 
-// vars 24 through 27 are in malachite-base
+// vars 24 through 36 are in malachite-base
+
+// All triples of `Vec<Limb>` that meet the preconditions for `limbs_eq_mod`, where the `Natural`
+// represented by the first `Vec` is equal to the negative of `Natural` represented by the second
+// `Vec` mod the `Natural` represented by the third `Vec`.
+pub fn unsigned_vec_triple_gen_var_37() -> Generator<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_37,
+        &random_primitive_int_vec_triple_gen_var_36,
+        &special_random_unsigned_vec_triple_gen_var_37,
+    )
+}
+
+// All triples of `Vec<Limb>` that meet the preconditions for `limbs_eq_mod`, where the `Natural`
+// represented by the first `Vec` is not equal to the negative of `Natural` represented by the
+// second `Vec` mod the `Natural` represented by the third `Vec`.
+pub fn unsigned_vec_triple_gen_var_38() -> Generator<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_38,
+        &random_primitive_int_vec_triple_gen_var_37,
+        &special_random_unsigned_vec_triple_gen_var_38,
+    )
+}
+
+// var 39 is in malachite-base
+
+// -- large types --
+
+// vars 1 through 4 are in malachite-base
+
+// All `(HalfGcdMatrix, Vec<Limb>, u8)` that are valid inputs to `HalfGcdMatrix::update_q`.
+pub fn large_type_gen_var_5() -> Generator<(HalfGcdMatrix, Vec<Limb>, u8)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_5,
+        &random_large_type_gen_var_5,
+        &special_random_large_type_gen_var_5,
+    )
+}
+
+// All `(HalfGcdMatrix1, Vec<Limb>, Vec<Limb>, Vec<Limb>)` that are valid inputs to
+// `HalfGcdMatrix1::mul_vector`.
+#[allow(clippy::type_complexity)]
+pub fn large_type_gen_var_6() -> Generator<(HalfGcdMatrix1, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_6,
+        &random_large_type_gen_var_6,
+        &special_random_large_type_gen_var_6,
+    )
+}
+
+// All `(HalfGcdMatrix, HalfGcdMatrix1)` that are valid inputs to `HalfGcdMatrix::mul_matrix_1`.
+pub fn large_type_gen_var_7() -> Generator<(HalfGcdMatrix, HalfGcdMatrix1)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_7,
+        &random_large_type_gen_var_7,
+        &special_random_large_type_gen_var_7,
+    )
+}
+
+// All valid inputs to `limbs_matrix_mul_2_2`.
+pub fn large_type_gen_var_8() -> Generator<T8> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_8,
+        &random_large_type_gen_var_8,
+        &special_random_large_type_gen_var_8,
+    )
+}
 
 pub mod common;
 pub mod exhaustive;

@@ -6,8 +6,8 @@ use natural::arithmetic::add::{
     limbs_add_limb, limbs_add_limb_to_out, limbs_slice_add_limb_in_place,
 };
 use natural::arithmetic::sub::{
-    limbs_sub, limbs_sub_greater_in_place_left, limbs_sub_limb, limbs_sub_limb_in_place,
-    limbs_sub_limb_to_out, limbs_sub_greater_to_out, limbs_vec_sub_in_place_right,
+    limbs_sub, limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb,
+    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_vec_sub_in_place_right,
 };
 use natural::logic::not::limbs_not_in_place;
 use natural::InnerNatural::{Large, Small};
@@ -565,7 +565,7 @@ pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// `xs` and `ys` may not be empty or only contain zeros. The output slice must be at least as long
 /// as the longer of the two input slices. max(`xs.len()`, `ys.len()`) limbs will be written; if the
 /// number of significant limbs of the result is lower, some of the written limbs will be zero.
-/// 
+///
 /// Returns whether there is a carry.
 ///
 /// Time: worst case O(n)

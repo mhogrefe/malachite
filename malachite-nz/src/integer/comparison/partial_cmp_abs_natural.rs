@@ -11,7 +11,7 @@ impl PartialOrdAbs<Natural> for Integer {
     /// Additional memory: worst case O(1)
     ///
     /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
-    /// 
+    ///
     /// # Examples
     /// ```
     /// extern crate malachite_base;

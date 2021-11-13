@@ -7,16 +7,16 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_exact::{
-    _limbs_div_exact_limb_in_place_no_special_3, _limbs_div_exact_limb_no_special_3,
-    _limbs_div_exact_limb_to_out_no_special_3, _limbs_modular_div, _limbs_modular_div_barrett,
-    _limbs_modular_div_barrett_scratch_len, _limbs_modular_div_divide_and_conquer,
-    _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
-    _limbs_modular_div_mod_divide_and_conquer, _limbs_modular_div_mod_schoolbook,
-    _limbs_modular_div_ref, _limbs_modular_div_ref_scratch_len, _limbs_modular_div_schoolbook,
-    _limbs_modular_div_scratch_len, limbs_div_exact, limbs_div_exact_3, limbs_div_exact_3_in_place,
-    limbs_div_exact_3_to_out, limbs_div_exact_limb, limbs_div_exact_limb_in_place,
-    limbs_div_exact_limb_to_out, limbs_div_exact_to_out, limbs_div_exact_to_out_ref_ref,
-    limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref, limbs_modular_invert,
+    limbs_div_exact, limbs_div_exact_3, limbs_div_exact_3_in_place, limbs_div_exact_3_to_out,
+    limbs_div_exact_limb, limbs_div_exact_limb_in_place,
+    limbs_div_exact_limb_in_place_no_special_3, limbs_div_exact_limb_no_special_3,
+    limbs_div_exact_limb_to_out, limbs_div_exact_limb_to_out_no_special_3, limbs_div_exact_to_out,
+    limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref,
+    limbs_modular_div, limbs_modular_div_barrett, limbs_modular_div_barrett_scratch_len,
+    limbs_modular_div_divide_and_conquer, limbs_modular_div_mod_barrett,
+    limbs_modular_div_mod_barrett_scratch_len, limbs_modular_div_mod_divide_and_conquer,
+    limbs_modular_div_mod_schoolbook, limbs_modular_div_ref, limbs_modular_div_ref_scratch_len,
+    limbs_modular_div_schoolbook, limbs_modular_div_scratch_len, limbs_modular_invert,
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
 };
 use malachite_nz::natural::Natural;
@@ -102,7 +102,7 @@ fn limbs_div_exact_limb_properties() {
                 expected_result
             );
             assert_eq!(
-                Natural::from_owned_limbs_asc(_limbs_div_exact_limb_no_special_3(limbs, limb)),
+                Natural::from_owned_limbs_asc(limbs_div_exact_limb_no_special_3(limbs, limb)),
                 expected_result
             );
         },
@@ -123,7 +123,7 @@ fn limbs_div_exact_limb_to_out_properties() {
             assert_eq!(&out[len..], &old_out[len..]);
 
             let mut out = old_out.to_vec();
-            _limbs_div_exact_limb_to_out_no_special_3(&mut out, in_limbs, limb);
+            limbs_div_exact_limb_to_out_no_special_3(&mut out, in_limbs, limb);
             let len = in_limbs.len();
             let expected_result = Natural::from_limbs_asc(in_limbs).div_exact(Natural::from(limb));
             assert_eq!(Natural::from_limbs_asc(&out[..len]), expected_result);
@@ -145,7 +145,7 @@ fn limbs_div_exact_limb_in_place_properties() {
             assert_eq!(Natural::from_owned_limbs_asc(limbs), expected_result);
 
             let mut limbs = old_limbs.to_vec();
-            _limbs_div_exact_limb_in_place_no_special_3(&mut limbs, limb);
+            limbs_div_exact_limb_in_place_no_special_3(&mut limbs, limb);
             let expected_result =
                 Natural::from_limbs_asc(&old_limbs).div_exact(Natural::from(limb));
             assert_eq!(Natural::from_owned_limbs_asc(limbs), expected_result);
@@ -231,7 +231,7 @@ fn limbs_modular_div_mod_schoolbook_properties() {
             let ns_old = ns;
             let mut qs = qs.to_vec();
             let mut ns = ns.to_vec();
-            let borrow = _limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, ds, inverse);
+            let borrow = limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, ds, inverse);
             let q_len = ns.len() - ds.len();
             verify_limbs_modular_div_mod(ns_old, ds, borrow, &qs[..q_len], &ns[q_len..]);
         },
@@ -247,7 +247,7 @@ fn limbs_modular_div_mod_divide_and_conquer_properties() {
             let ns_old = ns;
             let mut qs = qs.to_vec();
             let mut ns = ns.to_vec();
-            let borrow = _limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, ds, inverse);
+            let borrow = limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, ds, inverse);
             let q_len = ns.len() - ds.len();
             verify_limbs_modular_div_mod(ns_old, ds, borrow, &qs[..q_len], &ns[q_len..]);
         },
@@ -263,8 +263,8 @@ fn limbs_modular_div_mod_barrett_properties() {
             let mut qs = qs.to_vec();
             let mut rs = rs.to_vec();
             let mut scratch =
-                vec![0; _limbs_modular_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-            let borrow = _limbs_modular_div_mod_barrett(&mut qs, &mut rs, ns, ds, &mut scratch);
+                vec![0; limbs_modular_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+            let borrow = limbs_modular_div_mod_barrett(&mut qs, &mut rs, ns, ds, &mut scratch);
             let q_len = ns.len() - ds.len();
             verify_limbs_modular_div_mod(ns, ds, borrow, &qs[..q_len], &rs[..ds.len()]);
         },
@@ -279,7 +279,7 @@ fn limbs_modular_div_schoolbook_properties() {
             let ns_old = ns;
             let mut qs = qs.to_vec();
             let mut ns = ns.to_vec();
-            _limbs_modular_div_schoolbook(&mut qs, &mut ns, ds, inverse);
+            limbs_modular_div_schoolbook(&mut qs, &mut ns, ds, inverse);
             verify_limbs_modular_div(ns_old, ds, &qs);
         },
     );
@@ -294,7 +294,7 @@ fn limbs_modular_div_divide_and_conquer_properties() {
             let ns_old = ns;
             let mut qs = qs.to_vec();
             let mut ns = ns.to_vec();
-            _limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, ds, inverse);
+            limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, ds, inverse);
             verify_limbs_modular_div(ns_old, ds, &qs);
         },
     );
@@ -307,8 +307,8 @@ fn limbs_modular_div_barrett_properties() {
         triples_of_limb_vec_var_50,
         |&(ref qs, ref ns, ref ds)| {
             let mut qs = qs.to_vec();
-            let mut scratch = vec![0; _limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
-            _limbs_modular_div_barrett(&mut qs, ns, ds, &mut scratch);
+            let mut scratch = vec![0; limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
+            limbs_modular_div_barrett(&mut qs, ns, ds, &mut scratch);
             verify_limbs_modular_div(ns, ds, &qs[..ns.len()]);
         },
     );
@@ -323,13 +323,13 @@ fn limbs_modular_div_properties() {
             let qs_old = qs;
             let mut qs = qs_old.to_vec();
             let mut mut_ns = ns.to_vec();
-            let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
-            _limbs_modular_div(&mut qs, &mut mut_ns, ds, &mut scratch);
+            let mut scratch = vec![0; limbs_modular_div_scratch_len(ns.len(), ds.len())];
+            limbs_modular_div(&mut qs, &mut mut_ns, ds, &mut scratch);
             let result = qs;
 
             let mut qs = qs_old.to_vec();
-            let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
-            _limbs_modular_div_ref(&mut qs, ns, ds, &mut scratch);
+            let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+            limbs_modular_div_ref(&mut qs, ns, ds, &mut scratch);
             assert_eq!(qs, result);
 
             verify_limbs_modular_div(ns, ds, &qs[..ns.len()]);

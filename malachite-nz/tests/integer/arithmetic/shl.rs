@@ -1,7 +1,22 @@
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::arithmetic::traits::{Abs, IsPowerOf2, PowerOf2, ShlRound, UnsignedAbs};
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{signed_gen, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_nz_test_util::common::{
+    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
+};
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_signed_pair_gen_var_1, integer_unsigned_pair_gen_var_2,
+    natural_signed_pair_gen_var_2, natural_unsigned_pair_gen_var_4,
+};
 use num::BigInt;
 use rug;
+use std::ops::{Shl, ShlAssign, Shr};
 use std::str::FromStr;
 
 macro_rules! tests_unsigned {
@@ -270,3 +285,121 @@ tests_signed!(
 tests_signed!(i64, test_shl_i64, i, j, out, {}, n);
 tests_signed!(i128, test_shl_i128, i, j, out, {}, n);
 tests_signed!(isize, test_shl_isize, i, j, out, {}, n);
+
+fn shl_properties_helper_unsigned<T: PrimitiveUnsigned>()
+where
+    Integer: Shl<T, Output = Integer> + ShlAssign<T> + Shr<T, Output = Integer>,
+    for<'a> &'a Integer: Shl<T, Output = Integer>,
+    for<'a> &'a Natural: Shl<T, Output = Natural>,
+    u64: CheckedFrom<T>,
+{
+    integer_unsigned_pair_gen_var_2::<T>().test_properties(|(n, u)| {
+        let mut mut_n = n.clone();
+        mut_n <<= u;
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+
+        let shifted_alt = &n << u;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+        let shifted_alt = n.clone() << u;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        assert!((&n << u).abs() >= (&n).abs());
+        assert_eq!(-&n << u, -(&n << u));
+
+        assert_eq!(&n << u, &n * Integer::power_of_2(u64::exact_from(u)));
+        assert_eq!(&n << u >> u, n);
+    });
+
+    integer_gen().test_properties(|n| {
+        assert_eq!(&n << T::ZERO, n);
+    });
+
+    unsigned_gen_var_5::<T>().test_properties(|u| {
+        assert_eq!(Integer::ZERO << u, 0);
+        assert!(Natural::exact_from(Integer::ONE << u).is_power_of_2());
+    });
+
+    natural_unsigned_pair_gen_var_4::<T>().test_properties(|(n, u)| {
+        assert_eq!(&n << u, Integer::from(n) << u);
+    });
+}
+
+fn shl_properties_helper_signed<T: PrimitiveSigned>()
+where
+    Integer: Shl<T, Output = Integer> + ShlAssign<T>,
+    for<'a> &'a Integer: Shl<T, Output = Integer>
+        + Shl<<T as UnsignedAbs>::Output, Output = Integer>
+        + ShlRound<T, Output = Integer>,
+    for<'a> &'a Natural: Shl<T, Output = Natural>,
+{
+    integer_signed_pair_gen_var_1::<T>().test_properties(|(n, i)| {
+        let mut mut_n = n.clone();
+        mut_n <<= i;
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+
+        let shifted_alt = &n << i;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+        let shifted_alt = n.clone() << i;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        assert_eq!((&n).shl_round(i, RoundingMode::Floor), shifted);
+
+        if i >= T::ZERO {
+            assert_eq!(&n << i.unsigned_abs(), shifted);
+        }
+    });
+
+    integer_gen().test_properties(|n| {
+        assert_eq!(&n << T::ZERO, n);
+    });
+
+    signed_gen::<T>().test_properties(|i| {
+        assert_eq!(Integer::ZERO << i, 0);
+    });
+
+    natural_signed_pair_gen_var_2::<T>().test_properties(|(n, i)| {
+        assert_eq!(&n << i, Integer::from(n) << i);
+    });
+}
+
+#[test]
+fn shl_properties() {
+    apply_fn_to_unsigneds!(shl_properties_helper_unsigned);
+    apply_fn_to_signeds!(shl_properties_helper_signed);
+
+    integer_unsigned_pair_gen_var_2::<u32>().test_properties(|(n, u)| {
+        let shifted = &n << u;
+        let mut rug_n = integer_to_rug_integer(&n);
+        rug_n <<= u;
+        assert_eq!(rug_integer_to_integer(&rug_n), shifted);
+        assert_eq!(
+            bigint_to_integer(&(&integer_to_bigint(&n) << usize::exact_from(u))),
+            shifted
+        );
+        assert_eq!(
+            bigint_to_integer(&(integer_to_bigint(&n) << usize::exact_from(u))),
+            shifted
+        );
+        assert_eq!(
+            rug_integer_to_integer(&(integer_to_rug_integer(&n) << u)),
+            shifted
+        );
+    });
+
+    integer_signed_pair_gen_var_1::<i32>().test_properties(|(n, i)| {
+        let shifted = &n << i;
+        let mut rug_n = integer_to_rug_integer(&n);
+        rug_n <<= i;
+        assert_eq!(rug_integer_to_integer(&rug_n), shifted);
+        assert_eq!(
+            rug_integer_to_integer(&(integer_to_rug_integer(&n) << i)),
+            shifted
+        );
+    });
+}

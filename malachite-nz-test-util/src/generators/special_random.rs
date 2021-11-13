@@ -1,9 +1,19 @@
 use crate::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
 };
-use malachite_base::bools::random::random_bools;
+use crate::generators::exhaustive::{
+    filter_helper_1, filter_helper_2, filter_helper_3, filter_map_helper_1, filter_map_helper_2,
+    filter_map_helper_3, round_to_multiple_integer_filter_map,
+    round_to_multiple_natural_filter_map,
+};
+use crate::generators::T8;
+use crate::natural::arithmetic::gcd::half_gcd_matrix_create;
+use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::iterators::with_special_value;
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, Parity, PowerOf2};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity,
+    PowerOf2, RoundToMultipleOfPowerOf2Assign,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -14,15 +24,16 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::{BitAccess, BitConvertible, SignificantBits};
 use malachite_base::num::random::geometric::{
-    geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_unsigneds,
-    GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
+    geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_signeds,
+    geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
+    GeometricRandomSigneds,
 };
 use malachite_base::num::random::striped::{
     get_striped_bool_vec, get_striped_unsigned_vec, striped_random_natural_signeds,
-    striped_random_signeds, striped_random_unsigned_bit_chunks, striped_random_unsigned_vecs,
-    striped_random_unsigned_vecs_length_range, striped_random_unsigned_vecs_min_length,
-    striped_random_unsigneds, StripedBitSource, StripedRandomUnsignedBitChunks,
-    StripedRandomUnsignedVecs,
+    striped_random_positive_unsigneds, striped_random_signeds, striped_random_unsigned_bit_chunks,
+    striped_random_unsigned_vecs, striped_random_unsigned_vecs_length_range,
+    striped_random_unsigned_vecs_min_length, striped_random_unsigneds, StripedBitSource,
+    StripedRandomUnsignedBitChunks, StripedRandomUnsignedVecs,
 };
 use malachite_base::num::random::{
     random_unsigned_inclusive_range, random_unsigneds_less_than, RandomUnsignedRange,
@@ -33,14 +44,17 @@ use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
-    random_pairs, random_pairs_from_single, random_quadruples_xyyx, random_quadruples_xyyz,
-    random_triples, random_triples_from_single, random_triples_xyx, random_triples_xyy,
+    random_pairs, random_pairs_from_single, random_quadruples_from_single, random_quadruples_xxxy,
+    random_quadruples_xyyx, random_quadruples_xyyz, random_triples, random_triples_from_single,
+    random_triples_xxy, random_triples_xyx, random_triples_xyy,
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
 use malachite_base::vecs::random::random_vecs;
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
-use malachite_base_test_util::generators::common::{GenConfig, It};
+use malachite_base_test_util::generators::common::{
+    permute_1_3_2, reshape_1_3_to_4, GenConfig, It,
+};
 use malachite_base_test_util::generators::special_random::{
     special_random_unsigned_vec_unsigned_pair_gen_var_17, UnsignedVecTripleLenGenerator1,
     UnsignedVecTripleXYYLenGenerator,
@@ -48,9 +62,10 @@ use malachite_base_test_util::generators::special_random::{
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::random::{
     striped_random_integers, striped_random_natural_integers, striped_random_negative_integers,
-    StripedRandomIntegers,
+    striped_random_nonzero_integers, StripedRandomIntegers,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::arithmetic::gcd::half_gcd::{HalfGcdMatrix, HalfGcdMatrix1};
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22_input_sizes_valid,
@@ -76,9 +91,10 @@ use malachite_nz::natural::random::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::cmp::Ordering;
+use std::cmp::{max, Ordering};
 use std::collections::HashMap;
 use std::marker::PhantomData;
+use std::ops::{Shl, Shr};
 
 // -- Integer --
 
@@ -201,6 +217,16 @@ pub fn special_random_integer_gen_var_6(config: &GenConfig) -> It<Integer> {
     ))
 }
 
+pub fn special_random_integer_gen_var_7(config: &GenConfig) -> It<Integer> {
+    Box::new(striped_random_nonzero_integers(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    ))
+}
+
 // -- (Integer, Integer) --
 
 pub fn special_random_integer_pair_gen(config: &GenConfig) -> It<(Integer, Integer)> {
@@ -211,6 +237,84 @@ pub fn special_random_integer_pair_gen(config: &GenConfig) -> It<(Integer, Integ
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     )))
+}
+
+pub fn special_random_integer_pair_gen_var_1(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_nonzero_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_pair_gen_var_2(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_nonzero_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(x, y)| (x * &y, y)),
+    )
+}
+
+pub fn special_random_integer_pair_gen_var_3(config: &GenConfig) -> It<(Integer, Integer)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_nonzero_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .filter(|(x, y)| !x.divisible_by(y)),
+    )
 }
 
 // -- (Integer, Integer, Integer) --
@@ -235,6 +339,269 @@ pub fn special_random_integer_triple_gen_var_1(
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     )))
+}
+
+// -- (Integer, Integer, Integer, PrimitiveUnsigned) --
+
+pub fn special_random_integer_integer_integer_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, Integer, Integer, T)> {
+    Box::new(random_quadruples_xxxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Integer, Integer, Natural) --
+
+pub fn special_random_integer_integer_natural_triple_gen(
+    config: &GenConfig,
+) -> It<(Integer, Integer, Natural)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_integer_natural_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Integer, Integer, Natural)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, m)| (x * Integer::from(&m) + &y, y, m)),
+    )
+}
+
+pub fn special_random_integer_integer_natural_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Integer, Integer, Natural)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+    )
+}
+
+// -- (Integer, Integer, PrimitiveUnsigned) --
+
+pub fn special_random_integer_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, Integer, T)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_integer_integer_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, Integer, T)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, pow)| ((x << pow) + &y, y, pow)),
+    )
+}
+
+pub fn special_random_integer_integer_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, Integer, T)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_2(y, pow.exact_into())),
+    )
+}
+
+// -- (Integer, Integer, RoundingMode) --
+
+pub fn special_random_integer_integer_rounding_mode_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Integer, Integer, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_nonzero_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(x, y, rm)| {
+            if rm == RoundingMode::Exact {
+                (x * &y, y, rm)
+            } else {
+                (x, y, rm)
+            }
+        }),
+    )
+}
+
+pub fn special_random_integer_integer_rounding_mode_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Integer, Integer, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_nonzero_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter_map(|(x, y, rm)| round_to_multiple_integer_filter_map(x, y, rm)),
+    )
 }
 
 // -- (Integer, Natural) --
@@ -317,6 +684,30 @@ pub fn special_random_integer_signed_pair_gen<T: PrimitiveSigned>(
     ))
 }
 
+pub fn special_random_integer_signed_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Integer, PrimitiveSigned, Integer) --
 
 pub fn special_random_integer_signed_integer_triple_gen<T: PrimitiveSigned>(
@@ -341,6 +732,90 @@ pub fn special_random_integer_signed_integer_triple_gen<T: PrimitiveSigned>(
             )
         },
     ))
+}
+
+// -- (Integer, PrimitiveSigned, RoundingMode) --
+
+pub fn special_random_integer_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, RoundingMode)>
+where
+    Integer: Shr<T, Output = Integer>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(n, i, rm)| {
+            (
+                if i < T::ZERO && rm == RoundingMode::Exact {
+                    n >> i
+                } else {
+                    n
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn special_random_integer_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, RoundingMode)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(n, i, rm)| {
+            (
+                if i > T::ZERO && rm == RoundingMode::Exact {
+                    n << i
+                } else {
+                    n
+                },
+                i,
+                rm,
+            )
+        }),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned) --
@@ -462,6 +937,63 @@ pub fn special_random_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
             },
         )
         .map(Union2::unwrap),
+    )
+}
+
+pub fn special_random_integer_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed_2| {
+                striped_random_integers(
+                    seed_2,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(mut x, y)| {
+            x.round_to_multiple_of_power_of_2_assign(y.exact_into(), RoundingMode::Down);
+            (x, y)
+        }),
+    )
+}
+
+pub fn special_random_integer_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter(|(x, y)| !x.divisible_by_power_of_2(y.exact_into())),
     )
 }
 
@@ -610,6 +1142,30 @@ pub fn special_random_integer_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUns
     )
 }
 
+pub fn special_random_integer_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, T)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
 
 pub fn special_random_integer_unsigned_unsigned_natural_quadruple_gen_var_1<
@@ -654,7 +1210,92 @@ pub fn special_random_integer_unsigned_unsigned_natural_quadruple_gen_var_1<
     )
 }
 
+// -- (Integer, PrimitiveUnsigned, RoundingMode) --
+
+pub fn special_random_integer_unsigned_rounding_mode_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Integer, u64, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed.fork("xs"),
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<u64>(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(n, u, rm)| {
+            if rm == RoundingMode::Exact {
+                (n << u, u, rm)
+            } else {
+                (n, u, rm)
+            }
+        }),
+    )
+}
+
+pub fn special_random_integer_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Integer, T, RoundingMode)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_integers(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(n, u, rm)| (if rm == RoundingMode::Exact { n << u } else { n }, u, rm)),
+    )
+}
+
 // -- (Integer, RoundingMode) --
+
+pub fn special_random_integer_rounding_mode_pair_gen(
+    config: &GenConfig,
+) -> It<(Integer, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_integers(
+                seed.fork("xs"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
 
 pub fn special_random_integer_rounding_mode_pair_gen_var_1<
     T: for<'a> ConvertibleFrom<&'a Integer> + PrimitiveFloat,
@@ -677,6 +1318,24 @@ pub fn special_random_integer_rounding_mode_pair_gen_var_1<
         )
         .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
     )
+}
+
+pub fn special_random_integer_rounding_mode_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(Integer, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_nonzero_integers(
+                seed.fork("xs"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
 }
 
 // --(Integer, Vec<bool>) --
@@ -985,6 +1644,97 @@ pub fn special_random_natural_pair_gen_var_2(config: &GenConfig) -> It<(Natural,
     ))
 }
 
+pub fn special_random_natural_pair_gen_var_3(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(x, y, z)| (x * &y, y * z)),
+    )
+}
+
+pub fn special_random_natural_pair_gen_var_4(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_positive_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_pair_gen_var_5(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .map(|(x, y)| (x * &y, y)),
+    )
+}
+
+pub fn special_random_natural_pair_gen_var_6(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+        )
+        .filter(|(x, y)| !x.divisible_by(y)),
+    )
+}
+
 // -- (Natural, Natural, Natural) --
 
 pub fn special_random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
@@ -995,6 +1745,100 @@ pub fn special_random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Nat
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     )))
+}
+
+// -- (Natural, Natural, PrimitiveUnsigned) --
+
+pub fn special_random_natural_natural_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, Natural, T)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (Natural, Natural, RoundingMode) --
+
+pub fn special_random_natural_natural_rounding_mode_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Natural, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(x, y, rm)| {
+            if rm == RoundingMode::Exact {
+                (x * &y, y, rm)
+            } else {
+                (x, y, rm)
+            }
+        }),
+    )
+}
+
+pub fn special_random_natural_natural_rounding_mode_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Natural, Natural, RoundingMode)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .filter_map(|(x, y, rm)| round_to_multiple_natural_filter_map(x, y, rm)),
+    )
 }
 
 // -- (Natural, PrimitiveSigned) --
@@ -1047,6 +1891,30 @@ pub fn special_random_natural_signed_pair_gen_var_1<T: PrimitiveSigned>(
     ))
 }
 
+pub fn special_random_natural_signed_pair_gen_var_2<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Natural, PrimitiveSigned, Natural) --
 
 pub fn special_random_natural_signed_natural_triple_gen<T: PrimitiveSigned>(
@@ -1071,6 +1939,90 @@ pub fn special_random_natural_signed_natural_triple_gen<T: PrimitiveSigned>(
             )
         },
     ))
+}
+
+// -- (Natural, PrimitiveSigned, RoundingMode) --
+
+pub fn special_random_natural_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, RoundingMode)>
+where
+    Natural: Shr<T, Output = Natural>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(n, i, rm)| {
+            (
+                if i < T::ZERO && rm == RoundingMode::Exact {
+                    n >> i
+                } else {
+                    n
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn special_random_natural_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, RoundingMode)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(n, i, rm)| {
+            (
+                if i > T::ZERO && rm == RoundingMode::Exact {
+                    n << i
+                } else {
+                    n
+                },
+                i,
+                rm,
+            )
+        }),
+    )
 }
 
 // -- (Natural, PrimitiveUnsigned) --
@@ -1453,6 +2405,45 @@ pub fn special_random_natural_unsigned_unsigned_natural_quadruple_gen_var_1<
     )
 }
 
+// -- (Natural, PrimitiveUnsigned, RoundingMode) --
+
+pub fn special_random_natural_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, RoundingMode)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_excess_len_n", 4),
+                    config.get_or("mean_excess_len_d", 1),
+                )
+            },
+            &random_rounding_modes,
+        )
+        .map(|(n, u, rm)| {
+            if rm == RoundingMode::Exact {
+                (n << u, u, rm)
+            } else {
+                (n, u, rm)
+            }
+        }),
+    )
+}
+
 // --(Natural, PrimitiveUnsigned, Vec<bool>) --
 
 struct NaturalUnsignedBoolVecTripleGenerator {
@@ -1525,6 +2516,24 @@ pub fn special_random_natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt
 }
 
 // -- (Natural, RoundingMode) --
+
+pub fn special_random_natural_rounding_mode_pair_gen(
+    config: &GenConfig,
+) -> It<(Natural, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed.fork("xs"),
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
+}
 
 pub fn special_random_natural_rounding_mode_pair_gen_var_1<
     T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
@@ -1967,6 +2976,43 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_18(
 
 // var 19 is in malachite-base
 
+// -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
+
+// vars 1 through 5 are in malachite-base
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_6(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb, Limb)> {
+    Box::new(
+        random_triples_xyy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .filter(|(m, x, y)| {
+            !Integer::from(Natural::from(*x)).eq_mod(-Natural::from(*y), Natural::from_limbs_asc(m))
+        }),
+    )
+}
+
+// vars 7 through 8 are in malachite-base.
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
 
 struct DigitsSpecialRandomGenerator<T: PrimitiveUnsigned> {
@@ -2013,6 +3059,64 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1<T: Pri
         ),
         phantom: PhantomData,
     })
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        permute_1_3_2(Box::new(random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )))
+        .filter_map(filter_map_helper_1),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        permute_1_3_2(Box::new(random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )))
+        .filter(filter_helper_1),
+    )
 }
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
@@ -2225,6 +3329,68 @@ pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3<
         phantom: PhantomData,
     })
 }
+
+// vars 4 through 6 are in malachite-base.
+
+pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .filter_map(filter_map_helper_2),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .filter(filter_helper_2),
+    )
+}
+
+// var 9 is in malachite-base.
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
@@ -2516,4 +3682,263 @@ pub fn special_random_unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>(
     )
 }
 
-// vars 24 through 27 are in malachite-base
+// vars 24 through 36 are in malachite-base
+
+pub fn special_random_unsigned_vec_triple_gen_var_37(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_triples_from_single(
+            striped_random_unsigned_vecs_min_length(
+                EXAMPLE_SEED,
+                2,
+                config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|xs| *xs.last().unwrap() != 0),
+        )
+        .filter_map(filter_map_helper_3),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_38(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_triples_from_single(
+            striped_random_unsigned_vecs_min_length(
+                EXAMPLE_SEED,
+                2,
+                config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|xs| *xs.last().unwrap() != 0),
+        )
+        .filter(filter_helper_3),
+    )
+}
+
+// var 39 is in malachite-base.
+
+// -- large types --
+
+// vars 1 through 4 are in malachite-base
+
+fn special_random_half_gcd_matrix(
+    s: usize,
+    n: usize,
+    bit_source: &mut StripedBitSource,
+) -> HalfGcdMatrix {
+    assert!(n <= s);
+    let bits = u64::exact_from(n) << Limb::LOG_WIDTH;
+    let mut m00 = get_striped_unsigned_vec(bit_source, bits);
+    let m01 = get_striped_unsigned_vec(bit_source, bits);
+    let m10 = get_striped_unsigned_vec(bit_source, bits);
+    let m11 = get_striped_unsigned_vec(bit_source, bits);
+    m00.resize(s << 2, 0);
+    m00[s..s + n].copy_from_slice(&m01);
+    m00[s << 1..(s << 1) + n].copy_from_slice(&m10);
+    m00[s * 3..s * 3 + n].copy_from_slice(&m11);
+    half_gcd_matrix_create(s, n, m00)
+}
+
+struct HalfGcdMatrixAndVecGenerator {
+    sizes: GeometricRandomNaturalValues<usize>,
+    striped_bit_source: StripedBitSource,
+    bs: RandomBools,
+}
+
+impl Iterator for HalfGcdMatrixAndVecGenerator {
+    type Item = (HalfGcdMatrix, Vec<Limb>, u8);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            let x = self.sizes.next().unwrap();
+            let qs_len = x.checked_add(1);
+            let qs_len = if let Some(qs_len) = qs_len {
+                qs_len
+            } else {
+                continue;
+            };
+            let y = self.sizes.next().unwrap();
+            let m_n = qs_len.checked_add(y);
+            let m_n = if let Some(m_n) = m_n { m_n } else { continue };
+            let z = self.sizes.next().unwrap();
+            let m_s = m_n.checked_add(z);
+            let m_s = if let Some(m_s) = m_s { m_s } else { continue };
+            let m_s_1 = m_s.checked_add(2);
+            let m_s_1 = if let Some(m_s_1) = m_s_1 {
+                m_s_1
+            } else {
+                continue;
+            };
+            let m_s_2 = m_s.checked_add(qs_len);
+            let m_s_2 = if let Some(m_s_2) = m_s_2 {
+                m_s_2
+            } else {
+                continue;
+            };
+            let m_s = max(m_s_1, m_s_2);
+            let m = special_random_half_gcd_matrix(m_s, m_n, &mut self.striped_bit_source);
+            let qs = get_striped_unsigned_vec(
+                &mut self.striped_bit_source,
+                u64::exact_from(qs_len) << Limb::LOG_WIDTH,
+            );
+            let column = if self.bs.next().unwrap() { 1 } else { 0 };
+            return Some((m, qs, column));
+        }
+    }
+}
+
+pub fn special_random_large_type_gen_var_5(
+    config: &GenConfig,
+) -> It<(HalfGcdMatrix, Vec<Limb>, u8)> {
+    Box::new(HalfGcdMatrixAndVecGenerator {
+        sizes: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("sizes"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", 4),
+            config.get_or("mean_stripe_d", 1),
+        ),
+        bs: random_bools(EXAMPLE_SEED.fork("bs")),
+    })
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_6(
+    config: &GenConfig,
+) -> It<(HalfGcdMatrix1, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    reshape_1_3_to_4(Box::new(
+        random_quadruples_from_single(striped_random_unsigneds(
+            EXAMPLE_SEED.fork("m"),
+            config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .map(|(m00, m01, m10, m11)| HalfGcdMatrix1 {
+            data: [[m00, m01], [m10, m11]],
+        })
+        .zip(UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .flat_map(|(x, y, z)| {
+                let xs_len = x;
+                let ys_len = x.checked_add(1)?.checked_add(y)?;
+                let out_len = x.checked_add(1)?.checked_add(z)?;
+                Some((out_len, xs_len, ys_len))
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }),
+    ))
+}
+
+struct HalfGcdMatrixAndHalfGcdMatrix1Generator {
+    sizes: GeometricRandomNaturalValues<usize>,
+    striped_bit_source: StripedBitSource,
+    bit_chunks: StripedRandomUnsignedBitChunks<Limb>,
+}
+
+impl Iterator for HalfGcdMatrixAndHalfGcdMatrix1Generator {
+    type Item = (HalfGcdMatrix, HalfGcdMatrix1);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            let x = self.sizes.next().unwrap();
+            let n = x.checked_add(1);
+            let n = if let Some(n) = n { n } else { continue };
+            let y = self.sizes.next().unwrap();
+            let s = n.checked_add(y);
+            let s = if let Some(s) = s { s } else { continue };
+            let s = s.checked_add(1);
+            let s = if let Some(s) = s { s } else { continue };
+            let m = special_random_half_gcd_matrix(s, n, &mut self.striped_bit_source);
+            let m_1 = HalfGcdMatrix1 {
+                data: [
+                    [self.bit_chunks.next().unwrap(), self.bit_chunks.next().unwrap()],
+                    [self.bit_chunks.next().unwrap(), self.bit_chunks.next().unwrap()],
+                ],
+            };
+            return Some((m, m_1));
+        }
+    }
+}
+
+pub fn special_random_large_type_gen_var_7(
+    config: &GenConfig,
+) -> It<(HalfGcdMatrix, HalfGcdMatrix1)> {
+    Box::new(HalfGcdMatrixAndHalfGcdMatrix1Generator {
+        sizes: geometric_random_unsigneds(
+            EXAMPLE_SEED.fork("sizes"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+        bit_chunks: striped_random_unsigned_bit_chunks(
+            EXAMPLE_SEED.fork("bit_chunks"),
+            Limb::WIDTH - 1,
+            config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}
+
+struct MatrixMul22Generator {
+    sizes: GeometricRandomNaturalValues<u64>,
+    striped_bit_source: StripedBitSource,
+}
+
+impl Iterator for MatrixMul22Generator {
+    type Item = T8;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let ys_len = self.sizes.next().unwrap();
+        let xs_len = self.sizes.next().unwrap();
+        let sum_bits = (ys_len + xs_len + 1) << Limb::LOG_WIDTH;
+        let ys_bits = ys_len << Limb::LOG_WIDTH;
+        Some((
+            get_striped_unsigned_vec(&mut self.striped_bit_source, sum_bits),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, sum_bits),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, sum_bits),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, sum_bits),
+            usize::exact_from(xs_len),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, ys_bits),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, ys_bits),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, ys_bits),
+            get_striped_unsigned_vec(&mut self.striped_bit_source, ys_bits),
+        ))
+    }
+}
+
+pub fn special_random_large_type_gen_var_8(config: &GenConfig) -> It<T8> {
+    Box::new(MatrixMul22Generator {
+        sizes: geometric_random_positive_unsigneds(
+            EXAMPLE_SEED.fork("sizes"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+        striped_bit_source: StripedBitSource::new(
+            EXAMPLE_SEED.fork("striped_bit_source"),
+            config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ),
+    })
+}

@@ -182,6 +182,6 @@ impl<'a, 'b> CheckedHammingDistance<&'a Integer> for &'b Integer {
             (true, true) => Some(self.abs.hamming_distance(&other.abs)),
             (false, false) => Some(self.abs.hamming_distance_neg(&other.abs)),
             _ => None,
-        } 
+        }
     }
 }

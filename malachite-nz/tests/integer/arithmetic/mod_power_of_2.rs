@@ -1,8 +1,24 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingModPowerOf2, CeilingModPowerOf2Assign, ModPowerOf2, ModPowerOf2Assign, RemPowerOf2,
-    RemPowerOf2Assign,
+    Abs, CeilingModPowerOf2, CeilingModPowerOf2Assign, DivisibleByPowerOf2, ModPowerOf2,
+    ModPowerOf2Assign, NegModPowerOf2, PowerOf2, RemPowerOf2, RemPowerOf2Assign, ShrRound, Sign,
+};
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base::num::logic::traits::LowMask;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_10,
+    signed_unsigned_pair_gen_var_11, unsigned_gen,
 };
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_integer_unsigned_triple_gen_var_1, integer_unsigned_pair_gen_var_2,
+    integer_unsigned_pair_gen_var_4, integer_unsigned_pair_gen_var_5,
+    integer_unsigned_unsigned_triple_gen_var_3, natural_unsigned_pair_gen_var_4,
+};
+use std::cmp::min;
 use std::str::FromStr;
 
 #[test]
@@ -252,4 +268,209 @@ fn test_ceiling_mod_power_of_2() {
     test("-4294967297", 31, "-1");
     test("-4294967297", 32, "-1");
     test("-4294967297", 33, "-4294967297");
+}
+
+#[test]
+fn mod_power_of_2_properties() {
+    integer_unsigned_pair_gen_var_2().test_properties(|(n, u)| {
+        let mut mut_n = n.clone();
+        mut_n.mod_power_of_2_assign(u);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
+
+        let result_alt = (&n).mod_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+        let result_alt = n.clone().mod_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        assert_eq!((&n >> u << u) + &result, n);
+        assert!(result < Natural::power_of_2(u));
+        assert_eq!(result == 0, n.divisible_by_power_of_2(u));
+        assert_eq!((&result).mod_power_of_2(u), result);
+        assert_eq!(n & Integer::low_mask(u), result);
+    });
+
+    integer_integer_unsigned_triple_gen_var_1().test_properties(|(x, y, u)| {
+        let x = &x;
+        let y = &y;
+        let xm = Integer::from(x.mod_power_of_2(u));
+        let ym = Integer::from(y.mod_power_of_2(u));
+        assert_eq!((x + y).mod_power_of_2(u), (&xm + &ym).mod_power_of_2(u));
+        assert_eq!((x - y).mod_power_of_2(u), (&xm - &ym).mod_power_of_2(u));
+        assert_eq!((x * y).mod_power_of_2(u), (xm * ym).mod_power_of_2(u));
+    });
+
+    integer_unsigned_pair_gen_var_4().test_properties(|(n, u)| {
+        assert_eq!(n.mod_power_of_2(u), 0);
+    });
+
+    integer_unsigned_pair_gen_var_5().test_properties(|(n, u)| {
+        assert_ne!((&n).mod_power_of_2(u), 0);
+        assert_eq!(
+            Integer::from((&n).mod_power_of_2(u)) - n.ceiling_mod_power_of_2(u),
+            Natural::power_of_2(u)
+        );
+    });
+
+    integer_unsigned_unsigned_triple_gen_var_3().test_properties(|(n, u, v)| {
+        assert_eq!(
+            (&n).mod_power_of_2(u).mod_power_of_2(v),
+            n.mod_power_of_2(min(u, v))
+        );
+    });
+
+    signed_unsigned_pair_gen_var_10::<SignedLimb>().test_properties(|(i, pow)| {
+        assert_eq!(i.mod_power_of_2(pow), Integer::from(i).mod_power_of_2(pow));
+    });
+
+    natural_unsigned_pair_gen_var_4().test_properties(|(n, pow)| {
+        assert_eq!(
+            (&n).mod_power_of_2(pow),
+            Integer::from(n).mod_power_of_2(pow)
+        );
+    });
+
+    integer_gen().test_properties(|n| {
+        assert_eq!(n.mod_power_of_2(0), 0);
+    });
+
+    unsigned_gen().test_properties(|u| {
+        assert_eq!(Integer::ZERO.mod_power_of_2(u), 0);
+    });
+}
+
+#[test]
+fn rem_power_of_2_properties() {
+    integer_unsigned_pair_gen_var_2().test_properties(|(n, u)| {
+        let mut mut_n = n.clone();
+        mut_n.rem_power_of_2_assign(u);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
+
+        let result_alt = (&n).rem_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+        let result_alt = n.clone().rem_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        assert!(result.le_abs(&n));
+        assert_eq!((((&n).shr_round(u, RoundingMode::Down) << u) + &result), n);
+        assert!(result.lt_abs(&Natural::power_of_2(u)));
+        assert_eq!(result == 0, (&n).divisible_by_power_of_2(u));
+        assert_eq!((&result).rem_power_of_2(u), result);
+        assert_eq!(n.abs().mod_power_of_2(u), result.abs());
+    });
+
+    integer_unsigned_pair_gen_var_4().test_properties(|(n, u)| {
+        assert_eq!(n.rem_power_of_2(u), 0);
+    });
+
+    integer_unsigned_pair_gen_var_5().test_properties(|(n, u)| {
+        assert_ne!((&n).rem_power_of_2(u), 0);
+        assert_eq!((&n).rem_power_of_2(u).sign(), n.sign());
+    });
+
+    integer_unsigned_unsigned_triple_gen_var_3().test_properties(|(n, u, v)| {
+        assert_eq!(
+            (&n).rem_power_of_2(u).rem_power_of_2(v),
+            n.rem_power_of_2(min(u, v))
+        );
+    });
+
+    signed_unsigned_pair_gen_var_1::<SignedLimb, u64>().test_properties(|(i, pow)| {
+        assert_eq!(i.rem_power_of_2(pow), Integer::from(i).rem_power_of_2(pow));
+    });
+
+    natural_unsigned_pair_gen_var_4().test_properties(|(n, pow)| {
+        assert_eq!(
+            (&n).rem_power_of_2(pow),
+            Integer::from(n).rem_power_of_2(pow)
+        );
+    });
+
+    integer_gen().test_properties(|n| {
+        assert_eq!(n.rem_power_of_2(0), 0);
+    });
+
+    unsigned_gen().test_properties(|u| {
+        assert_eq!(Integer::ZERO.rem_power_of_2(u), 0);
+    });
+}
+
+#[test]
+fn ceiling_mod_power_of_2_properties() {
+    integer_unsigned_pair_gen_var_2().test_properties(|(n, u)| {
+        let mut mut_n = n.clone();
+        mut_n.ceiling_mod_power_of_2_assign(u);
+        assert!(mut_n.is_valid());
+        let result = mut_n;
+
+        let result_alt = (&n).ceiling_mod_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+        let result_alt = n.clone().ceiling_mod_power_of_2(u);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        assert_eq!(
+            (((&n).shr_round(u, RoundingMode::Ceiling) << u) + &result),
+            n
+        );
+        assert!(result <= 0);
+        assert!(-&result <= Natural::power_of_2(u));
+        assert_eq!(result == 0, (&n).divisible_by_power_of_2(u));
+        assert_eq!((-n).mod_power_of_2(u), -result);
+    });
+
+    integer_integer_unsigned_triple_gen_var_1().test_properties(|(x, y, u)| {
+        let x = &x;
+        let y = &y;
+        let xm = Integer::from(x.mod_power_of_2(u));
+        let ym = Integer::from(y.mod_power_of_2(u));
+        assert_eq!(
+            (x + y).ceiling_mod_power_of_2(u),
+            (&xm + &ym).ceiling_mod_power_of_2(u)
+        );
+        assert_eq!(
+            (x - y).ceiling_mod_power_of_2(u),
+            (&xm - &ym).ceiling_mod_power_of_2(u)
+        );
+        assert_eq!(
+            (x * y).ceiling_mod_power_of_2(u),
+            (xm * ym).ceiling_mod_power_of_2(u)
+        );
+    });
+
+    integer_unsigned_pair_gen_var_4().test_properties(|(n, u)| {
+        assert_eq!(n.ceiling_mod_power_of_2(u), 0);
+    });
+
+    integer_unsigned_pair_gen_var_5().test_properties(|(n, u)| {
+        assert_ne!(n.ceiling_mod_power_of_2(u), 0);
+    });
+
+    signed_unsigned_pair_gen_var_11::<SignedLimb>().test_properties(|(i, pow)| {
+        assert_eq!(
+            i.ceiling_mod_power_of_2(pow),
+            Integer::from(i).ceiling_mod_power_of_2(pow)
+        );
+    });
+
+    natural_unsigned_pair_gen_var_4().test_properties(|(n, pow)| {
+        assert_eq!(
+            -(&n).neg_mod_power_of_2(pow),
+            Integer::from(n).ceiling_mod_power_of_2(pow)
+        );
+    });
+
+    integer_gen().test_properties(|n| {
+        assert_eq!(n.ceiling_mod_power_of_2(0), 0);
+    });
+
+    unsigned_gen().test_properties(|u| {
+        assert_eq!(Integer::ZERO.ceiling_mod_power_of_2(u), 0);
+    });
 }

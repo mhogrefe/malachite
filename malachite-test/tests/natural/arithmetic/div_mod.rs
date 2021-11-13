@@ -8,12 +8,12 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
-    _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
-    _limbs_invert_newton_approx, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
-    limbs_div_limb_to_out_mod, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
-    limbs_div_mod_extra, limbs_div_mod_extra_in_place, limbs_div_mod_three_limb_by_two_limb,
-    limbs_div_mod_to_out, limbs_invert_limb, limbs_two_limb_inverse_helper,
+    limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_div_mod,
+    limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_by_two_limb_normalized,
+    limbs_div_mod_divide_and_conquer, limbs_div_mod_extra, limbs_div_mod_extra_in_place,
+    limbs_div_mod_schoolbook, limbs_div_mod_three_limb_by_two_limb, limbs_div_mod_to_out,
+    limbs_invert_approx, limbs_invert_basecase_approx, limbs_invert_limb,
+    limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -22,7 +22,7 @@ use malachite_nz_test_util::common::{
 };
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
-    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt,
+    limbs_div_limb_in_place_mod_alt, limbs_div_limb_to_out_mod_alt,
 };
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod_naive, limbs_div_limb_to_out_mod_naive,
@@ -298,7 +298,7 @@ fn limbs_div_limb_to_out_mod_properties() {
             let final_out = out.clone();
 
             let mut out = old_out.to_vec();
-            assert_eq!(_limbs_div_limb_to_out_mod_alt(&mut out, in_limbs, limb), r);
+            assert_eq!(limbs_div_limb_to_out_mod_alt(&mut out, in_limbs, limb), r);
             assert_eq!(out, final_out);
 
             let mut out = old_out.to_vec();
@@ -321,7 +321,7 @@ fn limbs_div_limb_in_place_mod_properties() {
             assert_eq!(r, r_alt);
 
             let mut limbs = old_limbs.clone();
-            let r_alt = _limbs_div_limb_in_place_mod_alt(&mut limbs, limb);
+            let r_alt = limbs_div_limb_in_place_mod_alt(&mut limbs, limb);
             let q_alt = Natural::from_owned_limbs_asc(limbs);
             assert_eq!(q, q_alt);
             assert_eq!(r, r_alt);
@@ -397,7 +397,7 @@ fn limbs_div_mod_schoolbook_properties() {
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
-            let q_highest = _limbs_div_mod_schoolbook(&mut qs, &mut ns, ds, *inverse);
+            let q_highest = limbs_div_mod_schoolbook(&mut qs, &mut ns, ds, *inverse);
             verify_limbs_div_mod_1(qs_in, ns_in, ds, q_highest, &qs, &ns);
         },
     );
@@ -411,7 +411,7 @@ fn limbs_div_mod_divide_and_conquer_properties() {
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
-            let q_highest = _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, ds, *inverse);
+            let q_highest = limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, ds, *inverse);
             verify_limbs_div_mod_1(qs_in, ns_in, ds, q_highest, &qs, &ns);
         },
     );
@@ -425,7 +425,7 @@ fn limbs_invert_basecase_approx_properties() {
         |(ref is_in, ref ds, ref scratch_in)| {
             let mut is = is_in.clone();
             let mut scratch = scratch_in.clone();
-            let result_definitely_exact = _limbs_invert_basecase_approx(&mut is, ds, &mut scratch);
+            let result_definitely_exact = limbs_invert_basecase_approx(&mut is, ds, &mut scratch);
             verify_limbs_invert_approx(is_in, ds, result_definitely_exact, &is);
         },
     );
@@ -439,7 +439,7 @@ fn limbs_invert_newton_approx_properties() {
         |(ref is_in, ref ds, ref scratch_in)| {
             let mut is = is_in.clone();
             let mut scratch = scratch_in.clone();
-            let result_definitely_exact = _limbs_invert_newton_approx(&mut is, ds, &mut scratch);
+            let result_definitely_exact = limbs_invert_newton_approx(&mut is, ds, &mut scratch);
             verify_limbs_invert_approx(is_in, ds, result_definitely_exact, &is);
         },
     );
@@ -453,7 +453,7 @@ fn limbs_invert_approx_properties() {
         |(ref is_in, ref ds, ref scratch_in)| {
             let mut is = is_in.clone();
             let mut scratch = scratch_in.clone();
-            let result_definitely_exact = _limbs_invert_approx(&mut is, ds, &mut scratch);
+            let result_definitely_exact = limbs_invert_approx(&mut is, ds, &mut scratch);
             verify_limbs_invert_approx(is_in, ds, result_definitely_exact, &is);
         },
     );
@@ -467,8 +467,8 @@ fn limbs_div_mod_barrett_properties() {
         |(ref qs_in, ref rs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
             let mut rs = rs_in.clone();
-            let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-            let q_highest = _limbs_div_mod_barrett(&mut qs, &mut rs, ns, ds, &mut scratch);
+            let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+            let q_highest = limbs_div_mod_barrett(&mut qs, &mut rs, ns, ds, &mut scratch);
             verify_limbs_div_mod_2(qs_in, rs_in, ns, ds, q_highest, &qs, &rs);
         },
     );

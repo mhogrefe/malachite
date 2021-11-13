@@ -588,10 +588,9 @@ fn benchmark_limbs_neg_xor_limb_neg_in_place(
         limit,
         file_name,
         &pair_1_vec_len_bucketer("xs"),
-        &mut [(
-            "Malachite",
-            &mut (|(mut xs, y)| limbs_neg_xor_limb_neg_in_place(&mut xs, y)),
-        )],
+        &mut [("Malachite", &mut |(mut xs, y)| {
+            limbs_neg_xor_limb_neg_in_place(&mut xs, y)
+        })],
     );
 }
 

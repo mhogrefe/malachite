@@ -6,7 +6,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use natural::Natural;
 use std::ops::{Shr, ShrAssign};
 
-fn _mod_power_of_2_shl_unsigned<T>(x: &Natural, bits: T, pow: u64) -> Natural
+fn mod_power_of_2_shl_unsigned_nz<T>(x: &Natural, bits: T, pow: u64) -> Natural
 where
     u64: ExactFrom<T>,
 {
@@ -18,7 +18,7 @@ where
     }
 }
 
-fn _mod_power_of_2_shl_assign_unsigned<T>(x: &mut Natural, bits: T, pow: u64)
+fn mod_power_of_2_shl_assign_unsigned_nz<T>(x: &mut Natural, bits: T, pow: u64)
 where
     u64: ExactFrom<T>,
 {
@@ -90,7 +90,7 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             /// ```
             #[inline]
             fn mod_power_of_2_shl(self, bits: $t, pow: u64) -> Natural {
-                _mod_power_of_2_shl_unsigned(self, bits, pow)
+                mod_power_of_2_shl_unsigned_nz(self, bits, pow)
             }
         }
 
@@ -122,14 +122,14 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
             /// ```
             #[inline]
             fn mod_power_of_2_shl_assign(&mut self, bits: $t, pow: u64) {
-                _mod_power_of_2_shl_assign_unsigned(self, bits, pow);
+                mod_power_of_2_shl_assign_unsigned_nz(self, bits, pow);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_mod_power_of_2_shl_unsigned);
 
-fn _mod_power_of_2_shl_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_power_of_2_shl_signed_nz<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
     pow: u64,
@@ -144,7 +144,7 @@ where
     }
 }
 
-fn _mod_power_of_2_shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_power_of_2_shl_assign_signed_nz<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Natural,
     bits: S,
     pow: u64,
@@ -219,7 +219,7 @@ macro_rules! impl_mod_power_of_2_shl_signed {
             /// ```
             #[inline]
             fn mod_power_of_2_shl(self, bits: $t, pow: u64) -> Natural {
-                _mod_power_of_2_shl_signed(self, bits, pow)
+                mod_power_of_2_shl_signed_nz(self, bits, pow)
             }
         }
 
@@ -255,7 +255,7 @@ macro_rules! impl_mod_power_of_2_shl_signed {
             /// ```
             #[inline]
             fn mod_power_of_2_shl_assign(&mut self, bits: $t, pow: u64) {
-                _mod_power_of_2_shl_assign_signed(self, bits, pow)
+                mod_power_of_2_shl_assign_signed_nz(self, bits, pow)
             }
         }
     };

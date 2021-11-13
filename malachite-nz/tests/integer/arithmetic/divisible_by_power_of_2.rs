@@ -1,6 +1,14 @@
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::generators::{signed_unsigned_pair_gen_var_1, unsigned_gen};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::common::integer_to_rug_integer;
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_unsigned_pair_gen_var_2, integer_unsigned_pair_gen_var_4,
+    integer_unsigned_pair_gen_var_5, natural_unsigned_pair_gen_var_4,
+};
 use std::str::FromStr;
 
 #[test]
@@ -50,4 +58,63 @@ fn test_divisible_by_power_of_2() {
     test("-18446744073709551616", 0, true);
     test("-18446744073709551616", 64, true);
     test("-18446744073709551616", 65, false);
+}
+
+#[test]
+fn divisible_by_power_of_2_properties() {
+    integer_unsigned_pair_gen_var_2().test_properties(|(x, pow)| {
+        let divisible = x.divisible_by_power_of_2(pow);
+        assert_eq!(
+            integer_to_rug_integer(&x).is_divisible_2pow(u32::exact_from(pow)),
+            divisible
+        );
+        if x != 0 {
+            assert_eq!(x.trailing_zeros().unwrap() >= pow, divisible);
+        }
+        assert_eq!((-&x).divisible_by_power_of_2(pow), divisible);
+        assert!((&x << pow).divisible_by_power_of_2(pow));
+        assert_eq!(&x >> pow << pow == x, divisible);
+    });
+
+    integer_unsigned_pair_gen_var_4().test_properties(|(x, pow)| {
+        assert!(x.divisible_by_power_of_2(pow));
+        assert!(integer_to_rug_integer(&x).is_divisible_2pow(u32::exact_from(pow)));
+        if x != 0 {
+            assert!(x.trailing_zeros().unwrap() >= pow);
+        }
+        assert!((-&x).divisible_by_power_of_2(pow));
+        assert_eq!(&x >> pow << pow, x);
+    });
+
+    integer_unsigned_pair_gen_var_5().test_properties(|(x, pow)| {
+        assert!(!x.divisible_by_power_of_2(pow));
+        assert!(!integer_to_rug_integer(&x).is_divisible_2pow(u32::exact_from(pow)));
+        if x != 0 {
+            assert!(x.trailing_zeros().unwrap() < pow);
+        }
+        assert!(!(-&x).divisible_by_power_of_2(pow));
+        assert_ne!(&x >> pow << pow, x);
+    });
+
+    integer_gen().test_properties(|x| {
+        assert!(x.divisible_by_power_of_2(0));
+    });
+
+    unsigned_gen().test_properties(|pow| {
+        assert!(Integer::ZERO.divisible_by_power_of_2(pow));
+    });
+
+    natural_unsigned_pair_gen_var_4().test_properties(|(x, pow)| {
+        assert_eq!(
+            x.divisible_by_power_of_2(pow),
+            Integer::from(x).divisible_by_power_of_2(pow)
+        );
+    });
+
+    signed_unsigned_pair_gen_var_1::<SignedLimb, u64>().test_properties(|(x, pow)| {
+        assert_eq!(
+            x.divisible_by_power_of_2(pow),
+            Integer::from(x).divisible_by_power_of_2(pow)
+        );
+    });
 }

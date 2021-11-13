@@ -6,17 +6,17 @@ use malachite_nz::natural::arithmetic::div::{
     limbs_div, limbs_div_limb, limbs_div_limb_in_place, limbs_div_limb_to_out, limbs_div_to_out,
 };
 use malachite_nz::natural::arithmetic::div_exact::{
-    _limbs_div_exact_limb_in_place_no_special_3, _limbs_div_exact_limb_no_special_3,
-    _limbs_div_exact_limb_to_out_no_special_3, _limbs_modular_div, _limbs_modular_div_barrett,
-    _limbs_modular_div_barrett_scratch_len, _limbs_modular_div_divide_and_conquer,
-    _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
-    _limbs_modular_div_mod_divide_and_conquer, _limbs_modular_div_mod_schoolbook,
-    _limbs_modular_div_ref, _limbs_modular_div_ref_scratch_len, _limbs_modular_div_schoolbook,
-    _limbs_modular_div_scratch_len, _limbs_modular_invert_small, limbs_div_exact,
-    limbs_div_exact_3, limbs_div_exact_3_in_place, limbs_div_exact_3_to_out, limbs_div_exact_limb,
-    limbs_div_exact_limb_in_place, limbs_div_exact_limb_to_out, limbs_div_exact_to_out,
+    limbs_div_exact, limbs_div_exact_3, limbs_div_exact_3_in_place, limbs_div_exact_3_to_out,
+    limbs_div_exact_limb, limbs_div_exact_limb_in_place,
+    limbs_div_exact_limb_in_place_no_special_3, limbs_div_exact_limb_no_special_3,
+    limbs_div_exact_limb_to_out, limbs_div_exact_limb_to_out_no_special_3, limbs_div_exact_to_out,
     limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref,
-    limbs_modular_invert, limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+    limbs_modular_div, limbs_modular_div_barrett, limbs_modular_div_barrett_scratch_len,
+    limbs_modular_div_divide_and_conquer, limbs_modular_div_mod_barrett,
+    limbs_modular_div_mod_barrett_scratch_len, limbs_modular_div_mod_divide_and_conquer,
+    limbs_modular_div_mod_schoolbook, limbs_modular_div_ref, limbs_modular_div_ref_scratch_len,
+    limbs_modular_div_schoolbook, limbs_modular_div_scratch_len, limbs_modular_invert,
+    limbs_modular_invert_limb, limbs_modular_invert_scratch_len, limbs_modular_invert_small,
 };
 use malachite_nz_test_util::natural::arithmetic::div_exact::{
     limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
@@ -235,7 +235,7 @@ fn demo_limbs_modular_invert(gm: GenerationMode, limit: usize) {
         let mut scratch = vec![0; limbs_modular_invert_scratch_len(ds.len())];
         limbs_modular_invert(&mut is, &ds, &mut scratch);
         println!(
-            "is := {:?}; _limbs_modular_invert(&mut is, {:?}, &mut scratch); is = {:?}, ",
+            "is := {:?}; limbs_modular_invert(&mut is, {:?}, &mut scratch); is = {:?}, ",
             old_is, ds, is,
         );
     }
@@ -247,10 +247,10 @@ fn demo_limbs_modular_div_mod_schoolbook(gm: GenerationMode, limit: usize) {
     {
         let qs_old = qs.clone();
         let ns_old = ns.clone();
-        let borrow = _limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse);
+        let borrow = limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse);
         println!(
             "qs := {:?}; ns := {:?}; \
-             _limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, {:?}, {}) = {}; qs = {:?}; \
+             limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, {:?}, {}) = {}; qs = {:?}; \
              ns = {:?}",
             qs_old, ns_old, ds, inverse, borrow, qs, ns
         );
@@ -263,10 +263,10 @@ fn demo_limbs_modular_div_mod_divide_and_conquer(gm: GenerationMode, limit: usiz
     {
         let qs_old = qs.clone();
         let ns_old = ns.clone();
-        let borrow = _limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
+        let borrow = limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         println!(
             "qs := {:?}; ns := {:?}; \
-             _limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = {}; \
+             limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = {}; \
              qs = {:?}; ns = {:?}",
             qs_old, ns_old, ds, inverse, borrow, qs, ns
         );
@@ -277,11 +277,11 @@ fn demo_limbs_modular_div_mod_barrett(gm: GenerationMode, limit: usize) {
     for (mut qs, mut rs, ns, ds) in quadruples_of_limb_vec_var_4(gm).take(limit) {
         let qs_old = qs.clone();
         let rs_old = rs.clone();
-        let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-        let borrow = _limbs_modular_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
+        let mut scratch = vec![0; limbs_modular_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+        let borrow = limbs_modular_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
         println!(
             "qs := {:?}; rs := {:?}; \
-             _limbs_modular_div_mod_divide_and_conquer(\
+             limbs_modular_div_mod_divide_and_conquer(\
              &mut qs, &mut rs, {:?}, {:?} &mut scratch) = {}; qs = {:?}; rs = {:?}",
             qs_old, rs_old, ns, ds, borrow, qs, rs
         );
@@ -294,9 +294,9 @@ fn demo_limbs_modular_div_schoolbook(gm: GenerationMode, limit: usize) {
     {
         let qs_old = qs.clone();
         let ns_old = ns.clone();
-        _limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
+        limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; _limbs_modular_div_schoolbook(&mut qs, &mut ns, {:?}, {}); \
+            "qs := {:?}; ns := {:?}; limbs_modular_div_schoolbook(&mut qs, &mut ns, {:?}, {}); \
              qs = {:?}",
             qs_old, ns_old, ds, inverse, qs
         );
@@ -309,10 +309,10 @@ fn demo_limbs_modular_div_divide_and_conquer(gm: GenerationMode, limit: usize) {
     {
         let qs_old = qs.clone();
         let ns_old = ns.clone();
-        _limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
+        limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         println!(
             "qs := {:?}; ns := {:?}; \
-             _limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, {:?}, {}); qs = {:?}",
+             limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, {:?}, {}); qs = {:?}",
             qs_old, ns_old, ds, inverse, qs
         );
     }
@@ -321,10 +321,10 @@ fn demo_limbs_modular_div_divide_and_conquer(gm: GenerationMode, limit: usize) {
 fn demo_limbs_modular_div_barrett(gm: GenerationMode, limit: usize) {
     for (mut qs, ns, ds) in triples_of_limb_vec_var_50(gm).take(limit) {
         let qs_old = qs.clone();
-        let mut scratch = vec![0; _limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
-        _limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch);
+        let mut scratch = vec![0; limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
+        limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; _limbs_modular_div_barrett(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
+            "qs := {:?}; limbs_modular_div_barrett(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
             qs_old, ns, ds, qs
         );
     }
@@ -334,10 +334,10 @@ fn demo_limbs_modular_div(gm: GenerationMode, limit: usize) {
     for (mut qs, mut ns, ds) in triples_of_limb_vec_var_51(gm).take(limit) {
         let ns_old = ns.clone();
         let qs_old = qs.clone();
-        let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
-        _limbs_modular_div(&mut qs, &mut ns, &ds, &mut scratch);
+        let mut scratch = vec![0; limbs_modular_div_scratch_len(ns.len(), ds.len())];
+        limbs_modular_div(&mut qs, &mut ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; _limbs_modular_div(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
+            "qs := {:?}; limbs_modular_div(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
             qs_old, ns_old, ds, qs
         );
     }
@@ -346,10 +346,10 @@ fn demo_limbs_modular_div(gm: GenerationMode, limit: usize) {
 fn demo_limbs_modular_div_ref(gm: GenerationMode, limit: usize) {
     for (mut qs, ns, ds) in triples_of_limb_vec_var_51(gm).take(limit) {
         let qs_old = qs.clone();
-        let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
-        _limbs_modular_div_ref(&mut qs, &ns, &ds, &mut scratch);
+        let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+        limbs_modular_div_ref(&mut qs, &ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; _limbs_modular_div_ref(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
+            "qs := {:?}; limbs_modular_div_ref(&mut qs, {:?}, {:?} &mut scratch); qs = {:?}",
             qs_old, ns, ds, qs
         );
     }
@@ -572,7 +572,7 @@ fn benchmark_limbs_div_exact_3_algorithms(gm: GenerationMode, limit: usize, file
             ),
             (
                 "_limbs_div_exact_limb_no_special_3",
-                &mut (|ref limbs| no_out!(_limbs_div_exact_limb_no_special_3(limbs, 3))),
+                &mut (|ref limbs| no_out!(limbs_div_exact_limb_no_special_3(limbs, 3))),
             ),
         ],
     );
@@ -596,7 +596,7 @@ fn benchmark_limbs_div_exact_3_to_out_algorithms(
             (
                 "_limbs_div_exact_limb_to_out_no_special_3",
                 &mut (|(mut out, in_limbs)| {
-                    _limbs_div_exact_limb_to_out_no_special_3(&mut out, &in_limbs, 3)
+                    limbs_div_exact_limb_to_out_no_special_3(&mut out, &in_limbs, 3)
                 }),
             ),
             (
@@ -628,7 +628,7 @@ fn benchmark_limbs_div_exact_3_in_place_algorithms(
         &mut [
             (
                 "_limbs_div_exact_limb_in_place_no_special_3",
-                &mut (|mut limbs| _limbs_div_exact_limb_in_place_no_special_3(&mut limbs, 3)),
+                &mut (|mut limbs| limbs_div_exact_limb_in_place_no_special_3(&mut limbs, 3)),
             ),
             (
                 "limbs_div_exact_3_in_place",
@@ -657,7 +657,7 @@ fn benchmark_limbs_modular_invert_algorithms(gm: GenerationMode, limit: usize, f
                 "modular invert small",
                 &mut (|(mut is, mut scratch, ds, inverse)| {
                     let n = ds.len();
-                    _limbs_modular_invert_small(n, &mut is, &mut scratch[..n], &ds, inverse);
+                    limbs_modular_invert_small(n, &mut is, &mut scratch[..n], &ds, inverse);
                 }),
             ),
             (
@@ -683,7 +683,7 @@ fn benchmark_limbs_modular_div_mod_schoolbook(gm: GenerationMode, limit: usize, 
         &mut [(
             "Malachite",
             &mut (|(mut qs, mut ns, ds, inverse)| {
-                no_out!(_limbs_modular_div_mod_schoolbook(
+                no_out!(limbs_modular_div_mod_schoolbook(
                     &mut qs, &mut ns, &ds, inverse
                 ))
             }),
@@ -709,7 +709,7 @@ fn benchmark_limbs_modular_div_mod_divide_and_conquer_algorithms(
             (
                 "schoolbook",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_modular_div_mod_schoolbook(
+                    no_out!(limbs_modular_div_mod_schoolbook(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
@@ -717,7 +717,7 @@ fn benchmark_limbs_modular_div_mod_divide_and_conquer_algorithms(
             (
                 "divide-and-conquer",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_modular_div_mod_divide_and_conquer(
+                    no_out!(limbs_modular_div_mod_divide_and_conquer(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
@@ -745,7 +745,7 @@ fn benchmark_limbs_modular_div_mod_barrett_algorithms(
                 "divide-and-conquer",
                 &mut (|(mut qs, _, mut ns, ds)| {
                     let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-                    no_out!(_limbs_modular_div_mod_divide_and_conquer(
+                    no_out!(limbs_modular_div_mod_divide_and_conquer(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
@@ -754,8 +754,8 @@ fn benchmark_limbs_modular_div_mod_barrett_algorithms(
                 "Barrett",
                 &mut (|(mut qs, mut rs, ns, ds)| {
                     let mut scratch =
-                        vec![0; _limbs_modular_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-                    no_out!(_limbs_modular_div_mod_barrett(
+                        vec![0; limbs_modular_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                    no_out!(limbs_modular_div_mod_barrett(
                         &mut qs,
                         &mut rs,
                         &ns,
@@ -781,7 +781,7 @@ fn benchmark_limbs_modular_div_schoolbook(gm: GenerationMode, limit: usize, file
         &mut [(
             "Malachite",
             &mut (|(mut qs, mut ns, ds, inverse)| {
-                _limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse)
+                limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse)
             }),
         )],
     );
@@ -805,13 +805,13 @@ fn benchmark_limbs_modular_div_divide_and_conquer_algorithms(
             (
                 "schoolbook",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    _limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse)
+                    limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse)
                 }),
             ),
             (
                 "divide-and-conquer",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    _limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
+                    limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
                 }),
             ),
         ],
@@ -837,15 +837,15 @@ fn benchmark_limbs_modular_div_barrett_algorithms(
                 "divide-and-conquer",
                 &mut (|(mut qs, mut ns, ds)| {
                     let inverse = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-                    _limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
+                    limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse)
                 }),
             ),
             (
                 "Barrett",
                 &mut (|(mut qs, ns, ds)| {
                     let mut scratch =
-                        vec![0; _limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
-                    _limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch)
+                        vec![0; limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
+                    limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch)
                 }),
             ),
         ],
@@ -870,16 +870,16 @@ fn benchmark_limbs_modular_div_evaluation_strategy(
             (
                 "limbs_modular_div(&mut [Limb], &mut [Limb], &[Limb], &mut [Limb])",
                 &mut (|(mut qs, mut ns, ds)| {
-                    let mut scratch = vec![0; _limbs_modular_div_scratch_len(ns.len(), ds.len())];
-                    _limbs_modular_div(&mut qs, &mut ns, &ds, &mut scratch)
+                    let mut scratch = vec![0; limbs_modular_div_scratch_len(ns.len(), ds.len())];
+                    limbs_modular_div(&mut qs, &mut ns, &ds, &mut scratch)
                 }),
             ),
             (
                 "limbs_modular_div_ref(&mut [Limb], &[Limb], &[Limb], &mut [Limb])",
                 &mut (|(mut qs, ns, ds)| {
                     let mut scratch =
-                        vec![0; _limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
-                    _limbs_modular_div_ref(&mut qs, &ns, &ds, &mut scratch)
+                        vec![0; limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+                    limbs_modular_div_ref(&mut qs, &ns, &ds, &mut scratch)
                 }),
             ),
         ],

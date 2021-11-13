@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::marker::PhantomData;
 
+pub const TINY_LIMIT: usize = 1000;
 pub const SMALL_LIMIT: usize = 1000;
 pub const LARGE_LIMIT: usize = 10000;
 
@@ -79,14 +80,15 @@ impl<T> Generator<T> {
         }
     }
 
-    fn test_properties_with_config_optional_exhaustive_limit<F: FnMut(T)>(
+    fn test_properties_with_config_with_limit_and_optional_exhaustive_limit<F: FnMut(T)>(
         &self,
         config: &GenConfig,
         mut test: F,
+        limit: usize,
         exhaustive_limit: bool,
     ) {
         if exhaustive_limit {
-            for x in (self.exhaustive)().take(LARGE_LIMIT) {
+            for x in (self.exhaustive)().take(limit) {
                 test(x);
             }
         } else {
@@ -94,14 +96,37 @@ impl<T> Generator<T> {
                 test(x);
             }
         }
-        for x in (self.random)(config).take(LARGE_LIMIT) {
+        for x in (self.random)(config).take(limit) {
             test(x);
         }
         if let Some(special_random) = self.special_random {
-            for x in special_random(config).take(LARGE_LIMIT) {
+            for x in special_random(config).take(limit) {
                 test(x);
             }
         }
+    }
+
+    pub fn test_properties_with_limit<F: FnMut(T)>(&self, limit: usize, test: F) {
+        self.test_properties_with_config_with_limit_and_optional_exhaustive_limit(
+            &GenConfig::new(),
+            test,
+            limit,
+            true,
+        );
+    }
+
+    fn test_properties_with_config_optional_exhaustive_limit<F: FnMut(T)>(
+        &self,
+        config: &GenConfig,
+        test: F,
+        exhaustive_limit: bool,
+    ) {
+        self.test_properties_with_config_with_limit_and_optional_exhaustive_limit(
+            config,
+            test,
+            LARGE_LIMIT,
+            exhaustive_limit,
+        )
     }
 
     pub fn test_properties_with_config<F: FnMut(T)>(&self, config: &GenConfig, test: F) {
@@ -111,6 +136,11 @@ impl<T> Generator<T> {
     #[inline]
     pub fn test_properties<F: FnMut(T)>(&self, test: F) {
         self.test_properties_with_config(&GenConfig::new(), test);
+    }
+
+    #[inline]
+    pub fn test_properties_with_limit_and_no_exhaustive_limit<F: FnMut(T)>(&self, test: F) {
+        self.test_properties_with_config_optional_exhaustive_limit(&GenConfig::new(), test, false);
     }
 
     #[inline]
@@ -160,6 +190,12 @@ pub fn reshape_2_2_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
     it: Box<dyn Iterator<Item = ((A, B), (C, D))>>,
 ) -> Box<dyn Iterator<Item = (A, B, C, D)>> {
     Box::new(it.map(|((a, b), (c, d))| (a, b, c, d)))
+}
+
+pub fn reshape_1_3_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
+    it: Box<dyn Iterator<Item = (A, (B, C, D))>>,
+) -> Box<dyn Iterator<Item = (A, B, C, D)>> {
+    Box::new(it.map(|(a, (b, c, d))| (a, b, c, d)))
 }
 
 pub fn reshape_3_1_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(

@@ -25,6 +25,7 @@ use std::ops::{Add, AddAssign};
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is returned.
+#[doc(hidden)]
 pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
     let len = xs.len();
     let mut out = Vec::with_capacity(len);
@@ -72,6 +73,7 @@ pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
@@ -114,6 +116,7 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
+#[doc(hidden)]
 pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: T) -> bool {
     for x in xs.iter_mut() {
         if x.overflowing_add_assign(y) {
@@ -151,6 +154,7 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: 
 /// ```
 ///
 /// This is mpz_add_ui from mpz/aors_ui.h, GMP 6.2.1, where the input is non-negative.
+#[doc(hidden)]
 pub fn limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     assert!(!xs.is_empty());
     if limbs_slice_add_limb_in_place(xs, y) {
@@ -191,6 +195,7 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
 /// and the output is returned.
+#[doc(hidden)]
 pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if std::ptr::eq(xs, ys) {
         return limbs_shl(xs, 1);
@@ -234,6 +239,7 @@ pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the output is returned.
+#[doc(hidden)]
 pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_add_greater(xs, ys)
@@ -270,6 +276,7 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_add_n from gmp.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -309,6 +316,7 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second.
+#[doc(hidden)]
 pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -353,6 +361,7 @@ pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_add_greater_to_out(out, xs, ys)
@@ -366,7 +375,7 @@ pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 /// `xs[..in_size]` and `ys` to `xs`. Returns whether there is a carry.
 ///
 /// For example,
-/// `_limbs_add_to_out_aliased(&mut xs[..12], 7, &ys[0..10])`
+/// `limbs_add_to_out_aliased(&mut xs[..12], 7, &ys[0..10])`
 /// would be equivalent to
 /// `limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])`
 /// although the latter expression is not allowed because `xs` cannot be borrowed in that way.
@@ -382,6 +391,7 @@ pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the second argument is at least as long as the
 /// first and the output pointer is the same as the first input pointer.
+#[doc(hidden)]
 pub fn limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
@@ -418,6 +428,7 @@ pub fn limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) ->
 /// ```
 ///
 /// This is mpn_add_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
+#[doc(hidden)]
 pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
@@ -457,6 +468,7 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
 /// and the output is written to the first input.
+#[doc(hidden)]
 pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -495,6 +507,7 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 ///
 /// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
 /// written to the first input.
+#[doc(hidden)]
 pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if std::ptr::eq(xs.as_slice(), ys) {
         limbs_vec_shl_in_place(xs, 1);
@@ -554,6 +567,7 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the output is written to the longer input.
+#[doc(hidden)]
 pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> (bool, bool) {
     if xs.len() >= ys.len() {
         (false, limbs_slice_add_greater_in_place_left(xs, ys))
@@ -598,6 +612,7 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -
 ///
 /// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
 /// written to the longer input.
+#[doc(hidden)]
 pub fn limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     if xs.len() >= ys.len() {
         if limbs_slice_add_greater_in_place_left(xs, ys) {
@@ -627,6 +642,7 @@ pub fn limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> 
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
 /// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp and up are disjoint.
+#[doc(hidden)]
 pub fn limbs_add_same_length_with_carry_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -654,6 +670,7 @@ pub fn limbs_add_same_length_with_carry_in_to_out(
 /// Panics if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
+#[doc(hidden)]
 pub fn limbs_add_same_length_with_carry_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],

@@ -1,7 +1,20 @@
 use malachite_base::num::arithmetic::traits::{DivRound, DivRoundAssign};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::signed_signed_rounding_mode_triple_gen_var_1;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::common::{
+    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
+};
+use malachite_nz_test_util::generators::{
+    integer_integer_rounding_mode_triple_gen_var_1, integer_pair_gen_var_1, integer_pair_gen_var_3,
+    integer_rounding_mode_pair_gen, integer_rounding_mode_pair_gen_var_2,
+    natural_natural_rounding_mode_triple_gen_var_1,
+};
 use num::{BigInt, Integer as NumInteger};
 use rug::ops::DivRounding;
 use std::str::FromStr;
@@ -996,4 +1009,120 @@ fn div_round_ref_ref_fail_1() {
 #[should_panic]
 fn div_round_ref_ref_fail_2() {
     (&Integer::from(10)).div_round(&Integer::from(3), RoundingMode::Exact);
+}
+
+#[test]
+fn div_round_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    integer_integer_rounding_mode_triple_gen_var_1().test_properties_with_config(
+        &config,
+        |(x, y, rm)| {
+            let mut mut_n = x.clone();
+            mut_n.div_round_assign(&y, rm);
+            assert!(mut_n.is_valid());
+            let q = mut_n;
+
+            let mut mut_n = x.clone();
+            mut_n.div_round_assign(y.clone(), rm);
+            assert!(mut_n.is_valid());
+            assert_eq!(mut_n, q);
+
+            let q_alt = (&x).div_round(&y, rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
+
+            let q_alt = (&x).div_round(y.clone(), rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
+
+            let q_alt = x.clone().div_round(&y, rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
+
+            let q_alt = x.clone().div_round(y.clone(), rm);
+            assert!(q_alt.is_valid());
+            assert_eq!(q_alt, q);
+
+            assert!(q.le_abs(&x));
+            assert_eq!(-(-&x).div_round(&y, -rm), q);
+            assert_eq!(-x.div_round(-y, -rm), q);
+        },
+    );
+
+    integer_pair_gen_var_1().test_properties(|(x, y)| {
+        let left_multiplied = &x * &y;
+        assert_eq!((&left_multiplied).div_round(&y, RoundingMode::Down), x);
+        assert_eq!((&left_multiplied).div_round(&y, RoundingMode::Up), x);
+        assert_eq!((&left_multiplied).div_round(&y, RoundingMode::Floor), x);
+        assert_eq!((&left_multiplied).div_round(&y, RoundingMode::Ceiling), x);
+        assert_eq!((&left_multiplied).div_round(&y, RoundingMode::Nearest), x);
+        assert_eq!((&left_multiplied).div_round(&y, RoundingMode::Exact), x);
+
+        assert_eq!(
+            rug_integer_to_integer(
+                &integer_to_rug_integer(&x).div_trunc(integer_to_rug_integer(&y))
+            ),
+            (&x).div_round(&y, RoundingMode::Down)
+        );
+        assert_eq!(
+            bigint_to_integer(&integer_to_bigint(&x).div_floor(&integer_to_bigint(&y))),
+            (&x).div_round(&y, RoundingMode::Floor)
+        );
+        assert_eq!(
+            rug_integer_to_integer(
+                &integer_to_rug_integer(&x).div_floor(integer_to_rug_integer(&y))
+            ),
+            (&x).div_round(&y, RoundingMode::Floor)
+        );
+        assert_eq!(
+            rug_integer_to_integer(
+                &integer_to_rug_integer(&x).div_ceil(integer_to_rug_integer(&y))
+            ),
+            x.div_round(y, RoundingMode::Ceiling)
+        );
+    });
+
+    integer_pair_gen_var_3().test_properties(|(x, y)| {
+        let down = (&x).div_round(&y, RoundingMode::Down);
+        let up = if (x >= 0) == (y >= 0) {
+            &down + Integer::ONE
+        } else {
+            &down - Integer::ONE
+        };
+        let floor = (&x).div_round(&y, RoundingMode::Floor);
+        let ceiling = &floor + Integer::ONE;
+        assert_eq!((&x).div_round(&y, RoundingMode::Up), up);
+        assert_eq!((&x).div_round(&y, RoundingMode::Ceiling), ceiling);
+        let nearest = x.div_round(y, RoundingMode::Nearest);
+        assert!(nearest == down || nearest == up);
+    });
+
+    integer_rounding_mode_pair_gen().test_properties(|(x, rm)| {
+        assert_eq!((&x).div_round(Integer::ONE, rm), x);
+        assert_eq!((&x).div_round(Integer::NEGATIVE_ONE, rm), -x);
+    });
+
+    integer_rounding_mode_pair_gen_var_2().test_properties(|(x, rm)| {
+        let x = &x;
+        assert_eq!(Integer::ZERO.div_round(x, rm), 0);
+        assert_eq!(x.div_round(x, rm), 1);
+        assert_eq!(x.div_round(-x, rm), -1);
+        assert_eq!((-x).div_round(x, rm), -1);
+    });
+
+    natural_natural_rounding_mode_triple_gen_var_1().test_properties(|(x, y, rm)| {
+        assert_eq!(
+            Integer::from(&x).div_round(Integer::from(&y), rm),
+            x.div_round(y, rm)
+        );
+    });
+
+    signed_signed_rounding_mode_triple_gen_var_1::<SignedLimb>().test_properties(|(x, y, rm)| {
+        assert_eq!(
+            Integer::from(x).div_round(Integer::from(y), rm),
+            x.div_round(y, rm)
+        );
+    });
 }

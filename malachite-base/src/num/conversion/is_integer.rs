@@ -29,7 +29,7 @@ impl<T: PrimitiveInt> IsInteger for T {
     }
 }
 
-fn _is_integer<T: PrimitiveFloat>(x: T) -> bool {
+fn is_integer<T: PrimitiveFloat>(x: T) -> bool {
     if x.is_nan() || x.is_infinite() {
         false
     } else if x == T::ZERO {
@@ -62,7 +62,7 @@ macro_rules! impl_is_integer_primitive_float {
             /// See the documentation of the `num::conversion::is_integer` module.
             #[inline]
             fn is_integer(self) -> bool {
-                _is_integer(self)
+                is_integer(self)
             }
         }
     };

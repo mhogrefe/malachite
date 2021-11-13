@@ -34,12 +34,9 @@ fn benchmark_integer_significant_bits_library_comparison(
         file_name,
         &triple_3_integer_bit_bucketer("n"),
         &mut [
-            (
-                "Malachite",
-                &mut (|(_, _, n)| no_out!(n.significant_bits())),
-            ),
-            ("num", &mut (|(n, _, _)| no_out!(n.bits()))),
-            ("rug", &mut (|(_, n, _)| no_out!(n.significant_bits()))),
+            ("Malachite", &mut |(_, _, n)| no_out!(n.significant_bits())),
+            ("num", &mut |(n, _, _)| no_out!(n.bits())),
+            ("rug", &mut |(_, n, _)| no_out!(n.significant_bits())),
         ],
     );
 }

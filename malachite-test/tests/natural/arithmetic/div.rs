@@ -1,13 +1,12 @@
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_nz::natural::arithmetic::div::{
-    _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
-    _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
-    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
-    limbs_div, limbs_div_divisor_of_limb_max_with_carry_in_place,
+    limbs_div, limbs_div_barrett, limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
+    limbs_div_barrett_scratch_len, limbs_div_divide_and_conquer,
+    limbs_div_divide_and_conquer_approx, limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
-    limbs_div_limb_to_out, limbs_div_to_out, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
-    limbs_div_to_out_val_ref,
+    limbs_div_limb_to_out, limbs_div_schoolbook, limbs_div_schoolbook_approx, limbs_div_to_out,
+    limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val, limbs_div_to_out_val_ref,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -200,7 +199,7 @@ fn limbs_div_schoolbook_properties() {
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
-            let q_highest = _limbs_div_schoolbook(&mut qs, &mut ns, ds, *inverse);
+            let q_highest = limbs_div_schoolbook(&mut qs, &mut ns, ds, *inverse);
             verify_limbs_div(qs_in, ns_in, ds, q_highest, &qs);
         },
     );
@@ -213,7 +212,7 @@ fn limbs_div_divide_and_conquer_properties() {
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
-            let q_highest = _limbs_div_divide_and_conquer(&mut qs, &mut ns, ds, *inverse);
+            let q_highest = limbs_div_divide_and_conquer(&mut qs, &mut ns, ds, *inverse);
             verify_limbs_div(qs_in, ns_in, ds, q_highest, &qs);
         },
     );
@@ -226,8 +225,8 @@ fn limbs_div_barrett_properties() {
         triples_of_limb_vec_var_42,
         |(ref qs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
-            let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
-            let q_highest = _limbs_div_barrett(&mut qs, &ns, ds, &mut scratch);
+            let mut scratch = vec![0; limbs_div_barrett_scratch_len(ns.len(), ds.len())];
+            let q_highest = limbs_div_barrett(&mut qs, &ns, ds, &mut scratch);
             verify_limbs_div(qs_in, ns, ds, q_highest, &qs);
         },
     );
@@ -240,7 +239,7 @@ fn limbs_div_schoolbook_approx_properties() {
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
-            let q_highest = _limbs_div_schoolbook_approx(&mut qs, &mut ns, ds, *inverse);
+            let q_highest = limbs_div_schoolbook_approx(&mut qs, &mut ns, ds, *inverse);
             verify_limbs_div_approx(qs_in, ns_in, ds, q_highest, &qs);
         },
     );
@@ -254,7 +253,7 @@ fn limbs_div_divide_and_conquer_approx_properties() {
         |(ref qs_in, ref ns_in, ref ds, inverse)| {
             let mut qs = qs_in.clone();
             let mut ns = ns_in.clone();
-            let q_highest = _limbs_div_divide_and_conquer_approx(&mut qs, &mut ns, ds, *inverse);
+            let q_highest = limbs_div_divide_and_conquer_approx(&mut qs, &mut ns, ds, *inverse);
             verify_limbs_div_approx(qs_in, ns_in, ds, q_highest, &qs);
         },
     );
@@ -267,8 +266,8 @@ fn limbs_div_barrett_approx_properties() {
         triples_of_limb_vec_var_41,
         |(ref qs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
-            let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
-            let q_highest = _limbs_div_barrett_approx(&mut qs, &ns, ds, &mut scratch);
+            let mut scratch = vec![0; limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
+            let q_highest = limbs_div_barrett_approx(&mut qs, &ns, ds, &mut scratch);
             verify_limbs_div_approx_2(qs_in, ns, ds, q_highest, &qs);
         },
     );

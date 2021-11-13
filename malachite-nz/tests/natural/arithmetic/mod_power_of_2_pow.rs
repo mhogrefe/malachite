@@ -140,39 +140,35 @@ fn limbs_mod_power_of_2_pow_fail_2() {
 
 #[test]
 fn test_mod_power_of_2_pow() {
-    let test = |u, exp, pow, out| {
-        assert!(Natural::from_str(u).unwrap().mod_power_of_2_is_reduced(pow));
+    let test = |s, t, pow, out| {
+        let u = Natural::from_str(s).unwrap();
+        let exp = Natural::from_str(t).unwrap();
+        assert!(u.mod_power_of_2_is_reduced(pow));
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_power_of_2_pow_assign(Natural::from_str(exp).unwrap(), pow);
+        let mut n = u.clone();
+        n.mod_power_of_2_pow_assign(exp.clone(), pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
         assert!(n.mod_power_of_2_is_reduced(pow));
 
-        let mut n = Natural::from_str(u).unwrap();
-        n.mod_power_of_2_pow_assign(&Natural::from_str(exp).unwrap(), pow);
+        let mut n = u.clone();
+        n.mod_power_of_2_pow_assign(&exp, pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_power_of_2_pow(Natural::from_str(exp).unwrap(), pow);
+        let n = u.clone().mod_power_of_2_pow(exp.clone(), pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap())
-            .mod_power_of_2_pow(Natural::from_str(exp).unwrap(), pow);
+        let n = (&u).mod_power_of_2_pow(exp.clone(), pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = Natural::from_str(u)
-            .unwrap()
-            .mod_power_of_2_pow(&Natural::from_str(exp).unwrap(), pow);
+        let n = u.clone().mod_power_of_2_pow(&exp, pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
 
-        let n = (&Natural::from_str(u).unwrap())
-            .mod_power_of_2_pow(&Natural::from_str(exp).unwrap(), pow);
+        let n = (&u).mod_power_of_2_pow(&exp, pow);
         assert_eq!(n.to_string(), out);
         assert!(n.is_valid());
     };

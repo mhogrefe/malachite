@@ -116,10 +116,9 @@ fn benchmark_limbs_hamming_distance_same_length(
         limit,
         file_name,
         &pair_1_vec_len_bucketer("xs"),
-        &mut [(
-            "Malachite",
-            &mut (|(xs, ys)| no_out!(limbs_hamming_distance_same_length(&xs, &ys))),
-        )],
+        &mut [("Malachite", &mut |(xs, ys)| {
+            no_out!(limbs_hamming_distance_same_length(&xs, &ys))
+        })],
     );
 }
 

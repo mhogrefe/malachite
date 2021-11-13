@@ -229,7 +229,7 @@ where
         (_, bits) if bits == T::ZERO => x.clone(),
         (Natural(Small(small)), bits) => {
             Natural(if let Some(shifted) = small.arithmetic_checked_shl(bits) {
-                Small(shifted) 
+                Small(shifted)
             } else {
                 Large(limbs_shl(&[*small], u64::exact_from(bits)))
             })

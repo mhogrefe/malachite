@@ -4,6 +4,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_nz::natural::Natural;
 use std::str::FromStr;
 
+// TODO clean from_str
+
 macro_rules! test_mod_power_of_2_shl_unsigned {
     ($t:ident) => {
         let test = |u, v: $t, pow, out| {

@@ -4,7 +4,7 @@ use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use std::ops::{BitOr, Shl, Shr};
 
 #[inline]
-fn _join_halves<T: BitOr<Output = T> + From<H> + Shl<u64, Output = T>, H: PrimitiveInt>(
+fn join_halves<T: BitOr<Output = T> + From<H> + Shl<u64, Output = T>, H: PrimitiveInt>(
     upper: H,
     lower: H,
 ) -> T {
@@ -12,7 +12,7 @@ fn _join_halves<T: BitOr<Output = T> + From<H> + Shl<u64, Output = T>, H: Primit
 }
 
 #[inline]
-fn _upper_half<T: Copy + Shr<u64, Output = T>, H: PrimitiveInt + WrappingFrom<T>>(x: &T) -> H {
+fn upper_half<T: Copy + Shr<u64, Output = T>, H: PrimitiveInt + WrappingFrom<T>>(x: &T) -> H {
     H::wrapping_from(*x >> H::WIDTH)
 }
 
@@ -39,7 +39,7 @@ macro_rules! impl_half_traits {
             /// See the documentation of the `num::conversion::half` module.
             #[inline]
             fn join_halves(upper: Self::Half, lower: Self::Half) -> Self {
-                _join_halves(upper, lower)
+                join_halves(upper, lower)
             }
         }
 
@@ -75,7 +75,7 @@ macro_rules! impl_half_traits {
             /// See the documentation of the `num::conversion::half` module.
             #[inline]
             fn upper_half(&self) -> Self::Half {
-                _upper_half(self)
+                upper_half(self)
             }
         }
     };

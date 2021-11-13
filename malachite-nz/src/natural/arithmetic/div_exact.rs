@@ -27,9 +27,9 @@ use natural::arithmetic::mul::mul_mod::{
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_to_out};
 use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
-    limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_greater_in_place_left,
-    limbs_sub_limb_in_place, limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_to_out, limbs_sub_same_length_to_out_with_overlap,
+    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
+    limbs_sub_same_length_to_out_with_overlap, limbs_sub_same_length_with_borrow_in_to_out,
 };
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::cmp::limbs_cmp_same_length;
@@ -66,6 +66,7 @@ const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
 ///
 /// test_invert_limb_table();
 /// ```
+#[doc(hidden)]
 pub fn test_invert_limb_table() {
     for (i, &inv) in INVERT_LIMB_TABLE.iter().enumerate() {
         let value = (u8::exact_from(i) << 1) + 1;
@@ -98,6 +99,7 @@ pub fn test_invert_limb_table() {
 /// ```
 ///
 /// This is binvert_limb from gmp-impl.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_modular_invert_limb(x: Limb) -> Limb {
     assert!(x.odd());
     let index = (x >> 1).mod_power_of_2(INVERT_LIMB_TABLE_LOG_SIZE);
@@ -125,7 +127,8 @@ pub fn limbs_modular_invert_limb(x: Limb) -> Limb {
 /// Panics if `ns` is empty or if `d` is zero.
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
-pub fn _limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
+#[doc(hidden)]
+pub fn limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_limb_to_out(&mut q, ns, d);
     q
@@ -141,7 +144,8 @@ pub fn _limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
 /// Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
-pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d: Limb) {
+#[doc(hidden)]
+pub fn limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert_ne!(len, 0);
@@ -198,7 +202,8 @@ pub fn _limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], 
 /// Panics if `ns` is empty or if `d` is zero.
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dst == src.
-pub fn _limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
+#[doc(hidden)]
+pub fn limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert_ne!(len, 0);
@@ -245,6 +250,7 @@ pub fn _limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
     }
 }
 
+#[doc(hidden)]
 pub const MAX_OVER_3: Limb = Limb::MAX / 3;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
@@ -270,6 +276,7 @@ pub const MAX_OVER_3: Limb = Limb::MAX / 3;
 ///
 /// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0
 /// and no carry-in, where the result is returned.
+#[doc(hidden)]
 pub fn limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_3_to_out(&mut q, ns);
@@ -305,6 +312,7 @@ pub fn limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
 ///
 /// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
 /// no carry-in, and no return value.
+#[doc(hidden)]
 pub fn limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
     let (out_last, out_init) = out[..ns.len()].split_last_mut().unwrap();
     let (ns_last, ns_init) = ns.split_last().unwrap();
@@ -341,6 +349,7 @@ pub fn limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
 /// ```
 /// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
 /// no carry-in, and no return value, where rp == up.
+#[doc(hidden)]
 pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
     let (ns_last, ns_init) = ns.split_last_mut().unwrap();
     let q = limbs_div_divisor_of_limb_max_with_carry_in_place(ns_init, MAX_OVER_3, 0);
@@ -377,11 +386,12 @@ pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 /// ```
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_to_out(out, ns)
     } else {
-        _limbs_div_exact_limb_to_out_no_special_3(out, ns, d);
+        limbs_div_exact_limb_to_out_no_special_3(out, ns, d);
     }
 }
 
@@ -408,11 +418,12 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 /// ```
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
+#[doc(hidden)]
 pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
     if d == 3 {
         limbs_div_exact_3(ns)
     } else {
-        _limbs_div_exact_limb_no_special_3(ns, d)
+        limbs_div_exact_limb_no_special_3(ns, d)
     }
 }
 
@@ -444,11 +455,12 @@ pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dest == src.
+#[doc(hidden)]
 pub fn limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_in_place(ns)
     } else {
-        _limbs_div_exact_limb_in_place_no_special_3(ns, d)
+        limbs_div_exact_limb_in_place_no_special_3(ns, d)
     }
 }
 
@@ -459,6 +471,7 @@ pub fn limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
 /// Result is O(`n`)
 ///
 /// This is mpn_binvert_itch from mpn/generic/binvert.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(n);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(
@@ -469,7 +482,8 @@ pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
     itch_local + itch_out
 }
 
-pub fn _limbs_modular_invert_small(
+#[doc(hidden)]
+pub fn limbs_modular_invert_small(
     size: usize,
     is: &mut [Limb],
     scratch: &mut [Limb],
@@ -477,9 +491,9 @@ pub fn _limbs_modular_invert_small(
     d_inv: Limb,
 ) {
     if size < DC_BDIV_Q_THRESHOLD {
-        _limbs_modular_div_schoolbook(is, scratch, ds, d_inv);
+        limbs_modular_div_schoolbook(is, scratch, ds, d_inv);
     } else {
-        _limbs_modular_div_divide_and_conquer(is, scratch, ds, d_inv);
+        limbs_modular_div_divide_and_conquer(is, scratch, ds, d_inv);
     }
 }
 
@@ -508,6 +522,7 @@ pub fn _limbs_modular_invert_small(
 /// ```
 ///
 /// This is mpn_binvert from mpn/generic/binvert.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     // Compute the computation precisions from highest to lowest, leaving the basecase size in
@@ -524,7 +539,7 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
     slice_set_zero(scratch_lo);
     scratch_lo[0] = 1;
     let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-    _limbs_modular_invert_small(size, is, scratch_lo, ds_lo, d_inv);
+    limbs_modular_invert_small(size, is, scratch_lo, ds_lo, d_inv);
     let mut previous_size = size;
     // Use Newton iterations to get the desired precision.
     for &size in sizes.iter().rev() {
@@ -562,7 +577,8 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
 ///
 /// This is mpn_sbpi1_bdiv_qr from mpn/generic/sbpi1_bdiv_qr.c, GMP 6.2.1. Note: need to investigate
 /// changes from 6.1.2.
-pub fn _limbs_modular_div_mod_schoolbook(
+#[doc(hidden)]
+pub fn limbs_modular_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -620,6 +636,21 @@ pub fn _limbs_modular_div_mod_schoolbook(
     }
 }
 
+fn limbs_modular_div_mod_helper(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    len: usize,
+    ds_lo: &[Limb],
+    d_inv: Limb,
+    scratch: &mut [Limb],
+) -> bool {
+    if len < DC_BDIV_QR_THRESHOLD {
+        limbs_modular_div_mod_schoolbook(qs, &mut ns[..len << 1], ds_lo, d_inv)
+    } else {
+        limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, scratch)
+    }
+}
+
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
 /// Additional memory: worst case O(n * log(n))
@@ -627,7 +658,7 @@ pub fn _limbs_modular_div_mod_schoolbook(
 /// where n = `ds.len()`
 ///
 /// This is mpn_dcpi1_bdiv_qr_n from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
-fn _limbs_modular_div_mod_divide_and_conquer_helper(
+fn limbs_modular_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -640,11 +671,7 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
     let lo = n >> 1; // floor(n / 2)
     let hi = n - lo; // ceil(n / 2)
     let (ds_lo, ds_hi) = ds.split_at(lo);
-    let carry = if lo < DC_BDIV_QR_THRESHOLD {
-        _limbs_modular_div_mod_schoolbook(qs, &mut ns[..lo << 1], ds_lo, d_inv)
-    } else {
-        _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, scratch)
-    };
+    let carry = limbs_modular_div_mod_helper(qs, ns, lo, ds_lo, d_inv, scratch);
     let (qs_lo, qs_hi) = qs.split_at_mut(lo);
     limbs_mul_greater_to_out(scratch, ds_hi, qs_lo);
     if carry {
@@ -653,11 +680,7 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
     let ns = &mut ns[lo..];
     let highest_r = limbs_sub_greater_in_place_left(ns, scratch);
     let (ds_lo, ds_hi) = ds.split_at(hi);
-    let carry = if hi < DC_BDIV_QR_THRESHOLD {
-        _limbs_modular_div_mod_schoolbook(qs_hi, &mut ns[..hi << 1], ds_lo, d_inv)
-    } else {
-        _limbs_modular_div_mod_divide_and_conquer_helper(qs_hi, ns, ds_lo, d_inv, scratch)
-    };
+    let carry = limbs_modular_div_mod_helper(qs_hi, ns, hi, ds_lo, d_inv, scratch);
     limbs_mul_greater_to_out(scratch, &qs_hi[..hi], ds_hi);
     if carry {
         assert!(!limbs_slice_add_limb_in_place(&mut scratch[hi..], 1));
@@ -688,7 +711,8 @@ fn _limbs_modular_div_mod_divide_and_conquer_helper(
 /// where n = `ns.len()`, d = `ds.len()`
 ///
 /// This is mpn_dcpi1_bdiv_qr from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
-pub fn _limbs_modular_div_mod_divide_and_conquer(
+#[doc(hidden)]
+pub fn limbs_modular_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -696,8 +720,8 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
 ) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
-    assert!(d_len >= 2); // to adhere to _limbs_modular_div_mod_schoolbook's limits
-    assert!(n_len > d_len); // to adhere to _limbs_modular_div_mod_schoolbook's limits
+    assert!(d_len >= 2); // to adhere to limbs_modular_div_mod_schoolbook's limits
+    assert!(n_len > d_len); // to adhere to limbs_modular_div_mod_schoolbook's limits
     assert!(ds[0].odd());
     let mut scratch = vec![0; d_len];
     let q_len = n_len - d_len;
@@ -714,11 +738,7 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
         };
         let (ds_lo, ds_hi) = ds.split_at(q_len_mod_d_len);
         // Perform the typically smaller block first.
-        carry = if q_len_mod_d_len < DC_BDIV_QR_THRESHOLD {
-            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..q_len_mod_d_len << 1], ds_lo, d_inv)
-        } else {
-            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, &mut scratch)
-        };
+        carry = limbs_modular_div_mod_helper(qs, ns, q_len_mod_d_len, ds_lo, d_inv, &mut scratch);
         if q_len_mod_d_len != d_len {
             limbs_mul_to_out(&mut scratch, ds_hi, &qs[..q_len_mod_d_len]);
             if carry {
@@ -738,7 +758,7 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
                 assert!(!borrow);
                 borrow = true;
             }
-            carry = _limbs_modular_div_mod_divide_and_conquer_helper(
+            carry = limbs_modular_div_mod_divide_and_conquer_helper(
                 &mut qs[q_diff..],
                 ns,
                 ds,
@@ -749,11 +769,7 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
         }
     } else {
         let (ds_lo, ds_hi) = ds.split_at(q_len);
-        carry = if q_len < DC_BDIV_QR_THRESHOLD {
-            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..q_len << 1], ds_lo, d_inv)
-        } else {
-            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, &mut scratch)
-        };
+        carry = limbs_modular_div_mod_helper(qs, ns, q_len, ds_lo, d_inv, &mut scratch);
         if q_len != d_len {
             limbs_mul_to_out(&mut scratch, ds_hi, qs);
             if carry {
@@ -775,13 +791,14 @@ pub fn _limbs_modular_div_mod_divide_and_conquer(
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_dcpi1_bdiv_qr_n_itch from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
-#[inline]
-pub const fn _limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+#[doc(hidden)]
+pub const fn limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }
 
 /// This is mpn_mu_bdiv_qr_itch from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
-pub fn _limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+#[doc(hidden)]
+pub fn limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let q_len = n_len - d_len;
     let i_len = if q_len > d_len {
@@ -804,7 +821,7 @@ pub fn _limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) ->
     i_len + max(scratch_len, modular_invert_scratch_len)
 }
 
-fn _limbs_modular_div_mod_barrett_unbalanced(
+fn limbs_modular_div_mod_barrett_unbalanced(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -911,7 +928,7 @@ fn _limbs_modular_div_mod_barrett_unbalanced(
     )
 }
 
-fn _limbs_modular_div_mod_barrett_balanced(
+fn limbs_modular_div_mod_barrett_balanced(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1010,7 +1027,8 @@ fn _limbs_modular_div_mod_barrett_balanced(
 /// the last limb of `ds` is even.
 ///
 /// This is mpn_mu_bdiv_qr from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
-pub fn _limbs_modular_div_mod_barrett(
+#[doc(hidden)]
+pub fn limbs_modular_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1022,9 +1040,9 @@ pub fn _limbs_modular_div_mod_barrett(
     assert!(d_len >= 2);
     assert!(n_len >= d_len + 2);
     if n_len > d_len << 1 {
-        _limbs_modular_div_mod_barrett_unbalanced(qs, rs, ns, ds, scratch)
+        limbs_modular_div_mod_barrett_unbalanced(qs, rs, ns, ds, scratch)
     } else {
-        _limbs_modular_div_mod_barrett_balanced(qs, rs, ns, ds, scratch)
+        limbs_modular_div_mod_barrett_balanced(qs, rs, ns, ds, scratch)
     }
 }
 
@@ -1051,7 +1069,8 @@ pub fn _limbs_modular_div_mod_barrett(
 ///
 /// This is mpn_sbpi1_bdiv_q from mpn/generic/sbpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
 /// changes from 6.1.2.
-pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
+#[doc(hidden)]
+pub fn limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1084,8 +1103,8 @@ pub fn _limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1.
-#[inline]
-pub const fn _limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+#[doc(hidden)]
+pub const fn limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
 }
 
@@ -1097,7 +1116,7 @@ pub const fn _limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) 
 ///
 /// This is mpn_dcpi1_bdiv_q_n from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
 /// changes from 6.1.2.
-fn _limbs_modular_div_divide_and_conquer_helper(
+fn limbs_modular_div_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -1113,7 +1132,7 @@ fn _limbs_modular_div_divide_and_conquer_helper(
         let qs = &mut qs[m..];
         let ns = &mut ns[m..];
         let carry_1 =
-            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, &ds[..lo], d_inv, scratch);
+            limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, &ds[..lo], d_inv, scratch);
         let qs = &qs[..lo];
         limbs_mul_low_same_length(scratch, qs, &ds[hi..n_rem]);
         limbs_sub_same_length_in_place_left(&mut ns[hi..n_rem], &scratch[..lo]);
@@ -1129,7 +1148,7 @@ fn _limbs_modular_div_divide_and_conquer_helper(
         n_rem = hi;
     }
     let m = n - n_rem;
-    _limbs_modular_div_schoolbook(&mut qs[m..], &mut ns[m..n], &ds[..n_rem], d_inv);
+    limbs_modular_div_schoolbook(&mut qs[m..], &mut ns[m..n], &ds[..n_rem], d_inv);
 }
 
 /// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
@@ -1143,7 +1162,8 @@ fn _limbs_modular_div_divide_and_conquer_helper(
 ///
 /// This is mpn_dcpi1_bdiv_q from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
 /// changes from 6.1.2.
-pub fn _limbs_modular_div_divide_and_conquer(
+#[doc(hidden)]
+pub fn limbs_modular_div_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -1166,9 +1186,9 @@ pub fn _limbs_modular_div_divide_and_conquer(
         // Perform the typically smaller block first.
         let (ds_lo, ds_hi) = ds.split_at(n_len_mod_d_len);
         let mut carry = if n_len_mod_d_len < DC_BDIV_QR_THRESHOLD {
-            _limbs_modular_div_mod_schoolbook(qs, &mut ns[..n_len_mod_d_len << 1], ds_lo, d_inv)
+            limbs_modular_div_mod_schoolbook(qs, &mut ns[..n_len_mod_d_len << 1], ds_lo, d_inv)
         } else {
-            _limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, &mut scratch)
+            limbs_modular_div_mod_divide_and_conquer_helper(qs, ns, ds_lo, d_inv, &mut scratch)
         };
         if n_len_mod_d_len != d_len {
             limbs_mul_to_out(&mut scratch, ds_hi, &qs[..n_len_mod_d_len]);
@@ -1187,7 +1207,7 @@ pub fn _limbs_modular_div_divide_and_conquer(
             if carry {
                 limbs_sub_limb_in_place(&mut ns[m + d_len..], 1);
             }
-            carry = _limbs_modular_div_mod_divide_and_conquer_helper(
+            carry = limbs_modular_div_mod_divide_and_conquer_helper(
                 &mut qs[m..],
                 &mut ns[m..],
                 ds,
@@ -1196,7 +1216,7 @@ pub fn _limbs_modular_div_divide_and_conquer(
             );
             m += d_len;
         }
-        _limbs_modular_div_divide_and_conquer_helper(
+        limbs_modular_div_divide_and_conquer_helper(
             &mut qs[diff..],
             &mut ns[diff..],
             ds,
@@ -1204,15 +1224,16 @@ pub fn _limbs_modular_div_divide_and_conquer(
             &mut scratch,
         );
     } else if n_len < DC_BDIV_Q_THRESHOLD {
-        _limbs_modular_div_schoolbook(qs, ns, ds, d_inv);
+        limbs_modular_div_schoolbook(qs, ns, ds, d_inv);
     } else {
         let mut scratch = vec![0; n_len];
-        _limbs_modular_div_divide_and_conquer_helper(qs, ns, ds, d_inv, &mut scratch);
+        limbs_modular_div_divide_and_conquer_helper(qs, ns, ds, d_inv, &mut scratch);
     }
 }
 
 /// This is mpn_mu_bdiv_q_itch from mpn/generic/mu_bdiv_q.c, GMP 6.2.1.
-pub fn _limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+#[doc(hidden)]
+pub fn limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let i_len;
     let mul_len = if n_len > d_len {
@@ -1245,7 +1266,7 @@ pub fn _limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usi
     i_len + max(mul_len, invert_len)
 }
 
-fn _limbs_modular_div_barrett_greater(
+fn limbs_modular_div_barrett_greater(
     qs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
@@ -1357,7 +1378,7 @@ fn _limbs_modular_div_barrett_greater(
     limbs_mul_low_same_length(qs_hi, &rs[..limit], &is[..limit]);
 }
 
-fn _limbs_modular_div_barrett_same_length(
+fn limbs_modular_div_barrett_same_length(
     qs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
@@ -1387,9 +1408,7 @@ fn _limbs_modular_div_barrett_same_length(
                 assert!(!limbs_sub_limb_in_place(scratch_hi, 1));
             }
         } else {
-            fail_on_untested_path(
-                "limbs_modular_div_mod_barrett_same_length, wrapped_len is None",
-            );
+            fail_on_untested_path("limbs_modular_div_mod_barrett_same_length, wrapped_len is None");
         }
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
@@ -1408,25 +1427,27 @@ fn _limbs_modular_div_barrett_same_length(
 /// where n = `ns.len()`
 ///
 /// This is mpn_mu_bdiv_q from mpn/generic/mu_bdiv_q.c, GMP 6.2.1.
-pub fn _limbs_modular_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+#[doc(hidden)]
+pub fn limbs_modular_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(d_len >= 2);
     assert!(n_len >= d_len);
     if n_len > d_len {
-        _limbs_modular_div_barrett_greater(qs, ns, ds, scratch);
+        limbs_modular_div_barrett_greater(qs, ns, ds, scratch);
     } else {
-        _limbs_modular_div_barrett_same_length(qs, ns, ds, scratch);
+        limbs_modular_div_barrett_same_length(qs, ns, ds, scratch);
     }
 }
 
 /// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, GMP 6.2.1, where nothing is allocated for
 /// inputs that are too small for Barrett division. Note: need to investigate changes from 6.1.2.
-pub fn _limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
+#[doc(hidden)]
+pub fn limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         0
     } else {
-        _limbs_modular_div_barrett_scratch_len(n_len, d_len)
+        limbs_modular_div_barrett_scratch_len(n_len, d_len)
     }
 }
 
@@ -1440,25 +1461,27 @@ pub fn _limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
 ///
 /// This is mpn_bdiv_q from mpn/generic/bdiv_q.c, GMP 6.2.1. Note: need to investigate changes from
 /// 6.1.2.
-pub fn _limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
+#[doc(hidden)]
+pub fn limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_schoolbook(qs, ns, ds, d_inv);
+        limbs_modular_div_schoolbook(qs, ns, ds, d_inv);
     } else if d_len < MU_BDIV_Q_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_divide_and_conquer(qs, ns, ds, d_inv);
+        limbs_modular_div_divide_and_conquer(qs, ns, ds, d_inv);
     } else {
-        _limbs_modular_div_barrett(qs, ns, ds, scratch);
+        limbs_modular_div_barrett(qs, ns, ds, scratch);
     }
 }
 
 /// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, GMP 6.2.1.
-pub fn _limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
+#[doc(hidden)]
+pub fn limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         n_len
     } else {
-        _limbs_modular_div_barrett_scratch_len(n_len, d_len)
+        limbs_modular_div_barrett_scratch_len(n_len, d_len)
     }
 }
 
@@ -1471,21 +1494,22 @@ pub fn _limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
 /// where n = `ns.len()`
 ///
 /// This is mpn_bdiv_q from mpn/generic/bdiv_q.c, GMP 6.2.1.
-pub fn _limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+#[doc(hidden)]
+pub fn limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
         let scratch = &mut scratch[..n_len];
         scratch.copy_from_slice(ns);
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_schoolbook(qs, scratch, ds, d_inv);
+        limbs_modular_div_schoolbook(qs, scratch, ds, d_inv);
     } else if d_len < MU_BDIV_Q_THRESHOLD {
         let scratch = &mut scratch[..n_len];
         scratch.copy_from_slice(ns);
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_divide_and_conquer(qs, scratch, ds, d_inv);
+        limbs_modular_div_divide_and_conquer(qs, scratch, ds, d_inv);
     } else {
-        _limbs_modular_div_barrett(qs, ns, ds, scratch);
+        limbs_modular_div_barrett(qs, ns, ds, scratch);
     }
 }
 
@@ -1522,6 +1546,7 @@ pub fn _limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch
 ///
 /// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1, where scratch is allocated
 /// internally and qp is returned.
+#[doc(hidden)]
 pub fn limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut qs = vec![0; ns.len() - ds.len() + 1];
     limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
@@ -1562,6 +1587,7 @@ pub fn limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1589,8 +1615,8 @@ pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb])
         limbs_slice_shr_in_place(&mut ns[..q_len_plus_1], shift);
     }
     let d_len = min(d_len, q_len);
-    let mut scratch = vec![0; _limbs_modular_div_scratch_len(q_len, d_len)];
-    _limbs_modular_div(qs, &mut ns[..q_len], &ds[..d_len], &mut scratch);
+    let mut scratch = vec![0; limbs_modular_div_scratch_len(q_len, d_len)];
+    limbs_modular_div(qs, &mut ns[..q_len], &ds[..d_len], &mut scratch);
 }
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
@@ -1631,6 +1657,7 @@ pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb])
 /// ```
 ///
 /// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1661,8 +1688,8 @@ pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Li
         limbs_slice_shr_in_place(&mut ns[..q_len_plus_1], shift);
     }
     let d_len = min(d_len, q_len);
-    let mut scratch = vec![0; _limbs_modular_div_scratch_len(q_len, d_len)];
-    _limbs_modular_div(qs, &mut ns[..q_len], &ds[..d_len], &mut scratch);
+    let mut scratch = vec![0; limbs_modular_div_scratch_len(q_len, d_len)];
+    limbs_modular_div(qs, &mut ns[..q_len], &ds[..d_len], &mut scratch);
 }
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
@@ -1703,6 +1730,7 @@ pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Li
 /// ```
 ///
 /// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1734,8 +1762,8 @@ pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Li
         ns = &ns_scratch;
     }
     let d_len = min(d_len, q_len);
-    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(q_len, d_len)];
-    _limbs_modular_div_ref(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
+    let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(q_len, d_len)];
+    limbs_modular_div_ref(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
 }
 
 /// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
@@ -1772,6 +1800,7 @@ pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Li
 /// ```
 ///
 /// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -1806,8 +1835,8 @@ pub fn limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb])
         ns = &ns_scratch;
     }
     let d_len = min(d_len, q_len);
-    let mut scratch = vec![0; _limbs_modular_div_ref_scratch_len(q_len, d_len)];
-    _limbs_modular_div_ref(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
+    let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(q_len, d_len)];
+    limbs_modular_div_ref(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
 }
 
 impl Natural {

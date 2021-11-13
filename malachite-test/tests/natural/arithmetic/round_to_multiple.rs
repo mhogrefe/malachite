@@ -14,6 +14,14 @@ use malachite_test::inputs::natural::{
     pairs_of_natural_and_rounding_mode, triples_of_natural_natural_and_rounding_mode_var_2,
 };
 
+// triples_of_unsigned_unsigned_and_rounding_mode_var_1 ->
+//     unsigned_unsigned_rounding_mode_triple_gen_var_2
+// pairs_of_natural_and_positive_natural -> natural_pair_gen_var_5
+// pairs_of_natural_and_positive_natural_var_2 -> natural_pair_gen_var_7
+// pairs_of_natural_and_rounding_mode -> natural_rounding_mode_pair_gen
+// triples_of_natural_natural_and_rounding_mode_var_2 ->
+//     natural_natural_rounding_mode_triple_gen_var_2
+
 #[test]
 fn round_to_multiple_properties() {
     test_properties(

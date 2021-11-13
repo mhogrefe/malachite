@@ -563,10 +563,34 @@ pub fn triple_2_vec_len_bucketer<T, U, V>(xs_name: &str) -> Bucketer<(T, Vec<U>,
     }
 }
 
-pub fn triple_2_3_vec_max_len_bucketer<'a, T, U, V>(
+pub fn triple_vec_max_len_bucketer<'a, T, U, V>(
+    xs_name: &str,
     ys_name: &str,
     zs_name: &str,
 ) -> Bucketer<'a, (Vec<T>, Vec<U>, Vec<V>)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys, zs)| max!(xs.len(), ys.len(), zs.len()),
+        bucketing_label: format!(
+            "max({}.len(), {}.len(), {}.len())",
+            xs_name, ys_name, zs_name
+        ),
+    }
+}
+
+pub fn triple_1_2_vec_max_len_bucketer<'a, T, U, V>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (Vec<T>, Vec<U>, V)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys, _)| max(xs.len(), ys.len()),
+        bucketing_label: format!("max({}.len(), {}.len())", xs_name, ys_name),
+    }
+}
+
+pub fn triple_2_3_vec_max_len_bucketer<'a, T, U, V>(
+    ys_name: &str,
+    zs_name: &str,
+) -> Bucketer<'a, (T, Vec<U>, Vec<V>)> {
     Bucketer {
         bucketing_function: &|(_, xs, ys)| max(xs.len(), ys.len()),
         bucketing_label: format!("max({}.len(), {}.len())", ys_name, zs_name),

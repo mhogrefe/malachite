@@ -13,15 +13,16 @@ use natural::arithmetic::mul::fft::{limbs_mul_fft, limbs_mul_fft_best_k};
 use natural::arithmetic::mul::{limbs_mul_greater_to_out, limbs_mul_same_length_to_out};
 use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::arithmetic::sub::{
-    limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_greater_in_place_left,
-    limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
-    limbs_sub_greater_to_out,
+    limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_to_out,
+    limbs_sub_same_length_with_borrow_in_in_place_right,
 };
 use platform::Limb;
 use std::cmp::min;
 
 //TODO tune
 pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
+//TODO tune
 pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
 
 pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(

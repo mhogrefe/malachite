@@ -5,18 +5,18 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::div::{
-    _limbs_div_barrett, _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
-    _limbs_div_barrett_scratch_len, _limbs_div_divide_and_conquer,
-    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook, _limbs_div_schoolbook_approx,
-    _limbs_div_to_out_balanced, _limbs_div_to_out_unbalanced, limbs_div,
-    limbs_div_divisor_of_limb_max_with_carry_in_place,
+    limbs_div, limbs_div_barrett, limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
+    limbs_div_barrett_scratch_len, limbs_div_divide_and_conquer,
+    limbs_div_divide_and_conquer_approx, limbs_div_divisor_of_limb_max_with_carry_in_place,
     limbs_div_divisor_of_limb_max_with_carry_to_out, limbs_div_limb, limbs_div_limb_in_place,
-    limbs_div_limb_to_out, limbs_div_to_out, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
-    limbs_div_to_out_val_ref,
+    limbs_div_limb_to_out, limbs_div_schoolbook, limbs_div_schoolbook_approx, limbs_div_to_out,
+    limbs_div_to_out_balanced, limbs_div_to_out_ref_ref, limbs_div_to_out_ref_val,
+    limbs_div_to_out_unbalanced, limbs_div_to_out_val_ref,
 };
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
-    _limbs_div_mod_schoolbook, limbs_div_mod, limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
+    limbs_div_mod, limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len,
+    limbs_div_mod_divide_and_conquer, limbs_div_mod_schoolbook, limbs_div_mod_to_out,
+    limbs_two_limb_inverse_helper,
 };
 use malachite_nz_test_util::natural::arithmetic::div::{
     limbs_div_limb_in_place_alt, limbs_div_limb_to_out_alt,
@@ -201,9 +201,9 @@ fn demo_limbs_div_schoolbook(gm: GenerationMode, limit: usize) {
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
-        let highest_q = _limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
+        let highest_q = limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; _limbs_div_schoolbook(&mut qs, &mut ns, {:?}, {}) = {}; \
+            "qs := {:?}; ns := {:?}; limbs_div_schoolbook(&mut qs, &mut ns, {:?}, {}) = {}; \
              qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, highest_q, qs, ns
         );
@@ -216,9 +216,9 @@ fn demo_limbs_div_divide_and_conquer(gm: GenerationMode, limit: usize) {
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
-        let highest_q = _limbs_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
+        let highest_q = limbs_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; _limbs_div_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = \
+            "qs := {:?}; ns := {:?}; limbs_div_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = \
              {}; qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, highest_q, qs, ns
         );
@@ -228,11 +228,11 @@ fn demo_limbs_div_divide_and_conquer(gm: GenerationMode, limit: usize) {
 fn demo_limbs_div_barrett(gm: GenerationMode, limit: usize) {
     for (mut qs, ns, ds) in triples_of_limb_vec_var_42(gm).take(limit) {
         let old_qs = qs.clone();
-        let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
-        let highest_q = _limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch);
+        let mut scratch = vec![0; limbs_div_barrett_scratch_len(ns.len(), ds.len())];
+        let highest_q = limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch);
         println!(
             "qs := {:?}; ns := {:?}; \
-             _limbs_div_barrett(&mut qs, ns, {:?}, &mut scratch) = {}; qs = {:?}",
+             limbs_div_barrett(&mut qs, ns, {:?}, &mut scratch) = {}; qs = {:?}",
             old_qs, ns, ds, highest_q, qs
         );
     }
@@ -244,10 +244,10 @@ fn demo_limbs_div_schoolbook_approx(gm: GenerationMode, limit: usize) {
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
-        let highest_q = _limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse);
+        let highest_q = limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse);
         println!(
             "qs := {:?}; ns := {:?}; \
-             _limbs_div_schoolbook_approx(&mut qs, &mut ns, {:?}, {}) = {}; \
+             limbs_div_schoolbook_approx(&mut qs, &mut ns, {:?}, {}) = {}; \
              qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, highest_q, qs, ns
         );
@@ -260,10 +260,10 @@ fn demo_limbs_div_divide_and_conquer_approx(gm: GenerationMode, limit: usize) {
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
-        let highest_q = _limbs_div_divide_and_conquer_approx(&mut qs, &mut ns, &ds, inverse);
+        let highest_q = limbs_div_divide_and_conquer_approx(&mut qs, &mut ns, &ds, inverse);
         println!(
             "qs := {:?}; ns := {:?}; \
-             _limbs_div_divide_and_conquer_approx(&mut qs, &mut ns, {:?}, {}) = {}; \
+             limbs_div_divide_and_conquer_approx(&mut qs, &mut ns, {:?}, {}) = {}; \
              qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, highest_q, qs, ns
         );
@@ -273,11 +273,11 @@ fn demo_limbs_div_divide_and_conquer_approx(gm: GenerationMode, limit: usize) {
 fn demo_limbs_div_barrett_approx(gm: GenerationMode, limit: usize) {
     for (mut qs, ns, ds) in triples_of_limb_vec_var_41(gm).take(limit) {
         let old_qs = qs.clone();
-        let mut scratch = vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
-        let highest_q = _limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch);
+        let mut scratch = vec![0; limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
+        let highest_q = limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch);
         println!(
             "qs := {:?}; ns := {:?}; \
-             _limbs_div_barrett_approx(&mut qs, ns, {:?}, &mut scratch) = {}; qs = {:?}",
+             limbs_div_barrett_approx(&mut qs, ns, {:?}, &mut scratch) = {}; qs = {:?}",
             old_qs, ns, ds, highest_q, qs
         );
     }
@@ -512,13 +512,13 @@ fn benchmark_limbs_div_schoolbook_algorithms(gm: GenerationMode, limit: usize, f
             (
                 "Schoolbook div/mod",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                    no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
                 "Schoolbook div",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                    no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
         ],
@@ -543,13 +543,13 @@ fn benchmark_limbs_div_divide_and_conquer_algorithms(
             (
                 "Schoolbook div",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                    no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
                 "divide-and-conquer div/mod",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_divide_and_conquer(
+                    no_out!(limbs_div_mod_divide_and_conquer(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
@@ -557,9 +557,7 @@ fn benchmark_limbs_div_divide_and_conquer_algorithms(
             (
                 "divide-and-conquer div",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_divide_and_conquer(
-                        &mut qs, &mut ns, &ds, inverse
-                    ))
+                    no_out!(limbs_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
         ],
@@ -580,9 +578,7 @@ fn benchmark_limbs_div_barrett_algorithms(gm: GenerationMode, limit: usize, file
             (
                 "divide-and-conquer div",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_divide_and_conquer(
-                        &mut qs, &mut ns, &ds, inverse
-                    ))
+                    no_out!(limbs_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
@@ -590,8 +586,8 @@ fn benchmark_limbs_div_barrett_algorithms(gm: GenerationMode, limit: usize, file
                 &mut (|(mut qs, ns, ds, _)| {
                     let mut rs = vec![0; ds.len()];
                     let mut scratch =
-                        vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-                    no_out!(_limbs_div_mod_barrett(
+                        vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                    no_out!(limbs_div_mod_barrett(
                         &mut qs,
                         &mut rs,
                         &ns,
@@ -603,8 +599,8 @@ fn benchmark_limbs_div_barrett_algorithms(gm: GenerationMode, limit: usize, file
             (
                 "Barrett div",
                 &mut (|(mut qs, ns, ds, _)| {
-                    let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
-                    no_out!(_limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch))
+                    let mut scratch = vec![0; limbs_div_barrett_scratch_len(ns.len(), ds.len())];
+                    no_out!(limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch))
                 }),
             ),
         ],
@@ -629,13 +625,13 @@ fn benchmark_limbs_div_schoolbook_approx_algorithms(
             (
                 "Schoolbook",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                    no_out!(limbs_div_schoolbook(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
                 "Schoolbook approx",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse))
+                    no_out!(limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
         ],
@@ -660,21 +656,19 @@ fn benchmark_limbs_div_divide_and_conquer_approx_algorithms(
             (
                 "Schoolbook approx",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse))
+                    no_out!(limbs_div_schoolbook_approx(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
                 "divide-and-conquer",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_divide_and_conquer(
-                        &mut qs, &mut ns, &ds, inverse
-                    ))
+                    no_out!(limbs_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
                 "divide-and-conquer approx",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_divide_and_conquer_approx(
+                    no_out!(limbs_div_divide_and_conquer_approx(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
@@ -703,7 +697,7 @@ fn benchmark_limbs_div_barrett_approx_algorithms(
                 &mut (|(mut qs, mut ns, ds, _)| {
                     // recompute inverse to make benchmark fair
                     let inverse = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-                    no_out!(_limbs_div_divide_and_conquer_approx(
+                    no_out!(limbs_div_divide_and_conquer_approx(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
@@ -711,16 +705,16 @@ fn benchmark_limbs_div_barrett_approx_algorithms(
             (
                 "Barrett",
                 &mut (|(mut qs, ns, ds, _)| {
-                    let mut scratch = vec![0; _limbs_div_barrett_scratch_len(ns.len(), ds.len())];
-                    no_out!(_limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch))
+                    let mut scratch = vec![0; limbs_div_barrett_scratch_len(ns.len(), ds.len())];
+                    no_out!(limbs_div_barrett(&mut qs, &ns, &ds, &mut scratch))
                 }),
             ),
             (
                 "Barrett approx",
                 &mut (|(mut qs, ns, ds, _)| {
                     let mut scratch =
-                        vec![0; _limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
-                    no_out!(_limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch))
+                        vec![0; limbs_div_barrett_approx_scratch_len(ns.len(), ds.len())];
+                    no_out!(limbs_div_barrett_approx(&mut qs, &ns, &ds, &mut scratch))
                 }),
             ),
         ],
@@ -765,12 +759,12 @@ fn benchmark_limbs_div_to_out_balancing_algorithms(
             (
                 "unbalanced",
                 &mut (|(mut qs, mut ns, mut ds)| {
-                    _limbs_div_to_out_unbalanced(&mut qs, &mut ns, &mut ds)
+                    limbs_div_to_out_unbalanced(&mut qs, &mut ns, &mut ds)
                 }),
             ),
             (
                 "balanced",
-                &mut (|(mut qs, ns, ds)| _limbs_div_to_out_balanced(&mut qs, &ns, &ds)),
+                &mut (|(mut qs, ns, ds)| limbs_div_to_out_balanced(&mut qs, &ns, &ds)),
             ),
         ],
     );

@@ -34,8 +34,10 @@ use platform::{
 };
 use std::cmp::Ordering;
 
+//TODO tune
 const GET_STR_THRESHOLD_LIMIT: usize = 150;
 
+//TODO tune
 #[doc(hidden)]
 pub const GET_STR_PRECOMPUTE_THRESHOLD: usize = 29;
 
@@ -113,6 +115,13 @@ macro_rules! base_10_normalization_step {
     };
 }
 
+//TODO tune
+const RP_LEN: usize = if TUNE_PROGRAM_BUILD {
+    GET_STR_THRESHOLD_LIMIT
+} else {
+    GET_STR_PRECOMPUTE_THRESHOLD
+};
+
 /// Convert `xs` to digits in base `base`, and put the result in `out`. Generate `len` digits,
 /// possibly padding with zeros to the left. If `len` is zero, generate as many characters as
 /// required. Return the number of significant digits. Complexity is quadratic; intended for small
@@ -138,11 +147,6 @@ pub fn _limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
     // Allocate memory for largest possible string, given that we only get here for operands with
     // `xs_len` < GET_STR_PRECOMPUTE_THRESHOLD and that the smallest base is 3. 7 / 11 is an
     // approximation to 1 / log_2(3).
-    const RP_LEN: usize = if TUNE_PROGRAM_BUILD {
-        GET_STR_THRESHOLD_LIMIT
-    } else {
-        GET_STR_PRECOMPUTE_THRESHOLD
-    };
     const BUFFER_LEN: usize = (RP_LEN << Limb::LOG_WIDTH) * 7 / 11;
     let mut buffer = [T::ZERO; BUFFER_LEN];
     let mut rs = [0; RP_LEN];
@@ -250,10 +254,13 @@ pub struct PowerTableRow<'a> {
     digits_in_base: usize, // number of corresponding digits
 }
 
+//TODO tune
 const DIV_1_VS_MUL_1_PERCENT: usize = 150;
 
+//TODO tune
 const HAVE_MPN_COMPUTE_POWTAB_MUL: bool = DIV_1_VS_MUL_1_PERCENT > 120;
 
+//TODO tune
 const HAVE_MPN_COMPUTE_POWTAB_DIV: bool = DIV_1_VS_MUL_1_PERCENT < 275;
 
 #[doc(hidden)]
@@ -583,6 +590,7 @@ pub fn _limbs_compute_power_table(
     (power_len, powers)
 }
 
+//TODO tune
 const GET_STR_DC_THRESHOLD: usize = 15;
 
 /// Convert `xs` to a string with a base as represented in `powers`, and put the string in `out`.
@@ -762,6 +770,7 @@ pub fn _to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natur
     }
 }
 
+//TODO tune
 const TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 50;
 
 const SQRT_MAX_LIMB: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
@@ -1167,6 +1176,7 @@ where
     Some(size)
 }
 
+//TODO tune
 // must be greater than get_chars_per_limb(3), which is 40 for 64-bit build
 const SET_STR_DC_THRESHOLD: usize = 7100;
 

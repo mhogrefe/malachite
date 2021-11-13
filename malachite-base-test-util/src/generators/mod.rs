@@ -801,7 +801,8 @@ pub fn signed_signed_unsigned_triple_gen_var_3<T: PrimitiveSigned>() -> Generato
 
 // -- (PrimitiveSigned, PrimitiveSigned, RoundingMode) --
 
-//TODO description
+// All `(T, T, RoundingMode)` where `T` is signed and the triple is a valid input to
+// `T::div_round`.
 pub fn signed_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
 ) -> Generator<(T, T, RoundingMode)> {
     Generator::new(
@@ -952,8 +953,8 @@ pub fn signed_unsigned_pair_gen_var_10<T: PrimitiveSigned>() -> Generator<(T, u6
     )
 }
 
-// All `(T, u64)`s where `T` is signed and the either the `T` is non-positive or the `u64` is less
-// than `T::WIDTH`.
+// All `(T, u64)`s where `T` is signed and the either the `T` is non-positive and not `T::MIN`, or
+// the `u64` is less than `T::WIDTH`.
 pub fn signed_unsigned_pair_gen_var_11<T: PrimitiveSigned>() -> Generator<(T, u64)> {
     Generator::new(
         &exhaustive_signed_unsigned_pair_gen_var_12,
@@ -2737,6 +2738,17 @@ pub fn unsigned_vec_unsigned_pair_gen_var_22<T: PrimitiveUnsigned, U: PrimitiveU
     )
 }
 
+// All `(Vec<T>, U)` where `T` and `U` are unsigned, the `Vec` has at least 2 elements and at least
+// one nonzero element, and the `U` is positive.
+pub fn unsigned_vec_unsigned_pair_gen_var_23<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(Vec<T>, U)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_primitive_int_pair_gen_var_5,
+        &random_primitive_int_vec_unsigned_pair_gen_var_12,
+        &special_random_unsigned_vec_unsigned_pair_gen_var_20,
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 type T1<T> = Generator<(Vec<T>, T, T)>;
@@ -2796,6 +2808,41 @@ pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_4<
         &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_4,
         &random_primitive_int_vec_unsigned_unsigned_triple_gen_var_3,
         &special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_4,
+    )
+}
+
+// All `(Vec<T>, T, T)` where `T` is unsigned, both `T`s are positive, the `Vec` contains at least
+// two elements, and its last element is nonzero.
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>() -> T1<T> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_5,
+        &random_primitive_int_vec_unsigned_unsigned_triple_gen_var_4,
+        &special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_5,
+    )
+}
+
+// var 6 is in malachite-nz
+
+// All `(Vec<T>, T, T)` where `T` is unsigned, the second `T` is positive, the `Vec` contains at
+// least two elements, and its last element is nonzero.
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_7<T: PrimitiveUnsigned>() -> T1<T> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_7,
+        &random_primitive_int_vec_unsigned_unsigned_triple_gen_var_5,
+        &special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_7,
+    )
+}
+
+// All `(Vec<T>, T, U)` where `T` and `U` are unsigned, the `U` is small, the `Vec` contains at
+// least two elements, and its last element is nonzero.
+pub fn unsigned_vec_unsigned_unsigned_triple_gen_var_8<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(Vec<T>, T, U)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_8,
+        &random_primitive_int_vec_unsigned_unsigned_triple_gen_var_6,
+        &special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_8,
     )
 }
 
@@ -2926,6 +2973,47 @@ pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>
         &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_5,
         &random_primitive_int_vec_primitive_int_vec_primitive_int_triple_gen_var_3,
         &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_5,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, U)` where `T` and `U` are unsigned, the `U` is positive, both `Vec`s
+// contain at least two elements, and their last elements are nonzero.
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(Vec<T>, Vec<T>, U)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6,
+        &random_primitive_int_vec_primitive_int_vec_primitive_int_triple_gen_var_4,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6,
+    )
+}
+
+// vars 7 through 8 are in malachite-nz.
+
+// All `(Vec<T>, Vec<T>, U)` where `T` and `U` are unsigned, the `U` is small, and the last
+// elements of both `Vec`s are nonzero.
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(Vec<T>, Vec<T>, U)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9,
+        &random_primitive_int_vec_primitive_int_vec_primitive_int_triple_gen_var_5,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9,
+    )
+}
+
+// All `(Vec<T>, Vec<T>, U)` where `T` and `U` are unsigned, the `U` is positive, and the last
+// elements of both `Vec`s are nonzero.
+pub fn unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> Generator<(Vec<T>, Vec<T>, U)> {
+    Generator::new(
+        &exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10,
+        &random_primitive_int_vec_primitive_int_vec_primitive_int_triple_gen_var_6,
+        &special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10,
     )
 }
 
@@ -3098,6 +3186,29 @@ pub fn unsigned_vec_triple_gen_var_35<T: PrimitiveUnsigned>() -> Generator<(Vec<
     )
 }
 
+// All `(Vec<T>, Vec<T>, T)` where `T` is unsigned, each `Vec` contains at least two elements, and
+// the last element of each `Vec` is nonzero.
+pub fn unsigned_vec_triple_gen_var_36<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_36,
+        &random_primitive_int_vec_triple_gen_var_35,
+        &special_random_unsigned_vec_triple_gen_var_36,
+    )
+}
+
+// vars 37 through 38 are in malachite-nz
+
+// All `(Vec<T>, Vec<T>, Vec<T>)` where `T` is unsigned and each `Vec` ends with a nonzero element.
+pub fn unsigned_vec_triple_gen_var_39<T: PrimitiveUnsigned>() -> Generator<(Vec<T>, Vec<T>, Vec<T>)>
+{
+    Generator::new(
+        &exhaustive_unsigned_vec_triple_gen_var_39,
+        &random_primitive_int_vec_triple_gen_var_38,
+        &special_random_unsigned_vec_triple_gen_var_39,
+    )
+}
+
 // -- large types --
 
 //TODO description
@@ -3139,6 +3250,8 @@ pub fn large_type_gen_var_4<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
         &special_random_large_type_gen_var_4,
     )
 }
+
+// var 5 is in malachite-nz
 
 pub mod common;
 pub mod exhaustive;

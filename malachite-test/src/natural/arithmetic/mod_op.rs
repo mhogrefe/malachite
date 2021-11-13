@@ -5,8 +5,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
-    _limbs_div_mod_schoolbook, limbs_div_mod_by_two_limb_normalized, limbs_div_mod_to_out,
+    limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len, limbs_div_mod_by_two_limb_normalized,
+    limbs_div_mod_divide_and_conquer, limbs_div_mod_schoolbook, limbs_div_mod_to_out,
 };
 use malachite_nz::natural::arithmetic::mod_op::{
     _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_limb_alt_1,
@@ -292,7 +292,7 @@ fn demo_limbs_mod_barrett(gm: GenerationMode, limit: usize) {
     for (mut qs, mut rs, ns, ds) in quadruples_of_limb_vec_var_1(gm).take(limit) {
         let old_qs = qs.clone();
         let old_rs = rs.clone();
-        let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+        let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
         _limbs_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
         println!(
             "qs := {:?}; rs := {:?}; _limbs_mod_barrett(&mut qs, &mut ns, {:?}, {:?}); rs = {:?}",
@@ -769,7 +769,7 @@ fn benchmark_limbs_mod_schoolbook_algorithms(gm: GenerationMode, limit: usize, f
             (
                 "using div/mod",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                    no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
@@ -802,7 +802,7 @@ fn benchmark_limbs_mod_divide_and_conquer_algorithms(
             (
                 "divide-and-conquer using div/mod",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_divide_and_conquer(
+                    no_out!(limbs_div_mod_divide_and_conquer(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
@@ -832,15 +832,15 @@ fn benchmark_limbs_mod_barrett_algorithms(gm: GenerationMode, limit: usize, file
                 "Barrett using div/mod",
                 &mut (|(mut qs, mut rs, ns, ds)| {
                     let mut scratch =
-                        vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-                    _limbs_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
+                        vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                    limbs_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
                 }),
             ),
             (
                 "Barrett",
                 &mut (|(mut qs, mut rs, ns, ds)| {
                     let mut scratch =
-                        vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                        vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
                     _limbs_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
                 }),
             ),

@@ -10,7 +10,7 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_set_zero};
 use natural::arithmetic::add::{
-    limbs_add_to_out_aliased, limbs_add_same_length_to_out,
+    limbs_add_same_length_to_out, limbs_add_to_out_aliased,
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
@@ -29,7 +29,7 @@ use natural::arithmetic::mul::{
     limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out, limbs_mul_to_out,
 };
 use natural::arithmetic::shr::limbs_shr_to_out;
-use natural::arithmetic::square::{limbs_square_to_out_basecase, limbs_square_to_out};
+use natural::arithmetic::square::{limbs_square_to_out, limbs_square_to_out_basecase};
 use natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
     limbs_sub_same_length_to_out,
@@ -160,8 +160,6 @@ fn limbs_redc_limb_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[
 fn limbs_redc_helper(out: &mut [Limb], xs: &mut [Limb], ms: &[Limb], is: &[Limb]) {
     limbs_redc(out, xs, ms, is)
 }
-
-// T
 
 #[allow(clippy::absurd_extreme_comparisons, clippy::type_complexity)]
 fn select_fns(

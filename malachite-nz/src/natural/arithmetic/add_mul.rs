@@ -11,8 +11,6 @@ use natural::Natural;
 use platform::{DoubleLimb, Limb};
 use std::mem::swap;
 
-//TODO doc hidden
-
 /// Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`
 /// and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result
 /// will have no trailing zeros.
@@ -34,6 +32,7 @@ use std::mem::swap;
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// positive, and w is returned instead of overwriting the first input.
+#[doc(hidden)]
 pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut out;
     if xs.len() >= ys.len() {
@@ -81,6 +80,7 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_addmul_1 from mpn/generic/addmul_1.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -128,6 +128,7 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
 /// same lengths, sub is positive, the lowest limbs of the result are written to the second input
 /// rather than the first, and the highest limb is returned.
+#[doc(hidden)]
 pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -179,6 +180,7 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and sub is
 /// positive.
+#[doc(hidden)]
 pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
@@ -245,6 +247,7 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// positive, and the result is written to the second input rather than the first.
+#[doc(hidden)]
 pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
     let ys_len = ys.len();
     if xs.len() >= ys_len {
@@ -317,6 +320,7 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// positive, and the result is written to the longer input.
+#[doc(hidden)]
 pub fn limbs_vec_add_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
@@ -357,6 +361,7 @@ pub fn limbs_vec_add_mul_limb_in_place_either(
 ///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// positive, and w is returned instead of overwriting the first input.
+#[doc(hidden)]
 pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
@@ -406,6 +411,7 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 ///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive and sub is
 /// positive.
+#[doc(hidden)]
 pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();

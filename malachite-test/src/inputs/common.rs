@@ -10,12 +10,6 @@ pub(crate) fn reshape_3_1_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
     Box::new(it.map(|((a, b, c), d)| (a, b, c, d)))
 }
 
-pub(crate) fn reshape_2_2_to_4<A: 'static, B: 'static, C: 'static, D: 'static>(
-    it: Box<dyn Iterator<Item = ((A, B), (C, D))>>,
-) -> Box<dyn Iterator<Item = (A, B, C, D)>> {
-    Box::new(it.map(|((a, b), (c, d))| (a, b, c, d)))
-}
-
 pub(crate) fn permute_2_1<A: 'static, B: 'static>(
     it: Box<dyn Iterator<Item = (A, B)>>,
 ) -> Box<dyn Iterator<Item = (B, A)>> {
@@ -38,10 +32,4 @@ pub(crate) fn permute_1_2_4_3<A: 'static, B: 'static, C: 'static, D: 'static>(
     it: Box<dyn Iterator<Item = (A, B, C, D)>>,
 ) -> Box<dyn Iterator<Item = (A, B, D, C)>> {
     Box::new(it.map(|(a, b, c, d)| (a, b, d, c)))
-}
-
-pub(crate) fn permute_1_3_4_2<A: 'static, B: 'static, C: 'static, D: 'static>(
-    it: Box<dyn Iterator<Item = (A, B, C, D)>>,
-) -> Box<dyn Iterator<Item = (A, C, D, B)>> {
-    Box::new(it.map(|(a, b, c, d)| (a, c, d, b)))
 }

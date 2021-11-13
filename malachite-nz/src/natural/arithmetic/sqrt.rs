@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::sqrt::sqrt_rem_newton;
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, ModPowerOf2, Parity,
-    ShrRound, SqrtRem, SqrtAssignRem, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
+    ShrRound, SqrtAssignRem, SqrtRem, Square, WrappingAddAssign, WrappingSquare, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Iverson;
@@ -15,8 +15,8 @@ use natural::arithmetic::add::{
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::div::{
-    _limbs_div_barrett_approx, _limbs_div_barrett_approx_scratch_len,
-    _limbs_div_divide_and_conquer_approx, _limbs_div_schoolbook_approx,
+    limbs_div_barrett_approx, limbs_div_barrett_approx_scratch_len,
+    limbs_div_divide_and_conquer_approx, limbs_div_schoolbook_approx,
 };
 use natural::arithmetic::div_mod::{
     limbs_div_limb_to_out_mod, limbs_div_mod_qs_to_out_rs_to_ns, limbs_two_limb_inverse_helper,
@@ -168,7 +168,7 @@ pub fn _limbs_sqrt_rem_helper(
 }
 
 /// This is mpn_divappr_q from mpn/generic/sqrtrem.c, GMP 6.2.1.
-fn limbs_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(d_len > 2);
@@ -178,12 +178,12 @@ fn limbs_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &
     scratch.copy_from_slice(ns);
     let inv = limbs_two_limb_inverse_helper(ds[d_len - 1], ds[d_len - 2]);
     qs[n_len - d_len] = Limb::iverson(if d_len < DC_DIVAPPR_Q_THRESHOLD {
-        _limbs_div_schoolbook_approx(qs, scratch, ds, inv)
+        limbs_div_schoolbook_approx(qs, scratch, ds, inv)
     } else if d_len < MU_DIVAPPR_Q_THRESHOLD {
-        _limbs_div_divide_and_conquer_approx(qs, scratch, ds, inv)
+        limbs_div_divide_and_conquer_approx(qs, scratch, ds, inv)
     } else {
-        let mut new_scratch = vec![0; _limbs_div_barrett_approx_scratch_len(n_len, d_len)];
-        _limbs_div_barrett_approx(qs, ns, ds, &mut new_scratch)
+        let mut new_scratch = vec![0; limbs_div_barrett_approx_scratch_len(n_len, d_len)];
+        limbs_div_barrett_approx(qs, ns, ds, &mut new_scratch)
     });
 }
 
@@ -234,7 +234,7 @@ pub fn _limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) 
     }
     // qs len is h1 + 2
     let (scratch_hi_lo, qs) = scratch_hi.split_at_mut(n + 1);
-    limbs_div_approx_helper(qs, scratch_hi_lo, out_hi, scratch_lo);
+    limbs_sqrt_div_approx_helper(qs, scratch_hi_lo, out_hi, scratch_lo);
     // qs_tail len is h1 + 1
     let (qs_head, qs_tail) = qs.split_first_mut().unwrap();
     let mut qs_last = Limb::iverson(r_hi);

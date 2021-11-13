@@ -6,6 +6,7 @@ use natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
+use std::cmp::Ordering;
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
 /// whether the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`;
@@ -38,14 +39,33 @@ pub fn limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> bool 
         return limbs_divisible_by_power_of_2(xs, pow);
     }
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
-    if i >= xs.len() {
-        false
-    } else if i == 0 {
-        xs[0].eq_mod_power_of_2(y.wrapping_neg(), pow)
-    } else {
-        xs[0] == y.wrapping_neg()
-            && xs[1..i].iter().all(|&x| x == Limb::MAX)
-            && xs[i].eq_mod_power_of_2(Limb::MAX, pow & Limb::WIDTH_MASK)
+    match i.cmp(&xs.len()) {
+        Ordering::Greater => false,
+        Ordering::Equal => {
+            if pow & Limb::WIDTH_MASK == 0 {
+                // Check whether the sum of X and y is 0 mod B ^ xs.len().
+                let mut carry = y;
+                for &x in xs {
+                    let sum = x.wrapping_add(carry);
+                    if sum != 0 {
+                        return false;
+                    }
+                    carry = 1;
+                }
+                true
+            } else {
+                false
+            }
+        }
+        Ordering::Less => {
+            if i == 0 {
+                xs[0].eq_mod_power_of_2(y.wrapping_neg(), pow)
+            } else {
+                xs[0] == y.wrapping_neg()
+                    && xs[1..i].iter().all(|&x| x == Limb::MAX)
+                    && xs[i].eq_mod_power_of_2(Limb::MAX, pow & Limb::WIDTH_MASK)
+            }
+        }
     }
 }
 

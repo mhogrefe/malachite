@@ -9,6 +9,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_neg);
     register_demo!(runner, demo_integer_neg_ref);
     register_demo!(runner, demo_integer_neg_assign);
+
     register_bench!(runner, benchmark_integer_neg_library_comparison);
     register_bench!(runner, benchmark_integer_neg_evaluation_strategy);
     register_bench!(runner, benchmark_integer_neg_assign);
@@ -50,9 +51,9 @@ fn benchmark_integer_neg_library_comparison(
         file_name,
         &triple_3_integer_bit_bucketer("x"),
         &mut [
-            ("Malachite", &mut (|(_, _, x)| no_out!(-x))),
-            ("num", &mut (|(x, _, _)| no_out!(-x))),
-            ("rug", &mut (|(_, x, _)| no_out!(-x))),
+            ("Malachite", &mut |(_, _, x)| no_out!(-x)),
+            ("num", &mut |(x, _, _)| no_out!(-x)),
+            ("rug", &mut |(_, x, _)| no_out!(-x)),
         ],
     );
 }

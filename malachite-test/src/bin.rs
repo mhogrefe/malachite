@@ -61,9 +61,7 @@ pub fn main() {
 }
 
 fn register(registry: &mut DemoBenchRegistry) {
-    integer::register(registry);
     natural::register(registry);
 }
 
-pub mod integer;
 pub mod natural;

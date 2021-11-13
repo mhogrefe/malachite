@@ -61,7 +61,7 @@ pub const fn digit_to_display_byte_upper(b: u8) -> Option<u8> {
     }
 }
 
-fn _fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
+fn fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
     w: &BaseFmtWrapper<T>,
     f: &mut Formatter,
 ) -> Result {
@@ -81,7 +81,7 @@ fn _fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
     f.pad_integral(true, "", std::str::from_utf8(&digits).unwrap())
 }
 
-fn _to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) -> String {
+fn to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) -> String {
     assert!((2..=36).contains(&base), "base out of range");
     if *x == T::ZERO {
         "0".to_string()
@@ -94,7 +94,7 @@ fn _to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) 
     }
 }
 
-fn _to_string_base_upper_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) -> String {
+fn to_string_base_upper_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) -> String {
     assert!((2..=36).contains(&base), "base out of range");
     if *x == T::ZERO {
         "0".to_string()
@@ -125,7 +125,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
-                _fmt_unsigned(self, f)
+                fmt_unsigned(self, f)
             }
         }
 
@@ -167,7 +167,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn to_string_base(&self, base: u64) -> String {
-                _to_string_base_unsigned(self, base)
+                to_string_base_unsigned(self, base)
             }
 
             /// Converts an unsigned number to a string using a specified base.
@@ -185,14 +185,14 @@ macro_rules! impl_to_string_base_unsigned {
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn to_string_base_upper(&self, base: u64) -> String {
-                _to_string_base_upper_unsigned(self, base)
+                to_string_base_upper_unsigned(self, base)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_to_string_base_unsigned);
 
-fn _fmt_signed<T: Copy + Ord + UnsignedAbs + Zero>(
+fn fmt_signed<T: Copy + Ord + UnsignedAbs + Zero>(
     w: &BaseFmtWrapper<T>,
     f: &mut Formatter,
 ) -> Result
@@ -222,7 +222,7 @@ where
     Display::fmt(&BaseFmtWrapper::new(w.x.unsigned_abs(), w.base), f)
 }
 
-fn _to_string_base_signed<U: Digits<u8>, S: Copy + Eq + Ord + UnsignedAbs<Output = U> + Zero>(
+fn to_string_base_signed<U: Digits<u8>, S: Copy + Eq + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &S,
     base: u64,
 ) -> String {
@@ -241,7 +241,7 @@ fn _to_string_base_signed<U: Digits<u8>, S: Copy + Eq + Ord + UnsignedAbs<Output
     }
 }
 
-fn _to_string_base_upper_signed<
+fn to_string_base_upper_signed<
     U: Digits<u8>,
     S: Copy + Eq + Ord + UnsignedAbs<Output = U> + Zero,
 >(
@@ -285,7 +285,7 @@ macro_rules! impl_to_string_base_signed {
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn fmt(&self, f: &mut Formatter) -> Result {
-                _fmt_signed(self, f)
+                fmt_signed(self, f)
             }
         }
 
@@ -335,7 +335,7 @@ macro_rules! impl_to_string_base_signed {
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn to_string_base(&self, base: u64) -> String {
-                _to_string_base_signed::<$u, $s>(self, base)
+                to_string_base_signed::<$u, $s>(self, base)
             }
 
             /// Converts a signed number to a string using a specified base.
@@ -357,7 +357,7 @@ macro_rules! impl_to_string_base_signed {
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
             fn to_string_base_upper(&self, base: u64) -> String {
-                _to_string_base_upper_signed::<$u, $s>(self, base)
+                to_string_base_upper_signed::<$u, $s>(self, base)
             }
         }
     };

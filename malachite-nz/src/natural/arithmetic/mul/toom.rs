@@ -9,16 +9,16 @@ use malachite_base::num::logic::traits::NotAssign;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::{slice_set_zero, slice_test_zero};
 use natural::arithmetic::add::{
-    limbs_add_same_length_with_carry_in_in_place_left, limbs_add_to_out_aliased,
-    limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_add_limb_to_out, limbs_add_same_length_to_out,
+    limbs_add_same_length_with_carry_in_in_place_left, limbs_add_to_out, limbs_add_to_out_aliased,
     limbs_slice_add_greater_in_place_left, limbs_slice_add_limb_in_place,
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mul::poly_eval::{
     limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
-    limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2,
-    limbs_mul_toom_evaluate_poly_in_1_and_neg_1, limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
+    limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2, limbs_mul_toom_evaluate_poly_in_1_and_neg_1,
+    limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
     limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow,
     limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg,
 };
@@ -28,7 +28,7 @@ use natural::arithmetic::mul::poly_interpolate::{
     limbs_mul_toom_interpolate_7_points, limbs_mul_toom_interpolate_8_points,
 };
 use natural::arithmetic::mul::{
-    limbs_mul_greater_to_out_basecase, limbs_mul_greater_to_out, limbs_mul_same_length_to_out,
+    limbs_mul_greater_to_out, limbs_mul_greater_to_out_basecase, limbs_mul_same_length_to_out,
     limbs_mul_to_out,
 };
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
@@ -37,10 +37,10 @@ use natural::arithmetic::square::{
     limbs_square_to_out_toom_6_scratch_len, limbs_square_to_out_toom_8_scratch_len,
 };
 use natural::arithmetic::sub::{
-    limbs_sub_same_length_with_borrow_in_in_place_left,
-    limbs_sub_same_length_with_borrow_in_to_out, limbs_sub_greater_in_place_left,
-    limbs_sub_greater_to_out, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
+    limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_to_out, limbs_sub_same_length_with_borrow_in_in_place_left,
+    limbs_sub_same_length_with_borrow_in_to_out,
 };
 use natural::comparison::cmp::limbs_cmp_same_length;
 use platform::{
@@ -49,7 +49,7 @@ use platform::{
 };
 use std::cmp::{max, Ordering};
 
-// T
+//TODO tune
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
 
 /// Helper function for high degree Toom-Cook algorithms.
@@ -122,17 +122,17 @@ pub const fn limbs_mul_greater_to_out_toom_22_scratch_len(xs_len: usize) -> usiz
 }
 
 // TODO make these compiler flags?
+//TODO tune
 #[doc(hidden)]
 pub const TUNE_PROGRAM_BUILD: bool = false;
+//TODO tune
 #[doc(hidden)]
 pub const WANT_FAT_BINARY: bool = true;
 
-// T
+//TODO tune
 #[doc(hidden)]
 pub const TOOM22_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD >= 2 * MUL_TOOM22_THRESHOLD;
-
-// T
 
 /// A helper function for `limbs_mul_greater_to_out_toom_22`.
 ///
@@ -156,8 +156,6 @@ fn limbs_mul_same_length_to_out_toom_22_recursive(
         limbs_mul_greater_to_out_toom_22(out, xs, ys, scratch);
     }
 }
-
-// T
 
 /// A helper function for `limbs_mul_greater_to_out_toom_22`.
 ///
@@ -654,16 +652,14 @@ pub fn limbs_mul_greater_to_out_toom_33_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + usize::wrapping_from(Limb::WIDTH)
 }
 
-// T
+//TODO tune
 #[doc(hidden)]
 pub const TOOM33_MAYBE_MUL_BASECASE: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM33_THRESHOLD < 3 * MUL_TOOM22_THRESHOLD;
-// T
+//TODO tune
 #[doc(hidden)]
 pub const TOOM33_MAYBE_MUL_TOOM33: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || MUL_TOOM44_THRESHOLD >= 3 * MUL_TOOM33_THRESHOLD;
-
-// T
 
 /// A helper function for `limbs_mul_greater_to_out_toom_33`.
 ///
@@ -690,6 +686,7 @@ pub fn limbs_mul_same_length_to_out_toom_33_recursive(
     }
 }
 
+//TODO tune
 const SMALLER_RECURSION_TOOM_33_AND_53: bool = true;
 
 /// This function can be used to determine whether the sizes of the input slices to
@@ -2791,18 +2788,16 @@ pub fn limbs_mul_greater_to_out_toom_6h_input_sizes_valid(xs_len: usize, ys_len:
     }
 }
 
-// T
+//TODO tune
 const TOOM_6H_MAYBE_MUL_BASECASE: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM22_THRESHOLD;
-// T
+//TODO tune
 const TOOM_6H_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM33_THRESHOLD;
 const TOOM_6H_MAYBE_MUL_TOOM33: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM6H_THRESHOLD < 6 * MUL_TOOM44_THRESHOLD;
 const TOOM_6H_MAYBE_MUL_TOOM6H: bool =
     TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= 6 * MUL_TOOM6H_THRESHOLD;
-
-// T
 
 /// Time: O(n<sup>log<sub>5</sub>(11)</sup>)
 ///
@@ -2986,11 +2981,11 @@ pub fn limbs_mul_greater_to_out_toom_6h(
     // Evaluation and recursive calls
     // 1/2, -1/2
     let out_lo_lo = &mut out_lo[..m];
-    let v_neg_half_neg = limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        v2, v0, p, xs, n, 1, out_lo_lo,
-    ) != limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        v3, v1, q, ys, n, 1, out_lo_lo,
-    );
+    let v_neg_half_neg =
+        limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(v2, v0, p, xs, n, 1, out_lo_lo)
+            != limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v3, v1, q, ys, n, 1, out_lo_lo,
+            );
     // X(-1/2) * Y(-1/2) * 2^
     // X(1/2) * Y(1/2) * 2^
     limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
@@ -3028,11 +3023,11 @@ pub fn limbs_mul_greater_to_out_toom_6h(
     limbs_toom_couple_handling(r1, &mut out_lo[..r], v_neg_4_neg, n, 2, 4);
     // 1/4, -1/4
     let out_lo_lo = &mut out_lo[..m];
-    let v_neg_quarter_neg = limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        v2, v0, p, xs, n, 2, out_lo_lo,
-    ) != limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
-        v3, v1, q, ys, n, 2, out_lo_lo,
-    );
+    let v_neg_quarter_neg =
+        limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(v2, v0, p, xs, n, 2, out_lo_lo)
+            != limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg(
+                v3, v1, q, ys, n, 2, out_lo_lo,
+            );
     // X(-1/4) * Y(-1/4) * 4^
     // X(1/4) * Y(1/4) * 4^
     limbs_mul_same_length_to_out_toom_6h_recursive(out_lo, v0, v1, scratch3);
@@ -3178,20 +3173,21 @@ pub(crate) const BIT_CORRECTION: bool = true;
 #[cfg(not(feature = "32_bit_limbs"))]
 pub(crate) const BIT_CORRECTION: bool = false;
 
-// T
+//TODO tune
 const TOOM_8H_MAYBE_MUL_BASECASE: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM22_THRESHOLD << 3;
-// T
+//TODO tune
 const TOOM_8H_MAYBE_MUL_TOOM22: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM33_THRESHOLD << 3;
+//TODO tune
 const TOOM_8H_MAYBE_MUL_TOOM33: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM44_THRESHOLD << 3;
+//TODO tune
 const TOOM_8H_MAYBE_MUL_TOOM44: bool =
     TUNE_PROGRAM_BUILD || MUL_TOOM8H_THRESHOLD < MUL_TOOM6H_THRESHOLD << 3;
+//TODO tune
 const TOOM_8H_MAYBE_MUL_TOOM8H: bool =
     TUNE_PROGRAM_BUILD || MUL_FFT_THRESHOLD >= MUL_TOOM8H_THRESHOLD << 3;
-
-// T
 
 /// Time: O(n<sup>log<sub>7</sub>(15)</sup>)
 ///

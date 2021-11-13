@@ -3,8 +3,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::TrailingZeros;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero};
 use natural::arithmetic::div_exact::{
-    _limbs_modular_div_mod_barrett, _limbs_modular_div_mod_barrett_scratch_len,
-    _limbs_modular_div_mod_divide_and_conquer, _limbs_modular_div_mod_schoolbook,
+    limbs_modular_div_mod_barrett, limbs_modular_div_mod_barrett_scratch_len,
+    limbs_modular_div_mod_divide_and_conquer, limbs_modular_div_mod_schoolbook,
     limbs_modular_invert_limb,
 };
 use natural::arithmetic::eq_mod::_limbs_mod_exact_odd_limb;
@@ -42,6 +42,14 @@ pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
         ns[0].divisible_by_power_of_2(twos) && _limbs_mod_exact_odd_limb(ns, d >> twos, 0) == 0
     } else {
         _limbs_mod_exact_odd_limb(ns, d, 0) == 0
+    }
+}
+
+fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
+    if ns.len() < BMOD_1_TO_MOD_1_THRESHOLD {
+        _limbs_mod_exact_odd_limb(ns, d_low, 0)
+    } else {
+        limbs_mod_limb(ns, d_low)
     }
 }
 
@@ -110,11 +118,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
         let d_1 = ds[1];
         if d_1 <= d_mask {
             let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
-            return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
-                _limbs_mod_exact_odd_limb(ns, d_low, 0)
-            } else {
-                limbs_mod_limb(ns, d_low)
-            } == 0;
+            return limbs_mod_limb_helper(ns, d_low) == 0;
         }
     }
     let n_len_plus_1 = n_len + 1;
@@ -138,16 +142,16 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let q_len = r_len - d_len;
     let rs = if d_len < DC_BDIV_QR_THRESHOLD || q_len < DC_BDIV_QR_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_schoolbook(&mut qs, rs, ds, d_inv);
+        limbs_modular_div_mod_schoolbook(&mut qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else if d_len < MU_BDIV_QR_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_divide_and_conquer(&mut qs, rs, ds, d_inv);
+        limbs_modular_div_mod_divide_and_conquer(&mut qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else {
-        let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
+        let mut scratch = vec![0; limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
         let ns = rs.to_vec();
-        _limbs_modular_div_mod_barrett(&mut qs, rs, &ns, ds, &mut scratch);
+        limbs_modular_div_mod_barrett(&mut qs, rs, &ns, ds, &mut scratch);
         &mut rs[..d_len]
     };
     slice_test_zero(rs)
@@ -219,11 +223,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
         let d_1 = ds[1];
         if d_1 <= d_mask {
             let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
-            return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
-                _limbs_mod_exact_odd_limb(ns, d_low, 0)
-            } else {
-                limbs_mod_limb(ns, d_low)
-            } == 0;
+            return limbs_mod_limb_helper(ns, d_low) == 0;
         }
     }
     let n_len_plus_1 = n_len + 1;
@@ -249,16 +249,16 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let q_len = r_len - d_len;
     let rs = if d_len < DC_BDIV_QR_THRESHOLD || q_len < DC_BDIV_QR_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_schoolbook(&mut qs, rs, ds, d_inv);
+        limbs_modular_div_mod_schoolbook(&mut qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else if d_len < MU_BDIV_QR_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_divide_and_conquer(&mut qs, rs, ds, d_inv);
+        limbs_modular_div_mod_divide_and_conquer(&mut qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else {
-        let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
+        let mut scratch = vec![0; limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
         let ns = rs.to_vec();
-        _limbs_modular_div_mod_barrett(&mut qs, rs, &ns, ds, &mut scratch);
+        limbs_modular_div_mod_barrett(&mut qs, rs, &ns, ds, &mut scratch);
         &mut rs[..d_len]
     };
     slice_test_zero(rs)
@@ -329,11 +329,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
         let d_1 = ds[1];
         if d_1 <= d_mask {
             let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
-            return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
-                _limbs_mod_exact_odd_limb(ns, d_low, 0)
-            } else {
-                limbs_mod_limb(ns, d_low)
-            } == 0;
+            return limbs_mod_limb_helper(ns, d_low) == 0;
         }
     }
     let n_len_plus_1 = n_len + 1;
@@ -356,16 +352,16 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let q_len = r_len - d_len;
     let rs = if d_len < DC_BDIV_QR_THRESHOLD || q_len < DC_BDIV_QR_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_schoolbook(qs, rs, ds, d_inv);
+        limbs_modular_div_mod_schoolbook(qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else if d_len < MU_BDIV_QR_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_divide_and_conquer(qs, rs, ds, d_inv);
+        limbs_modular_div_mod_divide_and_conquer(qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else {
-        let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
+        let mut scratch = vec![0; limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
         let ns = rs.to_vec();
-        _limbs_modular_div_mod_barrett(qs, rs, &ns, ds, &mut scratch);
+        limbs_modular_div_mod_barrett(qs, rs, &ns, ds, &mut scratch);
         &mut rs[..d_len]
     };
     slice_test_zero(rs)
@@ -436,11 +432,7 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
         let d_1 = ds[1];
         if d_1 <= d_mask {
             let d_low = (d_0 >> trailing_zeros) | (d_1 << (Limb::WIDTH - trailing_zeros));
-            return if n_len < BMOD_1_TO_MOD_1_THRESHOLD {
-                _limbs_mod_exact_odd_limb(ns, d_low, 0)
-            } else {
-                limbs_mod_limb(ns, d_low)
-            } == 0;
+            return limbs_mod_limb_helper(ns, d_low) == 0;
         }
     }
     let n_len_plus_1 = n_len + 1;
@@ -465,16 +457,16 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let q_len = r_len - d_len;
     let rs = if d_len < DC_BDIV_QR_THRESHOLD || q_len < DC_BDIV_QR_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_schoolbook(qs, rs, ds, d_inv);
+        limbs_modular_div_mod_schoolbook(qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else if d_len < MU_BDIV_QR_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
-        _limbs_modular_div_mod_divide_and_conquer(qs, rs, ds, d_inv);
+        limbs_modular_div_mod_divide_and_conquer(qs, rs, ds, d_inv);
         &mut rs[q_len..]
     } else {
-        let mut scratch = vec![0; _limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
+        let mut scratch = vec![0; limbs_modular_div_mod_barrett_scratch_len(r_len, d_len)];
         let ns = rs.to_vec();
-        _limbs_modular_div_mod_barrett(qs, rs, &ns, ds, &mut scratch);
+        limbs_modular_div_mod_barrett(qs, rs, &ns, ds, &mut scratch);
         &mut rs[..d_len]
     };
     slice_test_zero(rs)

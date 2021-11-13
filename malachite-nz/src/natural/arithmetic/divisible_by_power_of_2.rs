@@ -6,6 +6,8 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
+//TODO doc hidden
+
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is divisible by 2 raised to a given power.
 ///

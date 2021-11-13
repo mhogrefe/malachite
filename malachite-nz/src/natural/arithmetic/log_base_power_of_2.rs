@@ -109,7 +109,7 @@ pub fn limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u64> {
     }
 }
 
-pub fn _ceiling_log_base_power_of_2_naive(x: &Natural, pow: u64) -> u64 {
+pub fn ceiling_log_base_power_of_2_naive_nz(x: &Natural, pow: u64) -> u64 {
     assert_ne!(*x, Natural::ZERO);
     assert_ne!(pow, 0);
     let mut result = 0;
@@ -123,7 +123,7 @@ pub fn _ceiling_log_base_power_of_2_naive(x: &Natural, pow: u64) -> u64 {
 
 impl<'a> FloorLogBasePowerOf2 for &'a Natural {
     type Output = u64;
-    
+
     /// Returns the floor of the base-$2^p$ logarithm of a positive `Natural`.
     ///
     /// $f(x, p) = \lfloor\log_{2^p} x\rfloor$.

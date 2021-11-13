@@ -49,6 +49,7 @@ use std::cmp::Ordering;
 /// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[0xfffffffd, 1],
 ///     RoundingMode::Nearest), Some(1));
 /// ```
+#[doc(hidden)]
 pub fn limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) -> Option<Limb> {
     if n == 0 {
         Some(0)

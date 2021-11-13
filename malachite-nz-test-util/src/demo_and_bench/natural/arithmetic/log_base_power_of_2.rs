@@ -8,7 +8,7 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen_var_13;
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::log_base_power_of_2::{
-    _ceiling_log_base_power_of_2_naive, limbs_ceiling_log_base_power_of_2,
+    ceiling_log_base_power_of_2_naive_nz, limbs_ceiling_log_base_power_of_2,
     limbs_checked_log_base_power_of_2, limbs_floor_log_base_power_of_2,
 };
 use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_8;
@@ -214,7 +214,7 @@ fn benchmark_natural_ceiling_log_base_power_of_2_algorithms(
                 no_out!(n.ceiling_log_base_power_of_2(pow))
             }),
             ("naive", &mut |(ref n, pow)| {
-                no_out!(_ceiling_log_base_power_of_2_naive(n, pow))
+                no_out!(ceiling_log_base_power_of_2_naive_nz(n, pow))
             }),
         ],
     );

@@ -4,22 +4,22 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_nz::natural::Natural;
 use std::str::FromStr;
 
-//TODO clean from_str
-
 #[test]
 fn test_mod_power_of_2_neg() {
-    let test = |u, pow, out| {
-        assert!(Natural::from_str(u).unwrap().mod_power_of_2_is_reduced(pow));
-        let n = Natural::from_str(u).unwrap().mod_power_of_2_neg(pow);
+    let test = |s, pow, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert!(u.mod_power_of_2_is_reduced(pow));
+        let n = u.clone().mod_power_of_2_neg(pow);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
         assert!(n.mod_power_of_2_is_reduced(pow));
 
-        let n = (&Natural::from_str(u).unwrap()).mod_power_of_2_neg(pow);
+        let n = (&u).mod_power_of_2_neg(pow);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let mut n = Natural::from_str(u).unwrap();
+        let mut n = u;
         n.mod_power_of_2_neg_assign(pow);
         assert_eq!(n.to_string(), out);
     };

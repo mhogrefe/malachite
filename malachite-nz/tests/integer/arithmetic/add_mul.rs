@@ -1,5 +1,12 @@
-use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign};
+use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, CheckedAddMul};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base_test_util::generators::{signed_triple_gen, signed_triple_gen_var_1};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_pair_gen, integer_triple_gen, natural_triple_gen,
+};
 use std::str::FromStr;
 
 #[test]
@@ -252,4 +259,98 @@ fn test_add_mul() {
         "-14313318194700",
         "346780247600420147883596",
     );
+}
+
+#[test]
+fn add_mul_properties() {
+    integer_triple_gen().test_properties(|(a, b, c)| {
+        let mut mut_a = a.clone();
+        mut_a.add_mul_assign(b.clone(), c.clone());
+        assert!(mut_a.is_valid());
+        let result = mut_a;
+
+        let mut mut_a = a.clone();
+        mut_a.add_mul_assign(b.clone(), &c);
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let mut mut_a = a.clone();
+        mut_a.add_mul_assign(&b, c.clone());
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let mut mut_a = a.clone();
+        mut_a.add_mul_assign(&b, &c);
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let result_alt = a.clone().add_mul(b.clone(), c.clone());
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result_alt = a.clone().add_mul(b.clone(), &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result_alt = a.clone().add_mul(&b, c.clone());
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result_alt = a.clone().add_mul(&b, &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result_alt = (&a).add_mul(&b, &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let a = &a;
+        let b = &b;
+        let c = &c;
+        assert_eq!(a + b * c, result);
+        assert_eq!(a.add_mul(c, b), result);
+        assert_eq!(a.add_mul(&(-b), &(-c)), result);
+        assert_eq!((-a).add_mul(&(-b), c), -&result);
+        assert_eq!((-a).add_mul(b, -c), -result);
+    });
+
+    integer_gen().test_properties(|a| {
+        let a = &a;
+        assert_eq!(a.add_mul(a, &Integer::NEGATIVE_ONE), 0);
+        assert_eq!(a.add_mul(&(-a), &Integer::ONE), 0);
+    });
+
+    integer_pair_gen().test_properties(|(a, b)| {
+        let a = &a;
+        let b = &b;
+        assert_eq!(a.add_mul(&Integer::ZERO, b), *a);
+        assert_eq!(a.add_mul(&Integer::ONE, b), a + b);
+        assert_eq!(Integer::ZERO.add_mul(a, b), a * b);
+        assert_eq!(a.add_mul(b, &Integer::ZERO), *a);
+        assert_eq!(a.add_mul(b, &Integer::ONE), a + b);
+        assert_eq!((a * b).add_mul(-a, b), 0);
+        assert_eq!((a * b).add_mul(a, -b), 0);
+    });
+
+    natural_triple_gen().test_properties(|(x, y, z)| {
+        assert_eq!(
+            (&x).add_mul(&y, &z),
+            Integer::from(x).add_mul(Integer::from(y), Integer::from(z))
+        );
+    });
+
+    signed_triple_gen_var_1::<SignedLimb>().test_properties(|(x, y, z)| {
+        assert_eq!(
+            x.add_mul(y, z),
+            Integer::from(x).add_mul(Integer::from(y), Integer::from(z))
+        );
+    });
+
+    signed_triple_gen::<SignedLimb>().test_properties(|(x, y, z)| {
+        let result = Integer::from(x).add_mul(Integer::from(y), Integer::from(z));
+        assert_eq!(
+            x.checked_add_mul(y, z).is_some(),
+            SignedLimb::convertible_from(&result)
+        );
+    });
 }

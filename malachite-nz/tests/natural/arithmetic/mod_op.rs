@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::Zero;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_barrett_scratch_len, limbs_two_limb_inverse_helper,
+    limbs_div_mod_barrett_scratch_len, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::mod_op::{
     _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_schoolbook, limbs_mod,
@@ -1234,7 +1234,7 @@ fn test_limbs_mod_barrett() {
     let test = |qs_in: &[Limb], rs_in: &[Limb], ns: &[Limb], ds: &[Limb], rs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
         let mut rs = rs_in.to_vec();
-        let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+        let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
         _limbs_mod_barrett(&mut qs, &mut rs, ns, ds, &mut scratch);
         assert_eq!(rs, rs_out);
         verify_limbs_mod_2(rs_in, ns, ds, &rs);
@@ -2237,7 +2237,7 @@ fn test_limbs_mod_barrett() {
 fn limbs_mod_barrett_fail_1() {
     let ns = &[1, 2, 3];
     let ds = &[0x80000000];
-    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
     _limbs_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
@@ -2246,7 +2246,7 @@ fn limbs_mod_barrett_fail_1() {
 fn limbs_mod_barrett_fail_2() {
     let ns = &[1, 2];
     let ds = &[1, 0x80000000];
-    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
     _limbs_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
@@ -2255,7 +2255,7 @@ fn limbs_mod_barrett_fail_2() {
 fn limbs_mod_barrett_fail_3() {
     let ns = &[1, 2, 3];
     let ds = &[1, 2];
-    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
     _limbs_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
 }
 

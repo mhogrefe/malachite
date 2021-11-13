@@ -204,7 +204,6 @@ fn _limbs_root_to_out_internal(
             root_bits = (root_bits + log_exp) >> 1;
         } else {
             // add just one bit at a time
-            fail_on_untested_path("_limbs_root_to_out_internal, root_bits <= log_exp");
             root_bits -= 1;
         }
         i += 1;

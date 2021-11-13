@@ -1,8 +1,19 @@
-use malachite_base::num::arithmetic::traits::{ShlRound, ShlRoundAssign};
-use malachite_base::num::basic::traits::NegativeOne;
+use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, ShlRound, ShlRoundAssign};
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::{
+    signed_rounding_mode_pair_gen, signed_signed_rounding_mode_triple_gen_var_4,
+};
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::generators::{
+    integer_rounding_mode_pair_gen, integer_signed_rounding_mode_triple_gen_var_1,
+    natural_signed_rounding_mode_triple_gen_var_1,
+};
+use std::ops::Shr;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -1175,4 +1186,54 @@ macro_rules! shl_round_signed_fail_helper {
 #[test]
 fn shl_round_signed_fail() {
     apply_to_signeds!(shl_round_signed_fail_helper);
+}
+
+fn shl_round_properties_helper<T: PrimitiveSigned>()
+where
+    Integer: ShlRound<T, Output = Integer> + ShlRoundAssign<T> + Shr<T, Output = Integer>,
+    for<'a> &'a Integer: ShlRound<T, Output = Integer>,
+    Natural: Shr<T, Output = Natural>,
+    for<'a> &'a Natural: ShlRound<T, Output = Natural>,
+    SignedLimb: ArithmeticCheckedShl<T> + ShlRound<T, Output = SignedLimb>,
+{
+    integer_signed_rounding_mode_triple_gen_var_1::<T>().test_properties(|(n, i, rm)| {
+        let mut mut_n = n.clone();
+        mut_n.shl_round_assign(i, rm);
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+
+        let shifted_alt = (&n).shl_round(i, rm);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+        let shifted_alt = n.clone().shl_round(i, rm);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        assert_eq!(-(-&n).shl_round(i, -rm), shifted);
+    });
+
+    integer_rounding_mode_pair_gen().test_properties(|(n, rm)| {
+        assert_eq!((&n).shl_round(T::ZERO, rm), n);
+    });
+
+    signed_rounding_mode_pair_gen::<T>().test_properties(|(i, rm)| {
+        assert_eq!(Integer::ZERO.shl_round(i, rm), 0);
+    });
+
+    natural_signed_rounding_mode_triple_gen_var_1::<T>().test_properties(|(n, i, rm)| {
+        assert_eq!((&n).shl_round(i, rm), Integer::from(n).shl_round(i, rm));
+    });
+
+    signed_signed_rounding_mode_triple_gen_var_4::<SignedLimb, T>().test_properties(
+        |(n, i, rm)| {
+            if n.arithmetic_checked_shl(i).is_some() {
+                assert_eq!(n.shl_round(i, rm), Integer::from(n).shl_round(i, rm));
+            }
+        },
+    );
+}
+
+#[test]
+fn shl_round_properties() {
+    apply_fn_to_signeds!(shl_round_properties_helper);
 }

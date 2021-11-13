@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
-use malachite_nz::natural::arithmetic::div_mod::_limbs_div_mod_barrett_scratch_len;
+use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_barrett_scratch_len;
 use malachite_nz::natural::arithmetic::mod_op::{
     _limbs_mod_barrett, _limbs_mod_divide_and_conquer, _limbs_mod_limb_alt_1,
     _limbs_mod_limb_alt_2, _limbs_mod_limb_any_leading_zeros_1,
@@ -230,7 +230,7 @@ fn limbs_mod_barrett_properties() {
         |(ref qs_in, ref rs_in, ref ns, ref ds)| {
             let mut qs = qs_in.clone();
             let mut rs = rs_in.clone();
-            let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+            let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
             _limbs_mod_barrett(&mut qs, &mut rs, ns, ds, &mut scratch);
             verify_limbs_mod_2(rs_in, ns, ds, &rs);
         },

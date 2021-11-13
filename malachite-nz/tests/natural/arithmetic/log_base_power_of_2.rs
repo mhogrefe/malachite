@@ -11,7 +11,7 @@ use malachite_base_test_util::generators::{
     unsigned_gen_var_11, unsigned_pair_gen_var_21, unsigned_vec_unsigned_pair_gen_var_13,
 };
 use malachite_nz::natural::arithmetic::log_base_power_of_2::{
-    _ceiling_log_base_power_of_2_naive, limbs_ceiling_log_base_power_of_2,
+    ceiling_log_base_power_of_2_naive_nz, limbs_ceiling_log_base_power_of_2,
     limbs_checked_log_base_power_of_2, limbs_floor_log_base_power_of_2,
 };
 use malachite_nz::natural::Natural;
@@ -347,7 +347,7 @@ fn floor_log_base_power_of_2_properties() {
 fn ceiling_log_base_power_of_2_properties() {
     natural_unsigned_pair_gen_var_8().test_properties(|(n, pow)| {
         let ceiling_log = n.ceiling_log_base_power_of_2(pow);
-        assert_eq!(ceiling_log, _ceiling_log_base_power_of_2_naive(&n, pow));
+        assert_eq!(ceiling_log, ceiling_log_base_power_of_2_naive_nz(&n, pow));
         assert_eq!(ceiling_log == 0, n == Natural::ONE);
         assert_eq!(n.ceiling_log_base(&Natural::power_of_2(pow)), ceiling_log);
 

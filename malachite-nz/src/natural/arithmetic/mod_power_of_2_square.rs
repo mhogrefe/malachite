@@ -8,16 +8,16 @@ use malachite_base::rounding_modes::RoundingMode;
 use natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
 use natural::arithmetic::mod_power_of_2::limbs_vec_mod_power_of_2_in_place;
-use natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use natural::arithmetic::mul::mul_low::{
-    limbs_mul_low_same_length_basecase, limbs_mul_low_same_length,
+    limbs_mul_low_same_length, limbs_mul_low_same_length_basecase,
 };
 use natural::arithmetic::mul::toom::{TUNE_PROGRAM_BUILD, WANT_FAT_BINARY};
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use natural::arithmetic::square::{
-    limbs_square_diagonal, limbs_square_to_out_basecase, limbs_square, limbs_square_to_out,
+    limbs_square, limbs_square_diagonal, limbs_square_to_out, limbs_square_to_out_basecase,
     SQR_FFT_THRESHOLD,
 };
 use natural::InnerNatural::{Large, Small};
@@ -50,6 +50,7 @@ pub fn _limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs
 //TODO tune
 pub const SQRLO_DC_THRESHOLD_LIMIT: usize = 500;
 
+//TODO tune
 const SQRLO_BASECASE_ALLOC: usize = if SQRLO_DC_THRESHOLD_LIMIT < 2 {
     1
 } else {
@@ -96,6 +97,7 @@ pub fn _limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
 //TODO tune
 const SQRLO_BASECASE_THRESHOLD: usize = 8;
 
+//TODO tune
 /// This is MAYBE_range_basecase from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from
 /// 6.1.2?
 const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
@@ -106,6 +108,7 @@ const MAYBE_RANGE_BASECASE_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
         SQRLO_DC_THRESHOLD
     }) < SQR_TOOM2_THRESHOLD * 36 / (36 - 11);
 
+//TODO tune
 /// This is MAYBE_range_toom22 from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
 const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     || WANT_FAT_BINARY
@@ -171,6 +174,7 @@ const SQRLO_BASECASE_THRESHOLD_LIMIT: usize = 8;
 //TODO tune
 const SQRLO_SQR_THRESHOLD: usize = 6440;
 
+//TODO tune
 const SQR_BASECASE_ALLOC: usize = if SQRLO_BASECASE_THRESHOLD_LIMIT == 0 {
     1
 } else {

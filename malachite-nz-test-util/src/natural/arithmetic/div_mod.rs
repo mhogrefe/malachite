@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_nz::natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use malachite_nz::natural::arithmetic::div_mod::{_div_mod_by_preinversion, limbs_invert_limb};
+use malachite_nz::natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
 use malachite_nz::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use malachite_nz::platform::{DoubleLimb, Limb};
 
@@ -54,7 +54,7 @@ fn limbs_div_limb_normalized_in_place_mod(
 ) -> Limb {
     let len = ns.len();
     if len == 1 {
-        let (q, r) = _div_mod_by_preinversion(ns_high, ns[0], d, d_inv);
+        let (q, r) = div_mod_by_preinversion(ns_high, ns[0], d, d_inv);
         ns[0] = q;
         return r;
     }
@@ -97,7 +97,7 @@ fn limbs_div_limb_normalized_in_place_mod(
         q_high += 1;
         sum_high.wrapping_sub_assign(d);
     }
-    let (t, r) = _div_mod_by_preinversion(sum_high, sum_low, d, d_inv);
+    let (t, r) = div_mod_by_preinversion(sum_high, sum_low, d, d_inv);
     let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
         .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
@@ -125,7 +125,7 @@ fn limbs_div_limb_normalized_to_out_mod(
 ) -> Limb {
     let len = ns.len();
     if len == 1 {
-        let (q, r) = _div_mod_by_preinversion(n_last, ns[0], d, d_inv);
+        let (q, r) = div_mod_by_preinversion(n_last, ns[0], d, d_inv);
         out[0] = q;
         return r;
     }
@@ -167,7 +167,7 @@ fn limbs_div_limb_normalized_to_out_mod(
         q_high += 1;
         sum_high.wrapping_sub_assign(d);
     }
-    let (t, r) = _div_mod_by_preinversion(sum_high, sum_low, d, d_inv);
+    let (t, r) = div_mod_by_preinversion(sum_high, sum_low, d, d_inv);
     let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
         .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
@@ -178,7 +178,7 @@ fn limbs_div_limb_normalized_to_out_mod(
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where len > 1. Experiments show
 /// that this is always slower than `_limbs_div_limb_to_out_mod`.
-pub fn _limbs_div_limb_to_out_mod_alt(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
+pub fn limbs_div_limb_to_out_mod_alt(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -202,7 +202,7 @@ pub fn _limbs_div_limb_to_out_mod_alt(out: &mut [Limb], ns: &[Limb], d: Limb) ->
         let ns_last = limbs_shl_to_out(out, ns, bits);
         let d_inv = limbs_invert_limb(d);
         let (out_last, out_init) = out.split_last_mut().unwrap();
-        let (q, r) = _div_mod_by_preinversion(ns_last, *out_last, d, d_inv);
+        let (q, r) = div_mod_by_preinversion(ns_last, *out_last, d, d_inv);
         *out_last = q;
         limbs_div_limb_normalized_in_place_mod(out_init, r, d, d_inv) >> bits
     }
@@ -210,7 +210,7 @@ pub fn _limbs_div_limb_to_out_mod_alt(out: &mut [Limb], ns: &[Limb], d: Limb) ->
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where qp == up and len > 1.
 /// Experiments show that this is always slower than `_limbs_div_limb_in_place_mod`.
-pub fn _limbs_div_limb_in_place_mod_alt(ns: &mut [Limb], d: Limb) -> Limb {
+pub fn limbs_div_limb_in_place_mod_alt(ns: &mut [Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -230,7 +230,7 @@ pub fn _limbs_div_limb_in_place_mod_alt(ns: &mut [Limb], d: Limb) -> Limb {
         let d = d << bits;
         let ns_last = limbs_slice_shl_in_place(ns, bits);
         let d_inv = limbs_invert_limb(d);
-        let (q, r) = _div_mod_by_preinversion(ns_last, ns[len_minus_1], d, d_inv);
+        let (q, r) = div_mod_by_preinversion(ns_last, ns[len_minus_1], d, d_inv);
         ns[len_minus_1] = q;
         limbs_div_limb_normalized_in_place_mod(&mut ns[..len_minus_1], r, d, d_inv) >> bits
     }

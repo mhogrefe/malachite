@@ -5,10 +5,6 @@ extern crate malachite_nz_test_util;
 extern crate serde;
 extern crate serde_json;
 
-use crate::generate::tuning_dependency_info::{
-    print_constants_with_unfinished_deps, print_undefined_constants, print_undefined_functions,
-    read_and_print,
-};
 use demo_and_bench::register;
 use generate::digits_data::generate_string_data;
 use malachite_base_test_util::runner::cmd::read_command_line_arguments;
@@ -40,10 +36,6 @@ fn main() {
         let codegen_key = args.codegen_key.unwrap();
         match codegen_key.as_str() {
             "digits_data" => generate_string_data(),
-            "tdi_read_and_print" => read_and_print(),
-            "tdi_constants_with_unfinished_deps" => print_constants_with_unfinished_deps(),
-            "tdi_undefined_constants" => print_undefined_constants(),
-            "tdi_undefined_functions" => print_undefined_functions(),
             _ => panic!("Invalid codegen key: {}", codegen_key),
         }
     }

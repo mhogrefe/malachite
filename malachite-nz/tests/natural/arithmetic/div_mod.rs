@@ -13,7 +13,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
-    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt,
+    limbs_div_limb_in_place_mod_alt, limbs_div_limb_to_out_mod_alt,
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
@@ -25,16 +25,16 @@ use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_mod_barrett, _limbs_div_mod_barrett_scratch_len, _limbs_div_mod_divide_and_conquer,
-    _limbs_div_mod_schoolbook, _limbs_invert_approx, _limbs_invert_basecase_approx,
-    _limbs_invert_newton_approx, limbs_div_mod, limbs_div_mod_by_two_limb_normalized,
-    limbs_div_mod_to_out, limbs_two_limb_inverse_helper,
-};
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod, limbs_div_limb_mod, limbs_div_limb_to_out_mod,
     limbs_div_mod_three_limb_by_two_limb, limbs_invert_limb,
+};
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod, limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len,
+    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_divide_and_conquer,
+    limbs_div_mod_schoolbook, limbs_div_mod_to_out, limbs_invert_approx,
+    limbs_invert_basecase_approx, limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
 };
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::div_mod::{
@@ -74,7 +74,7 @@ fn test_limbs_div_limb_mod_and_limbs_div_limb_in_place_mod() {
         assert_eq!(ns, q);
 
         let mut ns = old_ns.to_vec();
-        assert_eq!(_limbs_div_limb_in_place_mod_alt(&mut ns, d), r);
+        assert_eq!(limbs_div_limb_in_place_mod_alt(&mut ns, d), r);
         assert_eq!(ns, q);
 
         let mut ns = old_ns.to_vec();
@@ -127,7 +127,7 @@ fn test_limbs_div_limb_to_out_mod() {
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();
-        assert_eq!(_limbs_div_limb_to_out_mod_alt(&mut out, ns, d), r);
+        assert_eq!(limbs_div_limb_to_out_mod_alt(&mut out, ns, d), r);
         assert_eq!(out, out_after);
 
         let mut out = out_before.to_vec();
@@ -604,7 +604,7 @@ fn test_limbs_div_mod_schoolbook() {
         let mut ns = ns_in.to_vec();
         let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
         assert_eq!(
-            _limbs_div_mod_schoolbook(&mut qs, &mut ns, ds, inv),
+            limbs_div_mod_schoolbook(&mut qs, &mut ns, ds, inv),
             q_highest
         );
         assert_eq!(qs, qs_out);
@@ -795,7 +795,7 @@ fn test_limbs_div_mod_schoolbook() {
 fn limbs_div_mod_schoolbook_fail_1() {
     let ds = &[3, 0x80000000];
     let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_schoolbook(&mut [10], &mut [1, 2, 3], ds, inv);
+    limbs_div_mod_schoolbook(&mut [10], &mut [1, 2, 3], ds, inv);
 }
 
 #[test]
@@ -803,7 +803,7 @@ fn limbs_div_mod_schoolbook_fail_1() {
 fn limbs_div_mod_schoolbook_fail_2() {
     let ds = &[3, 4, 5, 0x80000000];
     let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_schoolbook(&mut [10], &mut [1, 2, 3], ds, inv);
+    limbs_div_mod_schoolbook(&mut [10], &mut [1, 2, 3], ds, inv);
 }
 
 #[test]
@@ -811,7 +811,7 @@ fn limbs_div_mod_schoolbook_fail_2() {
 fn limbs_div_mod_schoolbook_fail_3() {
     let ds = &[3, 4, 0x80000000];
     let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_schoolbook(&mut [10], &mut [1, 2, 3, 4, 5], ds, inv);
+    limbs_div_mod_schoolbook(&mut [10], &mut [1, 2, 3, 4, 5], ds, inv);
 }
 
 #[test]
@@ -819,7 +819,7 @@ fn limbs_div_mod_schoolbook_fail_3() {
 fn limbs_div_mod_schoolbook_fail_4() {
     let ds = &[3, 4, 5];
     let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_schoolbook(&mut [10], &mut [1, 2, 3], ds, inv);
+    limbs_div_mod_schoolbook(&mut [10], &mut [1, 2, 3], ds, inv);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -836,7 +836,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
         let ds_len = ds.len();
         let inv = limbs_two_limb_inverse_helper(ds[ds_len - 1], ds[ds_len - 2]);
         assert_eq!(
-            _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, ds, inv),
+            limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, ds, inv),
             q_highest
         );
         assert_eq!(qs, qs_out);
@@ -918,10 +918,10 @@ fn test_limbs_div_mod_divide_and_conquer() {
             538552294, 1984267024, 700348592, 1278341418, 1614761367, 3944408375, 1269851701,
         ],
     );
-    // hi < DC_DIV_QR_THRESHOLD in _limbs_div_mod_divide_and_conquer_helper
-    // carry != 0 first time in _limbs_div_mod_divide_and_conquer_helper
-    // lo < DC_DIV_QR_THRESHOLD in _limbs_div_mod_divide_and_conquer_helper
-    // carry != 0 second time in _limbs_div_mod_divide_and_conquer_helper
+    // hi < DC_DIV_QR_THRESHOLD in limbs_div_mod_divide_and_conquer_helper
+    // carry != 0 first time in limbs_div_mod_divide_and_conquer_helper
+    // lo < DC_DIV_QR_THRESHOLD in limbs_div_mod_divide_and_conquer_helper
+    // carry != 0 second time in limbs_div_mod_divide_and_conquer_helper
     // q_len > d_len
     // q_len_mod_d_len == 1
     // 2 < q_len_mod_d_len < DC_DIV_QR_THRESHOLD
@@ -955,8 +955,8 @@ fn test_limbs_div_mod_divide_and_conquer() {
             1926929270,
         ],
     );
-    // hi >= DC_DIV_QR_THRESHOLD in _limbs_div_mod_divide_and_conquer_helper
-    // lo >= DC_DIV_QR_THRESHOLD in _limbs_div_mod_divide_and_conquer_helper
+    // hi >= DC_DIV_QR_THRESHOLD in limbs_div_mod_divide_and_conquer_helper
+    // lo >= DC_DIV_QR_THRESHOLD in limbs_div_mod_divide_and_conquer_helper
     // q_len_mod_d_len >= DC_DIV_QR_THRESHOLD
     test(
         &[
@@ -1633,7 +1633,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
         &[7, 0, 0, 0xfffffffc, u32::MAX, u32::MAX, 1],
         &[0, 0, 0, 0xfffffff9, u32::MAX, 0x7fffffff],
     );
-    // highest_q in _limbs_div_mod_divide_and_conquer_helper
+    // highest_q in limbs_div_mod_divide_and_conquer_helper
     test(
         &[
             2516900350, 3628420684, 45459239, 1513614219, 989392388, 453507217, 1512254264,
@@ -2052,7 +2052,7 @@ fn test_limbs_div_mod_divide_and_conquer() {
 fn limbs_div_mod_divide_and_conquer_fail_1() {
     let ds = &[3, 4, 5, 6, 0x80000000];
     let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inv);
+    limbs_div_mod_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inv);
 }
 
 #[test]
@@ -2060,7 +2060,7 @@ fn limbs_div_mod_divide_and_conquer_fail_1() {
 fn limbs_div_mod_divide_and_conquer_fail_2() {
     let ds = &[3, 4, 5, 6, 7, 0x80000000];
     let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8], ds, inv);
+    limbs_div_mod_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8], ds, inv);
 }
 
 #[test]
@@ -2068,7 +2068,7 @@ fn limbs_div_mod_divide_and_conquer_fail_2() {
 fn limbs_div_mod_divide_and_conquer_fail_3() {
     let ds = &[3, 4, 5, 6, 7, 0x80000000];
     let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_divide_and_conquer(&mut [10, 10], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inv);
+    limbs_div_mod_divide_and_conquer(&mut [10, 10], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inv);
 }
 
 #[test]
@@ -2076,7 +2076,7 @@ fn limbs_div_mod_divide_and_conquer_fail_3() {
 fn limbs_div_mod_divide_and_conquer_fail_4() {
     let ds = &[3, 4, 5, 6, 7, 8];
     let inv = limbs_two_limb_inverse_helper(ds[ds.len() - 1], ds[ds.len() - 2]);
-    _limbs_div_mod_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inv);
+    limbs_div_mod_divide_and_conquer(&mut [10; 4], &mut [1, 2, 3, 4, 5, 6, 7, 8, 9], ds, inv);
 }
 
 fn verify_limbs_invert_approx(
@@ -2118,7 +2118,7 @@ fn test_limbs_invert_basecase_approx() {
         let mut is = is_in.to_vec();
         let mut scratch = vec![0; is_in.len() << 1];
         assert_eq!(
-            _limbs_invert_basecase_approx(&mut is, ds, &mut scratch),
+            limbs_invert_basecase_approx(&mut is, ds, &mut scratch),
             result_definitely_exact
         );
         assert_eq!(is, is_out);
@@ -2327,25 +2327,25 @@ fn test_limbs_invert_basecase_approx() {
 #[test]
 #[should_panic]
 fn limbs_invert_basecase_approx_fail_1() {
-    _limbs_invert_basecase_approx(&mut [10; 3], &[1], &mut [10, 10]);
+    limbs_invert_basecase_approx(&mut [10; 3], &[1], &mut [10, 10]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_basecase_approx_fail_2() {
-    _limbs_invert_basecase_approx(&mut [10; 3], &[1, 0x80000000], &mut [10; 3]);
+    limbs_invert_basecase_approx(&mut [10; 3], &[1, 0x80000000], &mut [10; 3]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_basecase_approx_fail_3() {
-    _limbs_invert_basecase_approx(&mut [10; 3], &[], &mut [10; 3]);
+    limbs_invert_basecase_approx(&mut [10; 3], &[], &mut [10; 3]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_basecase_approx_fail_4() {
-    _limbs_invert_basecase_approx(&mut [10; 1], &[1, 0x80000000], &mut [10; 4]);
+    limbs_invert_basecase_approx(&mut [10; 1], &[1, 0x80000000], &mut [10; 4]);
 }
 
 #[test]
@@ -2354,7 +2354,7 @@ fn test_limbs_invert_newton_approx() {
         let mut is = is_in.to_vec();
         let mut scratch = vec![0; is_in.len() << 1];
         assert_eq!(
-            _limbs_invert_newton_approx(&mut is, ds, &mut scratch),
+            limbs_invert_newton_approx(&mut is, ds, &mut scratch),
             result_definitely_exact
         );
         assert_eq!(is, is_out);
@@ -4333,25 +4333,25 @@ fn test_limbs_invert_newton_approx() {
 #[test]
 #[should_panic]
 fn limbs_invert_newton_approx_fail_1() {
-    _limbs_invert_newton_approx(&mut [10; 6], &[1, 2, 3, 4, 5], &mut [10; 10]);
+    limbs_invert_newton_approx(&mut [10; 6], &[1, 2, 3, 4, 5], &mut [10; 10]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_newton_approx_fail_2() {
-    _limbs_invert_newton_approx(&mut [10; 6], &[1, 2, 3, 4, 0x80000000], &mut [10; 8]);
+    limbs_invert_newton_approx(&mut [10; 6], &[1, 2, 3, 4, 0x80000000], &mut [10; 8]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_newton_approx_fail_3() {
-    _limbs_invert_newton_approx(&mut [10; 6], &[1, 2, 3, 0x80000000], &mut [10; 10]);
+    limbs_invert_newton_approx(&mut [10; 6], &[1, 2, 3, 0x80000000], &mut [10; 10]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_newton_approx_fail_4() {
-    _limbs_invert_newton_approx(&mut [10; 4], &[1, 2, 3, 4, 0x80000000], &mut [10; 10]);
+    limbs_invert_newton_approx(&mut [10; 4], &[1, 2, 3, 4, 0x80000000], &mut [10; 10]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -4361,7 +4361,7 @@ fn test_limbs_invert_approx() {
         let mut is = is_in.to_vec();
         let mut scratch = vec![0; is_in.len() << 1];
         assert_eq!(
-            _limbs_invert_approx(&mut is, ds, &mut scratch),
+            limbs_invert_approx(&mut is, ds, &mut scratch),
             result_definitely_exact,
         );
         assert_eq!(is, is_out);
@@ -4560,25 +4560,25 @@ fn test_limbs_invert_approx() {
 #[test]
 #[should_panic]
 fn limbs_invert_approx_fail_1() {
-    _limbs_invert_approx(&mut [10; 3], &[1], &mut [10, 10]);
+    limbs_invert_approx(&mut [10; 3], &[1], &mut [10, 10]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_approx_fail_2() {
-    _limbs_invert_approx(&mut [10; 3], &[1, 0x80000000], &mut [10; 3]);
+    limbs_invert_approx(&mut [10; 3], &[1, 0x80000000], &mut [10; 3]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_approx_fail_3() {
-    _limbs_invert_approx(&mut [10; 3], &[], &mut [10; 3]);
+    limbs_invert_approx(&mut [10; 3], &[], &mut [10; 3]);
 }
 
 #[test]
 #[should_panic]
 fn limbs_invert_approx_fail_4() {
-    _limbs_invert_approx(&mut [10; 1], &[1, 0x80000000], &mut [10; 4]);
+    limbs_invert_approx(&mut [10; 1], &[1, 0x80000000], &mut [10; 4]);
 }
 
 fn verify_limbs_div_mod_2(
@@ -4620,9 +4620,9 @@ fn test_limbs_div_mod_barrett() {
                 rs_out: &[Limb]| {
         let mut qs = qs_in.to_vec();
         let mut rs = rs_in.to_vec();
-        let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+        let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
         assert_eq!(
-            _limbs_div_mod_barrett(&mut qs, &mut rs, ns, ds, &mut scratch),
+            limbs_div_mod_barrett(&mut qs, &mut rs, ns, ds, &mut scratch),
             q_highest,
         );
         assert_eq!(qs, qs_out);
@@ -4632,14 +4632,14 @@ fn test_limbs_div_mod_barrett() {
     #[cfg(feature = "32_bit_limbs")]
     {
         // q_len + MU_DIV_QR_SKEW_THRESHOLD >= d_len
-        // d_len != i_len in _limbs_div_mod_barrett_helper
+        // d_len != i_len in limbs_div_mod_barrett_helper
         // !limbs_add_limb_to_out(scratch, &ds[d_len - i_len_plus_1..], 1)
-        //      in _limbs_div_mod_barrett_helper
-        // !highest_q in _limbs_div_mod_barrett_preinverted
-        // i_len == chunk_len in _limbs_div_mod_barrett_preinverted
-        // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_div_mod_barrett_preinverted
-        // n > 0 in _limbs_div_mod_barrett_preinverted
-        // limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal in _limbs_div_mod_barrett_preinverted
+        //      in limbs_div_mod_barrett_helper
+        // !highest_q in limbs_div_mod_barrett_preinverted
+        // i_len == chunk_len in limbs_div_mod_barrett_preinverted
+        // i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_mod_barrett_preinverted
+        // n > 0 in limbs_div_mod_barrett_preinverted
+        // limbs_cmp_same_length(ns_hi, ds) >= Ordering::Equal in limbs_div_mod_barrett_preinverted
         test(
             &[10, 10],
             &[10, 10, 10],
@@ -4649,11 +4649,11 @@ fn test_limbs_div_mod_barrett() {
             &[6, 10],
             &[0xfffffffb, 1, 10],
         );
-        // highest_q in _limbs_div_mod_barrett_preinverted
-        // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in _limbs_div_mod_barrett_preinverted
-        // d_len_plus_i_len > scratch_len in _limbs_div_barrett_large_product
-        // i_len != chunk_len in _limbs_div_mod_barrett_preinverted
-        // limbs_cmp_same_length(ns_hi, ds) == Ordering::Less in _limbs_div_mod_barrett_preinverted
+        // highest_q in limbs_div_mod_barrett_preinverted
+        // i_len >= MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD in limbs_div_mod_barrett_preinverted
+        // d_len_plus_i_len > scratch_len in limbs_div_barrett_large_product
+        // i_len != chunk_len in limbs_div_mod_barrett_preinverted
+        // limbs_cmp_same_length(ns_hi, ds) == Ordering::Less in limbs_div_mod_barrett_preinverted
         test(
             &[
                 3347432287, 667250836, 2974407817, 429996943, 2750501459, 981155607, 2784121354,
@@ -4767,7 +4767,7 @@ fn test_limbs_div_mod_barrett() {
                 4212676921, 1479533912, 2157734799, 3588439224,
             ],
         );
-        // r != 0 in _limbs_div_mod_barrett_preinverted
+        // r != 0 in limbs_div_mod_barrett_preinverted
         test(
             &mut [10, 10],
             &mut [10, 10],
@@ -4777,8 +4777,8 @@ fn test_limbs_div_mod_barrett() {
             &[u32::MAX, 1],
             &[1, 0x7ffffffe],
         );
-        // d_len == i_len in _limbs_div_mod_barrett_helper
-        // n == 0 in _limbs_div_mod_barrett_preinverted
+        // d_len == i_len in limbs_div_mod_barrett_helper
+        // n == 0 in limbs_div_mod_barrett_preinverted
         test(
             &mut [10; 3],
             &mut [10, 10],
@@ -4789,12 +4789,12 @@ fn test_limbs_div_mod_barrett() {
             &[0, 0],
         );
         // q_len + MU_DIV_QR_SKEW_THRESHOLD < d_len
-        // !highest_q in _limbs_div_mod_barrett_large_helper
+        // !highest_q in limbs_div_mod_barrett_large_helper
         // !_limbs_sub_same_length_with_borrow_in_in_place_left(
         //            rs_hi,
         //            scratch_hi,
         //            limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),
-        //        ) in _limbs_div_mod_barrett_large_helper
+        //        ) in limbs_div_mod_barrett_large_helper
         test(
             &mut [10; 125],
             &mut [10; 405],
@@ -4888,7 +4888,7 @@ fn test_limbs_div_mod_barrett() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // highest_q in _limbs_div_mod_barrett_large_helper
+        // highest_q in limbs_div_mod_barrett_large_helper
         test(
             &[10; 115],
             &[10; 1254],
@@ -5769,8 +5769,8 @@ fn test_limbs_div_mod_barrett() {
 fn limbs_div_mod_barrett_fail_1() {
     let ns = &[1, 2, 3];
     let ds = &[0x80000000];
-    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-    _limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
+    let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
 #[test]
@@ -5778,8 +5778,8 @@ fn limbs_div_mod_barrett_fail_1() {
 fn limbs_div_mod_barrett_fail_2() {
     let ns = &[1, 2];
     let ds = &[1, 0x80000000];
-    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-    _limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
+    let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
 #[test]
@@ -5787,8 +5787,8 @@ fn limbs_div_mod_barrett_fail_2() {
 fn limbs_div_mod_barrett_fail_3() {
     let ns = &[1, 2, 3, 4];
     let ds = &[1, 0x80000000];
-    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-    _limbs_div_mod_barrett(&mut [10], &mut [10, 10, 10], ns, ds, &mut scratch);
+    let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    limbs_div_mod_barrett(&mut [10], &mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
 #[test]
@@ -5796,8 +5796,8 @@ fn limbs_div_mod_barrett_fail_3() {
 fn limbs_div_mod_barrett_fail_4() {
     let ns = &[1, 2, 3];
     let ds = &[1, 2];
-    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-    _limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
+    let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+    limbs_div_mod_barrett(&mut [10, 10], &mut [10, 10, 10], ns, ds, &mut scratch);
 }
 
 fn verify_limbs_div_mod_3(
@@ -5872,8 +5872,8 @@ fn test_limbs_div_mod() {
             verify_limbs_div_mod_3(qs_in, rs_in, ns, ds, &qs_out, &rs_out);
         };
         // d_len == 2
-        // bits != 0 in _limbs_div_mod_by_two_limb
-        // carry == 0 in _limbs_div_mod_by_two_limb
+        // bits != 0 in limbs_div_mod_by_two_limb
+        // carry == 0 in limbs_div_mod_by_two_limb
         test(
             &[10; 4],
             &[10; 4],
@@ -5890,7 +5890,7 @@ fn test_limbs_div_mod() {
             &[2576980377, 0, 10, 10],
             &[2576980381, 2, 10, 10],
         );
-        // bits == 0 in _limbs_div_mod_by_two_limb
+        // bits == 0 in limbs_div_mod_by_two_limb
         test(
             &[10; 4],
             &[10; 4],
@@ -5900,26 +5900,26 @@ fn test_limbs_div_mod() {
             &[4294967273, 1, 10, 10],
         );
         // adjusted_n_len < 2 * d_len
-        // q_len == 0 in _limbs_div_mod_balanced
+        // q_len == 0 in limbs_div_mod_balanced
         test(&[10], &[10; 3], &[0; 3], &[0, 0, 1], &[0], &[0; 3]);
-        // _q_len > 0 in _limbs_div_mod_balanced
-        // adjust in _limbs_div_mod_balanced
-        // q_len == 0 in _limbs_div_mod_balanced
-        // i_len >= 2 in _limbs_div_mod_balanced
+        // _q_len > 0 in limbs_div_mod_balanced
+        // adjust in limbs_div_mod_balanced
+        // q_len == 0 in limbs_div_mod_balanced
+        // i_len >= 2 in limbs_div_mod_balanced
         // ns_shifted[q_len - 1] >=
         //      (DoubleLimb::from(x) * DoubleLimb::from(qs[q_len - 1])).upper_half()
-        //      in _limbs_div_mod_balanced
-        // bits != 0 _limbs_div_mod_balanced
-        // q_len == r_len in _limbs_div_mod_balanced
-        // do_extra_cleanup in _limbs_div_mod_balanced
-        // !quotient_too_large in _limbs_div_mod_balanced
+        //      in limbs_div_mod_balanced
+        // bits != 0 limbs_div_mod_balanced
+        // q_len == r_len in limbs_div_mod_balanced
+        // do_extra_cleanup in limbs_div_mod_balanced
+        // !quotient_too_large in limbs_div_mod_balanced
         test(&[10], &[10; 3], &[0, 0, 1], &[0, 0, 1], &[1], &[0; 3]);
-        // !adjust in _limbs_div_mod_balanced
+        // !adjust in limbs_div_mod_balanced
         test(&[10, 10], &[10; 3], &[0; 4], &[0, 0, 1], &[0, 0], &[0; 3]);
-        // quotient_too_large in _limbs_div_mod_balanced
+        // quotient_too_large in limbs_div_mod_balanced
         test(&[10], &[10; 3], &[0, 0, 1], &[0, 1, 1], &[0], &[0, 0, 1]);
-        // bits != 0 in _limbs_div_mod_unbalanced
-        // bits != 0 and Schoolbook condition in _limbs_div_mod_unbalanced
+        // bits != 0 in limbs_div_mod_unbalanced
+        // bits != 0 and Schoolbook condition in limbs_div_mod_unbalanced
         test(
             &[10; 264],
             &[10; 30],
@@ -6002,7 +6002,7 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // carry != 0 in _limbs_div_mod_by_two_limb
+        // carry != 0 in limbs_div_mod_by_two_limb
         test(
             &[10; 148],
             &[10; 215],
@@ -6057,8 +6057,8 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // bits == 0 in _limbs_div_mod_balanced
-        // q_len == 2 in _limbs_div_mod_balanced
+        // bits == 0 in limbs_div_mod_balanced
+        // q_len == 2 in limbs_div_mod_balanced
         test(
             &[10; 373],
             &[10; 178],
@@ -6106,8 +6106,8 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10,
             ],
         );
-        // q_len > 2 in _limbs_div_mod_balanced
-        // q_len < DC_DIV_QR_THRESHOLD in _limbs_div_mod_balanced
+        // q_len > 2 in limbs_div_mod_balanced
+        // q_len < DC_DIV_QR_THRESHOLD in limbs_div_mod_balanced
         test(
             &[10; 4],
             &[10; 6],
@@ -6116,8 +6116,8 @@ fn test_limbs_div_mod() {
             &[4294967057, 15, 18, 0],
             &[718, 910, 1080, 1286, 1492, 2147483434],
         );
-        // i_len < 2 in _limbs_div_mod_balanced
-        // i_len_alt > 0 in _limbs_div_mod_balanced
+        // i_len < 2 in limbs_div_mod_balanced
+        // i_len_alt > 0 in limbs_div_mod_balanced
         test(
             &[10; 3],
             &[10; 4],
@@ -6126,8 +6126,8 @@ fn test_limbs_div_mod() {
             &[u32::MAX, u32::MAX, 0],
             &[3, 4, 0xfffffffc, 0x7fffffff],
         );
-        // i_len_alt == 0 in _limbs_div_mod_balanced
-        // !do_extra_cleanup in _limbs_div_mod_balanced
+        // i_len_alt == 0 in limbs_div_mod_balanced
+        // !do_extra_cleanup in limbs_div_mod_balanced
         test(
             &[10; 10],
             &[10; 10],
@@ -6138,9 +6138,9 @@ fn test_limbs_div_mod() {
         );
         // ns_shifted[q_len - 1] <
         //      (DoubleLimb::from(x) * DoubleLimb::from(qs[q_len - 1])).upper_half()
-        //      in _limbs_div_mod_balanced
-        // carry in _limbs_div_mod_balanced
-        // q_len != rn in _limbs_div_mod_balanced
+        //      in limbs_div_mod_balanced
+        // carry in limbs_div_mod_balanced
+        // q_len != rn in limbs_div_mod_balanced
         test(
             &[10; 25],
             &[10; 20],
@@ -6165,7 +6165,7 @@ fn test_limbs_div_mod() {
                 321699454, 1968063162, 10, 10, 10, 10,
             ],
         );
-        // carry in _limbs_div_mod_balanced
+        // carry in limbs_div_mod_balanced
         test(
             &[10, 10],
             &[10; 3],
@@ -6174,8 +6174,8 @@ fn test_limbs_div_mod() {
             &[3800268463, 0],
             &[0, 0, 0],
         );
-        // divide-and-conquer condition in _limbs_div_mod_unbalanced
-        // bits != 0 and divide-and-conquer condition in _limbs_div_mod_unbalanced
+        // divide-and-conquer condition in limbs_div_mod_unbalanced
+        // bits != 0 and divide-and-conquer condition in limbs_div_mod_unbalanced
         test(
             &[10; 674],
             &[10; 255],
@@ -6372,7 +6372,7 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10,
             ],
         );
-        // DC_DIV_QR_THRESHOLD <= q_len < MU_DIV_QR_THRESHOLD in _limbs_div_mod_unbalanced
+        // DC_DIV_QR_THRESHOLD <= q_len < MU_DIV_QR_THRESHOLD in limbs_div_mod_unbalanced
         test(
             &[10; 62],
             &[10; 1098],
@@ -6508,7 +6508,7 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10, 10,
             ],
         );
-        // bits == 0 and divide-and-conquer condition in _limbs_div_mod_unbalanced
+        // bits == 0 and divide-and-conquer condition in limbs_div_mod_unbalanced
         test(
             &[10; 320],
             &[10; 915],
@@ -6649,8 +6649,8 @@ fn test_limbs_div_mod() {
                 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
             ],
         );
-        // Barrett condition in _limbs_div_mod_unbalanced
-        // bits == 0 in Barrett condition in _limbs_div_mod_unbalanced
+        // Barrett condition in limbs_div_mod_unbalanced
+        // bits == 0 in Barrett condition in limbs_div_mod_unbalanced
         test(
             &[10; 1459],
             &[10; 1458],
@@ -10206,16 +10206,16 @@ fn test_limbs_div_mod() {
                 3985681094, 1514818198,
             ],
         );
-        // bits != 0 and Barrett condition in _limbs_div_mod_unbalanced
+        // bits != 0 and Barrett condition in limbs_div_mod_unbalanced
         test_only_verify(&[10; 19901], &[10; 100], &[123; 20000], &[123; 100]);
     }
     #[cfg(not(feature = "32_bit_limbs"))]
     {
         // d_len > 2
         // adjusted_n_len >= 2 * d_len
-        // bits == 0 in _limbs_div_mod_unbalanced
-        // Schoolbook condition in _limbs_div_mod_unbalanced
-        // bits == 0 and Schoolbook condition in _limbs_div_mod_unbalanced
+        // bits == 0 in limbs_div_mod_unbalanced
+        // Schoolbook condition in limbs_div_mod_unbalanced
+        // bits == 0 and Schoolbook condition in limbs_div_mod_unbalanced
         test(
             &[10; 17],
             &[10; 17],

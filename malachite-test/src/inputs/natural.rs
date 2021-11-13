@@ -1,7 +1,5 @@
 use common::GenerationMode;
-use inputs::common::{
-    permute_1_3_4_2, permute_2_1, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4,
-};
+use inputs::common::{permute_2_1, reshape_2_1_to_3, reshape_3_1_to_4};
 use malachite_base::num::arithmetic::traits::{
     DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, PowerOf2,
 };
@@ -28,7 +26,7 @@ use malachite_nz::natural::exhaustive::{
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use num::BigUint;
-use rand::{IsaacRng, Rand, Rng};
+use rand::Rand;
 use rug;
 use rust_wheels::iterators::common::{scramble, EXAMPLE_SEED};
 use rust_wheels::iterators::dependent_pairs::{
@@ -586,17 +584,6 @@ pub fn triples_of_natural_small_unsigned_and_small_unsigned<T: PrimitiveUnsigned
     }
 }
 
-// All triples of `Natural`, small `T`, and small `T`, where `T` is unsigned and the first `T` is
-// less than or equal to the second.
-pub fn triples_of_natural_small_unsigned_and_small_unsigned_var_1<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Natural, T, T)> {
-    Box::new(
-        triples_of_natural_small_unsigned_and_small_unsigned(gm)
-            .filter(|&(_, start, end)| start <= end),
-    )
-}
-
 pub fn triples_of_natural_natural_and_small_unsigned<T: PrimitiveUnsigned + Rand>(
     gm: GenerationMode,
 ) -> It<(Natural, Natural, T)> {
@@ -1139,24 +1126,6 @@ where
     )
 }
 
-struct RandomNaturalAndVecOfBoolVar1 {
-    naturals: It<Natural>,
-    rng: Box<IsaacRng>,
-}
-
-impl Iterator for RandomNaturalAndVecOfBoolVar1 {
-    type Item = (Natural, Vec<bool>);
-
-    fn next(&mut self) -> Option<(Natural, Vec<bool>)> {
-        let n = self.naturals.next().unwrap();
-        let mut bools = Vec::new();
-        for _ in 0..n.limb_count() {
-            bools.push(self.rng.gen::<bool>());
-        }
-        Some((n, bools))
-    }
-}
-
 fn quadruples_of_naturals(gm: GenerationMode) -> It<(Natural, Natural, Natural, Natural)> {
     match gm {
         GenerationMode::Exhaustive => {
@@ -1352,40 +1321,4 @@ pub fn quadruples_of_natural_natural_natural_and_small_unsigned<T: PrimitiveUnsi
             &(|seed| u32s_geometric(seed, scale).flat_map(T::checked_from)),
         )),
     }
-}
-
-fn quadruples_of_natural_small_unsigned_small_unsigned_and_natural<T: PrimitiveUnsigned + Rand>(
-    gm: GenerationMode,
-) -> It<(Natural, T, T, Natural)> {
-    permute_1_3_4_2(reshape_2_2_to_4(match gm {
-        GenerationMode::Exhaustive => Box::new(exhaustive_pairs_big_small(
-            exhaustive_pairs_from_single(exhaustive_naturals()),
-            exhaustive_pairs_from_single(exhaustive_unsigneds()),
-        )),
-        GenerationMode::Random(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_pairs_from_single(random_naturals(seed, scale))),
-            &(|seed| {
-                random_pairs_from_single(u32s_geometric(seed, scale).flat_map(T::checked_from))
-            }),
-        )),
-        GenerationMode::SpecialRandom(scale) => Box::new(random_pairs(
-            &EXAMPLE_SEED,
-            &(|seed| random_pairs_from_single(special_random_naturals(seed, scale))),
-            &(|seed| {
-                random_pairs_from_single(u32s_geometric(seed, scale).flat_map(T::checked_from))
-            }),
-        )),
-    }))
-}
-
-pub fn quadruples_of_natural_small_unsigned_small_unsigned_and_natural_var_1<
-    T: PrimitiveUnsigned + Rand,
->(
-    gm: GenerationMode,
-) -> It<(Natural, T, T, Natural)> {
-    Box::new(
-        quadruples_of_natural_small_unsigned_small_unsigned_and_natural(gm)
-            .filter(|&(_, start, end, _)| start < end),
-    )
 }

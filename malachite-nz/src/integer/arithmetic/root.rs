@@ -1,7 +1,6 @@
 use integer::Integer;
 use malachite_base::num::arithmetic::traits::{
-    CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Parity,
-    UnsignedAbs,
+    CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Parity, UnsignedAbs,
 };
 use natural::Natural;
 use std::ops::Neg;

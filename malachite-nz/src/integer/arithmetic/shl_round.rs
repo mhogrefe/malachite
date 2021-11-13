@@ -6,7 +6,7 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::rounding_modes::RoundingMode;
 use std::ops::{Shl, ShlAssign};
 
-fn _shl_round_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shl_round_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Integer,
     bits: S,
     rm: RoundingMode,
@@ -21,7 +21,7 @@ where
     }
 }
 
-fn _shl_round_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shl_round_assign_i<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Integer,
     bits: S,
     rm: RoundingMode,
@@ -191,7 +191,7 @@ macro_rules! impl_shl_round_signed {
             ///
             #[inline]
             fn shl_round(self, bits: $t, rm: RoundingMode) -> Integer {
-                _shl_round_signed_ref(self, bits, rm)
+                shl_round_signed_ref(self, bits, rm)
             }
         }
 
@@ -261,7 +261,7 @@ macro_rules! impl_shl_round_signed {
             /// ```
             #[inline]
             fn shl_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                _shl_round_assign(self, bits, rm);
+                shl_round_assign_i(self, bits, rm);
             }
         }
     };

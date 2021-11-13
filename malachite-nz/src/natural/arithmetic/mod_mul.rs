@@ -14,7 +14,7 @@ use platform::{DoubleLimb, Limb};
 /// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0.
 ///
 /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
-pub fn _limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
+pub fn limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
     let xs = &mut [0; 5];
     let out = &mut [0; 3];
     let bits = LeadingZeros::leading_zeros(m_1);
@@ -136,7 +136,7 @@ fn precompute_mod_mul_data_helper(m: &Natural) -> ModMulData {
         Natural(Large(ref xs)) => match xs[..] {
             [0, 1] => ModMulData::MinTwoLimbs,
             [m_0, m_1] => {
-                let (inv_2, inv_1, inv_0) = _limbs_precompute_mod_mul_two_limbs(m_1, m_0);
+                let (inv_2, inv_1, inv_0) = limbs_precompute_mod_mul_two_limbs(m_1, m_0);
                 ModMulData::TwoLimbs(inv_2, inv_1, inv_0)
             }
             _ => ModMulData::MoreThanTwoLimbs,

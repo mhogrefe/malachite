@@ -1,6 +1,18 @@
-use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
+use malachite_base::num::arithmetic::traits::{
+    CheckedRoot, Parity, Pow, PowAssign, PowerOf2, Square,
+};
+use malachite_base::num::basic::traits::{Iverson, NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::generators::{signed_unsigned_pair_gen_var_15, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::SignedLimb;
+use malachite_nz_test_util::common::{
+    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
+};
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_integer_unsigned_triple_gen_var_1, integer_unsigned_pair_gen_var_2,
+    integer_unsigned_unsigned_triple_gen_var_3, natural_unsigned_pair_gen_var_4,
+};
 use num::traits::Pow as NumPow;
 use num::BigInt;
 use rug::ops::Pow as RugPow;
@@ -168,4 +180,71 @@ fn test_pow() {
         "354070611898367606555445954656918550154832595750628623501854823341167403514406003590115726\
         6821921"
     );
+}
+
+#[test]
+fn pow_properties() {
+    integer_unsigned_pair_gen_var_2().test_properties(|(x, exp)| {
+        let power = (&x).pow(exp);
+        assert!(power.is_valid());
+
+        let power_alt = x.clone().pow(exp);
+        assert!(power_alt.is_valid());
+        assert_eq!(power_alt, power);
+
+        let mut power_alt = x.clone();
+        power_alt.pow_assign(exp);
+        assert!(power_alt.is_valid());
+        assert_eq!(power_alt, power);
+
+        let power_of_neg = (-&x).pow(exp);
+        if exp.even() {
+            assert_eq!(power_of_neg, power);
+        } else {
+            assert_eq!(power_of_neg, -&power);
+        }
+        if exp > 0 && (x >= 0 || exp.odd()) {
+            assert_eq!((&power).checked_root(exp).as_ref(), Some(&x));
+        }
+
+        assert_eq!(bigint_to_integer(&integer_to_bigint(&x).pow(exp)), power);
+        assert_eq!(
+            rug_integer_to_integer(&integer_to_rug_integer(&x).pow(u32::exact_from(exp))),
+            power
+        );
+    });
+
+    integer_gen().test_properties(|x| {
+        assert_eq!((&x).pow(0), 1);
+        assert_eq!((&x).pow(1), x);
+        assert_eq!((&x).pow(2), x.square());
+    });
+
+    unsigned_gen_var_5().test_properties(|exp| {
+        assert_eq!(Integer::ZERO.pow(exp), u64::iverson(exp == 0));
+        assert_eq!(Integer::ONE.pow(exp), 1);
+        assert_eq!(Integer::TWO.pow(exp), Integer::power_of_2(exp));
+
+        assert_eq!(
+            Integer::NEGATIVE_ONE.pow(exp),
+            if exp.even() { 1 } else { -1 }
+        );
+    });
+
+    integer_integer_unsigned_triple_gen_var_1().test_properties(|(x, y, exp)| {
+        assert_eq!((&x * &y).pow(exp), x.pow(exp) * y.pow(exp));
+    });
+
+    integer_unsigned_unsigned_triple_gen_var_3().test_properties(|(x, e, f)| {
+        assert_eq!((&x).pow(e + f), (&x).pow(e) * (&x).pow(f));
+        assert_eq!((&x).pow(e * f), x.pow(e).pow(f));
+    });
+
+    natural_unsigned_pair_gen_var_4().test_properties(|(x, exp)| {
+        assert_eq!((&x).pow(exp), Integer::from(x).pow(exp));
+    });
+
+    signed_unsigned_pair_gen_var_15::<SignedLimb>().test_properties(|(x, exp)| {
+        assert_eq!(Pow::pow(x, exp), Integer::from(x).pow(exp));
+    });
 }

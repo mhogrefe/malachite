@@ -74,7 +74,7 @@ impl Natural {
     }
 }
 
-fn _to_power_of_2_digits_asc<T: PrimitiveUnsigned>(x: &Natural, log_base: u64) -> Vec<T>
+fn to_power_of_2_digits_asc_nz<T: PrimitiveUnsigned>(x: &Natural, log_base: u64) -> Vec<T>
 where
     Limb: PowerOf2Digits<T>,
 {
@@ -99,7 +99,7 @@ where
     digits
 }
 
-fn _to_power_of_2_digits_desc<T>(x: &Natural, log_base: u64) -> Vec<T>
+fn to_power_of_2_digits_desc_nz<T>(x: &Natural, log_base: u64) -> Vec<T>
 where
     Natural: PowerOf2Digits<T>,
 {
@@ -108,7 +108,7 @@ where
     digits
 }
 
-fn _from_power_of_2_digits_asc<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
+fn from_power_of_2_digits_asc_nz<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
     log_base: u64,
     digits: I,
 ) -> Option<Natural>
@@ -130,7 +130,7 @@ where
     Some(Natural::from_owned_limbs_asc(limbs))
 }
 
-fn _from_power_of_2_digits_desc<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
+fn from_power_of_2_digits_desc_nz<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
     log_base: u64,
     digits: I,
 ) -> Option<Natural>
@@ -198,7 +198,7 @@ macro_rules! power_of_2_digits_unsigned {
             /// ```
             #[inline]
             fn to_power_of_2_digits_asc(&self, log_base: u64) -> Vec<$t> {
-                _to_power_of_2_digits_asc(self, log_base)
+                to_power_of_2_digits_asc_nz(self, log_base)
             }
 
             /// Returns a `Vec` containing the digits of `self` in descending order: most- to least-
@@ -241,7 +241,7 @@ macro_rules! power_of_2_digits_unsigned {
             /// ```
             #[inline]
             fn to_power_of_2_digits_desc(&self, log_base: u64) -> Vec<$t> {
-                _to_power_of_2_digits_desc(self, log_base)
+                to_power_of_2_digits_desc_nz(self, log_base)
             }
 
             /// Converts an iterator of digits into a `Natural`, where the base is a power of 2.
@@ -288,7 +288,7 @@ macro_rules! power_of_2_digits_unsigned {
                 log_base: u64,
                 digits: I,
             ) -> Option<Natural> {
-                _from_power_of_2_digits_asc(log_base, digits)
+                from_power_of_2_digits_asc_nz(log_base, digits)
             }
 
             /// Converts an iterator of digits into a `Natural`, where the base is a power of 2.
@@ -335,7 +335,7 @@ macro_rules! power_of_2_digits_unsigned {
                 log_base: u64,
                 digits: I,
             ) -> Option<Natural> {
-                _from_power_of_2_digits_desc(log_base, digits)
+                from_power_of_2_digits_desc_nz(log_base, digits)
             }
         }
     };

@@ -5,7 +5,7 @@ use malachite_base::rounding_modes::RoundingMode;
 use natural::Natural;
 use std::ops::{Shl, ShlAssign};
 
-fn _shr_round_unsigned_ref<'a, T>(x: &'a Integer, bits: T, rm: RoundingMode) -> Integer
+fn shr_round_unsigned_ref_i<'a, T>(x: &'a Integer, bits: T, rm: RoundingMode) -> Integer
 where
     &'a Natural: ShrRound<T, Output = Natural>,
 {
@@ -34,7 +34,7 @@ where
     }
 }
 
-fn _shr_round_assign_unsigned<T>(x: &mut Integer, bits: T, rm: RoundingMode)
+fn shr_round_assign_unsigned_i<T>(x: &mut Integer, bits: T, rm: RoundingMode)
 where
     Natural: ShrRoundAssign<T>,
 {
@@ -187,7 +187,7 @@ macro_rules! impl_shr_round_unsigned {
             /// ```
             #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Integer {
-                _shr_round_unsigned_ref(self, bits, rm)
+                shr_round_unsigned_ref_i(self, bits, rm)
             }
         }
 
@@ -247,14 +247,14 @@ macro_rules! impl_shr_round_unsigned {
             /// assert_eq!(n.to_string(), "1");
             /// ```
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                _shr_round_assign_unsigned(self, bits, rm);
+                shr_round_assign_unsigned_i(self, bits, rm);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_shr_round_unsigned);
 
-fn _shr_round_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_round_signed_ref_i<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Integer,
     bits: S,
     rm: RoundingMode,
@@ -269,7 +269,7 @@ where
     }
 }
 
-fn _shr_round_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_round_assign_signed_i<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Integer,
     bits: S,
     rm: RoundingMode,
@@ -442,7 +442,7 @@ macro_rules! impl_shr_round_signed {
             /// ```
             #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Integer {
-                _shr_round_signed_ref(self, bits, rm)
+                shr_round_signed_ref_i(self, bits, rm)
             }
         }
 
@@ -512,7 +512,7 @@ macro_rules! impl_shr_round_signed {
             /// ```
             #[inline]
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                _shr_round_assign_signed(self, bits, rm);
+                shr_round_assign_signed_i(self, bits, rm);
             }
         }
     };

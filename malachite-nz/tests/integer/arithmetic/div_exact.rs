@@ -1,7 +1,15 @@
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, DivRound};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::signed_pair_gen_var_3;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_gen_var_8, integer_pair_gen_var_2, natural_pair_gen_var_6,
+};
 use std::str::FromStr;
 
 #[test]
@@ -257,4 +265,75 @@ fn div_exact_ref_val_fail() {
 #[should_panic]
 fn div_exact_ref_ref_fail() {
     (&Integer::from(10)).div_exact(&Integer::ZERO);
+}
+
+#[test]
+fn div_exact_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    integer_pair_gen_var_2().test_properties_with_config(&config, |(x, y)| {
+        let mut mut_x = x.clone();
+        mut_x.div_exact_assign(&y);
+        assert!(mut_x.is_valid());
+        let q = mut_x;
+
+        let mut mut_x = x.clone();
+        mut_x.div_exact_assign(y.clone());
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, q);
+
+        let q_alt = (&x).div_exact(&y);
+        assert!(q_alt.is_valid());
+        assert_eq!(q_alt, q);
+
+        let q_alt = (&x).div_exact(y.clone());
+        assert!(q_alt.is_valid());
+        assert_eq!(q_alt, q);
+
+        let q_alt = x.clone().div_exact(&y);
+        assert!(q_alt.is_valid());
+        assert_eq!(q_alt, q);
+
+        let q_alt = x.clone().div_exact(y.clone());
+        assert!(q_alt.is_valid());
+        assert_eq!(q_alt, q);
+
+        let q_alt = (&x).div_round(&y, RoundingMode::Exact);
+        assert_eq!(q_alt, q);
+
+        assert_eq!(
+            rug_integer_to_integer(
+                &integer_to_rug_integer(&x).div_exact(&integer_to_rug_integer(&y))
+            ),
+            q
+        );
+
+        assert_eq!(&q * &y, x);
+        assert_eq!((-&x).div_exact(&y), -&q);
+        assert_eq!(x.div_exact(-y), -q);
+    });
+
+    integer_gen().test_properties(|n| {
+        let n = &n;
+        assert_eq!(n.div_exact(Integer::ONE), *n);
+        assert_eq!(n.div_exact(Integer::NEGATIVE_ONE), -n);
+    });
+
+    integer_gen_var_8().test_properties(|n| {
+        let n = &n;
+        assert_eq!(Integer::ZERO.div_exact(n), 0);
+        assert_eq!(n.div_exact(n), 1);
+    });
+
+    natural_pair_gen_var_6().test_properties(|(x, y)| {
+        assert_eq!(
+            Integer::from(&x).div_exact(Integer::from(&y)),
+            x.div_exact(y)
+        );
+    });
+
+    signed_pair_gen_var_3::<SignedLimb>().test_properties(|(x, y)| {
+        assert_eq!(Integer::from(x).div_exact(Integer::from(y)), x.div_exact(y));
+    });
 }

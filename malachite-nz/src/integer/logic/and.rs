@@ -7,7 +7,7 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 use std::cmp::{max, Ordering};
-use std::ops::{BitAnd, BitAndAssign}; 
+use std::ops::{BitAnd, BitAndAssign};
 
 /// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
 /// limbs of the bitwise and of the `Integer` and a negative number whose lowest limb is given by
@@ -258,7 +258,7 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
 /// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 3);
 /// assert_eq!(xs, &[0, 2]);
 ///
-/// let mut xs = vec![1, 1]; 
+/// let mut xs = vec![1, 1];
 /// limbs_vec_neg_and_limb_neg_in_place(&mut xs, 3);
 /// assert_eq!(xs, &[4294967293, 1]);
 ///
@@ -273,7 +273,7 @@ pub fn limbs_slice_neg_and_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
 #[doc(hidden)]
 pub fn limbs_vec_neg_and_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_neg_and_limb_neg_in_place(xs, y) {
-        xs.push(1) 
+        xs.push(1)
     }
 }
 

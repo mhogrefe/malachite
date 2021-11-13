@@ -1,11 +1,15 @@
 use crate::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
 };
+use crate::natural::arithmetic::gcd::half_gcd_matrix_create;
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
 use malachite_base::iterators::iter_windows;
-use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, DivRound, Parity, PowerOf2};
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShl, DivRound, DivisibleBy, DivisibleByPowerOf2, EqMod, EqModPowerOf2, Parity,
+    PowerOf2,
+};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -24,10 +28,13 @@ use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::exhaustive::{
-    exhaustive_dependent_pairs, exhaustive_pairs, exhaustive_pairs_from_single,
-    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz, exhaustive_triples,
-    exhaustive_triples_custom_output, exhaustive_triples_from_single, exhaustive_triples_xyx,
-    exhaustive_triples_xyy_custom_output, lex_pairs, ExhaustiveDependentPairsYsGenerator,
+    exhaustive_dependent_pairs, exhaustive_ordered_unique_pairs, exhaustive_pairs,
+    exhaustive_pairs_from_single, exhaustive_quadruples_from_single,
+    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xyyx,
+    exhaustive_quadruples_xyyz, exhaustive_triples, exhaustive_triples_custom_output,
+    exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
+    exhaustive_triples_xyx, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
+    lex_pairs, ExhaustiveDependentPairsYsGenerator,
 };
 use malachite_base::vecs::exhaustive::{
     exhaustive_vecs, exhaustive_vecs_fixed_length_from_single, exhaustive_vecs_length_range,
@@ -35,19 +42,23 @@ use malachite_base::vecs::exhaustive::{
     LexFixedLengthVecsFromSingle,
 };
 use malachite_base_test_util::generators::common::{
-    permute_1_3_2, permute_2_1, reshape_2_1_to_3, It,
+    permute_1_3_2, permute_2_1, reshape_1_3_to_4, reshape_2_1_to_3, It,
 };
 use malachite_base_test_util::generators::exhaustive::{
     exhaustive_unsigned_vec_unsigned_pair_gen_var_17, UnsignedVecTripleLenGenerator1,
     UnsignedVecTripleXYYLenGenerator,
 };
-use malachite_base_test_util::generators::exhaustive_pairs_big_tiny;
+use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_nz::integer::exhaustive::{
     exhaustive_integers, exhaustive_natural_integers, exhaustive_negative_integers,
+    exhaustive_nonzero_integers,
 };
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::arithmetic::gcd::half_gcd::{HalfGcdMatrix, HalfGcdMatrix1};
 use malachite_nz::natural::arithmetic::mul::fft::*;
+use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb;
+use malachite_nz::natural::arithmetic::mul::limbs_mul;
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_32_input_sizes_valid,
@@ -63,6 +74,9 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
+use malachite_nz::natural::arithmetic::sub::{
+    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place,
+};
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
@@ -72,8 +86,10 @@ use malachite_nz::natural::exhaustive::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use std::cmp::max;
 use std::iter::once;
 use std::marker::PhantomData;
+use std::ops::{Shl, Shr};
 
 // -- Integer --
 
@@ -136,10 +152,35 @@ pub fn exhaustive_integer_gen_var_7() -> It<Integer> {
     Box::new(exhaustive_negative_integers())
 }
 
+pub fn exhaustive_integer_gen_var_8() -> It<Integer> {
+    Box::new(exhaustive_nonzero_integers())
+}
+
 // -- (Integer, Integer) --
 
 pub fn exhaustive_integer_pair_gen() -> It<(Integer, Integer)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_integers()))
+}
+
+pub fn exhaustive_integer_pair_gen_var_1() -> It<(Integer, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integers(),
+        exhaustive_nonzero_integers(),
+    ))
+}
+
+pub fn exhaustive_integer_pair_gen_var_2() -> It<(Integer, Integer)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_integers(), exhaustive_nonzero_integers())
+            .map(|(x, y)| (x * &y, y)),
+    )
+}
+
+pub fn exhaustive_integer_pair_gen_var_3() -> It<(Integer, Integer)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_integers(), exhaustive_nonzero_integers())
+            .filter(|(x, y)| !x.divisible_by(y)),
+    )
 }
 
 // -- (Integer, Integer, Integer) --
@@ -150,6 +191,147 @@ pub fn exhaustive_integer_triple_gen() -> It<(Integer, Integer, Integer)> {
 
 pub fn exhaustive_integer_triple_gen_var_1() -> It<(Integer, Integer, Integer)> {
     Box::new(exhaustive_triples_from_single(exhaustive_natural_integers()))
+}
+
+// -- (Integer, Integer, Integer, PrimitiveUnsigned) --
+
+pub fn exhaustive_integer_integer_integer_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(Integer, Integer, Integer, T)> {
+    Box::new(exhaustive_quadruples_xxxy_custom_output(
+        exhaustive_integers(),
+        exhaustive_unsigneds::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+// -- (Integer, Integer, Natural) --
+
+pub fn exhaustive_integer_integer_natural_triple_gen() -> It<(Integer, Integer, Natural)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_integers(),
+        exhaustive_naturals(),
+    ))
+}
+
+pub fn exhaustive_integer_integer_natural_triple_gen_var_1() -> It<(Integer, Integer, Natural)> {
+    Box::new(
+        exhaustive_triples_xxy(exhaustive_integers(), exhaustive_naturals())
+            .map(|(x, y, m)| (x * Integer::from(&m) + &y, y, m)),
+    )
+}
+
+pub fn exhaustive_integer_integer_natural_triple_gen_var_2() -> It<(Integer, Integer, Natural)> {
+    Box::new(
+        exhaustive_triples_xxy(exhaustive_integers(), exhaustive_naturals())
+            .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+    )
+}
+
+// -- (Integer, Integer, PrimitiveUnsigned) --
+
+pub fn exhaustive_integer_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(Integer, Integer, T)> {
+    Box::new(exhaustive_triples_xxy_custom_output(
+        exhaustive_integers(),
+        exhaustive_unsigneds::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+pub fn exhaustive_integer_integer_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+) -> It<(Integer, Integer, T)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_integers(),
+            exhaustive_unsigneds::<T>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(x, y, pow)| ((x << pow) + &y, y, pow)),
+    )
+}
+
+pub fn exhaustive_integer_integer_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+) -> It<(Integer, Integer, T)> {
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_integers(),
+            exhaustive_unsigneds::<T>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_2(y, pow.exact_into())),
+    )
+}
+
+// -- (Integer, Integer, RoundingMode) --
+
+pub fn exhaustive_integer_integer_rounding_mode_triple_gen_var_1(
+) -> It<(Integer, Integer, RoundingMode)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_nonzero_integers(),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(x, y, rm)| {
+            if rm == RoundingMode::Exact {
+                (x * &y, y, rm)
+            } else {
+                (x, y, rm)
+            }
+        }),
+    )
+}
+
+pub(crate) fn round_to_multiple_integer_filter_map(
+    x: Integer,
+    y: Integer,
+    rm: RoundingMode,
+) -> Option<(Integer, Integer, RoundingMode)> {
+    if x == y {
+        Some((x, y, rm))
+    } else if y == 0 {
+        if rm == RoundingMode::Down
+            || rm
+                == if x >= 0 {
+                    RoundingMode::Floor
+                } else {
+                    RoundingMode::Ceiling
+                }
+            || rm == RoundingMode::Nearest
+        {
+            Some((x, y, rm))
+        } else {
+            None
+        }
+    } else if rm == RoundingMode::Exact {
+        Some((x * &y, y, rm))
+    } else {
+        Some((x, y, rm))
+    }
+}
+
+pub fn exhaustive_integer_integer_rounding_mode_triple_gen_var_2(
+) -> It<(Integer, Integer, RoundingMode)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_integers(),
+            exhaustive_nonzero_integers(),
+            exhaustive_rounding_modes(),
+        )
+        .filter_map(|(x, y, rm)| round_to_multiple_integer_filter_map(x, y, rm)),
+    )
 }
 
 // -- (Integer, Natural) --
@@ -179,6 +361,13 @@ pub fn exhaustive_integer_signed_pair_gen<T: PrimitiveSigned>() -> It<(Integer, 
     ))
 }
 
+pub fn exhaustive_integer_signed_pair_gen_var_1<T: PrimitiveSigned>() -> It<(Integer, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_integers(),
+        exhaustive_signeds(),
+    ))
+}
+
 // -- (Integer, PrimitiveSigned, Integer) --
 
 pub fn exhaustive_integer_signed_integer_triple_gen<T: PrimitiveSigned>(
@@ -187,6 +376,56 @@ pub fn exhaustive_integer_signed_integer_triple_gen<T: PrimitiveSigned>(
         exhaustive_integers(),
         exhaustive_signeds(),
     ))
+}
+
+// -- (Integer, PrimitiveSigned, RoundingMode) --
+
+pub fn exhaustive_integer_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+) -> It<(Integer, T, RoundingMode)>
+where
+    Integer: Shr<T, Output = Integer>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(exhaustive_integers(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((n, i), rm)| {
+            (
+                if i < T::ZERO && rm == RoundingMode::Exact {
+                    n >> i
+                } else {
+                    n
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn exhaustive_integer_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+) -> It<(Integer, T, RoundingMode)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(exhaustive_integers(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((n, i), rm)| {
+            (
+                if i > T::ZERO && rm == RoundingMode::Exact {
+                    n << i
+                } else {
+                    n
+                },
+                i,
+                rm,
+            )
+        }),
+    )
 }
 
 // -- (Integer, PrimitiveUnsigned) --
@@ -224,6 +463,40 @@ pub fn exhaustive_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> It<
             exhaustive_positive_primitive_ints::<T>()
                 .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE)),
         )),
+    )
+}
+
+struct IntegerDivisibleByP2PairsGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<u64, Integer, It<Integer>>
+    for IntegerDivisibleByP2PairsGenerator
+{
+    #[inline]
+    fn get_ys(&self, pow: &u64) -> It<Integer> {
+        let pow = *pow;
+        if pow == 0 {
+            Box::new(exhaustive_integers())
+        } else {
+            Box::new(exhaustive_integers().map(move |k| k << pow))
+        }
+    }
+}
+
+pub fn exhaustive_integer_unsigned_pair_gen_var_4<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
+    permute_2_1(Box::new(
+        exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_unsigneds(),
+            IntegerDivisibleByP2PairsGenerator,
+        )
+        .map(|(x, y)| (T::exact_from(x), y)),
+    ))
+}
+
+pub fn exhaustive_integer_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_integers(), exhaustive_unsigneds::<T>())
+            .filter(|(x, y)| !x.divisible_by_power_of_2(y.exact_into())),
     )
 }
 
@@ -288,6 +561,17 @@ pub fn exhaustive_integer_unsigned_unsigned_triple_gen_var_2<T: PrimitiveUnsigne
     )
 }
 
+pub fn exhaustive_integer_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+) -> It<(Integer, T, T)> {
+    Box::new(exhaustive_triples_xyy_custom_output(
+        exhaustive_integers(),
+        exhaustive_unsigneds::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
 // -- (Integer, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
 
 pub fn exhaustive_integer_unsigned_unsigned_natural_quadruple_gen_var_1<T: PrimitiveUnsigned>(
@@ -302,7 +586,51 @@ pub fn exhaustive_integer_unsigned_unsigned_natural_quadruple_gen_var_1<T: Primi
     )
 }
 
+// -- (Integer, PrimitiveUnsigned, RoundingMode) --
+
+pub fn exhaustive_integer_unsigned_rounding_mode_triple_gen_var_1(
+) -> It<(Integer, u64, RoundingMode)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_integers(),
+            exhaustive_unsigneds::<u64>(),
+            exhaustive_rounding_modes(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(n, u, rm)| {
+            if rm == RoundingMode::Exact {
+                (n << u, u, rm)
+            } else {
+                (n, u, rm)
+            }
+        }),
+    )
+}
+
+pub fn exhaustive_integer_unsigned_rounding_mode_triple_gen_var_2<T: PrimitiveUnsigned>(
+) -> It<(Integer, T, RoundingMode)>
+where
+    Integer: Shl<T, Output = Integer>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(exhaustive_integers(), exhaustive_unsigneds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((n, u), rm)| (if rm == RoundingMode::Exact { n << u } else { n }, u, rm)),
+    )
+}
+
 // -- (Integer, RoundingMode) --
+
+pub fn exhaustive_integer_rounding_mode_pair_gen() -> It<(Integer, RoundingMode)> {
+    Box::new(lex_pairs(
+        exhaustive_integers(),
+        exhaustive_rounding_modes(),
+    ))
+}
 
 pub fn exhaustive_integer_rounding_mode_pair_gen_var_1<
     T: for<'a> ConvertibleFrom<&'a Integer> + PrimitiveFloat,
@@ -311,6 +639,13 @@ pub fn exhaustive_integer_rounding_mode_pair_gen_var_1<
         lex_pairs(exhaustive_integers(), exhaustive_rounding_modes())
             .filter(|&(ref n, rm)| rm != RoundingMode::Exact || T::convertible_from(n)),
     )
+}
+
+pub fn exhaustive_integer_rounding_mode_pair_gen_var_2() -> It<(Integer, RoundingMode)> {
+    Box::new(lex_pairs(
+        exhaustive_nonzero_integers(),
+        exhaustive_rounding_modes(),
+    ))
 }
 
 // -- (Integer, Vec<bool>) --
@@ -532,10 +867,104 @@ pub fn exhaustive_natural_pair_gen_var_3() -> It<(Natural, Natural)> {
     ))
 }
 
+pub fn exhaustive_natural_pair_gen_var_4() -> It<(Natural, Natural)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_naturals())
+            .map(|(x, y, z)| (x * &y, y * z))
+            .unique(),
+    )
+}
+
+pub fn exhaustive_natural_pair_gen_var_5() -> It<(Natural, Natural)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_naturals(),
+        exhaustive_positive_naturals(),
+    ))
+}
+
+pub fn exhaustive_natural_pair_gen_var_6() -> It<(Natural, Natural)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_naturals(), exhaustive_positive_naturals())
+            .map(|(x, y)| (x * &y, y)),
+    )
+}
+
+pub fn exhaustive_natural_pair_gen_var_7() -> It<(Natural, Natural)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_naturals(), exhaustive_positive_naturals())
+            .filter(|(x, y)| !x.divisible_by(y)),
+    )
+}
+
 // -- (Natural, Natural, Natural) --
 
 pub fn exhaustive_natural_triple_gen() -> It<(Natural, Natural, Natural)> {
     Box::new(exhaustive_triples_from_single(exhaustive_naturals()))
+}
+
+// -- (Natural, Natural, PrimitiveUnsigned) --
+
+pub fn exhaustive_natural_natural_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(Natural, Natural, T)> {
+    Box::new(exhaustive_triples_xxy_custom_output(
+        exhaustive_naturals(),
+        exhaustive_unsigneds::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+// -- (Natural, Natural, RoundingMode) --
+
+pub fn exhaustive_natural_natural_rounding_mode_triple_gen_var_1(
+) -> It<(Natural, Natural, RoundingMode)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_positive_naturals(),
+            exhaustive_rounding_modes(),
+        )
+        .map(|(x, y, rm)| {
+            if rm == RoundingMode::Exact {
+                (x * &y, y, rm)
+            } else {
+                (x, y, rm)
+            }
+        }),
+    )
+}
+
+pub(crate) fn round_to_multiple_natural_filter_map(
+    x: Natural,
+    y: Natural,
+    rm: RoundingMode,
+) -> Option<(Natural, Natural, RoundingMode)> {
+    if x == y {
+        Some((x, y, rm))
+    } else if y == 0 {
+        if rm == RoundingMode::Down || rm == RoundingMode::Floor || rm == RoundingMode::Nearest {
+            Some((x, y, rm))
+        } else {
+            None
+        }
+    } else if rm == RoundingMode::Exact {
+        Some((x * &y, y, rm))
+    } else {
+        Some((x, y, rm))
+    }
+}
+
+pub fn exhaustive_natural_natural_rounding_mode_triple_gen_var_2(
+) -> It<(Natural, Natural, RoundingMode)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_naturals(),
+            exhaustive_positive_naturals(),
+            exhaustive_rounding_modes(),
+        )
+        .filter_map(|(x, y, rm)| round_to_multiple_natural_filter_map(x, y, rm)),
+    )
 }
 
 // -- (Natural, PrimitiveInt) --
@@ -603,6 +1032,13 @@ pub fn exhaustive_natural_signed_pair_gen_var_1<T: PrimitiveSigned>() -> It<(Nat
     ))
 }
 
+pub fn exhaustive_natural_signed_pair_gen_var_2<T: PrimitiveSigned>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_naturals(),
+        exhaustive_signeds(),
+    ))
+}
+
 // -- (Natural, PrimitiveSigned, Natural) --
 
 pub fn exhaustive_natural_signed_natural_triple_gen<T: PrimitiveSigned>(
@@ -611,6 +1047,56 @@ pub fn exhaustive_natural_signed_natural_triple_gen<T: PrimitiveSigned>(
         exhaustive_naturals(),
         exhaustive_signeds(),
     ))
+}
+
+// -- (Natural, PrimitiveSigned, RoundingMode) --
+
+pub fn exhaustive_natural_signed_rounding_mode_triple_gen_var_1<T: PrimitiveSigned>(
+) -> It<(Natural, T, RoundingMode)>
+where
+    Natural: Shr<T, Output = Natural>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(exhaustive_naturals(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((n, i), rm)| {
+            (
+                if i < T::ZERO && rm == RoundingMode::Exact {
+                    n >> i
+                } else {
+                    n
+                },
+                i,
+                rm,
+            )
+        }),
+    )
+}
+
+pub fn exhaustive_natural_signed_rounding_mode_triple_gen_var_2<T: PrimitiveSigned>(
+) -> It<(Natural, T, RoundingMode)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(exhaustive_naturals(), exhaustive_signeds::<T>()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((n, i), rm)| {
+            (
+                if i > T::ZERO && rm == RoundingMode::Exact {
+                    n << i
+                } else {
+                    n
+                },
+                i,
+                rm,
+            )
+        }),
+    )
 }
 
 // -- (Natural, PrimitiveUnsigned) --
@@ -721,6 +1207,28 @@ pub fn exhaustive_natural_unsigned_unsigned_natural_quadruple_gen_var_1<T: Primi
     )
 }
 
+// -- (Natural, PrimitiveUnsigned, RoundingMode) --
+
+pub fn exhaustive_natural_unsigned_rounding_mode_triple_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(Natural, T, RoundingMode)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Box::new(
+        lex_pairs(
+            exhaustive_pairs_big_small(exhaustive_naturals(), exhaustive_unsigneds()),
+            exhaustive_rounding_modes(),
+        )
+        .map(|((n, u), rm)| {
+            if rm == RoundingMode::Exact {
+                (n << u, u, rm)
+            } else {
+                (n, u, rm)
+            }
+        }),
+    )
+}
+
 // -- (Natural, PrimitiveUnsigned, Vec<bool>) --
 
 struct NaturalUnsignedBoolVecPairGenerator;
@@ -768,6 +1276,13 @@ pub fn exhaustive_natural_unsigned_bool_vec_triple_gen_var_2<T: PrimitiveInt>(
 }
 
 // -- (Natural, RoundingMode) --
+
+pub fn exhaustive_natural_rounding_mode_pair_gen() -> It<(Natural, RoundingMode)> {
+    Box::new(lex_pairs(
+        exhaustive_naturals(),
+        exhaustive_rounding_modes(),
+    ))
+}
 
 pub fn exhaustive_natural_rounding_mode_pair_gen_var_1<
     T: for<'a> ConvertibleFrom<&'a Natural> + PrimitiveFloat,
@@ -1021,6 +1536,25 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_18() -> It<(Vec<Limb>, u64)
     )
 }
 
+// -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned)
+
+// vars 1 through 5 are in malachite-base
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_6() -> It<(Vec<Limb>, Limb, Limb)> {
+    Box::new(
+        exhaustive_triples_xyy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter(|(m, x, y)| {
+            !Integer::from(Natural::from(*x)).eq_mod(-Natural::from(*y), Natural::from_limbs_asc(m))
+        }),
+    )
+}
+
+// vars 7 through 8 are in malachite-base.
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>)
 
 struct ValidLengthsGenerator;
@@ -1052,6 +1586,55 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_1<T: Primiti
             ValidLengthsGenerator,
         )
         .map(|((xs, base), out)| (out, base, xs)),
+    )
+}
+
+pub(crate) fn filter_map_helper_1(
+    t: (Vec<Limb>, Limb, Vec<Limb>),
+) -> Option<(Vec<Limb>, Limb, Vec<Limb>)> {
+    let (xs, y, m) = t;
+    let mut product_limbs = if xs.is_empty() {
+        Vec::new()
+    } else {
+        limbs_mul(&xs, &m)
+    };
+    if product_limbs.last() == Some(&0) {
+        product_limbs.pop();
+    }
+    if limbs_sub_limb_in_place(&mut product_limbs, y) || *product_limbs.last().unwrap() == 0 {
+        None
+    } else {
+        Some((product_limbs, y, m))
+    }
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_2(
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        permute_1_3_2(Box::new(exhaustive_triples_xxy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )))
+        .filter_map(filter_map_helper_1),
+    )
+}
+
+pub(crate) fn filter_helper_1(t: &(Vec<Limb>, Limb, Vec<Limb>)) -> bool {
+    let (xs, y, m) = t;
+    !Integer::from(Natural::from_limbs_asc(xs))
+        .eq_mod(-Natural::from(*y), Natural::from_limbs_asc(m))
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3(
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        permute_1_3_2(Box::new(exhaustive_triples_xxy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )))
+        .filter(filter_helper_1),
     )
 }
 
@@ -1207,6 +1790,62 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_3<
         .map(|((base, _), (xs, out))| (out, xs, base)),
     )
 }
+
+// vars 4 through 6 are in malachite-base.
+
+pub(crate) fn filter_map_helper_2(
+    t: (Vec<Limb>, Vec<Limb>, Limb),
+) -> Option<(Vec<Limb>, Vec<Limb>, Limb)> {
+    let (xs, ys, m) = t;
+    let mut product_limbs = if xs.is_empty() {
+        Vec::new()
+    } else {
+        limbs_mul_limb(&xs, m)
+    };
+    if product_limbs.last() == Some(&0) {
+        product_limbs.pop();
+    }
+    if product_limbs.len() < ys.len()
+        || limbs_sub_greater_in_place_left(&mut product_limbs, &ys)
+        || *product_limbs.last().unwrap() == 0
+    {
+        None
+    } else {
+        Some((product_limbs, ys, m))
+    }
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_7(
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter_map(filter_map_helper_2),
+    )
+}
+
+pub(crate) fn filter_helper_2(t: &(Vec<Limb>, Vec<Limb>, Limb)) -> bool {
+    let (xs, ys, m) = t;
+    !Integer::from(Natural::from_limbs_asc(xs))
+        .eq_mod(-Natural::from_limbs_asc(ys), Natural::from(*m))
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8(
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter(filter_helper_2),
+    )
+}
+
+// var 9 is in malachite-base.
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
@@ -1387,4 +2026,254 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_23<T: PrimitiveUnsigned>(
     )
 }
 
-// vars 24 through 27 are in malachite-base
+// vars 24 through 36 are in malachite-base
+
+pub(crate) fn filter_map_helper_3(
+    t: (Vec<Limb>, Vec<Limb>, Vec<Limb>),
+) -> Option<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    let (xs, ys, m) = t;
+    let mut product_limbs = if xs.is_empty() {
+        Vec::new()
+    } else {
+        limbs_mul(&xs, &m)
+    };
+    if product_limbs.last() == Some(&0) {
+        product_limbs.pop();
+    }
+    if product_limbs.len() < ys.len()
+        || limbs_sub_greater_in_place_left(&mut product_limbs, &ys)
+        || *product_limbs.last().unwrap() == 0
+    {
+        None
+    } else {
+        Some((product_limbs, ys, m))
+    }
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_37() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_triples_from_single(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+        )
+        .filter_map(filter_map_helper_3),
+    )
+}
+
+pub(crate) fn filter_helper_3(t: &(Vec<Limb>, Vec<Limb>, Vec<Limb>)) -> bool {
+    let (xs, ys, m) = t;
+    !Integer::from(Natural::from_limbs_asc(xs))
+        .eq_mod(-Natural::from_limbs_asc(ys), Natural::from_limbs_asc(m))
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_38() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_triples_from_single(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+        )
+        .filter(filter_helper_3),
+    )
+}
+
+// var 39 is in malachite-base.
+
+// -- large types --
+
+// vars 1 through 4 are in malachite-base
+
+fn exhaustive_half_gcd_matrices_with_size(s: usize, n: usize) -> It<HalfGcdMatrix> {
+    assert_ne!(n, 0);
+    assert!(n <= s);
+    Box::new(
+        exhaustive_quadruples_from_single(exhaustive_vecs_fixed_length_from_single(
+            u64::exact_from(n),
+            exhaustive_unsigneds(),
+        ))
+        .map(move |(mut m00, m01, m10, m11)| {
+            m00.resize(s << 2, 0);
+            m00[s..s + n].copy_from_slice(&m01);
+            m00[s << 1..(s << 1) + n].copy_from_slice(&m10);
+            m00[s * 3..s * 3 + n].copy_from_slice(&m11);
+            half_gcd_matrix_create(s, n, m00)
+        }),
+    )
+}
+
+struct HalfGcdMatrixGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<(usize, usize), HalfGcdMatrix, It<HalfGcdMatrix>>
+    for HalfGcdMatrixGenerator
+{
+    #[inline]
+    fn get_ys(&self, t: &(usize, usize)) -> It<HalfGcdMatrix> {
+        let &(n, s) = t;
+        exhaustive_half_gcd_matrices_with_size(s, n)
+    }
+}
+
+fn exhaustive_half_gcd_matrices() -> It<HalfGcdMatrix> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_ordered_unique_pairs(exhaustive_positive_primitive_ints()),
+            HalfGcdMatrixGenerator,
+        )
+        .map(|p| p.1),
+    )
+}
+
+struct HalfGcdMatrixAndVecGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        (usize, usize, usize),
+        (HalfGcdMatrix, Vec<Limb>, u8),
+        It<(HalfGcdMatrix, Vec<Limb>, u8)>,
+    > for HalfGcdMatrixAndVecGenerator
+{
+    #[inline]
+    fn get_ys(&self, t: &(usize, usize, usize)) -> It<(HalfGcdMatrix, Vec<Limb>, u8)> {
+        let &(qs_len, m_n, m_s) = t;
+        reshape_2_1_to_3(Box::new(lex_pairs(
+            exhaustive_pairs(
+                exhaustive_half_gcd_matrices_with_size(m_s, m_n),
+                exhaustive_vecs_fixed_length_from_single(
+                    u64::exact_from(qs_len),
+                    exhaustive_unsigneds(),
+                ),
+            ),
+            0..=1,
+        )))
+    }
+}
+
+pub fn exhaustive_large_type_gen_var_5() -> It<(HalfGcdMatrix, Vec<Limb>, u8)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<usize>()).flat_map(
+                |(x, y, z)| {
+                    let qs_len = x.checked_add(1)?;
+                    let m_n = qs_len.checked_add(y)?;
+                    let m_s_1 = m_n.checked_add(qs_len)?.checked_add(z)?;
+                    let m_s_2 = m_n.checked_add(2)?.checked_add(z)?;
+                    Some((qs_len, m_n, max(m_s_1, m_s_2)))
+                },
+            ),
+            HalfGcdMatrixAndVecGenerator,
+        )
+        .map(|p| p.1),
+    )
+}
+
+fn exhaustive_half_gcd_matrices_1() -> It<HalfGcdMatrix1> {
+    Box::new(
+        exhaustive_quadruples_from_single(exhaustive_unsigneds()).map(|(m00, m01, m10, m11)| {
+            HalfGcdMatrix1 {
+                data: [[m00, m01], [m10, m11]],
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_6() -> It<(HalfGcdMatrix1, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    reshape_1_3_to_4(Box::new(exhaustive_pairs(
+        exhaustive_half_gcd_matrices_1(),
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).flat_map(|(x, y, z)| {
+                let xs_len = x;
+                let ys_len = x.checked_add(1)?.checked_add(y)?;
+                let out_len = x.checked_add(1)?.checked_add(z)?;
+                Some((out_len, xs_len, ys_len))
+            }),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .map(|p| p.1),
+    )))
+}
+
+pub fn exhaustive_large_type_gen_var_7() -> It<(HalfGcdMatrix, HalfGcdMatrix1)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_half_gcd_matrices(),
+        exhaustive_quadruples_from_single(primitive_int_increasing_range(
+            0,
+            Limb::power_of_2(Limb::WIDTH - 1),
+        ))
+        .map(|(m00, m01, m10, m11)| HalfGcdMatrix1 {
+            data: [[m00, m01], [m10, m11]],
+        }),
+    ))
+}
+
+struct MatrixMul22Generator;
+pub(crate) type T8 = (
+    Vec<Limb>,
+    Vec<Limb>,
+    Vec<Limb>,
+    Vec<Limb>,
+    usize,
+    Vec<Limb>,
+    Vec<Limb>,
+    Vec<Limb>,
+    Vec<Limb>,
+);
+
+impl ExhaustiveDependentPairsYsGenerator<(u64, u64), T8, It<T8>> for MatrixMul22Generator {
+    #[inline]
+    fn get_ys(&self, p: &(u64, u64)) -> It<T8> {
+        let &(ys_len, xs_len) = p;
+        Box::new(
+            exhaustive_pairs(
+                exhaustive_quadruples_from_single(exhaustive_vecs_fixed_length_from_single(
+                    ys_len + xs_len + 1,
+                    exhaustive_unsigneds(),
+                )),
+                exhaustive_quadruples_from_single(exhaustive_vecs_fixed_length_from_single(
+                    ys_len,
+                    exhaustive_unsigneds(),
+                )),
+            )
+            .map(
+                move |((xs00, xs01, xs10, xs11), (ys00, ys01, ys10, ys11))| {
+                    (
+                        xs00,
+                        xs01,
+                        xs10,
+                        xs11,
+                        usize::exact_from(xs_len),
+                        ys00,
+                        ys01,
+                        ys10,
+                        ys11,
+                    )
+                },
+            ),
+        )
+    }
+}
+
+pub fn exhaustive_large_type_gen_var_8() -> It<T8> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_pairs_from_single(exhaustive_positive_primitive_ints()),
+            MatrixMul22Generator,
+        )
+        .map(|p| p.1),
+    )
+}

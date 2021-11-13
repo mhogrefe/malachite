@@ -5,8 +5,8 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::NotAssign;
 use natural::arithmetic::add::{
-    limbs_add_to_out_aliased, limbs_add_limb_to_out, limbs_add_same_length_to_out,
-    limbs_add_to_out, limbs_slice_add_greater_in_place_left,
+    limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_add_to_out,
+    limbs_add_to_out_aliased, limbs_slice_add_greater_in_place_left,
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
@@ -390,8 +390,6 @@ pub(crate) fn limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow(
     limbs_slice_add_same_length_in_place_left(v_2_pow, scratch);
     v_neg_2_pow_neg
 }
-
-// T
 
 /// Given a `Natural` whose limbs are `ys`, multiplies the `Natural` by 2<sup>`shift`</sup> and adds
 /// the `Natural` whose limbs are the lowest `ys.len()` limbs of `xs`, writing the lowest `ys.len()`

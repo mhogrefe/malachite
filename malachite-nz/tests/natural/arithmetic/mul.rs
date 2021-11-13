@@ -20186,7 +20186,7 @@ fn mul_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_bits_n", 2048);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    natural_pair_gen().test_properties(|(x, y)| {
+    natural_pair_gen().test_properties_with_config(&config, |(x, y)| {
         let product_val_val = x.clone() * y.clone();
         let product_val_ref = x.clone() * &y;
         let product_ref_val = &x * y.clone();

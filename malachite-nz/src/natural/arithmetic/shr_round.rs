@@ -498,7 +498,7 @@ pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingM
     }
 }
 
-fn _shr_round_unsigned_ref<T: Copy + Display + Eq + Zero>(
+fn shr_round_unsigned_ref_n<T: Copy + Display + Eq + Zero>(
     x: &Natural,
     bits: T,
     rm: RoundingMode,
@@ -521,7 +521,7 @@ where
     }
 }
 
-fn _shr_round_assign_unsigned<T: Copy + Eq + Zero>(x: &mut Natural, bits: T, rm: RoundingMode)
+fn shr_round_assign_unsigned_n<T: Copy + Eq + Zero>(x: &mut Natural, bits: T, rm: RoundingMode)
 where
     u64: ExactFrom<T>,
     Limb: ShrRoundAssign<T>,
@@ -668,7 +668,7 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// ```
             #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
-                _shr_round_unsigned_ref(self, bits, rm)
+                shr_round_unsigned_ref_n(self, bits, rm)
             }
         }
 
@@ -731,14 +731,14 @@ macro_rules! impl_natural_shr_round_unsigned {
             /// ```
             #[inline]
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                _shr_round_assign_unsigned(self, bits, rm);
+                shr_round_assign_unsigned_n(self, bits, rm);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_natural_shr_round_unsigned);
 
-fn _shr_round_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_round_signed_ref_n<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
     rm: RoundingMode,
@@ -753,7 +753,7 @@ where
     }
 }
 
-fn _shr_round_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_round_assign_signed_n<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Natural,
     bits: S,
     rm: RoundingMode,
@@ -913,7 +913,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// ```
             #[inline]
             fn shr_round(self, bits: $t, rm: RoundingMode) -> Natural {
-                _shr_round_signed_ref(self, bits, rm)
+                shr_round_signed_ref_n(self, bits, rm)
             }
         }
 
@@ -983,7 +983,7 @@ macro_rules! impl_natural_shr_round_signed {
             /// ```
             #[inline]
             fn shr_round_assign(&mut self, bits: $t, rm: RoundingMode) {
-                _shr_round_assign_signed(self, bits, rm);
+                shr_round_assign_signed_n(self, bits, rm);
             }
         }
     };

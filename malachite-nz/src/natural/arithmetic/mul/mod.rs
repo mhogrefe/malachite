@@ -13,8 +13,7 @@ use natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_44_scratch_len, limbs_mul_greater_to_out_toom_53,
     limbs_mul_greater_to_out_toom_63, limbs_mul_greater_to_out_toom_6h,
     limbs_mul_greater_to_out_toom_6h_scratch_len, limbs_mul_greater_to_out_toom_8h,
-    limbs_mul_greater_to_out_toom_8h_scratch_len,
-    limbs_mul_same_length_to_out_toom_6h_scratch_len,
+    limbs_mul_greater_to_out_toom_8h_scratch_len, limbs_mul_same_length_to_out_toom_6h_scratch_len,
     limbs_mul_same_length_to_out_toom_8h_scratch_len,
 };
 use natural::arithmetic::square::limbs_square_to_out;
@@ -94,8 +93,6 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     }
 }
 
-// T
-
 /// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s
 /// to an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long
@@ -162,8 +159,6 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < ys_len << 2
 }
-
-// T
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
 /// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
@@ -319,12 +314,10 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
             let mut scratch = vec![0; limbs_mul_greater_to_out_toom_44_scratch_len(xs_len)];
             limbs_mul_greater_to_out_toom_44(out, xs, ys, &mut scratch);
         } else if ys_len < MUL_TOOM8H_THRESHOLD {
-            let mut scratch =
-                vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len)];
+            let mut scratch = vec![0; limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len, ys_len)];
             limbs_mul_greater_to_out_toom_6h(out, xs, ys, &mut scratch);
         } else {
-            let mut scratch =
-                vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)];
+            let mut scratch = vec![0; limbs_mul_greater_to_out_toom_8h_scratch_len(xs_len, ys_len)];
             limbs_mul_greater_to_out_toom_8h(out, xs, ys, &mut scratch);
         }
     } else {

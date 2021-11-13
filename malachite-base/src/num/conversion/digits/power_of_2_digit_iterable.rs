@@ -183,7 +183,7 @@ impl<T: PrimitiveUnsigned, U: PrimitiveUnsigned + WrappingFrom<<T as BitBlockAcc
     }
 }
 
-fn _power_of_2_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+fn power_of_2_digits<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
     x: T,
     log_base: u64,
 ) -> PrimitivePowerOf2DigitIterator<T, U> {
@@ -239,7 +239,7 @@ macro_rules! impl_power_of_2_digit_iterable {
                         self,
                         log_base: u64,
                     ) -> PrimitivePowerOf2DigitIterator<$t, $u> {
-                        _power_of_2_digits(self, log_base)
+                        power_of_2_digits(self, log_base)
                     }
                 }
             };

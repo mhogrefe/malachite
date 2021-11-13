@@ -13,13 +13,13 @@ use natural::arithmetic::add::{
     limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use natural::arithmetic::mul::fft::{limbs_mul_greater_to_out_fft, SQR_FFT_MODF_THRESHOLD};
 use natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
+use natural::arithmetic::mul::limbs_mul_greater_to_out_basecase;
 use natural::arithmetic::mul::poly_eval::{
     limbs_mul_toom_evaluate_deg_3_poly_in_1_and_neg_1,
-    limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2,
-    limbs_mul_toom_evaluate_poly_in_1_and_neg_1, limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
+    limbs_mul_toom_evaluate_deg_3_poly_in_2_and_neg_2, limbs_mul_toom_evaluate_poly_in_1_and_neg_1,
+    limbs_mul_toom_evaluate_poly_in_2_and_neg_2,
     limbs_mul_toom_evaluate_poly_in_2_pow_and_neg_2_pow,
     limbs_mul_toom_evaluate_poly_in_2_pow_neg_and_neg_2_pow_neg,
 };
@@ -111,6 +111,7 @@ pub const fn limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
     (xs_len + Limb::WIDTH as usize) << 1
 }
 
+//TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom2_sqr.c, GMP 6.1.2.
 pub const TOOM2_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD >= 2 * SQR_TOOM2_THRESHOLD;
@@ -226,12 +227,15 @@ pub const fn limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
 
+//TODO tune
 const SMALLER_RECURSION_TOOM_3: bool = true;
 
+//TODO tune
 /// This is MAYBE_sqr_toom3 from mpn/generic/toom3_sqr.c, GMP 6.1.2.
 pub const TOOM3_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM4_THRESHOLD >= 3 * SQR_TOOM3_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_basecase from mpn/generic/toom3_sqr.c, GMP 6.1.2.
 pub const TOOM3_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD < 3 * SQR_TOOM2_THRESHOLD;
@@ -388,14 +392,17 @@ pub const fn limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
 
+//TODO tune
 /// This is MAYBE_sqr_basecase from mpn/generic/toom4_sqr.c, GMP 6.1.2.
 pub const TOOM4_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM2_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
 pub const TOOM4_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM3_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_toom4 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
 pub const TOOM4_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD >= 4 * SQR_TOOM4_THRESHOLD;
@@ -526,33 +533,41 @@ pub fn limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
         - (SQR_TOOM6_THRESHOLD << 1)
 }
 
+//TODO tune
 /// This is SQR_TOOM6_MAX from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 const SQR_TOOM6_MAX: usize = (SQR_TOOM8_THRESHOLD + 6 * 2 - 1 + 5) / 6;
 
+//TODO tune
 /// This is MAYBE_sqr_basecase from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 pub const TOOM6_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM2_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_basecase from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 pub const TOOM6_MAYBE_SQR_ABOVE_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM2_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 pub const TOOM6_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM3_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_toom2 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 pub const TOOM6_MAYBE_SQR_ABOVE_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM3_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_toom3 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 pub const TOOM6_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM4_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_toom3 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 pub const TOOM6_MAYBE_SQR_ABOVE_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM4_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_toom4 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
 pub const TOOM6_MAYBE_SQR_ABOVE_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM6_THRESHOLD;
@@ -655,6 +670,7 @@ pub fn limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [
     limbs_mul_toom_interpolate_12_points(out, r1, r3, r5, n, s << 1, false, wse);
 }
 
+//TODO tune
 pub const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
 
 /// This function can be used to determine whether the size of the input slice to
@@ -678,6 +694,7 @@ pub fn limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
         - ((SQR_TOOM8_THRESHOLD * 15) >> 3)
 }
 
+//TODO tune
 /// This is SQR_TOOM8_MAX from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
     (SQR_FFT_THRESHOLD + 8 * 2 - 1 + 7) / 8
@@ -685,38 +702,47 @@ pub const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1
     usize::MAX
 };
 
+//TODO tune
 /// This is MAYBE_sqr_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM2_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_ABOVE_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM2_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM3_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_ABOVE_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM3_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM4_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_ABOVE_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM4_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM6_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_ABOVE_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM6_THRESHOLD;
 
+//TODO tune
 /// This is MAYBE_sqr_above_toom6 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
 pub const TOOM8_MAYBE_SQR_ABOVE_TOOM6: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM8_THRESHOLD;
@@ -851,6 +877,7 @@ pub fn limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [
     limbs_mul_toom_interpolate_16_points(out, r1, r3, r5, r7, n, s << 1, false, &mut wse[..p]);
 }
 
+//TODO tune
 pub const SQR_TOOM3_THRESHOLD_LIMIT: usize = SQR_TOOM3_THRESHOLD;
 
 /// This is mpn_sqr from mpn/generic/sqr.c, GMP 6.1.2.

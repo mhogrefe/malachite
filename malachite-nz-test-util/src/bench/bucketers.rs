@@ -1,8 +1,11 @@
+use malachite_base::max;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::bucketers::Bucketer;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
 use std::cmp::{max, min};
 
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<Natural> {
@@ -202,6 +205,56 @@ pub fn pair_integer_max_bit_bucketer<'a>(
     }
 }
 
+pub fn triple_integer_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Integer, Integer, Integer)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits())",
+            x_name, y_name, z_name
+        ),
+    }
+}
+
+pub fn triple_1_2_integer_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Integer, Integer, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _)| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn pair_2_triple_1_2_integer_max_bit_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, (Integer, Integer, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, _))| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
 pub fn pair_2_pair_integer_max_bit_bucketer<'a, T>(
     x_name: &'a str,
     y_name: &'a str,
@@ -351,5 +404,70 @@ pub fn integer_deserialize_bucketer<'a>() -> Bucketer<'a, (String, String, Strin
             usize::exact_from(n.significant_bits())
         },
         bucketing_label: "n.significant_bits()".to_string(),
+    }
+}
+
+pub fn pair_1_half_gcd_matrix_bucketer<T>(m_name: &str) -> Bucketer<(HalfGcdMatrix, T)> {
+    Bucketer {
+        bucketing_function: &|(m, _)| m.s,
+        bucketing_label: m_name.to_string(),
+    }
+}
+
+pub fn triple_1_half_gcd_matrix_bucketer<T, U>(m_name: &str) -> Bucketer<(HalfGcdMatrix, T, U)> {
+    Bucketer {
+        bucketing_function: &|(m, _, _)| m.s,
+        bucketing_label: m_name.to_string(),
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn limbs_matrix_2_2_mul_bucketer<'a>() -> Bucketer<
+    'a,
+    (
+        Vec<Limb>,
+        Vec<Limb>,
+        Vec<Limb>,
+        Vec<Limb>,
+        usize,
+        Vec<Limb>,
+        Vec<Limb>,
+        Vec<Limb>,
+        Vec<Limb>,
+    ),
+> {
+    Bucketer {
+        bucketing_function: &|(_, _, _, _, xs_len, ys00, _, _, _)| max(*xs_len, ys00.len()),
+        bucketing_label: "max(xs_len, ys_len)".to_string(),
+    }
+}
+
+pub fn pair_1_integer_bits_times_pair_2_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Integer, u64)> {
+    Bucketer {
+        bucketing_function: &|&(ref x, y)| usize::exact_from(x.significant_bits() * y),
+        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
+    }
+}
+
+pub fn triple_3_pair_1_integer_bits_times_pair_2_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U, (Integer, u64))> {
+    Bucketer {
+        bucketing_function: &|&(_, _, (ref x, y))| usize::exact_from(x.significant_bits() * y),
+        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
+    }
+}
+
+pub fn triple_1_2_integer_bit_u64_max_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Integer, u64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _)| usize::exact_from(max(x.significant_bits(), *y)),
+        bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
     }
 }

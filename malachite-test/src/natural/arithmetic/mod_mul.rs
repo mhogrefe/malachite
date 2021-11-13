@@ -5,7 +5,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::mod_mul::{
-    _limbs_mod_mul_two_limbs, _limbs_precompute_mod_mul_two_limbs,
+    _limbs_mod_mul_two_limbs, limbs_precompute_mod_mul_two_limbs,
 };
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
@@ -63,7 +63,7 @@ fn demo_limbs_precompute_mod_mul_two_limbs(gm: GenerationMode, limit: usize) {
             "_limbs_precompute_mod_mul_two_limbs({}, {}) = {:?}",
             m_1,
             m_0,
-            _limbs_precompute_mod_mul_two_limbs(m_1, m_0)
+            limbs_precompute_mod_mul_two_limbs(m_1, m_0)
         );
     }
 }
@@ -219,7 +219,7 @@ fn benchmark_limbs_precompute_mod_mul_two_limbs_algorithms(
         &mut [
             (
                 "default",
-                &mut (|(m_1, m_0)| no_out!(_limbs_precompute_mod_mul_two_limbs(m_1, m_0))),
+                &mut (|(m_1, m_0)| no_out!(limbs_precompute_mod_mul_two_limbs(m_1, m_0))),
             ),
             (
                 "alt",

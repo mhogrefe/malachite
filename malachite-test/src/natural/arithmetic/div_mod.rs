@@ -8,20 +8,19 @@ use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::div_mod::{
-    _limbs_div_barrett_large_product, _limbs_div_mod_barrett, _limbs_div_mod_barrett_helper,
-    _limbs_div_mod_barrett_large_helper, _limbs_div_mod_barrett_scratch_len,
-    _limbs_div_mod_divide_and_conquer, _limbs_div_mod_schoolbook, _limbs_invert_approx,
-    _limbs_invert_basecase_approx, _limbs_invert_newton_approx, limbs_div_limb_in_place_mod,
-    limbs_div_limb_mod, limbs_div_limb_to_out_mod, limbs_div_mod,
-    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_extra, limbs_div_mod_extra_in_place,
-    limbs_div_mod_three_limb_by_two_limb, limbs_div_mod_to_out, limbs_invert_limb,
-    limbs_two_limb_inverse_helper,
+    limbs_div_barrett_large_product, limbs_div_limb_in_place_mod, limbs_div_limb_mod,
+    limbs_div_limb_to_out_mod, limbs_div_mod, limbs_div_mod_barrett, limbs_div_mod_barrett_helper,
+    limbs_div_mod_barrett_large_helper, limbs_div_mod_barrett_scratch_len,
+    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_divide_and_conquer, limbs_div_mod_extra,
+    limbs_div_mod_extra_in_place, limbs_div_mod_schoolbook, limbs_div_mod_three_limb_by_two_limb,
+    limbs_div_mod_to_out, limbs_invert_approx, limbs_invert_basecase_approx, limbs_invert_limb,
+    limbs_invert_newton_approx, limbs_two_limb_inverse_helper,
 };
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::natural::arithmetic::div_mod::rug_ceiling_div_neg_mod;
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
-    _limbs_div_limb_in_place_mod_alt, _limbs_div_limb_to_out_mod_alt,
+    limbs_div_limb_in_place_mod_alt, limbs_div_limb_to_out_mod_alt,
 };
 use malachite_nz_test_util::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod_naive, limbs_div_limb_to_out_mod_naive,
@@ -299,9 +298,9 @@ fn demo_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize) {
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
-        let highest_q = _limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse);
+        let highest_q = limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse);
         println!(
-            "qs := {:?}; ns := {:?}; _limbs_div_mod_schoolbook(&mut qs, &mut ns, {:?}, {}) = {}; \
+            "qs := {:?}; ns := {:?}; limbs_div_mod_schoolbook(&mut qs, &mut ns, {:?}, {}) = {}; \
              qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, highest_q, qs, ns
         );
@@ -314,10 +313,10 @@ fn demo_limbs_div_mod_divide_and_conquer(gm: GenerationMode, limit: usize) {
     {
         let old_qs = qs.clone();
         let old_ns = ns.clone();
-        let highest_q = _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
+        let highest_q = limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
         println!(
             "qs := {:?}; ns := {:?}; \
-             _limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = {}; \
+             limbs_div_mod_divide_and_conquer(&mut qs, &mut ns, {:?}, {}) = {}; \
              qs = {:?}, ns = {:?}",
             old_qs, old_ns, ds, inverse, highest_q, qs, ns
         );
@@ -328,10 +327,10 @@ fn demo_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize) {
     for (mut is, ds, mut scratch) in triples_of_limb_vec_var_38(gm).take(limit) {
         let old_is = is.clone();
         let old_scratch = scratch.clone();
-        let result_definitely_exact = _limbs_invert_basecase_approx(&mut is, &ds, &mut scratch);
+        let result_definitely_exact = limbs_invert_basecase_approx(&mut is, &ds, &mut scratch);
         println!(
             "is := {:?}; scratch := {:?}; \
-             _limbs_invert_basecase_approx(&mut is, {:?}, &mut scratch) = {}; \
+             limbs_invert_basecase_approx(&mut is, {:?}, &mut scratch) = {}; \
              is = {:?}, scratch = {:?}",
             old_is, old_scratch, ds, result_definitely_exact, is, scratch
         );
@@ -342,10 +341,10 @@ fn demo_limbs_invert_newton_approx(gm: GenerationMode, limit: usize) {
     for (mut is, ds, mut scratch) in triples_of_limb_vec_var_39(gm).take(limit) {
         let old_is = is.clone();
         let old_scratch = scratch.clone();
-        let result_definitely_exact = _limbs_invert_newton_approx(&mut is, &ds, &mut scratch);
+        let result_definitely_exact = limbs_invert_newton_approx(&mut is, &ds, &mut scratch);
         println!(
             "is := {:?}; scratch := {:?}; \
-             _limbs_invert_newton_approx(&mut is, {:?}, &mut scratch) = {}; \
+             limbs_invert_newton_approx(&mut is, {:?}, &mut scratch) = {}; \
              is = {:?}, scratch = {:?}",
             old_is, old_scratch, ds, result_definitely_exact, is, scratch
         );
@@ -356,10 +355,10 @@ fn demo_limbs_invert_approx(gm: GenerationMode, limit: usize) {
     for (mut is, ds, mut scratch) in triples_of_limb_vec_var_38(gm).take(limit) {
         let old_is = is.clone();
         let old_scratch = scratch.clone();
-        let result_definitely_exact = _limbs_invert_approx(&mut is, &ds, &mut scratch);
+        let result_definitely_exact = limbs_invert_approx(&mut is, &ds, &mut scratch);
         println!(
             "is := {:?}; scratch := {:?}; \
-             _limbs_invert_approx(&mut is, {:?}, &mut scratch) = {}; \
+             limbs_invert_approx(&mut is, {:?}, &mut scratch) = {}; \
              is = {:?}, scratch = {:?}",
             old_is, old_scratch, ds, result_definitely_exact, is, scratch
         );
@@ -370,10 +369,10 @@ fn demo_limbs_div_mod_barrett(gm: GenerationMode, limit: usize) {
     for (mut qs, mut rs, ns, ds) in quadruples_of_limb_vec_var_1(gm).take(limit) {
         let old_qs = qs.clone();
         let old_rs = rs.clone();
-        let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-        let highest_q = _limbs_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
+        let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+        let highest_q = limbs_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
         println!(
-            "qs := {:?}; rs := {:?}; _limbs_div_mod_barrett(&mut qs, &mut ns, {:?}, {:?}) = {}; \
+            "qs := {:?}; rs := {:?}; limbs_div_mod_barrett(&mut qs, &mut ns, {:?}, {:?}) = {}; \
              qs = {:?}, rs = {:?}",
             old_qs, old_rs, ns, ds, highest_q, qs, rs
         );
@@ -632,7 +631,7 @@ fn benchmark_limbs_div_limb_to_out_mod_algorithms(
             (
                 "alt",
                 &mut (|(mut out, in_limbs, limb)| {
-                    no_out!(_limbs_div_limb_to_out_mod_alt(&mut out, &in_limbs, limb))
+                    no_out!(limbs_div_limb_to_out_mod_alt(&mut out, &in_limbs, limb))
                 }),
             ),
             (
@@ -667,7 +666,7 @@ fn benchmark_limbs_div_limb_in_place_mod_algorithms(
             (
                 "alt",
                 &mut (|(mut limbs, limb)| {
-                    no_out!(_limbs_div_limb_in_place_mod_alt(&mut limbs, limb))
+                    no_out!(limbs_div_limb_in_place_mod_alt(&mut limbs, limb))
                 }),
             ),
             (
@@ -767,7 +766,7 @@ fn benchmark_limbs_div_mod_schoolbook(gm: GenerationMode, limit: usize, file_nam
         &mut [(
             "Malachite",
             &mut (|(mut qs, mut ns, ds, inverse)| {
-                no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
             }),
         )],
     );
@@ -791,13 +790,13 @@ fn benchmark_limbs_div_mod_divide_and_conquer_algorithms(
             (
                 "Schoolbook",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
+                    no_out!(limbs_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse))
                 }),
             ),
             (
                 "divide-and-conquer",
                 &mut (|(mut qs, mut ns, ds, inverse)| {
-                    no_out!(_limbs_div_mod_divide_and_conquer(
+                    no_out!(limbs_div_mod_divide_and_conquer(
                         &mut qs, &mut ns, &ds, inverse
                     ))
                 }),
@@ -819,7 +818,7 @@ fn benchmark_limbs_invert_basecase_approx(gm: GenerationMode, limit: usize, file
         &mut [(
             "Malachite",
             &mut (|(mut is, ds, mut scratch)| {
-                no_out!(_limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
+                no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
             }),
         )],
     );
@@ -843,13 +842,13 @@ fn benchmark_limbs_invert_newton_approx_algorithms(
             (
                 "basecase",
                 &mut (|(mut is, ds, mut scratch)| {
-                    no_out!(_limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
+                    no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
                 }),
             ),
             (
                 "Newton",
                 &mut (|(mut is, ds, mut scratch)| {
-                    no_out!(_limbs_invert_newton_approx(&mut is, &ds, &mut scratch))
+                    no_out!(limbs_invert_newton_approx(&mut is, &ds, &mut scratch))
                 }),
             ),
         ],
@@ -870,13 +869,13 @@ fn benchmark_limbs_invert_approx_algorithms(gm: GenerationMode, limit: usize, fi
             (
                 "basecase",
                 &mut (|(mut is, ds, mut scratch)| {
-                    no_out!(_limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
+                    no_out!(limbs_invert_basecase_approx(&mut is, &ds, &mut scratch))
                 }),
             ),
             (
                 "default",
                 &mut (|(mut is, ds, mut scratch)| {
-                    no_out!(_limbs_invert_approx(&mut is, &ds, &mut scratch))
+                    no_out!(limbs_invert_approx(&mut is, &ds, &mut scratch))
                 }),
             ),
         ],
@@ -896,8 +895,8 @@ fn benchmark_limbs_div_mod_barrett(gm: GenerationMode, limit: usize, file_name: 
         &mut [(
             "Malachite",
             &mut (|(mut qs, mut rs, ns, ds)| {
-                let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
-                no_out!(_limbs_div_mod_barrett(
+                let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                no_out!(limbs_div_mod_barrett(
                     &mut qs,
                     &mut rs,
                     &ns,
@@ -930,7 +929,7 @@ fn benchmark_limbs_div_mod_divide_and_conquer_to_barrett_algorithms(
                     let q_len = ns.len() - ds.len() + 1;
                     ds[q_len - 1].set_bit(Limb::WIDTH - 1);
                     let inverse = limbs_two_limb_inverse_helper(ds[q_len - 1], ds[q_len - 2]);
-                    no_out!(_limbs_div_mod_divide_and_conquer(
+                    no_out!(limbs_div_mod_divide_and_conquer(
                         &mut qs,
                         &mut ns[..q_len << 1],
                         &ds[..q_len],
@@ -947,8 +946,8 @@ fn benchmark_limbs_div_mod_divide_and_conquer_to_barrett_algorithms(
                     let q_len_2 = q_len << 1;
                     ds[q_len - 1].set_bit(Limb::WIDTH - 1);
                     limbs_two_limb_inverse_helper(ds[q_len - 1], ds[q_len - 2]);
-                    let mut scratch = vec![0; _limbs_div_mod_barrett_scratch_len(q_len_2, q_len)];
-                    _limbs_div_mod_barrett(
+                    let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(q_len_2, q_len)];
+                    limbs_div_mod_barrett(
                         &mut qs,
                         &mut rs,
                         &ns[..q_len_2],
@@ -987,7 +986,7 @@ fn benchmark_limbs_div_mod_barrett_product_algorithms(
             (
                 "_limbs_div_barrett_large_product",
                 &mut (|(mut scratch, ds, qs, rs_hi, scratch_len, i_len)| {
-                    _limbs_div_barrett_large_product(
+                    limbs_div_barrett_large_product(
                         &mut scratch,
                         &ds,
                         &qs,
@@ -1020,9 +1019,9 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
                 "_limbs_div_mod_barrett_helper",
                 &mut (|(mut qs, mut rs, ns, ds)| {
                     let mut scratch =
-                        vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                        vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
                     let q_len = ns.len() - ds.len();
-                    no_out!(_limbs_div_mod_barrett_helper(
+                    no_out!(limbs_div_mod_barrett_helper(
                         &mut qs[..q_len],
                         &mut rs[..ds.len()],
                         &ns,
@@ -1035,9 +1034,9 @@ fn benchmark_limbs_div_mod_barrett_helper_algorithms(
                 "_limbs_div_mod_barrett_large_helper",
                 &mut (|(mut qs, mut rs, ns, ds)| {
                     let mut scratch =
-                        vec![0; _limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+                        vec![0; limbs_div_mod_barrett_scratch_len(ns.len(), ds.len())];
                     let q_len = ns.len() - ds.len();
-                    no_out!(_limbs_div_mod_barrett_large_helper(
+                    no_out!(limbs_div_mod_barrett_large_helper(
                         &mut qs[..q_len],
                         &mut rs[..ds.len()],
                         &ns,

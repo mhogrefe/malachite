@@ -7,7 +7,7 @@ use natural::Natural;
 use std::cmp::Ordering;
 use std::ops::{Shr, ShrAssign};
 
-fn _mod_shl_ref_val_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T, m: Natural) -> Natural
+fn mod_shl_ref_val_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T, m: Natural) -> Natural
 where
     Natural: From<T>,
 {
@@ -21,7 +21,7 @@ where
     }
 }
 
-fn _mod_shl_ref_ref_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T, m: &Natural) -> Natural
+fn mod_shl_ref_ref_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T, m: &Natural) -> Natural
 where
     Natural: From<T>,
 {
@@ -35,7 +35,7 @@ where
     }
 }
 
-fn _mod_shl_assign_unsigned<T: Copy + Eq + Zero>(x: &mut Natural, bits: T, m: Natural)
+fn mod_shl_assign_unsigned_nz<T: Copy + Eq + Zero>(x: &mut Natural, bits: T, m: Natural)
 where
     Natural: From<T>,
 {
@@ -47,7 +47,7 @@ where
     }
 }
 
-fn _mod_shl_assign_ref_unsigned<T: Copy + Eq + Zero>(x: &mut Natural, bits: T, m: &Natural)
+fn mod_shl_assign_ref_unsigned<T: Copy + Eq + Zero>(x: &mut Natural, bits: T, m: &Natural)
 where
     Natural: From<T>,
 {
@@ -155,7 +155,7 @@ macro_rules! impl_mod_shl_unsigned {
             /// ```
             #[inline]
             fn mod_shl(self, bits: $t, m: Natural) -> Natural {
-                _mod_shl_ref_val_unsigned(self, bits, m)
+                mod_shl_ref_val_unsigned(self, bits, m)
             }
         }
 
@@ -187,7 +187,7 @@ macro_rules! impl_mod_shl_unsigned {
             /// ```
             #[inline]
             fn mod_shl(self, bits: $t, m: &'b Natural) -> Natural {
-                _mod_shl_ref_ref_unsigned(self, bits, m)
+                mod_shl_ref_ref_unsigned(self, bits, m)
             }
         }
 
@@ -216,7 +216,7 @@ macro_rules! impl_mod_shl_unsigned {
             /// ```
             #[inline]
             fn mod_shl_assign(&mut self, bits: $t, m: Natural) {
-                _mod_shl_assign_unsigned(self, bits, m);
+                mod_shl_assign_unsigned_nz(self, bits, m);
             }
         }
 
@@ -245,14 +245,14 @@ macro_rules! impl_mod_shl_unsigned {
             /// ```
             #[inline]
             fn mod_shl_assign(&mut self, bits: $t, m: &'a Natural) {
-                _mod_shl_assign_ref_unsigned(self, bits, m);
+                mod_shl_assign_ref_unsigned(self, bits, m);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_mod_shl_unsigned);
 
-fn _mod_shl_ref_val_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shl_ref_val_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
     m: Natural,
@@ -272,7 +272,7 @@ where
     }
 }
 
-fn _mod_shl_ref_ref_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shl_ref_ref_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
     m: &Natural,
@@ -292,7 +292,7 @@ where
     }
 }
 
-fn _mod_shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shl_assign_signed_nz<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Natural,
     bits: S,
     m: Natural,
@@ -310,7 +310,7 @@ fn _mod_shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     }
 }
 
-fn _mod_shl_assign_ref_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shl_assign_ref_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Natural,
     bits: S,
     m: &Natural,
@@ -427,7 +427,7 @@ macro_rules! impl_mod_shl_signed {
             /// ```
             #[inline]
             fn mod_shl(self, bits: $t, m: Natural) -> Natural {
-                _mod_shl_ref_val_signed(self, bits, m)
+                mod_shl_ref_val_signed(self, bits, m)
             }
         }
 
@@ -460,7 +460,7 @@ macro_rules! impl_mod_shl_signed {
             /// ```
             #[inline]
             fn mod_shl(self, bits: $t, m: &'b Natural) -> Natural {
-                _mod_shl_ref_ref_signed(self, bits, m)
+                mod_shl_ref_ref_signed(self, bits, m)
             }
         }
 
@@ -493,7 +493,7 @@ macro_rules! impl_mod_shl_signed {
             /// ```
             #[inline]
             fn mod_shl_assign(&mut self, bits: $t, m: Natural) {
-                _mod_shl_assign_signed(self, bits, m);
+                mod_shl_assign_signed_nz(self, bits, m);
             }
         }
 
@@ -526,7 +526,7 @@ macro_rules! impl_mod_shl_signed {
             /// ```
             #[inline]
             fn mod_shl_assign(&mut self, bits: $t, m: &'a Natural) {
-                _mod_shl_assign_ref_signed(self, bits, m);
+                mod_shl_assign_ref_signed(self, bits, m);
             }
         }
     };

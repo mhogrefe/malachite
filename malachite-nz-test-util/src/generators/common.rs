@@ -156,3 +156,38 @@ pub fn integer_natural_pair_rm(
         )
     }))
 }
+
+#[allow(clippy::type_complexity)]
+pub fn integer_integer_natural_triple_rm(
+    ts: It<(Integer, Integer, Natural)>,
+) -> It<(
+    (rug::Integer, rug::Integer, rug::Integer),
+    (Integer, Integer, Natural),
+)> {
+    Box::new(ts.map(|(x, y, z)| {
+        (
+            (
+                integer_to_rug_integer(&x),
+                integer_to_rug_integer(&y),
+                natural_to_rug_integer(&z),
+            ),
+            (x, y, z),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn integer_integer_triple_1_2_rm<T: 'static + Clone>(
+    ts: It<(Integer, Integer, T)>,
+) -> It<((rug::Integer, rug::Integer, T), (Integer, Integer, T))> {
+    Box::new(ts.map(|(x, y, z)| {
+        (
+            (
+                integer_to_rug_integer(&x),
+                integer_to_rug_integer(&y),
+                z.clone(),
+            ),
+            (x, y, z),
+        )
+    }))
+}

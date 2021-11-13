@@ -11,9 +11,9 @@ use natural::arithmetic::divisible_by::{
 };
 use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::arithmetic::sub::{
-    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_limb_to_out,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_to_out, limbs_sub_greater_to_out,
+    limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
+    limbs_sub_limb_to_out, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
 };
 use natural::comparison::cmp::limbs_cmp;
 use natural::InnerNatural::{Large, Small};
@@ -28,6 +28,7 @@ use std::cmp::Ordering;
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_modexact_1c_odd, from mpn/generic/mode1o.c, GMP 6.2.1, where size == 1.
+/// Pass carry == 0 to get mpn_modexact_1_odd from gmp-impl.c, GMP 6.2.1, where size == 1.
 pub const fn _limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Limb {
     if n > carry {
         let result = (n - carry) % d;
@@ -66,6 +67,7 @@ pub const fn _limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Li
 /// where n = `xs.len()`
 ///
 /// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c, GMP 6.2.1.
+/// Pass carry == 0 to get mpn_modexact_1_odd from gmp-impl.c, GMP 6.2.1.
 pub fn _limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
     let len = ns.len();
     if len == 1 {

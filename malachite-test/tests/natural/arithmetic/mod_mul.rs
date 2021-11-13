@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::JoinHalves;
 use malachite_nz::natural::arithmetic::mod_mul::{
-    _limbs_mod_mul_two_limbs, _limbs_precompute_mod_mul_two_limbs,
+    _limbs_mod_mul_two_limbs, limbs_precompute_mod_mul_two_limbs,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -23,7 +23,7 @@ use malachite_test::inputs::natural::{
 #[test]
 fn limbs_precompute_mod_mul_two_limbs_properties() {
     test_properties(pairs_of_unsigneds_var_6, |&(m_1, m_0)| {
-        let (inv_2, inv_1, inv_0) = _limbs_precompute_mod_mul_two_limbs(m_1, m_0);
+        let (inv_2, inv_1, inv_0) = limbs_precompute_mod_mul_two_limbs(m_1, m_0);
         assert_eq!(
             limbs_precompute_mod_mul_two_limbs_alt(m_1, m_0),
             (inv_2, inv_1, inv_0)

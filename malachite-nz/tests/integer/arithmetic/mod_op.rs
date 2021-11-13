@@ -1,8 +1,20 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign,
+    CeilingDivMod, CeilingMod, CeilingModAssign, DivMod, DivRem, Mod, ModAssign, NegMod,
 };
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::signed_pair_gen_var_4;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::common::{
+    bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
+};
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_gen_var_8, integer_pair_gen_var_1, integer_pair_gen_var_2,
+    natural_pair_gen_var_5,
+};
 use num::{BigInt, Integer as NumInteger};
 use rug::ops::RemRounding;
 use std::str::FromStr;
@@ -993,4 +1005,245 @@ fn ceiling_mod_ref_val_fail() {
 #[should_panic]
 fn ceiling_mod_ref_ref_fail() {
     (&Integer::from(10)).ceiling_mod(&Integer::ZERO);
+}
+
+fn mod_properties_helper(x: Integer, y: Integer) {
+    let mut mut_x = x.clone();
+    mut_x.mod_assign(&y);
+    assert!(mut_x.is_valid());
+    let remainder = mut_x;
+
+    let mut mut_x = x.clone();
+    mut_x.mod_assign(y.clone());
+    let remainder_alt = mut_x;
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = (&x).mod_op(&y);
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = (&x).mod_op(y.clone());
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = x.clone().mod_op(&y);
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = x.clone().mod_op(y.clone());
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    assert_eq!((&x).div_mod(&y).1, remainder);
+
+    let num_remainder = integer_to_bigint(&x).mod_floor(&integer_to_bigint(&y));
+    assert_eq!(bigint_to_integer(&num_remainder), remainder);
+
+    let rug_remainder = integer_to_rug_integer(&x).rem_floor(integer_to_rug_integer(&y));
+    assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
+
+    assert!(remainder.lt_abs(&y));
+    assert!(remainder == 0 || (remainder > 0) == (y > 0));
+
+    assert_eq!((-&x).mod_op(&y), -(&x).ceiling_mod(&y));
+    assert_eq!((&x).mod_op(-&y), x.ceiling_mod(y));
+}
+
+#[test]
+fn mod_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    integer_pair_gen_var_1()
+        .test_properties_with_config(&config, |(x, y)| mod_properties_helper(x, y));
+
+    integer_pair_gen_var_2()
+        .test_properties_with_config(&config, |(x, y)| mod_properties_helper(x, y));
+
+    integer_gen().test_properties(|x| {
+        assert_eq!((&x).mod_op(Integer::ONE), 0);
+        assert_eq!(x.mod_op(Integer::NEGATIVE_ONE), 0);
+    });
+
+    integer_gen_var_8().test_properties(|x| {
+        let x = &x;
+        assert_eq!(x.mod_op(Integer::ONE), 0);
+        assert_eq!(x.mod_op(Integer::NEGATIVE_ONE), 0);
+        assert_eq!(x.mod_op(x), 0);
+        assert_eq!(x.mod_op(-x), 0);
+        assert_eq!(Integer::ZERO.mod_op(x), 0);
+        if *x > 1 {
+            assert_eq!(Integer::ONE.mod_op(x), 1);
+            assert_eq!(Integer::NEGATIVE_ONE.mod_op(x), x - Integer::ONE);
+        }
+    });
+
+    natural_pair_gen_var_5().test_properties(|(x, y)| {
+        assert_eq!(Integer::from(&x).mod_op(Integer::from(&y)), x.mod_op(y));
+    });
+
+    signed_pair_gen_var_4::<SignedLimb>().test_properties(|(x, y)| {
+        assert_eq!(Integer::from(x).mod_op(Integer::from(y)), x.mod_op(y));
+    });
+}
+
+fn rem_properties_helper(x: Integer, y: Integer) {
+    let mut mut_x = x.clone();
+    mut_x %= &y;
+    assert!(mut_x.is_valid());
+    let remainder = mut_x;
+
+    let mut mut_x = x.clone();
+    mut_x %= y.clone();
+    assert!(mut_x.is_valid());
+    assert_eq!(mut_x, remainder);
+
+    let remainder_alt = &x % &y;
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = &x % y.clone();
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = x.clone() % &y;
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = x.clone() % y.clone();
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    assert_eq!((&x).div_rem(&y).1, remainder);
+
+    let num_remainder = integer_to_bigint(&x) % &integer_to_bigint(&y);
+    assert_eq!(bigint_to_integer(&num_remainder), remainder);
+
+    let rug_remainder = integer_to_rug_integer(&x) % integer_to_rug_integer(&y);
+    assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
+
+    assert!(remainder.lt_abs(&y));
+    assert!(remainder == 0 || (remainder > 0) == (x > 0));
+
+    assert_eq!((-&x) % &y, -&remainder);
+    assert_eq!(x % (-y), remainder);
+}
+
+#[test]
+fn rem_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    integer_pair_gen_var_1()
+        .test_properties_with_config(&config, |(x, y)| rem_properties_helper(x, y));
+
+    integer_pair_gen_var_2()
+        .test_properties_with_config(&config, |(x, y)| rem_properties_helper(x, y));
+
+    integer_gen().test_properties(|x| {
+        assert_eq!(&x % Integer::ONE, 0);
+        assert_eq!(x % Integer::NEGATIVE_ONE, 0);
+    });
+
+    integer_gen_var_8().test_properties(|x| {
+        let x = &x;
+        assert_eq!(x % Integer::ONE, 0);
+        assert_eq!(x % Integer::NEGATIVE_ONE, 0);
+        assert_eq!(x % x, 0);
+        assert_eq!(x % -x, 0);
+        assert_eq!(Integer::ZERO % x, 0);
+        if *x > 1 {
+            assert_eq!(Integer::ONE % x, 1);
+            assert_eq!(Integer::NEGATIVE_ONE % x, -1);
+        }
+    });
+
+    natural_pair_gen_var_5().test_properties(|(x, y)| {
+        assert_eq!(Integer::from(&x) % Integer::from(&y), x % y);
+    });
+
+    signed_pair_gen_var_4::<SignedLimb>().test_properties(|(x, y)| {
+        assert_eq!(Integer::from(x) % Integer::from(y), x % y);
+    });
+}
+
+fn ceiling_mod_properties_helper(x: Integer, y: Integer) {
+    let mut mut_x = x.clone();
+    mut_x.ceiling_mod_assign(&y);
+    assert!(mut_x.is_valid());
+    let remainder = mut_x;
+
+    let mut mut_x = x.clone();
+    mut_x.ceiling_mod_assign(y.clone());
+    let remainder_alt = mut_x;
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = (&x).ceiling_mod(&y);
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = (&x).ceiling_mod(y.clone());
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = x.clone().ceiling_mod(&y);
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    let remainder_alt = x.clone().ceiling_mod(y.clone());
+    assert!(remainder_alt.is_valid());
+    assert_eq!(remainder_alt, remainder);
+
+    assert_eq!((&x).ceiling_div_mod(&y).1, remainder);
+
+    let rug_remainder = integer_to_rug_integer(&x).rem_ceil(integer_to_rug_integer(&y));
+    assert_eq!(rug_integer_to_integer(&rug_remainder), remainder);
+
+    assert!(remainder.lt_abs(&y));
+    assert!(remainder == 0 || (remainder >= 0) != (y > 0));
+
+    assert_eq!((-&x).ceiling_mod(&y), -(&x).mod_op(&y));
+    assert_eq!((&x).ceiling_mod(-&y), x.mod_op(y));
+}
+
+#[test]
+fn ceiling_mod_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    integer_pair_gen_var_1()
+        .test_properties_with_config(&config, |(x, y)| ceiling_mod_properties_helper(x, y));
+
+    integer_pair_gen_var_2()
+        .test_properties_with_config(&config, |(x, y)| ceiling_mod_properties_helper(x, y));
+
+    integer_gen().test_properties(|x| {
+        assert_eq!((&x).ceiling_mod(Integer::ONE), 0);
+        assert_eq!(x.ceiling_mod(Integer::NEGATIVE_ONE), 0);
+    });
+
+    integer_gen_var_8().test_properties(|x| {
+        let x = &x;
+        assert_eq!(x.ceiling_mod(Integer::ONE), 0);
+        assert_eq!(x.ceiling_mod(Integer::NEGATIVE_ONE), 0);
+        assert_eq!(x.ceiling_mod(x), 0);
+        assert_eq!(x.ceiling_mod(-x), 0);
+        assert_eq!(Integer::ZERO.ceiling_mod(x), 0);
+    });
+
+    natural_pair_gen_var_5().test_properties(|(x, y)| {
+        assert_eq!(
+            Integer::from(&x).ceiling_mod(Integer::from(&y)),
+            -x.neg_mod(y)
+        );
+    });
+
+    signed_pair_gen_var_4::<SignedLimb>().test_properties(|(x, y)| {
+        assert_eq!(
+            Integer::from(x).ceiling_mod(Integer::from(y)),
+            x.ceiling_mod(y)
+        );
+    });
 }

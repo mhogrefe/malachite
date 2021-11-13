@@ -1,8 +1,8 @@
-use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
     CheckedLogBasePowerOf2, DivExactAssign, FloorLogBase, FloorLogBasePowerOf2, Pow,
 };
+use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use natural::Natural;
 use std::cmp::Ordering;
 
@@ -157,7 +157,7 @@ impl<'a, 'b> CeilingLogBase<&'b Natural> for &'a Natural {
 
 impl<'a, 'b> CheckedLogBase<&'b Natural> for &'a Natural {
     type Output = u64;
-    
+
     /// Returns the base-$b$ logarithm of a positive `Natural`. If the integer is not a power of
     /// $b$, `None` is returned.
     ///

@@ -4,7 +4,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use std::ops::{Shr, ShrAssign};
 
-fn _mod_shl_unsigned<T: ModMul<T, Output = T> + ModPow<u64, T, Output = T> + PrimitiveInt, U>(
+fn mod_shl_unsigned<T: ModMul<T, Output = T> + ModPow<u64, T, Output = T> + PrimitiveInt, U>(
     x: T,
     other: U,
     m: T,
@@ -19,7 +19,7 @@ where
     }
 }
 
-fn _mod_shl_assign_unsigned<T: ModMulAssign<T> + ModPow<u64, T, Output = T> + PrimitiveInt, U>(
+fn mod_shl_assign_unsigned<T: ModMulAssign<T> + ModPow<u64, T, Output = T> + PrimitiveInt, U>(
     x: &mut T,
     other: U,
     m: T,
@@ -57,7 +57,7 @@ macro_rules! impl_mod_shl_unsigned {
                     /// See the documentation of the `num::arithmetic::mod_shl` module.
                     #[inline]
                     fn mod_shl(self, other: $u, m: $t) -> $t {
-                        _mod_shl_unsigned(self, other, m)
+                        mod_shl_unsigned(self, other, m)
                     }
                 }
 
@@ -79,7 +79,7 @@ macro_rules! impl_mod_shl_unsigned {
                     /// See the documentation of the `num::arithmetic::mod_shl` module.
                     #[inline]
                     fn mod_shl_assign(&mut self, other: $u, m: $t) {
-                        _mod_shl_assign_unsigned(self, other, m);
+                        mod_shl_assign_unsigned(self, other, m);
                     }
                 }
             };
@@ -89,7 +89,7 @@ macro_rules! impl_mod_shl_unsigned {
 }
 apply_to_unsigneds!(impl_mod_shl_unsigned);
 
-fn _mod_shl_signed<
+fn mod_shl_signed<
     T: ModShl<U, T, Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -111,7 +111,7 @@ fn _mod_shl_signed<
     }
 }
 
-fn _mod_shl_assign_signed<
+fn mod_shl_assign_signed<
     T: ModShlAssign<U, T> + PrimitiveInt + ShrAssign<U>,
     U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -158,7 +158,7 @@ macro_rules! impl_mod_shl_signed {
                     /// See the documentation of the `num::arithmetic::mod_shl` module.
                     #[inline]
                     fn mod_shl(self, other: $u, m: $t) -> $t {
-                        _mod_shl_signed(self, other, m)
+                        mod_shl_signed(self, other, m)
                     }
                 }
 
@@ -181,7 +181,7 @@ macro_rules! impl_mod_shl_signed {
                     /// See the documentation of the `num::arithmetic::mod_shl` module.
                     #[inline]
                     fn mod_shl_assign(&mut self, other: $u, m: $t) {
-                        _mod_shl_assign_signed(self, other, m);
+                        mod_shl_assign_signed(self, other, m);
                     }
                 }
             };

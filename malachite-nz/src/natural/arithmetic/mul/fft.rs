@@ -22,8 +22,9 @@ use natural::arithmetic::mul::square_mod::{
 use natural::arithmetic::shl::{limbs_shl_to_out, limbs_shl_with_complement_to_out};
 use natural::arithmetic::square::limbs_square_to_out;
 use natural::arithmetic::sub::{
-    limbs_sub_greater_in_place_left, limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
-    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out, limbs_sub_greater_to_out,
+    limbs_sub_greater_in_place_left, limbs_sub_greater_to_out, limbs_sub_limb_in_place,
+    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
+    limbs_sub_same_length_to_out,
 };
 use natural::comparison::cmp::limbs_cmp_same_length;
 use natural::logic::not::limbs_not_to_out;
@@ -55,7 +56,8 @@ const fn get_k(entry: &(usize, usize)) -> usize {
 
 const MUL_FFT_TABLE3_SIZE: usize = 208;
 
-//TODO tune!! Format is (n, k)
+//TODO tune
+// Format is (n, k)
 // from mpn/*/*/gmp-mparam.h
 const MUL_FFT_TABLE3: [(usize, usize); MUL_FFT_TABLE3_SIZE] = [
     (396, 5),
@@ -270,7 +272,8 @@ const MUL_FFT_TABLE3: [(usize, usize); MUL_FFT_TABLE3_SIZE] = [
 
 const SQR_FFT_TABLE3_SIZE: usize = 203;
 
-//TODO tune!! Format is (n, k)
+//TODO tune
+//Format is (n, k)
 // from mpn/*/*/gmp-mparam.h
 const SQR_FFT_TABLE3: [(usize, usize); SQR_FFT_TABLE3_SIZE] = [
     (340, 5),
@@ -484,7 +487,7 @@ const SQR_FFT_TABLE3: [(usize, usize); SQR_FFT_TABLE3_SIZE] = [
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_fft_best_k from mpn/generic/mul_fft.c, GMP 6.1.2, the mpn_fft_table3 variant.
+/// This is mpn_fft_best_k from mpn/generic/mul_fft.c, GMP 6.2.1, the mpn_fft_table3 variant.
 pub(crate) fn limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
     let fft_table: &[(usize, usize)] = if square {
         &SQR_FFT_TABLE3
@@ -509,7 +512,7 @@ pub(crate) fn limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
 /// where n = `xs.len()`
 ///
 /// This is mpn_fft_mul from gmp-impl.h, GMP 6.2.1, and mpn_nussbaumer_mul from
-/// mpn/generic/mpn_nussbaumer_mul.c, GMP 6.1.2.
+/// mpn/generic/mpn_nussbaumer_mul.c, GMP 6.2.1.
 #[doc(hidden)]
 #[inline]
 pub fn limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
@@ -534,7 +537,7 @@ pub fn limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_fft_initl from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_fft_initl from mpn/generic/mul_fft.c, GMP 6.2.1.
 fn limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<&[usize]> {
     let mut table = Vec::with_capacity(k + 1);
     for i in 0..=k {
@@ -561,7 +564,7 @@ fn limbs_mul_fft_bit_reverse_table(mut scratch: &mut [usize], k: usize) -> Vec<&
 ///
 /// Additional memory: worst case O(1)
 ///
-/// This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_mul_fft_lcm from mpn/generic/mul_fft.c, GMP 6.2.1.
 fn limbs_mul_fft_lcm_of_a_and_two_pow_k(a: usize, k: usize) -> usize {
     a << k.saturating_sub(usize::exact_from(a.trailing_zeros()))
 }
@@ -578,7 +581,7 @@ fn limbs_mul_fft_lcm_of_a_and_two_pow_k(a: usize, k: usize) -> usize {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_normalize from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_fft_normalize from mpn/generic/mul_fft.c, GMP 6.2.1.
 fn limbs_mul_fft_normalize(xs: &mut [Limb]) {
     if *xs.last().unwrap() != 0 {
         assert!(!limbs_sub_limb_in_place(xs, 1));
@@ -598,7 +601,7 @@ fn limbs_mul_fft_normalize(xs: &mut [Limb]) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, GMP 6.1.2, where r == a.
+/// This is mpn_fft_add_modF from mpn/generic/mul_fft.c, GMP 6.2.1, where r == a.
 fn limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
     let (ys_last, ys_init) = ys.split_last().unwrap();
@@ -626,7 +629,7 @@ fn limbs_mul_fft_add_mod_f_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_sub_modF from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_fft_sub_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
 fn limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let n = xs.len() - 1;
     let mut carry = xs[n].wrapping_sub(ys[n]);
@@ -651,7 +654,7 @@ fn limbs_mul_fft_sub_mod_f_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_fft_mul_2exp_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
 fn limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     let n = xs.len() - 1;
     let small_bits = u64::exact_from(bits) & Limb::WIDTH_MASK;
@@ -744,7 +747,7 @@ fn limbs_mul_fft_shl_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
 ///
 /// where n = `xs.len()`
 ///
-/// This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_fft_div_2exp_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
 fn limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
     limbs_mul_fft_shl_mod_f_to_out(out, xs, ((xs.len() - 1) << (Limb::LOG_WIDTH + 1)) - bits);
     // 1 / 2 ^ bits = 2 ^ (2 * n' * L - bits) mod 2 ^ (n' * Limb::WIDTH) + 1 where n' = xs.len() - 1
@@ -762,7 +765,7 @@ fn limbs_mul_fft_shr_mod_f_to_out(out: &mut [Limb], xs: &[Limb], bits: usize) {
 ///
 /// where a = `xs.len()`
 ///
-/// This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c, GMP 6.1.2. nl is omitted as it is just
+/// This is mpn_mul_fft_decompose from mpn/generic/mul_fft.c, GMP 6.2.1. nl is omitted as it is just
 /// the length of n (here, xs). nprime is `width` - 1.
 fn limbs_mul_fft_decompose<'a>(
     a_s: &'a mut [Limb],
@@ -833,7 +836,7 @@ fn limbs_mul_fft_decompose<'a>(
 ///
 /// where n = `xss[0].len()`
 ///
-/// This is mpn_fft_fft from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_fft_fft from mpn/generic/mul_fft.c, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_mul_fft_fft(
     xss: &mut [&mut [Limb]],
@@ -919,7 +922,7 @@ pub fn limbs_mul_fft_fft(
 ///
 /// where n = `xss[0].len()`
 ///
-/// This is mpn_fft_fftinv from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_fft_fftinv from mpn/generic/mul_fft.c, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_mul_fft_inverse(
     xss: &mut [&mut [Limb]],
@@ -971,7 +974,7 @@ pub fn limbs_mul_fft_inverse(
 ///
 /// where n = `n`
 ///
-/// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c, GMP 6.1.2.
+/// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
     let xs_len = xs.len();
@@ -1000,7 +1003,7 @@ pub fn limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) ->
 ///
 /// where n = `xss[i].len()` (each slice in `xss` should have the same length)
 ///
-/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, GMP 6.1.2, where ap != bp. K is omitted
+/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, GMP 6.2.1, where ap != bp. K is omitted
 /// because it is unused; it is just the length of `xss` and `yss`.
 fn limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
     let n = xss[0].len() - 1;
@@ -1039,8 +1042,7 @@ fn limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
         for (xs, ys) in xss.iter_mut().zip(yss.iter_mut()) {
             limbs_mul_fft_normalize(xs);
             limbs_mul_fft_normalize(ys);
-            let residues =
-                limbs_mul_fft_decompose(a, two_pow_k, s, xs, p, q_shifted, &mut scratch);
+            let residues = limbs_mul_fft_decompose(a, two_pow_k, s, xs, p, q_shifted, &mut scratch);
             limbs_mul_fft_decompose(b, two_pow_k, s, ys, p, q_shifted, &mut scratch);
             xs[n] = Limb::iverson(limbs_mul_fft_internal(
                 xs,
@@ -1089,7 +1091,7 @@ fn limbs_mul_fft_mul_mod_f_k(xss: &mut [&mut [Limb]], yss: &mut [&mut [Limb]]) {
 ///
 /// where n = `xss[i].len()` (each slice in `xss` should have the same length)
 ///
-/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, GMP 6.1.2, where ap == bp. K is omitted
+/// This is mpn_fft_mul_modF_K from mpn/generic/mul_fft.c, GMP 6.2.1, where ap == bp. K is omitted
 /// because it is unused; it is just the length of `xss`.
 fn limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
     let n = xss[0].len() - 1;
@@ -1173,7 +1175,7 @@ fn limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
 ///
 /// where n = `xss[i].len()` (each slice in `xss` should have the same length)
 ///
-/// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c, GMP 6.1.2. A is excluded as it is
+/// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c, GMP 6.2.1. A is excluded as it is
 /// unused. nprime is `xss[0].len()` - 1.
 #[doc(hidden)]
 pub fn limbs_mul_fft_internal(
@@ -1308,7 +1310,7 @@ pub fn limbs_mul_fft_internal(
 ///
 /// assuming k = O(log(p)), xs.len() = O(p).
 ///
-// This is mpn_mul_fft from mpn/generic/mul_fft.c, GMP 6.1.2.
+// This is mpn_mul_fft from mpn/generic/mul_fft.c, GMP 6.2.1.
 pub(crate) fn limbs_mul_fft(
     out: &mut [Limb],
     p: usize,

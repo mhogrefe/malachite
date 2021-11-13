@@ -1,5 +1,15 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::common::{integer_to_bigint, integer_to_rug_integer};
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_gen_var_8, integer_pair_gen, integer_pair_gen_var_2,
+    integer_pair_gen_var_3, natural_pair_gen,
+};
 use malachite_nz_test_util::integer::arithmetic::divisible_by::num_divisible_by;
 use num::BigInt;
 use std::str::FromStr;
@@ -342,4 +352,77 @@ fn test_divisible_by() {
         8186307133288106956593939073729500658176632828099788",
         false
     );
+}
+
+#[test]
+fn divisible_by_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_bits_n", 2048);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    integer_pair_gen().test_properties_with_config(&config, |(x, y)| {
+        let divisible = (&x).divisible_by(&y);
+        assert_eq!((&x).divisible_by(y.clone()), divisible);
+        assert_eq!(x.clone().divisible_by(&y), divisible);
+        assert_eq!(x.clone().divisible_by(y.clone()), divisible);
+
+        assert_eq!(x == 0 || y != 0 && &x % &y == 0, divisible);
+        assert_eq!((-&x).divisible_by(&y), divisible);
+        assert_eq!((&x).divisible_by(-&y), divisible);
+        assert_eq!(
+            num_divisible_by(&integer_to_bigint(&x), &integer_to_bigint(&y)),
+            divisible
+        );
+        assert_eq!(
+            integer_to_rug_integer(&x).is_divisible(&integer_to_rug_integer(&y)),
+            divisible
+        );
+    });
+
+    integer_pair_gen_var_2().test_properties(|(x, y)| {
+        assert!((&x).divisible_by(&y));
+        assert!(x == 0 || y != 0 && &x % &y == 0);
+        assert!(num_divisible_by(
+            &integer_to_bigint(&x),
+            &integer_to_bigint(&y)
+        ));
+        assert!(integer_to_rug_integer(&x).is_divisible(&integer_to_rug_integer(&y)));
+    });
+
+    integer_pair_gen_var_3().test_properties(|(x, y)| {
+        assert!(!(&x).divisible_by(&y));
+        assert!(x != 0 && (y == 0 || &x % &y != 0));
+        assert!(!num_divisible_by(
+            &integer_to_bigint(&x),
+            &integer_to_bigint(&y)
+        ));
+        assert!(!integer_to_rug_integer(&x).is_divisible(&integer_to_rug_integer(&y)));
+    });
+
+    integer_gen().test_properties(|n| {
+        assert!((&n).divisible_by(Integer::ONE));
+        assert!(n.divisible_by(Integer::NEGATIVE_ONE));
+    });
+
+    integer_gen_var_8().test_properties(|n| {
+        assert!(!(&n).divisible_by(Integer::ZERO));
+        assert!(Integer::ZERO.divisible_by(&n));
+        if n > 1 {
+            assert!(!Integer::ONE.divisible_by(&n));
+        }
+        assert!((&n).divisible_by(&n));
+    });
+
+    natural_pair_gen().test_properties(|(x, y)| {
+        assert_eq!(
+            Integer::from(&x).divisible_by(Integer::from(&y)),
+            x.divisible_by(y)
+        );
+    });
+
+    signed_pair_gen::<SignedLimb>().test_properties(|(x, y)| {
+        assert_eq!(
+            Integer::from(x).divisible_by(Integer::from(y)),
+            x.divisible_by(y)
+        );
+    });
 }

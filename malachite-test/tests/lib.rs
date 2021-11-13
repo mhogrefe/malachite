@@ -11,38 +11,6 @@ extern crate rand;
 extern crate rug;
 extern crate rust_wheels;
 
-pub mod integer {
-    pub mod arithmetic {
-        pub mod abs;
-        pub mod add;
-        pub mod add_mul;
-        pub mod div;
-        pub mod div_exact;
-        pub mod div_mod;
-        pub mod div_round;
-        pub mod divisible_by;
-        pub mod divisible_by_power_of_2;
-        pub mod eq_mod;
-        pub mod eq_mod_power_of_2;
-        pub mod mod_op;
-        pub mod mod_power_of_2;
-        pub mod mul;
-        pub mod parity;
-        pub mod pow;
-        pub mod power_of_2;
-        pub mod round_to_multiple;
-        pub mod round_to_multiple_of_power_of_2;
-        pub mod shl;
-        pub mod shl_round;
-        pub mod shr;
-        pub mod shr_round;
-        pub mod sign;
-        pub mod square;
-        pub mod sub;
-        pub mod sub_mul;
-    }
-}
-
 pub mod natural {
     pub mod arithmetic {
         pub mod add;

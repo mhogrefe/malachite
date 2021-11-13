@@ -1,17 +1,21 @@
-use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::{CheckedSubMul, SubMul, SubMulAssign, UnsignedAbs};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::conversion::traits::ConvertibleFrom;
+use malachite_base_test_util::generators::{
+    signed_triple_gen, signed_triple_gen_var_2, unsigned_vec_triple_gen_var_39,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10,
+};
 use malachite_nz::integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul, limbs_overflowing_sub_mul_in_place_left,
     limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
     limbs_overflowing_sub_mul_limb_in_place_left, limbs_overflowing_sub_mul_limb_in_place_right,
 };
 use malachite_nz::integer::Integer;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::platform::Limb;
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::generators::{integer_gen, integer_pair_gen, integer_triple_gen};
+use std::str::FromStr;
 
-#[cfg(feature = "32_bit_limbs")]
 #[test]
 fn test_limbs_overflowing_sub_mul_limb() {
     let test = |xs_before: &[Limb], ys_before: &[Limb], z: Limb, result: &[Limb], sign: bool| {
@@ -31,17 +35,37 @@ fn test_limbs_overflowing_sub_mul_limb() {
         );
         assert_eq!(ys, result);
     };
-    test(&[123, 456], &[123], 4, &[4294966927, 455, 0], true);
-    test(&[123, 456], &[123], u32::MAX, &[246, 333, 0], true);
-    test(&[123], &[123], 1, &[0, 0], true);
-    test(&[123], &[123], 4, &[369, 0], false);
-    test(
-        &[123],
-        &[123, 456],
-        u32::MAX,
-        &[4294967050, 4294966962, 455],
-        false,
-    );
+    #[cfg(feature = "32_bit_limbs")]
+    {
+        test(&[123, 456], &[123], 4, &[4294966927, 455, 0], true);
+        test(&[123, 456], &[123], u32::MAX, &[246, 333, 0], true);
+        test(&[123], &[123], 1, &[0, 0], true);
+        test(&[123], &[123], 4, &[369, 0], false);
+        test(
+            &[123],
+            &[123, 456],
+            u32::MAX,
+            &[4294967050, 4294966962, 455],
+            false,
+        );
+        test(
+            &[8191],
+            &[0, 4160749568],
+            1610678208,
+            &[4294959105, 4294967295, 1560344513],
+            false,
+        );
+    }
+    #[cfg(not(feature = "32_bit_limbs"))]
+    {
+        test(
+            &[18446744073709551615],
+            &[0, 18446744056529682432],
+            18446742974197923840,
+            &[1, 18446744073709551615, 18446742957018055679],
+            false,
+        );
+    }
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -393,4 +417,200 @@ fn test_sub_mul() {
         "1000000000000",
         "0",
     );
+    test(
+        "18446744073709551615",
+        "340282366604025813406317257057592410112",
+        "18446742974197923840",
+        "-6277101355396255406250174417290596496345921599978512318465",
+    );
+}
+
+#[test]
+fn limbs_overflowing_sub_mul_limb_properties() {
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().test_properties(|(a, b, c)| {
+        let (result, sign) = limbs_overflowing_sub_mul_limb(&a, &b, c);
+        let expected_result = Integer::from(Natural::from_owned_limbs_asc(a)).sub_mul(
+            Integer::from(Natural::from_owned_limbs_asc(b)),
+            Integer::from(c),
+        );
+        assert_eq!(sign, expected_result >= 0);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(result),
+            expected_result.unsigned_abs()
+        );
+    });
+}
+
+#[test]
+fn limbs_overflowing_sub_mul_limb_in_place_left_properties() {
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().test_properties(|(mut a, b, c)| {
+        let a_old = a.clone();
+        let sign = limbs_overflowing_sub_mul_limb_in_place_left(&mut a, &b, c);
+        let expected_result = Integer::from(Natural::from_owned_limbs_asc(a_old)).sub_mul(
+            Integer::from(Natural::from_owned_limbs_asc(b)),
+            Integer::from(c),
+        );
+        assert_eq!(sign, expected_result >= 0);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(a),
+            expected_result.unsigned_abs(),
+        );
+    });
+}
+
+#[test]
+fn limbs_overflowing_sub_mul_limb_in_place_right_properties() {
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().test_properties(|(a, mut b, c)| {
+        let b_old = b.clone();
+        let sign = limbs_overflowing_sub_mul_limb_in_place_right(&a, &mut b, c);
+        let expected_result = Integer::from(Natural::from_owned_limbs_asc(a)).sub_mul(
+            Integer::from(Natural::from_owned_limbs_asc(b_old)),
+            Integer::from(c),
+        );
+        assert_eq!(sign, expected_result >= 0);
+        assert_eq!(
+            Natural::from_owned_limbs_asc(b),
+            expected_result.unsigned_abs()
+        );
+    });
+}
+
+#[test]
+fn limbs_overflowing_sub_mul_limb_in_place_either_properties() {
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10().test_properties(|(mut a, mut b, c)| {
+        let a_old = a.clone();
+        let b_old = b.clone();
+        let (right, sign) = limbs_overflowing_sub_mul_limb_in_place_either(&mut a, &mut b, c);
+        let expected_result = Integer::from(Natural::from_limbs_asc(&a_old)).sub_mul(
+            Integer::from(Natural::from_limbs_asc(&b_old)),
+            Integer::from(c),
+        );
+        let result = Natural::from_owned_limbs_asc(if right {
+            assert_eq!(a_old, a);
+            b
+        } else {
+            assert_eq!(b_old, b);
+            a
+        });
+        assert_eq!(sign, expected_result >= 0);
+        assert_eq!(result, expected_result.unsigned_abs());
+    });
+}
+
+#[test]
+fn limbs_overflowing_sub_mul_properties() {
+    unsigned_vec_triple_gen_var_39().test_properties(|(a, b, c)| {
+        let (result, sign) = limbs_overflowing_sub_mul(&a, &b, &c);
+        let expected_result = Integer::from(Natural::from_owned_limbs_asc(a)).sub_mul(
+            Integer::from(Natural::from_owned_limbs_asc(b)),
+            Integer::from(Natural::from_owned_limbs_asc(c)),
+        );
+        if expected_result != 0 {
+            assert_eq!(sign, expected_result >= 0);
+        }
+        assert_eq!(
+            Natural::from_owned_limbs_asc(result),
+            expected_result.unsigned_abs()
+        );
+    });
+}
+
+#[test]
+fn limbs_overflowing_sub_mul_in_place_left_properties() {
+    unsigned_vec_triple_gen_var_39().test_properties(|(mut a, b, c)| {
+        let a_old = a.clone();
+        let sign = limbs_overflowing_sub_mul_in_place_left(&mut a, &b, &c);
+        let expected_result = Integer::from(Natural::from_owned_limbs_asc(a_old)).sub_mul(
+            Integer::from(Natural::from_owned_limbs_asc(b)),
+            Integer::from(Natural::from_owned_limbs_asc(c)),
+        );
+        if expected_result != 0 {
+            assert_eq!(sign, expected_result >= 0);
+        }
+        assert_eq!(
+            Natural::from_owned_limbs_asc(a),
+            expected_result.unsigned_abs()
+        );
+    });
+}
+
+#[test]
+fn sub_mul_properties() {
+    integer_triple_gen().test_properties(|(a, b, c)| {
+        let mut mut_a = a.clone();
+        mut_a.sub_mul_assign(b.clone(), c.clone());
+        assert!(mut_a.is_valid());
+        let result = mut_a;
+
+        let mut mut_a = a.clone();
+        mut_a.sub_mul_assign(b.clone(), &c);
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let mut mut_a = a.clone();
+        mut_a.sub_mul_assign(&b, c.clone());
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let mut mut_a = a.clone();
+        mut_a.sub_mul_assign(&b, &c);
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let result_alt = a.clone().sub_mul(b.clone(), c.clone());
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result = a.clone().sub_mul(b.clone(), &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result = a.clone().sub_mul(&b, c.clone());
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result = a.clone().sub_mul(&b, &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result = (&a).sub_mul(&b, &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        assert_eq!(&a - &b * &c, result);
+        assert_eq!((&a).sub_mul(&c, &b), result);
+        assert_eq!((&a).sub_mul(&(-&b), &(-&c)), result);
+        assert_eq!((-&a).sub_mul(&(-&b), &c), -&result);
+        assert_eq!((-a).sub_mul(b, -c), -result);
+    });
+
+    integer_gen().test_properties(|a| {
+        assert_eq!((&a).sub_mul(&a, &Integer::ONE), 0);
+        assert_eq!((&a).sub_mul(&(-&a), &Integer::NEGATIVE_ONE), 0);
+    });
+
+    integer_pair_gen().test_properties(|(a, b)| {
+        assert_eq!((&a).sub_mul(&Integer::ZERO, &b), a);
+        assert_eq!((&a).sub_mul(&Integer::ONE, &b), &a - &b);
+        assert_eq!(Integer::ZERO.sub_mul(&a, &b), -&a * &b);
+        assert_eq!((&a).sub_mul(&b, &Integer::ZERO), a);
+        assert_eq!((&a).sub_mul(&b, &Integer::ONE), &a - &b);
+        assert_eq!((&a * &b).sub_mul(&a, &b), 0);
+        assert_eq!((&a * &b).sub_mul(-a, -b), 0);
+    });
+
+    signed_triple_gen_var_2::<SignedLimb>().test_properties(|(x, y, z)| {
+        assert_eq!(
+            x.sub_mul(y, z),
+            Integer::from(x).sub_mul(Integer::from(y), Integer::from(z))
+        );
+    });
+
+    signed_triple_gen::<SignedLimb>().test_properties(|(x, y, z)| {
+        let result = Integer::from(x).sub_mul(Integer::from(y), Integer::from(z));
+        assert_eq!(
+            x.checked_sub_mul(y, z).is_some(),
+            SignedLimb::convertible_from(&result)
+        );
+    });
 }

@@ -31,7 +31,7 @@ macro_rules! natural_signed_single_arg_bench_with_trait {
                 limit,
                 file_name,
                 &signed_bit_bucketer(),
-                &mut [("Malachite", &mut (|x| no_out!(Natural::$f(x))))],
+                &mut [("Malachite", &mut |x| no_out!(Natural::$f(x)))],
             );
         }
     };

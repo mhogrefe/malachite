@@ -7,7 +7,7 @@ use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_mul::{
-    _limbs_mod_mul_two_limbs, _limbs_precompute_mod_mul_two_limbs,
+    _limbs_mod_mul_two_limbs, limbs_precompute_mod_mul_two_limbs,
 };
 use malachite_nz::natural::Natural;
 
@@ -16,7 +16,7 @@ use malachite_nz::natural::Natural;
 fn test_limbs_precompute_mod_mul_two_limbs() {
     let test = |m_1, m_0, inv_2, inv_1, inv_0| {
         assert_eq!(
-            _limbs_precompute_mod_mul_two_limbs(m_1, m_0),
+            limbs_precompute_mod_mul_two_limbs(m_1, m_0),
             (inv_2, inv_1, inv_0)
         );
         assert_eq!(
@@ -35,7 +35,7 @@ fn test_limbs_precompute_mod_mul_two_limbs() {
 #[test]
 fn test_limbs_mod_mul_two_limbs() {
     let test = |x_1, x_0, y_1, y_0, m_1, m_0, r_1, r_0| {
-        let (inv_2, inv_1, inv_0) = _limbs_precompute_mod_mul_two_limbs(m_1, m_0);
+        let (inv_2, inv_1, inv_0) = limbs_precompute_mod_mul_two_limbs(m_1, m_0);
         assert_eq!(
             _limbs_mod_mul_two_limbs(x_1, x_0, y_1, y_0, m_1, m_0, inv_2, inv_1, inv_0),
             (r_1, r_0)

@@ -344,11 +344,10 @@ fn benchmark_primitive_int_convertible_from_natural_algorithms<
         file_name,
         &natural_bit_bucketer("n"),
         &mut [
-            ("standard", &mut (|n| no_out!(T::convertible_from(&n)))),
-            (
-                "using checked_from",
-                &mut (|n| no_out!(T::checked_from(&n).is_some())),
-            ),
+            ("standard", &mut |n| no_out!(T::convertible_from(&n))),
+            ("using checked_from", &mut |n| {
+                no_out!(T::checked_from(&n).is_some())
+            }),
         ],
     );
 }
@@ -368,8 +367,8 @@ fn benchmark_u32_checked_from_natural_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut (|(_, n)| no_out!(u32::checked_from(&n)))),
-            ("rug", &mut (|(n, _)| no_out!(n.to_u32()))),
+            ("Malachite", &mut |(_, n)| no_out!(u32::checked_from(&n))),
+            ("rug", &mut |(n, _)| no_out!(n.to_u32())),
         ],
     );
 }
@@ -410,8 +409,8 @@ fn benchmark_u64_checked_from_natural_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut (|(_, n)| no_out!(u64::checked_from(&n)))),
-            ("rug", &mut (|(n, _)| no_out!(n.to_u64()))),
+            ("Malachite", &mut |(_, n)| no_out!(u64::checked_from(&n))),
+            ("rug", &mut |(n, _)| no_out!(n.to_u64())),
         ],
     );
 }
@@ -452,8 +451,8 @@ fn benchmark_i32_checked_from_natural_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut (|(_, n)| no_out!(i32::checked_from(&n)))),
-            ("rug", &mut (|(n, _)| no_out!(n.to_i32()))),
+            ("Malachite", &mut |(_, n)| no_out!(i32::checked_from(&n))),
+            ("rug", &mut |(n, _)| no_out!(n.to_i32())),
         ],
     );
 }
@@ -494,8 +493,8 @@ fn benchmark_i64_checked_from_natural_library_comparison(
         file_name,
         &pair_2_natural_bit_bucketer("n"),
         &mut [
-            ("Malachite", &mut (|(_, n)| no_out!(i64::checked_from(&n)))),
-            ("rug", &mut (|(n, _)| no_out!(n.to_i64()))),
+            ("Malachite", &mut |(_, n)| no_out!(i64::checked_from(&n))),
+            ("rug", &mut |(n, _)| no_out!(n.to_i64())),
         ],
     );
 }

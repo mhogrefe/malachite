@@ -1,5 +1,8 @@
-use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
+use malachite_base::num::arithmetic::traits::{Abs, CheckedSqrt, Square, SquareAssign};
+use malachite_base_test_util::generators::signed_gen_var_10;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::generators::{integer_gen, integer_pair_gen, natural_gen};
 use std::str::FromStr;
 
 #[test]
@@ -30,4 +33,36 @@ fn test_square() {
     test("-123", "15129");
     test("-1000", "1000000");
     test("-123456789", "15241578750190521");
+}
+
+#[test]
+fn square_properties() {
+    integer_gen().test_properties(|x| {
+        let square = (&x).square();
+        assert!(square.is_valid());
+
+        let mut mut_x = x.clone();
+        mut_x.square_assign();
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, square);
+
+        assert_eq!(&x * &x, square);
+        assert_eq!((-&x).square(), square);
+        assert!(square >= 0);
+        assert!(square >= x);
+
+        assert_eq!(square.checked_sqrt(), Some(x.abs()));
+    });
+
+    integer_pair_gen().test_properties(|(x, y)| {
+        assert_eq!((&x * &y).square(), x.square() * y.square());
+    });
+
+    natural_gen().test_properties(|x| {
+        assert_eq!((&x).square(), Integer::from(x).square());
+    });
+
+    signed_gen_var_10::<Limb, SignedLimb>().test_properties(|x| {
+        assert_eq!(x.square(), Integer::from(x).square());
+    });
 }

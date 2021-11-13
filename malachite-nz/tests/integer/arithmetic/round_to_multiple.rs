@@ -1,7 +1,16 @@
-use malachite_base::num::arithmetic::traits::{RoundToMultiple, RoundToMultipleAssign};
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::arithmetic::traits::{
+    Abs, DivRound, DivisibleBy, Parity, RoundToMultiple, RoundToMultipleAssign,
+};
+use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
+use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::signed_signed_rounding_mode_triple_gen_var_2;
 use malachite_nz::integer::Integer;
+use malachite_nz::platform::{Limb, SignedLimb};
+use malachite_nz_test_util::generators::{
+    integer_integer_rounding_mode_triple_gen_var_2, integer_pair_gen_var_1, integer_pair_gen_var_3,
+    integer_rounding_mode_pair_gen, natural_natural_rounding_mode_triple_gen_var_2,
+};
 use std::str::FromStr;
 
 #[test]
@@ -1072,4 +1081,132 @@ fn round_to_multiple_ref_ref_fail_3() {
 #[should_panic]
 fn round_to_multiple_ref_ref_fail_4() {
     (&Integer::from(10)).round_to_multiple(&Integer::ZERO, RoundingMode::Exact);
+}
+
+#[test]
+fn round_to_multiple_properties() {
+    integer_integer_rounding_mode_triple_gen_var_2().test_properties(|(x, y, rm)| {
+        let mut mut_n = x.clone();
+        mut_n.round_to_multiple_assign(&y, rm);
+        assert!(mut_n.is_valid());
+        let r = mut_n;
+
+        let mut mut_n = x.clone();
+        mut_n.round_to_multiple_assign(y.clone(), rm);
+        assert!(mut_n.is_valid());
+        assert_eq!(mut_n, r);
+
+        let r_alt = (&x).round_to_multiple(&y, rm);
+        assert!(r_alt.is_valid());
+        assert_eq!(r_alt, r);
+
+        let r_alt = (&x).round_to_multiple(y.clone(), rm);
+        assert!(r_alt.is_valid());
+        assert_eq!(r_alt, r);
+
+        let r_alt = x.clone().round_to_multiple(&y, rm);
+        assert!(r_alt.is_valid());
+        assert_eq!(r_alt, r);
+
+        let r_alt = x.clone().round_to_multiple(y.clone(), rm);
+        assert!(r_alt.is_valid());
+        assert_eq!(r_alt, r);
+
+        assert_eq!(-(-&x).round_to_multiple(&y, -rm), r);
+        assert_eq!((&x).round_to_multiple(-&y, rm), r);
+        assert!((&r).divisible_by(&y));
+        if y == 0 {
+            assert_eq!(r, 0);
+        } else {
+            assert!((&r - &x).le_abs(&y));
+            match rm {
+                RoundingMode::Floor => assert!(r <= x),
+                RoundingMode::Ceiling => assert!(r >= x),
+                RoundingMode::Down => assert!(r.le_abs(&x)),
+                RoundingMode::Up => assert!(r.ge_abs(&x)),
+                RoundingMode::Exact => assert_eq!(r, x),
+                RoundingMode::Nearest => {
+                    let closest;
+                    let second_closest;
+                    if r <= x {
+                        closest = &x - &r;
+                        second_closest = &r + (&y).abs() - &x;
+                    } else {
+                        closest = &r - &x;
+                        second_closest = x + (&y).abs() - &r;
+                    }
+                    assert!(closest <= second_closest);
+                    if closest == second_closest {
+                        assert!(r.div_round(y, RoundingMode::Exact).even());
+                    }
+                }
+            }
+        }
+    });
+
+    integer_pair_gen_var_1().test_properties(|(x, y)| {
+        let product = x * &y;
+        assert_eq!(
+            (&product).round_to_multiple(&y, RoundingMode::Down),
+            product
+        );
+        assert_eq!((&product).round_to_multiple(&y, RoundingMode::Up), product);
+        assert_eq!(
+            (&product).round_to_multiple(&y, RoundingMode::Floor),
+            product
+        );
+        assert_eq!(
+            (&product).round_to_multiple(&y, RoundingMode::Ceiling),
+            product
+        );
+        assert_eq!(
+            (&product).round_to_multiple(&y, RoundingMode::Nearest),
+            product
+        );
+        assert_eq!(
+            (&product).round_to_multiple(&y, RoundingMode::Exact),
+            product
+        );
+    });
+
+    integer_pair_gen_var_3().test_properties(|(x, y)| {
+        let down = (&x).round_to_multiple(&y, RoundingMode::Down);
+        let up = if x >= 0 {
+            &down + (&y).abs()
+        } else {
+            &down - (&y).abs()
+        };
+        let floor = (&x).round_to_multiple(&y, RoundingMode::Floor);
+        let ceiling = &floor + (&y).abs();
+        assert_eq!((&x).round_to_multiple(&y, RoundingMode::Up), up);
+        assert_eq!((&x).round_to_multiple(&y, RoundingMode::Ceiling), ceiling);
+        let nearest = x.round_to_multiple(y, RoundingMode::Nearest);
+        assert!(nearest == down || nearest == up);
+    });
+
+    integer_rounding_mode_pair_gen().test_properties(|(x, rm)| {
+        let x = &x;
+        assert_eq!(x.round_to_multiple(Integer::ONE, rm), *x);
+        assert_eq!(x.round_to_multiple(Integer::NEGATIVE_ONE, rm), *x);
+        assert_eq!(Integer::ZERO.round_to_multiple(x, rm), 0);
+        assert_eq!(x.round_to_multiple(x, rm), *x);
+        assert_eq!(x.round_to_multiple(-x, rm), *x);
+        assert_eq!((-x).round_to_multiple(x, rm), -x);
+    });
+
+    natural_natural_rounding_mode_triple_gen_var_2().test_properties(|(x, y, rm)| {
+        assert_eq!(
+            Integer::from(&x).round_to_multiple(Integer::from(&y), rm),
+            x.round_to_multiple(y, rm)
+        );
+    });
+
+    signed_signed_rounding_mode_triple_gen_var_2::<Limb, SignedLimb>().test_properties(
+        |(x, y, rm)| {
+            assert_eq!(
+                Integer::from(x).round_to_multiple(Integer::from(y), rm),
+                x.round_to_multiple(y, rm)
+            );
+        },
+    );
 }

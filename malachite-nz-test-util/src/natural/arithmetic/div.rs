@@ -3,8 +3,8 @@ use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_nz::natural::arithmetic::add::limbs_slice_add_limb_in_place;
-use malachite_nz::natural::arithmetic::div::_div_by_preinversion;
-use malachite_nz::natural::arithmetic::div_mod::{_div_mod_by_preinversion, limbs_invert_limb};
+use malachite_nz::natural::arithmetic::div::div_by_preinversion;
+use malachite_nz::natural::arithmetic::div_mod::{div_mod_by_preinversion, limbs_invert_limb};
 use malachite_nz::natural::arithmetic::shl::{limbs_shl_to_out, limbs_slice_shl_in_place};
 use malachite_nz::platform::{DoubleLimb, Limb};
 
@@ -21,7 +21,7 @@ use malachite_nz::platform::{DoubleLimb, Limb};
 fn limbs_div_limb_normalized_in_place(ns: &mut [Limb], ns_high: Limb, d: Limb, d_inv: Limb) {
     let len = ns.len();
     if len == 1 {
-        ns[0] = _div_by_preinversion(ns_high, ns[0], d, d_inv);
+        ns[0] = div_by_preinversion(ns_high, ns[0], d, d_inv);
         return;
     }
     let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
@@ -63,7 +63,7 @@ fn limbs_div_limb_normalized_in_place(ns: &mut [Limb], ns_high: Limb, d: Limb, d
         q_high += 1;
         sum_high.wrapping_sub_assign(d);
     }
-    let t = _div_by_preinversion(sum_high, sum_low, d, d_inv);
+    let t = div_by_preinversion(sum_high, sum_low, d, d_inv);
     let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
         .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
@@ -90,7 +90,7 @@ fn limbs_div_limb_normalized_to_out(
 ) {
     let len = ns.len();
     if len == 1 {
-        out[0] = _div_by_preinversion(ns_high, ns[0], d, d_inv);
+        out[0] = div_by_preinversion(ns_high, ns[0], d, d_inv);
         return;
     }
     let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
@@ -131,7 +131,7 @@ fn limbs_div_limb_normalized_to_out(
         q_high += 1;
         sum_high.wrapping_sub_assign(d);
     }
-    let t = _div_by_preinversion(sum_high, sum_low, d, d_inv);
+    let t = div_by_preinversion(sum_high, sum_low, d, d_inv);
     let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
         .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
@@ -161,7 +161,7 @@ pub fn limbs_div_limb_to_out_alt(out: &mut [Limb], ns: &[Limb], d: Limb) {
         let d = d << bits;
         let ns_high = limbs_shl_to_out(out, ns, bits);
         let d_inv = limbs_invert_limb(d);
-        let (q, r) = _div_mod_by_preinversion(ns_high, out[len_minus_1], d, d_inv);
+        let (q, r) = div_mod_by_preinversion(ns_high, out[len_minus_1], d, d_inv);
         out[len_minus_1] = q;
         limbs_div_limb_normalized_in_place(&mut out[..len_minus_1], r, d, d_inv)
     }
@@ -188,7 +188,7 @@ pub fn limbs_div_limb_in_place_alt(ns: &mut [Limb], d: Limb) {
         let d = d << bits;
         let ns_high = limbs_slice_shl_in_place(ns, bits);
         let d_inv = limbs_invert_limb(d);
-        let (q, r) = _div_mod_by_preinversion(ns_high, ns[len_minus_1], d, d_inv);
+        let (q, r) = div_mod_by_preinversion(ns_high, ns[len_minus_1], d, d_inv);
         ns[len_minus_1] = q;
         limbs_div_limb_normalized_in_place(&mut ns[..len_minus_1], r, d, d_inv)
     }

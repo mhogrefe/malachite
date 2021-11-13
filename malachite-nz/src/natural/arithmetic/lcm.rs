@@ -135,7 +135,7 @@ impl LcmAssign<Natural> for Natural {
     /// $$
     /// x \gets \operatorname{lcm}(x, y).
     /// $$
-    /// 
+    ///
     /// TODO complexity
     ///
     /// # Examples
@@ -174,7 +174,7 @@ impl<'a> LcmAssign<&'a Natural> for Natural {
     /// $$
     /// x \gets \operatorname{lcm}(x, y).
     /// $$
-    /// 
+    ///
     /// TODO complexity
     ///
     /// # Examples

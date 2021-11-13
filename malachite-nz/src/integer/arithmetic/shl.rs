@@ -2,9 +2,9 @@ use integer::Integer;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
 use natural::Natural;
-use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
+use std::ops::{Shl, ShlAssign, Shr};
 
-fn _shl_unsigned<T>(x: Integer, bits: T) -> Integer
+fn shl_unsigned<T>(x: Integer, bits: T) -> Integer
 where
     Natural: Shl<T, Output = Natural>,
 {
@@ -14,7 +14,7 @@ where
     }
 }
 
-fn _shl_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
+fn shl_unsigned_ref<'a, T>(x: &'a Integer, bits: T) -> Integer
 where
     &'a Natural: Shl<T, Output = Natural>,
 {
@@ -54,7 +54,7 @@ macro_rules! impl_shl_unsigned {
             /// ```
             #[inline]
             fn shl(self, bits: $t) -> Integer {
-                _shl_unsigned(self, bits)
+                shl_unsigned(self, bits)
             }
         }
 
@@ -86,7 +86,7 @@ macro_rules! impl_shl_unsigned {
             /// ```
             #[inline]
             fn shl(self, bits: $t) -> Integer {
-                _shl_unsigned_ref(self, bits)
+                shl_unsigned_ref(self, bits)
             }
         }
 
@@ -138,17 +138,6 @@ where
         x << bits.unsigned_abs()
     } else {
         x >> bits.unsigned_abs()
-    }
-}
-
-fn _shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Integer, bits: S)
-where
-    Integer: ShlAssign<U> + ShrAssign<U>,
-{
-    if bits >= S::ZERO {
-        *x <<= bits.unsigned_abs();
-    } else {
-        *x >>= bits.unsigned_abs();
     }
 }
 

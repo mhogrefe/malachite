@@ -119,12 +119,13 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_left(
             borrow.wrapping_add_assign(1);
         }
         xs.resize(ys_len + 1, 0);
-        let (xs_hi_last, xs_hi_init) = xs[xs_len..].split_last_mut().unwrap();
+        let xs_hi = &mut xs[xs_len..];
+        let (xs_hi_last, xs_hi_init) = xs_hi.split_last_mut().unwrap();
         *xs_hi_last = limbs_mul_limb_with_carry_to_out(xs_hi_init, ys_hi, z, borrow);
         // Apply any -1 from above. The value at xs_hi is non-zero because z != 0 and the high limb
         // of ys will be non-zero.
         if negative_one {
-            limbs_sub_limb_in_place(xs_hi_init, 1);
+            assert!(!limbs_sub_limb_in_place(xs_hi, 1));
         }
         false
     }
@@ -251,7 +252,7 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
     let (ys_hi_last, ys_hi_init) = ys_hi.split_last_mut().unwrap();
     *ys_hi_last = limbs_slice_mul_limb_with_carry_in_place(ys_hi_init, z, borrow);
     if negative_one {
-        limbs_sub_limb_in_place(ys_hi_init, 1);
+        assert!(!limbs_sub_limb_in_place(ys_hi, 1));
     }
     false
 }
@@ -586,7 +587,7 @@ impl<'a, 'b, 'c> SubMul<&'a Integer, &'b Integer> for &'c Integer {
     }
 }
 
-impl<'a> SubMulAssign<Integer, Integer> for Integer {
+impl SubMulAssign<Integer, Integer> for Integer {
     /// Adds the product of an `Integer` (y) and an `Integer` (z) to an `Integer` (self), in place,
     /// taking y and z by value.
     ///

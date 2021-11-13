@@ -11,11 +11,12 @@ use natural::arithmetic::add::{
     limbs_add_limb_to_out, limbs_add_same_length_to_out, limbs_slice_add_same_length_in_place_left,
 };
 use natural::arithmetic::div_mod::{
-    _limbs_div_barrett_large_product, _limbs_div_mod_balanced, _limbs_div_mod_barrett_helper,
-    _limbs_div_mod_barrett_is_len, _limbs_div_mod_barrett_scratch_len,
-    _limbs_div_mod_divide_and_conquer_helper, _limbs_div_mod_schoolbook, _limbs_invert_approx,
-    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_three_limb_by_two_limb, limbs_invert_limb,
-    limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD, MUPI_DIV_QR_THRESHOLD,
+    limbs_div_barrett_large_product, limbs_div_mod_balanced, limbs_div_mod_barrett_helper,
+    limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len,
+    limbs_div_mod_by_two_limb_normalized, limbs_div_mod_divide_and_conquer_helper,
+    limbs_div_mod_schoolbook, limbs_div_mod_three_limb_by_two_limb, limbs_invert_approx,
+    limbs_invert_limb, limbs_two_limb_inverse_helper, MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD,
+    MUPI_DIV_QR_THRESHOLD,
 };
 use natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
 use natural::arithmetic::mul::{
@@ -24,10 +25,10 @@ use natural::arithmetic::mul::{
 use natural::arithmetic::shl::limbs_shl_to_out;
 use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::arithmetic::sub::{
+    limbs_sub_limb_in_place, limbs_sub_same_length_in_place_left,
+    limbs_sub_same_length_in_place_right, limbs_sub_same_length_to_out,
     limbs_sub_same_length_with_borrow_in_in_place_left,
-    limbs_sub_same_length_with_borrow_in_in_place_right, limbs_sub_limb_in_place,
-    limbs_sub_same_length_in_place_left, limbs_sub_same_length_in_place_right,
-    limbs_sub_same_length_to_out,
+    limbs_sub_same_length_with_borrow_in_in_place_right,
 };
 use natural::arithmetic::sub_mul::limbs_sub_mul_limb_same_length_in_place_left;
 use natural::comparison::cmp::limbs_cmp_same_length;
@@ -292,9 +293,9 @@ fn _limbs_mod_divide_and_conquer_helper(
     let qs_hi = &mut qs[lo..];
     let (ds_lo, ds_hi) = ds.split_at(lo);
     let highest_q = if hi < DC_DIV_QR_THRESHOLD {
-        _limbs_div_mod_schoolbook(qs_hi, &mut ns[lo << 1..n << 1], ds_hi, d_inv)
+        limbs_div_mod_schoolbook(qs_hi, &mut ns[lo << 1..n << 1], ds_hi, d_inv)
     } else {
-        _limbs_div_mod_divide_and_conquer_helper(qs_hi, &mut ns[lo << 1..], ds_hi, d_inv, scratch)
+        limbs_div_mod_divide_and_conquer_helper(qs_hi, &mut ns[lo << 1..], ds_hi, d_inv, scratch)
     };
     let qs_hi = &mut qs_hi[..hi];
     limbs_mul_greater_to_out(scratch, qs_hi, ds_lo);
@@ -314,9 +315,9 @@ fn _limbs_mod_divide_and_conquer_helper(
     }
     let (ds_lo, ds_hi) = ds.split_at(hi);
     let q_lo = if lo < DC_DIV_QR_THRESHOLD {
-        _limbs_div_mod_schoolbook(qs, &mut ns[hi..n + lo], ds_hi, d_inv)
+        limbs_div_mod_schoolbook(qs, &mut ns[hi..n + lo], ds_hi, d_inv)
     } else {
-        _limbs_div_mod_divide_and_conquer_helper(qs, &mut ns[hi..], ds_hi, d_inv, scratch)
+        limbs_div_mod_divide_and_conquer_helper(qs, &mut ns[hi..], ds_hi, d_inv, scratch)
     };
     let qs_lo = &mut qs[..lo];
     let ns_lo = &mut ns[..n];
@@ -424,9 +425,9 @@ pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
                 if q_len_mod_d_len == 2 {
                     limbs_div_mod_by_two_limb_normalized(qs_block, ns, ds_hi)
                 } else if q_len_mod_d_len < DC_DIV_QR_THRESHOLD {
-                    _limbs_div_mod_schoolbook(qs_block, ns, ds_hi, d_inv)
+                    limbs_div_mod_schoolbook(qs_block, ns, ds_hi, d_inv)
                 } else {
-                    _limbs_div_mod_divide_and_conquer_helper(
+                    limbs_div_mod_divide_and_conquer_helper(
                         qs_block,
                         ns,
                         ds_hi,
@@ -468,9 +469,9 @@ pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
         let m = d_len - q_len;
         let (ds_lo, ds_hi) = ds.split_at(m);
         let highest_q = if q_len < DC_DIV_QR_THRESHOLD {
-            _limbs_div_mod_schoolbook(qs, &mut ns[m..], ds_hi, d_inv)
+            limbs_div_mod_schoolbook(qs, &mut ns[m..], ds_hi, d_inv)
         } else {
-            _limbs_div_mod_divide_and_conquer_helper(qs, &mut ns[m..], ds_hi, d_inv, &mut scratch)
+            limbs_div_mod_divide_and_conquer_helper(qs, &mut ns[m..], ds_hi, d_inv, &mut scratch)
         };
         if m != 0 {
             let qs = &mut qs[..q_len];
@@ -549,7 +550,7 @@ fn _limbs_mod_barrett_preinverted(
         if i_len < MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD {
             limbs_mul_greater_to_out(scratch, ds, qs);
         } else {
-            _limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
+            limbs_div_barrett_large_product(scratch, ds, qs, rs_hi, scratch_len, i_len)
         }
         let mut r = rs_hi[0].wrapping_sub(scratch[d_len]);
         // Subtract the product from the partial remainder combined with new limbs from the
@@ -611,7 +612,7 @@ pub fn _limbs_mod_barrett_helper(
     assert!(n_len > d_len);
     let q_len = n_len - d_len;
     // Compute the inverse size.
-    let i_len = _limbs_div_mod_barrett_is_len(q_len, d_len);
+    let i_len = limbs_div_mod_barrett_is_len(q_len, d_len);
     assert!(i_len <= d_len);
     let i_len_plus_1 = i_len + 1;
     let (is, scratch_hi) = scratch.split_at_mut(i_len_plus_1);
@@ -621,13 +622,13 @@ pub fn _limbs_mod_barrett_helper(
         let (scratch_first, scratch_lo_tail) = scratch_lo.split_first_mut().unwrap();
         scratch_lo_tail.copy_from_slice(&ds[..i_len]);
         *scratch_first = 1;
-        _limbs_invert_approx(is, scratch_lo, scratch_hi);
+        limbs_invert_approx(is, scratch_lo, scratch_hi);
         slice_move_left(is, 1);
     } else if limbs_add_limb_to_out(scratch_hi, &ds[d_len - i_len_plus_1..], 1) {
         slice_set_zero(&mut is[..i_len]);
     } else {
         let (scratch_lo, scratch_hi) = scratch_hi.split_at_mut(i_len_plus_1);
-        _limbs_invert_approx(is, scratch_lo, scratch_hi);
+        limbs_invert_approx(is, scratch_lo, scratch_hi);
         slice_move_left(is, 1);
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
@@ -651,7 +652,7 @@ fn _limbs_mod_barrett_large_helper(
     let (ds_lo, ds_hi) = ds.split_at(d_len - q_len_plus_one);
     let (rs_lo, rs_hi) = rs.split_at_mut(n);
     let rs_hi = &mut rs_hi[..q_len_plus_one];
-    let highest_q = _limbs_div_mod_barrett_helper(qs, rs_hi, ns_hi, ds_hi, scratch);
+    let highest_q = limbs_div_mod_barrett_helper(qs, rs_hi, ns_hi, ds_hi, scratch);
     // Multiply the quotient by the divisor limbs ignored above.
     // The product is d_len - 1 limbs long.
     limbs_mul_to_out(scratch, ds_lo, qs);
@@ -736,7 +737,7 @@ fn _limbs_mod_by_two_limb(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
     }
 }
 
-fn divide_and_conquer_condition(n_len: usize, d_len: usize) -> bool {
+fn limbs_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
     let n_64 = n_len as f64;
     let d_64 = d_len as f64;
     d_len < MUPI_DIV_QR_THRESHOLD
@@ -787,7 +788,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
         } else {
             limbs_shr_to_out(rs, ns_shifted, bits);
         }
-    } else if divide_and_conquer_condition(n_len, d_len) {
+    } else if limbs_mod_dc_condition(n_len, d_len) {
         let mut qs = vec![0; n_len - d_len];
         _limbs_mod_divide_and_conquer(&mut qs, ns_shifted, ds_shifted, d_inv);
         let ns_shifted = &ns_shifted[..d_len];
@@ -797,7 +798,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
             limbs_shr_to_out(rs, ns_shifted, bits);
         }
     } else {
-        let scratch_len = _limbs_div_mod_barrett_scratch_len(n_len, d_len);
+        let scratch_len = limbs_div_mod_barrett_scratch_len(n_len, d_len);
         let mut qs = vec![0; n_len - d_len];
         let mut scratch = vec![0; scratch_len];
         _limbs_mod_barrett(&mut qs, rs, ns_shifted, ds_shifted, &mut scratch);
@@ -886,7 +887,7 @@ pub fn limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
         let adjusted_n_len = if adjust { n_len + 1 } else { n_len };
         if adjusted_n_len < d_len << 1 {
             let mut qs = vec![0; n_len - d_len + 1];
-            _limbs_div_mod_balanced(&mut qs, rs, ns, ds, adjust);
+            limbs_div_mod_balanced(&mut qs, rs, ns, ds, adjust);
         } else {
             _limbs_mod_unbalanced(rs, ns, ds, adjusted_n_len);
         }
