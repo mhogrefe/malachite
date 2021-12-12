@@ -219,7 +219,7 @@ pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64
     remaining_bits
 }
 
-fn _shl_ref_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T) -> Natural
+fn shl_ref_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T) -> Natural
 where
     u64: ExactFrom<T>,
     Limb: ArithmeticCheckedShl<T, Output = Limb>,
@@ -240,7 +240,7 @@ where
     }
 }
 
-fn _shl_assign<T: Copy + Eq + Zero>(x: &mut Natural, bits: T)
+fn shl_assign<T: Copy + Eq + Zero>(x: &mut Natural, bits: T)
 where
     u64: ExactFrom<T>,
     Limb: ArithmeticCheckedShl<T, Output = Limb>,
@@ -320,7 +320,7 @@ macro_rules! impl_natural_shl_unsigned {
 
             #[inline]
             fn shl(self, bits: $t) -> Natural {
-                _shl_ref_unsigned(self, bits)
+                shl_ref_unsigned(self, bits)
             }
         }
 
@@ -350,14 +350,14 @@ macro_rules! impl_natural_shl_unsigned {
         impl ShlAssign<$t> for Natural {
             #[inline]
             fn shl_assign(&mut self, bits: $t) {
-                _shl_assign(self, bits);
+                shl_assign(self, bits);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_natural_shl_unsigned);
 
-fn _shl_ref_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shl_ref_signed<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
 ) -> Natural
@@ -371,7 +371,7 @@ where
     }
 }
 
-fn _shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Natural, bits: S)
+fn shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Natural, bits: S)
 where
     Natural: ShlAssign<U> + ShrAssign<U>,
 {
@@ -445,7 +445,7 @@ macro_rules! impl_natural_shl_signed {
             /// ```
             #[inline]
             fn shl(self, bits: $t) -> Natural {
-                _shl_ref_signed(self, bits)
+                shl_ref_signed(self, bits)
             }
         }
 
@@ -481,7 +481,7 @@ macro_rules! impl_natural_shl_signed {
             /// ```
             #[inline]
             fn shl_assign(&mut self, bits: $t) {
-                _shl_assign_signed(self, bits);
+                shl_assign_signed(self, bits);
             }
         }
     };

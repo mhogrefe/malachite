@@ -11,8 +11,8 @@ use malachite_nz_test_util::generators::{
     natural_gen_var_1, natural_gen_var_2, natural_pair_gen_var_3,
 };
 use malachite_nz_test_util::natural::arithmetic::log_base::{
-    _ceiling_log_base_by_squaring, _ceiling_log_base_naive, _checked_log_base_by_squaring,
-    _checked_log_base_naive, _floor_log_base_by_squaring, _floor_log_base_naive,
+    ceiling_log_base_by_squaring, ceiling_log_base_naive, checked_log_base_by_squaring,
+    checked_log_base_naive, floor_log_base_by_squaring, floor_log_base_naive,
 };
 use std::str::FromStr;
 
@@ -230,8 +230,8 @@ fn approx_log_properties() {
 fn floor_log_base_properties() {
     natural_pair_gen_var_3().test_properties(|(n, base)| {
         let floor_log = n.floor_log_base(&base);
-        assert_eq!(_floor_log_base_naive(&n, &base), floor_log);
-        assert_eq!(_floor_log_base_by_squaring(&n, &base), floor_log,);
+        assert_eq!(floor_log_base_naive(&n, &base), floor_log);
+        assert_eq!(floor_log_base_by_squaring(&n, &base), floor_log,);
         assert_eq!(floor_log == 0, n < base);
 
         let power = (&base).pow(floor_log);
@@ -266,8 +266,8 @@ fn floor_log_base_properties() {
 fn ceiling_log_base_properties() {
     natural_pair_gen_var_3().test_properties(|(n, base)| {
         let ceiling_log = n.ceiling_log_base(&base);
-        assert_eq!(_ceiling_log_base_naive(&n, &base), ceiling_log);
-        assert_eq!(_ceiling_log_base_by_squaring(&n, &base), ceiling_log);
+        assert_eq!(ceiling_log_base_naive(&n, &base), ceiling_log);
+        assert_eq!(ceiling_log_base_by_squaring(&n, &base), ceiling_log);
         assert_eq!(ceiling_log == 0, n == Natural::ONE);
 
         let power = (&base).pow(ceiling_log);
@@ -304,8 +304,8 @@ fn ceiling_log_base_properties() {
 fn checked_log_base_properties() {
     natural_pair_gen_var_3().test_properties(|(n, base)| {
         let checked_log = n.checked_log_base(&base);
-        assert_eq!(_checked_log_base_naive(&n, &base), checked_log);
-        assert_eq!(_checked_log_base_by_squaring(&n, &base), checked_log);
+        assert_eq!(checked_log_base_naive(&n, &base), checked_log);
+        assert_eq!(checked_log_base_by_squaring(&n, &base), checked_log);
         if let Some(log) = checked_log {
             assert_eq!((&base).pow(log), n);
             assert_eq!(log == 0, n == Natural::ONE);

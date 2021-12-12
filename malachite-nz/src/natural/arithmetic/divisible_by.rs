@@ -7,7 +7,7 @@ use natural::arithmetic::div_exact::{
     limbs_modular_div_mod_divide_and_conquer, limbs_modular_div_mod_schoolbook,
     limbs_modular_invert_limb,
 };
-use natural::arithmetic::eq_mod::_limbs_mod_exact_odd_limb;
+use natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
 use natural::arithmetic::mod_op::limbs_mod_limb;
 use natural::arithmetic::shr::{limbs_shr_to_out, limbs_slice_shr_in_place};
 use natural::InnerNatural::{Large, Small};
@@ -35,19 +35,20 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 ///
 /// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.2.1, where a is non-negative and the
 /// ABOVE_THRESHOLD branch is excluded.
+#[doc(hidden)]
 pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     assert!(ns.len() > 1);
     if d.even() {
         let twos = TrailingZeros::trailing_zeros(d);
-        ns[0].divisible_by_power_of_2(twos) && _limbs_mod_exact_odd_limb(ns, d >> twos, 0) == 0
+        ns[0].divisible_by_power_of_2(twos) && limbs_mod_exact_odd_limb(ns, d >> twos, 0) == 0
     } else {
-        _limbs_mod_exact_odd_limb(ns, d, 0) == 0
+        limbs_mod_exact_odd_limb(ns, d, 0) == 0
     }
 }
 
 fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
     if ns.len() < BMOD_1_TO_MOD_1_THRESHOLD {
-        _limbs_mod_exact_odd_limb(ns, d_low, 0)
+        limbs_mod_exact_odd_limb(ns, d_low, 0)
     } else {
         limbs_mod_limb(ns, d_low)
     }
@@ -82,6 +83,7 @@ fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
 /// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
+#[doc(hidden)]
 pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -110,7 +112,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
             limbs_mod_limb(ns, d_0) == 0
         } else {
-            _limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
+            limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
     let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
@@ -186,6 +188,7 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 /// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
+#[doc(hidden)]
 pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -215,7 +218,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
             limbs_mod_limb(ns, d_0) == 0
         } else {
-            _limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
+            limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
     let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
@@ -293,6 +296,7 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
 /// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
+#[doc(hidden)]
 pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -321,7 +325,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
             limbs_mod_limb(ns, d_0) == 0
         } else {
-            _limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
+            limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
     let trailing_zeros = TrailingZeros::trailing_zeros(d_0);
@@ -396,6 +400,7 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 /// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
+#[doc(hidden)]
 pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -424,7 +429,7 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
         return if n_len >= BMOD_1_TO_MOD_1_THRESHOLD {
             limbs_mod_limb(ns, d_0) == 0
         } else {
-            _limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
+            limbs_mod_exact_odd_limb(ns, d_0 >> d_0.trailing_zeros(), 0) == 0
         };
     }
     let trailing_zeros = TrailingZeros::trailing_zeros(d_0);

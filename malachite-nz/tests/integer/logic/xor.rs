@@ -1184,8 +1184,7 @@ fn xor_properties() {
         assert_eq!(!(!x ^ y), result);
     });
 
-    integer_gen().test_properties(|x| {
-        let x = &x;
+    integer_gen().test_properties(|ref x| {
         assert_eq!(x ^ Integer::ZERO, *x);
         assert_eq!(Integer::ZERO ^ x, *x);
         assert_eq!(x ^ Integer::NEGATIVE_ONE, !x);

@@ -3,7 +3,7 @@ use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 
-pub fn _xxx_sub_yyy_is_zzz<T: PrimitiveUnsigned>(
+pub fn xxx_sub_yyy_is_zzz<T: PrimitiveUnsigned>(
     x_2: T,
     x_1: T,
     x_0: T,
@@ -59,7 +59,7 @@ macro_rules! impl_xxx_sub_yyy_is_zzz {
                 y_1: $t,
                 y_0: $t,
             ) -> ($t, $t, $t) {
-                _xxx_sub_yyy_is_zzz::<$t>(x_2, x_1, x_0, y_2, y_1, y_0)
+                xxx_sub_yyy_is_zzz::<$t>(x_2, x_1, x_0, y_2, y_1, y_0)
             }
         }
     };

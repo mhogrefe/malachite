@@ -1,20 +1,29 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz_test_util::natural::arithmetic::divisible_by::combined_limbs_divisible_by_limb;
-use malachite_nz_test_util::natural::arithmetic::divisible_by::num_divisible_by;
-use num::BigUint;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::slices::slice_test_zero;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_15, unsigned_vec_pair_gen_var_16,
+    unsigned_vec_unsigned_pair_gen_var_22,
+};
 use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by, limbs_divisible_by_limb, limbs_divisible_by_ref_ref,
     limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
+use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_nz_test_util::generators::{
+    natural_gen, natural_gen_var_2, natural_pair_gen, natural_pair_gen_var_6,
+    natural_pair_gen_var_7, unsigned_vec_pair_gen_var_17,
+};
+use malachite_nz_test_util::natural::arithmetic::divisible_by::{
+    combined_limbs_divisible_by_limb, num_divisible_by,
+};
+use num::BigUint;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -41,7 +50,6 @@ fn limbs_divisible_by_limb_fail() {
     limbs_divisible_by_limb(&[10], 10);
 }
 
-#[cfg(feature = "32_bit_limbs")]
 fn verify_limbs_divisible_by(ns: &[Limb], ds: &[Limb], divisible: bool) {
     assert_eq!(
         Natural::from_limbs_asc(ns).divisible_by(Natural::from_limbs_asc(ds)),
@@ -884,4 +892,122 @@ fn test_divisible_by() {
         false
     );
     test("1", "94815577610368829905234938913859", false)
+}
+
+#[test]
+fn limbs_divisible_by_limb_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_22().test_properties_with_config(&config, |(xs, y)| {
+        let divisible = limbs_divisible_by_limb(&xs, y);
+        assert_eq!(
+            (&Natural::from_limbs_asc(&xs)).divisible_by(Natural::from(y)),
+            divisible
+        );
+        assert_eq!(limbs_mod_limb(&xs, y) == 0, divisible);
+        assert_eq!(combined_limbs_divisible_by_limb(&xs, y), divisible);
+    });
+}
+
+#[test]
+fn limbs_divisible_by_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_15().test_properties_with_config(&config, |(mut ns, mut ds)| {
+        let ns_old = ns.clone();
+        let ds_old = ds.clone();
+        let divisible = limbs_divisible_by(&mut ns, &mut ds);
+
+        let mut ns = ns_old.clone();
+        assert_eq!(limbs_divisible_by_val_ref(&mut ns, &ds_old), divisible);
+
+        let mut ds = ds_old.clone();
+        assert_eq!(limbs_divisible_by_ref_val(&ns_old, &mut ds), divisible);
+
+        assert_eq!(limbs_divisible_by_ref_ref(&ns_old, &ds_old), divisible);
+
+        verify_limbs_divisible_by(&ns_old, &ds_old, divisible);
+    });
+
+    unsigned_vec_pair_gen_var_17().test_properties_with_config(&config, |(mut ns, mut ds)| {
+        let ns_old = ns.clone();
+        let ds_old = ds.clone();
+        assert!(limbs_divisible_by(&mut ns, &mut ds));
+
+        let mut ns = ns_old.clone();
+        assert!(limbs_divisible_by_val_ref(&mut ns, &ds_old));
+
+        let mut ds = ds_old.clone();
+        assert!(limbs_divisible_by_ref_val(&ns_old, &mut ds));
+
+        assert!(limbs_divisible_by_ref_ref(&ns_old, &ds_old));
+        verify_limbs_divisible_by(&ns_old, &ds_old, true);
+    });
+
+    unsigned_vec_pair_gen_var_16().test_properties_with_config(&config, |(ns, ds)| {
+        let divisible = limbs_divisible_by_ref_ref(&ns, &ds);
+        assert_eq!(slice_test_zero(&limbs_mod(&ns, &ds)), divisible);
+    });
+}
+
+#[test]
+fn divisible_by_properties() {
+    natural_pair_gen().test_properties(|(x, y)| {
+        let divisible = (&x).divisible_by(&y);
+        assert_eq!((&x).divisible_by(y.clone()), divisible);
+        assert_eq!(x.clone().divisible_by(&y), divisible);
+        assert_eq!(x.clone().divisible_by(y.clone()), divisible);
+
+        assert_eq!(x == 0 || y != 0 && &x % &y == 0, divisible);
+        assert_eq!(
+            num_divisible_by(&natural_to_biguint(&x), &natural_to_biguint(&y)),
+            divisible
+        );
+        assert_eq!(
+            natural_to_rug_integer(&x).is_divisible(&natural_to_rug_integer(&y)),
+            divisible
+        );
+    });
+
+    natural_pair_gen_var_6().test_properties(|(x, y)| {
+        assert!((&x).divisible_by(&y));
+        assert!(x == 0 || y != 0 && &x % &y == 0);
+        assert!(num_divisible_by(
+            &natural_to_biguint(&x),
+            &natural_to_biguint(&y)
+        ));
+        assert!(natural_to_rug_integer(&x).is_divisible(&natural_to_rug_integer(&y)));
+    });
+
+    natural_pair_gen_var_7().test_properties(|(x, y)| {
+        assert!(!(&x).divisible_by(&y));
+        assert!(x != 0 && (y == 0 || &x % &y != 0));
+        assert!(!num_divisible_by(
+            &natural_to_biguint(&x),
+            &natural_to_biguint(&y)
+        ));
+        assert!(!natural_to_rug_integer(&x).is_divisible(&natural_to_rug_integer(&y)));
+    });
+
+    natural_gen().test_properties(|n| {
+        assert!(n.divisible_by(Natural::ONE));
+    });
+
+    natural_gen_var_2().test_properties(|n| {
+        assert!(!(&n).divisible_by(Natural::ZERO));
+        assert!(Natural::ZERO.divisible_by(&n));
+        if n > 1 {
+            assert!(!Natural::ONE.divisible_by(&n));
+        }
+        assert!((&n).divisible_by(&n));
+    });
+
+    unsigned_pair_gen_var_27::<Limb>().test_properties(|(x, y)| {
+        assert_eq!(
+            Natural::from(x).divisible_by(Natural::from(y)),
+            x.divisible_by(y)
+        );
+    });
 }

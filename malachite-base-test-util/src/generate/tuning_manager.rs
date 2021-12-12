@@ -44,7 +44,7 @@ const FN_PREFIXES: [&str; 6] =
 const ALLOWED_DOUBLE_NAMES: [&str; 3] = ["limbs_mod_limb", "oz_fmt", "fail_on_untested_path"];
 
 #[derive(Clone, Debug, Eq, PartialEq, Hash, Ord, PartialOrd)]
-pub struct FunctionRecord {
+struct FunctionRecord {
     name: String,
     file_path: String,
     line_number: usize,

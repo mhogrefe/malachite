@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::xx_add_yy_is_zz::_explicit_xx_add_yy_is_zz;
+use malachite_base::num::arithmetic::xx_add_yy_is_zz::explicit_xx_add_yy_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::bucketers::quadruple_max_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -53,7 +53,7 @@ fn benchmark_xx_add_yy_is_zz_algorithms<T: PrimitiveUnsigned>(
                 no_out!(T::xx_add_yy_is_zz(x_1, x_0, y_1, y_0))
             }),
             ("explicit", &mut |(x_1, x_0, y_1, y_0)| {
-                no_out!(_explicit_xx_add_yy_is_zz(x_1, x_0, y_1, y_0))
+                no_out!(explicit_xx_add_yy_is_zz(x_1, x_0, y_1, y_0))
             }),
         ],
     );

@@ -562,7 +562,7 @@ fn irregular_iterator<T: PrimitiveUnsigned>(
     })
 }
 
-fn _power_of_2_digits<T: PrimitiveUnsigned>(
+fn power_of_2_digits<T: PrimitiveUnsigned>(
     x: &Natural,
     log_base: u64,
 ) -> NaturalPowerOf2DigitPrimitiveIterator<T>
@@ -665,7 +665,7 @@ macro_rules! iterables {
                 self,
                 log_base: u64,
             ) -> NaturalPowerOf2DigitPrimitiveIterator<'a, $t> {
-                _power_of_2_digits(self, log_base)
+                power_of_2_digits(self, log_base)
             }
         }
     };

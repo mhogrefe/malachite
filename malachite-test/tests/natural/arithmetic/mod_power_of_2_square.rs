@@ -6,9 +6,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
-    _limbs_square_low_basecase, _limbs_square_low_divide_and_conquer,
-    _limbs_square_low_scratch_len, limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref,
-    limbs_square_low,
+    limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref, limbs_square_low,
+    limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -40,12 +39,12 @@ fn limbs_square_low_basecase_properties() {
     test_properties(pairs_of_unsigned_vec_var_26, |&(ref out, ref xs)| {
         let out_old = out;
         let mut out = out_old.clone();
-        _limbs_square_low_basecase(&mut out, xs);
+        limbs_square_low_basecase(&mut out, xs);
         verify_limbs_square_low(out_old, xs, &out);
         let expected_out = out;
 
         let mut out = out_old.clone();
-        _limbs_square_low_basecase_unrestricted(&mut out, xs);
+        limbs_square_low_basecase_unrestricted(&mut out, xs);
         assert_eq!(out, expected_out);
     });
 }
@@ -55,8 +54,8 @@ fn limbs_square_low_divide_and_conquer_properties() {
     test_properties(pairs_of_unsigned_vec_var_27, |&(ref out, ref xs)| {
         let out_old = out;
         let mut out = out_old.clone();
-        let mut scratch = vec![0; _limbs_square_low_scratch_len(xs.len())];
-        _limbs_square_low_divide_and_conquer(&mut out, xs, &mut scratch);
+        let mut scratch = vec![0; limbs_square_low_scratch_len(xs.len())];
+        limbs_square_low_divide_and_conquer(&mut out, xs, &mut scratch);
         verify_limbs_square_low(out_old, xs, &out);
     });
 }

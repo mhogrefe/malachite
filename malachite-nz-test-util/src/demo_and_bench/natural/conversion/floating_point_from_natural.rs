@@ -130,6 +130,7 @@ fn benchmark_float_rounding_from_natural<
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_float_from_natural<T: for<'a> From<&'a Natural> + PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,

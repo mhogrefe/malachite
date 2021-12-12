@@ -292,9 +292,7 @@ fn mod_power_of_2_properties() {
         assert_eq!(n & Integer::low_mask(u), result);
     });
 
-    integer_integer_unsigned_triple_gen_var_1().test_properties(|(x, y, u)| {
-        let x = &x;
-        let y = &y;
+    integer_integer_unsigned_triple_gen_var_1().test_properties(|(ref x, ref y, u)| {
         let xm = Integer::from(x.mod_power_of_2(u));
         let ym = Integer::from(y.mod_power_of_2(u));
         assert_eq!((x + y).mod_power_of_2(u), (&xm + &ym).mod_power_of_2(u));
@@ -425,9 +423,7 @@ fn ceiling_mod_power_of_2_properties() {
         assert_eq!((-n).mod_power_of_2(u), -result);
     });
 
-    integer_integer_unsigned_triple_gen_var_1().test_properties(|(x, y, u)| {
-        let x = &x;
-        let y = &y;
+    integer_integer_unsigned_triple_gen_var_1().test_properties(|(ref x, ref y, u)| {
         let xm = Integer::from(x.mod_power_of_2(u));
         let ym = Integer::from(y.mod_power_of_2(u));
         assert_eq!(

@@ -1,21 +1,16 @@
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::arithmetic::traits::{
     DivExact, DivExactAssign, DivRound, EqModPowerOf2, ModPowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_base::num::basic::traits::One;
-use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_nz::integer::Integer;
-use malachite_nz::natural::arithmetic::div_exact::{
-    self, limbs_modular_div_mod_barrett, limbs_modular_div_mod_barrett_scratch_len,
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_gen_var_22, unsigned_pair_gen_var_11, unsigned_vec_pair_gen_var_12,
 };
-#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::div_exact::{
     limbs_div_exact, limbs_div_exact_3, limbs_div_exact_3_in_place, limbs_div_exact_3_to_out,
     limbs_div_exact_limb, limbs_div_exact_limb_in_place,
@@ -23,21 +18,30 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_div_exact_limb_to_out, limbs_div_exact_limb_to_out_no_special_3, limbs_div_exact_to_out,
     limbs_div_exact_to_out_ref_ref, limbs_div_exact_to_out_ref_val, limbs_div_exact_to_out_val_ref,
     limbs_modular_div, limbs_modular_div_barrett, limbs_modular_div_barrett_scratch_len,
-    limbs_modular_div_divide_and_conquer, limbs_modular_div_mod_divide_and_conquer,
+    limbs_modular_div_divide_and_conquer, limbs_modular_div_mod_barrett,
+    limbs_modular_div_mod_barrett_scratch_len, limbs_modular_div_mod_divide_and_conquer,
     limbs_modular_div_mod_schoolbook, limbs_modular_div_ref, limbs_modular_div_ref_scratch_len,
     limbs_modular_div_schoolbook, limbs_modular_div_scratch_len, limbs_modular_invert,
-    limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+    limbs_modular_invert_limb, limbs_modular_invert_scratch_len, test_invert_limb_table,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-#[cfg(feature = "32_bit_limbs")]
+use malachite_nz_test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
+use malachite_nz_test_util::generators::{
+    large_type_gen_var_13, large_type_gen_var_14, large_type_gen_var_15, large_type_gen_var_16,
+    natural_gen, natural_gen_var_2, natural_pair_gen_var_6, unsigned_vec_gen_var_5,
+    unsigned_vec_pair_gen_var_13, unsigned_vec_quadruple_gen_var_2, unsigned_vec_triple_gen_var_46,
+    unsigned_vec_triple_gen_var_47, unsigned_vec_triple_gen_var_48,
+    unsigned_vec_unsigned_pair_gen_var_24, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14,
+};
 use malachite_nz_test_util::natural::arithmetic::div_exact::{
     limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
 };
+use std::str::FromStr;
 
 #[test]
 fn test_test_invert_limb_table() {
-    div_exact::test_invert_limb_table();
+    test_invert_limb_table();
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -280,7 +284,6 @@ fn limbs_div_exact_3_to_out_fail_2() {
     limbs_div_exact_3_to_out(&mut [10], &[10, 10]);
 }
 
-#[cfg(feature = "32_bit_limbs")]
 fn verify_limbs_modular_invert(ds: &[Limb], is: &[Limb]) {
     let d = Natural::from_limbs_asc(ds);
     let i = Natural::from_limbs_asc(is);
@@ -9192,7 +9195,6 @@ fn limbs_modular_div_mod_barrett_fail_5() {
     limbs_modular_div_mod_barrett(&mut [10; 3], &mut [10; 3], ns, ds, &mut scratch);
 }
 
-#[cfg(feature = "32_bit_limbs")]
 fn verify_limbs_modular_div(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
     let n = Natural::from_limbs_asc(ns);
     let d = Natural::from_limbs_asc(ds);
@@ -11205,7 +11207,6 @@ fn limbs_modular_div_ref_fail_5() {
     limbs_modular_div_ref(&mut [10; 3], ns, ds, &mut scratch);
 }
 
-#[cfg(feature = "32_bit_limbs")]
 fn verify_limbs_div_exact(ns: &[Limb], ds: &[Limb], qs: &[Limb]) {
     let n = Natural::from_limbs_asc(ns);
     let d = Natural::from_limbs_asc(ds);
@@ -11542,4 +11543,358 @@ fn div_exact_ref_val_fail() {
 #[should_panic]
 fn div_exact_ref_ref_fail() {
     (&Natural::from(10u32)).div_exact(&Natural::ZERO);
+}
+
+#[test]
+fn limbs_modular_invert_limb_properties() {
+    unsigned_gen_var_22().test_properties(|x| {
+        let inverse = limbs_modular_invert_limb(x);
+        assert_eq!(x.wrapping_mul(inverse), 1);
+        assert_eq!(limbs_modular_invert_limb(inverse), x);
+    });
+}
+
+#[test]
+fn limbs_div_exact_limb_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_24().test_properties_with_config(&config, |(xs, y)| {
+        let expected_result = Natural::from_limbs_asc(&xs).div_exact(Natural::from(y));
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_div_exact_limb(&xs, y)),
+            expected_result
+        );
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_div_exact_limb_no_special_3(&xs, y)),
+            expected_result
+        );
+    });
+}
+
+#[test]
+fn limbs_div_exact_limb_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14().test_properties_with_config(
+        &config,
+        |(mut out, xs, y)| {
+            let old_out = out.clone();
+            limbs_div_exact_limb_to_out(&mut out, &xs, y);
+            let len = xs.len();
+            let expected_result = Natural::from_limbs_asc(&xs).div_exact(Natural::from(y));
+            assert_eq!(Natural::from_limbs_asc(&out[..len]), expected_result);
+            assert_eq!(&out[len..], &old_out[len..]);
+
+            let mut out = old_out.to_vec();
+            limbs_div_exact_limb_to_out_no_special_3(&mut out, &xs, y);
+            let len = xs.len();
+            let expected_result = Natural::from_owned_limbs_asc(xs).div_exact(Natural::from(y));
+            assert_eq!(Natural::from_limbs_asc(&out[..len]), expected_result);
+            assert_eq!(&out[len..], &old_out[len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_exact_limb_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_24().test_properties_with_config(&config, |(mut xs, y)| {
+        let old_xs = xs.clone();
+        limbs_div_exact_limb_in_place(&mut xs, y);
+        let expected_result = Natural::from_limbs_asc(&old_xs).div_exact(Natural::from(y));
+        assert_eq!(Natural::from_owned_limbs_asc(xs), expected_result);
+
+        let mut xs = old_xs.to_vec();
+        limbs_div_exact_limb_in_place_no_special_3(&mut xs, y);
+        let expected_result = Natural::from_owned_limbs_asc(old_xs).div_exact(Natural::from(y));
+        assert_eq!(Natural::from_owned_limbs_asc(xs), expected_result);
+    });
+}
+
+#[test]
+fn limbs_div_exact_3_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_5().test_properties_with_config(&config, |xs| {
+        let q_limbs = Natural::from_owned_limbs_asc(limbs_div_exact_3(&xs));
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_div_exact_limb(&xs, 3)),
+            q_limbs,
+        );
+        assert_eq!(
+            Natural::from_owned_limbs_asc(xs).div_exact(Natural::from(3u32)),
+            q_limbs
+        );
+    });
+}
+
+#[test]
+fn limbs_div_exact_3_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_13().test_properties_with_config(&config, |(mut out, xs)| {
+        let old_out = out.clone();
+        limbs_div_exact_3_to_out(&mut out, &xs);
+        let len = xs.len();
+        assert_eq!(
+            Natural::from_limbs_asc(&out[..len]),
+            Natural::from_limbs_asc(&xs).div_exact(Natural::from(3u32))
+        );
+        assert_eq!(&out[len..], &old_out[len..]);
+
+        let mut out_alt = old_out.clone();
+        limbs_div_exact_limb_to_out(&mut out_alt, &xs, 3);
+        assert_eq!(out_alt, out);
+
+        let mut out_alt = old_out;
+        limbs_div_exact_3_to_out_alt(&mut out_alt, &xs);
+        assert_eq!(out_alt, out);
+    });
+}
+
+#[test]
+fn limbs_div_exact_3_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_5().test_properties_with_config(&config, |mut xs| {
+        let old_xs = xs.clone();
+        limbs_div_exact_3_in_place(&mut xs);
+        assert_eq!(
+            Natural::from_limbs_asc(&xs),
+            Natural::from_limbs_asc(&old_xs).div_exact(Natural::from(3u32))
+        );
+
+        let mut xs_alt = old_xs.to_vec();
+        limbs_div_exact_limb_in_place(&mut xs_alt, 3);
+        assert_eq!(xs_alt, xs);
+
+        let mut xs_alt = old_xs.to_vec();
+        limbs_div_exact_3_in_place_alt(&mut xs_alt);
+        assert_eq!(xs_alt, xs);
+    });
+}
+
+#[test]
+fn limbs_modular_invert_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_12().test_properties_with_config(&config, |(mut is, ds)| {
+        let n = ds.len();
+        let mut scratch = vec![0; limbs_modular_invert_scratch_len(n)];
+        limbs_modular_invert(&mut is, &ds, &mut scratch);
+        verify_limbs_modular_invert(&ds, &is[..n]);
+    });
+}
+
+#[test]
+fn limbs_modular_div_mod_schoolbook_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    large_type_gen_var_14().test_properties_with_config(
+        &config,
+        |(mut qs, mut ns, ds, inverse)| {
+            let ns_old = ns.clone();
+            let borrow = limbs_modular_div_mod_schoolbook(&mut qs, &mut ns, &ds, inverse);
+            let q_len = ns.len() - ds.len();
+            verify_limbs_modular_div_mod(&ns_old, &ds, borrow, &qs[..q_len], &ns[q_len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_modular_div_mod_divide_and_conquer_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 128);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    large_type_gen_var_15().test_properties_with_config(
+        &config,
+        |(mut qs, mut ns, ds, inverse)| {
+            let ns_old = ns.clone();
+            let borrow = limbs_modular_div_mod_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
+            let q_len = ns.len() - ds.len();
+            verify_limbs_modular_div_mod(&ns_old, &ds, borrow, &qs[..q_len], &ns[q_len..]);
+        },
+    );
+}
+
+#[test]
+fn limbs_modular_div_mod_barrett_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    unsigned_vec_quadruple_gen_var_2().test_properties_with_config(
+        &config,
+        |(mut qs, mut rs, ns, ds)| {
+            let mut scratch =
+                vec![0; limbs_modular_div_mod_barrett_scratch_len(ns.len(), ds.len())];
+            let borrow = limbs_modular_div_mod_barrett(&mut qs, &mut rs, &ns, &ds, &mut scratch);
+            let q_len = ns.len() - ds.len();
+            verify_limbs_modular_div_mod(&ns, &ds, borrow, &qs[..q_len], &rs[..ds.len()]);
+        },
+    );
+}
+
+#[test]
+fn limbs_modular_div_schoolbook_properties() {
+    large_type_gen_var_13().test_properties(|(mut qs, mut ns, ds, inverse)| {
+        let ns_old = ns.clone();
+        limbs_modular_div_schoolbook(&mut qs, &mut ns, &ds, inverse);
+        verify_limbs_modular_div(&ns_old, &ds, &qs);
+    });
+}
+
+#[test]
+fn limbs_modular_div_divide_and_conquer_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    large_type_gen_var_16().test_properties_with_config(
+        &config,
+        |(mut qs, mut ns, ds, inverse)| {
+            let ns_old = ns.clone();
+            limbs_modular_div_divide_and_conquer(&mut qs, &mut ns, &ds, inverse);
+            verify_limbs_modular_div(&ns_old, &ds, &qs);
+        },
+    );
+}
+
+#[test]
+fn limbs_modular_div_barrett_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_46().test_properties_with_config(&config, |(mut qs, ns, ds)| {
+        let mut scratch = vec![0; limbs_modular_div_barrett_scratch_len(ns.len(), ds.len())];
+        limbs_modular_div_barrett(&mut qs, &ns, &ds, &mut scratch);
+        verify_limbs_modular_div(&ns, &ds, &qs[..ns.len()]);
+    });
+}
+
+#[test]
+fn limbs_modular_div_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_47().test_properties_with_config(
+        &config,
+        |(mut qs, mut ns, ds)| {
+            let qs_old = qs.clone();
+            let ns_old = ns.clone();
+            let mut scratch = vec![0; limbs_modular_div_scratch_len(ns.len(), ds.len())];
+            limbs_modular_div(&mut qs, &mut ns, &ds, &mut scratch);
+            let result = qs;
+
+            let mut qs = qs_old.to_vec();
+            let ns = ns_old;
+            let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(ns.len(), ds.len())];
+            limbs_modular_div_ref(&mut qs, &ns, &ds, &mut scratch);
+            assert_eq!(qs, result);
+
+            verify_limbs_modular_div(&ns, &ds, &qs[..ns.len()]);
+        },
+    );
+}
+
+#[test]
+fn limbs_div_exact_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 512);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_48().test_properties_with_config(
+        &config,
+        |(mut qs, mut ns, mut ds)| {
+            let qs_old = qs.clone();
+            let ns_old = ns.clone();
+            let ds_old = ds.clone();
+            limbs_div_exact_to_out(&mut qs, &mut ns, &mut ds);
+            let result = qs;
+
+            let mut qs = qs_old.to_vec();
+            let mut ns = ns_old.to_vec();
+            let mut ds = ds_old.to_vec();
+            limbs_div_exact_to_out_val_ref(&mut qs, &mut ns, &ds);
+            assert_eq!(qs, result);
+
+            let mut qs = qs_old.to_vec();
+            let ns = ns_old;
+            limbs_div_exact_to_out_ref_val(&mut qs, &ns, &mut ds);
+            assert_eq!(qs, result);
+
+            let mut qs = qs_old.to_vec();
+            let ds = ds_old;
+            limbs_div_exact_to_out_ref_ref(&mut qs, &ns, &ds);
+            assert_eq!(qs, result);
+
+            let q_len = ns.len() - ds.len() + 1;
+            let qs = limbs_div_exact(&ns, &ds);
+            assert_eq!(qs, &result[..q_len]);
+
+            verify_limbs_div_exact(&ns, &ds, &qs[..q_len]);
+        },
+    );
+}
+
+#[test]
+fn div_exact_properties() {
+    natural_pair_gen_var_6().test_properties(|(x, y)| {
+        let mut mut_x = x.clone();
+        mut_x.div_exact_assign(&y);
+        assert!(mut_x.is_valid());
+        let q = mut_x;
+
+        let mut mut_x = x.clone();
+        mut_x.div_exact_assign(y.clone());
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, q);
+
+        let q_alt = (&x).div_exact(&y);
+        assert!(q_alt.is_valid());
+        assert_eq!(q_alt, q);
+
+        let q_alt = (&x).div_exact(y.clone());
+        assert!(q_alt.is_valid());
+        assert_eq!(q_alt, q);
+
+        let q_alt = x.clone().div_exact(&y);
+        assert!(q_alt.is_valid());
+        assert_eq!(q_alt, q);
+
+        let q_alt = x.clone().div_exact(y.clone());
+        assert!(q_alt.is_valid());
+        assert_eq!(q_alt, q);
+
+        let q_alt = (&x).div_round(&y, RoundingMode::Exact);
+        assert_eq!(q_alt, q);
+
+        assert_eq!(
+            rug_integer_to_natural(
+                &natural_to_rug_integer(&x).div_exact(&natural_to_rug_integer(&y))
+            ),
+            q
+        );
+
+        assert_eq!(q * y, x);
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!((&n).div_exact(Natural::ONE), n);
+    });
+
+    natural_gen_var_2().test_properties(|n| {
+        assert_eq!(Natural::ZERO.div_exact(&n), 0);
+        assert_eq!((&n).div_exact(&n), 1);
+    });
+
+    unsigned_pair_gen_var_11::<Limb>().test_properties(|(x, y)| {
+        assert_eq!(Natural::from(x).div_exact(Natural::from(y)), x.div_exact(y));
+    });
 }

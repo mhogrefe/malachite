@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::gcd::{_gcd_binary, _gcd_euclidean, _gcd_fast_a, _gcd_fast_b};
+use malachite_base::num::arithmetic::gcd::{gcd_binary, gcd_euclidean, gcd_fast_a, gcd_fast_b};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_27, unsigned_triple_gen_var_19,
@@ -30,10 +30,10 @@ fn test_gcd() {
 fn gcd_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         let gcd = x.gcd(y);
-        assert_eq!(_gcd_euclidean(x, y), gcd);
-        assert_eq!(_gcd_binary(x, y), gcd);
-        assert_eq!(_gcd_fast_a(x, y), gcd);
-        assert_eq!(_gcd_fast_b(x, y), gcd);
+        assert_eq!(gcd_euclidean(x, y), gcd);
+        assert_eq!(gcd_binary(x, y), gcd);
+        assert_eq!(gcd_fast_a(x, y), gcd);
+        assert_eq!(gcd_fast_b(x, y), gcd);
 
         let mut x_mut = x;
         x_mut.gcd_assign(y);

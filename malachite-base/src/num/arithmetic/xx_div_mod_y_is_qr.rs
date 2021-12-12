@@ -6,7 +6,7 @@ use num::conversion::traits::WrappingFrom;
 use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use num::logic::traits::LeadingZeros;
 
-fn _implicit_xx_div_mod_y_is_qr<
+fn implicit_xx_div_mod_y_is_qr<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -20,7 +20,7 @@ fn _implicit_xx_div_mod_y_is_qr<
 }
 
 /// This is udiv_qrnnd_int from longlong.h, FLINT 2.7.1, where (q, r) is returned.
-fn _explicit_xx_div_mod_y_is_qr_normalized<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: T) -> (T, T) {
+fn explicit_xx_div_mod_y_is_qr_normalized<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: T) -> (T, T) {
     let (d_1, d_0) = wide_split_in_half(y);
     let (x_0_1, x_0_0) = wide_split_in_half(x_0);
     let mut q_1 = x_1 / d_1;
@@ -51,13 +51,13 @@ fn _explicit_xx_div_mod_y_is_qr_normalized<T: PrimitiveUnsigned>(x_1: T, x_0: T,
 }
 
 /// This is udiv_qrnnd from longlong.h, FLINT 2.7.1, where (q, r) is returned.
-pub fn _explicit_xx_div_mod_y_is_qr<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: T) -> (T, T) {
+pub fn explicit_xx_div_mod_y_is_qr<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: T) -> (T, T) {
     assert!(x_1 < y);
     let shift = LeadingZeros::leading_zeros(y);
     if shift == 0 {
-        _explicit_xx_div_mod_y_is_qr_normalized(x_1, x_0, y)
+        explicit_xx_div_mod_y_is_qr_normalized(x_1, x_0, y)
     } else {
-        let (q, r) = _explicit_xx_div_mod_y_is_qr_normalized(
+        let (q, r) = explicit_xx_div_mod_y_is_qr_normalized(
             x_1 << shift | (x_0 >> (T::WIDTH - shift)),
             x_0 << shift,
             y << shift,
@@ -95,7 +95,7 @@ macro_rules! implicit_xx_div_mod_is_qr {
             /// This is udiv_qrnnd from longlong.h, FLINT 2.7.1, where  (q, r) is returned.
             #[inline]
             fn xx_div_mod_y_is_qr(x_1: $t, x_0: $t, y: $t) -> ($t, $t) {
-                _implicit_xx_div_mod_y_is_qr::<$t, $dt>(x_1, x_0, y)
+                implicit_xx_div_mod_y_is_qr::<$t, $dt>(x_1, x_0, y)
             }
         }
     };
@@ -177,6 +177,6 @@ impl XXDivModYIsQR for u128 {
     /// This is udiv_qrnnd from longlong.h, FLINT 2.7.1, where (q, r) is returned.
     #[inline]
     fn xx_div_mod_y_is_qr(x_1: u128, x_0: u128, y: u128) -> (u128, u128) {
-        _explicit_xx_div_mod_y_is_qr(x_1, x_0, y)
+        explicit_xx_div_mod_y_is_qr(x_1, x_0, y)
     }
 }

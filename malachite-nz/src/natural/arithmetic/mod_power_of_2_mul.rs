@@ -46,6 +46,7 @@ use platform::{DoubleLimb, Limb};
 ///     &[10200, 20402, 30605, 20402, 10200, 0]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
     if std::ptr::eq(xs.as_slice(), ys.as_slice()) {
         return limbs_mod_power_of_2_square(xs, pow);
@@ -108,6 +109,7 @@ pub fn limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64
 ///     &[10200, 20402, 30605, 20402, 10200, 0]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) -> Vec<Limb> {
     if std::ptr::eq(xs.as_slice(), ys) {
         return limbs_mod_power_of_2_square(xs, pow);
@@ -174,6 +176,7 @@ pub fn limbs_mod_power_of_2_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: u6
 ///     &[10200, 20402, 30605, 20402, 10200, 0]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     if std::ptr::eq(xs, ys) {
         return limbs_mod_power_of_2_square_ref(xs, pow);

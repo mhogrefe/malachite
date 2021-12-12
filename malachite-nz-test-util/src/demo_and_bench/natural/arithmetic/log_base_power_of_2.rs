@@ -8,10 +8,11 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen_var_13;
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::log_base_power_of_2::{
-    ceiling_log_base_power_of_2_naive_nz, limbs_ceiling_log_base_power_of_2,
-    limbs_checked_log_base_power_of_2, limbs_floor_log_base_power_of_2,
+    limbs_ceiling_log_base_power_of_2, limbs_checked_log_base_power_of_2,
+    limbs_floor_log_base_power_of_2,
 };
 use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_8;
+use malachite_nz_test_util::natural::arithmetic::log_base_power_of_2::*;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_floor_log_base_power_of_2);

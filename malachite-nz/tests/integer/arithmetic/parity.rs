@@ -49,8 +49,7 @@ fn test_odd() {
 
 #[test]
 fn even_properties() {
-    integer_gen().test_properties(|x| {
-        let x = &x;
+    integer_gen().test_properties(|ref x| {
         let even = x.even();
         assert_eq!(!x.odd(), even);
         assert_eq!(x.divisible_by(Integer::TWO), even);
@@ -66,8 +65,7 @@ fn even_properties() {
 
 #[test]
 fn odd_properties() {
-    integer_gen().test_properties(|x| {
-        let x = &x;
+    integer_gen().test_properties(|ref x| {
         let odd = x.odd();
         assert_eq!(!x.even(), odd);
         assert_eq!(!x.divisible_by(Integer::TWO), odd);

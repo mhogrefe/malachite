@@ -1,6 +1,6 @@
 use num::arithmetic::traits::{ModSub, ModSubAssign, WrappingAdd, WrappingSub};
 
-fn _mod_sub<T: Copy + Ord + WrappingAdd<T, Output = T> + WrappingSub<T, Output = T>>(
+fn mod_sub<T: Copy + Ord + WrappingAdd<T, Output = T> + WrappingSub<T, Output = T>>(
     x: T,
     other: T,
     m: T,
@@ -31,7 +31,7 @@ macro_rules! impl_mod_sub {
             /// This is nmod_sub from nmod_vec.h, FLINT 2.7.1.
             #[inline]
             fn mod_sub(self, other: $t, m: $t) -> $t {
-                _mod_sub(self, other, m)
+                mod_sub(self, other, m)
             }
         }
 

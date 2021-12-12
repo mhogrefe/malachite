@@ -1,11 +1,11 @@
 use malachite_base::num::arithmetic::root::{
-    _cbrt_chebyshev_approx_u32, _cbrt_chebyshev_approx_u64, _fast_ceiling_root_u32,
-    _fast_ceiling_root_u64, _fast_checked_root_u32, _fast_checked_root_u64, _fast_floor_cbrt_u32,
-    _fast_floor_cbrt_u64, _fast_floor_root_u32, _fast_floor_root_u64, _fast_root_rem_u32,
-    _fast_root_rem_u64, _floor_root_approx_and_refine,
+    cbrt_chebyshev_approx_u32, cbrt_chebyshev_approx_u64, fast_ceiling_root_u32,
+    fast_ceiling_root_u64, fast_checked_root_u32, fast_checked_root_u64, fast_floor_cbrt_u32,
+    fast_floor_cbrt_u64, fast_floor_root_u32, fast_floor_root_u64, fast_root_rem_u32,
+    fast_root_rem_u64, floor_root_approx_and_refine,
 };
 use malachite_base::num::arithmetic::root::{
-    _ceiling_root_binary, _checked_root_binary, _floor_root_binary, _root_rem_binary,
+    ceiling_root_binary, checked_root_binary, floor_root_binary, root_rem_binary,
 };
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CheckedRoot, FloorRoot, Parity, RootRem,
@@ -23,7 +23,7 @@ use std::panic::catch_unwind;
 fn test_floor_root() {
     fn test_u<T: PrimitiveUnsigned>(n: T, exp: u64, out: T) {
         assert_eq!(n.floor_root(exp), out);
-        assert_eq!(_floor_root_binary(n, exp), out);
+        assert_eq!(floor_root_binary(n, exp), out);
 
         let mut n = n;
         n.floor_root_assign(exp);
@@ -135,7 +135,7 @@ pub fn floor_root_fail() {
 fn test_ceiling_root() {
     fn test_u<T: PrimitiveUnsigned>(n: T, exp: u64, out: T) {
         assert_eq!(n.ceiling_root(exp), out);
-        assert_eq!(_ceiling_root_binary(n, exp), out);
+        assert_eq!(ceiling_root_binary(n, exp), out);
 
         let mut n = n;
         n.ceiling_root_assign(exp);
@@ -246,7 +246,7 @@ pub fn ceiling_root_fail() {
 fn test_checked_root() {
     fn test_u<T: PrimitiveUnsigned>(n: T, exp: u64, out: Option<T>) {
         assert_eq!(n.checked_root(exp), out);
-        assert_eq!(_checked_root_binary(n, exp), out);
+        assert_eq!(checked_root_binary(n, exp), out);
     }
     test_u::<u8>(0, 1, Some(0));
     test_u::<u8>(1, 1, Some(1));
@@ -349,7 +349,7 @@ pub fn checked_root_fail() {
 fn test_root_rem() {
     fn test<T: PrimitiveUnsigned>(n: T, exp: u64, out_root: T, out_rem: T) {
         assert_eq!(n.root_rem(exp), (out_root, out_rem));
-        assert_eq!(_root_rem_binary(n, exp), (out_root, out_rem));
+        assert_eq!(root_rem_binary(n, exp), (out_root, out_rem));
 
         let mut n = n;
         assert_eq!(n.root_assign_rem(exp), out_rem);
@@ -401,7 +401,7 @@ fn floor_root_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         n_alt.floor_root_assign(exp);
         assert_eq!(n_alt, root);
-        assert_eq!(_floor_root_binary(n, exp), root);
+        assert_eq!(floor_root_binary(n, exp), root);
         let pow = root.pow(exp);
         let ceiling_root = n.ceiling_root(exp);
         if pow == n {
@@ -425,7 +425,7 @@ fn floor_root_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         n_alt.floor_root_assign(3);
         assert_eq!(n_alt, cbrt);
-        assert_eq!(_floor_root_binary(n, 3), cbrt);
+        assert_eq!(floor_root_binary(n, 3), cbrt);
         let cube = cbrt.pow(3);
         let ceiling_cbrt = n.ceiling_root(3);
         if cube == n {
@@ -491,14 +491,14 @@ macro_rules! floor_root_approx_and_refine_helper {
     ($t:ty) => {
         unsigned_pair_gen_var_32::<$t, u64>().test_properties(|(n, exp)| {
             assert_eq!(
-                _floor_root_approx_and_refine(|x| x as f64, |f| f as $t, n, exp),
+                floor_root_approx_and_refine(|x| x as f64, |f| f as $t, n, exp),
                 n.floor_root(exp),
             );
         });
 
         unsigned_gen::<$t>().test_properties(|n| {
             assert_eq!(
-                _floor_root_approx_and_refine(|x| x as f64, |f| f as $t, n, 3),
+                floor_root_approx_and_refine(|x| x as f64, |f| f as $t, n, 3),
                 n.floor_root(3),
             );
         });
@@ -511,21 +511,21 @@ fn floor_root_properties() {
     apply_fn_to_signeds!(floor_root_properties_helper_signed);
 
     unsigned_gen_var_1::<u32>().test_properties(|n| {
-        assert_eq!(_cbrt_chebyshev_approx_u32(n), n.floor_root(3));
-        assert_eq!(_fast_floor_cbrt_u32(n), n.floor_root(3));
+        assert_eq!(cbrt_chebyshev_approx_u32(n), n.floor_root(3));
+        assert_eq!(fast_floor_cbrt_u32(n), n.floor_root(3));
     });
 
     unsigned_gen_var_1::<u64>().test_properties(|n| {
-        assert_eq!(_cbrt_chebyshev_approx_u64(n), n.floor_root(3));
-        assert_eq!(_fast_floor_cbrt_u64(n), n.floor_root(3));
+        assert_eq!(cbrt_chebyshev_approx_u64(n), n.floor_root(3));
+        assert_eq!(fast_floor_cbrt_u64(n), n.floor_root(3));
     });
 
     unsigned_pair_gen_var_32::<u32, u64>().test_properties(|(n, exp)| {
-        assert_eq!(_fast_floor_root_u32(n, exp), n.floor_root(exp));
+        assert_eq!(fast_floor_root_u32(n, exp), n.floor_root(exp));
     });
 
     unsigned_pair_gen_var_32::<u64, u64>().test_properties(|(n, exp)| {
-        assert_eq!(_fast_floor_root_u64(n, exp), n.floor_root(exp));
+        assert_eq!(fast_floor_root_u64(n, exp), n.floor_root(exp));
     });
 
     apply_to_unsigneds!(floor_root_approx_and_refine_helper);
@@ -537,7 +537,7 @@ fn ceiling_root_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         n_alt.ceiling_root_assign(exp);
         assert_eq!(n_alt, root);
-        assert_eq!(_ceiling_root_binary(n, exp), root);
+        assert_eq!(ceiling_root_binary(n, exp), root);
         if let Some(pow) = root.checked_pow(exp) {
             let floor_root = n.floor_root(exp);
             if pow == n {
@@ -560,7 +560,7 @@ fn ceiling_root_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         n_alt.ceiling_root_assign(3);
         assert_eq!(n_alt, cbrt);
-        assert_eq!(_ceiling_root_binary(n, 3), cbrt);
+        assert_eq!(ceiling_root_binary(n, 3), cbrt);
         if let Some(cube) = cbrt.checked_pow(3) {
             let floor_cbrt = n.floor_root(3);
             if cube == n {
@@ -628,18 +628,18 @@ fn ceiling_root_properties() {
     apply_fn_to_signeds!(ceiling_root_properties_helper_signed);
 
     unsigned_pair_gen_var_32::<u32, u64>().test_properties(|(n, exp)| {
-        assert_eq!(_fast_ceiling_root_u32(n, exp), n.ceiling_root(exp));
+        assert_eq!(fast_ceiling_root_u32(n, exp), n.ceiling_root(exp));
     });
 
     unsigned_pair_gen_var_32::<u64, u64>().test_properties(|(n, exp)| {
-        assert_eq!(_fast_ceiling_root_u64(n, exp), n.ceiling_root(exp));
+        assert_eq!(fast_ceiling_root_u64(n, exp), n.ceiling_root(exp));
     });
 }
 
 fn checked_root_properties_helper_unsigned<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_32::<T, u64>().test_properties(|(n, exp)| {
         let root = n.checked_root(exp);
-        assert_eq!(_checked_root_binary(n, exp), root);
+        assert_eq!(checked_root_binary(n, exp), root);
         if let Some(root) = root {
             assert_eq!(root.pow(exp), n);
             assert_eq!(n.floor_root(exp), root);
@@ -652,7 +652,7 @@ fn checked_root_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert_eq!(n.checked_root(1), Some(n));
 
         let cbrt = n.checked_root(3);
-        assert_eq!(_checked_root_binary(n, 3), cbrt);
+        assert_eq!(checked_root_binary(n, 3), cbrt);
         if let Some(cbrt) = cbrt {
             assert_eq!(cbrt.pow(3), n);
             assert_eq!(n.floor_root(3), cbrt);
@@ -699,11 +699,11 @@ fn checked_root_properties() {
     apply_fn_to_signeds!(checked_root_properties_helper_signed);
 
     unsigned_pair_gen_var_32::<u32, u64>().test_properties(|(n, exp)| {
-        assert_eq!(_fast_checked_root_u32(n, exp), n.checked_root(exp));
+        assert_eq!(fast_checked_root_u32(n, exp), n.checked_root(exp));
     });
 
     unsigned_pair_gen_var_32::<u64, u64>().test_properties(|(n, exp)| {
-        assert_eq!(_fast_checked_root_u64(n, exp), n.checked_root(exp));
+        assert_eq!(fast_checked_root_u64(n, exp), n.checked_root(exp));
     });
 }
 
@@ -713,7 +713,7 @@ fn root_rem_properties_helper<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         assert_eq!(n_alt.root_assign_rem(exp), rem);
         assert_eq!(n_alt, root);
-        assert_eq!(_root_rem_binary(n, exp), (root, rem));
+        assert_eq!(root_rem_binary(n, exp), (root, rem));
         assert_eq!(n.floor_root(exp), root);
         assert_eq!(root.pow(exp) + rem, n);
     });
@@ -726,7 +726,7 @@ fn root_rem_properties_helper<T: PrimitiveUnsigned>() {
         let mut n_alt = n;
         assert_eq!(n_alt.root_assign_rem(3), rem);
         assert_eq!(n_alt, cbrt);
-        assert_eq!(_root_rem_binary(n, 3), (cbrt, rem));
+        assert_eq!(root_rem_binary(n, 3), (cbrt, rem));
         assert_eq!(n.floor_root(3), cbrt);
         assert_eq!(cbrt.pow(3) + rem, n);
     });
@@ -737,10 +737,10 @@ fn root_rem_properties() {
     apply_fn_to_unsigneds!(root_rem_properties_helper);
 
     unsigned_pair_gen_var_32::<u32, u64>().test_properties(|(n, exp)| {
-        assert_eq!(_fast_root_rem_u32(n, exp), n.root_rem(exp));
+        assert_eq!(fast_root_rem_u32(n, exp), n.root_rem(exp));
     });
 
     unsigned_pair_gen_var_32::<u64, u64>().test_properties(|(n, exp)| {
-        assert_eq!(_fast_root_rem_u64(n, exp), n.root_rem(exp));
+        assert_eq!(fast_root_rem_u64(n, exp), n.root_rem(exp));
     });
 }

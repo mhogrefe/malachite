@@ -8,7 +8,7 @@ use num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-fn _mod_power_of_2_unsigned<T: PrimitiveInt>(x: T, pow: u64) -> T {
+fn mod_power_of_2_unsigned<T: PrimitiveInt>(x: T, pow: u64) -> T {
     if x == T::ZERO || pow >= T::WIDTH {
         x
     } else {
@@ -16,14 +16,14 @@ fn _mod_power_of_2_unsigned<T: PrimitiveInt>(x: T, pow: u64) -> T {
     }
 }
 
-fn _mod_power_of_2_assign_unsigned<T: PrimitiveInt>(x: &mut T, pow: u64) {
+fn mod_power_of_2_assign_unsigned<T: PrimitiveInt>(x: &mut T, pow: u64) {
     if *x != T::ZERO && pow < T::WIDTH {
         *x &= T::low_mask(pow)
     }
 }
 
 #[inline]
-fn _neg_mod_power_of_2_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, pow: u64) -> T {
+fn neg_mod_power_of_2_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, pow: u64) -> T {
     if x != T::ZERO && pow > T::WIDTH {
         panic!("{}", ERROR_MESSAGE);
     }
@@ -51,7 +51,7 @@ macro_rules! impl_mod_power_of_2_unsigned {
             /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn mod_power_of_2(self, pow: u64) -> $s {
-                _mod_power_of_2_unsigned(self, pow)
+                mod_power_of_2_unsigned(self, pow)
             }
         }
 
@@ -72,7 +72,7 @@ macro_rules! impl_mod_power_of_2_unsigned {
             /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn mod_power_of_2_assign(&mut self, pow: u64) {
-                _mod_power_of_2_assign_unsigned(self, pow);
+                mod_power_of_2_assign_unsigned(self, pow);
             }
         }
 
@@ -144,7 +144,7 @@ macro_rules! impl_mod_power_of_2_unsigned {
             /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn neg_mod_power_of_2(self, pow: u64) -> $s {
-                _neg_mod_power_of_2_unsigned(self, pow)
+                neg_mod_power_of_2_unsigned(self, pow)
             }
         }
 
@@ -175,7 +175,7 @@ macro_rules! impl_mod_power_of_2_unsigned {
 }
 apply_to_unsigneds!(impl_mod_power_of_2_unsigned);
 
-fn _mod_power_of_2_signed<U: ModPowerOf2<Output = U> + WrappingFrom<S>, S: PrimitiveInt>(
+fn mod_power_of_2_signed<U: ModPowerOf2<Output = U> + WrappingFrom<S>, S: PrimitiveInt>(
     x: S,
     pow: u64,
 ) -> U {
@@ -185,14 +185,14 @@ fn _mod_power_of_2_signed<U: ModPowerOf2<Output = U> + WrappingFrom<S>, S: Primi
     U::wrapping_from(x).mod_power_of_2(pow)
 }
 
-fn _mod_power_of_2_assign_signed<U, S: CheckedFrom<U> + Copy + ModPowerOf2<Output = U>>(
+fn mod_power_of_2_assign_signed<U, S: CheckedFrom<U> + Copy + ModPowerOf2<Output = U>>(
     x: &mut S,
     pow: u64,
 ) {
     *x = S::checked_from(x.mod_power_of_2(pow)).expect(ERROR_MESSAGE);
 }
 
-fn _rem_power_of_2_signed<
+fn rem_power_of_2_signed<
     U: ModPowerOf2<Output = U> + WrappingFrom<S>,
     S: Copy + Ord + WrappingFrom<U> + WrappingNeg<Output = S> + Zero,
 >(
@@ -206,7 +206,7 @@ fn _rem_power_of_2_signed<
     }
 }
 
-fn _ceiling_mod_power_of_2_signed<
+fn ceiling_mod_power_of_2_signed<
     U: ModPowerOf2<Output = U> + NegModPowerOf2<Output = U> + WrappingFrom<S>,
     S: CheckedFrom<U> + CheckedNeg<Output = S> + Copy + Ord + WrappingNeg<Output = S> + Zero,
 >(
@@ -249,7 +249,7 @@ macro_rules! impl_mod_power_of_2_signed {
             /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn mod_power_of_2(self, pow: u64) -> $u {
-                _mod_power_of_2_signed(self, pow)
+                mod_power_of_2_signed(self, pow)
             }
         }
 
@@ -274,7 +274,7 @@ macro_rules! impl_mod_power_of_2_signed {
             /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn mod_power_of_2_assign(&mut self, pow: u64) {
-                _mod_power_of_2_assign_signed(self, pow);
+                mod_power_of_2_assign_signed(self, pow);
             }
         }
 
@@ -298,7 +298,7 @@ macro_rules! impl_mod_power_of_2_signed {
             /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn rem_power_of_2(self, pow: u64) -> $s {
-                _rem_power_of_2_signed::<$u, $s>(self, pow)
+                rem_power_of_2_signed::<$u, $s>(self, pow)
             }
         }
 
@@ -348,7 +348,7 @@ macro_rules! impl_mod_power_of_2_signed {
             /// See the documentation of the `num::arithmetic::mod_power_of_2` module.
             #[inline]
             fn ceiling_mod_power_of_2(self, pow: u64) -> $s {
-                _ceiling_mod_power_of_2_signed::<$u, $s>(self, pow)
+                ceiling_mod_power_of_2_signed::<$u, $s>(self, pow)
             }
         }
 

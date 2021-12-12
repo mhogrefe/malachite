@@ -239,7 +239,7 @@ fn estimated_limb_len_helper(x: Limb, exp: u64) -> usize {
 }
 
 // Never an underestimate.
-fn _limb_pow_alt_estimated_out_len(x: Limb, exp: u64) -> usize {
+fn limb_pow_alt_estimated_out_len(x: Limb, exp: u64) -> usize {
     if exp.even() {
         estimated_limb_len_helper(x, exp >> 1) << 1
     } else {
@@ -249,8 +249,8 @@ fn _limb_pow_alt_estimated_out_len(x: Limb, exp: u64) -> usize {
 
 // Never an underestimate.
 #[inline]
-fn _limb_pow_alt_estimated_scratch_len(x: Limb, exp: u64) -> usize {
-    _limb_pow_alt_estimated_out_len(x, exp_predecessor(exp))
+fn limb_pow_alt_estimated_scratch_len(x: Limb, exp: u64) -> usize {
+    limb_pow_alt_estimated_out_len(x, exp_predecessor(exp))
 }
 
 /// TODO figure out how to find scratch len using mp_bases. x > 1.
@@ -296,8 +296,8 @@ fn limb_pow_to_out_alt<'a>(
 }
 
 fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
-    let mut out = vec![0; _limb_pow_alt_estimated_out_len(x, exp)];
-    let mut scratch = vec![0; _limb_pow_alt_estimated_scratch_len(x, exp)];
+    let mut out = vec![0; limb_pow_alt_estimated_out_len(x, exp)];
+    let mut scratch = vec![0; limb_pow_alt_estimated_scratch_len(x, exp)];
     let out_len = limb_pow_to_out_alt(&mut out, x, exp, &mut scratch);
     assert!(out_len <= out.len());
     out.truncate(out_len);
@@ -311,7 +311,7 @@ fn estimated_limbs_len_helper(xs: &[Limb], exp: u64) -> usize {
 }
 
 // Never an underestimate.
-fn _limbs_pow_alt_estimated_out_len(xs: &[Limb], exp: u64) -> usize {
+fn limbs_pow_alt_estimated_out_len(xs: &[Limb], exp: u64) -> usize {
     if exp.even() {
         estimated_limbs_len_helper(xs, exp >> 1) << 1
     } else {
@@ -321,8 +321,8 @@ fn _limbs_pow_alt_estimated_out_len(xs: &[Limb], exp: u64) -> usize {
 
 // Never an underestimate.
 #[inline]
-fn _limbs_pow_alt_estimated_scratch_len(xs: &[Limb], exp: u64) -> usize {
-    _limbs_pow_alt_estimated_out_len(xs, exp_predecessor(exp))
+fn limbs_pow_alt_estimated_scratch_len(xs: &[Limb], exp: u64) -> usize {
+    limbs_pow_alt_estimated_out_len(xs, exp_predecessor(exp))
 }
 
 /// TODO figure out how to find scratch len using mp_bases.
@@ -371,8 +371,8 @@ fn limbs_pow_to_out_alt<'a>(
 }
 
 fn limbs_pow_alt(xs: &[Limb], exp: u64) -> Vec<Limb> {
-    let mut out = vec![0; _limbs_pow_alt_estimated_out_len(xs, exp)];
-    let mut scratch = vec![0; _limbs_pow_alt_estimated_scratch_len(xs, exp)];
+    let mut out = vec![0; limbs_pow_alt_estimated_out_len(xs, exp)];
+    let mut scratch = vec![0; limbs_pow_alt_estimated_scratch_len(xs, exp)];
     let out_len = limbs_pow_to_out_alt(&mut out, xs, exp, &mut scratch);
     assert!(out_len <= out.len());
     out.truncate(out_len);

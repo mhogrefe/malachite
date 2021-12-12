@@ -47,9 +47,9 @@ impl FloorRootAssign for Integer {
     #[inline]
     fn floor_root_assign(&mut self, exp: u64) {
         if *self >= 0 {
-            self.unsigned_abs_mut(|n| n.floor_root_assign(exp));
+            self.mutate_unsigned_abs(|n| n.floor_root_assign(exp));
         } else if exp.odd() {
-            self.unsigned_abs_mut(|n| n.ceiling_root_assign(exp));
+            self.mutate_unsigned_abs(|n| n.ceiling_root_assign(exp));
         } else {
             panic!("Cannot take even root of {}", self)
         }
@@ -171,9 +171,9 @@ impl CeilingRootAssign for Integer {
     #[inline]
     fn ceiling_root_assign(&mut self, exp: u64) {
         if *self >= 0 {
-            self.unsigned_abs_mut(|n| n.ceiling_root_assign(exp));
+            self.mutate_unsigned_abs(|n| n.ceiling_root_assign(exp));
         } else if exp.odd() {
-            self.unsigned_abs_mut(|n| n.floor_root_assign(exp));
+            self.mutate_unsigned_abs(|n| n.floor_root_assign(exp));
         } else {
             panic!("Cannot take even root of {}", self)
         }

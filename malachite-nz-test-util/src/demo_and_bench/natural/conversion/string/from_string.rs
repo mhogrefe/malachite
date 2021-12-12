@@ -8,7 +8,7 @@ use malachite_base_test_util::generators::{
 };
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::natural::conversion::string::from_string::_from_string_base_naive;
+use malachite_nz_test_util::natural::conversion::string::from_string::from_string_base_naive;
 use num::{BigUint, Num};
 use std::str::FromStr;
 
@@ -124,7 +124,7 @@ fn benchmark_natural_from_str_algorithms(
         &mut [
             ("default", &mut |s| no_out!(Natural::from_str(&s).unwrap())),
             ("naive", &mut |s| {
-                no_out!(_from_string_base_naive(10, &s).unwrap())
+                no_out!(from_string_base_naive(10, &s).unwrap())
             }),
         ],
     );
@@ -261,7 +261,7 @@ fn benchmark_natural_from_string_base_algorithms(
                 no_out!(Natural::from_string_base(base, &s).unwrap())
             }),
             ("naive", &mut |(base, s)| {
-                no_out!(_from_string_base_naive(base, &s).unwrap())
+                no_out!(from_string_base_naive(base, &s).unwrap())
             }),
         ],
     );

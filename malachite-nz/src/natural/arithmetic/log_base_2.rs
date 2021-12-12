@@ -28,6 +28,7 @@ use platform::Limb;
 /// assert_eq!(limbs_floor_log_base_2(&[0b11]), 1);
 /// assert_eq!(limbs_floor_log_base_2(&[0, 0b1101]), 35);
 /// ```
+#[doc(hidden)]
 #[inline]
 pub fn limbs_floor_log_base_2(xs: &[Limb]) -> u64 {
     limbs_significant_bits(xs) - 1
@@ -57,6 +58,7 @@ pub fn limbs_floor_log_base_2(xs: &[Limb]) -> u64 {
 /// assert_eq!(limbs_ceiling_log_base_2(&[0b11]), 2);
 /// assert_eq!(limbs_ceiling_log_base_2(&[0, 0b1101]), 36);
 /// ```
+#[doc(hidden)]
 pub fn limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
     let floor_log_base_2 = limbs_floor_log_base_2(xs);
     if limbs_is_power_of_2(xs) {
@@ -98,6 +100,7 @@ pub fn limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
 /// assert_eq!(limbs_checked_log_base_2(&[0, 0b1101]), None);
 /// assert_eq!(limbs_checked_log_base_2(&[0, 0b1000]), Some(35));
 /// ```
+#[doc(hidden)]
 pub fn limbs_checked_log_base_2(xs: &[Limb]) -> Option<u64> {
     let (xs_last, xs_init) = xs.split_last().unwrap();
     if slice_test_zero(xs_init) {

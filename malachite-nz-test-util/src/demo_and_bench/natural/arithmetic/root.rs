@@ -19,7 +19,7 @@ use malachite_nz_test_util::generators::{
     natural_unsigned_pair_gen_var_7_nrm, natural_unsigned_pair_gen_var_7_rm,
 };
 use malachite_nz_test_util::natural::arithmetic::root::{
-    _ceiling_root_binary, _checked_root_binary, _floor_root_binary, _root_rem_binary,
+    ceiling_root_binary, checked_root_binary, floor_root_binary, root_rem_binary,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -379,7 +379,7 @@ fn benchmark_natural_floor_cbrt_algorithms(
         &natural_bit_bucketer("x"),
         &mut [
             ("default", &mut |x| no_out!(x.floor_root(3))),
-            ("binary", &mut |x| no_out!(_floor_root_binary(&x, 3))),
+            ("binary", &mut |x| no_out!(floor_root_binary(&x, 3))),
         ],
     );
 }
@@ -465,7 +465,7 @@ fn benchmark_natural_ceiling_cbrt_algorithms(
         &natural_bit_bucketer("x"),
         &mut [
             ("default", &mut |x| no_out!(x.ceiling_root(3))),
-            ("binary", &mut |x| no_out!(_ceiling_root_binary(&x, 3))),
+            ("binary", &mut |x| no_out!(ceiling_root_binary(&x, 3))),
         ],
     );
 }
@@ -529,7 +529,7 @@ fn benchmark_natural_checked_cbrt_algorithms(
         &natural_bit_bucketer("x"),
         &mut [
             ("default", &mut |x| no_out!(x.checked_root(3))),
-            ("binary", &mut |x| no_out!(_checked_root_binary(&x, 3))),
+            ("binary", &mut |x| no_out!(checked_root_binary(&x, 3))),
         ],
     );
 }
@@ -577,7 +577,7 @@ fn benchmark_natural_cbrt_rem_algorithms(
                 let pow = (&root).pow(3);
                 (root, x - pow);
             }),
-            ("binary", &mut |x| no_out!(_root_rem_binary(&x, 3))),
+            ("binary", &mut |x| no_out!(root_rem_binary(&x, 3))),
         ],
     );
 }
@@ -665,7 +665,7 @@ fn benchmark_natural_floor_root_algorithms(
         &mut [
             ("default", &mut |(x, exp)| no_out!(x.floor_root(exp))),
             ("binary", &mut |(x, exp)| {
-                no_out!(_floor_root_binary(&x, exp))
+                no_out!(floor_root_binary(&x, exp))
             }),
         ],
     );
@@ -759,7 +759,7 @@ fn benchmark_natural_ceiling_root_algorithms(
         &mut [
             ("default", &mut |(x, exp)| no_out!(x.ceiling_root(exp))),
             ("binary", &mut |(x, exp)| {
-                no_out!(_ceiling_root_binary(&x, exp))
+                no_out!(ceiling_root_binary(&x, exp))
             }),
         ],
     );
@@ -825,7 +825,7 @@ fn benchmark_natural_checked_root_algorithms(
         &mut [
             ("default", &mut |(x, exp)| no_out!(x.checked_root(exp))),
             ("binary", &mut |(x, exp)| {
-                no_out!(_checked_root_binary(&x, exp))
+                no_out!(checked_root_binary(&x, exp))
             }),
         ],
     );
@@ -878,7 +878,7 @@ fn benchmark_natural_root_rem_algorithms(
                 let pow = (&root).pow(exp);
                 (root, x - pow);
             }),
-            ("binary", &mut |(x, exp)| no_out!(_root_rem_binary(&x, exp))),
+            ("binary", &mut |(x, exp)| no_out!(root_rem_binary(&x, exp))),
         ],
     );
 }

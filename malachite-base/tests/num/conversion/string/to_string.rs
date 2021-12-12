@@ -18,7 +18,7 @@ use malachite_base_test_util::generators::{
     unsigned_triple_gen_var_6,
 };
 use malachite_base_test_util::num::conversion::string::to_string::{
-    _to_string_base_signed_naive, _to_string_base_unsigned_naive,
+    to_string_base_signed_naive, to_string_base_unsigned_naive,
 };
 use std::cmp::max;
 use std::fmt::{Debug, Display};
@@ -156,7 +156,7 @@ pub fn test_to_string_base() {
         u8: WrappingFrom<T>,
     {
         assert_eq!(x.to_string_base(base), out);
-        assert_eq!(_to_string_base_unsigned_naive(x, base), out);
+        assert_eq!(to_string_base_unsigned_naive(x, base), out);
         assert_eq!(format!("{}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), out);
@@ -217,7 +217,7 @@ pub fn test_to_string_base() {
         <T as UnsignedAbs>::Output: PrimitiveUnsigned,
     {
         assert_eq!(x.to_string_base(base), out);
-        assert_eq!(_to_string_base_signed_naive(x, base), out);
+        assert_eq!(to_string_base_signed_naive(x, base), out);
         assert_eq!(format!("{}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), out);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), out);
@@ -313,7 +313,7 @@ where
 {
     unsigned_pair_gen_var_8::<T, u64>().test_properties(|(x, base)| {
         let s = x.to_string_base(base);
-        assert_eq!(_to_string_base_unsigned_naive(x, base), s);
+        assert_eq!(to_string_base_unsigned_naive(x, base), s);
         assert_eq!(format!("{}", BaseFmtWrapper::new(x, base)), s);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), s);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), s);
@@ -389,7 +389,7 @@ where
 {
     signed_unsigned_pair_gen_var_5::<T, u64>().test_properties(|(x, base)| {
         let s = x.to_string_base(base);
-        assert_eq!(_to_string_base_signed_naive(x, base), s);
+        assert_eq!(to_string_base_signed_naive(x, base), s);
         assert_eq!(format!("{}", BaseFmtWrapper::new(x, base)), s);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(x, base)), s);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(x, base)), s);

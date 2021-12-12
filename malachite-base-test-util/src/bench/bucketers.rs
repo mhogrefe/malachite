@@ -535,6 +535,13 @@ pub fn pair_1_vec_len_bucketer<T, U>(xs_name: &str) -> Bucketer<(Vec<T>, U)> {
     }
 }
 
+pub fn pair_1_vec_len_sub_1_bucketer<T, U>(xs_name: &str) -> Bucketer<(Vec<T>, U)> {
+    Bucketer {
+        bucketing_function: &|&(ref xs, _)| xs.len() - 1,
+        bucketing_label: format!("{}.len() - 1", xs_name),
+    }
+}
+
 pub fn pair_2_vec_len_bucketer<T, U>(ys_name: &str) -> Bucketer<(T, Vec<U>)> {
     Bucketer {
         bucketing_function: &|&(_, ref ys)| ys.len(),
@@ -621,6 +628,22 @@ pub fn quadruple_3_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, U
     }
 }
 
+pub fn quadruple_4_vec_len_bucketer<T, U, V, W>(xs_name: &str) -> Bucketer<(T, U, V, Vec<W>)> {
+    Bucketer {
+        bucketing_function: &|&(_, _, _, ref xs)| xs.len(),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
+pub fn quintuple_1_vec_len_bucketer<T, U, V, W, X>(
+    xs_name: &str,
+) -> Bucketer<(Vec<T>, U, V, W, X)> {
+    Bucketer {
+        bucketing_function: &|&(ref xs, _, _, _, _)| xs.len(),
+        bucketing_label: format!("{}.len()", xs_name),
+    }
+}
+
 pub fn pair_sum_vec_len_bucketer<'a, T, U>(
     xs_name: &str,
     ys_name: &str,
@@ -638,6 +661,26 @@ pub fn triple_2_3_sum_vec_len_bucketer<'a, T, U, V>(
     Bucketer {
         bucketing_function: &|(_, xs, ys)| xs.len() + ys.len(),
         bucketing_label: format!("{}.len() + {}.len()", xs_name, ys_name),
+    }
+}
+
+pub fn triple_2_3_diff_vec_len_bucketer<'a, T, U, V>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (T, Vec<U>, Vec<V>)> {
+    Bucketer {
+        bucketing_function: &|(_, xs, ys)| xs.len() - ys.len(),
+        bucketing_label: format!("{}.len() - {}.len()", xs_name, ys_name),
+    }
+}
+
+pub fn quadruple_2_3_diff_vec_len_bucketer<'a, T, U, V, W>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (T, Vec<U>, Vec<V>, W)> {
+    Bucketer {
+        bucketing_function: &|(_, xs, ys, _)| xs.len() - ys.len(),
+        bucketing_label: format!("{}.len() - {}.len()", xs_name, ys_name),
     }
 }
 

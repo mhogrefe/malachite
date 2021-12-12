@@ -43,7 +43,10 @@ fn striped_random_unsigned_bit_chunks_helper<T: CheckedToF64 + PrimitiveUnsigned
             actual_sample_moment_stats
         ),
         (
-            expected_values.iter().map(|x| x.to_string()).collect_vec(),
+            expected_values
+                .iter()
+                .map(ToString::to_string)
+                .collect_vec(),
             expected_common_values
                 .iter()
                 .map(|(x, frequency)| (x.to_string(), *frequency))

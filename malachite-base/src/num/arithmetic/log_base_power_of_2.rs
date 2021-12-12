@@ -9,7 +9,7 @@ use num::logic::traits::SignificantBits;
 use rounding_modes::RoundingMode;
 
 #[doc(hidden)]
-pub fn _ceiling_log_base_power_of_2_naive<T: PrimitiveInt>(x: T, pow: u64) -> u64 {
+pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveInt>(x: T, pow: u64) -> u64 {
     assert_ne!(x, T::ZERO);
     assert_ne!(pow, 0);
     if pow >= T::WIDTH {
@@ -28,7 +28,7 @@ pub fn _ceiling_log_base_power_of_2_naive<T: PrimitiveInt>(x: T, pow: u64) -> u6
     result
 }
 
-fn _floor_log_base_power_of_2<T: Copy + Eq + SignificantBits + Zero>(x: T, pow: u64) -> u64 {
+fn floor_log_base_power_of_2<T: Copy + Eq + SignificantBits + Zero>(x: T, pow: u64) -> u64 {
     if x == T::ZERO {
         panic!("Cannot take the base-2 logarithm of 0.");
     }
@@ -36,7 +36,7 @@ fn _floor_log_base_power_of_2<T: Copy + Eq + SignificantBits + Zero>(x: T, pow: 
     (x.significant_bits() - 1) / pow
 }
 
-fn _ceiling_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(
+fn ceiling_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(
     x: T,
     pow: u64,
 ) -> u64 {
@@ -52,7 +52,7 @@ fn _ceiling_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Ze
     }
 }
 
-fn _checked_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(
+fn checked_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(
     x: T,
     pow: u64,
 ) -> Option<u64> {
@@ -89,7 +89,7 @@ macro_rules! impl_log_base_power_of_2_unsigned {
             /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
             #[inline]
             fn floor_log_base_power_of_2(self, pow: u64) -> u64 {
-                _floor_log_base_power_of_2(self, pow)
+                floor_log_base_power_of_2(self, pow)
             }
         }
 
@@ -112,7 +112,7 @@ macro_rules! impl_log_base_power_of_2_unsigned {
             /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
             #[inline]
             fn ceiling_log_base_power_of_2(self, pow: u64) -> u64 {
-                _ceiling_log_base_power_of_2(self, pow)
+                ceiling_log_base_power_of_2(self, pow)
             }
         }
 
@@ -140,7 +140,7 @@ macro_rules! impl_log_base_power_of_2_unsigned {
             /// See the documentation of the `num::arithmetic::log_base_power_of_2` module.
             #[inline]
             fn checked_log_base_power_of_2(self, pow: u64) -> Option<u64> {
-                _checked_log_base_power_of_2(self, pow)
+                checked_log_base_power_of_2(self, pow)
             }
         }
     };

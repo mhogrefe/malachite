@@ -1,12 +1,12 @@
 use num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Add, ModPowerOf2AddAssign};
 use num::basic::integers::PrimitiveInt;
 
-fn _mod_power_of_2_add<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, other: T, pow: u64) -> T {
+fn mod_power_of_2_add<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, other: T, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
     x.wrapping_add(other).mod_power_of_2(pow)
 }
 
-fn _mod_power_of_2_add_assign<T: PrimitiveInt>(x: &mut T, other: T, pow: u64) {
+fn mod_power_of_2_add_assign<T: PrimitiveInt>(x: &mut T, other: T, pow: u64) {
     assert!(pow <= T::WIDTH);
     x.wrapping_add_assign(other);
     x.mod_power_of_2_assign(pow);
@@ -28,7 +28,7 @@ macro_rules! impl_mod_power_of_2_add {
             /// See the documentation of the `num::arithmetic::mod_power_of_2_add` module.
             #[inline]
             fn mod_power_of_2_add(self, other: $t, pow: u64) -> $t {
-                _mod_power_of_2_add(self, other, pow)
+                mod_power_of_2_add(self, other, pow)
             }
         }
 
@@ -45,7 +45,7 @@ macro_rules! impl_mod_power_of_2_add {
             /// See the documentation of the `num::arithmetic::mod_power_of_2_add` module.
             #[inline]
             fn mod_power_of_2_add_assign(&mut self, other: $t, pow: u64) {
-                _mod_power_of_2_add_assign(self, other, pow);
+                mod_power_of_2_add_assign(self, other, pow);
             }
         }
     };

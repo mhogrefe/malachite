@@ -3,7 +3,7 @@ use num::arithmetic::traits::DivisibleBy;
 use num::basic::traits::{NegativeOne, Zero};
 use std::ops::Rem;
 
-fn _divisible_by_unsigned<T: Copy + Eq + Rem<T, Output = T> + Zero>(x: T, other: T) -> bool {
+fn divisible_by_unsigned<T: Copy + Eq + Rem<T, Output = T> + Zero>(x: T, other: T) -> bool {
     x == T::ZERO || other != T::ZERO && x % other == T::ZERO
 }
 
@@ -27,14 +27,14 @@ macro_rules! impl_divisible_by_unsigned {
             /// See the documentation of the `num::arithmetic::divisible_by` module.
             #[inline]
             fn divisible_by(self, other: $t) -> bool {
-                _divisible_by_unsigned(self, other)
+                divisible_by_unsigned(self, other)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_divisible_by_unsigned);
 
-fn _divisible_by_signed<T: Copy + Eq + Min + NegativeOne + Rem<T, Output = T> + Zero>(
+fn divisible_by_signed<T: Copy + Eq + Min + NegativeOne + Rem<T, Output = T> + Zero>(
     x: T,
     other: T,
 ) -> bool {
@@ -63,7 +63,7 @@ macro_rules! impl_divisible_by_signed {
             /// See the documentation of the `num::arithmetic::divisible_by` module.
             #[inline]
             fn divisible_by(self, other: $t) -> bool {
-                _divisible_by_signed(self, other)
+                divisible_by_signed(self, other)
             }
         }
     };

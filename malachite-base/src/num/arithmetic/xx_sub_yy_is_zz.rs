@@ -3,7 +3,7 @@ use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{JoinHalves, SplitInHalf, WrappingFrom};
 
-fn _implicit_xx_sub_yy_is_zz<DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
+fn implicit_xx_sub_yy_is_zz<DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
     x_1: DT::Half,
     x_0: DT::Half,
     y_1: DT::Half,
@@ -14,7 +14,7 @@ fn _implicit_xx_sub_yy_is_zz<DT: JoinHalves + PrimitiveUnsigned + SplitInHalf>(
         .split_in_half()
 }
 
-pub fn _explicit_xx_sub_yy_is_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y_0: T) -> (T, T) {
+pub fn explicit_xx_sub_yy_is_zz<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y_0: T) -> (T, T) {
     let (z_0, borrow) = x_0.overflowing_sub(y_0);
     let mut z_1 = x_1.wrapping_sub(y_1);
     if borrow {
@@ -51,7 +51,7 @@ macro_rules! implicit_xx_sub_yy_is_zz {
             /// This is sub_ddmmss from longlong.h, GMP 6.2.1, where (sh, sl) is returned.
             #[inline]
             fn xx_sub_yy_is_zz(x_1: $t, x_0: $t, y_1: $t, y_0: $t) -> ($t, $t) {
-                _implicit_xx_sub_yy_is_zz::<$dt>(x_1, x_0, y_1, y_0)
+                implicit_xx_sub_yy_is_zz::<$dt>(x_1, x_0, y_1, y_0)
             }
         }
     };
@@ -127,6 +127,6 @@ impl XXSubYYIsZZ for u128 {
     /// This is sub_ddmmss from longlong.h, GMP 6.2.1, where (sh, sl) is returned.
     #[inline]
     fn xx_sub_yy_is_zz(x_1: u128, x_0: u128, y_1: u128, y_0: u128) -> (u128, u128) {
-        _explicit_xx_sub_yy_is_zz(x_1, x_0, y_1, y_0)
+        explicit_xx_sub_yy_is_zz(x_1, x_0, y_1, y_0)
     }
 }

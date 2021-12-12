@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::log_base::{
-    _ceiling_log_base_naive, _checked_log_base_naive, _floor_log_base_naive,
+    ceiling_log_base_naive, checked_log_base_naive, floor_log_base_naive,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::bucketers::pair_1_bit_bucketer;
@@ -66,7 +66,7 @@ fn benchmark_floor_log_base_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(n, base)| no_out!(n.floor_log_base(base))),
             ("naive", &mut |(n, base)| {
-                no_out!(_floor_log_base_naive(n, base))
+                no_out!(floor_log_base_naive(n, base))
             }),
         ],
     );
@@ -92,7 +92,7 @@ fn benchmark_ceiling_log_base_algorithms<T: PrimitiveUnsigned>(
                 &mut |(n, base)| no_out!(n.ceiling_log_base(base)),
             ),
             ("naive", &mut |(n, base)| {
-                no_out!(_ceiling_log_base_naive(n, base))
+                no_out!(ceiling_log_base_naive(n, base))
             }),
         ],
     );
@@ -118,7 +118,7 @@ fn benchmark_checked_log_base_algorithms<T: PrimitiveUnsigned>(
                 &mut |(n, base)| no_out!(n.checked_log_base(base)),
             ),
             ("naive", &mut |(n, base)| {
-                no_out!(_checked_log_base_naive(n, base))
+                no_out!(checked_log_base_naive(n, base))
             }),
         ],
     );

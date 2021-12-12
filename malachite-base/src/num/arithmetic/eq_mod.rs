@@ -1,7 +1,7 @@
 use num::arithmetic::traits::{EqMod, Mod};
 use num::basic::traits::Zero;
 
-fn _eq_mod<U: Eq, S: Copy + Eq + Mod<S, Output = U> + Zero>(x: S, other: S, m: S) -> bool {
+fn eq_mod<U: Eq, S: Copy + Eq + Mod<S, Output = U> + Zero>(x: S, other: S, m: S) -> bool {
     x == other || m != S::ZERO && x.mod_op(m) == other.mod_op(m)
 }
 
@@ -24,7 +24,7 @@ macro_rules! impl_eq_mod {
             /// See the documentation of the `num::arithmetic::eq_mod` module.
             #[inline]
             fn eq_mod(self, other: $t, m: $t) -> bool {
-                _eq_mod(self, other, m)
+                eq_mod(self, other, m)
             }
         }
     };

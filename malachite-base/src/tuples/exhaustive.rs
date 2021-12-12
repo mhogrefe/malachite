@@ -2,14 +2,19 @@ use iterators::bit_distributor::{BitDistributor, BitDistributorOutputType};
 use iterators::iterator_cache::IteratorCache;
 use num::arithmetic::traits::CheckedPow;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::iterators::{ruler_sequence, RulerSequence};
 use num::logic::traits::SignificantBits;
 use std::cmp::max;
 use std::fmt::Debug;
 use std::iter::{once, Once};
 use std::marker::PhantomData;
+use std::mem::swap;
 use vecs::exhaustive::{
-    fixed_length_ordered_unique_indices_helper, next_bit_pattern, unique_indices, UniqueIndices,
+    exhaustive_ordered_unique_vecs_fixed_length, fixed_length_ordered_unique_indices_helper,
+    next_bit_pattern, unique_indices, ExhaustiveOrderedUniqueCollections,
+    ExhaustiveUniqueVecsGenerator, UniqueIndices,
 };
+use vecs::ExhaustiveVecPermutations;
 
 /// Generates the only unit: `()`.
 ///
@@ -91,38 +96,24 @@ macro_rules! lex_custom_tuples {
                     None
                 } else if self.first {
                     self.first = false;
-                    $(
-                        $(
-                            let $x;
-                        )*
-                    )*
+                    $($(let $x;)*)*
                     $(
                         if let Some(x) = self.$xs.get(0) {
-                            $(
-                                $x = x.clone();
-                            )*
+                            $($x = x.clone();)*
                         } else {
                             self.done = true;
                             return None;
                         }
                     )*
                     let mut out = $nones;
-                    $(
-                        $(
-                            out.$i = Some($x);
-                        )*
-                    )*
+                    $($(out.$i = Some($x);)*)*
                     Some($unwrap_tuple(out))
                 } else if self.increment_counters() {
                     self.done = true;
                     None
                 } else {
                     let mut out = $nones;
-                    $(
-                        $(
-                            out.$i = self.$xs.get(self.counters[$i]).cloned();
-                        )*
-                    )*
+                    $($(out.$i = self.$xs.get(self.counters[$i]).cloned();)*)*
                     Some($unwrap_tuple(out))
                 }
             }
@@ -194,6 +185,13 @@ fn unwrap_quadruple<X, Y, Z, W>(
     (a, b, c, d): (Option<X>, Option<Y>, Option<Z>, Option<W>),
 ) -> (X, Y, Z, W) {
     (a.unwrap(), b.unwrap(), c.unwrap(), d.unwrap())
+}
+
+#[allow(clippy::missing_const_for_fn, clippy::type_complexity)]
+fn unwrap_quintuple<X, Y, Z, W, V>(
+    (a, b, c, d, e): (Option<X>, Option<Y>, Option<Z>, Option<W>, Option<V>),
+) -> (X, Y, Z, W, V) {
+    (a.unwrap(), b.unwrap(), c.unwrap(), d.unwrap(), e.unwrap())
 }
 
 lex_custom_tuples!(
@@ -1342,17 +1340,6 @@ custom_tuples!(
     [Y, J, ys, ys_done, [3, output_type_ys_3]]
 );
 custom_tuples!(
-    ExhaustiveQuadruplesXYYZ,
-    (X, Y, Y, Z),
-    (None, None, None, None),
-    unwrap_quadruple,
-    exhaustive_quadruples_xyyz,
-    exhaustive_quadruples_xyyz_custom_output,
-    [X, I, xs, xs_done, [0, output_type_xs_0]],
-    [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]],
-    [Z, K, zs, zs_done, [3, output_type_zs_3]]
-);
-custom_tuples!(
     ExhaustiveQuadruplesXXYX,
     (X, X, Y, X),
     (None, None, None, None),
@@ -1371,6 +1358,39 @@ custom_tuples!(
     exhaustive_quadruples_xyyx_custom_output,
     [X, I, xs, xs_done, [0, output_type_xs_0], [3, output_type_xs_3]],
     [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]]
+);
+custom_tuples!(
+    ExhaustiveQuadruplesXYXZ,
+    (X, Y, X, Z),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xyxz,
+    exhaustive_quadruples_xyxz_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0], [2, output_type_xs_2]],
+    [Y, J, ys, ys_done, [1, output_type_ys_1]],
+    [Z, K, zs, zs_done, [3, output_type_zs_3]]
+);
+custom_tuples!(
+    ExhaustiveQuadruplesXYYZ,
+    (X, Y, Y, Z),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xyyz,
+    exhaustive_quadruples_xyyz_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0]],
+    [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]],
+    [Z, K, zs, zs_done, [3, output_type_zs_3]]
+);
+custom_tuples!(
+    ExhaustiveQuintuplesXYYYZ,
+    (X, Y, Y, Y, Z),
+    (None, None, None, None, None),
+    unwrap_quintuple,
+    exhaustive_quintuples_xyyyz,
+    exhaustive_quintuples_xyyyz_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0]],
+    [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2], [3, output_type_ys_3]],
+    [Z, K, zs, zs_done, [4, output_type_zs_4]]
 );
 
 /// A trait used by dependent-pairs structs.
@@ -2108,9 +2128,9 @@ macro_rules! lex_ordered_unique_tuples {
             }
         }
 
-        /// Generates $k$-tuples of with elements from a single iterator, such that each tuple has
-        /// no repeated elements, and the elements in each `Vec` are ordered the same way as they
-        /// are in the source iterator.
+        /// Generates $k$-tuples of elements from a single iterator, such that each tuple has no
+        /// repeated elements, and the elements in each `Vec` are ordered the same way as they are
+        /// in the source iterator.
         ///
         /// The source iterator should not repeat any elements, but this is not enforced.
         ///
@@ -2273,9 +2293,9 @@ macro_rules! exhaustive_ordered_unique_tuples {
             }
         }
 
-        /// Generates $k$-tuples of with elements from a single iterator, such that each tuple has
-        /// no repeated elements, and the elements in each `Vec` are ordered the same way as they
-        /// are in the source iterator.
+        /// Generates $k$-tuples of elements from a single iterator, such that each tuple has no
+        /// repeated elements, and the elements in each `Vec` are ordered the same way as they are
+        /// in the source iterator.
         ///
         /// The source iterator should not repeat any elements, but this is not enforced.
         ///
@@ -2429,8 +2449,8 @@ macro_rules! lex_unique_tuples {
             }
         }
 
-        /// Generates $k$-tuples of with elements from a single iterator, such that each tuple has
-        /// no repeated elements.
+        /// Generates $k$-tuples of elements from a single iterator, such that each tuple has no
+        /// repeated elements.
         ///
         /// The source iterator should not repeat any elements, but this is not enforced.
         ///
@@ -2534,5 +2554,244 @@ lex_unique_tuples!(
         I::Item
     ),
     lex_unique_octuples,
+    [0, 1, 2, 3, 4, 5, 6, 7]
+);
+
+/// Generates all pairs of elements from an iterator, where the pairs have no repetitions.
+#[derive(Clone)]
+pub struct ExhaustiveUniquePairs<I: Iterator>
+where
+    I::Item: Clone,
+{
+    next: Option<(I::Item, I::Item)>,
+    ps: ExhaustiveOrderedUniquePairs<I>,
+}
+
+impl<I: Iterator> Iterator for ExhaustiveUniquePairs<I>
+where
+    I::Item: Clone,
+{
+    type Item = (I::Item, I::Item);
+
+    fn next(&mut self) -> Option<(I::Item, I::Item)> {
+        if self.next.is_some() {
+            let mut p = None;
+            swap(&mut p, &mut self.next);
+            p
+        } else if let Some(p) = self.ps.next() {
+            self.next = Some((p.1.clone(), p.0.clone()));
+            Some(p)
+        } else {
+            None
+        }
+    }
+}
+
+/// Generates pairs of elements from a single iterator, such that each pair has no repeated
+/// elements.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is $\tfrac{1}{2}{n!}$.
+///
+/// If `xs` is empty, the output is also empty.
+///
+/// # Complexity per iteration
+/// $$
+/// T(i) = O(T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i) = O(M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time
+/// and additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::tuples::exhaustive::exhaustive_unique_pairs;
+///
+/// let xss = exhaustive_unique_pairs(1..=6).take(20).collect_vec();
+/// assert_eq!(
+///     xss.into_iter().collect_vec().as_slice(),
+///     &[
+///         (1, 2),
+///         (2, 1),
+///         (1, 3),
+///         (3, 1),
+///         (2, 3),
+///         (3, 2),
+///         (1, 4),
+///         (4, 1),
+///         (2, 4),
+///         (4, 2),
+///         (3, 4),
+///         (4, 3),
+///         (1, 5),
+///         (5, 1),
+///         (2, 5),
+///         (5, 2),
+///         (3, 5),
+///         (5, 3),
+///         (4, 5),
+///         (5, 4)
+///     ]
+/// );
+/// ```
+pub fn exhaustive_unique_pairs<I: Iterator>(xs: I) -> ExhaustiveUniquePairs<I>
+where
+    I::Item: Clone,
+{
+    ExhaustiveUniquePairs {
+        next: None,
+        ps: exhaustive_ordered_unique_pairs(xs),
+    }
+}
+
+macro_rules! exhaustive_unique_tuples {
+    (
+        $struct: ident,
+        $k: expr,
+        $out_t: ty,
+        $fn: ident,
+        [$($i: expr),*]
+    ) => {
+        /// Generates all $k$-tuples of elements from an iterator, where the tuples have no
+        /// repetitions.
+        ///
+        /// This struct is macro-generated.
+        #[derive(Clone)]
+        pub struct $struct<I: Iterator>
+        where
+            I::Item: Clone,
+        {
+            xss: ExhaustiveDependentPairs<
+                Vec<I::Item>,
+                Vec<I::Item>,
+                RulerSequence<usize>,
+                ExhaustiveUniqueVecsGenerator<I::Item, I>,
+                ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>,
+                ExhaustiveVecPermutations<I::Item>,
+            >,
+        }
+
+        #[allow(clippy::type_complexity)]
+        impl<I: Iterator> Iterator for $struct<I>
+        where
+            I::Item: Clone,
+        {
+            type Item = $out_t;
+
+            fn next(&mut self) -> Option<Self::Item> {
+                self.xss.next().map(|mut p| {
+                    let mut drain = p.1.drain(..);
+                    ($(((drain.next().unwrap(), $i).0)),*)
+                })
+            }
+        }
+
+        /// Generates $k$-tuples of elements from a single iterator, such that each tuple has no
+        /// repeated elements.
+        ///
+        /// The source iterator should not repeat any elements, but this is not enforced.
+        ///
+        /// If the input iterator is infinite, the output length is also infinite.
+        ///
+        /// If the input iterator length is $n$, the output length is $\frac{n!}{k!}$.
+        ///
+        /// If `xs` is empty, the output is also empty.
+        ///
+        /// # Complexity per iteration
+        /// $$
+        /// T(i, k) = O(k + T^\prime (i))
+        /// $$
+        ///
+        /// $$
+        /// M(i, k) = O(k + M^\prime (i))
+        /// $$
+        ///
+        /// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time
+        /// and additional memory functions of `xs`.
+        ///
+        /// # Examples
+        /// See the documentation of the `tuples::exhaustive` module.
+        pub fn $fn<I: Iterator>(xs: I) -> $struct<I>
+        where
+            I::Item: Clone,
+        {
+            $struct {
+                xss: exhaustive_dependent_pairs(
+                    ruler_sequence(),
+                    exhaustive_ordered_unique_vecs_fixed_length($k, xs),
+                    ExhaustiveUniqueVecsGenerator::new(),
+                ),
+            }
+        }
+    }
+}
+exhaustive_unique_tuples!(
+    ExhaustiveUniqueTriples,
+    3,
+    (I::Item, I::Item, I::Item),
+    exhaustive_unique_triples,
+    [0, 1, 2]
+);
+exhaustive_unique_tuples!(
+    ExhaustiveUniqueQuadruples,
+    4,
+    (I::Item, I::Item, I::Item, I::Item),
+    exhaustive_unique_quadruples,
+    [0, 1, 2, 3]
+);
+exhaustive_unique_tuples!(
+    ExhaustiveUniqueQuintuples,
+    5,
+    (I::Item, I::Item, I::Item, I::Item, I::Item),
+    exhaustive_unique_quintuples,
+    [0, 1, 2, 3, 4]
+);
+exhaustive_unique_tuples!(
+    ExhaustiveUniqueSextuples,
+    6,
+    (I::Item, I::Item, I::Item, I::Item, I::Item, I::Item),
+    exhaustive_unique_sextuples,
+    [0, 1, 2, 3, 4, 5]
+);
+exhaustive_unique_tuples!(
+    ExhaustiveUniqueSeptuples,
+    7,
+    (
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item
+    ),
+    exhaustive_unique_septuples,
+    [0, 1, 2, 3, 4, 5, 6]
+);
+exhaustive_unique_tuples!(
+    ExhaustiveUniqueOctuples,
+    8,
+    (
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item,
+        I::Item
+    ),
+    exhaustive_unique_octuples,
     [0, 1, 2, 3, 4, 5, 6, 7]
 );

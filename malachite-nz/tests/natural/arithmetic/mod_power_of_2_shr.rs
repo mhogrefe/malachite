@@ -6,27 +6,24 @@ use std::str::FromStr;
 
 macro_rules! test_mod_power_of_2_shr {
     ($t:ident) => {
-        let test = |u, v: $t, pow, out| {
-            let mut n = Natural::from_str(u).unwrap();
+        let test = |s, v: $t, pow, out| {
+            let u = Natural::from_str(s).unwrap();
+
+            let mut n = u.clone();
             assert!(n.mod_power_of_2_is_reduced(pow));
             n.mod_power_of_2_shr_assign(v, pow);
             assert!(n.is_valid());
             assert_eq!(n.to_string(), out);
             assert!(n.mod_power_of_2_is_reduced(pow));
 
-            let n = Natural::from_str(u).unwrap().mod_power_of_2_shr(v, pow);
+            let n = u.clone().mod_power_of_2_shr(v, pow);
             assert!(n.is_valid());
 
-            let n = (&Natural::from_str(u).unwrap()).mod_power_of_2_shr(v, pow);
+            let n = (&u).mod_power_of_2_shr(v, pow);
             assert!(n.is_valid());
             assert_eq!(n.to_string(), out);
 
-            assert_eq!(
-                (Natural::from_str(u).unwrap() >> v)
-                    .mod_power_of_2(pow)
-                    .to_string(),
-                out
-            );
+            assert_eq!((u >> v).mod_power_of_2(pow).to_string(), out);
         };
         test("0", -10, 0, "0");
         test("0", -10, 8, "0");

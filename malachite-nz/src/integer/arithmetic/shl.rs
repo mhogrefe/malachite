@@ -127,7 +127,7 @@ macro_rules! impl_shl_unsigned {
 }
 apply_to_unsigneds!(impl_shl_unsigned);
 
-fn _shl_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shl_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Integer,
     bits: S,
 ) -> Integer
@@ -210,7 +210,7 @@ macro_rules! impl_shl_signed {
             /// ```
             #[inline]
             fn shl(self, bits: $t) -> Integer {
-                _shl_signed_ref(self, bits)
+                shl_signed_ref(self, bits)
             }
         }
 

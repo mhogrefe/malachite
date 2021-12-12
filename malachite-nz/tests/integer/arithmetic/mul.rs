@@ -157,8 +157,7 @@ fn mul_properties() {
         assert_eq!(&x * -&y, -product);
     });
 
-    integer_gen().test_properties(|x| {
-        let x = &x;
+    integer_gen().test_properties(|ref x| {
         assert_eq!(x * Integer::ZERO, 0);
         assert_eq!(Integer::ZERO * x, 0);
         assert_eq!(x * Integer::ONE, *x);
@@ -168,10 +167,7 @@ fn mul_properties() {
         assert_eq!(x * x, x.square());
     });
 
-    integer_triple_gen().test_properties(|(x, y, z)| {
-        let x = &x;
-        let y = &y;
-        let z = &z;
+    integer_triple_gen().test_properties(|(ref x, ref y, ref z)| {
         assert_eq!((x * y) * z, x * (y * z));
         assert_eq!(x * (y + z), x * y + x * z);
         assert_eq!((x + y) * z, x * z + y * z);

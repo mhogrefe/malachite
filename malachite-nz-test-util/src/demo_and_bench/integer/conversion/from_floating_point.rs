@@ -125,6 +125,7 @@ fn benchmark_integer_rounding_from_float<T: PrimitiveFloat>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_from_float<T: PrimitiveFloat>(
     gm: GenMode,
     config: GenConfig,

@@ -6,7 +6,7 @@ use num::arithmetic::traits::{
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-fn _saturating_sub_mul_unsigned<T: SaturatingMul<T, Output = T> + SaturatingSub<T, Output = T>>(
+fn saturating_sub_mul_unsigned<T: SaturatingMul<T, Output = T> + SaturatingSub<T, Output = T>>(
     x: T,
     y: T,
     z: T,
@@ -14,7 +14,7 @@ fn _saturating_sub_mul_unsigned<T: SaturatingMul<T, Output = T> + SaturatingSub<
     x.saturating_sub(y.saturating_mul(z))
 }
 
-fn _saturating_sub_mul_assign_unsigned<T: SaturatingMul<T, Output = T> + SaturatingSubAssign<T>>(
+fn saturating_sub_mul_assign_unsigned<T: SaturatingMul<T, Output = T> + SaturatingSubAssign<T>>(
     x: &mut T,
     y: T,
     z: T,
@@ -45,7 +45,7 @@ macro_rules! impl_saturating_sub_mul_unsigned {
             /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
             #[inline]
             fn saturating_sub_mul(self, y: $t, z: $t) -> $t {
-                _saturating_sub_mul_unsigned(self, y, z)
+                saturating_sub_mul_unsigned(self, y, z)
             }
         }
 
@@ -69,14 +69,14 @@ macro_rules! impl_saturating_sub_mul_unsigned {
             /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
             #[inline]
             fn saturating_sub_mul_assign(&mut self, y: $t, z: $t) {
-                self.saturating_sub_assign(y.saturating_mul(z));
+                saturating_sub_mul_assign_unsigned(self, y, z);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_saturating_sub_mul_unsigned);
 
-fn _saturating_sub_mul_signed<
+fn saturating_sub_mul_signed<
     U: CheckedMul<U, Output = U> + Copy + Ord + WrappingSub<U, Output = U>,
     S: Copy
         + Eq
@@ -144,7 +144,7 @@ macro_rules! impl_saturating_sub_mul_signed {
             /// See the documentation of the `num::arithmetic::saturating_sub_mul` module.
             #[inline]
             fn saturating_sub_mul(self, y: $t, z: $t) -> $t {
-                _saturating_sub_mul_signed(self, y, z)
+                saturating_sub_mul_signed(self, y, z)
             }
         }
 

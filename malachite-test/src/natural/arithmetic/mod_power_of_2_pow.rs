@@ -228,7 +228,7 @@ fn benchmark_natural_mod_power_of_2_pow_algorithms(
             ),
             (
                 "simple binary",
-                &mut (|(x, exp, pow)| no_out!(_simple_binary_mod_power_of_2_pow(&x, &exp, pow))),
+                &mut (|(x, exp, pow)| no_out!(simple_binary_mod_power_of_2_pow(&x, &exp, pow))),
             ),
         ],
     );

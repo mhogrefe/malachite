@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::log_base::{
-    _ceiling_log_base_naive, _checked_log_base_naive, _floor_log_base_naive,
+    ceiling_log_base_naive, checked_log_base_naive, floor_log_base_naive,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{
@@ -116,7 +116,7 @@ fn floor_log_base_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_24::<T, T>().test_properties(|(n, base)| {
         let floor_log = n.floor_log_base(base);
         assert!(floor_log < T::WIDTH);
-        assert_eq!(floor_log, _floor_log_base_naive(n, base));
+        assert_eq!(floor_log, floor_log_base_naive(n, base));
         assert_eq!(floor_log == 0, n < base);
 
         if let Some(pow) = base.checked_pow(floor_log) {
@@ -148,7 +148,7 @@ fn ceiling_log_base_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_24::<T, T>().test_properties(|(n, base)| {
         let ceiling_log = n.ceiling_log_base(base);
         assert!(ceiling_log <= T::WIDTH);
-        assert_eq!(ceiling_log, _ceiling_log_base_naive(n, base));
+        assert_eq!(ceiling_log, ceiling_log_base_naive(n, base));
         assert_eq!(ceiling_log == 0, n == T::ONE);
 
         if let Some(pow) = base.checked_pow(ceiling_log) {
@@ -182,7 +182,7 @@ fn ceiling_log_base_properties() {
 fn checked_log_base_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_24::<T, T>().test_properties(|(n, base)| {
         let checked_log = n.checked_log_base(base);
-        assert_eq!(checked_log, _checked_log_base_naive(n, base));
+        assert_eq!(checked_log, checked_log_base_naive(n, base));
         if let Some(log) = checked_log {
             assert_eq!(base.pow(log), n);
             assert!(log <= T::WIDTH);

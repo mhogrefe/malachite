@@ -6,7 +6,7 @@ use num::basic::traits::{One, Zero};
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub};
 
-fn _div_mod_unsigned<T: Copy + Div<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>>(
+fn div_mod_unsigned<T: Copy + Div<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>>(
     x: T,
     other: T,
 ) -> (T, T) {
@@ -14,7 +14,7 @@ fn _div_mod_unsigned<T: Copy + Div<T, Output = T> + Mul<T, Output = T> + Sub<T, 
     (q, x - q * other)
 }
 
-fn _div_assign_mod_unsigned<T: Copy + DivAssign<T> + Mul<T, Output = T> + Sub<T, Output = T>>(
+fn div_assign_mod_unsigned<T: Copy + DivAssign<T> + Mul<T, Output = T> + Sub<T, Output = T>>(
     x: &mut T,
     other: T,
 ) -> T {
@@ -23,7 +23,7 @@ fn _div_assign_mod_unsigned<T: Copy + DivAssign<T> + Mul<T, Output = T> + Sub<T,
     original - *x * other
 }
 
-fn _ceiling_div_neg_mod_unsigned<
+fn ceiling_div_neg_mod_unsigned<
     T: Add<T, Output = T>
         + Copy
         + DivMod<T, DivOutput = T, ModOutput = T>
@@ -44,7 +44,7 @@ fn _ceiling_div_neg_mod_unsigned<
     }
 }
 
-fn _ceiling_div_assign_neg_mod_unsigned<
+fn ceiling_div_assign_neg_mod_unsigned<
     T: AddAssign<T> + Copy + DivAssignMod<T, ModOutput = T> + Eq + One + Sub<T, Output = T> + Zero,
 >(
     x: &mut T,
@@ -86,7 +86,7 @@ macro_rules! impl_div_mod_unsigned {
             /// See the documentation of the `num::arithmetic::div_mod` module.
             #[inline]
             fn div_mod(self, other: $t) -> ($t, $t) {
-                _div_mod_unsigned(self, other)
+                div_mod_unsigned(self, other)
             }
         }
 
@@ -115,7 +115,7 @@ macro_rules! impl_div_mod_unsigned {
             /// See the documentation of the `num::arithmetic::div_mod` module.
             #[inline]
             fn div_assign_mod(&mut self, other: $t) -> $t {
-                _div_assign_mod_unsigned(self, other)
+                div_assign_mod_unsigned(self, other)
             }
         }
 
@@ -204,7 +204,7 @@ macro_rules! impl_div_mod_unsigned {
             /// See the documentation of the `num::arithmetic::div_mod` module.
             #[inline]
             fn ceiling_div_neg_mod(self, other: $t) -> ($t, $t) {
-                _ceiling_div_neg_mod_unsigned(self, other)
+                ceiling_div_neg_mod_unsigned(self, other)
             }
         }
 
@@ -233,14 +233,14 @@ macro_rules! impl_div_mod_unsigned {
             /// See the documentation of the `num::arithmetic::div_mod` module.
             #[inline]
             fn ceiling_div_assign_neg_mod(&mut self, other: $t) -> $t {
-                _ceiling_div_assign_neg_mod_unsigned(self, other)
+                ceiling_div_assign_neg_mod_unsigned(self, other)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_div_mod_unsigned);
 
-fn _div_mod_signed<
+fn div_mod_signed<
     U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
     S: Copy
         + ExactFrom<U>
@@ -271,9 +271,7 @@ fn _div_mod_signed<
     )
 }
 
-fn _div_rem_signed<
-    T: CheckedDiv<T, Output = T> + Copy + Mul<T, Output = T> + Sub<T, Output = T>,
->(
+fn div_rem_signed<T: CheckedDiv<T, Output = T> + Copy + Mul<T, Output = T> + Sub<T, Output = T>>(
     x: T,
     other: T,
 ) -> (T, T) {
@@ -281,7 +279,7 @@ fn _div_rem_signed<
     (q, x - q * other)
 }
 
-fn _div_assign_rem_signed<
+fn div_assign_rem_signed<
     T: CheckedDiv<T, Output = T> + Copy + Mul<T, Output = T> + Sub<T, Output = T>,
 >(
     x: &mut T,
@@ -292,7 +290,7 @@ fn _div_assign_rem_signed<
     original - *x * other
 }
 
-fn _ceiling_div_mod_signed<
+fn ceiling_div_mod_signed<
     U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
     T: Copy
         + ExactFrom<U>
@@ -350,7 +348,7 @@ macro_rules! impl_div_mod_signed {
             /// See the documentation of the `num::arithmetic::div_mod` module.
             #[inline]
             fn div_mod(self, other: $t) -> ($t, $t) {
-                _div_mod_signed(self, other)
+                div_mod_signed(self, other)
             }
         }
 
@@ -412,7 +410,7 @@ macro_rules! impl_div_mod_signed {
             /// See the documentation of the `num::arithmetic::div_mod` module.
             #[inline]
             fn div_rem(self, other: $t) -> ($t, $t) {
-                _div_rem_signed(self, other)
+                div_rem_signed(self, other)
             }
         }
 
@@ -443,7 +441,7 @@ macro_rules! impl_div_mod_signed {
             /// See the documentation of the `num::arithmetic::div_mod` module.
             #[inline]
             fn div_assign_rem(&mut self, other: $t) -> $t {
-                _div_assign_rem_signed(self, other)
+                div_assign_rem_signed(self, other)
             }
         }
 
@@ -472,7 +470,7 @@ macro_rules! impl_div_mod_signed {
             /// See the documentation of the `num::arithmetic::div_mod` module.
             #[inline]
             fn ceiling_div_mod(self, other: $t) -> ($t, $t) {
-                _ceiling_div_mod_signed(self, other)
+                ceiling_div_mod_signed(self, other)
             }
         }
 

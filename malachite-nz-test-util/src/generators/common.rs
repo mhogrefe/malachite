@@ -68,6 +68,50 @@ pub fn natural_pair_1_nrm<T: 'static + Clone>(
 }
 
 #[allow(clippy::type_complexity)]
+pub fn natural_triple_nrm(
+    ts: It<(Natural, Natural, Natural)>,
+) -> It<(
+    (BigUint, BigUint, BigUint),
+    (rug::Integer, rug::Integer, rug::Integer),
+    (Natural, Natural, Natural),
+)> {
+    Box::new(ts.map(|(x, y, z)| {
+        (
+            (
+                natural_to_biguint(&x),
+                natural_to_biguint(&y),
+                natural_to_biguint(&z),
+            ),
+            (
+                natural_to_rug_integer(&x),
+                natural_to_rug_integer(&y),
+                natural_to_rug_integer(&z),
+            ),
+            (x, y, z),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn natural_triple_rm(
+    ts: It<(Natural, Natural, Natural)>,
+) -> It<(
+    (rug::Integer, rug::Integer, rug::Integer),
+    (Natural, Natural, Natural),
+)> {
+    Box::new(ts.map(|(x, y, z)| {
+        (
+            (
+                natural_to_rug_integer(&x),
+                natural_to_rug_integer(&y),
+                natural_to_rug_integer(&z),
+            ),
+            (x, y, z),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
 pub fn natural_triple_1_rm<T: 'static + Clone, U: 'static + Clone>(
     ts: It<(Natural, T, U)>,
 ) -> It<((rug::Integer, T, U), (Natural, T, U))> {
@@ -170,6 +214,22 @@ pub fn integer_integer_natural_triple_rm(
                 integer_to_rug_integer(&x),
                 integer_to_rug_integer(&y),
                 natural_to_rug_integer(&z),
+            ),
+            (x, y, z),
+        )
+    }))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn natural_natural_triple_1_2_rm<T: 'static + Clone>(
+    ts: It<(Natural, Natural, T)>,
+) -> It<((rug::Integer, rug::Integer, T), (Natural, Natural, T))> {
+    Box::new(ts.map(|(x, y, z)| {
+        (
+            (
+                natural_to_rug_integer(&x),
+                natural_to_rug_integer(&y),
+                z.clone(),
             ),
             (x, y, z),
         )

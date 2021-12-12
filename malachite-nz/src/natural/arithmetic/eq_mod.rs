@@ -21,7 +21,7 @@ use natural::Natural;
 use platform::{DoubleLimb, Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 use std::cmp::Ordering;
 
-/// See the description for `_limbs_mod_exact_odd_limb`. divisor must be odd.
+/// See the description for `limbs_mod_exact_odd_limb`. divisor must be odd.
 ///
 /// Time: worst case O(1)
 ///
@@ -29,7 +29,8 @@ use std::cmp::Ordering;
 ///
 /// This is mpn_modexact_1c_odd, from mpn/generic/mode1o.c, GMP 6.2.1, where size == 1.
 /// Pass carry == 0 to get mpn_modexact_1_odd from gmp-impl.c, GMP 6.2.1, where size == 1.
-pub const fn _limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Limb {
+#[doc(hidden)]
+pub const fn limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Limb {
     if n > carry {
         let result = (n - carry) % d;
         if result == 0 {
@@ -68,10 +69,11 @@ pub const fn _limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Li
 ///
 /// This is mpn_modexact_1c_odd from mpn/generic/mode1o.c, GMP 6.2.1.
 /// Pass carry == 0 to get mpn_modexact_1_odd from gmp-impl.c, GMP 6.2.1.
-pub fn _limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
     let len = ns.len();
     if len == 1 {
-        return _limbs_limb_mod_exact_odd_limb(ns[0], d, carry);
+        return limbs_limb_mod_exact_odd_limb(ns[0], d, carry);
     }
     let d_inv = limbs_modular_invert_limb(d);
     let d_double = DoubleLimb::from(d);
@@ -125,6 +127,7 @@ pub fn _limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb 
 ///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.2.1, where a is positive and the
 /// ABOVE_THRESHOLD branch is excluded.
+#[doc(hidden)]
 pub fn limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
     assert_ne!(m, 0);
     assert!(xs.len() > 1);
@@ -133,9 +136,9 @@ pub fn limbs_eq_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
         if !xs[0].wrapping_sub(y).divisible_by_power_of_2(twos) {
             return false;
         }
-        _limbs_mod_exact_odd_limb(xs, m >> twos, y)
+        limbs_mod_exact_odd_limb(xs, m >> twos, y)
     } else {
-        _limbs_mod_exact_odd_limb(xs, m, y)
+        limbs_mod_exact_odd_limb(xs, m, y)
     };
     r == 0 || r == m
 }
@@ -171,7 +174,7 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
                     r == y % m_0
                 }
             } else {
-                let r = _limbs_mod_exact_odd_limb(xs, m_0, y);
+                let r = limbs_mod_exact_odd_limb(xs, m_0, y);
                 r == 0 || r == m_0
             });
         }
@@ -205,6 +208,7 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
+#[doc(hidden)]
 pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -243,6 +247,7 @@ pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
+#[doc(hidden)]
 pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -281,6 +286,7 @@ pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool 
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
+#[doc(hidden)]
 pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -318,6 +324,7 @@ pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool 
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
 #[allow(clippy::absurd_extreme_comparisons)]
+#[doc(hidden)]
 pub fn limbs_eq_limb_mod(xs: &mut [Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_eq_limb_mod_helper(xs, y, ms) {
         return equal;
@@ -373,6 +380,7 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], m: Limb) -> Option<bool> {
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
+#[doc(hidden)]
 pub fn limbs_eq_mod_limb_ref_ref(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_ref_ref_greater(xs, ys, m)
@@ -428,6 +436,7 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
+#[doc(hidden)]
 pub fn limbs_eq_mod_limb_ref_val(xs: &[Limb], ys: &mut [Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_ref_val_greater(xs, ys, m)
@@ -486,6 +495,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> b
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
+#[doc(hidden)]
 pub fn limbs_eq_mod_limb_val_ref(xs: &mut [Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_limb_val_ref_greater(xs, ys, m)
@@ -564,6 +574,7 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], m: &[Limb]) -> Option<bool> {
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive and each is
 /// longer than one limb.
+#[doc(hidden)]
 pub fn limbs_eq_mod_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_ref_ref(xs, ys, ms)
@@ -615,6 +626,7 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive and each is
 /// longer than one limb.
+#[doc(hidden)]
 pub fn limbs_eq_mod_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_ref_val(xs, ys, ms)
@@ -666,6 +678,7 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive and each is
 /// longer than one limb.
+#[doc(hidden)]
 pub fn limbs_eq_mod_ref_val_ref(xs: &[Limb], ys: &mut [Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_val_ref(xs, ys, ms)
@@ -735,6 +748,7 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], ms: &[Limb]) -
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive and each is
 /// longer than one limb.
+#[doc(hidden)]
 pub fn limbs_eq_mod_ref_val_val(xs: &[Limb], ys: &mut [Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_greater_ref_val_val(xs, ys, ms)

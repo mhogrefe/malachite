@@ -27,6 +27,7 @@ use platform::Limb;
 /// assert_eq!(limbs_is_power_of_2(&[1, 0b1000]), false);
 /// assert_eq!(limbs_is_power_of_2(&[0, 0b1010]), false);
 /// ```
+#[doc(hidden)]
 pub fn limbs_is_power_of_2(xs: &[Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last().unwrap();
     slice_test_zero(xs_init) && xs_last.is_power_of_2()

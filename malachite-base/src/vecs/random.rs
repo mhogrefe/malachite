@@ -149,13 +149,6 @@ macro_rules! random_vecs_fixed_length {
         /// `xs` must be infinite.
         ///
         /// # Expected complexity per iteration
-        /// Let $j$ be the largest index of any output associated with `xs`, $X$ the set of outputs
-        /// with indices higher than $j$, $P$ the product of the lengths of all the iterators
-        /// associated with the outputs in $X$, including multiplicities, and $T^\prime$ and
-        /// $M^\prime$ the time and additional memory complexities of `xs`.
-        ///
-        /// We have
-        ///
         /// $$
         /// T(n) = O(\sum_{j=0}^{n-1}T_j)
         /// $$

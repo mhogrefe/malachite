@@ -37,7 +37,7 @@ use std::cmp::Ordering;
 ///
 /// This is mpn_sqrtrem2 from mpn/generic/sqrtrem.c, GMP 6.2.1.
 #[doc(hidden)]
-pub fn _sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
+pub fn sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
     assert!(n_hi.leading_zeros() < 2);
     let (mut sqrt, mut r_lo) = sqrt_rem_newton::<Limb, SignedLimb>(n_hi);
     const PREC: u64 = Limb::WIDTH >> 1;
@@ -76,7 +76,7 @@ pub fn _sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
     (sqrt, r_hi == 1, r_lo)
 }
 
-pub const fn _limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
+pub const fn limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
     (n >> 1) + 1
 }
 
@@ -91,7 +91,7 @@ pub const fn _limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
 ///
 /// This is mpn_dc_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1.
 #[doc(hidden)]
-pub fn _limbs_sqrt_rem_helper(
+pub fn limbs_sqrt_rem_helper(
     out: &mut [Limb],
     xs: &mut [Limb],
     approx: Limb,
@@ -107,12 +107,12 @@ pub fn _limbs_sqrt_rem_helper(
     let xs_hi = &mut xs[two_h1..];
     let out_hi = &mut out[h1..];
     let q = if h2 == 1 {
-        let (sqrt, r_hi, r_lo) = _sqrt_rem_2_newton(xs_hi[1], xs_hi[0]);
+        let (sqrt, r_hi, r_lo) = sqrt_rem_2_newton(xs_hi[1], xs_hi[0]);
         out_hi[0] = sqrt;
         xs_hi[0] = r_lo;
         r_hi
     } else {
-        _limbs_sqrt_rem_helper(out_hi, xs_hi, 0, scratch)
+        limbs_sqrt_rem_helper(out_hi, xs_hi, 0, scratch)
     };
     if q {
         assert!(limbs_sub_same_length_in_place_left(
@@ -198,7 +198,7 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
 /// The return value is true iff there is a remainder (that is, x is not a perfect square).
 ///
 /// This is mpn_dc_sqrt from mpn/generic/sqrtrem.c, GMP 6.2.1.
-pub fn _limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
+pub fn limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
     let odd = usize::iverson(odd);
     assert_eq!(xs.len(), (n << 1) - odd);
@@ -225,7 +225,7 @@ pub fn _limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) 
         scratch_hi[1..n + h2 + 2].copy_from_slice(&xs[h1 - 1 - odd..(n << 1) - odd]);
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(n + 1); // scratch_hi len is n + h1 + 3
-    let r_hi = _limbs_sqrt_rem_helper(out_hi, &mut scratch_hi[h1 + 1..n + h2 + 1], 0, scratch_lo);
+    let r_hi = limbs_sqrt_rem_helper(out_hi, &mut scratch_hi[h1 + 1..n + h2 + 1], 0, scratch_lo);
     if r_hi {
         assert!(limbs_sub_same_length_in_place_left(
             &mut scratch_hi[h1 + 1..n + 1],
@@ -343,10 +343,10 @@ pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
         }
         2 => {
             out[0] = if shift == 0 {
-                _sqrt_rem_2_newton(xs[1], xs[0]).0
+                sqrt_rem_2_newton(xs[1], xs[0]).0
             } else {
                 let lo = xs[0];
-                _sqrt_rem_2_newton(
+                sqrt_rem_2_newton(
                     (high << two_shift) | (lo >> (Limb::WIDTH - two_shift)),
                     lo << two_shift,
                 )
@@ -355,7 +355,7 @@ pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
         }
         _ if xs_len > 8 => {
             let out_len = xs_len.shr_round(1, RoundingMode::Ceiling);
-            _limbs_sqrt_helper(&mut out[..out_len], xs, shift, xs_len.odd());
+            limbs_sqrt_helper(&mut out[..out_len], xs, shift, xs_len.odd());
         }
         _ => {
             let out_len = xs_len.shr_round(1, RoundingMode::Ceiling);
@@ -379,12 +379,12 @@ pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
                 if xs_len.odd() {
                     shift += Limb::WIDTH >> 1;
                 }
-                _limbs_sqrt_rem_helper(out, scratch_1, Limb::low_mask(shift) - 1, scratch_2);
+                limbs_sqrt_rem_helper(out, scratch_1, Limb::low_mask(shift) - 1, scratch_2);
                 limbs_slice_shr_in_place(out, shift);
             } else {
                 let mut rem = xs.to_vec();
                 let mut scratch = vec![0; (out_len >> 1) + 1];
-                _limbs_sqrt_rem_helper(out, &mut rem, 0, &mut scratch);
+                limbs_sqrt_rem_helper(out, &mut rem, 0, &mut scratch);
             }
         }
     }
@@ -437,7 +437,7 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
         }
         2 => {
             if shift == 0 {
-                let (sqrt, r_hi, r_lo) = _sqrt_rem_2_newton(xs[1], xs[0]);
+                let (sqrt, r_hi, r_lo) = sqrt_rem_2_newton(xs[1], xs[0]);
                 out_rem[0] = r_lo;
                 out_sqrt[0] = sqrt;
                 if r_hi {
@@ -449,7 +449,7 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
             } else {
                 let mut lo = xs[0];
                 let hi = (high << two_shift) | (lo >> (Limb::WIDTH - two_shift));
-                out_sqrt[0] = _sqrt_rem_2_newton(hi, lo << two_shift).0 >> shift;
+                out_sqrt[0] = sqrt_rem_2_newton(hi, lo << two_shift).0 >> shift;
                 lo.wrapping_sub_assign(out_sqrt[0].wrapping_square());
                 out_rem[0] = lo;
                 usize::iverson(lo != 0)
@@ -477,7 +477,7 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
                 if xs_len.odd() {
                     shift += Limb::WIDTH >> 1;
                 }
-                let r_hi = _limbs_sqrt_rem_helper(out_sqrt, scratch_1, 0, scratch_2);
+                let r_hi = limbs_sqrt_rem_helper(out_sqrt, scratch_1, 0, scratch_2);
                 let s = out_sqrt[0] & Limb::low_mask(shift);
                 let scratch_1_lo = &mut scratch_1[..out_len];
                 let mut r_lo = limbs_slice_add_mul_limb_same_length_in_place_left(
@@ -511,7 +511,7 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
             } else {
                 out_rem[..xs_len].copy_from_slice(xs);
                 let mut scratch = vec![0; (out_len >> 1) + 1];
-                if _limbs_sqrt_rem_helper(out_sqrt, out_rem, 0, &mut scratch) {
+                if limbs_sqrt_rem_helper(out_sqrt, out_rem, 0, &mut scratch) {
                     out_rem[out_len] = 1;
                     out_len += 1;
                 }

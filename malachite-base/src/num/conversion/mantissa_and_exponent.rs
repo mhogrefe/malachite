@@ -9,7 +9,7 @@ use num::conversion::traits::{
 use num::logic::traits::{BitAccess, LeadingZeros, LowMask, SignificantBits, TrailingZeros};
 use rounding_modes::RoundingMode;
 
-fn _raw_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, u64) {
+fn raw_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, u64) {
     let bits = x.to_bits();
     let mantissa = bits.mod_power_of_2(T::MANTISSA_WIDTH);
     let exponent: u64 = (bits >> T::MANTISSA_WIDTH).exact_into();
@@ -18,17 +18,17 @@ fn _raw_mantissa_and_exponent<T: PrimitiveFloat>(x: T) -> (u64, u64) {
 }
 
 #[inline]
-fn _raw_mantissa<T: PrimitiveFloat>(x: T) -> u64 {
+fn raw_mantissa<T: PrimitiveFloat>(x: T) -> u64 {
     x.to_bits().mod_power_of_2(T::MANTISSA_WIDTH)
 }
 
 #[inline]
-fn _raw_exponent<T: PrimitiveFloat>(x: T) -> u64 {
+fn raw_exponent<T: PrimitiveFloat>(x: T) -> u64 {
     let exponent: u64 = (x.to_bits() >> T::MANTISSA_WIDTH).exact_into();
     exponent.mod_power_of_2(T::EXPONENT_WIDTH)
 }
 
-fn _from_raw_mantissa_and_exponent<T: PrimitiveFloat>(raw_mantissa: u64, raw_exponent: u64) -> T {
+fn from_raw_mantissa_and_exponent<T: PrimitiveFloat>(raw_mantissa: u64, raw_exponent: u64) -> T {
     assert!(raw_mantissa.significant_bits() <= T::MANTISSA_WIDTH);
     assert!(raw_exponent.significant_bits() <= T::EXPONENT_WIDTH);
     let x = T::from_bits((raw_exponent << T::MANTISSA_WIDTH) | raw_mantissa);
@@ -40,7 +40,7 @@ fn _from_raw_mantissa_and_exponent<T: PrimitiveFloat>(raw_mantissa: u64, raw_exp
     }
 }
 
-fn _integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (u64, i64) {
+fn integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (u64, i64) {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (mut raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -60,7 +60,7 @@ fn _integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (u
     }
 }
 
-fn _integer_mantissa_primitive_float<T: PrimitiveFloat>(x: T) -> u64 {
+fn integer_mantissa_primitive_float<T: PrimitiveFloat>(x: T) -> u64 {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (mut raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -70,7 +70,7 @@ fn _integer_mantissa_primitive_float<T: PrimitiveFloat>(x: T) -> u64 {
     raw_mantissa >> raw_mantissa.trailing_zeros()
 }
 
-fn _integer_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> i64 {
+fn integer_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> i64 {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -89,7 +89,7 @@ fn _integer_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> i64 {
     }
 }
 
-fn _from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
+fn from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     integer_mantissa: u64,
     integer_exponent: i64,
 ) -> Option<T> {
@@ -127,7 +127,7 @@ fn _from_integer_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     ))
 }
 
-fn _sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (T, i64) {
+fn sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (T, i64) {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -149,7 +149,7 @@ fn _sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> (T, i6
     }
 }
 
-fn _sci_mantissa_primitive_float<T: PrimitiveFloat>(x: T) -> T {
+fn sci_mantissa_primitive_float<T: PrimitiveFloat>(x: T) -> T {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (mut mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -161,7 +161,7 @@ fn _sci_mantissa_primitive_float<T: PrimitiveFloat>(x: T) -> T {
     T::from_raw_mantissa_and_exponent(mantissa, u64::wrapping_from(T::MAX_EXPONENT))
 }
 
-fn _sci_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> i64 {
+fn sci_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> i64 {
     assert!(x.is_finite());
     assert!(x != T::ZERO);
     let (raw_mantissa, raw_exponent) = x.raw_mantissa_and_exponent();
@@ -175,7 +175,7 @@ fn _sci_exponent_primitive_float<T: PrimitiveFloat>(x: T) -> i64 {
 }
 
 #[allow(clippy::wrong_self_convention)]
-fn _from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
+fn from_sci_mantissa_and_exponent_primitive_float<T: PrimitiveFloat>(
     sci_mantissa: T,
     sci_exponent: i64,
 ) -> Option<T> {
@@ -589,7 +589,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn raw_mantissa_and_exponent(self) -> (u64, u64) {
-                _raw_mantissa_and_exponent(self)
+                raw_mantissa_and_exponent(self)
             }
 
             /// Returns the raw mantissa.
@@ -616,7 +616,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn raw_mantissa(self) -> u64 {
-                _raw_mantissa(self)
+                raw_mantissa(self)
             }
 
             /// Returns the raw exponent.
@@ -642,7 +642,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn raw_exponent(self) -> u64 {
-                _raw_exponent(self)
+                raw_exponent(self)
             }
 
             /// Constructs a float from its raw mantissa and exponent.
@@ -672,7 +672,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn from_raw_mantissa_and_exponent(raw_mantissa: u64, raw_exponent: u64) -> $t {
-                _from_raw_mantissa_and_exponent(raw_mantissa, raw_exponent)
+                from_raw_mantissa_and_exponent(raw_mantissa, raw_exponent)
             }
         }
 
@@ -698,7 +698,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn integer_mantissa_and_exponent(self) -> (u64, i64) {
-                _integer_mantissa_and_exponent_primitive_float(self)
+                integer_mantissa_and_exponent_primitive_float(self)
             }
 
             /// Returns the integer mantissa.
@@ -720,7 +720,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn integer_mantissa(self) -> u64 {
-                _integer_mantissa_primitive_float(self)
+                integer_mantissa_primitive_float(self)
             }
 
             /// Returns the integer exponent.
@@ -742,7 +742,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn integer_exponent(self) -> i64 {
-                _integer_exponent_primitive_float(self)
+                integer_exponent_primitive_float(self)
             }
 
             /// Constructs a float from its integer mantissa and exponent.
@@ -770,7 +770,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
                 integer_mantissa: u64,
                 integer_exponent: i64,
             ) -> Option<$t> {
-                _from_integer_mantissa_and_exponent_primitive_float(
+                from_integer_mantissa_and_exponent_primitive_float(
                     integer_mantissa,
                     integer_exponent,
                 )
@@ -800,7 +800,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn sci_mantissa_and_exponent(self) -> ($t, i64) {
-                _sci_mantissa_and_exponent_primitive_float(self)
+                sci_mantissa_and_exponent_primitive_float(self)
             }
 
             /// Returns the scientific mantissa.
@@ -823,7 +823,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn sci_mantissa(self) -> $t {
-                _sci_mantissa_primitive_float(self)
+                sci_mantissa_primitive_float(self)
             }
 
             /// Returns the scientific exponent.
@@ -844,7 +844,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn sci_exponent(self) -> i64 {
-                _sci_exponent_primitive_float(self)
+                sci_exponent_primitive_float(self)
             }
 
             /// Constructs a float from its scientific mantissa and exponent.
@@ -870,7 +870,7 @@ macro_rules! impl_mantissa_and_exponent_primitive_float {
             /// See the documentation of the `num::conversion::mantissa_and_exponent` module.
             #[inline]
             fn from_sci_mantissa_and_exponent(sci_mantissa: $t, sci_exponent: i64) -> Option<$t> {
-                _from_sci_mantissa_and_exponent_primitive_float(sci_mantissa, sci_exponent)
+                from_sci_mantissa_and_exponent_primitive_float(sci_mantissa, sci_exponent)
             }
         }
     };

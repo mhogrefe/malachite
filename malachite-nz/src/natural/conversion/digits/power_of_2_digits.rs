@@ -17,7 +17,7 @@ use std::cmp::{min, Ordering};
 
 impl Natural {
     #[doc(hidden)]
-    pub fn _to_power_of_2_digits_asc_naive<
+    pub fn to_power_of_2_digits_asc_naive<
         T: for<'a> CheckedFrom<&'a Natural> + PrimitiveUnsigned,
     >(
         &self,
@@ -45,7 +45,7 @@ impl Natural {
     }
 
     #[doc(hidden)]
-    pub fn _from_power_of_2_digits_asc_naive<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
+    pub fn from_power_of_2_digits_asc_naive<T: PrimitiveUnsigned, I: Iterator<Item = T>>(
         log_base: u64,
         digits: I,
     ) -> Option<Natural>
@@ -717,7 +717,7 @@ impl PowerOf2Digits<Natural> for Natural {
 
 impl Natural {
     #[doc(hidden)]
-    pub fn _to_power_of_2_digits_asc_natural_naive(&self, log_base: u64) -> Vec<Natural> {
+    pub fn to_power_of_2_digits_asc_natural_naive(&self, log_base: u64) -> Vec<Natural> {
         assert_ne!(log_base, 0);
         let digit_len = self
             .significant_bits()
@@ -733,7 +733,7 @@ impl Natural {
     }
 
     #[doc(hidden)]
-    pub fn _from_power_of_2_digits_asc_natural_naive<I: Iterator<Item = Natural>>(
+    pub fn from_power_of_2_digits_asc_natural_naive<I: Iterator<Item = Natural>>(
         log_base: u64,
         digits: I,
     ) -> Option<Natural> {

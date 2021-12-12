@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::mod_pow::_simple_binary_mod_pow;
+use malachite_base::num::arithmetic::mod_pow::simple_binary_mod_pow;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::bucketers::triple_2_3_product_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -6,7 +6,7 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{
     unsigned_triple_gen_var_14, unsigned_triple_gen_var_15,
 };
-use malachite_base_test_util::num::arithmetic::mod_pow::_naive_mod_pow;
+use malachite_base_test_util::num::arithmetic::mod_pow::naive_mod_pow;
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -58,7 +58,7 @@ fn benchmark_mod_pow_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(x, exp, m)| no_out!(x.mod_pow(exp, m))),
             ("simple binary", &mut |(x, exp, m)| {
-                no_out!(_simple_binary_mod_pow(x, exp, m))
+                no_out!(simple_binary_mod_pow(x, exp, m))
             }),
         ],
     );
@@ -81,10 +81,10 @@ fn benchmark_mod_pow_naive_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(x, exp, m)| no_out!(x.mod_pow(exp, m))),
             ("naive", &mut |(x, exp, m)| {
-                no_out!(_naive_mod_pow(x, exp, m))
+                no_out!(naive_mod_pow(x, exp, m))
             }),
             ("simple binary", &mut |(x, exp, m)| {
-                no_out!(_simple_binary_mod_pow(x, exp, m))
+                no_out!(simple_binary_mod_pow(x, exp, m))
             }),
         ],
     );

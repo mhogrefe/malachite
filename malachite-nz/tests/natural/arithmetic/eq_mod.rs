@@ -1,25 +1,42 @@
-use malachite_base::num::arithmetic::traits::EqMod;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz_test_util::natural::arithmetic::eq_mod::_combined_limbs_eq_limb_mod_limb;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz_test_util::natural::arithmetic::eq_mod::{
-    limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2, limbs_eq_mod_limb_naive_1,
-    limbs_eq_mod_limb_naive_2, limbs_eq_mod_naive_1, limbs_eq_mod_naive_2,
+use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_triple_gen_var_19, unsigned_triple_gen_var_21, unsigned_vec_triple_gen_var_36,
+    unsigned_vec_unsigned_unsigned_triple_gen_var_10,
+    unsigned_vec_unsigned_unsigned_triple_gen_var_7,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6,
 };
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_eq_limb_mod, limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref,
     limbs_eq_limb_mod_ref_val, limbs_eq_limb_mod_val_ref, limbs_eq_mod_limb_ref_ref,
     limbs_eq_mod_limb_ref_val, limbs_eq_mod_limb_val_ref, limbs_eq_mod_ref_ref_ref,
     limbs_eq_mod_ref_ref_val, limbs_eq_mod_ref_val_ref, limbs_eq_mod_ref_val_val,
+    limbs_limb_mod_exact_odd_limb, limbs_mod_exact_odd_limb,
 };
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::natural_to_rug_integer;
+use malachite_nz_test_util::generators::{
+    natural_pair_gen, natural_triple_gen, natural_triple_gen_var_1, natural_triple_gen_var_2,
+    unsigned_vec_triple_gen_var_54, unsigned_vec_triple_gen_var_55,
+    unsigned_vec_unsigned_unsigned_triple_gen_var_11,
+    unsigned_vec_unsigned_unsigned_triple_gen_var_12,
+    unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4,
+    unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16,
+};
+use malachite_nz_test_util::natural::arithmetic::eq_mod::{
+    combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2,
+    limbs_eq_mod_limb_naive_1, limbs_eq_mod_limb_naive_2, limbs_eq_mod_naive_1,
+    limbs_eq_mod_naive_2,
+};
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -27,7 +44,7 @@ fn test_limbs_eq_limb_mod_limb() {
     let test = |xs: &[Limb], y: Limb, m: Limb, equal: bool| {
         assert_eq!(limbs_eq_limb_mod_limb(xs, y, m), equal);
         assert_eq!(limbs_mod_limb(xs, m) == y % m, equal);
-        assert_eq!(_combined_limbs_eq_limb_mod_limb(xs, y, m), equal);
+        assert_eq!(combined_limbs_eq_limb_mod_limb(xs, y, m), equal);
     };
     test(&[6, 7], 4, 2, true);
     test(&[7, 7], 4, 2, false);
@@ -673,4 +690,283 @@ fn test_eq_mod() {
     test("1000000001234", "1235", "1000000000000", false);
     test("1000000001234", "5000000001234", "1000000000000", true);
     test("1000000001234", "5000000001235", "1000000000000", false);
+}
+
+#[test]
+fn limbs_limb_mod_exact_odd_limb_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_triple_gen_var_21().test_properties_with_config(&config, |(n, d, carry)| {
+        let r = Natural::from(limbs_limb_mod_exact_odd_limb(n, d, carry));
+        assert_eq!(n.eq_mod(carry, d), r == 0);
+        assert!(r <= d);
+        if carry < d {
+            assert!(r < d);
+        }
+        let a = Natural::from(n);
+        let d = Natural::from(d);
+        let carry = Natural::from(carry);
+        assert!(((&r << Limb::WIDTH) + &a).eq_mod(&carry, &d) || (r + a).eq_mod(carry, d));
+    });
+}
+
+#[test]
+fn limbs_mod_exact_odd_limb_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_unsigned_triple_gen_var_10().test_properties_with_config(
+        &config,
+        |(ns, d, carry)| {
+            let r = Natural::from(limbs_mod_exact_odd_limb(&ns, d, carry));
+            assert!(r <= d);
+            if carry < d {
+                assert!(r < d);
+            }
+            let ns_len = u64::exact_from(ns.len());
+            let a = Natural::from_owned_limbs_asc(ns);
+            let d = Natural::from(d);
+            let carry = Natural::from(carry);
+            assert_eq!((&a).eq_mod(&carry, &d), r == 0 || r == d);
+            let p_1 = &r << (ns_len * Limb::WIDTH);
+            let p_2 = r << ((ns_len - 1) * Limb::WIDTH);
+            assert!((p_1 + &a).eq_mod(&carry, &d) || (p_2 + a).eq_mod(carry, d));
+        },
+    );
+}
+
+#[test]
+fn limbs_eq_limb_mod_limb_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_unsigned_triple_gen_var_7().test_properties_with_config(
+        &config,
+        |(xs, y, m)| {
+            let equal = limbs_eq_limb_mod_limb(&xs, y, m);
+            assert_eq!(
+                Natural::from_limbs_asc(&xs).eq_mod(Natural::from(y), Natural::from(m)),
+                equal
+            );
+            assert_eq!(limbs_mod_limb(&xs, m) == y % m, equal);
+            assert_eq!(combined_limbs_eq_limb_mod_limb(&xs, y, m), equal);
+        },
+    );
+
+    unsigned_vec_unsigned_unsigned_triple_gen_var_11().test_properties_with_config(
+        &config,
+        |(xs, y, m)| {
+            assert!(limbs_eq_limb_mod_limb(&xs, y, m));
+            assert!(Natural::from_limbs_asc(&xs).eq_mod(Natural::from(y), Natural::from(m)));
+            assert_eq!(limbs_mod_limb(&xs, m), y % m);
+            assert!(combined_limbs_eq_limb_mod_limb(&xs, y, m));
+        },
+    );
+
+    unsigned_vec_unsigned_unsigned_triple_gen_var_12().test_properties_with_config(
+        &config,
+        |(xs, y, m)| {
+            assert!(!limbs_eq_limb_mod_limb(&xs, y, m));
+            assert!(!Natural::from_limbs_asc(&xs).eq_mod(Natural::from(y), Natural::from(m)));
+            assert_ne!(limbs_mod_limb(&xs, m), y % m);
+            assert!(!combined_limbs_eq_limb_mod_limb(&xs, y, m));
+        },
+    );
+}
+
+#[test]
+fn limbs_eq_limb_mod_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6().test_properties_with_config(
+        &config,
+        |(xs, ms, y)| {
+            let equal = limbs_eq_limb_mod_ref_ref(&xs, y, &ms);
+            let mut mut_xs = xs.clone();
+            let mut mut_ms = ms.clone();
+            assert_eq!(limbs_eq_limb_mod(&mut mut_xs, y, &mut mut_ms), equal);
+            let mut mut_xs = xs.clone();
+            assert_eq!(limbs_eq_limb_mod_val_ref(&mut mut_xs, y, &ms), equal);
+            let mut mut_ms = ms.clone();
+            assert_eq!(limbs_eq_limb_mod_ref_val(&xs, y, &mut mut_ms), equal);
+            assert_eq!(
+                Natural::from_limbs_asc(&xs).eq_mod(Natural::from(y), Natural::from_limbs_asc(&ms)),
+                equal
+            );
+            assert_eq!(limbs_eq_limb_mod_naive_1(&xs, y, &ms), equal);
+            assert_eq!(limbs_eq_limb_mod_naive_2(&xs, y, &ms), equal);
+        },
+    );
+
+    unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4().test_properties_with_config(
+        &config,
+        |(xs, y, ms)| {
+            assert!(
+                Natural::from_limbs_asc(&xs).eq_mod(Natural::from(y), Natural::from_limbs_asc(&ms))
+            );
+            assert!(limbs_eq_limb_mod_ref_ref(&xs, y, &ms));
+            assert!(limbs_eq_limb_mod_naive_1(&xs, y, &ms));
+            assert!(limbs_eq_limb_mod_naive_2(&xs, y, &ms));
+        },
+    );
+
+    unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5().test_properties_with_config(
+        &config,
+        |(xs, y, ms)| {
+            assert!(!Natural::from_limbs_asc(&xs)
+                .eq_mod(Natural::from(y), Natural::from_limbs_asc(&ms)));
+            assert!(!limbs_eq_limb_mod_ref_ref(&xs, y, &ms));
+            assert!(!limbs_eq_limb_mod_naive_1(&xs, y, &ms));
+            assert!(!limbs_eq_limb_mod_naive_2(&xs, y, &ms));
+        },
+    );
+}
+
+#[test]
+fn limbs_eq_mod_limb_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_6().test_properties_with_config(
+        &config,
+        |(xs, ys, m)| {
+            let equal = limbs_eq_mod_limb_ref_ref(&xs, &ys, m);
+            let mut mut_xs = xs.clone();
+            assert_eq!(limbs_eq_mod_limb_val_ref(&mut mut_xs, &ys, m), equal);
+            let mut mut_ys = ys.clone();
+            assert_eq!(limbs_eq_mod_limb_ref_val(&xs, &mut mut_ys, m), equal);
+            assert_eq!(
+                Natural::from_limbs_asc(&xs).eq_mod(Natural::from_limbs_asc(&ys), Natural::from(m)),
+                equal
+            );
+            assert_eq!(limbs_eq_mod_limb_naive_1(&xs, &ys, m), equal);
+            assert_eq!(limbs_eq_mod_limb_naive_2(&xs, &ys, m), equal);
+        },
+    );
+
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15().test_properties_with_config(
+        &config,
+        |(xs, ys, m)| {
+            assert!(
+                Natural::from_limbs_asc(&xs).eq_mod(Natural::from_limbs_asc(&ys), Natural::from(m))
+            );
+            assert!(limbs_eq_mod_limb_ref_ref(&xs, &ys, m));
+            assert!(limbs_eq_mod_limb_naive_1(&xs, &ys, m));
+            assert!(limbs_eq_mod_limb_naive_2(&xs, &ys, m));
+        },
+    );
+
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16().test_properties_with_config(
+        &config,
+        |(xs, ys, m)| {
+            assert!(!Natural::from_limbs_asc(&xs)
+                .eq_mod(Natural::from_limbs_asc(&ys), Natural::from(m)));
+            assert!(!limbs_eq_mod_limb_ref_ref(&xs, &ys, m));
+            assert!(!limbs_eq_mod_limb_naive_1(&xs, &ys, m));
+            assert!(!limbs_eq_mod_limb_naive_2(&xs, &ys, m));
+        },
+    );
+}
+
+#[test]
+fn limbs_eq_mod_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_36().test_properties_with_config(&config, |(xs, ys, ms)| {
+        let equal = limbs_eq_mod_ref_ref_ref(&xs, &ys, &ms);
+        let mut mut_ys = ys.clone();
+        let mut mut_ms = ms.clone();
+        assert_eq!(
+            limbs_eq_mod_ref_val_val(&xs, &mut mut_ys, &mut mut_ms),
+            equal
+        );
+        let mut mut_ys = ys.clone();
+        assert_eq!(limbs_eq_mod_ref_val_ref(&xs, &mut mut_ys, &ms), equal);
+        let mut mut_ms = ms.clone();
+        assert_eq!(limbs_eq_mod_ref_ref_val(&xs, &ys, &mut mut_ms), equal);
+        assert_eq!(
+            Natural::from_limbs_asc(&xs)
+                .eq_mod(Natural::from_limbs_asc(&ys), Natural::from_limbs_asc(&ms)),
+            equal
+        );
+        assert_eq!(limbs_eq_mod_naive_1(&xs, &ys, &ms), equal);
+        assert_eq!(limbs_eq_mod_naive_2(&xs, &ys, &ms), equal);
+    });
+
+    unsigned_vec_triple_gen_var_54().test_properties_with_config(&config, |(xs, ys, ms)| {
+        assert!(Natural::from_limbs_asc(&xs)
+            .eq_mod(Natural::from_limbs_asc(&ys), Natural::from_limbs_asc(&ms)));
+        assert!(limbs_eq_mod_ref_ref_ref(&xs, &ys, &ms));
+        assert!(limbs_eq_mod_naive_1(&xs, &ys, &ms));
+        assert!(limbs_eq_mod_naive_2(&xs, &ys, &ms));
+    });
+
+    unsigned_vec_triple_gen_var_55().test_properties_with_config(&config, |(xs, ys, ms)| {
+        assert!(!Natural::from_limbs_asc(&xs)
+            .eq_mod(Natural::from_limbs_asc(&ys), Natural::from_limbs_asc(&ms)));
+        assert!(!limbs_eq_mod_ref_ref_ref(&xs, &ys, &ms));
+        assert!(!limbs_eq_mod_naive_1(&xs, &ys, &ms));
+        assert!(!limbs_eq_mod_naive_2(&xs, &ys, &ms));
+    });
+}
+
+#[test]
+fn eq_mod_properties() {
+    natural_triple_gen().test_properties(|(x, y, m)| {
+        let equal = (&x).eq_mod(&y, &m);
+        assert_eq!((&y).eq_mod(&x, &m), equal);
+
+        assert_eq!((&x).eq_mod(&y, m.clone()), equal);
+        assert_eq!((&x).eq_mod(y.clone(), &m), equal);
+        assert_eq!((&x).eq_mod(y.clone(), m.clone()), equal);
+        assert_eq!(x.clone().eq_mod(&y, &m), equal);
+        assert_eq!(x.clone().eq_mod(&y, m.clone()), equal);
+        assert_eq!(x.clone().eq_mod(y.clone(), &m), equal);
+        assert_eq!(x.clone().eq_mod(y.clone(), m.clone()), equal);
+
+        assert_eq!(
+            (Integer::from(&x) - Integer::from(&y)).divisible_by(Integer::from(&m)),
+            equal
+        );
+        assert_eq!(
+            (Integer::from(&y) - Integer::from(&x)).divisible_by(Integer::from(&m)),
+            equal
+        );
+        assert_eq!(
+            natural_to_rug_integer(&x)
+                .is_congruent(&natural_to_rug_integer(&y), &natural_to_rug_integer(&m)),
+            equal
+        );
+    });
+
+    natural_triple_gen_var_1().test_properties(|(x, y, m)| {
+        assert!((&x).eq_mod(&y, &m));
+        assert!((&y).eq_mod(&x, &m));
+        assert!(natural_to_rug_integer(&x)
+            .is_congruent(&natural_to_rug_integer(&y), &natural_to_rug_integer(&m)));
+    });
+
+    natural_triple_gen_var_2().test_properties(|(x, y, m)| {
+        assert!(!(&x).eq_mod(&y, &m));
+        assert!(!(&y).eq_mod(&x, &m));
+        assert!(!natural_to_rug_integer(&x)
+            .is_congruent(&natural_to_rug_integer(&y), &natural_to_rug_integer(&m)));
+    });
+
+    natural_pair_gen().test_properties(|(x, y)| {
+        assert!((&x).eq_mod(&y, Natural::ONE));
+        assert_eq!((&x).eq_mod(Natural::ZERO, &y), (&x).divisible_by(&y));
+        assert!((&x).eq_mod(&x, &y));
+        assert_eq!((&x).eq_mod(&y, Natural::ZERO), x == y);
+    });
+
+    unsigned_triple_gen_var_19::<Limb>().test_properties(|(x, y, m)| {
+        assert_eq!(
+            Natural::from(x).eq_mod(Natural::from(y), Natural::from(m)),
+            x.eq_mod(y, m)
+        );
+    });
 }

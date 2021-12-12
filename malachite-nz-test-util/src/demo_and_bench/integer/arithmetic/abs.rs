@@ -1,9 +1,13 @@
-use crate::bench::bucketers::{integer_bit_bucketer, triple_3_integer_bit_bucketer};
+use crate::bench::bucketers::{
+    integer_bit_bucketer, triple_1_integer_bit_bucketer, triple_3_integer_bit_bucketer,
+};
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
-use malachite_nz_test_util::generators::{integer_gen, integer_gen_nrm};
+use malachite_nz_test_util::generators::{
+    integer_gen, integer_gen_nrm, integer_integer_natural_triple_gen,
+};
 use num::Signed;
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -13,11 +17,13 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_unsigned_abs);
     register_demo!(runner, demo_integer_unsigned_abs_ref);
     register_demo!(runner, demo_integer_unsigned_abs_ref_out);
+    register_demo!(runner, demo_integer_mutate_unsigned_abs);
 
     register_bench!(runner, benchmark_integer_abs_library_comparison);
     register_bench!(runner, benchmark_integer_abs_evaluation_strategy);
     register_bench!(runner, benchmark_integer_abs_assign);
     register_bench!(runner, benchmark_integer_unsigned_abs_evaluation_strategy);
+    register_bench!(runner, benchmark_integer_mutate_unsigned_abs);
 }
 
 fn demo_integer_abs(gm: GenMode, config: GenConfig, limit: usize) {
@@ -55,6 +61,25 @@ fn demo_integer_unsigned_abs_ref(gm: GenMode, config: GenConfig, limit: usize) {
 fn demo_integer_unsigned_abs_ref_out(gm: GenMode, config: GenConfig, limit: usize) {
     for n in integer_gen().get(gm, &config).take(limit) {
         println!("{}.unsigned_abs_ref() = {}", n, n.unsigned_abs_ref());
+    }
+}
+
+fn demo_integer_mutate_unsigned_abs(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut n, out, new_abs) in integer_integer_natural_triple_gen()
+        .get(gm, &config)
+        .take(limit)
+    {
+        let old_n = n.clone();
+        let old_out = out.clone();
+        let old_new_abs = new_abs.clone();
+        let actual_out = n.mutate_unsigned_abs(|x| {
+            *x = new_abs;
+            out
+        });
+        println!(
+            "n := {}; n.mutate_unsigned_abs(|x| {{ *x = {}; {} }}) = {}; n = {}",
+            old_n, old_new_abs, old_out, actual_out, n
+        );
     }
 }
 
@@ -137,5 +162,28 @@ fn benchmark_integer_unsigned_abs_evaluation_strategy(
                 no_out!(n.unsigned_abs_ref())
             }),
         ],
+    );
+}
+
+fn benchmark_integer_mutate_unsigned_abs(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "Integer.mutate_unsigned_abs(FnOnce(&mut Natural) -> T)",
+        BenchmarkType::Single,
+        integer_integer_natural_triple_gen().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_integer_bit_bucketer("x"),
+        &mut [("Malachite", &mut |(mut n, out, new_abs)| {
+            no_out!(n.mutate_unsigned_abs(|x| {
+                *x = new_abs;
+                out
+            }))
+        })],
     );
 }

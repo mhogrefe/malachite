@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::x_mul_y_is_zz::_explicit_x_mul_y_is_zz;
+use malachite_base::num::arithmetic::x_mul_y_is_zz::explicit_x_mul_y_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::bucketers::pair_max_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -34,7 +34,7 @@ fn benchmark_x_mul_y_is_zz_algorithms<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(x, y)| no_out!(T::x_mul_y_is_zz(x, y))),
             ("explicit", &mut |(x, y)| {
-                no_out!(_explicit_x_mul_y_is_zz(x, y))
+                no_out!(explicit_x_mul_y_is_zz(x, y))
             }),
         ],
     );

@@ -5,7 +5,7 @@ use rounding_modes::RoundingMode;
 use std::fmt::Display;
 use std::ops::{Add, Div, Mul, Shr, Sub};
 
-fn _div_round_unsigned<
+fn div_round_unsigned<
     T: Add<T, Output = T>
         + Copy
         + Display
@@ -88,7 +88,7 @@ macro_rules! impl_div_round_unsigned {
             /// See the documentation of the `num::arithmetic::div_round` module.
             #[inline]
             fn div_round(self, other: $t, rm: RoundingMode) -> $t {
-                _div_round_unsigned(self, other, rm)
+                div_round_unsigned(self, other, rm)
             }
         }
 
@@ -116,7 +116,7 @@ macro_rules! impl_div_round_unsigned {
 }
 apply_to_unsigneds!(impl_div_round_unsigned);
 
-fn _div_round_signed<
+fn div_round_signed<
     U: DivRound<U, Output = U>,
     S: Copy
         + ExactFrom<U>
@@ -180,7 +180,7 @@ macro_rules! impl_div_round_signed {
             /// # Examples
             /// See the documentation of the `num::arithmetic::div_round` module.
             fn div_round(self, other: $t, rm: RoundingMode) -> $t {
-                _div_round_signed(self, other, rm)
+                div_round_signed(self, other, rm)
             }
         }
 

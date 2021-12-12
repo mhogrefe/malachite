@@ -75,7 +75,7 @@ fn demo_limbs_square_to_out_basecase(gm: GenerationMode, limit: usize) {
         let xs_old = xs.clone();
         limbs_square_to_out_basecase(&mut xs, &ys);
         println!(
-            "out := {:?}; _limbs_square_to_out_basecase(&mut out, {:?}); out = {:?}",
+            "out := {:?}; limbs_square_to_out_basecase(&mut out, {:?}); out = {:?}",
             xs_old, ys, xs
         );
     }
@@ -107,7 +107,7 @@ fn benchmark_limbs_square_to_out_basecase_algorithms(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "_limbs_square_to_out_basecase(&mut [Limb], &[Limb])",
+        "limbs_square_to_out_basecase(&mut [Limb], &[Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_17(gm),
         gm.name(),
@@ -121,7 +121,7 @@ fn benchmark_limbs_square_to_out_basecase_algorithms(
                 &mut (|(mut xs, ys)| limbs_square_to_out_basecase(&mut xs, &ys)),
             ),
             (
-                "using _limbs_mul_greater_to_out_basecase",
+                "using limbs_mul_greater_to_out_basecase",
                 &mut (|(mut xs, ys)| limbs_mul_greater_to_out_basecase(&mut xs, &ys, &ys)),
             ),
         ],
@@ -134,7 +134,7 @@ fn benchmark_limbs_square_to_out_toom_2_algorithms(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "_limbs_square_to_out_toom_2(&mut [Limb], &[Limb], &mut [Limb])",
+        "limbs_square_to_out_toom_2(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_18(gm),
         gm.name(),
@@ -164,7 +164,7 @@ fn benchmark_limbs_square_to_out_toom_3_algorithms(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "_limbs_square_to_out_toom_3(&mut [Limb], &[Limb], &mut [Limb])",
+        "limbs_square_to_out_toom_3(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_19(gm),
         gm.name(),
@@ -197,7 +197,7 @@ fn benchmark_limbs_square_to_out_toom_4_algorithms(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "_limbs_square_to_out_toom_4(&mut [Limb], &[Limb], &mut [Limb])",
+        "limbs_square_to_out_toom_4(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_21(gm),
         gm.name(),
@@ -230,7 +230,7 @@ fn benchmark_limbs_square_to_out_toom_6_algorithms(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "_limbs_square_to_out_toom_6(&mut [Limb], &[Limb], &mut [Limb])",
+        "limbs_square_to_out_toom_6(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_22(gm),
         gm.name(),
@@ -263,7 +263,7 @@ fn benchmark_limbs_square_to_out_toom_8_algorithms(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "_limbs_square_to_out_toom_8(&mut [Limb], &[Limb], &mut [Limb])",
+        "limbs_square_to_out_toom_8(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_23(gm),
         gm.name(),
@@ -292,7 +292,7 @@ fn benchmark_limbs_square_to_out_toom_8_algorithms(
 
 fn benchmark_limbs_square_to_out_fft_algorithms(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark_old(
-        "_limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb]) for squaring",
+        "limbs_mul_greater_to_out_fft(&mut [Limb], &[Limb], &[Limb]) for squaring",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_23(gm),
         gm.name(),

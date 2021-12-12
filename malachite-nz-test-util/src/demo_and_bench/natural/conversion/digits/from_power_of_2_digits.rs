@@ -213,7 +213,7 @@ fn benchmark_from_power_of_2_digits_asc_algorithms<T: PrimitiveUnsigned>(
                 ))
             }),
             ("naive", &mut |(digits, log_base)| {
-                no_out!(Natural::_from_power_of_2_digits_asc_naive(
+                no_out!(Natural::from_power_of_2_digits_asc_naive(
                     log_base,
                     digits.into_iter()
                 ))
@@ -273,7 +273,7 @@ fn benchmark_natural_from_power_of_2_digits_asc_natural_algorithms(
                 ))
             }),
             ("naive", &mut |(digits, log_base)| {
-                no_out!(Natural::_from_power_of_2_digits_asc_natural_naive(
+                no_out!(Natural::from_power_of_2_digits_asc_natural_naive(
                     log_base,
                     digits.into_iter()
                 ))

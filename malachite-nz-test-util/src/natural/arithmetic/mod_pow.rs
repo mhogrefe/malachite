@@ -3,7 +3,7 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::BitIterable;
 use malachite_nz::natural::Natural;
 
-pub fn _simple_binary_mod_pow(x: &Natural, exp: &Natural, m: &Natural) -> Natural {
+pub fn simple_binary_mod_pow(x: &Natural, exp: &Natural, m: &Natural) -> Natural {
     if *m == 1 {
         return Natural::ZERO;
     }

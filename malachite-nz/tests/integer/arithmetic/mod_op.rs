@@ -1066,8 +1066,7 @@ fn mod_properties() {
         assert_eq!(x.mod_op(Integer::NEGATIVE_ONE), 0);
     });
 
-    integer_gen_var_8().test_properties(|x| {
-        let x = &x;
+    integer_gen_var_8().test_properties(|ref x| {
         assert_eq!(x.mod_op(Integer::ONE), 0);
         assert_eq!(x.mod_op(Integer::NEGATIVE_ONE), 0);
         assert_eq!(x.mod_op(x), 0);
@@ -1146,8 +1145,7 @@ fn rem_properties() {
         assert_eq!(x % Integer::NEGATIVE_ONE, 0);
     });
 
-    integer_gen_var_8().test_properties(|x| {
-        let x = &x;
+    integer_gen_var_8().test_properties(|ref x| {
         assert_eq!(x % Integer::ONE, 0);
         assert_eq!(x % Integer::NEGATIVE_ONE, 0);
         assert_eq!(x % x, 0);
@@ -1224,8 +1222,7 @@ fn ceiling_mod_properties() {
         assert_eq!(x.ceiling_mod(Integer::NEGATIVE_ONE), 0);
     });
 
-    integer_gen_var_8().test_properties(|x| {
-        let x = &x;
+    integer_gen_var_8().test_properties(|ref x| {
         assert_eq!(x.ceiling_mod(Integer::ONE), 0);
         assert_eq!(x.ceiling_mod(Integer::NEGATIVE_ONE), 0);
         assert_eq!(x.ceiling_mod(x), 0);

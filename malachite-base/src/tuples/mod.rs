@@ -437,6 +437,42 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 ///     ]
 /// );
 /// ```
+///
+/// # exhaustive_unique_tuples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::tuples::exhaustive::exhaustive_unique_quadruples;
+///
+/// let xss = exhaustive_unique_quadruples(1..=6).take(20).collect_vec();
+/// assert_eq!(
+///     xss.into_iter().collect_vec().as_slice(),
+///     &[
+///         (1, 2, 3, 4),
+///         (1, 2, 3, 5),
+///         (1, 2, 4, 3),
+///         (1, 2, 4, 5),
+///         (1, 3, 2, 4),
+///         (1, 2, 5, 3),
+///         (1, 3, 4, 2),
+///         (1, 3, 4, 5),
+///         (1, 4, 2, 3),
+///         (1, 3, 2, 5),
+///         (1, 4, 3, 2),
+///         (1, 2, 5, 4),
+///         (2, 1, 3, 4),
+///         (1, 3, 5, 2),
+///         (2, 1, 4, 3),
+///         (2, 3, 4, 5),
+///         (2, 3, 1, 4),
+///         (1, 5, 2, 3),
+///         (2, 3, 4, 1),
+///         (1, 4, 2, 5)
+///     ]
+/// );
+/// ```
 pub mod exhaustive;
 /// This module contains iterators that generate tuples randomly.
 ///

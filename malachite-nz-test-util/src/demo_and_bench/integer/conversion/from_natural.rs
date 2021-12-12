@@ -24,6 +24,7 @@ fn demo_integer_from_natural_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_from_natural_evaluation_strategy(
     gm: GenMode,
     config: GenConfig,

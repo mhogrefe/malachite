@@ -434,7 +434,7 @@ const MAX_POWER_128: [u128; 128] = [
     170141183460469231731687303715884105728,
 ];
 
-pub fn _floor_root_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
+pub fn floor_root_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
     x: T,
@@ -551,7 +551,7 @@ const COEFF: [[f32; 3]; 16] = [
 // This is n_cbrt_chebyshev_approx from ulong_extras/cbrt_chebyshev_approximation.c, FLINT 2.7.1,
 // where FLINT64 is false.
 #[doc(hidden)]
-pub fn _cbrt_chebyshev_approx_u32(n: u32) -> u32 {
+pub fn cbrt_chebyshev_approx_u32(n: u32) -> u32 {
     // UPPER_LIMIT is the max cube root possible for one word
     const UPPER_LIMIT: u32 = 1625; // 1625 < (2^32)^(1/3)
     const BIAS_HEX: u32 = 0x3f000000;
@@ -593,7 +593,7 @@ pub fn _cbrt_chebyshev_approx_u32(n: u32) -> u32 {
 // This is n_cbrt_chebyshev_approx from ulong_extras/cbrt_chebyshev_approximation.c, FLINT 2.7.1,
 // where FLINT64 is true.
 #[doc(hidden)]
-pub fn _cbrt_chebyshev_approx_u64(n: u64) -> u64 {
+pub fn cbrt_chebyshev_approx_u64(n: u64) -> u64 {
     // UPPER_LIMIT is the max cube root possible for one word
     const UPPER_LIMIT: u64 = 2642245; // 2642245 < (2^64)^(1/3)
     const BIAS_HEX: u64 = 0x3fe0000000000000;
@@ -629,15 +629,8 @@ pub fn _cbrt_chebyshev_approx_u64(n: u64) -> u64 {
     cbrt
 }
 
-// This is n_cbrt_estimate from ulong_extras/n_cbrt_estimate.c, FLINT 2.7.1, where FLINT64 is
-// false.
-fn _cbrt_estimate_f32(a: f64) -> f64 {
-    const S: u64 = 1065353216; // ((1 << 7) - 1) << 23
-    f64::from_bits((((u64::from((a as f32).to_bits()) - S) * 1431655765) >> 32) + S)
-}
-
 // This is n_cbrt_estimate from ulong_extras/n_cbrt_estimate.c, FLINT 2.7.1, where FLINT64 is true.
-fn _cbrt_estimate_f64(a: f64) -> f64 {
+fn cbrt_estimate_f64(a: f64) -> f64 {
     const S: u64 = 4607182418800017408; // ((1 << 10) - 1) << 52
     f64::from_bits(
         u64::wrapping_from((u128::from(a.to_bits() - S) * 6148914691236517205) >> 64) + S,
@@ -646,7 +639,7 @@ fn _cbrt_estimate_f64(a: f64) -> f64 {
 
 // This is n_cbrt from ulong_extras/cbrt.c, FLINT 2.7.1, where FLINT64 is false.
 #[doc(hidden)]
-pub fn _fast_floor_cbrt_u32(n: u32) -> u32 {
+pub fn fast_floor_cbrt_u32(n: u32) -> u32 {
     // Taking care of smaller roots
     if n < 125 {
         return if n >= 64 {
@@ -693,7 +686,7 @@ pub fn _fast_floor_cbrt_u32(n: u32) -> u32 {
     }
     let val = f64::from(n);
     const UPPER_LIMIT: u32 = 1625; // 1625 < (2^32)^(1/3)
-    let mut x = _cbrt_estimate_f64(val);
+    let mut x = cbrt_estimate_f64(val);
     // Kahan's iterations to get cube root
     let xcub = x * x * x;
     let num = (xcub - val) * x;
@@ -725,7 +718,7 @@ const CBRT_CHEBYSHEV_THRESHOLD: u64 = 10;
 
 // This is n_cbrt from ulong_extras/cbrt.c, FLINT 2.7.1, where FLINT64 is true.
 #[doc(hidden)]
-pub fn _fast_floor_cbrt_u64(n: u64) -> u64 {
+pub fn fast_floor_cbrt_u64(n: u64) -> u64 {
     // Taking care of smaller roots
     if n < 125 {
         return if n >= 64 {
@@ -771,11 +764,11 @@ pub fn _fast_floor_cbrt_u64(n: u64) -> u64 {
         };
     }
     if n.significant_bits() > CBRT_CHEBYSHEV_THRESHOLD {
-        return _cbrt_chebyshev_approx_u64(n);
+        return cbrt_chebyshev_approx_u64(n);
     }
     let val = n as f64;
     const UPPER_LIMIT: u64 = 2642245; // 2642245 < (2^64)^(1/3)
-    let mut x = _cbrt_estimate_f64(val);
+    let mut x = cbrt_estimate_f64(val);
     // Kahan's iterations to get cube root
     let xcub = x * x * x;
     let num = (xcub - val) * x;
@@ -910,7 +903,7 @@ const MUL_FACTOR_64: [u64; 65] = [
 
 // This is n_root_estimate from ulong_extras/root_estimate.c, FLINT 2.7.1, where FLINT64 is false.
 #[doc(hidden)]
-pub fn _root_estimate_32(a: f64, n: usize) -> u32 {
+pub fn root_estimate_32(a: f64, n: usize) -> u32 {
     let mut s = (1 << 7) - 1;
     s <<= 23;
     let mut i = (a as f32).to_bits();
@@ -923,7 +916,7 @@ pub fn _root_estimate_32(a: f64, n: usize) -> u32 {
 
 // This is n_root_estimate from ulong_extras/root_estimate.c, FLINT 2.7.1, where FLINT64 is true.
 #[doc(hidden)]
-pub fn _root_estimate_64(a: f64, n: usize) -> u64 {
+pub fn root_estimate_64(a: f64, n: usize) -> u64 {
     let mut s = (1 << 10) - 1;
     s <<= 52;
     let mut i = a.to_bits();
@@ -1004,7 +997,7 @@ const INV_TABLE: [f64; 65] = [
 
 // This is n_root from ulong_extras/root.c, FLINT 2.7.1, where FLINT64 is false and root is nonzero.
 #[doc(hidden)]
-pub fn _fast_floor_root_u32(n: u32, exp: u64) -> u32 {
+pub fn fast_floor_root_u32(n: u32, exp: u64) -> u32 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
@@ -1016,12 +1009,12 @@ pub fn _fast_floor_root_u32(n: u32, exp: u64) -> u32 {
         return n.floor_sqrt();
     }
     if exp == 3 {
-        return _cbrt_chebyshev_approx_u32(n);
+        return cbrt_chebyshev_approx_u32(n);
     }
     let exp = u32::wrapping_from(exp);
     let exp_usize = usize::wrapping_from(exp);
     let upper_limit = MAX_BASE_32[exp_usize]; // n <= upper_limit ^ exp
-    let x = _root_estimate_32(f64::from(n), exp_usize);
+    let x = root_estimate_32(f64::from(n), exp_usize);
     // one round of Newton iteration
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
@@ -1050,7 +1043,7 @@ pub fn _fast_floor_root_u32(n: u32, exp: u64) -> u32 {
 
 // This is n_root from ulong_extras/root.c, FLINT 2.7.1, where FLINT64 is true and root is nonzero.
 #[doc(hidden)]
-pub fn _fast_floor_root_u64(n: u64, exp: u64) -> u64 {
+pub fn fast_floor_root_u64(n: u64, exp: u64) -> u64 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
@@ -1059,7 +1052,7 @@ pub fn _fast_floor_root_u64(n: u64, exp: u64) -> u64 {
         return n.floor_sqrt();
     }
     if exp == 3 {
-        return _cbrt_chebyshev_approx_u64(n);
+        return cbrt_chebyshev_approx_u64(n);
     }
     if exp >= u64::WIDTH || (1 << exp) > n {
         return 1;
@@ -1067,7 +1060,7 @@ pub fn _fast_floor_root_u64(n: u64, exp: u64) -> u64 {
     let exp = u32::wrapping_from(exp);
     let exp_usize = usize::wrapping_from(exp);
     let upper_limit = MAX_BASE_64[exp_usize]; // n <= upper_limit ^ exp
-    let x = _root_estimate_64(n as f64, exp_usize);
+    let x = root_estimate_64(n as f64, exp_usize);
     // one round of Newton iteration
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
@@ -1095,7 +1088,7 @@ pub fn _fast_floor_root_u64(n: u64, exp: u64) -> u64 {
 }
 
 #[doc(hidden)]
-pub fn _fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
+pub fn fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
@@ -1107,13 +1100,13 @@ pub fn _fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
         return n.ceiling_sqrt();
     }
     if exp == 3 {
-        let root = _cbrt_chebyshev_approx_u32(n);
+        let root = cbrt_chebyshev_approx_u32(n);
         return if root.pow(3) == n { root } else { root + 1 };
     }
     let exp = u32::wrapping_from(exp);
     let exp_usize = usize::wrapping_from(exp);
     let upper_limit = MAX_BASE_32[exp_usize]; // n <= upper_limit ^ exp
-    let x = _root_estimate_32(f64::from(n), exp_usize);
+    let x = root_estimate_32(f64::from(n), exp_usize);
     // one round of Newton iteration
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
@@ -1145,7 +1138,7 @@ pub fn _fast_ceiling_root_u32(n: u32, exp: u64) -> u32 {
 }
 
 #[doc(hidden)]
-pub fn _fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
+pub fn fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return n;
@@ -1157,13 +1150,13 @@ pub fn _fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
         return n.ceiling_sqrt();
     }
     if exp == 3 {
-        let root = _cbrt_chebyshev_approx_u64(n);
+        let root = cbrt_chebyshev_approx_u64(n);
         return if root.pow(3) == n { root } else { root + 1 };
     }
     let exp = u32::wrapping_from(exp);
     let exp_usize = usize::wrapping_from(exp);
     let upper_limit = MAX_BASE_64[exp_usize]; // n <= upper_limit ^ root
-    let x = _root_estimate_64(n as f64, exp_usize);
+    let x = root_estimate_64(n as f64, exp_usize);
     // one round of Newton iteration
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
@@ -1195,7 +1188,7 @@ pub fn _fast_ceiling_root_u64(n: u64, exp: u64) -> u64 {
 }
 
 #[doc(hidden)]
-pub fn _fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
+pub fn fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return Some(n);
@@ -1207,13 +1200,13 @@ pub fn _fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
         return n.checked_sqrt();
     }
     if exp == 3 {
-        let root = _cbrt_chebyshev_approx_u32(n);
+        let root = cbrt_chebyshev_approx_u32(n);
         return if root.pow(3) == n { Some(root) } else { None };
     }
     let exp = u32::wrapping_from(exp);
     let exp_usize = usize::wrapping_from(exp);
     let upper_limit = MAX_BASE_32[exp_usize]; // n <= upper_limit ^ exp
-    let x = _root_estimate_32(f64::from(n), exp_usize);
+    let x = root_estimate_32(f64::from(n), exp_usize);
     // one round of Newton iteration
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
@@ -1245,7 +1238,7 @@ pub fn _fast_checked_root_u32(n: u32, exp: u64) -> Option<u32> {
 }
 
 #[doc(hidden)]
-pub fn _fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
+pub fn fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return Some(n);
@@ -1257,13 +1250,13 @@ pub fn _fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
         return n.checked_sqrt();
     }
     if exp == 3 {
-        let root = _cbrt_chebyshev_approx_u64(n);
+        let root = cbrt_chebyshev_approx_u64(n);
         return if root.pow(3) == n { Some(root) } else { None };
     }
     let exp = u32::wrapping_from(exp);
     let exp_usize = usize::wrapping_from(exp);
     let upper_limit = MAX_BASE_64[exp_usize]; // n <= upper_limit ^ root
-    let x = _root_estimate_64(n as f64, exp_usize);
+    let x = root_estimate_64(n as f64, exp_usize);
     // one round of Newton iteration
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
@@ -1295,7 +1288,7 @@ pub fn _fast_checked_root_u64(n: u64, exp: u64) -> Option<u64> {
 }
 
 #[doc(hidden)]
-pub fn _fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
+pub fn fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return (n, 0);
@@ -1307,14 +1300,14 @@ pub fn _fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
         return n.sqrt_rem();
     }
     if exp == 3 {
-        let root = _cbrt_chebyshev_approx_u32(n);
+        let root = cbrt_chebyshev_approx_u32(n);
         let pow = root.pow(3);
         return (root, n - pow);
     }
     let exp = u32::wrapping_from(exp);
     let exp_usize = usize::wrapping_from(exp);
     let upper_limit = MAX_BASE_32[exp_usize]; // n <= upper_limit ^ exp
-    let x = _root_estimate_32(f64::from(n), exp_usize);
+    let x = root_estimate_32(f64::from(n), exp_usize);
     // one round of Newton iteration
     let mut root = u32::rounding_from(
         (f64::from(n / x.pow(exp - 1)) - f64::from(x)) * INV_TABLE[exp_usize],
@@ -1342,7 +1335,7 @@ pub fn _fast_root_rem_u32(n: u32, exp: u64) -> (u32, u32) {
 }
 
 #[doc(hidden)]
-pub fn _fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
+pub fn fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
     assert_ne!(exp, 0);
     if n < 2 || exp == 1 {
         return (n, 0);
@@ -1354,14 +1347,14 @@ pub fn _fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
         return n.sqrt_rem();
     }
     if exp == 3 {
-        let root = _cbrt_chebyshev_approx_u64(n);
+        let root = cbrt_chebyshev_approx_u64(n);
         let pow = root.pow(3);
         return (root, n - pow);
     }
     let exp = u32::wrapping_from(exp);
     let exp_usize = usize::wrapping_from(exp);
     let upper_limit = MAX_BASE_64[exp_usize]; // n <= upper_limit ^ root
-    let x = _root_estimate_64(n as f64, exp_usize);
+    let x = root_estimate_64(n as f64, exp_usize);
     // one round of Newton iteration
     let mut root = u64::rounding_from(
         (((n / x.pow(exp - 1)) as f64) - x as f64) * INV_TABLE[exp_usize],
@@ -1389,7 +1382,7 @@ pub fn _fast_root_rem_u64(n: u64, exp: u64) -> (u64, u64) {
 }
 
 #[doc(hidden)]
-pub fn _floor_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
+pub fn floor_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
     if exp == 0 {
         panic!("Cannot take 0th root");
     } else if exp == 1 || x < T::TWO {
@@ -1406,8 +1399,8 @@ pub fn _floor_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
 }
 
 #[doc(hidden)]
-pub fn _ceiling_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
-    let floor_root = _floor_root_binary(x, exp);
+pub fn ceiling_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
+    let floor_root = floor_root_binary(x, exp);
     if floor_root.pow(exp) == x {
         floor_root
     } else {
@@ -1416,8 +1409,8 @@ pub fn _ceiling_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> T {
 }
 
 #[doc(hidden)]
-pub fn _checked_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> Option<T> {
-    let floor_root = _floor_root_binary(x, exp);
+pub fn checked_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> Option<T> {
+    let floor_root = floor_root_binary(x, exp);
     if floor_root.pow(exp) == x {
         Some(floor_root)
     } else {
@@ -1426,8 +1419,8 @@ pub fn _checked_root_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> Option<T> {
 }
 
 #[doc(hidden)]
-pub fn _root_rem_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> (T, T) {
-    let floor_root = _floor_root_binary(x, exp);
+pub fn root_rem_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> (T, T) {
+    let floor_root = floor_root_binary(x, exp);
     (floor_root, x - floor_root.pow(exp))
 }
 
@@ -1721,7 +1714,7 @@ impl FloorRoot for u32 {
     /// is adjusted afterwards to account for error.
     #[inline]
     fn floor_root(self, exp: u64) -> u32 {
-        _fast_floor_root_u32(self, exp)
+        fast_floor_root_u32(self, exp)
     }
 }
 
@@ -1747,7 +1740,7 @@ impl CeilingRoot for u32 {
     /// is adjusted afterwards to account for error.
     #[inline]
     fn ceiling_root(self, exp: u64) -> u32 {
-        _fast_ceiling_root_u32(self, exp)
+        fast_ceiling_root_u32(self, exp)
     }
 }
 
@@ -1778,7 +1771,7 @@ impl CheckedRoot for u32 {
     /// is adjusted afterwards to account for error.
     #[inline]
     fn checked_root(self, exp: u64) -> Option<u32> {
-        _fast_checked_root_u32(self, exp)
+        fast_checked_root_u32(self, exp)
     }
 }
 
@@ -1806,7 +1799,7 @@ impl RootRem for u32 {
     /// is adjusted afterwards to account for error.
     #[inline]
     fn root_rem(self, exp: u64) -> (u32, u32) {
-        _fast_root_rem_u32(self, exp)
+        fast_root_rem_u32(self, exp)
     }
 }
 
@@ -1832,7 +1825,7 @@ impl FloorRoot for u64 {
     /// is adjusted afterwards to account for error.
     #[inline]
     fn floor_root(self, exp: u64) -> u64 {
-        _fast_floor_root_u64(self, exp)
+        fast_floor_root_u64(self, exp)
     }
 }
 
@@ -1858,7 +1851,7 @@ impl CeilingRoot for u64 {
     /// is adjusted afterwards to account for error.
     #[inline]
     fn ceiling_root(self, exp: u64) -> u64 {
-        _fast_ceiling_root_u64(self, exp)
+        fast_ceiling_root_u64(self, exp)
     }
 }
 
@@ -1889,7 +1882,7 @@ impl CheckedRoot for u64 {
     /// is adjusted afterwards to account for error.
     #[inline]
     fn checked_root(self, exp: u64) -> Option<u64> {
-        _fast_checked_root_u64(self, exp)
+        fast_checked_root_u64(self, exp)
     }
 }
 
@@ -1917,7 +1910,7 @@ impl RootRem for u64 {
     /// is adjusted afterwards to account for error.
     #[inline]
     fn root_rem(self, exp: u64) -> (u64, u64) {
-        _fast_root_rem_u64(self, exp)
+        fast_root_rem_u64(self, exp)
     }
 }
 
@@ -2071,7 +2064,7 @@ impl FloorRoot for u128 {
     /// This implementation computes the root using floating-point arithmetic. The approximate
     /// result is adjusted afterwards to account for error.
     fn floor_root(self, exp: u64) -> u128 {
-        _floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp)
+        floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp)
     }
 }
 
@@ -2095,7 +2088,7 @@ impl CeilingRoot for u128 {
     /// This implementation computes the root using floating-point arithmetic. The approximate
     /// result is adjusted afterwards to account for error.
     fn ceiling_root(self, exp: u64) -> u128 {
-        let root = _floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
+        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
         if root.pow(u32::saturating_from(exp)) == self {
             root
         } else {
@@ -2130,7 +2123,7 @@ impl CheckedRoot for u128 {
     /// This implementation computes the root using floating-point arithmetic. The approximate
     /// result is adjusted afterwards to account for error.
     fn checked_root(self, exp: u64) -> Option<u128> {
-        let root = _floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
+        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
         if root.pow(u32::saturating_from(exp)) == self {
             Some(root)
         } else {
@@ -2161,7 +2154,7 @@ impl RootRem for u128 {
     /// This implementation computes the root using floating-point arithmetic. The approximate
     /// result is adjusted afterwards to account for error.
     fn root_rem(self, exp: u64) -> (u128, u128) {
-        let root = _floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
+        let root = floor_root_approx_and_refine(|x| x as f64, |x| x as u128, self, exp);
         (root, self - root.pow(u32::saturating_from(exp)))
     }
 }
@@ -2217,9 +2210,9 @@ macro_rules! impl_root_signed {
             #[inline]
             fn floor_root(self, exp: u64) -> $t {
                 if self >= 0 {
-                    $t::wrapping_from(_floor_root_binary(self.unsigned_abs(), exp))
+                    $t::wrapping_from(floor_root_binary(self.unsigned_abs(), exp))
                 } else if exp.odd() {
-                    $t::wrapping_from(_ceiling_root_binary(self.unsigned_abs(), exp)).wrapping_neg()
+                    $t::wrapping_from(ceiling_root_binary(self.unsigned_abs(), exp)).wrapping_neg()
                 } else {
                     panic!("Cannot take even root of a negative number");
                 }
@@ -2244,9 +2237,9 @@ macro_rules! impl_root_signed {
             #[inline]
             fn ceiling_root(self, exp: u64) -> $t {
                 if self >= 0 {
-                    $t::wrapping_from(_ceiling_root_binary(self.unsigned_abs(), exp))
+                    $t::wrapping_from(ceiling_root_binary(self.unsigned_abs(), exp))
                 } else if exp.odd() {
-                    $t::wrapping_from(_floor_root_binary(self.unsigned_abs(), exp)).wrapping_neg()
+                    $t::wrapping_from(floor_root_binary(self.unsigned_abs(), exp)).wrapping_neg()
                 } else {
                     panic!("Cannot take even root of a negative number");
                 }
@@ -2277,9 +2270,9 @@ macro_rules! impl_root_signed {
             #[inline]
             fn checked_root(self, exp: u64) -> Option<$t> {
                 if self >= 0 {
-                    _checked_root_binary(self.unsigned_abs(), exp).map($t::wrapping_from)
+                    checked_root_binary(self.unsigned_abs(), exp).map($t::wrapping_from)
                 } else if exp.odd() {
-                    _checked_root_binary(self.unsigned_abs(), exp)
+                    checked_root_binary(self.unsigned_abs(), exp)
                         .map(|x| $t::wrapping_from(x).wrapping_neg())
                 } else {
                     panic!("Cannot take even root of a negative number");

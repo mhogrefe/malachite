@@ -24,7 +24,7 @@ pub(crate) fn floor_inverse_binary<F: Fn(&Natural) -> Natural>(
     }
 }
 
-pub fn _floor_sqrt_binary(x: &Natural) -> Natural {
+pub fn floor_sqrt_binary(x: &Natural) -> Natural {
     if x < &Natural::TWO {
         x.clone()
     } else {
@@ -33,8 +33,8 @@ pub fn _floor_sqrt_binary(x: &Natural) -> Natural {
     }
 }
 
-pub fn _ceiling_sqrt_binary(x: &Natural) -> Natural {
-    let floor_sqrt = _floor_sqrt_binary(x);
+pub fn ceiling_sqrt_binary(x: &Natural) -> Natural {
+    let floor_sqrt = floor_sqrt_binary(x);
     if &(&floor_sqrt).square() == x {
         floor_sqrt
     } else {
@@ -42,8 +42,8 @@ pub fn _ceiling_sqrt_binary(x: &Natural) -> Natural {
     }
 }
 
-pub fn _checked_sqrt_binary(x: &Natural) -> Option<Natural> {
-    let floor_sqrt = _floor_sqrt_binary(x);
+pub fn checked_sqrt_binary(x: &Natural) -> Option<Natural> {
+    let floor_sqrt = floor_sqrt_binary(x);
     if &(&floor_sqrt).square() == x {
         Some(floor_sqrt)
     } else {
@@ -51,8 +51,8 @@ pub fn _checked_sqrt_binary(x: &Natural) -> Option<Natural> {
     }
 }
 
-pub fn _sqrt_rem_binary(x: &Natural) -> (Natural, Natural) {
-    let floor_sqrt = _floor_sqrt_binary(x);
+pub fn sqrt_rem_binary(x: &Natural) -> (Natural, Natural) {
+    let floor_sqrt = floor_sqrt_binary(x);
     let rem = x - (&floor_sqrt).square();
     (floor_sqrt, rem)
 }

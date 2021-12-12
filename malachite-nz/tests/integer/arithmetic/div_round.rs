@@ -1104,8 +1104,7 @@ fn div_round_properties() {
         assert_eq!((&x).div_round(Integer::NEGATIVE_ONE, rm), -x);
     });
 
-    integer_rounding_mode_pair_gen_var_2().test_properties(|(x, rm)| {
-        let x = &x;
+    integer_rounding_mode_pair_gen_var_2().test_properties(|(ref x, rm)| {
         assert_eq!(Integer::ZERO.div_round(x, rm), 0);
         assert_eq!(x.div_round(x, rm), 1);
         assert_eq!(x.div_round(-x, rm), -1);

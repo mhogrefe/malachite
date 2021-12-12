@@ -2661,6 +2661,7 @@ fn special_random_finite_float_inclusive_range<T: PrimitiveFloat>(
 }
 
 /// Generates random primitive floats in a range.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum SpecialRandomFloatInclusiveRange<T: PrimitiveFloat> {
     OnlySpecial(RandomValuesFromVec<T>),

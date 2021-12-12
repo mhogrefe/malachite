@@ -4,7 +4,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use std::ops::{Neg, Shr};
 
-fn _arithmetic_checked_shr_unsigned_signed<
+fn arithmetic_checked_shr_unsigned_signed<
     T: ArithmeticCheckedShl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -55,7 +55,7 @@ macro_rules! impl_arithmetic_checked_shr_unsigned_signed {
                     /// module.
                     #[inline]
                     fn arithmetic_checked_shr(self, bits: $u) -> Option<$t> {
-                        _arithmetic_checked_shr_unsigned_signed(self, bits)
+                        arithmetic_checked_shr_unsigned_signed(self, bits)
                     }
                 }
             };
@@ -65,7 +65,7 @@ macro_rules! impl_arithmetic_checked_shr_unsigned_signed {
 }
 apply_to_unsigneds!(impl_arithmetic_checked_shr_unsigned_signed);
 
-fn _arithmetic_checked_shr_signed_signed<
+fn arithmetic_checked_shr_signed_signed<
     T: ArithmeticCheckedShl<U, Output = T> + Neg<Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -120,7 +120,7 @@ macro_rules! impl_arithmetic_checked_shr_signed_signed {
                     /// module.
                     #[inline]
                     fn arithmetic_checked_shr(self, bits: $u) -> Option<$t> {
-                        _arithmetic_checked_shr_signed_signed(self, bits)
+                        arithmetic_checked_shr_signed_signed(self, bits)
                     }
                 }
             };

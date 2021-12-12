@@ -371,8 +371,8 @@ pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 }
 
 /// Given two slices of `Limb`s as the limbs `xs` and `ys`, where `xs` is at least as long as `ys`
-/// and `in_size` is no greater than `ys.len()`, writes the `ys.len()` lowest limbs of the sum of
-/// `xs[..in_size]` and `ys` to `xs`. Returns whether there is a carry.
+/// and `xs_len` is no greater than `ys.len()`, writes the `ys.len()` lowest limbs of the sum of
+/// `xs[..xs_len]` and `ys` to `xs`. Returns whether there is a carry.
 ///
 /// For example,
 /// `limbs_add_to_out_aliased(&mut xs[..12], 7, &ys[0..10])`
@@ -387,17 +387,17 @@ pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// # Panics
-/// Panics if `xs` is shorter than `ys` or `in_size` is greater than `ys.len()`.
+/// Panics if `xs` is shorter than `ys` or `xs_len` is greater than `ys.len()`.
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the second argument is at least as long as the
 /// first and the output pointer is the same as the first input pointer.
 #[doc(hidden)]
-pub fn limbs_add_to_out_aliased(xs: &mut [Limb], in_size: usize, ys: &[Limb]) -> bool {
+pub fn limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
-    assert!(in_size <= ys_len);
-    let (ys_lo, ys_hi) = ys.split_at(in_size);
-    xs[in_size..ys_len].copy_from_slice(ys_hi);
+    assert!(xs_len <= ys_len);
+    let (ys_lo, ys_hi) = ys.split_at(xs_len);
+    xs[xs_len..ys_len].copy_from_slice(ys_hi);
     limbs_slice_add_greater_in_place_left(&mut xs[..ys_len], ys_lo)
 }
 

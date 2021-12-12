@@ -3,9 +3,10 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::bucketers::Bucketer;
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix;
+use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use std::cmp::{max, min};
 
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<Natural> {
@@ -169,6 +170,26 @@ pub fn pair_2_pair_1_natural_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(T, 
     }
 }
 
+pub fn triple_natural_max_bit_bucketer<'a>(
+    x_name: &'a str,
+    y_name: &'a str,
+    z_name: &'a str,
+) -> Bucketer<'a, (Natural, Natural, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, y, z)| {
+            usize::exact_from(max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits()
+            ))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits())",
+            x_name, y_name, z_name
+        ),
+    }
+}
+
 pub fn integer_bit_bucketer(var_name: &str) -> Bucketer<Integer> {
     Bucketer {
         bucketing_function: &|x| usize::exact_from(x.significant_bits()),
@@ -221,6 +242,36 @@ pub fn triple_integer_max_bit_bucketer<'a>(
         bucketing_label: format!(
             "max({}.significant_bits(), {}.significant_bits(), {}.significant_bits())",
             x_name, y_name, z_name
+        ),
+    }
+}
+
+pub fn triple_1_2_natural_max_bit_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Natural, Natural, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _)| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
+        ),
+    }
+}
+
+pub fn pair_2_triple_1_2_natural_max_bit_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, (Natural, Natural, U))> {
+    Bucketer {
+        bucketing_function: &|(_, (x, y, _))| {
+            usize::exact_from(max(x.significant_bits(), y.significant_bits()))
+        },
+        bucketing_label: format!(
+            "max({}.significant_bits(), {}.significant_bits())",
+            x_name, y_name
         ),
     }
 }
@@ -407,14 +458,50 @@ pub fn integer_deserialize_bucketer<'a>() -> Bucketer<'a, (String, String, Strin
     }
 }
 
-pub fn pair_1_half_gcd_matrix_bucketer<T>(m_name: &str) -> Bucketer<(HalfGcdMatrix, T)> {
+pub fn triple_1_3_prod_natural_bits_bucketer<'a, T>(
+    xs_name: &'a str,
+    zs_name: &'a str,
+) -> Bucketer<'a, (Natural, T, Natural)> {
+    Bucketer {
+        bucketing_function: &|(x, _, z)| {
+            usize::exact_from(x.significant_bits())
+                .checked_mul(usize::exact_from(z.significant_bits()))
+                .unwrap()
+        },
+        bucketing_label: format!(
+            "{}.significant_bits() * {}.significant_bits()",
+            xs_name, zs_name
+        ),
+    }
+}
+
+pub fn triple_3_triple_1_3_prod_natural_bits_bucketer<'a, T, U, V>(
+    xs_name: &'a str,
+    zs_name: &'a str,
+) -> Bucketer<'a, (T, U, (Natural, V, Natural))> {
+    Bucketer {
+        bucketing_function: &|(_, _, (x, _, z))| {
+            usize::exact_from(x.significant_bits())
+                .checked_mul(usize::exact_from(z.significant_bits()))
+                .unwrap()
+        },
+        bucketing_label: format!(
+            "{}.significant_bits() * {}.significant_bits()",
+            xs_name, zs_name
+        ),
+    }
+}
+
+pub fn pair_1_half_gcd_matrix_bucketer<T>(m_name: &str) -> Bucketer<(OwnedHalfGcdMatrix, T)> {
     Bucketer {
         bucketing_function: &|(m, _)| m.s,
         bucketing_label: m_name.to_string(),
     }
 }
 
-pub fn triple_1_half_gcd_matrix_bucketer<T, U>(m_name: &str) -> Bucketer<(HalfGcdMatrix, T, U)> {
+pub fn triple_1_half_gcd_matrix_bucketer<T, U>(
+    m_name: &str,
+) -> Bucketer<(OwnedHalfGcdMatrix, T, U)> {
     Bucketer {
         bucketing_function: &|(m, _, _)| m.s,
         bucketing_label: m_name.to_string(),
@@ -469,5 +556,74 @@ pub fn triple_1_2_integer_bit_u64_max_bucketer<'a, T>(
     Bucketer {
         bucketing_function: &|(x, y, _)| usize::exact_from(max(x.significant_bits(), *y)),
         bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
+    }
+}
+
+pub fn limbs_div_to_out_balancing_bucketer<'a>() -> Bucketer<'a, (Vec<Limb>, Vec<Limb>, Vec<Limb>)>
+{
+    Bucketer {
+        bucketing_function: &|(_, ns, ds)| max(2, (ds.len() << 1).saturating_sub(ns.len())),
+        bucketing_label: "max(2, 2 * ds.len() - ns.len())".to_string(),
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn limbs_div_mod_extra_bucketer<'a>(
+) -> Bucketer<'a, (Vec<Limb>, usize, Vec<Limb>, Limb, Limb, u64)> {
+    Bucketer {
+        bucketing_function: &|(_, fraction_len, ref ns, _, _, _)| ns.len() + fraction_len,
+        bucketing_label: "ns.len() + fraction_len".to_string(),
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn limbs_div_mod_barrett_product_bucketer<'a>(
+) -> Bucketer<'a, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
+    Bucketer {
+        bucketing_function: &|(_, _, _, _, _, i_len)| i_len << 1,
+        bucketing_label: "2 * i_len".to_string(),
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn limbs_div_mod_barrett_helper_bucketer<'a>(
+) -> Bucketer<'a, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Bucketer {
+        bucketing_function: &|(_, _, ns, ds)| (ds.len() << 1).saturating_sub(ns.len()),
+        bucketing_label: "max(0, 2 * ds.len() - ns.len())".to_string(),
+    }
+}
+
+pub fn limb_pair_significant_bits_bucketer(var_name: &str) -> Bucketer<(Limb, Limb)> {
+    Bucketer {
+        bucketing_function: &|&(hi, lo)| usize::exact_from(limbs_significant_bits(&[lo, hi])),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn limbs_mod_mul_two_limbs_bucketer<'a>(
+) -> Bucketer<'a, (Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb)> {
+    Bucketer {
+        bucketing_function: &|&(x_1, x_0, y_1, y_0, _, _, _, _, _)| {
+            usize::exact_from(max(
+                limbs_significant_bits(&[x_0, x_1]),
+                limbs_significant_bits(&[y_0, y_1]),
+            ))
+        },
+        bucketing_label: "m.significant_bits()".to_string(),
+    }
+}
+
+pub fn limbs_mod_limb_small_unnormalized_bucketer<'a>() -> Bucketer<'a, (Vec<Limb>, Limb)> {
+    Bucketer {
+        bucketing_function: &|(ns, d)| {
+            if *ns.last().unwrap() < *d {
+                ns.len() - 1
+            } else {
+                ns.len()
+            }
+        },
+        bucketing_label: "adjusted ns.len()".to_string(),
     }
 }

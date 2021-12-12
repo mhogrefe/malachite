@@ -7,7 +7,7 @@ use rounding_modes::RoundingMode;
 use std::fmt::Display;
 use std::ops::{Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
 
-fn _shr_round_unsigned_unsigned<
+fn shr_round_unsigned_unsigned<
     T: PrimitiveInt + Shl<U, Output = T> + Shr<U, Output = T>,
     U: Copy + Display + Eq + One + Ord + Sub<U, Output = U> + WrappingFrom<u64> + Zero,
 >(
@@ -64,7 +64,7 @@ fn _shr_round_unsigned_unsigned<
     }
 }
 
-fn _shr_round_assign_unsigned_unsigned<
+fn shr_round_assign_unsigned_unsigned<
     T: PrimitiveInt + Shl<U, Output = T> + ShrAssign<U>,
     U: Copy + Display + Eq + One + Ord + Sub<U, Output = U> + WrappingFrom<u64> + Zero,
 >(
@@ -167,7 +167,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// See the documentation of the `num::arithmetic::shr_round` module.
                     #[inline]
                     fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
-                        _shr_round_unsigned_unsigned(self, bits, rm)
+                        shr_round_unsigned_unsigned(self, bits, rm)
                     }
                 }
 
@@ -190,7 +190,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
                     /// See the documentation of the `num::arithmetic::shr_round` module.
                     #[inline]
                     fn shr_round_assign(&mut self, bits: $u, rm: RoundingMode) {
-                        _shr_round_assign_unsigned_unsigned(self, bits, rm);
+                        shr_round_assign_unsigned_unsigned(self, bits, rm);
                     }
                 }
             };
@@ -200,7 +200,7 @@ macro_rules! impl_shr_round_unsigned_unsigned {
 }
 apply_to_unsigneds!(impl_shr_round_unsigned_unsigned);
 
-fn _shr_round_signed_unsigned<
+fn shr_round_signed_unsigned<
     U: Copy + Eq + ShrRound<B, Output = U> + Zero,
     S: Copy + Eq + Min + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + WrappingFrom<U> + Zero,
     B,
@@ -270,7 +270,7 @@ macro_rules! impl_shr_round_signed_unsigned {
                     /// See the documentation of the `num::arithmetic::shr_round` module.
                     #[inline]
                     fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
-                        _shr_round_signed_unsigned(self, bits, rm)
+                        shr_round_signed_unsigned(self, bits, rm)
                     }
                 }
 
@@ -303,7 +303,7 @@ macro_rules! impl_shr_round_signed_unsigned {
 }
 apply_to_signeds!(impl_shr_round_signed_unsigned);
 
-fn _shr_round_primitive_signed<
+fn shr_round_primitive_signed<
     T: PrimitiveInt + Shl<U, Output = T> + ShrRound<U, Output = T>,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -324,7 +324,7 @@ fn _shr_round_primitive_signed<
     }
 }
 
-fn _shr_round_assign_primitive_signed<
+fn shr_round_assign_primitive_signed<
     T: PrimitiveInt + ShlAssign<U> + ShrRoundAssign<U>,
     U: Ord + WrappingFrom<u64>,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -371,7 +371,7 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// See the documentation of the `num::arithmetic::shr_round` module.
                     #[inline]
                     fn shr_round(self, bits: $u, rm: RoundingMode) -> $t {
-                        _shr_round_primitive_signed(self, bits, rm)
+                        shr_round_primitive_signed(self, bits, rm)
                     }
                 }
 
@@ -420,7 +420,7 @@ macro_rules! impl_shr_round_primitive_signed {
                     /// See the documentation of the `num::arithmetic::shr_round` module.
                     #[inline]
                     fn shr_round_assign(&mut self, bits: $u, rm: RoundingMode) {
-                        _shr_round_assign_primitive_signed(self, bits, rm)
+                        shr_round_assign_primitive_signed(self, bits, rm)
                     }
                 }
             };

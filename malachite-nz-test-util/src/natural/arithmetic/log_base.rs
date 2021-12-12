@@ -7,7 +7,7 @@ use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
 
-pub fn _floor_log_base_naive(x: &Natural, base: &Natural) -> u64 {
+pub fn floor_log_base_naive(x: &Natural, base: &Natural) -> u64 {
     assert_ne!(*x, 0);
     assert!(*base > 1);
     let mut result = 0;
@@ -20,7 +20,7 @@ pub fn _floor_log_base_naive(x: &Natural, base: &Natural) -> u64 {
     result - 1
 }
 
-pub fn _ceiling_log_base_naive(x: &Natural, base: &Natural) -> u64 {
+pub fn ceiling_log_base_naive(x: &Natural, base: &Natural) -> u64 {
     assert_ne!(*x, 0);
     assert!(*base > 1);
     let mut result = 0;
@@ -32,7 +32,7 @@ pub fn _ceiling_log_base_naive(x: &Natural, base: &Natural) -> u64 {
     result
 }
 
-pub fn _checked_log_base_naive(x: &Natural, base: &Natural) -> Option<u64> {
+pub fn checked_log_base_naive(x: &Natural, base: &Natural) -> Option<u64> {
     assert_ne!(*x, 0);
     assert!(*base > 1);
     let mut result = 0;
@@ -86,14 +86,14 @@ fn log_by_squaring_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     (log, false)
 }
 
-pub fn _floor_log_base_by_squaring(x: &Natural, base: &Natural) -> u64 {
+pub fn floor_log_base_by_squaring(x: &Natural, base: &Natural) -> u64 {
     if let Some(log_base) = base.checked_log_base_2() {
         return x.floor_log_base_power_of_2(log_base);
     }
     log_by_squaring_helper(x, base).0
 }
 
-pub fn _ceiling_log_base_by_squaring(x: &Natural, base: &Natural) -> u64 {
+pub fn ceiling_log_base_by_squaring(x: &Natural, base: &Natural) -> u64 {
     if let Some(log_base) = base.checked_log_base_2() {
         return x.ceiling_log_base_power_of_2(log_base);
     }
@@ -105,7 +105,7 @@ pub fn _ceiling_log_base_by_squaring(x: &Natural, base: &Natural) -> u64 {
     }
 }
 
-pub fn _checked_log_base_by_squaring(x: &Natural, base: &Natural) -> Option<u64> {
+pub fn checked_log_base_by_squaring(x: &Natural, base: &Natural) -> Option<u64> {
     if let Some(log_base) = base.checked_log_base_2() {
         return x.checked_log_base_power_of_2(log_base);
     }

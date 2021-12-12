@@ -6,7 +6,7 @@ use num::conversion::traits::{
 };
 use std::cmp::Ord;
 
-pub fn _unsigned_to_digits_asc_naive<
+pub fn unsigned_to_digits_asc_naive<
     T: Copy + DivAssignMod<T, ModOutput = T> + Eq + ExactFrom<U> + Zero,
     U: Copy + One + Ord + WrappingFrom<T>,
 >(
@@ -23,7 +23,7 @@ pub fn _unsigned_to_digits_asc_naive<
     digits
 }
 
-fn _to_digits_asc<
+fn to_digits_asc<
     T: ConvertibleFrom<U>
         + Copy
         + DivAssignMod<T, ModOutput = T>
@@ -42,11 +42,11 @@ fn _to_digits_asc<
     } else if let Some(log_base) = base.checked_log_base_2() {
         x.to_power_of_2_digits_asc(log_base)
     } else {
-        _unsigned_to_digits_asc_naive(x, *base)
+        unsigned_to_digits_asc_naive(x, *base)
     }
 }
 
-fn _to_digits_desc<
+fn to_digits_desc<
     T: ConvertibleFrom<U>
         + Copy
         + DivAssignMod<T, ModOutput = T>
@@ -65,13 +65,13 @@ fn _to_digits_desc<
     } else if let Some(log_base) = base.checked_log_base_2() {
         x.to_power_of_2_digits_desc(log_base)
     } else {
-        let mut digits = _unsigned_to_digits_asc_naive(x, *base);
+        let mut digits = unsigned_to_digits_asc_naive(x, *base);
         digits.reverse();
         digits
     }
 }
 
-fn _from_digits_asc<
+fn from_digits_asc<
     T: Digits<U> + PowerOf2Digits<U>,
     U: CheckedLogBase2<Output = u64> + Copy,
     I: Iterator<Item = U>,
@@ -88,7 +88,7 @@ fn _from_digits_asc<
     }
 }
 
-fn _from_digits_desc<
+fn from_digits_desc<
     T: CheckedAdd<T, Output = T>
         + CheckedMul<T, Output = T>
         + Copy
@@ -154,7 +154,7 @@ macro_rules! impl_digits {
                     /// module.
                     #[inline]
                     fn to_digits_asc(&self, base: &$u) -> Vec<$u> {
-                        _to_digits_asc(self, base)
+                        to_digits_asc(self, base)
                     }
 
                     /// Returns a `Vec` containing the digits of `self` in descending order (most-
@@ -186,7 +186,7 @@ macro_rules! impl_digits {
                     /// module.
                     #[inline]
                     fn to_digits_desc(&self, base: &$u) -> Vec<$u> {
-                        _to_digits_desc(self, base)
+                        to_digits_desc(self, base)
                     }
 
                     /// Converts an iterator of digits into a value.
@@ -215,7 +215,7 @@ macro_rules! impl_digits {
                     /// module.
                     #[inline]
                     fn from_digits_asc<I: Iterator<Item = $u>>(base: &$u, digits: I) -> Option<$t> {
-                        _from_digits_asc(base, digits)
+                        from_digits_asc(base, digits)
                     }
 
                     /// Converts an iterator of digits into a value.
@@ -247,7 +247,7 @@ macro_rules! impl_digits {
                         base: &$u,
                         digits: I,
                     ) -> Option<$t> {
-                        _from_digits_desc(base, digits)
+                        from_digits_desc(base, digits)
                     }
                 }
             };

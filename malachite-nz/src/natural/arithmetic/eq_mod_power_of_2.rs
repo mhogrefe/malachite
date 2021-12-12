@@ -30,6 +30,7 @@ use std::cmp::Ordering;
 /// assert_eq!(limbs_eq_limb_mod_power_of_2(&[0b1111011, 0b111001000], 0b1111011, 36), false);
 /// assert_eq!(limbs_eq_limb_mod_power_of_2(&[0b1111011, 0b111001000], 0b1111011, 100), false);
 /// ```
+#[doc(hidden)]
 pub fn limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     if i >= xs.len() {
@@ -100,6 +101,7 @@ fn limbs_eq_mod_power_of_2_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
 /// ```
 ///
 /// This is mpz_congruent_2exp_p from mpz/cong_2exp.c, GMP 6.2.1, where a and c are non-negative.
+#[doc(hidden)]
 pub fn limbs_eq_mod_power_of_2(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     match xs.len().cmp(&ys.len()) {
         Ordering::Equal => limbs_eq_mod_power_of_2_same_length(xs, ys, pow),

@@ -22,7 +22,7 @@ macro_rules! impl_eq_abs_unsigned {
 }
 apply_to_unsigneds!(impl_eq_abs_unsigned);
 
-fn _eq_abs_signed<U: Eq, S: Copy + UnsignedAbs<Output = U>>(x: &S, y: &S) -> bool {
+fn eq_abs_signed<U: Eq, S: Copy + UnsignedAbs<Output = U>>(x: &S, y: &S) -> bool {
     x.unsigned_abs() == y.unsigned_abs()
 }
 
@@ -38,7 +38,7 @@ macro_rules! impl_eq_abs_signed {
             /// See the documentation of the `num::comparison::eq_abs` module.
             #[inline]
             fn eq_abs(&self, other: &Self) -> bool {
-                _eq_abs_signed(self, other)
+                eq_abs_signed(self, other)
             }
         }
     };

@@ -2,7 +2,7 @@ use num::arithmetic::traits::{
     WrappingMul, WrappingSub, WrappingSubAssign, WrappingSubMul, WrappingSubMulAssign,
 };
 
-fn _wrapping_sub_mul<T: WrappingMul<T, Output = T> + WrappingSub<T, Output = T>>(
+fn wrapping_sub_mul<T: WrappingMul<T, Output = T> + WrappingSub<T, Output = T>>(
     x: T,
     y: T,
     z: T,
@@ -10,7 +10,7 @@ fn _wrapping_sub_mul<T: WrappingMul<T, Output = T> + WrappingSub<T, Output = T>>
     x.wrapping_sub(y.wrapping_mul(z))
 }
 
-fn _wrapping_sub_mul_assign<T: WrappingMul<T, Output = T> + WrappingSubAssign<T>>(
+fn wrapping_sub_mul_assign<T: WrappingMul<T, Output = T> + WrappingSubAssign<T>>(
     x: &mut T,
     y: T,
     z: T,
@@ -34,7 +34,7 @@ macro_rules! impl_wrapping_sub_mul {
             /// See the documentation of the `num::arithmetic::wrapping_sub_mul` module.
             #[inline]
             fn wrapping_sub_mul(self, y: $t, z: $t) -> $t {
-                _wrapping_sub_mul(self, y, z)
+                wrapping_sub_mul(self, y, z)
             }
         }
 
@@ -50,7 +50,7 @@ macro_rules! impl_wrapping_sub_mul {
             /// See the documentation of the `num::arithmetic::wrapping_sub_mul` module.
             #[inline]
             fn wrapping_sub_mul_assign(&mut self, y: $t, z: $t) {
-                _wrapping_sub_mul_assign(self, y, z)
+                wrapping_sub_mul_assign(self, y, z)
             }
         }
     };

@@ -5,7 +5,7 @@ use num::conversion::traits::{CheckedFrom, PowerOf2Digits, WrappingFrom};
 use num::logic::traits::SignificantBits;
 use std::ops::{BitOr, BitOrAssign, ShrAssign};
 
-fn _to_power_of_2_digits_asc<
+fn to_power_of_2_digits_asc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
     U: PrimitiveInt + WrappingFrom<T>,
 >(
@@ -35,19 +35,19 @@ fn _to_power_of_2_digits_asc<
     digits
 }
 
-fn _to_power_of_2_digits_desc<
+fn to_power_of_2_digits_desc<
     T: Copy + Eq + ShrAssign<u64> + SignificantBits + Zero,
     U: PrimitiveInt + WrappingFrom<T>,
 >(
     x: &T,
     log_base: u64,
 ) -> Vec<U> {
-    let mut digits = _to_power_of_2_digits_asc(x, log_base);
+    let mut digits = to_power_of_2_digits_asc(x, log_base);
     digits.reverse();
     digits
 }
 
-fn _from_power_of_2_digits_asc<
+fn from_power_of_2_digits_asc<
     T: ArithmeticCheckedShl<u64, Output = T>
         + BitOrAssign<T>
         + CheckedFrom<U>
@@ -79,7 +79,7 @@ fn _from_power_of_2_digits_asc<
     Some(n)
 }
 
-fn _from_power_of_2_digits_desc<
+fn from_power_of_2_digits_desc<
     T: ArithmeticCheckedShl<u64, Output = T> + BitOr<Output = T> + WrappingFrom<U> + Zero,
     U: PrimitiveInt,
     I: Iterator<Item = U>,
@@ -142,7 +142,7 @@ macro_rules! impl_power_of_2_digits {
                     /// module.
                     #[inline]
                     fn to_power_of_2_digits_asc(&self, log_base: u64) -> Vec<$u> {
-                        _to_power_of_2_digits_asc(self, log_base)
+                        to_power_of_2_digits_asc(self, log_base)
                     }
 
                     /// Returns a `Vec` containing the digits of `self` in descending order (most-
@@ -176,7 +176,7 @@ macro_rules! impl_power_of_2_digits {
                     /// module.
                     #[inline]
                     fn to_power_of_2_digits_desc(&self, log_base: u64) -> Vec<$u> {
-                        _to_power_of_2_digits_desc(self, log_base)
+                        to_power_of_2_digits_desc(self, log_base)
                     }
 
                     /// Converts an iterator of digits into a value, where the base is a power of
@@ -210,7 +210,7 @@ macro_rules! impl_power_of_2_digits {
                         log_base: u64,
                         digits: I,
                     ) -> Option<$t> {
-                        _from_power_of_2_digits_asc(log_base, digits)
+                        from_power_of_2_digits_asc(log_base, digits)
                     }
 
                     /// Converts an iterator of digits into a value, where the base is a power of
@@ -243,7 +243,7 @@ macro_rules! impl_power_of_2_digits {
                         log_base: u64,
                         digits: I,
                     ) -> Option<$t> {
-                        _from_power_of_2_digits_desc(log_base, digits)
+                        from_power_of_2_digits_desc(log_base, digits)
                     }
                 }
             };

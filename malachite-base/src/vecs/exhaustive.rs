@@ -12,11 +12,14 @@ use num::logic::traits::SignificantBits;
 use std::cmp::{max, min, Ordering};
 use std::iter::{empty, once, FromIterator, Once, Zip};
 use std::marker::PhantomData;
+use std::mem::swap;
 use std::ops::RangeFrom;
 use tuples::exhaustive::{
-    exhaustive_dependent_pairs_stop_after_empty_ys, lex_dependent_pairs_stop_after_empty_ys,
-    ExhaustiveDependentPairs, ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
+    exhaustive_dependent_pairs, exhaustive_dependent_pairs_stop_after_empty_ys,
+    lex_dependent_pairs_stop_after_empty_ys, ExhaustiveDependentPairs,
+    ExhaustiveDependentPairsYsGenerator, LexDependentPairs,
 };
+use vecs::{exhaustive_vec_permutations, ExhaustiveVecPermutations};
 
 pub(crate) fn validate_oi_map<I: Iterator<Item = usize>>(max_input_index: usize, xs: I) {
     let oi_sorted_unique = xs.unique().sorted().collect_vec();
@@ -526,7 +529,6 @@ macro_rules! exhaustive_fixed_length_vecs {
                 $xs_done: bool,
                 $outputs: Vec<usize>,
             )*
-            output_to_input_map: Vec<usize>,
         }
 
         impl<T: Clone, $($it: Iterator<Item=T>,)*> $exhaustive_struct<T, $($it,)*> {
@@ -717,7 +719,6 @@ macro_rules! exhaustive_fixed_length_vecs {
                     $outputs: output_types.iter().enumerate()
                         .filter_map(|(o, (_, i))| if *i == $i { Some(o) } else { None }).collect(),
                 )*
-                output_to_input_map
             }
         }
 
@@ -1129,7 +1130,6 @@ where
     )
 }
 
-#[doc(hidden)]
 #[derive(Clone, Debug)]
 struct LexVecsGenerator<Y: Clone, J: Clone + Iterator<Item = Y>> {
     ys: J,
@@ -3026,6 +3026,8 @@ where
     }
 }
 
+/// Generates all collections of elements from an iterator, where the collections have no
+/// repetitions and are ordered the same way as in the iterator.
 #[derive(Clone)]
 pub enum ExhaustiveOrderedUniqueCollections<I: Iterator, C: FromIterator<I::Item>>
 where
@@ -3443,7 +3445,7 @@ where
     ExhaustiveOrderedUniqueCollections::new(a, b, xs)
 }
 
-pub(crate) fn fixed_length_unique_indices_helper(indices: &mut [usize], used: &mut [bool]) -> bool {
+fn fixed_length_unique_indices_helper(indices: &mut [usize], used: &mut [bool]) -> bool {
     let n = used.len();
     let k = indices.len();
     assert!(k <= n);
@@ -3566,7 +3568,7 @@ where
 ///
 /// If $k$ is nonzero and the input iterator length is $n$, the output length is
 /// $$
-/// (n)_ k = \prod_ {i=0}^{k-1}(n - i).
+/// (n)_ k = \prod_ {i=0}^{k-1}(n - i) = frac{n!}{(n-k)!}.
 /// $$
 ///
 /// If $k$ is 0, the output consists of one empty `Vec`.
@@ -3651,7 +3653,7 @@ impl<I: Clone + Iterator> ShortlexUniqueVecs<I>
 where
     I::Item: Clone,
 {
-    pub(crate) fn new(a: u64, b: u64, xs: I) -> ShortlexUniqueVecs<I> {
+    fn new(a: u64, b: u64, xs: I) -> ShortlexUniqueVecs<I> {
         ShortlexUniqueVecs {
             current_len: a,
             max_len: b,
@@ -4449,5 +4451,555 @@ where
         phase_1_vec: Some(phase_1_vec),
         xsss: Vec::new(),
         next_xss: Vec::new(),
+    }
+}
+
+#[doc(hidden)]
+#[derive(Clone)]
+pub struct ExhaustiveUniqueVecs2<I: Iterator>
+where
+    I::Item: Clone,
+{
+    next: Option<(I::Item, I::Item)>,
+    ps: ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>,
+}
+
+impl<I: Iterator> Iterator for ExhaustiveUniqueVecs2<I>
+where
+    I::Item: Clone,
+{
+    type Item = Vec<I::Item>;
+
+    fn next(&mut self) -> Option<Vec<I::Item>> {
+        if self.next.is_some() {
+            let mut p = None;
+            swap(&mut p, &mut self.next);
+            let (a, b) = p.unwrap();
+            Some(vec![a, b])
+        } else if let Some(p) = self.ps.next() {
+            self.next = Some((p[1].clone(), p[0].clone()));
+            Some(p)
+        } else {
+            None
+        }
+    }
+}
+
+fn exhaustive_unique_vecs_2<I: Iterator>(xs: I) -> ExhaustiveUniqueVecs2<I>
+where
+    I::Item: Clone,
+{
+    ExhaustiveUniqueVecs2 {
+        next: None,
+        ps: exhaustive_ordered_unique_vecs_fixed_length(2, xs),
+    }
+}
+
+#[doc(hidden)]
+#[derive(Clone, Debug)]
+pub struct ExhaustiveUniqueVecsGenerator<T: Clone, I: Iterator<Item = T>> {
+    phantom_t: PhantomData<T>,
+    phantom_i: PhantomData<I>,
+}
+
+impl<T: Clone, I: Iterator<Item = T>> ExhaustiveUniqueVecsGenerator<T, I> {
+    #[inline]
+    pub(crate) fn new() -> ExhaustiveUniqueVecsGenerator<T, I> {
+        ExhaustiveUniqueVecsGenerator {
+            phantom_i: PhantomData,
+            phantom_t: PhantomData,
+        }
+    }
+}
+
+impl<T: Clone, I: Iterator<Item = T>>
+    ExhaustiveDependentPairsYsGenerator<Vec<T>, Vec<T>, ExhaustiveVecPermutations<T>>
+    for ExhaustiveUniqueVecsGenerator<T, I>
+{
+    #[inline]
+    fn get_ys(&self, xs: &Vec<T>) -> ExhaustiveVecPermutations<T> {
+        exhaustive_vec_permutations(xs.clone())
+    }
+}
+
+/// Generates all fixed-length `Vec`s of elements from an iterator, where the `Vec`s have no
+/// repetitions and are ordered the same way as in the iterator.
+#[allow(clippy::type_complexity)]
+#[derive(Clone)]
+pub enum ExhaustiveUniqueVecsFixedLength<I: Iterator>
+where
+    I::Item: Clone,
+{
+    Zero(bool),
+    One(I),
+    Two(ExhaustiveUniqueVecs2<I>),
+    GreaterThanTwo(
+        ExhaustiveDependentPairs<
+            Vec<I::Item>,
+            Vec<I::Item>,
+            RulerSequence<usize>,
+            ExhaustiveUniqueVecsGenerator<I::Item, I>,
+            ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>,
+            ExhaustiveVecPermutations<I::Item>,
+        >,
+    ),
+}
+
+impl<I: Iterator> Iterator for ExhaustiveUniqueVecsFixedLength<I>
+where
+    I::Item: Clone,
+{
+    type Item = Vec<I::Item>;
+
+    fn next(&mut self) -> Option<Vec<I::Item>> {
+        match self {
+            ExhaustiveUniqueVecsFixedLength::Zero(done) => {
+                if *done {
+                    None
+                } else {
+                    *done = true;
+                    Some(Vec::new())
+                }
+            }
+            ExhaustiveUniqueVecsFixedLength::One(xs) => xs.next().map(|x| vec![x]),
+            ExhaustiveUniqueVecsFixedLength::Two(ps) => ps.next(),
+            ExhaustiveUniqueVecsFixedLength::GreaterThanTwo(xss) => xss.next().map(|p| p.1),
+        }
+    }
+}
+
+/// Generates `Vec`s of a given length with elements from a single iterator, such that each `Vec`
+/// has no repeated elements.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// If $k$ is 0, the output length is 1.
+///
+/// If $k$ is nonzero and the input iterator is infinite, the output length is also infinite.
+///
+/// If $k$ is nonzero and the input iterator length is $n$, the output length is
+/// $$
+/// (n)_ k = \prod_ {i=0}^{k-1}(n - i) = frac{n!}{(n-k)!}.
+/// $$
+///
+/// If $k$ is 0, the output consists of one empty `Vec`.
+///
+/// If `xs` is empty, the output is also empty, unless $k$ is 0.
+///
+/// # Complexity per iteration
+/// $$
+/// T(i, k) = O(k + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i, k) = O(k + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_fixed_length;
+///
+/// let xss = exhaustive_unique_vecs_fixed_length(4, 1..=6).take(20).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2, 3, 4],
+///         &[1, 2, 3, 5],
+///         &[1, 2, 4, 3],
+///         &[1, 2, 4, 5],
+///         &[1, 3, 2, 4],
+///         &[1, 2, 5, 3],
+///         &[1, 3, 4, 2],
+///         &[1, 3, 4, 5],
+///         &[1, 4, 2, 3],
+///         &[1, 3, 2, 5],
+///         &[1, 4, 3, 2],
+///         &[1, 2, 5, 4],
+///         &[2, 1, 3, 4],
+///         &[1, 3, 5, 2],
+///         &[2, 1, 4, 3],
+///         &[2, 3, 4, 5],
+///         &[2, 3, 1, 4],
+///         &[1, 5, 2, 3],
+///         &[2, 3, 4, 1],
+///         &[1, 4, 2, 5]
+///     ]
+/// );
+/// ```
+pub fn exhaustive_unique_vecs_fixed_length<I: Iterator>(
+    k: u64,
+    xs: I,
+) -> ExhaustiveUniqueVecsFixedLength<I>
+where
+    I::Item: Clone,
+{
+    match k {
+        0 => ExhaustiveUniqueVecsFixedLength::Zero(false),
+        1 => ExhaustiveUniqueVecsFixedLength::One(xs),
+        2 => ExhaustiveUniqueVecsFixedLength::Two(exhaustive_unique_vecs_2(xs)),
+        k => ExhaustiveUniqueVecsFixedLength::GreaterThanTwo(exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_ordered_unique_vecs_fixed_length(k, xs),
+            ExhaustiveUniqueVecsGenerator::new(),
+        )),
+    }
+}
+
+/// Generates all `Vec`s of elements from an iterator, where the `Vec`s have no repetitions and are
+/// ordered the same way as in the iterator.
+#[allow(clippy::type_complexity)]
+#[derive(Clone)]
+pub struct ExhaustiveUniqueVecs<I: Iterator>
+where
+    I::Item: Clone,
+{
+    xs: ExhaustiveDependentPairs<
+        Vec<I::Item>,
+        Vec<I::Item>,
+        RulerSequence<usize>,
+        ExhaustiveUniqueVecsGenerator<I::Item, I>,
+        ExhaustiveOrderedUniqueCollections<I, Vec<I::Item>>,
+        ExhaustiveVecPermutations<I::Item>,
+    >,
+}
+
+impl<I: Iterator> Iterator for ExhaustiveUniqueVecs<I>
+where
+    I::Item: Clone,
+{
+    type Item = Vec<I::Item>;
+
+    #[inline]
+    fn next(&mut self) -> Option<Vec<I::Item>> {
+        self.xs.next().map(|p| p.1)
+    }
+}
+
+/// Generates `Vec`s with elements from a single iterator, such that each `Vec` has no repeated
+/// elements.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_ {k=0}^n \frac{n!}{k!}
+/// $$
+/// $$
+/// = \\begin{cases}
+///     1 & n = 0 \\\\
+///     2 & n = 1 \\\\
+///     \operatorname{round}(en!) & \\text{otherwise}.
+/// \\end{cases}
+/// $$
+///
+/// See <https://oeis.org/A000522>.
+///
+/// If `xs` is empty, the output consists of a single empty `Vec`.
+///
+/// # Complexity per iteration
+/// $$
+/// T(i) = O(\log i + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i) = O(\log i + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs;
+///
+/// let xss = exhaustive_unique_vecs(1..=4).take(20).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[][..],
+///         &[1],
+///         &[2],
+///         &[3],
+///         &[1, 2],
+///         &[1, 3],
+///         &[2, 1],
+///         &[1, 2, 3],
+///         &[3, 1],
+///         &[2, 3],
+///         &[3, 2],
+///         &[4],
+///         &[1, 3, 2],
+///         &[1, 4],
+///         &[2, 1, 3],
+///         &[3, 4],
+///         &[2, 3, 1],
+///         &[4, 1],
+///         &[3, 1, 2],
+///         &[2, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_unique_vecs<I: Iterator>(xs: I) -> ExhaustiveUniqueVecs<I>
+where
+    I::Item: Clone,
+{
+    ExhaustiveUniqueVecs {
+        xs: exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_ordered_unique_vecs(xs),
+            ExhaustiveUniqueVecsGenerator::new(),
+        ),
+    }
+}
+
+/// Generates `Vec`s with a mininum length, with elements from a single iterator, such that each
+/// `Vec` has no repeated elements.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// If the input iterator is infinite, the output length is also infinite.
+///
+/// If the input iterator length is $n$ and the `min_length` is $\ell$, the output length is
+/// $$
+/// \sum_ {k=\ell}^n \frac{n!}{k!}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i) = O(\log i + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i) = O(\log i + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_min_length;
+///
+/// let xss = exhaustive_unique_vecs_min_length(2, 1..=4).take(20).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[2, 1],
+///         &[2, 3],
+///         &[3, 1],
+///         &[3, 2],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3, 2],
+///         &[1, 4],
+///         &[2, 1, 3],
+///         &[2, 4],
+///         &[2, 3, 1],
+///         &[4, 1],
+///         &[3, 1, 2],
+///         &[3, 4],
+///         &[3, 2, 1],
+///         &[4, 2],
+///         &[1, 4, 2],
+///         &[1, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_unique_vecs_min_length<I: Iterator>(
+    min_length: u64,
+    xs: I,
+) -> ExhaustiveUniqueVecs<I>
+where
+    I::Item: Clone,
+{
+    ExhaustiveUniqueVecs {
+        xs: exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_ordered_unique_vecs_min_length(min_length, xs),
+            ExhaustiveUniqueVecsGenerator::new(),
+        ),
+    }
+}
+
+/// Generates `Vec`s, with lengths in a range $[a, b)$, with elements from a single iterator, such
+/// that each `Vec` has no repeated elements.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// If $a \leq b$, the output is empty.
+///
+/// If $a = 0$ and $b = 1$, the output consists of a single empty `Vec`.
+///
+/// If the input iterator is infinite and $0 < a < b$, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^{b - 1} \frac{n!}{k!}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i) = O(\log i + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i) = O(\log i + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_length_range;
+///
+/// let xss = exhaustive_unique_vecs_length_range(2, 4, 1..=4).take(20).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[2, 1],
+///         &[2, 3],
+///         &[3, 1],
+///         &[3, 2],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3, 2],
+///         &[1, 4],
+///         &[2, 1, 3],
+///         &[2, 4],
+///         &[2, 3, 1],
+///         &[4, 1],
+///         &[3, 1, 2],
+///         &[3, 4],
+///         &[3, 2, 1],
+///         &[4, 2],
+///         &[1, 4, 2],
+///         &[1, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_unique_vecs_length_range<I: Iterator>(
+    a: u64,
+    b: u64,
+    xs: I,
+) -> ExhaustiveUniqueVecs<I>
+where
+    I::Item: Clone,
+{
+    ExhaustiveUniqueVecs {
+        xs: exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_ordered_unique_vecs_length_range(a, b, xs),
+            ExhaustiveUniqueVecsGenerator::new(),
+        ),
+    }
+}
+
+/// Generates `Vec`s, with lengths in a range $[a, b]$, with elements from a single iterator, such
+/// that each `Vec` has no repeated elements.
+///
+/// The source iterator should not repeat any elements, but this is not enforced.
+///
+/// If $a < b$, the output is empty.
+///
+/// If $a = b = 0$, the output consists of a single empty `Vec`.
+///
+/// If the input iterator is infinite and $0 < a \leq b$, the output length is also infinite.
+///
+/// If the input iterator length is $n$, the output length is
+/// $$
+/// \sum_{i=a}^b \frac{n!}{k!}.
+/// $$
+///
+/// # Complexity per iteration
+/// $$
+/// T(i) = O(\log i + T^\prime (i))
+/// $$
+///
+/// $$
+/// M(i) = O(\log i + M^\prime (i))
+/// $$
+///
+/// where $T$ is time, $M$ is additional memory, and $T^\prime$ and $M^\prime$ are the time and
+/// additional memory functions of `xs`.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::vecs::exhaustive::exhaustive_unique_vecs_length_inclusive_range;
+///
+/// let xss = exhaustive_unique_vecs_length_inclusive_range(2, 3, 1..=4).take(20).collect_vec();
+/// assert_eq!(
+///     xss.iter().map(Vec::as_slice).collect_vec().as_slice(),
+///     &[
+///         &[1, 2][..],
+///         &[1, 3],
+///         &[2, 1],
+///         &[2, 3],
+///         &[3, 1],
+///         &[3, 2],
+///         &[1, 2, 3],
+///         &[1, 2, 4],
+///         &[1, 3, 2],
+///         &[1, 4],
+///         &[2, 1, 3],
+///         &[2, 4],
+///         &[2, 3, 1],
+///         &[4, 1],
+///         &[3, 1, 2],
+///         &[3, 4],
+///         &[3, 2, 1],
+///         &[4, 2],
+///         &[1, 4, 2],
+///         &[1, 3, 4]
+///     ]
+/// );
+/// ```
+#[inline]
+pub fn exhaustive_unique_vecs_length_inclusive_range<I: Iterator>(
+    a: u64,
+    b: u64,
+    xs: I,
+) -> ExhaustiveUniqueVecs<I>
+where
+    I::Item: Clone,
+{
+    ExhaustiveUniqueVecs {
+        xs: exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_ordered_unique_vecs_length_inclusive_range(a, b, xs),
+            ExhaustiveUniqueVecsGenerator::new(),
+        ),
     }
 }

@@ -1184,8 +1184,7 @@ fn round_to_multiple_properties() {
         assert!(nearest == down || nearest == up);
     });
 
-    integer_rounding_mode_pair_gen().test_properties(|(x, rm)| {
-        let x = &x;
+    integer_rounding_mode_pair_gen().test_properties(|(ref x, rm)| {
         assert_eq!(x.round_to_multiple(Integer::ONE, rm), *x);
         assert_eq!(x.round_to_multiple(Integer::NEGATIVE_ONE, rm), *x);
         assert_eq!(Integer::ZERO.round_to_multiple(x, rm), 0);

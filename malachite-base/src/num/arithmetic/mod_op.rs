@@ -5,7 +5,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
 use std::ops::{Neg, Rem, RemAssign, Sub};
 
-fn _neg_mod_unsigned<T: Copy + Eq + Rem<T, Output = T> + Sub<T, Output = T> + Zero>(
+fn neg_mod_unsigned<T: Copy + Eq + Rem<T, Output = T> + Sub<T, Output = T> + Zero>(
     x: T,
     other: T,
 ) -> T {
@@ -17,7 +17,7 @@ fn _neg_mod_unsigned<T: Copy + Eq + Rem<T, Output = T> + Sub<T, Output = T> + Ze
     }
 }
 
-fn _neg_mod_assign_unsigned<T: Copy + Eq + RemAssign<T> + Sub<T, Output = T> + Zero>(
+fn neg_mod_assign_unsigned<T: Copy + Eq + RemAssign<T> + Sub<T, Output = T> + Zero>(
     x: &mut T,
     other: T,
 ) {
@@ -101,7 +101,7 @@ macro_rules! impl_mod_unsigned {
             /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn neg_mod(self, other: $t) -> $t {
-                _neg_mod_unsigned(self, other)
+                neg_mod_unsigned(self, other)
             }
         }
 
@@ -125,14 +125,14 @@ macro_rules! impl_mod_unsigned {
             /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn neg_mod_assign(&mut self, other: $t) {
-                _neg_mod_assign_unsigned(self, other);
+                neg_mod_assign_unsigned(self, other);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_mod_unsigned);
 
-fn _mod_op_signed<
+fn mod_op_signed<
     U: NegMod<U, Output = U> + Rem<U, Output = U>,
     S: Copy + ExactFrom<U> + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + Zero,
 >(
@@ -151,7 +151,7 @@ fn _mod_op_signed<
     }
 }
 
-fn _ceiling_mod_signed<
+fn ceiling_mod_signed<
     U: NegMod<U, Output = U> + Rem<U, Output = U>,
     S: Copy + ExactFrom<U> + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + Zero,
 >(
@@ -195,7 +195,7 @@ macro_rules! impl_mod_signed {
             /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn mod_op(self, other: $t) -> $t {
-                _mod_op_signed(self, other)
+                mod_op_signed(self, other)
             }
         }
 
@@ -247,7 +247,7 @@ macro_rules! impl_mod_signed {
             /// See the documentation of the `num::arithmetic::mod_op` module.
             #[inline]
             fn ceiling_mod(self, other: $t) -> $t {
-                _ceiling_mod_signed(self, other)
+                ceiling_mod_signed(self, other)
             }
         }
 

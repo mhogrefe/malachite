@@ -7,7 +7,7 @@ use natural::Natural;
 use std::cmp::Ordering;
 use std::ops::{Shr, ShrAssign};
 
-fn _mod_shr_ref_val<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shr_ref_val<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
     m: Natural,
@@ -27,7 +27,7 @@ where
     }
 }
 
-fn _mod_shr_ref_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shr_ref_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
     m: &Natural,
@@ -47,7 +47,7 @@ where
     }
 }
 
-fn _mod_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Natural,
     bits: S,
     m: Natural,
@@ -65,7 +65,7 @@ fn _mod_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     }
 }
 
-fn _mod_shr_assign_ref<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_shr_assign_ref<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Natural,
     bits: S,
     m: &Natural,
@@ -182,7 +182,7 @@ macro_rules! impl_mod_shr {
             /// ```
             #[inline]
             fn mod_shr(self, bits: $t, m: Natural) -> Natural {
-                _mod_shr_ref_val(self, bits, m)
+                mod_shr_ref_val(self, bits, m)
             }
         }
 
@@ -215,7 +215,7 @@ macro_rules! impl_mod_shr {
             /// ```
             #[inline]
             fn mod_shr(self, bits: $t, m: &'b Natural) -> Natural {
-                _mod_shr_ref_ref(self, bits, m)
+                mod_shr_ref_ref(self, bits, m)
             }
         }
 
@@ -248,7 +248,7 @@ macro_rules! impl_mod_shr {
             /// ```
             #[inline]
             fn mod_shr_assign(&mut self, bits: $t, m: Natural) {
-                _mod_shr_assign(self, bits, m);
+                mod_shr_assign(self, bits, m);
             }
         }
 
@@ -281,7 +281,7 @@ macro_rules! impl_mod_shr {
             /// ```
             #[inline]
             fn mod_shr_assign(&mut self, bits: $t, m: &'a Natural) {
-                _mod_shr_assign_ref(self, bits, m);
+                mod_shr_assign_ref(self, bits, m);
             }
         }
     };

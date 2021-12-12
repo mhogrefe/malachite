@@ -173,7 +173,7 @@ macro_rules! lossless_conversion {
     };
 }
 
-fn _checked_from_lossy<
+fn checked_from_lossy<
     A: Copy + Ord + WrappingFrom<B> + Zero,
     B: Copy + Ord + WrappingFrom<A> + Zero,
 >(
@@ -187,7 +187,7 @@ fn _checked_from_lossy<
     }
 }
 
-fn _saturating_from_lossy<A: CheckedFrom<B> + Ord, B: Max + Min + WrappingFrom<A>>(value: A) -> B {
+fn saturating_from_lossy<A: CheckedFrom<B> + Ord, B: Max + Min + WrappingFrom<A>>(value: A) -> B {
     if let Some(b_max) = A::checked_from(B::MAX) {
         if value >= b_max {
             return B::MAX;
@@ -201,7 +201,7 @@ fn _saturating_from_lossy<A: CheckedFrom<B> + Ord, B: Max + Min + WrappingFrom<A
     B::wrapping_from(value)
 }
 
-fn _overflowing_from_lossy<
+fn overflowing_from_lossy<
     A: Copy + Ord + WrappingFrom<B> + Zero,
     B: Copy + Ord + WrappingFrom<A> + Zero,
 >(
@@ -214,7 +214,7 @@ fn _overflowing_from_lossy<
     )
 }
 
-fn _convertible_from_lossy<
+fn convertible_from_lossy<
     A: Copy + Ord + WrappingFrom<B> + Zero,
     B: Copy + Ord + WrappingFrom<A> + Zero,
 >(
@@ -257,7 +257,7 @@ macro_rules! lossy_conversion {
         impl CheckedFrom<$a> for $b {
             #[inline]
             fn checked_from(value: $a) -> Option<$b> {
-                _checked_from_lossy(value)
+                checked_from_lossy(value)
             }
         }
 
@@ -317,7 +317,7 @@ macro_rules! lossy_conversion {
         impl SaturatingFrom<$a> for $b {
             #[inline]
             fn saturating_from(value: $a) -> $b {
-                _saturating_from_lossy(value)
+                saturating_from_lossy(value)
             }
         }
 
@@ -341,7 +341,7 @@ macro_rules! lossy_conversion {
         impl OverflowingFrom<$a> for $b {
             #[inline]
             fn overflowing_from(value: $a) -> ($b, bool) {
-                _overflowing_from_lossy(value)
+                overflowing_from_lossy(value)
             }
         }
 
@@ -367,7 +367,7 @@ macro_rules! lossy_conversion {
         impl ConvertibleFrom<$a> for $b {
             #[inline]
             fn convertible_from(value: $a) -> bool {
-                _convertible_from_lossy::<$a, $b>(value)
+                convertible_from_lossy::<$a, $b>(value)
             }
         }
     };
@@ -461,7 +461,7 @@ no_containment_conversion!(i32, isize);
 no_containment_conversion!(i64, isize);
 no_containment_conversion!(i128, isize);
 
-fn _primitive_float_rounding_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
+fn primitive_float_rounding_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
     value: U,
     rm: RoundingMode,
 ) -> T {
@@ -482,7 +482,7 @@ fn _primitive_float_rounding_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsign
     }
 }
 
-fn _unsigned_rounding_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+fn unsigned_rounding_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     value: U,
     rm: RoundingMode,
 ) -> T {
@@ -535,7 +535,7 @@ fn _unsigned_rounding_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFlo
     }
 }
 
-fn _primitive_float_checked_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
+fn primitive_float_checked_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigned>(
     value: U,
 ) -> Option<T> {
     if value == U::ZERO {
@@ -545,7 +545,7 @@ fn _primitive_float_checked_from_unsigned<T: PrimitiveFloat, U: PrimitiveUnsigne
     T::from_sci_mantissa_and_exponent(mantissa, i64::wrapping_from(exponent))
 }
 
-fn _unsigned_checked_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+fn unsigned_checked_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     value: U,
 ) -> Option<T> {
     if !value.is_finite() {
@@ -564,7 +564,7 @@ fn _unsigned_checked_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloa
     }
 }
 
-fn _primitive_float_convertible_from_unsigned<
+fn primitive_float_convertible_from_unsigned<
     T: PrimitiveFloat,
     U: PrimitiveUnsigned + SciMantissaAndExponent<T, u64>,
 >(
@@ -580,7 +580,7 @@ fn _primitive_float_convertible_from_unsigned<
 }
 
 #[inline]
-fn _unsigned_convertible_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
+fn unsigned_convertible_from_primitive_float<T: PrimitiveUnsigned, U: PrimitiveFloat>(
     value: U,
 ) -> bool {
     value >= U::ZERO
@@ -617,7 +617,7 @@ macro_rules! impl_from_float_unsigned {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn rounding_from(value: $u, rm: RoundingMode) -> $f {
-                        _primitive_float_rounding_from_unsigned(value, rm)
+                        primitive_float_rounding_from_unsigned(value, rm)
                     }
                 }
 
@@ -660,7 +660,7 @@ macro_rules! impl_from_float_unsigned {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn rounding_from(value: $f, rm: RoundingMode) -> $u {
-                        _unsigned_rounding_from_primitive_float(value, rm)
+                        unsigned_rounding_from_primitive_float(value, rm)
                     }
                 }
 
@@ -679,7 +679,7 @@ macro_rules! impl_from_float_unsigned {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn checked_from(value: $u) -> Option<$f> {
-                        _primitive_float_checked_from_unsigned(value)
+                        primitive_float_checked_from_unsigned(value)
                     }
                 }
 
@@ -697,7 +697,7 @@ macro_rules! impl_from_float_unsigned {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn checked_from(value: $f) -> Option<$u> {
-                        _unsigned_checked_from_primitive_float(value)
+                        unsigned_checked_from_primitive_float(value)
                     }
                 }
 
@@ -716,7 +716,7 @@ macro_rules! impl_from_float_unsigned {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn convertible_from(value: $u) -> bool {
-                        _primitive_float_convertible_from_unsigned::<$f, $u>(value)
+                        primitive_float_convertible_from_unsigned::<$f, $u>(value)
                     }
                 }
 
@@ -734,7 +734,7 @@ macro_rules! impl_from_float_unsigned {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn convertible_from(value: $f) -> bool {
-                        _unsigned_convertible_from_primitive_float::<$u, $f>(value)
+                        unsigned_convertible_from_primitive_float::<$u, $f>(value)
                     }
                 }
             };
@@ -745,7 +745,7 @@ macro_rules! impl_from_float_unsigned {
 apply_to_unsigneds!(impl_from_float_unsigned);
 
 #[inline]
-fn _primitive_float_rounding_from_signed<
+fn primitive_float_rounding_from_signed<
     U: PrimitiveUnsigned,
     S: PrimitiveSigned + UnsignedAbs<Output = U>,
     F: PrimitiveFloat + RoundingFrom<U>,
@@ -761,7 +761,7 @@ fn _primitive_float_rounding_from_signed<
     }
 }
 
-fn _signed_rounding_from_primitive_float<
+fn signed_rounding_from_primitive_float<
     U: PrimitiveUnsigned + RoundingFrom<F>,
     S: CheckedFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     F: PrimitiveFloat,
@@ -824,7 +824,7 @@ fn _signed_rounding_from_primitive_float<
 }
 
 #[inline]
-fn _primitive_float_checked_from_signed<
+fn primitive_float_checked_from_signed<
     U: PrimitiveUnsigned,
     S: PrimitiveSigned + UnsignedAbs<Output = U>,
     F: CheckedFrom<U> + PrimitiveFloat,
@@ -839,7 +839,7 @@ fn _primitive_float_checked_from_signed<
     }
 }
 
-fn _signed_checked_from_primitive_float<
+fn signed_checked_from_primitive_float<
     U: CheckedFrom<F> + PrimitiveUnsigned,
     S: CheckedFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     F: PrimitiveFloat,
@@ -862,7 +862,7 @@ fn _signed_checked_from_primitive_float<
 }
 
 #[inline]
-fn _primitive_float_convertible_from_signed<
+fn primitive_float_convertible_from_signed<
     U: PrimitiveUnsigned,
     S: PrimitiveSigned + UnsignedAbs<Output = U>,
     F: ConvertibleFrom<U> + PrimitiveFloat,
@@ -872,7 +872,7 @@ fn _primitive_float_convertible_from_signed<
     F::convertible_from(value.unsigned_abs())
 }
 
-fn _signed_convertible_from_primitive_float<
+fn signed_convertible_from_primitive_float<
     U: PrimitiveUnsigned,
     S: PrimitiveSigned,
     F: PrimitiveFloat,
@@ -927,7 +927,7 @@ macro_rules! impl_from_float_signed {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn rounding_from(value: $i, rm: RoundingMode) -> $f {
-                        _primitive_float_rounding_from_signed::<$u, $i, $f>(value, rm)
+                        primitive_float_rounding_from_signed::<$u, $i, $f>(value, rm)
                     }
                 }
 
@@ -973,7 +973,7 @@ macro_rules! impl_from_float_signed {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn rounding_from(value: $f, rm: RoundingMode) -> $i {
-                        _signed_rounding_from_primitive_float::<$u, $i, $f>(value, rm)
+                        signed_rounding_from_primitive_float::<$u, $i, $f>(value, rm)
                     }
                 }
 
@@ -991,7 +991,7 @@ macro_rules! impl_from_float_signed {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn checked_from(value: $i) -> Option<$f> {
-                        _primitive_float_checked_from_signed(value)
+                        primitive_float_checked_from_signed(value)
                     }
                 }
 
@@ -1009,7 +1009,7 @@ macro_rules! impl_from_float_signed {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn checked_from(value: $f) -> Option<$i> {
-                        _signed_checked_from_primitive_float::<$u, $i, $f>(value)
+                        signed_checked_from_primitive_float::<$u, $i, $f>(value)
                     }
                 }
 
@@ -1027,7 +1027,7 @@ macro_rules! impl_from_float_signed {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn convertible_from(value: $i) -> bool {
-                        _primitive_float_convertible_from_signed::<$u, $i, $f>(value)
+                        primitive_float_convertible_from_signed::<$u, $i, $f>(value)
                     }
                 }
 
@@ -1045,7 +1045,7 @@ macro_rules! impl_from_float_signed {
                     /// See the documentation of the `num::conversion::from` module.
                     #[inline]
                     fn convertible_from(value: $f) -> bool {
-                        _signed_convertible_from_primitive_float::<$u, $i, $f>(value)
+                        signed_convertible_from_primitive_float::<$u, $i, $f>(value)
                     }
                 }
             };

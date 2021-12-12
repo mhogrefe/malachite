@@ -38,6 +38,7 @@ where
     }
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_from_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
@@ -58,6 +59,7 @@ fn benchmark_integer_from_unsigned<T: PrimitiveUnsigned>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_from_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
@@ -78,6 +80,7 @@ fn benchmark_integer_from_signed<T: PrimitiveSigned>(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_from_u32_library_comparison(
     gm: GenMode,
     config: GenConfig,
@@ -100,6 +103,7 @@ fn benchmark_integer_from_u32_library_comparison(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_from_u64_library_comparison(
     gm: GenMode,
     config: GenConfig,
@@ -122,6 +126,7 @@ fn benchmark_integer_from_u64_library_comparison(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_from_i32_library_comparison(
     gm: GenMode,
     config: GenConfig,
@@ -144,6 +149,7 @@ fn benchmark_integer_from_i32_library_comparison(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_from_i64_library_comparison(
     gm: GenMode,
     config: GenConfig,

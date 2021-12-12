@@ -2,7 +2,7 @@ use num::arithmetic::traits::{ModNeg, ModNegAssign};
 use num::basic::traits::Zero;
 use std::ops::Sub;
 
-fn _mod_neg<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: T, m: T) -> T {
+fn mod_neg<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: T, m: T) -> T {
     if x == T::ZERO {
         T::ZERO
     } else {
@@ -10,7 +10,7 @@ fn _mod_neg<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: T, m: T) -> T {
     }
 }
 
-fn _mod_neg_assign<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: &mut T, m: T) {
+fn mod_neg_assign<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: &mut T, m: T) {
     if *x != T::ZERO {
         *x = m - *x;
     }
@@ -34,7 +34,7 @@ macro_rules! impl_mod_neg {
             /// This is nmod_neg from nmod_vec.h, FLINT 2.7.1.
             #[inline]
             fn mod_neg(self, m: $t) -> $t {
-                _mod_neg(self, m)
+                mod_neg(self, m)
             }
         }
 
@@ -52,7 +52,7 @@ macro_rules! impl_mod_neg {
             /// This is nmod_neg from nmod_vec.h, FLINT 2.7.1, where the output is assigned to a.
             #[inline]
             fn mod_neg_assign(&mut self, m: $t) {
-                _mod_neg_assign(self, m)
+                mod_neg_assign(self, m)
             }
         }
     };

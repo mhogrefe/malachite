@@ -140,7 +140,7 @@ fn limbs_div_limb_normalized_to_out(
 }
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, but not computing the remainder.
-/// Experiments show that this is always slower than `_limbs_div_limb_to_out`.
+/// Experiments show that this is always slower than `limbs_div_limb_to_out`.
 pub fn limbs_div_limb_to_out_alt(out: &mut [Limb], ns: &[Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -168,7 +168,7 @@ pub fn limbs_div_limb_to_out_alt(out: &mut [Limb], ns: &[Limb], d: Limb) {
 }
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where qp == up, but not computing
-/// the remainder. Experiments show that this is always slower than `_limbs_div_limb_in_place`.
+/// the remainder. Experiments show that this is always slower than `limbs_div_limb_in_place`.
 pub fn limbs_div_limb_in_place_alt(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();

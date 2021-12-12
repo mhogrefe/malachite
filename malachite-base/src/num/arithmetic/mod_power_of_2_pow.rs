@@ -2,7 +2,7 @@ use num::arithmetic::traits::{ModPowerOf2MulAssign, ModPowerOf2Pow, ModPowerOf2P
 use num::basic::integers::PrimitiveInt;
 use num::logic::traits::BitIterable;
 
-fn _mod_power_of_2_pow<T: ModPowerOf2MulAssign<T> + PrimitiveInt>(x: T, exp: u64, pow: u64) -> T {
+fn mod_power_of_2_pow<T: ModPowerOf2MulAssign<T> + PrimitiveInt>(x: T, exp: u64, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
     if pow == 0 {
         return T::ZERO;
@@ -37,7 +37,7 @@ macro_rules! impl_mod_power_of_2_pow {
             /// See the documentation of the `num::arithmetic::mod_power_of_2_pow` module.
             #[inline]
             fn mod_power_of_2_pow(self, exp: u64, pow: u64) -> $t {
-                _mod_power_of_2_pow(self, exp, pow)
+                mod_power_of_2_pow(self, exp, pow)
             }
         }
 

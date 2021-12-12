@@ -5,7 +5,7 @@ use num::conversion::traits::WrappingFrom;
 use rounding_modes::RoundingMode;
 use std::ops::{Shl, ShlAssign};
 
-fn _shl_round<
+fn shl_round<
     T: PrimitiveInt + Shl<U, Output = T> + ShrRound<U, Output = T>,
     U,
     S: Copy + Ord + UnsignedAbs<Output = U> + WrappingFrom<u64> + Zero,
@@ -26,7 +26,7 @@ fn _shl_round<
     }
 }
 
-fn _shl_round_assign<
+fn shl_round_assign<
     T: PrimitiveInt + ShlAssign<U> + ShrRoundAssign<U>,
     U,
     S: Copy + Ord + UnsignedAbs<Output = U> + WrappingFrom<u64> + Zero,
@@ -74,7 +74,7 @@ macro_rules! impl_shl_round {
                     /// See the documentation of the `num::arithmetic::shl_round` module.
                     #[inline]
                     fn shl_round(self, bits: $u, rm: RoundingMode) -> $t {
-                        _shl_round(self, bits, rm)
+                        shl_round(self, bits, rm)
                     }
                 }
 
@@ -99,7 +99,7 @@ macro_rules! impl_shl_round {
                     /// See the documentation of the `num::arithmetic::shl_round` module.
                     #[inline]
                     fn shl_round_assign(&mut self, bits: $u, rm: RoundingMode) {
-                        _shl_round_assign(self, bits, rm)
+                        shl_round_assign(self, bits, rm)
                     }
                 }
             };

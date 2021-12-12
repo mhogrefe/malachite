@@ -1,7 +1,6 @@
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, FloorLogBasePowerOf2,
 };
-use malachite_base::num::basic::traits::{One, Zero};
 use natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
@@ -28,6 +27,7 @@ use platform::Limb;
 /// assert_eq!(limbs_floor_log_base_power_of_2(&[100], 2), 3);
 /// assert_eq!(limbs_floor_log_base_power_of_2(&[0, 1], 8), 4);
 /// ```
+#[doc(hidden)]
 pub fn limbs_floor_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
     assert_ne!(pow, 0);
     (limbs_significant_bits(xs) - 1) / pow
@@ -57,6 +57,7 @@ pub fn limbs_floor_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
 /// assert_eq!(limbs_ceiling_log_base_power_of_2(&[100], 2), 4);
 /// assert_eq!(limbs_ceiling_log_base_power_of_2(&[0, 1], 8), 4);
 /// ```
+#[doc(hidden)]
 pub fn limbs_ceiling_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
     assert_ne!(pow, 0);
     let significant_bits_m_1 = limbs_significant_bits(xs) - 1;
@@ -98,6 +99,7 @@ pub fn limbs_ceiling_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
 /// assert_eq!(limbs_checked_log_base_power_of_2(&[100], 2), None);
 /// assert_eq!(limbs_checked_log_base_power_of_2(&[0, 1], 8), Some(4));
 /// ```
+#[doc(hidden)]
 pub fn limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u64> {
     assert_ne!(pow, 0);
     let significant_bits_m_1 = limbs_significant_bits(xs) - 1;
@@ -107,18 +109,6 @@ pub fn limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u64> {
     } else {
         None
     }
-}
-
-pub fn ceiling_log_base_power_of_2_naive_nz(x: &Natural, pow: u64) -> u64 {
-    assert_ne!(*x, Natural::ZERO);
-    assert_ne!(pow, 0);
-    let mut result = 0;
-    let mut p = Natural::ONE;
-    while p < *x {
-        result += 1;
-        p <<= pow;
-    }
-    result
 }
 
 impl<'a> FloorLogBasePowerOf2 for &'a Natural {

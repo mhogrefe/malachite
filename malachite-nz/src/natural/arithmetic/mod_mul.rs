@@ -14,6 +14,7 @@ use platform::{DoubleLimb, Limb};
 /// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0.
 ///
 /// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
+#[doc(hidden)]
 pub fn limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
     let xs = &mut [0; 5];
     let out = &mut [0; 3];
@@ -49,7 +50,8 @@ pub fn limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, 
 /// a = w - 2 * m
 ///
 /// This is _fmpz_mod_mul2 from fmpz_mod/mul.c, FLINT 2.7.1.
-pub fn _limbs_mod_mul_two_limbs(
+#[doc(hidden)]
+pub fn limbs_mod_mul_two_limbs(
     x_1: Limb,
     x_0: Limb,
     y_1: Limb,
@@ -66,8 +68,7 @@ pub fn _limbs_mod_mul_two_limbs(
     let (t, carry) = (DoubleLimb::from(x_1) * DoubleLimb::from(y_0))
         .overflowing_add(DoubleLimb::from(x_0) * DoubleLimb::from(y_1));
     let (t_2, t_1) = t.split_in_half();
-    let (w_3, w_2, w_1) =
-        Limb::xxx_add_yyy_is_zzz(w_3, w_2, w_1, if carry { 1 } else { 0 }, t_2, t_1);
+    let (w_3, w_2, w_1) = Limb::xxx_add_yyy_is_zzz(w_3, w_2, w_1, Limb::iverson(carry), t_2, t_1);
 
     // z[5:0] = w[3:1] * ninv[2:0], z[5] should end up zero
     let (z_3, z_2) = Limb::x_mul_y_is_zz(w_2, inv_1);
@@ -122,6 +123,7 @@ pub fn _limbs_mod_mul_two_limbs(
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[doc(hidden)]
 pub enum ModMulData {
     OneLimb(Limb),
     MinTwoLimbs,
@@ -155,14 +157,14 @@ impl Natural {
     ) -> Natural {
         let (r_1, r_0) = match (self, y, m) {
             (&Natural(Small(x)), &Natural(Small(y)), &Natural(Large(ref ms))) => {
-                _limbs_mod_mul_two_limbs(0, x, 0, y, ms[1], ms[0], inv_2, inv_1, inv_0)
+                limbs_mod_mul_two_limbs(0, x, 0, y, ms[1], ms[0], inv_2, inv_1, inv_0)
             }
             (&Natural(Large(ref xs)), &Natural(Small(y)), &Natural(Large(ref ms)))
             | (&Natural(Small(y)), &Natural(Large(ref xs)), &Natural(Large(ref ms))) => {
-                _limbs_mod_mul_two_limbs(xs[1], xs[0], 0, y, ms[1], ms[0], inv_2, inv_1, inv_0)
+                limbs_mod_mul_two_limbs(xs[1], xs[0], 0, y, ms[1], ms[0], inv_2, inv_1, inv_0)
             }
             (&Natural(Large(ref xs)), &Natural(Large(ref ys)), &Natural(Large(ref ms))) => {
-                _limbs_mod_mul_two_limbs(
+                limbs_mod_mul_two_limbs(
                     xs[1], xs[0], ys[1], ys[0], ms[1], ms[0], inv_2, inv_1, inv_0,
                 )
             }
@@ -182,22 +184,22 @@ impl Natural {
         match (&mut *self, y, m) {
             (&mut Natural(Small(x)), &Natural(Small(y)), &Natural(Large(ref ms))) => {
                 let (r_1, r_0) =
-                    _limbs_mod_mul_two_limbs(0, x, 0, y, ms[1], ms[0], inv_2, inv_1, inv_0);
+                    limbs_mod_mul_two_limbs(0, x, 0, y, ms[1], ms[0], inv_2, inv_1, inv_0);
                 *self = Natural::from_owned_limbs_asc(vec![r_0, r_1]);
             }
             (&mut Natural(Small(x)), &Natural(Large(ref ys)), &Natural(Large(ref ms))) => {
                 let (r_1, r_0) =
-                    _limbs_mod_mul_two_limbs(0, x, ys[1], ys[0], ms[1], ms[0], inv_2, inv_1, inv_0);
+                    limbs_mod_mul_two_limbs(0, x, ys[1], ys[0], ms[1], ms[0], inv_2, inv_1, inv_0);
                 *self = Natural::from_owned_limbs_asc(vec![r_0, r_1])
             }
             (&mut Natural(Large(ref mut xs)), &Natural(Small(y)), &Natural(Large(ref ms))) => {
                 let (r_1, r_0) =
-                    _limbs_mod_mul_two_limbs(xs[1], xs[0], 0, y, ms[1], ms[0], inv_2, inv_1, inv_0);
+                    limbs_mod_mul_two_limbs(xs[1], xs[0], 0, y, ms[1], ms[0], inv_2, inv_1, inv_0);
                 *xs = vec![r_0, r_1];
                 self.trim();
             }
             (&mut Natural(Large(ref mut xs)), &Natural(Large(ref ys)), &Natural(Large(ref ms))) => {
-                let (r_1, r_0) = _limbs_mod_mul_two_limbs(
+                let (r_1, r_0) = limbs_mod_mul_two_limbs(
                     xs[1], xs[0], ys[1], ys[0], ms[1], ms[0], inv_2, inv_1, inv_0,
                 );
                 *xs = vec![r_0, r_1];

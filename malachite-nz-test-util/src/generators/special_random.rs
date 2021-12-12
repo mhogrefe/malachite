@@ -2,12 +2,15 @@ use crate::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
 };
 use crate::generators::exhaustive::{
-    filter_helper_1, filter_helper_2, filter_helper_3, filter_map_helper_1, filter_map_helper_2,
-    filter_map_helper_3, round_to_multiple_integer_filter_map,
+    filter_helper_1, filter_helper_2, filter_helper_3, filter_helper_4, filter_helper_5,
+    filter_helper_6, filter_map_helper_1, filter_map_helper_2, filter_map_helper_3,
+    gcd_input_filter, large_type_filter_map_1, limbs_eq_mod_map, limbs_significant_bits_helper,
+    map_helper_1, map_helper_2, map_helper_3, round_to_multiple_integer_filter_map,
     round_to_multiple_natural_filter_map,
 };
+use crate::generators::factors_of_limb_max;
 use crate::generators::T8;
-use crate::natural::arithmetic::gcd::half_gcd_matrix_create;
+use crate::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
 use malachite_base::bools::random::{random_bools, RandomBools};
 use malachite_base::iterators::with_special_value;
 use malachite_base::num::arithmetic::traits::{
@@ -17,16 +20,18 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::traits::{Two, Zero};
+use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
 };
-use malachite_base::num::logic::traits::{BitAccess, BitConvertible, SignificantBits};
+use malachite_base::num::logic::traits::{
+    BitAccess, BitConvertible, LeadingZeros, SignificantBits,
+};
 use malachite_base::num::random::geometric::{
     geometric_random_positive_unsigneds, geometric_random_signed_range, geometric_random_signeds,
-    geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
-    GeometricRandomSigneds,
+    geometric_random_unsigned_inclusive_range, geometric_random_unsigneds,
+    GeometricRandomNaturalValues, GeometricRandomSignedRange, GeometricRandomSigneds,
 };
 use malachite_base::num::random::striped::{
     get_striped_bool_vec, get_striped_unsigned_vec, striped_random_natural_signeds,
@@ -44,20 +49,24 @@ use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::rounding_modes::random::random_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::tuples::random::{
-    random_pairs, random_pairs_from_single, random_quadruples_from_single, random_quadruples_xxxy,
-    random_quadruples_xyyx, random_quadruples_xyyz, random_triples, random_triples_from_single,
-    random_triples_xxy, random_triples_xyx, random_triples_xyy,
+    random_ordered_unique_pairs, random_pairs, random_pairs_from_single,
+    random_quadruples_from_single, random_quadruples_xxxy, random_quadruples_xyxz,
+    random_quadruples_xyyx, random_quadruples_xyyz, random_quintuples_xyyyz,
+    random_sextuples_from_single, random_triples, random_triples_from_single, random_triples_xxy,
+    random_triples_xyx, random_triples_xyy,
 };
 use malachite_base::unions::random::random_union2s;
 use malachite_base::unions::Union2;
 use malachite_base::vecs::random::random_vecs;
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{
-    permute_1_3_2, reshape_1_3_to_4, GenConfig, It,
+    permute_1_3_2, reshape_1_3_to_4, reshape_2_2_to_4, GenConfig, It,
 };
+use malachite_base_test_util::generators::random::get_two_highest;
 use malachite_base_test_util::generators::special_random::{
-    special_random_unsigned_vec_unsigned_pair_gen_var_17, UnsignedVecTripleLenGenerator1,
-    UnsignedVecTripleXYYLenGenerator,
+    special_random_unsigned_vec_unsigned_pair_gen_var_17, UnsignedVecPairLenGenerator1,
+    UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
+    UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
 };
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::random::{
@@ -65,8 +74,19 @@ use malachite_nz::integer::random::{
     striped_random_nonzero_integers, StripedRandomIntegers,
 };
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::arithmetic::gcd::half_gcd::{HalfGcdMatrix, HalfGcdMatrix1};
+use malachite_nz::natural::arithmetic::div_exact::{
+    limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+};
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len, limbs_invert_limb,
+    limbs_two_limb_inverse_helper,
+};
+use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
+use malachite_nz::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
 use malachite_nz::natural::arithmetic::mul::fft::*;
+use malachite_nz::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
+use malachite_nz::natural::arithmetic::mul::limbs_mul;
+use malachite_nz::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_32_input_sizes_valid,
@@ -1735,6 +1755,16 @@ pub fn special_random_natural_pair_gen_var_6(config: &GenConfig) -> It<(Natural,
     )
 }
 
+pub fn special_random_natural_pair_gen_var_7(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_ordered_unique_pairs(striped_random_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_stripe_n", 32),
+        config.get_or("mean_stripe_d", 1),
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
 // -- (Natural, Natural, Natural) --
 
 pub fn special_random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
@@ -1745,6 +1775,227 @@ pub fn special_random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Nat
         config.get_or("mean_bits_n", 64),
         config.get_or("mean_bits_d", 1),
     )))
+}
+
+pub fn special_random_natural_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(x, y, m)| (x * &m + &y, y, m)),
+    )
+}
+
+pub fn special_random_natural_triple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+    )
+}
+
+pub fn special_random_natural_triple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .flat_map(|(x, y, z)| {
+            let z = max(&x, &y) + z + Natural::ONE;
+            Some((x, y, z))
+        }),
+    )
+}
+
+pub fn special_random_natural_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_positive_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(x, y, mut z)| {
+            z += &x;
+            z += Natural::ONE;
+            (x, y, z)
+        }),
+    )
+}
+
+// -- (Natural, Natural, Natural, Natural) --
+
+pub fn special_random_natural_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        random_quadruples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .flat_map(|(x, y, z, w)| {
+            let ranking = [(&x, 0), (&y, 1), (&z, 2), (&w, 3)];
+            let (hi, next_hi) = get_two_highest(&ranking);
+            if hi.0 == next_hi.0 {
+                None
+            } else {
+                Some(match hi.1 {
+                    0 => (y, z, w, x),
+                    1 => (x, z, w, y),
+                    2 => (x, y, w, z),
+                    _ => (x, y, z, w),
+                })
+            }
+        }),
+    )
+}
+
+pub fn special_random_natural_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        random_quadruples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(x, y, z, mut w)| {
+            w += max!(&x, &y);
+            w += Natural::ONE;
+            (x, y, z, w)
+        }),
+    )
+}
+
+pub fn special_random_natural_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        random_quadruples_from_single(striped_random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", 32),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(x, y, z, mut w)| {
+            w += &x;
+            w += Natural::ONE;
+            (x, y, z, w)
+        }),
+    )
+}
+
+// -- (Natural, Natural, Natural, PrimitiveUnsigned) --
+
+pub fn special_random_natural_natural_natural_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, T)> {
+    Box::new(random_quadruples_xxxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_natural_natural_natural_unsigned_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, u64)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, z, mut m)| {
+            m += max!(
+                x.significant_bits(),
+                y.significant_bits(),
+                z.significant_bits()
+            );
+            (x, y, z, m)
+        }),
+    )
 }
 
 // -- (Natural, Natural, PrimitiveUnsigned) --
@@ -1771,6 +2022,93 @@ pub fn special_random_natural_natural_unsigned_triple_gen_var_1<T: PrimitiveUnsi
             )
         },
     ))
+}
+
+pub fn special_random_natural_natural_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, Natural, T)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, pow)| ((x << pow) + &y, y, pow)),
+    )
+}
+
+pub fn special_random_natural_natural_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, Natural, T)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_2(y, pow.exact_into())),
+    )
+}
+
+pub fn special_random_natural_natural_unsigned_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Natural, Natural, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, mut m)| {
+            m += max(x.significant_bits(), y.significant_bits());
+            (x, y, m)
+        }),
+    )
 }
 
 // -- (Natural, Natural, RoundingMode) --
@@ -2198,6 +2536,91 @@ pub fn special_random_natural_unsigned_pair_gen_var_7<T: PrimitiveUnsigned>(
     ))
 }
 
+pub fn special_random_natural_unsigned_pair_gen_var_8<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed_2| {
+                striped_random_naturals(
+                    seed_2,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(mut x, y)| {
+            x.round_to_multiple_of_power_of_2_assign(y.exact_into(), RoundingMode::Down);
+            (x, y)
+        }),
+    )
+}
+
+pub fn special_random_natural_unsigned_pair_gen_var_9<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_small_n", 32),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter(|(x, y)| !x.divisible_by_power_of_2(y.exact_into())),
+    )
+}
+
+pub fn special_random_natural_unsigned_pair_gen_var_10(config: &GenConfig) -> It<(Natural, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_naturals(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, mut m)| {
+            m += x.significant_bits();
+            (x, m)
+        }),
+    )
+}
+
 // -- (Natural, PrimitiveUnsigned, bool) --
 
 pub fn special_random_natural_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -2368,6 +2791,30 @@ pub fn special_random_natural_unsigned_unsigned_triple_gen_var_4<T: PrimitiveUns
         )
         .map(|(xs, y, z)| if y <= z { (xs, y, z) } else { (xs, z, y) }),
     )
+}
+
+pub fn special_random_natural_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, T)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_naturals(
+                seed,
+                config.get_or("mean_stripe_n", 32),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("small_unsigned_mean_n", 32),
+                config.get_or("small_unsigned_mean_d", 1),
+            )
+        },
+    ))
 }
 
 // -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
@@ -2750,6 +3197,69 @@ pub fn special_random_unsigned_natural_unsigned_triple_gen<T: PrimitiveUnsigned>
     ))
 }
 
+// -- (PrimitiveUnsigned * 6) --
+
+// var 1 is in malachite-base.
+
+pub fn special_random_unsigned_sextuple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Limb, Limb, Limb, Limb, Limb, Limb)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        random_pairs_from_single(striped_random_unsigneds(
+                            seed_2,
+                            config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                        ))
+                    },
+                    &|seed_2| {
+                        random_pairs(
+                            seed_2,
+                            &|seed_3| {
+                                random_unsigned_inclusive_range(
+                                    seed_3,
+                                    Limb::power_of_2(Limb::WIDTH - 1),
+                                    Limb::MAX,
+                                )
+                            },
+                            &|seed_3| {
+                                striped_random_unsigneds(
+                                    seed_3,
+                                    config.get_or("mean_unsigned_stripe_n", Limb::WIDTH >> 1),
+                                    config.get_or("mean_unsigned_stripe_d", 1),
+                                )
+                            },
+                        )
+                    },
+                )
+                .filter(|&((n_2, n_1), (d_1, d_0))| n_2 < d_1 || n_2 == d_1 && n_1 < d_0)
+            },
+            &|seed| {
+                striped_random_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", 32),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(|(((n_2, n_1), (d_1, d_0)), n_0)| {
+            (
+                n_2,
+                n_1,
+                n_0,
+                d_1,
+                d_0,
+                limbs_two_limb_inverse_helper(d_1, d_0),
+            )
+        }),
+    )
+}
+
 // -- (String, String, String) --
 
 pub fn special_random_string_triple_gen_var_1(config: &GenConfig) -> It<(String, String, String)> {
@@ -2934,6 +3444,27 @@ pub fn special_random_natural_vec_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
     ))
 }
 
+// -- Vec<PrimitiveUnsigned> --
+
+// vars 1 through 4 are in malachite-base.
+
+pub fn special_random_unsigned_vec_gen_var_5(config: &GenConfig) -> It<Vec<Limb>> {
+    Box::new(
+        striped_random_unsigned_vecs_min_length(
+            EXAMPLE_SEED,
+            1,
+            config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|mut xs| {
+            limbs_vec_mul_limb_in_place(&mut xs, 3);
+            xs
+        }),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 // vars 1 through 3 are in malachite-base
@@ -2960,7 +3491,7 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_4<
     ))
 }
 
-// vars 5 through 17 are in malachite-base
+// vars 5 through 17 are in malachite-base.
 
 pub fn special_random_unsigned_vec_unsigned_pair_gen_var_18(
     config: &GenConfig,
@@ -2974,7 +3505,38 @@ pub fn special_random_unsigned_vec_unsigned_pair_gen_var_18(
     )
 }
 
-// var 19 is in malachite-base
+// vars 19 through 20 are in malachite-base.
+
+pub fn special_random_unsigned_vec_unsigned_pair_gen_var_21(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    1,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_small_unsigned_n", 4),
+                    config.get_or("mean_small_unsigned_d", 1),
+                )
+            },
+        )
+        .map(|(mut xs, y)| {
+            limbs_vec_mul_limb_in_place(&mut xs, y);
+            (xs, y)
+        }),
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
@@ -3012,6 +3574,183 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_6(
 }
 
 // vars 7 through 8 are in malachite-base.
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_9(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb, Limb)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigned_vecs(
+                seed,
+                config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &|seed| random_values_from_vec(seed, factors_of_limb_max()),
+        &|seed| {
+            striped_random_unsigneds(
+                seed,
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
+// var 10 is in malachite-base.
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_11(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb, Limb)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(map_helper_3),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_12(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb, Limb)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .filter(filter_helper_6),
+    )
+}
+
+// var 13 is in malachite-base.
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_14<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length::<Limb>(
+                    seed,
+                    1,
+                    config.get_or("mean_stripe_n", T::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .map(|(xs, y, mut pow)| {
+            pow += max(limbs_significant_bits_helper(&xs), y.significant_bits());
+            (xs, y, pow)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_15<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length::<Limb>(
+                    seed,
+                    1,
+                    config.get_or("mean_stripe_n", T::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .map(|(xs, y, mut pow)| {
+            pow += max(limbs_significant_bits_helper(&xs), y.significant_bits());
+            (xs, y, pow)
+        }),
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>) --
 
@@ -3119,6 +3858,64 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3(
     )
 }
 
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        permute_1_3_2(Box::new(random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )))
+        .map(map_helper_1),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        permute_1_3_2(Box::new(random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )))
+        .filter(filter_helper_4),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 struct BasecaseDigitsSpecialRandomGenerator<T: PrimitiveUnsigned> {
@@ -3193,6 +3990,132 @@ pub fn special_random_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_
         phantom: PhantomData,
     })
 }
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
+
+// vars 1 through 10 are in malachite-base.
+
+pub fn special_random_unsigned_vec_pair_gen_var_11(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecPairLenGenerator2 {
+            phantom: PhantomData,
+            lengths: random_pairs_from_single(geometric_random_unsigned_inclusive_range(
+                EXAMPLE_SEED.fork("lengths"),
+                2,
+                u64::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .map(|(x, y)| if x >= y { (x, y) } else { (y, x) }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .filter(|(xs, ys)| gcd_input_filter(xs, ys)),
+    )
+}
+
+// vars 12 through 13 are in malachite-base.
+
+pub fn special_random_unsigned_vec_pair_gen_var_14(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecPairLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_pairs_from_single(geometric_random_positive_unsigneds(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .map(|(x, y)| if x >= y { (x, y) } else { (y, x) }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .filter_map(|(out, mut xs)| {
+            limbs_vec_mul_limb_in_place(&mut xs, 3);
+            if out.len() >= xs.len() {
+                Some((out, xs))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_pair_gen_var_15(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_pairs_from_single(striped_random_unsigned_vecs_min_length(
+            EXAMPLE_SEED,
+            2,
+            config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .map(|(ns, mut ds)| {
+            let d_last = ds.last_mut().unwrap();
+            if *d_last == 0 {
+                *d_last = 1;
+            }
+            let mut new_ns = limbs_mul(&ns, &ds);
+            if *new_ns.last().unwrap() == 0 {
+                new_ns.pop();
+            }
+            (new_ns, ds)
+        }),
+    )
+}
+
+// vars 16 through 17 are in malachite-base.
+
+pub fn special_random_unsigned_vec_pair_gen_var_18(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_pairs_from_single(
+            striped_random_unsigned_vecs_min_length(
+                EXAMPLE_SEED,
+                1,
+                config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter_map(|mut xs| {
+                let x_last = xs.last_mut().unwrap();
+                if *x_last == Limb::MAX {
+                    None
+                } else {
+                    *x_last += 1;
+                    Some(xs)
+                }
+            }),
+        )
+        .filter_map(|(ns, ds)| {
+            let mut ns = limbs_mul(&ns, &ds);
+            if *ns.last().unwrap() == 0 {
+                ns.pop();
+            }
+            if *ns.last().unwrap() == 0 {
+                None
+            } else {
+                Some((ns, ds))
+            }
+        }),
+    )
+}
+
+// var 19 is in malachite-base.
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
@@ -3390,7 +4313,257 @@ pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8(
     )
 }
 
-// var 9 is in malachite-base.
+// vars 9 through 13 are in malachite-base.
+
+pub fn special_random_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| UnsignedVecPairLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_pairs_from_single(geometric_random_unsigned_inclusive_range(
+                    seed.fork("lengths"),
+                    2,
+                    u64::MAX,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .map(|(x, y)| if x >= y { (x, y) } else { (y, x) }),
+                striped_bit_source: StripedBitSource::new(
+                    seed.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .filter_map(|((out, mut xs), y)| {
+            limbs_vec_mul_limb_in_place(&mut xs, y);
+            if out.len() >= xs.len() {
+                Some((out, xs, y))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_15(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .map(map_helper_2),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_16(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .filter(|xs| *xs.last().unwrap() != 0)
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .filter(filter_helper_5),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_17(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| UnsignedVecPairLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_pairs_from_single(geometric_random_unsigneds::<u64>(
+                    seed.fork("lengths"),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .filter_map(|(mut n_len, mut d_init_len)| {
+                    n_len = n_len.checked_add(3)?;
+                    d_init_len = d_init_len.checked_add(2)?;
+                    if n_len > d_init_len {
+                        Some((n_len, d_init_len))
+                    } else {
+                        None
+                    }
+                }),
+                striped_bit_source: StripedBitSource::new(
+                    seed.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+            &|seed| {
+                random_unsigned_inclusive_range(seed, Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX)
+            },
+        )
+        .map(|((n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (n, d_init, inverse)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_18(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs::<Limb>(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .map(|(xs, ys, mut pow)| {
+            pow += max(
+                limbs_significant_bits_helper(&xs),
+                limbs_significant_bits_helper(&ys),
+            );
+            (xs, ys, pow)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_19(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| UnsignedVecPairLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_pairs_from_single(geometric_random_unsigneds(
+                    seed.fork("lengths"),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .map(|(x, y)| if x >= y { (x, y) } else { (y, x) }),
+                striped_bit_source: StripedBitSource::new(
+                    seed.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .map(|((xs, ys), mut pow)| {
+            pow += max(
+                limbs_significant_bits_helper(&xs),
+                limbs_significant_bits_helper(&ys),
+            );
+            (xs, ys, pow)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_unsigned_unsigned_triple_gen_var_20(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length::<Limb>(
+                    seed,
+                    1,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+                .flat_map(|mut xs| {
+                    let last_x = xs.last_mut().unwrap();
+                    *last_x = last_x.checked_add(1)?;
+                    Some(xs)
+                })
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("small_unsigned_mean_n", 4),
+                    config.get_or("small_unsigned_mean_d", 1),
+                )
+            },
+        )
+        .map(|(xs, ys, mut pow)| {
+            pow += max(
+                limbs_significant_bits_helper(&xs),
+                limbs_significant_bits_helper(&ys),
+            );
+            (xs, ys, pow)
+        }),
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
@@ -3722,7 +4895,634 @@ pub fn special_random_unsigned_vec_triple_gen_var_38(
     )
 }
 
-// var 39 is in malachite-base.
+// vars 39 through 41 is in malachite-base.
+
+pub fn special_random_unsigned_vec_triple_gen_var_42(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| UnsignedVecTripleLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                    seed.fork("lengths"),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .filter_map(|(q_len, mut n_len, mut d_init_len)| {
+                    n_len = n_len.checked_add(2)?;
+                    d_init_len = d_init_len.checked_add(1)?;
+                    let d_len = d_init_len + 1;
+                    if n_len >= d_len && q_len >= n_len - d_len {
+                        Some((q_len, n_len, d_init_len))
+                    } else {
+                        None
+                    }
+                }),
+                striped_bit_source: StripedBitSource::new(
+                    seed.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+            &|seed| {
+                random_unsigned_inclusive_range(seed, Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX)
+            },
+        )
+        .map(|((q, n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            (q, n, d_init)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_43(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| UnsignedVecTripleLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                    seed.fork("lengths"),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .filter_map(|(q_len, mut n_len, mut d_init_len)| {
+                    n_len = n_len.checked_add(3)?;
+                    d_init_len = d_init_len.checked_add(1)?;
+                    let d_len = d_init_len + 1;
+                    if n_len > d_len && q_len >= n_len - d_len {
+                        Some((q_len, n_len, d_init_len))
+                    } else {
+                        None
+                    }
+                }),
+                striped_bit_source: StripedBitSource::new(
+                    seed.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+            &|seed| {
+                random_unsigned_inclusive_range(seed, Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX)
+            },
+        )
+        .map(|((q, n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            (q, n, d_init)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_44(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut n_len, mut d_len)| {
+                q_len = q_len.checked_add(1)?;
+                n_len = n_len.checked_add(2)?;
+                d_len = d_len.checked_add(2)?;
+                if n_len >= d_len && q_len > n_len - d_len {
+                    Some((q_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .filter(|(_, _, d)| *d.last().unwrap() != 0),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_45(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut n_len, mut d_len)| {
+                q_len = q_len.checked_add(1)?;
+                n_len = n_len.checked_add(2)?;
+                d_len = d_len.checked_add(2)?;
+                if n_len >= d_len && q_len > n_len - d_len && n_len < (d_len - 1) << 1 {
+                    Some((q_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .filter(|(_, _, d)| *d.last().unwrap() != 0),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_46(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigned_inclusive_range::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                2,
+                u64::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(q_len, n_len, d_len)| {
+                if q_len >= n_len && n_len >= d_len {
+                    Some((q_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, mut d)| {
+            d[0] |= 1;
+            (q, n, d)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_47(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigned_inclusive_range::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                1,
+                u64::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(q_len, n_len, d_len)| {
+                if q_len >= n_len && n_len >= d_len {
+                    Some((q_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, mut d)| {
+            d[0] |= 1;
+            (q, n, d)
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_48(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigned_inclusive_range::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                1,
+                u64::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(q_len, n_len, d_len)| {
+                if q_len + 1 >= n_len {
+                    Some((q_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .filter_map(|(q, n, mut d)| {
+            let d_last = d.last_mut().unwrap();
+            if *d_last == 0 {
+                *d_last = 1;
+            }
+            let mut new_n = limbs_mul(&n, &d);
+            if *new_n.last().unwrap() == 0 {
+                new_n.pop();
+            }
+            if q.len() + d.len() >= new_n.len() + 1 {
+                Some((q, new_n, d))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_49(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigned_inclusive_range::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                1,
+                u64::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(q_len, n_len, mut d_len)| {
+                d_len = d_len.checked_add(1)?;
+                if q_len + 1 >= n_len {
+                    Some((q_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .filter_map(|(q, n, mut d)| {
+            let d_last = d.last_mut().unwrap();
+            if *d_last == 0 {
+                *d_last = 1;
+            }
+            let mut new_n = limbs_mul(&n, &d);
+            if *new_n.last().unwrap() == 0 {
+                new_n.pop();
+            }
+            if q.len() > new_n.len() - d.len() {
+                Some((q, n, d))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+// vars 50 through 53 are in malachite-base.
+
+pub fn special_random_unsigned_vec_triple_gen_var_54(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_triples_from_single(
+            striped_random_unsigned_vecs_min_length(
+                EXAMPLE_SEED,
+                2,
+                config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|xs| *xs.last().unwrap() != 0),
+        )
+        .map(|(xs, ys, m)| limbs_eq_mod_map(&xs, ys, m)),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_55(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_triples_from_single(
+            striped_random_unsigned_vecs_min_length(
+                EXAMPLE_SEED,
+                2,
+                config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                config.get_or("mean_stripe_d", 1),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|xs| *xs.last().unwrap() != 0),
+        )
+        .filter(|(xs, ys, m)| !limbs_eq_mod_ref_ref_ref(xs, ys, m)),
+    )
+}
+
+pub fn special_random_unsigned_vec_triple_gen_var_56(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| UnsignedVecPairLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_pairs_from_single(geometric_random_unsigneds::<u64>(
+                    seed.fork("lengths"),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .filter_map(|(q_len, n_len): (u64, u64)| {
+                    Some((q_len.checked_add(n_len)?, n_len.checked_add(2)?))
+                }),
+                striped_bit_source: StripedBitSource::new(
+                    seed.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+            &|seed| {
+                random_pairs(
+                    seed,
+                    &|seed_2| {
+                        random_unsigned_inclusive_range(
+                            seed_2,
+                            Limb::power_of_2(Limb::WIDTH - 1),
+                            Limb::MAX,
+                        )
+                    },
+                    &|seed_2| {
+                        striped_random_positive_unsigneds(
+                            seed_2,
+                            config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                            config.get_or("mean_stripe_d", 1),
+                        )
+                    },
+                )
+            },
+        )
+        .map(|((q, n), (d_1, d_0))| (q, n, vec![d_0, d_1])),
+    )
+}
+
+// var 57 is in malachite-base.
+
+// -- (Vec<PrimitiveUnsigned> * 4) --
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_unsigned_vec_quadruple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecQuadrupleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_quadruples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                q_len = q_len.checked_add(1)?;
+                r_len = r_len.checked_add(2)?;
+                n_len = n_len.checked_add(2)?;
+                d_len = d_len.checked_add(2)?;
+                if r_len >= d_len && n_len >= d_len && q_len > n_len - d_len {
+                    Some((q_len, r_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, r, mut d)| {
+            let last_d = d.last_mut().unwrap();
+            if *last_d == 0 {
+                *last_d = 1;
+            }
+            (q, n, r, d)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_unsigned_vec_quadruple_gen_var_2(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecQuadrupleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_quadruples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                q_len = q_len.checked_add(2)?;
+                r_len = r_len.checked_add(2)?;
+                n_len = n_len.checked_add(4)?;
+                d_len = d_len.checked_add(2)?;
+                if n_len >= d_len + 2 && q_len >= n_len - d_len && r_len >= d_len {
+                    Some((q_len, r_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, r, mut d)| {
+            d[0] |= 1;
+            (q, n, r, d)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_unsigned_vec_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecQuadrupleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_quadruples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                q_len = q_len.checked_add(4)?;
+                r_len = r_len.checked_add(2)?;
+                n_len = n_len.checked_add(4)?;
+                d_len = d_len.checked_add(2)?;
+                if n_len >= d_len + 2 && q_len >= n_len - d_len && r_len >= d_len {
+                    Some((q_len, r_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, r, mut d)| {
+            d[0] |= 1;
+            (q, n, r, d)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_unsigned_vec_quadruple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecQuadrupleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_quadruples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                q_len = q_len.checked_add(1)?;
+                r_len = r_len.checked_add(2)?;
+                n_len = n_len.checked_add(2)?;
+                d_len = d_len.checked_add(2)?;
+                if r_len >= d_len
+                    && n_len >= d_len
+                    && q_len > n_len - d_len
+                    && (d_len << 1) > n_len + 1
+                {
+                    Some((q_len, r_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, r, mut d)| {
+            let last_d = d.last_mut().unwrap();
+            if *last_d == 0 {
+                *last_d = 1;
+            }
+            (q, n, r, d)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_unsigned_vec_quadruple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecQuadrupleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_quadruples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                q_len = q_len.checked_add(1)?;
+                r_len = r_len.checked_add(2)?;
+                n_len = n_len.checked_add(3)?;
+                d_len = d_len.checked_add(2)?;
+                if r_len >= d_len && n_len > d_len && q_len + d_len >= n_len {
+                    Some((q_len, r_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(
+            |(q, n, r, mut d): (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)| {
+                d.last_mut().unwrap().set_bit(Limb::WIDTH - 1);
+                (q, n, r, d)
+            },
+        ),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_unsigned_vec_quadruple_gen_var_6(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        UnsignedVecQuadrupleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_quadruples_from_single(geometric_random_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(out_len, mut b_len, e_len, mut m_len)| {
+                b_len = b_len.checked_add(1)?;
+                m_len = m_len.checked_add(1)?;
+                if out_len >= m_len {
+                    Some((out_len, b_len, e_len, m_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .filter(|(_, bs, es, ms)| {
+            (es.len() > 1 || es.len() == 1 && es[0] > 1)
+                && *bs.last().unwrap() != 0
+                && *es.last().unwrap() != 0
+                && *ms.last().unwrap() != 0
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_unsigned_vec_quadruple_gen_var_7(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(special_random_unsigned_vec_quadruple_gen_var_6(config).map(
+        |(out, bs, es, mut ms)| {
+            ms[0] |= 1;
+            (out, bs, es, ms)
+        },
+    ))
+}
 
 // -- large types --
 
@@ -3732,7 +5532,7 @@ fn special_random_half_gcd_matrix(
     s: usize,
     n: usize,
     bit_source: &mut StripedBitSource,
-) -> HalfGcdMatrix {
+) -> OwnedHalfGcdMatrix {
     assert!(n <= s);
     let bits = u64::exact_from(n) << Limb::LOG_WIDTH;
     let mut m00 = get_striped_unsigned_vec(bit_source, bits);
@@ -3753,7 +5553,7 @@ struct HalfGcdMatrixAndVecGenerator {
 }
 
 impl Iterator for HalfGcdMatrixAndVecGenerator {
-    type Item = (HalfGcdMatrix, Vec<Limb>, u8);
+    type Item = (OwnedHalfGcdMatrix, Vec<Limb>, u8);
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -3796,7 +5596,7 @@ impl Iterator for HalfGcdMatrixAndVecGenerator {
 
 pub fn special_random_large_type_gen_var_5(
     config: &GenConfig,
-) -> It<(HalfGcdMatrix, Vec<Limb>, u8)> {
+) -> It<(OwnedHalfGcdMatrix, Vec<Limb>, u8)> {
     Box::new(HalfGcdMatrixAndVecGenerator {
         sizes: geometric_random_unsigneds(
             EXAMPLE_SEED.fork("sizes"),
@@ -3854,7 +5654,7 @@ struct HalfGcdMatrixAndHalfGcdMatrix1Generator {
 }
 
 impl Iterator for HalfGcdMatrixAndHalfGcdMatrix1Generator {
-    type Item = (HalfGcdMatrix, HalfGcdMatrix1);
+    type Item = (OwnedHalfGcdMatrix, HalfGcdMatrix1);
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -3880,7 +5680,7 @@ impl Iterator for HalfGcdMatrixAndHalfGcdMatrix1Generator {
 
 pub fn special_random_large_type_gen_var_7(
     config: &GenConfig,
-) -> It<(HalfGcdMatrix, HalfGcdMatrix1)> {
+) -> It<(OwnedHalfGcdMatrix, HalfGcdMatrix1)> {
     Box::new(HalfGcdMatrixAndHalfGcdMatrix1Generator {
         sizes: geometric_random_unsigneds(
             EXAMPLE_SEED.fork("sizes"),
@@ -3941,4 +5741,447 @@ pub fn special_random_large_type_gen_var_8(config: &GenConfig) -> It<T8> {
             config.get_or("mean_stripe_d", 1),
         ),
     })
+}
+
+// var 9 is in malachite-base.
+
+pub fn special_random_large_type_gen_var_10(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Limb, Limb)> {
+    reshape_2_2_to_4(Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| UnsignedVecPairLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_pairs_from_single(geometric_random_positive_unsigneds(
+                seed.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .map(|(x, y)| if x >= y { (x, y) } else { (y, x) }),
+            striped_bit_source: StripedBitSource::new(
+                seed.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        },
+        &|seed| {
+            random_pairs(
+                seed,
+                &|seed_2| random_values_from_vec(seed_2, factors_of_limb_max()),
+                &|seed_2| {
+                    striped_random_unsigneds(
+                        seed_2,
+                        config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                        config.get_or("mean_stripe_d", 1),
+                    )
+                },
+            )
+        },
+    )))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_11(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| UnsignedVecTripleLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                    seed.fork("lengths"),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .filter_map(|(q_len, mut n_len, mut d_init_len)| {
+                    n_len = n_len.checked_add(3)?;
+                    d_init_len = d_init_len.checked_add(2)?;
+                    let d_len = d_init_len + 1;
+                    if n_len >= d_len && q_len >= n_len - d_len {
+                        Some((q_len, n_len, d_init_len))
+                    } else {
+                        None
+                    }
+                }),
+                striped_bit_source: StripedBitSource::new(
+                    seed.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+            &|seed| {
+                random_unsigned_inclusive_range(seed, Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX)
+            },
+        )
+        .map(|((q, n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (q, n, d_init, inverse)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_12(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| UnsignedVecTripleLenGenerator1 {
+                phantom: PhantomData,
+                lengths: random_triples_from_single(geometric_random_unsigneds::<u64>(
+                    seed.fork("lengths"),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                ))
+                .filter_map(|(mut q_len, mut n_len, mut d_init_len)| {
+                    q_len = q_len.checked_add(3)?;
+                    n_len = n_len.checked_add(9)?;
+                    d_init_len = d_init_len.checked_add(5)?;
+                    let d_len = d_init_len + 1;
+                    if n_len >= d_len + 3 && q_len >= n_len - d_len {
+                        Some((q_len, n_len, d_init_len))
+                    } else {
+                        None
+                    }
+                }),
+                striped_bit_source: StripedBitSource::new(
+                    seed.fork("striped_bit_source"),
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                ),
+            },
+            &|seed| {
+                random_unsigned_inclusive_range(seed, Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX)
+            },
+        )
+        .map(|((q, n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (q, n, d_init, inverse)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_13(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_positive_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter(|&(q_len, n_len, d_len)| q_len >= n_len && n_len >= d_len),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, mut d)| {
+            d[0] |= 1;
+            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            (q, n, d, inverse)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_14(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_positive_unsigneds::<u64>(
+                EXAMPLE_SEED.fork("lengths"),
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut n_len, d_len)| {
+                q_len = q_len.checked_add(1)?;
+                n_len = n_len.checked_add(1)?;
+                if q_len >= n_len && n_len > d_len {
+                    Some((q_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, mut d)| {
+            d[0] |= 1;
+            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            (q, n, d, inverse)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_15(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigned_inclusive_range(
+                EXAMPLE_SEED.fork("lengths"),
+                2,
+                u64::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter_map(|(mut q_len, mut n_len, d_len)| {
+                q_len = q_len.checked_add(1)?;
+                n_len = n_len.checked_add(1)?;
+                if q_len >= n_len && n_len > d_len {
+                    Some((q_len, n_len, d_len))
+                } else {
+                    None
+                }
+            }),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, mut d)| {
+            d[0] |= 1;
+            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            (q, n, d, inverse)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_16(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        UnsignedVecTripleLenGenerator1 {
+            phantom: PhantomData,
+            lengths: random_triples_from_single(geometric_random_unsigned_inclusive_range(
+                EXAMPLE_SEED.fork("lengths"),
+                2,
+                u64::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ))
+            .filter(|&(q_len, n_len, d_len)| q_len >= n_len && n_len >= d_len),
+            striped_bit_source: StripedBitSource::new(
+                EXAMPLE_SEED.fork("striped_bit_source"),
+                config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            ),
+        }
+        .map(|(q, n, mut d)| {
+            d[0] |= 1;
+            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            (q, n, d, inverse)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_17(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        striped_random_unsigned_vecs_min_length(
+            EXAMPLE_SEED,
+            1,
+            config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+            config.get_or("mean_stripe_d", 1),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        )
+        .map(|mut d| {
+            d[0] |= 1;
+            let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+            let is = vec![0; d.len()];
+            let scratch = vec![0; limbs_modular_invert_scratch_len(d.len())];
+            (is, scratch, d, inverse)
+        }),
+    )
+}
+
+pub fn special_random_large_type_gen_var_18(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, usize, Limb, Limb, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .filter_map(|(ns, fraction_len, d)| {
+            if ns.len() <= fraction_len {
+                None
+            } else {
+                let shift = LeadingZeros::leading_zeros(d);
+                let d_inv = limbs_invert_limb(d << shift);
+                Some((ns, fraction_len, d, d_inv, shift))
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_19(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, usize, Vec<Limb>, Limb, Limb, u64)> {
+    Box::new(
+        random_quadruples_xyxz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_positive_unsigneds(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+        )
+        .filter_map(|(out, fraction_len, ns, d)| {
+            if ns.is_empty() || out.len() < ns.len() + fraction_len {
+                None
+            } else {
+                let shift = LeadingZeros::leading_zeros(d);
+                let d_inv = limbs_invert_limb(d << shift);
+                Some((out, fraction_len, ns, d, d_inv, shift))
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_20(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
+    Box::new(
+        random_quintuples_xyyyz(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_unsigned_vecs_min_length(
+                    seed,
+                    2,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                striped_random_unsigned_vecs(
+                    seed,
+                    config.get_or("mean_stripe_n", Limb::WIDTH << 1),
+                    config.get_or("mean_stripe_d", 1),
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    3,
+                    u32::MAX,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .filter_map(|(ds, mut scratch, mut qs, mut rs_hi, n_len)| {
+            let n_len = usize::wrapping_from(n_len);
+            let d_len = ds.len();
+            if n_len < d_len {
+                return None;
+            }
+            let i_len = limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
+            if i_len == 0 || qs.len() < i_len {
+                return None;
+            }
+            qs.truncate(i_len);
+            if rs_hi.len() < i_len {
+                return None;
+            }
+            rs_hi.truncate(i_len);
+            let scratch_len = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
+            let x = limbs_div_mod_barrett_scratch_len(n_len, d_len);
+            if x < i_len {
+                return None;
+            }
+            let actual_scratch_len = x - i_len;
+            if actual_scratch_len < d_len + i_len {
+                return None;
+            }
+            if scratch.len() < actual_scratch_len {
+                return None;
+            }
+            scratch.truncate(actual_scratch_len);
+            Some((scratch, ds, qs, rs_hi, scratch_len, i_len))
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn special_random_large_type_gen_var_21(
+    config: &GenConfig,
+) -> It<(Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb)> {
+    Box::new(
+        random_sextuples_from_single(striped_random_positive_unsigneds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", Limb::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        ))
+        .filter_map(large_type_filter_map_1),
+    )
 }

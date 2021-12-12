@@ -1,13 +1,13 @@
 use num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Mul, ModPowerOf2MulAssign};
 use num::basic::integers::PrimitiveInt;
 
-fn _mod_power_of_2_mul<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, other: T, pow: u64) -> T {
+fn mod_power_of_2_mul<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, other: T, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
     x.wrapping_mul(other).mod_power_of_2(pow)
 }
 
 #[inline]
-fn _mod_power_of_2_mul_assign<T: PrimitiveInt>(x: &mut T, other: T, pow: u64) {
+fn mod_power_of_2_mul_assign<T: PrimitiveInt>(x: &mut T, other: T, pow: u64) {
     assert!(pow <= T::WIDTH);
     x.wrapping_mul_assign(other);
     x.mod_power_of_2_assign(pow);
@@ -29,7 +29,7 @@ macro_rules! impl_mod_power_of_2_mul {
             /// See the documentation of the `num::arithmetic::mod_power_of_2_mul` module.
             #[inline]
             fn mod_power_of_2_mul(self, other: $t, pow: u64) -> $t {
-                _mod_power_of_2_mul(self, other, pow)
+                mod_power_of_2_mul(self, other, pow)
             }
         }
 
@@ -46,7 +46,7 @@ macro_rules! impl_mod_power_of_2_mul {
             /// See the documentation of the `num::arithmetic::mod_power_of_2_mul` module.
             #[inline]
             fn mod_power_of_2_mul_assign(&mut self, other: $t, pow: u64) {
-                _mod_power_of_2_mul_assign(self, other, pow)
+                mod_power_of_2_mul_assign(self, other, pow)
             }
         }
     };

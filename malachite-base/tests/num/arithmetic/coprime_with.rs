@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::coprime_with::{
-    _coprime_with_check_2, _coprime_with_check_2_3, _coprime_with_check_2_3_5,
+    coprime_with_check_2, coprime_with_check_2_3, coprime_with_check_2_3_5,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{unsigned_gen, unsigned_pair_gen_var_27};
@@ -29,9 +29,9 @@ fn coprime_with_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
         let c = x.coprime_with(y);
         assert_eq!(x.gcd(y) == T::ONE, c);
-        assert_eq!(_coprime_with_check_2(x, y), c);
-        assert_eq!(_coprime_with_check_2_3(x, y), c);
-        assert_eq!(_coprime_with_check_2_3_5(x, y), c);
+        assert_eq!(coprime_with_check_2(x, y), c);
+        assert_eq!(coprime_with_check_2_3(x, y), c);
+        assert_eq!(coprime_with_check_2_3_5(x, y), c);
         assert_eq!(y.coprime_with(x), c);
     });
 

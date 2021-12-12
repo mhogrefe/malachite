@@ -14,7 +14,7 @@ use malachite_base_test_util::generators::{
     unsigned_gen_var_7, unsigned_pair_gen_var_8, unsigned_triple_gen_var_6,
 };
 use malachite_base_test_util::num::conversion::string::to_string::{
-    _to_string_base_signed_naive, _to_string_base_unsigned_naive,
+    to_string_base_signed_naive, to_string_base_unsigned_naive,
 };
 use malachite_base_test_util::runner::Runner;
 use std::fmt::Display;
@@ -351,7 +351,7 @@ fn benchmark_to_string_base_algorithms_unsigned<T: PrimitiveUnsigned>(
                 no_out!(format!("{}", BaseFmtWrapper::new(x, base)))
             }),
             ("naive", &mut |(x, base)| {
-                no_out!(_to_string_base_unsigned_naive(x, base))
+                no_out!(to_string_base_unsigned_naive(x, base))
             }),
         ],
     );
@@ -384,7 +384,7 @@ fn benchmark_to_string_base_algorithms_signed<T: PrimitiveSigned>(
                 no_out!(format!("{}", BaseFmtWrapper::new(x, base)))
             }),
             ("naive", &mut |(x, base)| {
-                no_out!(_to_string_base_signed_naive(x, base))
+                no_out!(to_string_base_signed_naive(x, base))
             }),
         ],
     );

@@ -1,7 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_nz::natural::arithmetic::div_mod::limbs_invert_limb;
-use malachite_nz::natural::arithmetic::mod_op::_mod_by_preinversion;
+use malachite_nz::natural::arithmetic::mod_op::mod_by_preinversion;
 use malachite_nz::platform::Limb;
 use rug::ops::RemRounding;
 
@@ -17,7 +17,7 @@ pub fn rug_neg_mod(x: rug::Integer, y: rug::Integer) -> rug::Integer {
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.1.2, where qxn is 0 and un > 1, but not
 /// computing the quotient.
-pub fn _limbs_mod_limb_alt_3(ns: &[Limb], d: Limb) -> Limb {
+pub fn limbs_mod_limb_alt_3(ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -32,7 +32,7 @@ pub fn _limbs_mod_limb_alt_3(ns: &[Limb], d: Limb) -> Limb {
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for n in ns_init.iter().rev() {
-            r = _mod_by_preinversion(r, *n, d, d_inv);
+            r = mod_by_preinversion(r, *n, d, d_inv);
         }
         r
     } else {
@@ -52,9 +52,9 @@ pub fn _limbs_mod_limb_alt_3(ns: &[Limb], d: Limb) -> Limb {
         r |= previous_n >> cobits;
         for &n in ns_init.iter().rev() {
             let shifted_n = (previous_n << bits) | (n >> cobits);
-            r = _mod_by_preinversion(r, shifted_n, d, d_inv);
+            r = mod_by_preinversion(r, shifted_n, d, d_inv);
             previous_n = n;
         }
-        _mod_by_preinversion(r, previous_n << bits, d, d_inv) >> bits
+        mod_by_preinversion(r, previous_n << bits, d, d_inv) >> bits
     }
 }

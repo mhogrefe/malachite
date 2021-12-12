@@ -615,6 +615,7 @@ pub mod tuples {
         pub mod exhaustive_tuples_1_input;
         pub mod exhaustive_tuples_custom_output;
         pub mod exhaustive_tuples_from_single;
+        pub mod exhaustive_unique_tuples;
         pub mod exhaustive_units;
         pub mod lex_custom_tuples;
         pub mod lex_dependent_pairs;
@@ -655,6 +656,11 @@ pub mod vecs {
         pub mod exhaustive_ordered_unique_vecs_length_inclusive_range;
         pub mod exhaustive_ordered_unique_vecs_length_range;
         pub mod exhaustive_ordered_unique_vecs_min_length;
+        pub mod exhaustive_unique_vecs;
+        pub mod exhaustive_unique_vecs_fixed_length;
+        pub mod exhaustive_unique_vecs_length_inclusive_range;
+        pub mod exhaustive_unique_vecs_length_range;
+        pub mod exhaustive_unique_vecs_min_length;
         pub mod exhaustive_vecs;
         pub mod exhaustive_vecs_fixed_length_from_single;
         pub mod exhaustive_vecs_fixed_length_m_inputs;

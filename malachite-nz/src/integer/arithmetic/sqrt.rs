@@ -46,7 +46,7 @@ impl FloorSqrtAssign for Integer {
     #[inline]
     fn floor_sqrt_assign(&mut self) {
         if *self >= 0 {
-            self.unsigned_abs_mut(Natural::floor_sqrt_assign);
+            self.mutate_unsigned_abs(Natural::floor_sqrt_assign);
         } else {
             panic!("Cannot take square root of {}", self)
         }
@@ -166,7 +166,7 @@ impl CeilingSqrtAssign for Integer {
     #[inline]
     fn ceiling_sqrt_assign(&mut self) {
         if *self >= 0 {
-            self.unsigned_abs_mut(Natural::ceiling_sqrt_assign);
+            self.mutate_unsigned_abs(Natural::ceiling_sqrt_assign);
         } else {
             panic!("Cannot take square root of {}", self)
         }

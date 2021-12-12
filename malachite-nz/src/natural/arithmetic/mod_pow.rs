@@ -145,6 +145,7 @@ fn to_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb]) {
 //TODO tune
 const REDC_1_TO_REDC_N_THRESHOLD: usize = 100;
 
+#[doc(hidden)]
 pub fn limbs_mod_pow_odd_scratch_len(n: usize) -> usize {
     max(limbs_modular_invert_scratch_len(n), n << 1)
 }
@@ -265,6 +266,7 @@ fn select_fns(
 /// ```
 ///
 /// This is mpn_powm from mpn/generic/powm.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_mod_pow_odd(
     out: &mut [Limb],
     xs: &[Limb],
@@ -385,6 +387,7 @@ pub fn limbs_mod_pow_odd(
 ///
 /// This is mpz_powm from mpn/generic/powm.c, GMP 6.2.1, where b, e, and m are non-negative.
 /// Investigate changes from 6.1.2?
+#[doc(hidden)]
 pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
     let ms_len = ms.len();
     let es_len = es.len();
@@ -806,9 +809,7 @@ impl ModPowAssign<Natural, Natural> for Natural {
         match (&mut *self, &exp, &m) {
             (_, _, natural_one!()) => *self = Natural::ZERO,
             (_, natural_zero!(), _) => *self = Natural::ONE,
-            (natural_zero!(), _, _) => *self = Natural::ZERO,
-            (_, natural_one!(), _) => {}
-            (natural_one!(), _, _) => *self = Natural::ONE,
+            (natural_zero!(), _, _) | (_, natural_one!(), _) | (natural_one!(), _, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -856,9 +857,7 @@ impl<'a> ModPowAssign<Natural, &'a Natural> for Natural {
         match (&mut *self, &exp, m) {
             (_, _, natural_one!()) => *self = Natural::ZERO,
             (_, natural_zero!(), _) => *self = Natural::ONE,
-            (natural_zero!(), _, _) => *self = Natural::ZERO,
-            (_, natural_one!(), _) => {}
-            (natural_one!(), _, _) => *self = Natural::ONE,
+            (natural_zero!(), _, _) | (_, natural_one!(), _) | (natural_one!(), _, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -906,9 +905,7 @@ impl<'a> ModPowAssign<&'a Natural, Natural> for Natural {
         match (&mut *self, exp, &m) {
             (_, _, natural_one!()) => *self = Natural::ZERO,
             (_, natural_zero!(), _) => *self = Natural::ONE,
-            (natural_zero!(), _, _) => *self = Natural::ZERO,
-            (_, natural_one!(), _) => {}
-            (natural_one!(), _, _) => *self = Natural::ONE,
+            (natural_zero!(), _, _) | (_, natural_one!(), _) | (natural_one!(), _, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {
@@ -951,9 +948,7 @@ impl<'a, 'b> ModPowAssign<&'a Natural, &'b Natural> for Natural {
         match (&mut *self, exp, m) {
             (_, _, natural_one!()) => *self = Natural::ZERO,
             (_, natural_zero!(), _) => *self = Natural::ONE,
-            (natural_zero!(), _, _) => *self = Natural::ZERO,
-            (_, natural_one!(), _) => {}
-            (natural_one!(), _, _) => *self = Natural::ONE,
+            (natural_zero!(), _, _) | (_, natural_one!(), _) | (natural_one!(), _, _) => {}
             (Natural(Small(x)), Natural(Small(e)), Natural(Small(m)))
                 if u64::convertible_from(*e) =>
             {

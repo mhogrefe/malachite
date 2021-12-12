@@ -50,7 +50,7 @@ macro_rules! impl_unsigned {
 }
 apply_to_unsigneds!(impl_unsigned);
 
-fn _eq_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &Integer, other: &S) -> bool
+fn eq_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &Integer, other: &S) -> bool
 where
     Natural: PartialEq<U>,
 {
@@ -75,7 +75,7 @@ macro_rules! impl_signed {
             /// assert!(Integer::from(-123) == -123i64);
             /// ```
             fn eq(&self, other: &$t) -> bool {
-                _eq_signed(self, other)
+                eq_signed(self, other)
             }
         }
 

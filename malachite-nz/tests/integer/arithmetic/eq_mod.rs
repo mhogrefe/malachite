@@ -729,20 +729,14 @@ fn eq_mod_properties() {
         );
     });
 
-    integer_integer_natural_triple_gen_var_1().test_properties(|(x, y, m)| {
-        let x = &x;
-        let y = &y;
-        let m = &m;
+    integer_integer_natural_triple_gen_var_1().test_properties(|(ref x, ref y, ref m)| {
         assert!(x.eq_mod(y, m));
         assert!(y.eq_mod(x, m));
         assert!(integer_to_rug_integer(x)
             .is_congruent(&integer_to_rug_integer(y), &natural_to_rug_integer(m)));
     });
 
-    integer_integer_natural_triple_gen_var_2().test_properties(|(x, y, m)| {
-        let x = &x;
-        let y = &y;
-        let m = &m;
+    integer_integer_natural_triple_gen_var_2().test_properties(|(ref x, ref y, ref m)| {
         assert!(!x.eq_mod(y, m));
         assert!(!y.eq_mod(x, m));
         assert!(!integer_to_rug_integer(x)

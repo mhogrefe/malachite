@@ -113,7 +113,6 @@ pub struct EvenMultipleIteratorToBitChunks<
     U: PrimitiveUnsigned,
 > {
     xs: I,
-    x: T,
     x_width: u64,
     y_width: u64,
     done: bool,
@@ -160,7 +159,6 @@ fn even_multiple_iterator_to_bit_chunks<
 ) -> EvenMultipleIteratorToBitChunks<I, T, U> {
     EvenMultipleIteratorToBitChunks {
         xs,
-        x: T::ZERO,
         x_width: in_chunk_size,
         y_width: out_chunk_size,
         done: false,

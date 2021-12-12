@@ -31,6 +31,7 @@ use platform::Limb;
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative and the
 /// result is returned.
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         return Vec::new();
@@ -75,6 +76,7 @@ pub fn limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative, res == in,
 /// and instead of possibly being truncated, the high limbs of res are possibly filled with zeros.
+#[doc(hidden)]
 pub fn limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) {
     if pow == 0 {
         slice_set_zero(xs);
@@ -118,6 +120,7 @@ pub fn limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) {
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative and
 /// res == in.
+#[doc(hidden)]
 pub fn limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
         xs.clear();
@@ -153,6 +156,7 @@ pub fn limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is negative and the result
 /// is returned. `xs` is the limbs of -in.
+#[doc(hidden)]
 pub fn limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let mut result = xs.to_vec();
     limbs_neg_mod_power_of_2_in_place(&mut result, pow);
@@ -186,6 +190,7 @@ pub fn limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
 ///
 /// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is negative and res == in.
 /// `xs` is the limbs of -in.
+#[doc(hidden)]
 pub fn limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
     xs.resize(new_size, 0);

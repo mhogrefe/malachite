@@ -111,6 +111,7 @@ impl Natural {
     /// Returns true iff `self` is valid. To be valid, `self` can only be `Large` when it is at
     /// least 2<sup>`Limb::WIDTH`</sup>, and cannot have leading zero limbs. All `Natural`s must be
     /// valid.
+    #[doc(hidden)]
     pub fn is_valid(&self) -> bool {
         match *self {
             Natural(Small(_)) => true,
@@ -119,6 +120,7 @@ impl Natural {
     }
 
     /// A `Large` value (when using 32-bit limbs) used for testing.
+    #[doc(hidden)]
     pub fn trillion() -> Natural {
         Natural::from_str("1000000000000").unwrap()
     }

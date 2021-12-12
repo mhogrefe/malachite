@@ -1,16 +1,25 @@
-use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign, Parity};
-use natural::arithmetic::eq_mod::_limbs_mod_exact_odd_limb;
-use natural::arithmetic::mod_op::_limbs_mod_limb_alt_2;
+use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::logic::traits::TrailingZeros;
+use malachite_base::slices::slice_leading_zeros;
+use natural::arithmetic::eq_mod::limbs_mod_exact_odd_limb;
+use natural::arithmetic::gcd::half_gcd::limbs_gcd_reduced;
+use natural::arithmetic::mod_op::limbs_mod_limb_alt_2;
+use natural::arithmetic::shr::limbs_slice_shr_in_place;
+use natural::comparison::cmp::limbs_cmp;
+use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
-use std::cmp::min;
+use std::cmp::{min, Ordering};
+use std::mem::swap;
 
 /// This is MPN_MOD_OR_MODEXACT_1_ODD from gmp-impl.h, GMP 6.2.1, where size > 1.
 fn limbs_mod_or_modexact(ns: &[Limb], d: Limb) -> Limb {
     if ns.len() < BMOD_1_TO_MOD_1_THRESHOLD {
-        _limbs_mod_exact_odd_limb(ns, d, 0)
+        limbs_mod_exact_odd_limb(ns, d, 0)
     } else {
-        _limbs_mod_limb_alt_2(ns, d)
+        limbs_mod_limb_alt_2(ns, d)
     }
 }
 
@@ -32,41 +41,40 @@ pub fn limbs_gcd_limb(xs: &[Limb], mut y: Limb) -> Limb {
     y << zeros
 }
 
-pub fn gcd_euclidean_nz(x: Natural, y: Natural) -> Natural {
-    if y == 0 {
-        x
-    } else {
-        let r = x % &y;
-        gcd_euclidean_nz(y, r)
-    }
-}
-
-// recursive implementation overflows stack, so using a loop instead
-pub fn gcd_binary_nz(mut x: Natural, mut y: Natural) -> Natural {
-    let mut twos = 0;
-    loop {
-        if x == y {
-            return x << twos;
-        } else if x == 0 {
-            return y << twos;
-        } else if y == 0 {
-            return x << twos;
-        } else if x.even() {
-            x >>= 1;
-            if y.even() {
-                y >>= 1;
-                twos += 1;
-            }
-        } else if y.even() {
-            y >>= 1;
-        } else if x > y {
-            x -= &y;
-            x >>= 1;
-        } else {
-            y -= &x;
-            y >>= 1;
+fn gcd_greater_helper(mut xs: &mut [Limb], mut ys: &mut [Limb]) -> Natural {
+    let xs_zero_limbs = slice_leading_zeros(xs);
+    let ys_zero_limbs = slice_leading_zeros(ys);
+    let common_zero_limbs = min(xs_zero_limbs, ys_zero_limbs);
+    xs = &mut xs[common_zero_limbs..];
+    ys = &mut ys[common_zero_limbs..];
+    let xs_zero_bits = TrailingZeros::trailing_zeros(xs[0]);
+    let ys_zero_bits = TrailingZeros::trailing_zeros(ys[0]);
+    let common_zero_bits = min(xs_zero_bits, ys_zero_bits);
+    if common_zero_bits != 0 {
+        limbs_slice_shr_in_place(xs, common_zero_bits);
+        limbs_slice_shr_in_place(ys, common_zero_bits);
+        if *xs.last().unwrap() == 0 {
+            let n = xs.len();
+            xs = &mut xs[..n - 1];
+        }
+        if *ys.last().unwrap() == 0 {
+            let n = ys.len();
+            ys = &mut ys[..n - 1];
         }
     }
+    let n = if ys.len() == 1 {
+        Natural::from(if xs.len() == 1 {
+            xs[0].gcd(ys[0])
+        } else {
+            limbs_gcd_limb(xs, ys[0])
+        })
+    } else {
+        let mut out = vec![0; xs.len()];
+        let out_len = limbs_gcd_reduced(&mut out, xs, ys);
+        out.resize(out_len, 0);
+        Natural::from_owned_limbs_asc(out)
+    };
+    n << ((u64::exact_from(common_zero_limbs) << Limb::LOG_WIDTH) + common_zero_bits)
 }
 
 impl Gcd<Natural> for Natural {
@@ -195,7 +203,28 @@ impl<'a, 'b> Gcd<&'a Natural> for &'b Natural {
     /// ```
     #[inline]
     fn gcd(self, other: &'a Natural) -> Natural {
-        gcd_binary_nz(self.clone(), other.clone())
+        match (self, other) {
+            (x, natural_zero!()) => x.clone(),
+            (natural_zero!(), y) => y.clone(),
+            (x, y) if std::ptr::eq(x, y) => x.clone(),
+            (Natural(Small(x)), Natural(Small(y))) => Natural::from(x.gcd(*y)),
+            (Natural(Large(ref xs)), Natural(Small(y))) => Natural::from(limbs_gcd_limb(xs, *y)),
+            (Natural(Small(x)), Natural(Large(ref ys))) => Natural::from(limbs_gcd_limb(ys, *x)),
+            (Natural(Large(xs)), Natural(Large(ys))) => {
+                let c = limbs_cmp(xs, ys);
+                if c == Ordering::Equal {
+                    return self.clone();
+                }
+                let mut xs = xs.clone();
+                let mut xs: &mut [Limb] = &mut xs;
+                let mut ys = ys.clone();
+                let mut ys: &mut [Limb] = &mut ys;
+                if c == Ordering::Less {
+                    swap(&mut xs, &mut ys);
+                }
+                gcd_greater_helper(xs, ys)
+            }
+        }
     }
 }
 
@@ -227,7 +256,29 @@ impl GcdAssign<Natural> for Natural {
     /// ```
     #[inline]
     fn gcd_assign(&mut self, other: Natural) {
-        *self = gcd_binary_nz(self.clone(), other);
+        match (&mut *self, other) {
+            (_, natural_zero!()) => {}
+            (natural_zero!(), y) => *self = y,
+            (Natural(Small(ref mut x)), Natural(Small(y))) => x.gcd_assign(y),
+            (Natural(Large(ref xs)), Natural(Small(y))) => {
+                *self = Natural::from(limbs_gcd_limb(xs, y))
+            }
+            (Natural(Small(x)), Natural(Large(ref ys))) => {
+                *self = Natural::from(limbs_gcd_limb(ys, *x))
+            }
+            (Natural(Large(ref mut xs)), Natural(Large(mut ys))) => {
+                let mut xs: &mut [Limb] = &mut *xs;
+                let mut ys: &mut [Limb] = &mut ys;
+                match limbs_cmp(xs, ys) {
+                    Ordering::Equal => return,
+                    Ordering::Less => {
+                        swap(&mut xs, &mut ys);
+                    }
+                    _ => {}
+                }
+                *self = gcd_greater_helper(xs, ys);
+            }
+        }
     }
 }
 
@@ -259,7 +310,30 @@ impl<'a> GcdAssign<&'a Natural> for Natural {
     /// ```
     #[inline]
     fn gcd_assign(&mut self, other: &'a Natural) {
-        *self = gcd_binary_nz(self.clone(), other.clone());
+        match (&mut *self, other) {
+            (_, natural_zero!()) => {}
+            (natural_zero!(), y) => self.clone_from(y),
+            (Natural(Small(ref mut x)), Natural(Small(y))) => x.gcd_assign(*y),
+            (Natural(Large(ref xs)), Natural(Small(y))) => {
+                *self = Natural::from(limbs_gcd_limb(xs, *y))
+            }
+            (Natural(Small(x)), Natural(Large(ref ys))) => {
+                *self = Natural::from(limbs_gcd_limb(ys, *x))
+            }
+            (Natural(Large(ref mut xs)), Natural(Large(ys))) => {
+                let c = limbs_cmp(xs, ys);
+                if c == Ordering::Equal {
+                    return;
+                }
+                let mut xs: &mut [Limb] = &mut *xs;
+                let mut ys = ys.clone();
+                let mut ys: &mut [Limb] = &mut ys;
+                if c == Ordering::Less {
+                    swap(&mut xs, &mut ys);
+                }
+                *self = gcd_greater_helper(xs, ys);
+            }
+        }
     }
 }
 

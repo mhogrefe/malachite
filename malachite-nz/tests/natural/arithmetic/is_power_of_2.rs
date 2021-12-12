@@ -1,10 +1,15 @@
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
-use rug;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{unsigned_gen, unsigned_vec_gen_var_1};
 use malachite_nz::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::natural_to_rug_integer;
+use malachite_nz_test_util::generators::natural_gen;
+use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -47,4 +52,37 @@ fn test_is_power_of_2() {
     test("1025", false);
     test("1000000000000", false);
     test("1099511627776", true);
+}
+
+#[test]
+fn limbs_is_power_of_2_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_gen_var_1().test_properties_with_config(&config, |xs| {
+        assert_eq!(
+            limbs_is_power_of_2(&xs),
+            Natural::from_owned_limbs_asc(xs).is_power_of_2()
+        );
+    });
+}
+
+#[allow(clippy::cmp_owned, clippy::useless_conversion)]
+#[test]
+fn is_power_of_2_properties() {
+    natural_gen().test_properties(|x| {
+        let is_power_of_2 = x.is_power_of_2();
+        assert_eq!(natural_to_rug_integer(&x).is_power_of_two(), is_power_of_2);
+        if x != 0 {
+            let trailing_zeros = x.trailing_zeros().unwrap();
+            assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_2);
+            if trailing_zeros <= u64::from(Limb::MAX) {
+                assert_eq!(x >> trailing_zeros == 1, is_power_of_2);
+            }
+        }
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        assert_eq!(u.is_power_of_2(), Natural::from(u).is_power_of_2());
+    });
 }

@@ -1308,9 +1308,7 @@ fn limbs_modular_div_barrett_greater(
                     }
                 }
             } else {
-                fail_on_untested_path(
-                    "_limbs_modular_div_mod_barrett_greater, wrapped_len is None",
-                );
+                fail_on_untested_path("limbs_modular_div_mod_barrett_greater, wrapped_len is None");
             }
         }
         let (scratch_lo, scratch_hi) = scratch.split_at_mut(d_len);

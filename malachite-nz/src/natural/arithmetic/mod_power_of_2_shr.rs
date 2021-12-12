@@ -5,7 +5,7 @@ use malachite_base::num::basic::traits::Zero;
 use natural::Natural;
 use std::ops::{Shr, ShrAssign};
 
-fn _mod_power_of_2_shr_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_power_of_2_shr_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
     pow: u64,
@@ -20,7 +20,7 @@ where
     }
 }
 
-fn _mod_power_of_2_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn mod_power_of_2_shr_assign<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &mut Natural,
     bits: S,
     pow: u64,
@@ -94,7 +94,7 @@ macro_rules! impl_mod_power_of_2_shr_signed {
             /// ```
             #[inline]
             fn mod_power_of_2_shr(self, bits: $t, pow: u64) -> Natural {
-                _mod_power_of_2_shr_ref(self, bits, pow)
+                mod_power_of_2_shr_ref(self, bits, pow)
             }
         }
 
@@ -130,7 +130,7 @@ macro_rules! impl_mod_power_of_2_shr_signed {
             /// ```
             #[inline]
             fn mod_power_of_2_shr_assign(&mut self, bits: $t, pow: u64) {
-                _mod_power_of_2_shr_assign(self, bits, pow);
+                mod_power_of_2_shr_assign(self, bits, pow);
             }
         }
     };

@@ -16,7 +16,7 @@ macro_rules! exhaustive_unions {
         /// the first variant's elements are generated first, followed by the second variant's
         /// elements, and so on.
         ///
-        /// This `struct` is created by `lex_union[n]s`. See its documentation for more.
+        /// This `struct` is created by `exhaustive_union[n]s`. See its documentation for more.
         #[derive(Clone, Debug)]
         pub struct $lex_struct<$($t, $it: Iterator<Item=$t>),*> {
             i: u64,

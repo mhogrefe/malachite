@@ -1,13 +1,25 @@
-use malachite_base::num::arithmetic::traits::EqModPowerOf2;
+use malachite_base::num::arithmetic::traits::{DivisibleByPowerOf2, EqModPowerOf2, ModPowerOf2};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use rug;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_triple_gen_var_4, unsigned_vec_unsigned_unsigned_triple_gen_var_8,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9,
+};
 use malachite_nz::natural::arithmetic::eq_mod_power_of_2::{
     limbs_eq_limb_mod_power_of_2, limbs_eq_mod_power_of_2,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::natural_to_rug_integer;
+use malachite_nz_test_util::generators::{
+    natural_natural_natural_unsigned_quadruple_gen_var_1,
+    natural_natural_unsigned_triple_gen_var_1, natural_natural_unsigned_triple_gen_var_2,
+    natural_natural_unsigned_triple_gen_var_3, natural_pair_gen, natural_unsigned_pair_gen_var_4,
+};
+use rug;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -82,4 +94,99 @@ fn test_eq_mod_power_of_2() {
     test("4294967295", "4294967295", 32, true);
     test("281474976710672", "844424930131984", 49, true);
     test("281474976710672", "844424930131984", 50, false);
+}
+
+#[test]
+fn limbs_eq_limb_mod_power_of_2_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_unsigned_triple_gen_var_8().test_properties_with_config(
+        &config,
+        |(xs, y, pow)| {
+            assert_eq!(
+                limbs_eq_limb_mod_power_of_2(&xs, y, pow),
+                Natural::from_owned_limbs_asc(xs).eq_mod_power_of_2(&Natural::from(y), pow)
+            );
+        },
+    );
+}
+
+#[test]
+fn limbs_eq_mod_power_of_2_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9().test_properties_with_config(
+        &config,
+        |(xs, ys, pow)| {
+            assert_eq!(
+                limbs_eq_mod_power_of_2(&xs, &ys, pow),
+                Natural::from_owned_limbs_asc(xs)
+                    .eq_mod_power_of_2(&Natural::from_owned_limbs_asc(ys), pow)
+            );
+        },
+    );
+}
+
+#[test]
+fn eq_mod_power_of_2_properties() {
+    natural_natural_unsigned_triple_gen_var_1().test_properties(|(x, y, pow)| {
+        let eq_mod_power_of_2 = x.eq_mod_power_of_2(&y, pow);
+        assert_eq!(
+            natural_to_rug_integer(&x)
+                .is_congruent_2pow(&natural_to_rug_integer(&y), u32::exact_from(pow)),
+            eq_mod_power_of_2
+        );
+        assert_eq!(y.eq_mod_power_of_2(&x, pow), eq_mod_power_of_2);
+        assert_eq!(
+            x.mod_power_of_2(pow) == y.mod_power_of_2(pow),
+            eq_mod_power_of_2
+        );
+    });
+
+    natural_natural_unsigned_triple_gen_var_2().test_properties(|(x, y, pow)| {
+        assert!(x.eq_mod_power_of_2(&y, pow));
+        assert!(natural_to_rug_integer(&x)
+            .is_congruent_2pow(&natural_to_rug_integer(&y), u32::exact_from(pow)));
+        assert!(y.eq_mod_power_of_2(&x, pow));
+        assert_eq!(x.mod_power_of_2(pow), y.mod_power_of_2(pow));
+    });
+
+    natural_natural_unsigned_triple_gen_var_3().test_properties(|(x, y, pow)| {
+        assert!(!x.eq_mod_power_of_2(&y, pow));
+        assert!(!natural_to_rug_integer(&x)
+            .is_congruent_2pow(&natural_to_rug_integer(&y), u32::exact_from(pow)));
+        assert!(!y.eq_mod_power_of_2(&x, pow));
+        assert_ne!(x.mod_power_of_2(pow), y.mod_power_of_2(pow));
+    });
+
+    natural_unsigned_pair_gen_var_4().test_properties(|(n, pow)| {
+        assert!(n.eq_mod_power_of_2(&n, pow));
+        assert_eq!(
+            n.eq_mod_power_of_2(&Natural::ZERO, pow),
+            n.divisible_by_power_of_2(pow)
+        );
+        assert_eq!(
+            Natural::ZERO.eq_mod_power_of_2(&n, pow),
+            n.divisible_by_power_of_2(pow)
+        );
+    });
+
+    natural_natural_natural_unsigned_quadruple_gen_var_1().test_properties(|(x, y, z, pow)| {
+        if x.eq_mod_power_of_2(&y, pow) && y.eq_mod_power_of_2(&z, pow) {
+            assert!(x.eq_mod_power_of_2(&z, pow));
+        }
+    });
+
+    natural_pair_gen().test_properties(|(x, y)| {
+        assert!(x.eq_mod_power_of_2(&y, 0));
+    });
+
+    unsigned_triple_gen_var_4::<Limb, u64>().test_properties(|(x, y, pow)| {
+        assert_eq!(
+            x.eq_mod_power_of_2(y, pow),
+            Natural::from(x).eq_mod_power_of_2(&Natural::from(y), pow)
+        )
+    });
 }

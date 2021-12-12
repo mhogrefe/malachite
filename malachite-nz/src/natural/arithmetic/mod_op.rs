@@ -49,7 +49,8 @@ use std::ops::{Rem, RemAssign};
 /// Additional memory: O(1)
 ///
 /// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1, but not computing the quotient.
-pub fn _mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
+#[doc(hidden)]
+pub fn mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
     let (q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
         .split_in_half();
@@ -86,14 +87,16 @@ pub fn _mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> 
 /// assert_eq!(limbs_mod_limb(&[u32::MAX, u32::MAX], 3), 0);
 /// ```
 #[cfg(feature = "32_bit_limbs")]
+#[doc(hidden)]
 #[inline]
 pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
-    _limbs_mod_limb_alt_2(ns, d)
+    limbs_mod_limb_alt_2(ns, d)
 }
 #[cfg(not(feature = "32_bit_limbs"))]
+#[doc(hidden)]
 #[inline]
 pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
-    _limbs_mod_limb_alt_1(ns, d)
+    limbs_mod_limb_alt_1(ns, d)
 }
 
 /// Computes the remainder of `[n_2, n_1, n_0]` / `[d_1, d_0]`. Requires the highest bit of `d_1` to
@@ -129,6 +132,7 @@ pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
 /// ```
 ///
 /// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.2.1, returning only the remainder.
+#[doc(hidden)]
 pub fn limbs_mod_three_limb_by_two_limb(
     n_2: Limb,
     n_1: Limb,
@@ -182,6 +186,7 @@ pub fn limbs_mod_three_limb_by_two_limb(
 ///
 /// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.2.1, returning the two limbs of the
 /// remainder.
+#[doc(hidden)]
 pub fn limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
     assert_eq!(ds.len(), 2);
     let n_len = ns.len();
@@ -224,7 +229,8 @@ pub fn limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb
 ///
 /// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.2.1, where only the remainder is
 /// calculated.
-pub fn _limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
+#[doc(hidden)]
+pub fn limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let d_len = ds.len();
     assert!(d_len > 2);
     let n_len = ns.len();
@@ -280,7 +286,7 @@ pub fn _limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
 ///
 /// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1, where only the remainder
 /// is calculated.
-fn _limbs_mod_divide_and_conquer_helper(
+fn limbs_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -348,11 +354,12 @@ fn _limbs_mod_divide_and_conquer_helper(
 ///
 /// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1, where only the remainder is
 /// calculated.
-pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
+#[doc(hidden)]
+pub fn limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     let n_len = ns.len();
     let d_len = ds.len();
-    assert!(d_len >= 6); // to adhere to _limbs_div_mod_schoolbook's limits
-    assert!(n_len >= d_len + 3); // to adhere to _limbs_div_mod_schoolbook's limits
+    assert!(d_len >= 6); // to adhere to limbs_div_mod_schoolbook's limits
+    assert!(n_len >= d_len + 3); // to adhere to limbs_div_mod_schoolbook's limits
     let a = d_len - 1;
     let d_1 = ds[a];
     let b = d_len - 2;
@@ -457,7 +464,7 @@ pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
         let mut offset = n_len.checked_sub(d_len + q_len_mod_d_len).unwrap();
         while offset != 0 {
             offset -= d_len;
-            _limbs_mod_divide_and_conquer_helper(
+            limbs_mod_divide_and_conquer_helper(
                 &mut qs[offset..],
                 &mut ns[offset..],
                 ds,
@@ -500,7 +507,7 @@ pub fn _limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Lim
 ///
 /// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1, where only the remainder
 /// is calculated.
-fn _limbs_mod_barrett_preinverted(
+fn limbs_mod_barrett_preinverted(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -598,7 +605,8 @@ fn _limbs_mod_barrett_preinverted(
 ///
 /// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.2.1, where only the remainder is
 /// calculated.
-pub fn _limbs_mod_barrett_helper(
+#[doc(hidden)]
+pub fn limbs_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -632,11 +640,11 @@ pub fn _limbs_mod_barrett_helper(
         slice_move_left(is, 1);
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
-    _limbs_mod_barrett_preinverted(qs, rs, ns, ds, scratch_lo, scratch_hi);
+    limbs_mod_barrett_preinverted(qs, rs, ns, ds, scratch_lo, scratch_hi);
 }
 
 /// `qs` is just used as scratch space.
-fn _limbs_mod_barrett_large_helper(
+fn limbs_mod_barrett_large_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -687,7 +695,8 @@ fn _limbs_mod_barrett_large_helper(
 /// less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
 ///
 /// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
-pub fn _limbs_mod_barrett(
+#[doc(hidden)]
+pub fn limbs_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -700,9 +709,9 @@ pub fn _limbs_mod_barrett(
     let qs = &mut qs[..q_len];
     // Test whether 2 * d_len - n_len > MU_DIV_QR_SKEW_THRESHOLD
     if d_len <= q_len + MU_DIV_QR_SKEW_THRESHOLD {
-        _limbs_mod_barrett_helper(qs, &mut rs[..d_len], ns, ds, scratch)
+        limbs_mod_barrett_helper(qs, &mut rs[..d_len], ns, ds, scratch)
     } else {
-        _limbs_mod_barrett_large_helper(qs, rs, ns, ds, scratch)
+        limbs_mod_barrett_large_helper(qs, rs, ns, ds, scratch)
     }
 }
 
@@ -714,7 +723,7 @@ pub fn _limbs_mod_barrett(
 /// Additional memory: worst case O(n)
 ///
 /// where n = `ns.len()`
-fn _limbs_mod_by_two_limb(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
+fn limbs_mod_by_two_limb(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb) {
     let n_len = ns.len();
     let ds_1 = ds[1];
     let bits = LeadingZeros::leading_zeros(ds_1);
@@ -758,7 +767,7 @@ fn limbs_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
 /// Additional memory: Worst case O(n * log(n))
 ///
 /// where n = `ns.len()`
-fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_len: usize) {
+fn limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_len: usize) {
     let mut n_len = ns.len();
     let d_len = ds.len();
     let mut ds_shifted_vec;
@@ -781,7 +790,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
     let d_inv = limbs_two_limb_inverse_helper(ds_shifted[d_len - 1], ds_shifted[d_len - 2]);
     let ns_shifted = &mut ns_shifted[..n_len];
     if d_len < DC_DIV_QR_THRESHOLD {
-        _limbs_mod_schoolbook(ns_shifted, ds_shifted, d_inv);
+        limbs_mod_schoolbook(ns_shifted, ds_shifted, d_inv);
         let ns_shifted = &ns_shifted[..d_len];
         if bits == 0 {
             rs.copy_from_slice(ns_shifted);
@@ -790,7 +799,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
         }
     } else if limbs_mod_dc_condition(n_len, d_len) {
         let mut qs = vec![0; n_len - d_len];
-        _limbs_mod_divide_and_conquer(&mut qs, ns_shifted, ds_shifted, d_inv);
+        limbs_mod_divide_and_conquer(&mut qs, ns_shifted, ds_shifted, d_inv);
         let ns_shifted = &ns_shifted[..d_len];
         if bits == 0 {
             rs.copy_from_slice(ns_shifted);
@@ -801,7 +810,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
         let scratch_len = limbs_div_mod_barrett_scratch_len(n_len, d_len);
         let mut qs = vec![0; n_len - d_len];
         let mut scratch = vec![0; scratch_len];
-        _limbs_mod_barrett(&mut qs, rs, ns_shifted, ds_shifted, &mut scratch);
+        limbs_mod_barrett(&mut qs, rs, ns_shifted, ds_shifted, &mut scratch);
         if bits != 0 {
             limbs_slice_shr_in_place(rs, bits);
         }
@@ -834,6 +843,7 @@ fn _limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_l
 ///
 /// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where qp is not calculated and rp is
 /// returned.
+#[doc(hidden)]
 pub fn limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut rs = vec![0; ds.len()];
     limbs_mod_to_out(&mut rs, ns, ds);
@@ -870,6 +880,7 @@ pub fn limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where qp is not calculated.
+#[doc(hidden)]
 pub fn limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
@@ -878,7 +889,7 @@ pub fn limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let ds_last = *ds.last().unwrap();
     assert!(d_len > 1 && ds_last != 0);
     if d_len == 2 {
-        let (r_0, r_1) = _limbs_mod_by_two_limb(ns, ds);
+        let (r_0, r_1) = limbs_mod_by_two_limb(ns, ds);
         rs[0] = r_0;
         rs[1] = r_1;
     } else {
@@ -889,12 +900,12 @@ pub fn limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
             let mut qs = vec![0; n_len - d_len + 1];
             limbs_div_mod_balanced(&mut qs, rs, ns, ds, adjust);
         } else {
-            _limbs_mod_unbalanced(rs, ns, ds, adjusted_n_len);
+            limbs_mod_unbalanced(rs, ns, ds, adjusted_n_len);
         }
     }
 }
 
-fn _limbs_rem_naive(ns: &[Limb], d: Limb) -> Limb {
+fn limbs_rem_naive(ns: &[Limb], d: Limb) -> Limb {
     let d = DoubleLimb::from(d);
     let mut r = 0;
     for &n in ns.iter().rev() {
@@ -916,7 +927,7 @@ fn _limbs_rem_naive(ns: &[Limb], d: Limb) -> Limb {
 fn limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv: Limb) -> Limb {
     let len = ns.len();
     if len == 1 {
-        return _mod_by_preinversion(ns_high, ns[0], d, d_inv);
+        return mod_by_preinversion(ns_high, ns[0], d, d_inv);
     }
     let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
     let (sum, mut big_carry) = DoubleLimb::join_halves(ns[len - 1], ns[len - 2])
@@ -942,7 +953,7 @@ fn limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv: Limb) -
     if sum_high >= d {
         sum_high.wrapping_sub_assign(d);
     }
-    _mod_by_preinversion(sum_high, sum_low, d, d_inv)
+    mod_by_preinversion(sum_high, sum_low, d, d_inv)
 }
 
 /// The high bit of `d` must be set.
@@ -965,7 +976,7 @@ fn limbs_mod_limb_normalized_shl(
 ) -> Limb {
     let len = ns.len();
     if len == 1 {
-        return _mod_by_preinversion(ns_high, ns[0] << bits, d, d_inv);
+        return mod_by_preinversion(ns_high, ns[0] << bits, d, d_inv);
     }
     let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
     let cobits = Limb::WIDTH - bits;
@@ -1002,13 +1013,14 @@ fn limbs_mod_limb_normalized_shl(
     if sum_high >= d {
         sum_high.wrapping_sub_assign(d);
     }
-    _mod_by_preinversion(sum_high, sum_low, d, d_inv)
+    mod_by_preinversion(sum_high, sum_low, d, d_inv)
 }
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.2.1, where the quotient is not computed
 /// and the remainder is returned. Experiments show that this is always slower than
-/// `_limbs_mod_limb`.
-pub fn _limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
+/// `limbs_mod_limb`.
+#[doc(hidden)]
+pub fn limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -1025,7 +1037,7 @@ pub fn _limbs_mod_limb_alt_1(ns: &[Limb], d: Limb) -> Limb {
         let d = d << bits;
         let cobits = Limb::WIDTH - bits;
         let d_inv = limbs_invert_limb(d);
-        let r = _mod_by_preinversion(
+        let r = mod_by_preinversion(
             ns_high >> cobits,
             (ns_high << bits) | (ns[len - 2] >> cobits),
             d,
@@ -1058,7 +1070,8 @@ fn mod_by_preinversion_special(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) 
     r
 }
 
-pub fn _limbs_mod_limb_small_small(ns: &[Limb], d: Limb, mut r: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_small_small(ns: &[Limb], d: Limb, mut r: Limb) -> Limb {
     let d = DoubleLimb::from(d);
     for &n in ns.iter().rev() {
         r = (DoubleLimb::join_halves(r, n) % d).lower_half();
@@ -1066,7 +1079,8 @@ pub fn _limbs_mod_limb_small_small(ns: &[Limb], d: Limb, mut r: Limb) -> Limb {
     r
 }
 
-pub fn _limbs_mod_limb_small_normalized_large(ns: &[Limb], d: Limb, mut r: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_small_normalized_large(ns: &[Limb], d: Limb, mut r: Limb) -> Limb {
     let d_inv = limbs_invert_limb(d);
     for &n in ns.iter().rev() {
         r = mod_by_preinversion_special(r, n, d, d_inv);
@@ -1082,7 +1096,8 @@ pub fn _limbs_mod_limb_small_normalized_large(ns: &[Limb], d: Limb, mut r: Limb)
 ///
 /// This is mpn_mod_1_norm from mpn/generic/mod_1.c, GMP 6.2.1.
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn _limbs_mod_limb_small_normalized(ns: &[Limb], d: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_small_normalized(ns: &[Limb], d: Limb) -> Limb {
     let mut len = ns.len();
     assert_ne!(len, 0);
     assert!(d.get_highest_bit());
@@ -1097,14 +1112,15 @@ pub fn _limbs_mod_limb_small_normalized(ns: &[Limb], d: Limb) -> Limb {
     } else {
         let ns = &ns[..len];
         if len < MOD_1_NORM_THRESHOLD {
-            _limbs_mod_limb_small_small(ns, d, r)
+            limbs_mod_limb_small_small(ns, d, r)
         } else {
-            _limbs_mod_limb_small_normalized_large(ns, d, r)
+            limbs_mod_limb_small_normalized_large(ns, d, r)
         }
     }
 }
 
-pub fn _limbs_mod_limb_small_unnormalized_large(ns: &[Limb], mut d: Limb, mut r: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_small_unnormalized_large(ns: &[Limb], mut d: Limb, mut r: Limb) -> Limb {
     let shift = LeadingZeros::leading_zeros(d);
     d <<= shift;
     let (ns_last, ns_init) = ns.split_last().unwrap();
@@ -1129,7 +1145,8 @@ pub fn _limbs_mod_limb_small_unnormalized_large(ns: &[Limb], mut d: Limb, mut r:
 /// This is mpn_mod_1_unnorm from mpn/generic/mod_1.c, GMP 6.2.1, where UDIV_NEEDS_NORMALIZATION is
 /// false.
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn _limbs_mod_limb_small_unnormalized(ns: &[Limb], d: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_small_unnormalized(ns: &[Limb], d: Limb) -> Limb {
     let mut len = ns.len();
     assert_ne!(len, 0);
     assert_ne!(d, 0);
@@ -1147,18 +1164,19 @@ pub fn _limbs_mod_limb_small_unnormalized(ns: &[Limb], d: Limb) -> Limb {
     }
     let ns = &ns[..len];
     if len < MOD_1_UNNORM_THRESHOLD {
-        _limbs_mod_limb_small_small(ns, d, r)
+        limbs_mod_limb_small_small(ns, d, r)
     } else {
-        _limbs_mod_limb_small_unnormalized_large(ns, d, r)
+        limbs_mod_limb_small_unnormalized_large(ns, d, r)
     }
 }
 
 #[inline]
-pub fn _limbs_mod_limb_any_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_any_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
     if MOD_1_1P_METHOD {
-        _limbs_mod_limb_any_leading_zeros_1(ns, d)
+        limbs_mod_limb_any_leading_zeros_1(ns, d)
     } else {
-        _limbs_mod_limb_any_leading_zeros_2(ns, d)
+        limbs_mod_limb_any_leading_zeros_2(ns, d)
     }
 }
 
@@ -1169,7 +1187,8 @@ pub fn _limbs_mod_limb_any_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
 /// where n = `ns.len()`
 ///
 /// This is mpn_mod_1_1p_cps_1 combined with mpn_mod_1_1p_1 from mpn/generic/mod_1.c, GMP 6.2.1.
-pub fn _limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
     let len = ns.len();
     assert!(len >= 2);
     let shift = u64::from(d.leading_zeros());
@@ -1210,7 +1229,8 @@ pub fn _limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
 /// where n = `ns.len()`
 ///
 /// This is mpn_mod_1_1p_cps_2 combined with mpn_mod_1_1p_2 from mpn/generic/mod_1.c, GMP 6.2.1.
-pub fn _limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
     let len = ns.len();
     assert!(len >= 2);
     let shift = LeadingZeros::leading_zeros(d);
@@ -1277,7 +1297,8 @@ pub fn _limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
 /// where n = `ns.len()`
 ///
 /// This is mpn_mod_1s_2p_cps combined with mpn_mod_1s_2p from mpn/generic/mod_1_2.c, GMP 6.2.1.
-pub fn _limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb {
     let mut len = ns.len();
     assert_ne!(len, 0);
     let shift = LeadingZeros::leading_zeros(d);
@@ -1334,7 +1355,8 @@ pub fn _limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb {
 /// where n = `ns.len()`
 ///
 /// This is mpn_mod_1s_4p_cps combined with mpn_mod_1s_4p from mpn/generic/mod_1_4.c, GMP 6.2.1.
-pub fn _limbs_mod_limb_at_least_2_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_at_least_2_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
     let mut len = ns.len();
     assert_ne!(len, 0);
     let shift = LeadingZeros::leading_zeros(d);
@@ -1413,33 +1435,35 @@ const HIGHEST_TWO_BITS_MASK: Limb = !(Limb::MAX >> 2);
 ///
 /// This is mpn_mod_1 from mpn/generic/mod_1.c, GMP 6.2.1, where n > 1.
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn _limbs_mod_limb_alt_2(ns: &[Limb], d: Limb) -> Limb {
+#[doc(hidden)]
+pub fn limbs_mod_limb_alt_2(ns: &[Limb], d: Limb) -> Limb {
     let len = ns.len();
     assert!(len > 1);
     assert_ne!(d, 0);
     if d.get_highest_bit() {
         if len < MOD_1N_TO_MOD_1_1_THRESHOLD {
-            _limbs_mod_limb_small_normalized(ns, d)
+            limbs_mod_limb_small_normalized(ns, d)
         } else {
-            _limbs_mod_limb_any_leading_zeros(ns, d)
+            limbs_mod_limb_any_leading_zeros(ns, d)
         }
     } else if len < MOD_1U_TO_MOD_1_1_THRESHOLD {
-        _limbs_mod_limb_small_unnormalized(ns, d)
+        limbs_mod_limb_small_unnormalized(ns, d)
     } else if len < MOD_1_1_TO_MOD_1_2_THRESHOLD {
-        _limbs_mod_limb_any_leading_zeros(ns, d)
+        limbs_mod_limb_any_leading_zeros(ns, d)
     } else if len < MOD_1_2_TO_MOD_1_4_THRESHOLD || d & HIGHEST_TWO_BITS_MASK != 0 {
-        _limbs_mod_limb_at_least_1_leading_zero(ns, d)
+        limbs_mod_limb_at_least_1_leading_zero(ns, d)
     } else {
-        _limbs_mod_limb_at_least_2_leading_zeros(ns, d)
+        limbs_mod_limb_at_least_2_leading_zeros(ns, d)
     }
 }
 
 impl Natural {
-    pub fn _mod_limb_naive(&self, other: Limb) -> Limb {
+    #[doc(hidden)]
+    pub fn mod_limb_naive(&self, other: Limb) -> Limb {
         match (self, other) {
             (_, 0) => panic!("division by zero"),
             (Natural(Small(small)), other) => small % other,
-            (Natural(Large(ref limbs)), other) => _limbs_rem_naive(limbs, other),
+            (Natural(Large(ref limbs)), other) => limbs_rem_naive(limbs, other),
         }
     }
 

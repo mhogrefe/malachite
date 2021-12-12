@@ -3,16 +3,16 @@ use num::basic::traits::Zero;
 use std::ops::Div;
 
 #[inline]
-fn _lcm<
+fn lcm<
     T: CheckedMul<T, Output = T> + Copy + Div<T, Output = T> + Eq + Gcd<T, Output = T> + Zero,
 >(
     x: T,
     y: T,
 ) -> T {
-    _checked_lcm(x, y).unwrap()
+    checked_lcm(x, y).unwrap()
 }
 
-fn _checked_lcm<
+fn checked_lcm<
     T: CheckedMul<T, Output = T> + Copy + Div<T, Output = T> + Eq + Gcd<T, Output = T> + Zero,
 >(
     x: T,
@@ -46,7 +46,7 @@ macro_rules! impl_lcm {
             /// See the documentation of the `num::arithmetic::lcm` module.
             #[inline]
             fn lcm(self, other: $t) -> $t {
-                _lcm(self, other)
+                lcm(self, other)
             }
         }
 
@@ -67,7 +67,7 @@ macro_rules! impl_lcm {
             /// See the documentation of the `num::arithmetic::lcm` module.
             #[inline]
             fn lcm_assign(&mut self, other: $t) {
-                *self = _lcm(*self, other);
+                *self = lcm(*self, other);
             }
         }
 
@@ -96,7 +96,7 @@ macro_rules! impl_lcm {
             /// See the documentation of the `num::arithmetic::lcm` module.
             #[inline]
             fn checked_lcm(self, other: $t) -> Option<$t> {
-                _checked_lcm(self, other)
+                checked_lcm(self, other)
             }
         }
     };

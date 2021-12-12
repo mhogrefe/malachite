@@ -5,15 +5,15 @@ use num::logic::traits::TrailingZeros;
 use std::cmp::min;
 use std::ops::{Rem, Shl, Shr, ShrAssign, Sub, SubAssign};
 
-pub fn _gcd_euclidean<T: Copy + Eq + Zero + Rem<T, Output = T>>(x: T, y: T) -> T {
+pub fn gcd_euclidean<T: Copy + Eq + Zero + Rem<T, Output = T>>(x: T, y: T) -> T {
     if y == T::ZERO {
         x
     } else {
-        _gcd_euclidean(y, x % y)
+        gcd_euclidean(y, x % y)
     }
 }
 
-pub fn _gcd_binary<
+pub fn gcd_binary<
     T: Copy
         + Eq
         + Ord
@@ -34,22 +34,22 @@ pub fn _gcd_binary<
         x
     } else if x.even() {
         if y.odd() {
-            _gcd_binary(x >> 1, y)
+            gcd_binary(x >> 1, y)
         } else {
-            _gcd_binary(x >> 1, y >> 1) << 1
+            gcd_binary(x >> 1, y >> 1) << 1
         }
     } else if y.even() {
-        _gcd_binary(x, y >> 1)
+        gcd_binary(x, y >> 1)
     } else if x > y {
-        _gcd_binary((x - y) >> 1, y)
+        gcd_binary((x - y) >> 1, y)
     } else {
-        _gcd_binary((y - x) >> 1, x)
+        gcd_binary((y - x) >> 1, x)
     }
 }
 
 type Q = u64;
 // This is the first version of n_gcd from ulong_extras/gcd.c, FLINT 2.7.1.
-pub fn _gcd_fast_a<
+pub fn gcd_fast_a<
     T: Copy + Eq + Ord + Shl<u64, Output = T> + ShrAssign<Q> + SubAssign<T> + TrailingZeros + Zero,
 >(
     mut x: T,
@@ -79,7 +79,7 @@ pub fn _gcd_fast_a<
 }
 
 // This is the second version of n_gcd from ulong_extras/gcd.c, FLINT 2.7.1.
-pub fn _gcd_fast_b<T: PrimitiveUnsigned>(mut x: T, y: T) -> T {
+pub fn gcd_fast_b<T: PrimitiveUnsigned>(mut x: T, y: T) -> T {
     let mut v;
     if x >= y {
         v = y;
@@ -150,7 +150,7 @@ macro_rules! impl_gcd {
             /// See the documentation of the `num::arithmetic::gcd` module.
             #[inline]
             fn gcd(self, other: $t) -> $t {
-                _gcd_fast_a(self, other)
+                gcd_fast_a(self, other)
             }
         }
 
@@ -173,7 +173,7 @@ macro_rules! impl_gcd {
             /// See the documentation of the `num::arithmetic::gcd` module.
             #[inline]
             fn gcd_assign(&mut self, other: $t) {
-                *self = _gcd_fast_a(*self, other);
+                *self = gcd_fast_a(*self, other);
             }
         }
     };

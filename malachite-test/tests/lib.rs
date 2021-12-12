@@ -13,30 +13,6 @@ extern crate rust_wheels;
 
 pub mod natural {
     pub mod arithmetic {
-        pub mod add;
-        pub mod add_mul;
-        pub mod checked_sub;
-        pub mod checked_sub_mul;
-        pub mod div;
-        pub mod div_exact;
-        pub mod div_mod;
-        pub mod div_round;
-        pub mod divisible_by;
-        pub mod divisible_by_power_of_2;
-        pub mod eq_mod;
-        pub mod eq_mod_power_of_2;
-        pub mod is_power_of_2;
-        pub mod mod_add;
-        pub mod mod_is_reduced;
-        pub mod mod_mul;
-        pub mod mod_neg;
-        pub mod mod_op;
-        pub mod mod_pow;
-        pub mod mod_power_of_2;
-        pub mod mod_power_of_2_add;
-        pub mod mod_power_of_2_is_reduced;
-        pub mod mod_power_of_2_mul;
-        pub mod mod_power_of_2_neg;
         pub mod mod_power_of_2_pow;
         pub mod mod_power_of_2_shl;
         pub mod mod_power_of_2_shr;

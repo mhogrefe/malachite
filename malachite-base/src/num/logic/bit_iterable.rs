@@ -164,7 +164,7 @@ impl<T: PrimitiveUnsigned> Index<u64> for PrimitiveUnsignedBitIterator<T> {
     }
 }
 
-fn _bits_unsigned<T: PrimitiveUnsigned>(x: T) -> PrimitiveUnsignedBitIterator<T> {
+fn bits_unsigned<T: PrimitiveUnsigned>(x: T) -> PrimitiveUnsignedBitIterator<T> {
     let significant_bits = x.significant_bits();
     PrimitiveUnsignedBitIterator {
         value: x,
@@ -194,7 +194,7 @@ macro_rules! impl_bit_iterable_unsigned {
             /// See the documentation of the `num::logic::bit_iterable` module.
             #[inline]
             fn bits(self) -> PrimitiveUnsignedBitIterator<$t> {
-                _bits_unsigned(self)
+                bits_unsigned(self)
             }
         }
     };
@@ -315,7 +315,7 @@ impl<U: PrimitiveUnsigned, S: PrimitiveSigned> Index<u64> for PrimitiveSignedBit
     }
 }
 
-fn _bits_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(
+fn bits_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(
     x: S,
 ) -> PrimitiveSignedBitIterator<U, S> {
     let unsigned = U::wrapping_from(x);
@@ -355,7 +355,7 @@ macro_rules! impl_bit_iterable_signed {
             /// See the documentation of the `num::logic::bit_iterable` module.
             #[inline]
             fn bits(self) -> PrimitiveSignedBitIterator<$u, $s> {
-                _bits_signed::<$u, $s>(self)
+                bits_signed::<$u, $s>(self)
             }
         }
     };

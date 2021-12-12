@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::gcd::{_gcd_binary, _gcd_euclidean, _gcd_fast_a, _gcd_fast_b};
+use malachite_base::num::arithmetic::gcd::{gcd_binary, gcd_euclidean, gcd_fast_a, gcd_fast_b};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::bucketers::pair_max_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -44,10 +44,10 @@ fn benchmark_gcd_algorithms<T: PrimitiveUnsigned>(
         &pair_max_bit_bucketer("x", "y"),
         &mut [
             ("default", &mut |(x, y)| no_out!(x.gcd(y))),
-            ("Euclidean", &mut |(x, y)| no_out!(_gcd_euclidean(x, y))),
-            ("binary", &mut |(x, y)| no_out!(_gcd_binary(x, y))),
-            ("fast A", &mut |(x, y)| no_out!(_gcd_fast_a(x, y))),
-            ("fast B", &mut |(x, y)| no_out!(_gcd_fast_b(x, y))),
+            ("Euclidean", &mut |(x, y)| no_out!(gcd_euclidean(x, y))),
+            ("binary", &mut |(x, y)| no_out!(gcd_binary(x, y))),
+            ("fast A", &mut |(x, y)| no_out!(gcd_fast_a(x, y))),
+            ("fast B", &mut |(x, y)| no_out!(gcd_fast_b(x, y))),
         ],
     );
 }

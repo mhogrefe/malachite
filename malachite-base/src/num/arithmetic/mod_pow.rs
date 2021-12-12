@@ -1,4 +1,4 @@
-use num::arithmetic::mod_mul::{_limbs_invert_limb_u32, _limbs_invert_limb_u64};
+use num::arithmetic::mod_mul::{limbs_invert_limb_u32, limbs_invert_limb_u64};
 use num::arithmetic::traits::{ModPow, ModPowAssign, ModPowPrecomputed, ModPowPrecomputedAssign};
 use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
@@ -7,7 +7,7 @@ use num::conversion::traits::{HasHalf, JoinHalves, SplitInHalf};
 use num::logic::traits::{BitIterable, LeadingZeros};
 
 #[doc(hidden)]
-pub fn _simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
+pub fn simple_binary_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
     if m == T::ONE {
         return T::ZERO;
     }
@@ -55,7 +55,7 @@ fn mul_mod_helper<
 // m.get_highest_bit(), x < m
 //
 // This is n_powmod_ui_preinv from ulong_extras/powmod_ui_preinv.c, FLINT 2.7.1.
-fn _fast_pow_mod<
+fn fast_pow_mod<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -125,13 +125,13 @@ macro_rules! impl_mod_pow_precomputed_fast {
             /// See the documentation of the `num::arithmetic::mod_pow` module.
             fn mod_pow_precomputed(self, exp: u64, m: $t, data: &($t, u64)) -> $t {
                 let (inverse, shift) = *data;
-                _fast_pow_mod::<$t, $dt>(self << shift, exp, m << shift, inverse, shift) >> shift
+                fast_pow_mod::<$t, $dt>(self << shift, exp, m << shift, inverse, shift) >> shift
             }
         }
     };
 }
-impl_mod_pow_precomputed_fast!(u32, u64, _limbs_invert_limb_u32);
-impl_mod_pow_precomputed_fast!(u64, u128, _limbs_invert_limb_u64);
+impl_mod_pow_precomputed_fast!(u32, u64, limbs_invert_limb_u32);
+impl_mod_pow_precomputed_fast!(u64, u128, limbs_invert_limb_u64);
 
 macro_rules! impl_mod_pow_precomputed_promoted {
     ($t:ident) => {
@@ -200,7 +200,7 @@ impl ModPowPrecomputed<u64, u128> for u128 {
     /// See the documentation of the `num::arithmetic::mod_pow` module.
     #[inline]
     fn mod_pow_precomputed(self, exp: u64, m: u128, _data: &()) -> u128 {
-        _simple_binary_mod_pow(self, exp, m)
+        simple_binary_mod_pow(self, exp, m)
     }
 }
 
@@ -295,7 +295,7 @@ macro_rules! impl_mod_pow {
             /// See the documentation of the `num::arithmetic::mod_pow` module.
             #[inline]
             fn mod_pow(self, exp: u64, m: $t) -> $t {
-                _simple_binary_mod_pow(self, exp, m)
+                simple_binary_mod_pow(self, exp, m)
             }
         }
 
@@ -316,7 +316,7 @@ macro_rules! impl_mod_pow {
             /// See the documentation of the `num::arithmetic::mod_pow` module.
             #[inline]
             fn mod_pow_assign(&mut self, exp: u64, m: $t) {
-                *self = _simple_binary_mod_pow(*self, exp, m);
+                *self = simple_binary_mod_pow(*self, exp, m);
             }
         }
     };

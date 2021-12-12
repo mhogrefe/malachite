@@ -177,7 +177,7 @@ fn limbs_div_limb_normalized_to_out_mod(
 }
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where len > 1. Experiments show
-/// that this is always slower than `_limbs_div_limb_to_out_mod`.
+/// that this is always slower than `limbs_div_limb_to_out_mod`.
 pub fn limbs_div_limb_to_out_mod_alt(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
@@ -209,7 +209,7 @@ pub fn limbs_div_limb_to_out_mod_alt(out: &mut [Limb], ns: &[Limb], d: Limb) -> 
 }
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, where qp == up and len > 1.
-/// Experiments show that this is always slower than `_limbs_div_limb_in_place_mod`.
+/// Experiments show that this is always slower than `limbs_div_limb_in_place_mod`.
 pub fn limbs_div_limb_in_place_mod_alt(ns: &mut [Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();

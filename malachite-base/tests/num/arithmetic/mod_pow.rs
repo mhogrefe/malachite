@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::mod_pow::_simple_binary_mod_pow;
+use malachite_base::num::arithmetic::mod_pow::simple_binary_mod_pow;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -6,12 +6,12 @@ use malachite_base_test_util::generators::{
     unsigned_pair_gen_var_12, unsigned_pair_gen_var_16, unsigned_quadruple_gen_var_6,
     unsigned_quadruple_gen_var_7, unsigned_triple_gen_var_14, unsigned_triple_gen_var_15,
 };
-use malachite_base_test_util::num::arithmetic::mod_pow::_naive_mod_pow;
+use malachite_base_test_util::num::arithmetic::mod_pow::naive_mod_pow;
 
 fn mod_pow_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, exp: u64, m, out| {
-        assert_eq!(_naive_mod_pow(x, exp, m), out);
-        assert_eq!(_simple_binary_mod_pow(x, exp, m), out);
+        assert_eq!(naive_mod_pow(x, exp, m), out);
+        assert_eq!(simple_binary_mod_pow(x, exp, m), out);
 
         assert_eq!(x.mod_pow(exp, m), out);
 
@@ -89,11 +89,11 @@ fn mod_pow_properties_helper_helper<T: PrimitiveUnsigned, F: Fn(T, u64, T) -> T>
 
 fn mod_pow_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_triple_gen_var_15::<T, u64>().test_properties(|(x, exp, m)| {
-        mod_pow_properties_helper_helper(x, exp, m, _simple_binary_mod_pow)
+        mod_pow_properties_helper_helper(x, exp, m, simple_binary_mod_pow)
     });
 
     unsigned_triple_gen_var_14::<T, u64>()
-        .test_properties(|(x, exp, m)| mod_pow_properties_helper_helper(x, exp, m, _naive_mod_pow));
+        .test_properties(|(x, exp, m)| mod_pow_properties_helper_helper(x, exp, m, naive_mod_pow));
 
     unsigned_pair_gen_var_12::<u64, T>().test_properties(|(exp, m)| {
         assert_eq!(T::ZERO.mod_pow(exp, m), T::iverson(exp == 0 && m != T::ONE));

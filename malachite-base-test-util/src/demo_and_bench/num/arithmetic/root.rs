@@ -1,12 +1,12 @@
 use malachite_base::named::Named;
 use malachite_base::num::arithmetic::root::{
-    _cbrt_chebyshev_approx_u32, _cbrt_chebyshev_approx_u64, _fast_ceiling_root_u32,
-    _fast_ceiling_root_u64, _fast_checked_root_u32, _fast_checked_root_u64, _fast_floor_cbrt_u32,
-    _fast_floor_cbrt_u64, _fast_floor_root_u32, _fast_floor_root_u64, _fast_root_rem_u32,
-    _fast_root_rem_u64, _floor_root_approx_and_refine,
+    cbrt_chebyshev_approx_u32, cbrt_chebyshev_approx_u64, fast_ceiling_root_u32,
+    fast_ceiling_root_u64, fast_checked_root_u32, fast_checked_root_u64, fast_floor_cbrt_u32,
+    fast_floor_cbrt_u64, fast_floor_root_u32, fast_floor_root_u64, fast_root_rem_u32,
+    fast_root_rem_u64, floor_root_approx_and_refine,
 };
 use malachite_base::num::arithmetic::root::{
-    _ceiling_root_binary, _checked_root_binary, _floor_root_binary, _root_rem_binary,
+    ceiling_root_binary, checked_root_binary, floor_root_binary, root_rem_binary,
 };
 use malachite_base::num::arithmetic::traits::{CeilingRoot, CheckedRoot, FloorRoot, RootRem};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -339,9 +339,9 @@ macro_rules! benchmark_floor_cbrt_algorithms_unsigned {
                 &unsigned_bit_bucketer(),
                 &mut [
                     ("default", &mut |n| no_out!(n.floor_root(3))),
-                    ("binary", &mut |n| no_out!(_floor_root_binary(n, 3))),
+                    ("binary", &mut |n| no_out!(floor_root_binary(n, 3))),
                     ("approx and refine", &mut |n| {
-                        no_out!(_floor_root_approx_and_refine(
+                        no_out!(floor_root_approx_and_refine(
                             |x| x as f64,
                             |f| f as $t,
                             n,
@@ -430,7 +430,7 @@ fn benchmark_ceiling_cbrt_algorithms_unsigned<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.ceiling_root(3))),
-            ("binary", &mut |n| no_out!(_ceiling_root_binary(n, 3))),
+            ("binary", &mut |n| no_out!(ceiling_root_binary(n, 3))),
         ],
     );
 }
@@ -505,7 +505,7 @@ fn benchmark_checked_cbrt_algorithms_unsigned<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.checked_root(3))),
-            ("binary", &mut |n| no_out!(_checked_root_binary(n, 3))),
+            ("binary", &mut |n| no_out!(checked_root_binary(n, 3))),
         ],
     );
 }
@@ -544,7 +544,7 @@ fn benchmark_cbrt_rem_algorithms<T: PrimitiveUnsigned>(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.root_rem(3))),
-            ("binary", &mut |n| no_out!(_root_rem_binary(n, 3))),
+            ("binary", &mut |n| no_out!(root_rem_binary(n, 3))),
         ],
     );
 }
@@ -580,11 +580,9 @@ macro_rules! benchmark_floor_root_algorithms_unsigned {
                 &pair_1_bit_bucketer("x"),
                 &mut [
                     ("default", &mut |(n, exp)| no_out!(n.floor_root(exp))),
-                    ("binary", &mut |(n, exp)| {
-                        no_out!(_floor_root_binary(n, exp))
-                    }),
+                    ("binary", &mut |(n, exp)| no_out!(floor_root_binary(n, exp))),
                     ("approx and refine", &mut |(n, exp)| {
-                        no_out!(_floor_root_approx_and_refine(
+                        no_out!(floor_root_approx_and_refine(
                             |x| x as f64,
                             |f| f as $t,
                             n,
@@ -674,7 +672,7 @@ fn benchmark_ceiling_root_algorithms_unsigned<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.ceiling_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(_ceiling_root_binary(n, exp))
+                no_out!(ceiling_root_binary(n, exp))
             }),
         ],
     );
@@ -751,7 +749,7 @@ fn benchmark_checked_root_algorithms_unsigned<T: PrimitiveUnsigned>(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.checked_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(_checked_root_binary(n, exp))
+                no_out!(checked_root_binary(n, exp))
             }),
         ],
     );
@@ -791,7 +789,7 @@ fn benchmark_root_rem_algorithms<T: PrimitiveUnsigned>(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.root_rem(exp))),
-            ("binary", &mut |(n, exp)| no_out!(_root_rem_binary(n, exp))),
+            ("binary", &mut |(n, exp)| no_out!(root_rem_binary(n, exp))),
         ],
     );
 }
@@ -832,11 +830,11 @@ fn benchmark_floor_cbrt_algorithms_2_u32(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.floor_root(3))),
-            ("binary", &mut |n| no_out!(_floor_root_binary(n, 3))),
-            ("fast", &mut |n| no_out!(_fast_floor_cbrt_u32(n))),
-            ("Chebyshev", &mut |n| no_out!(_cbrt_chebyshev_approx_u32(n))),
+            ("binary", &mut |n| no_out!(floor_root_binary(n, 3))),
+            ("fast", &mut |n| no_out!(fast_floor_cbrt_u32(n))),
+            ("Chebyshev", &mut |n| no_out!(cbrt_chebyshev_approx_u32(n))),
             ("approx and refine", &mut |n| {
-                no_out!(_floor_root_approx_and_refine(
+                no_out!(floor_root_approx_and_refine(
                     |x| x as f64,
                     |f| f as u32,
                     n,
@@ -863,11 +861,11 @@ fn benchmark_floor_cbrt_algorithms_2_u64(
         &unsigned_bit_bucketer(),
         &mut [
             ("default", &mut |n| no_out!(n.floor_root(3))),
-            ("binary", &mut |n| no_out!(_floor_root_binary(n, 3))),
-            ("fast", &mut |n| no_out!(_fast_floor_cbrt_u64(n))),
-            ("Chebyshev", &mut |n| no_out!(_cbrt_chebyshev_approx_u64(n))),
+            ("binary", &mut |n| no_out!(floor_root_binary(n, 3))),
+            ("fast", &mut |n| no_out!(fast_floor_cbrt_u64(n))),
+            ("Chebyshev", &mut |n| no_out!(cbrt_chebyshev_approx_u64(n))),
             ("approx and refine", &mut |n| {
-                no_out!(_floor_root_approx_and_refine(
+                no_out!(floor_root_approx_and_refine(
                     |x| x as f64,
                     |f| f as u64,
                     n,
@@ -894,14 +892,10 @@ fn benchmark_floor_root_algorithms_2_u32(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.floor_root(exp))),
-            ("binary", &mut |(n, exp)| {
-                no_out!(_floor_root_binary(n, exp))
-            }),
-            ("fast", &mut |(n, exp)| {
-                no_out!(_fast_floor_root_u32(n, exp))
-            }),
+            ("binary", &mut |(n, exp)| no_out!(floor_root_binary(n, exp))),
+            ("fast", &mut |(n, exp)| no_out!(fast_floor_root_u32(n, exp))),
             ("approx and refine", &mut |(n, exp)| {
-                no_out!(_floor_root_approx_and_refine(
+                no_out!(floor_root_approx_and_refine(
                     |x| x as f64,
                     |f| f as u32,
                     n,
@@ -928,14 +922,10 @@ fn benchmark_floor_root_algorithms_2_u64(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.floor_root(exp))),
-            ("binary", &mut |(n, exp)| {
-                no_out!(_floor_root_binary(n, exp))
-            }),
-            ("fast", &mut |(n, exp)| {
-                no_out!(_fast_floor_root_u64(n, exp))
-            }),
+            ("binary", &mut |(n, exp)| no_out!(floor_root_binary(n, exp))),
+            ("fast", &mut |(n, exp)| no_out!(fast_floor_root_u64(n, exp))),
             ("approx and refine", &mut |(n, exp)| {
-                no_out!(_floor_root_approx_and_refine(
+                no_out!(floor_root_approx_and_refine(
                     |x| x as f64,
                     |f| f as u64,
                     n,
@@ -963,10 +953,10 @@ fn benchmark_ceiling_root_algorithms_2_u32(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.ceiling_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(_ceiling_root_binary(n, exp))
+                no_out!(ceiling_root_binary(n, exp))
             }),
             ("fast", &mut |(n, exp)| {
-                no_out!(_fast_ceiling_root_u32(n, exp))
+                no_out!(fast_ceiling_root_u32(n, exp))
             }),
         ],
     );
@@ -989,10 +979,10 @@ fn benchmark_ceiling_root_algorithms_2_u64(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.ceiling_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(_ceiling_root_binary(n, exp))
+                no_out!(ceiling_root_binary(n, exp))
             }),
             ("fast", &mut |(n, exp)| {
-                no_out!(_fast_ceiling_root_u64(n, exp))
+                no_out!(fast_ceiling_root_u64(n, exp))
             }),
         ],
     );
@@ -1015,10 +1005,10 @@ fn benchmark_checked_root_algorithms_2_u32(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.checked_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(_checked_root_binary(n, exp))
+                no_out!(checked_root_binary(n, exp))
             }),
             ("fast", &mut |(n, exp)| {
-                no_out!(_fast_checked_root_u32(n, exp))
+                no_out!(fast_checked_root_u32(n, exp))
             }),
         ],
     );
@@ -1041,10 +1031,10 @@ fn benchmark_checked_root_algorithms_2_u64(
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.checked_root(exp))),
             ("binary", &mut |(n, exp)| {
-                no_out!(_checked_root_binary(n, exp))
+                no_out!(checked_root_binary(n, exp))
             }),
             ("fast", &mut |(n, exp)| {
-                no_out!(_fast_checked_root_u64(n, exp))
+                no_out!(fast_checked_root_u64(n, exp))
             }),
         ],
     );
@@ -1066,8 +1056,8 @@ fn benchmark_root_rem_algorithms_2_u32(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.root_rem(exp))),
-            ("binary", &mut |(n, exp)| no_out!(_root_rem_binary(n, exp))),
-            ("fast", &mut |(n, exp)| no_out!(_fast_root_rem_u32(n, exp))),
+            ("binary", &mut |(n, exp)| no_out!(root_rem_binary(n, exp))),
+            ("fast", &mut |(n, exp)| no_out!(fast_root_rem_u32(n, exp))),
         ],
     );
 }
@@ -1088,8 +1078,8 @@ fn benchmark_root_rem_algorithms_2_u64(
         &pair_1_bit_bucketer("x"),
         &mut [
             ("default", &mut |(n, exp)| no_out!(n.root_rem(exp))),
-            ("binary", &mut |(n, exp)| no_out!(_root_rem_binary(n, exp))),
-            ("fast", &mut |(n, exp)| no_out!(_fast_root_rem_u64(n, exp))),
+            ("binary", &mut |(n, exp)| no_out!(root_rem_binary(n, exp))),
+            ("fast", &mut |(n, exp)| no_out!(fast_root_rem_u64(n, exp))),
         ],
     );
 }

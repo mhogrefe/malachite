@@ -29,11 +29,11 @@ use platform::Limb;
 /// assert_eq!(limbs_next_power_of_2(&[123, 456, u32::MAX]), &[0, 0, 0, 1]);
 /// ```
 pub fn limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
-    let xs_last = xs.last().unwrap();
+    let (xs_last, xs_init) = xs.split_last().unwrap();
     let mut out;
     if let Some(x) = xs_last.checked_next_power_of_two() {
-        out = vec![0; xs.len() - 1];
-        if x == *xs_last && !slice_test_zero(&xs[..xs.len() - 1]) {
+        out = vec![0; xs_init.len()];
+        if x == *xs_last && !slice_test_zero(xs_init) {
             if let Some(x) = x.arithmetic_checked_shl(1) {
                 out.push(x)
             } else {

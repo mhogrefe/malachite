@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::mod_mul::{
-    _fast_mod_mul, _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted,
-    _naive_mod_mul, test_invert_u32_table, test_invert_u64_table,
+    fast_mod_mul, limbs_invert_limb_u32, limbs_invert_limb_u64, limbs_mod_preinverted,
+    naive_mod_mul, test_invert_u32_table, test_invert_u64_table,
 };
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -25,7 +25,7 @@ fn test_test_invert_u64_table() {
 #[test]
 fn test_limbs_invert_limb_u32() {
     let test = |x, out| {
-        assert_eq!(_limbs_invert_limb_u32(x), out);
+        assert_eq!(limbs_invert_limb_u32(x), out);
         assert_eq!(limbs_invert_limb_naive::<u32, u64>(x), out);
     };
     test(0x80000000, u32::MAX);
@@ -38,13 +38,13 @@ fn test_limbs_invert_limb_u32() {
 #[test]
 #[should_panic]
 fn limbs_invert_limb_u32_fail() {
-    _limbs_invert_limb_u32(123);
+    limbs_invert_limb_u32(123);
 }
 
 #[test]
 fn test_limbs_invert_limb_u64() {
     let test = |x, out| {
-        assert_eq!(_limbs_invert_limb_u64(x), out);
+        assert_eq!(limbs_invert_limb_u64(x), out);
         assert_eq!(limbs_invert_limb_naive::<u64, u128>(x), out);
     };
     test(0x8000000000000000, u64::MAX);
@@ -57,7 +57,7 @@ fn test_limbs_invert_limb_u64() {
 #[test]
 #[should_panic]
 fn limbs_invert_limb_u64_fail() {
-    _limbs_invert_limb_u64(123);
+    limbs_invert_limb_u64(123);
 }
 
 #[test]
@@ -72,7 +72,7 @@ fn test_limbs_mod_preinverted() {
         out: T,
     ) {
         let d_inv = limbs_invert_limb_naive::<T, DT>(d << LeadingZeros::leading_zeros(d));
-        assert_eq!(_limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv), out);
+        assert_eq!(limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv), out);
         assert_eq!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)), out);
     }
     test::<u8, u16>(0, 0, 1, 0);
@@ -98,7 +98,7 @@ fn mod_mul_helper<T: PrimitiveUnsigned>() {
         mut_x.mod_mul_precomputed_assign(y, m, &data);
         assert_eq!(mut_x, out);
 
-        assert_eq!(_naive_mod_mul(x, y, m), out);
+        assert_eq!(naive_mod_mul(x, y, m), out);
     };
     test(T::ZERO, T::ZERO, T::ONE, T::ZERO);
     test(T::TWO, T::exact_from(3), T::exact_from(7), T::exact_from(6));
@@ -125,7 +125,7 @@ fn test_mod_mul() {
 #[test]
 fn invert_limb_u32_properties() {
     unsigned_gen_var_12().test_properties(|x| {
-        let inverse = _limbs_invert_limb_u32(x);
+        let inverse = limbs_invert_limb_u32(x);
         assert_eq!(limbs_invert_limb_naive::<u32, u64>(x), inverse);
         assert_ne!(inverse, 0);
     });
@@ -134,7 +134,7 @@ fn invert_limb_u32_properties() {
 #[test]
 fn invert_limb_u64_properties() {
     unsigned_gen_var_12().test_properties(|x| {
-        let inverse = _limbs_invert_limb_u64(x);
+        let inverse = limbs_invert_limb_u64(x);
         assert_eq!(limbs_invert_limb_naive::<u64, u128>(x), inverse);
         assert_ne!(inverse, 0);
     });
@@ -145,7 +145,7 @@ fn mod_mul_preinverted_properties_helper<
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >() {
     unsigned_quadruple_gen_var_5::<T, DT>().test_properties(|(x_1, x_0, d, d_inv)| {
-        let r = _limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv);
+        let r = limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv);
         let n = DT::join_halves(x_1, x_0);
         assert_eq!(T::exact_from(n % DT::from(d)), r);
         assert!(r < d);
@@ -181,7 +181,7 @@ fn mod_mul_properties_helper<T: PrimitiveUnsigned>() {
         x_alt.mod_mul_precomputed_assign(y, m, &data);
         assert_eq!(x_alt, product);
 
-        assert_eq!(_naive_mod_mul(x, y, m), product);
+        assert_eq!(naive_mod_mul(x, y, m), product);
         assert_eq!(y.mod_mul(x, m), product);
         assert_eq!(x.mod_mul(y.mod_neg(m), m), product.mod_neg(m));
         assert_eq!(x.mod_neg(m).mod_mul(y, m), product.mod_neg(m));
@@ -214,7 +214,7 @@ fn mod_mul_properties_fast_helper<
     unsigned_triple_gen_var_12::<T>().test_properties(|(x, y, m)| {
         let product = x.mod_mul(y, m);
         assert_eq!(
-            _fast_mod_mul::<T, DT>(x, y, m, T::precompute_mod_mul_data(&m)),
+            fast_mod_mul::<T, DT>(x, y, m, T::precompute_mod_mul_data(&m)),
             product
         );
     });

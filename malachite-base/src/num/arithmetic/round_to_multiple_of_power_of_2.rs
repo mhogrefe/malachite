@@ -3,7 +3,7 @@ use num::arithmetic::traits::{
 };
 use rounding_modes::RoundingMode;
 
-fn _round_to_multiple_of_power_of_2<
+fn round_to_multiple_of_power_of_2<
     T: ArithmeticCheckedShl<u64, Output = T> + ShrRound<u64, Output = T>,
 >(
     x: T,
@@ -73,7 +73,7 @@ macro_rules! impl_round_to_multiple_of_power_of_2 {
             /// module.
             #[inline]
             fn round_to_multiple_of_power_of_2(self, pow: u64, rm: RoundingMode) -> $t {
-                _round_to_multiple_of_power_of_2(self, pow, rm)
+                round_to_multiple_of_power_of_2(self, pow, rm)
             }
         }
 

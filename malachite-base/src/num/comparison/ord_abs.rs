@@ -46,7 +46,7 @@ macro_rules! impl_ord_abs_unsigned {
 }
 apply_to_unsigneds!(impl_ord_abs_unsigned);
 
-fn _cmp_abs_signed<U: Ord, S: Copy + UnsignedAbs<Output = U>>(x: &S, y: &S) -> Ordering {
+fn cmp_abs_signed<U: Ord, S: Copy + UnsignedAbs<Output = U>>(x: &S, y: &S) -> Ordering {
     x.unsigned_abs().cmp(&y.unsigned_abs())
 }
 
@@ -62,7 +62,7 @@ macro_rules! impl_ord_abs_signed {
             /// See the documentation of the `num::comparison::ord_abs` module.
             #[inline]
             fn cmp_abs(&self, other: &Self) -> Ordering {
-                _cmp_abs_signed(self, other)
+                cmp_abs_signed(self, other)
             }
         }
     };

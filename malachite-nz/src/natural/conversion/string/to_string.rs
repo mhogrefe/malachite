@@ -10,7 +10,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use natural::conversion::digits::general_digits::{_limbs_to_digits_small_base, limbs_digit_count};
+use natural::conversion::digits::general_digits::{limbs_digit_count, limbs_to_digits_small_base};
 use natural::conversion::string::BaseFmtWrapper;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
@@ -194,7 +194,7 @@ impl Display for Natural {
             Natural(Large(xs)) => {
                 let mut digits = vec![0; usize::exact_from(limbs_digit_count(xs, 10))];
                 let mut xs = xs.clone();
-                let len = _limbs_to_digits_small_base(&mut digits, 10, &mut xs, None);
+                let len = limbs_to_digits_small_base(&mut digits, 10, &mut xs, None);
                 digits.truncate(len);
                 for digit in &mut digits {
                     *digit = digit_to_display_byte_lower(*digit).unwrap();

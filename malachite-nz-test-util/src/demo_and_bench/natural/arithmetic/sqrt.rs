@@ -17,13 +17,13 @@ use malachite_base_test_util::generators::{
 };
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::sqrt::{
-    _limbs_sqrt_helper, _limbs_sqrt_rem_helper, _limbs_sqrt_rem_helper_scratch_len,
-    _sqrt_rem_2_newton, limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_rem,
-    limbs_sqrt_rem_to_out, limbs_sqrt_to_out,
+    limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_helper, limbs_sqrt_rem,
+    limbs_sqrt_rem_helper, limbs_sqrt_rem_helper_scratch_len, limbs_sqrt_rem_to_out,
+    limbs_sqrt_to_out, sqrt_rem_2_newton,
 };
 use malachite_nz_test_util::generators::{natural_gen, natural_gen_nrm, natural_gen_rm};
 use malachite_nz_test_util::natural::arithmetic::sqrt::{
-    _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _sqrt_rem_binary,
+    ceiling_sqrt_binary, checked_sqrt_binary, floor_sqrt_binary, sqrt_rem_binary,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -77,20 +77,20 @@ fn demo_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize) {
             "sqrt_rem_2_newton({}, {}) = {:?}",
             h_hi,
             h_lo,
-            _sqrt_rem_2_newton(h_hi, h_lo)
+            sqrt_rem_2_newton(h_hi, h_lo)
         );
     }
 }
 
 fn demo_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut out, mut xs) in unsigned_vec_pair_gen_var_4().get(gm, &config).take(limit) {
-        let mut scratch = vec![0; _limbs_sqrt_rem_helper_scratch_len(out.len())];
+        let mut scratch = vec![0; limbs_sqrt_rem_helper_scratch_len(out.len())];
         let old_out = out.clone();
         let old_xs = xs.clone();
-        let r_hi = _limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch);
+        let r_hi = limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch);
         println!(
             "out := {:?}, xs := {:?}; \
-            _limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch) = {}; \
+            limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch) = {}; \
             out = {:?}, xs = {:?}",
             old_out, old_xs, r_hi, out, xs
         );
@@ -100,9 +100,9 @@ fn demo_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize) {
 fn demo_limbs_sqrt_helper(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut out, xs, shift, odd) in large_type_gen_var_2().get(gm, &config).take(limit) {
         let old_out = out.clone();
-        let r = _limbs_sqrt_helper(&mut out, &xs, shift, odd);
+        let r = limbs_sqrt_helper(&mut out, &xs, shift, odd);
         println!(
-            "out := {:?}, _limbs_sqrt_helper(&mut out, {:?}, {}, {}) = {}; out = {:?}",
+            "out := {:?}, limbs_sqrt_helper(&mut out, {:?}, {}, {}) = {}; out = {:?}",
             old_out, xs, shift, odd, r, out
         );
     }
@@ -250,14 +250,14 @@ fn benchmark_sqrt_rem_2_newton(gm: GenMode, config: GenConfig, limit: usize, fil
         file_name,
         &pair_max_bit_bucketer("n_hi", "n_lo"),
         &mut [("sqrt_rem_2_newton(Limb, Limb)", &mut |(n_hi, n_lo)| {
-            no_out!(_sqrt_rem_2_newton(n_hi, n_lo))
+            no_out!(sqrt_rem_2_newton(n_hi, n_lo))
         })],
     );
 }
 
 fn benchmark_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
-        "_limbs_sqrt_rem_helper(&mut [Limb], &mut [Limb], Limb, &mut [Limb])",
+        "limbs_sqrt_rem_helper(&mut [Limb], &mut [Limb], Limb, &mut [Limb])",
         BenchmarkType::Single,
         unsigned_vec_pair_gen_var_4().get(gm, &config),
         gm.name(),
@@ -265,10 +265,10 @@ fn benchmark_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize,
         file_name,
         &pair_2_vec_len_bucketer("xs"),
         &mut [(
-            "_limbs_sqrt_rem_helper(&mut [Limb], &mut [Limb], Limb, &mut [Limb])",
+            "limbs_sqrt_rem_helper(&mut [Limb], &mut [Limb], Limb, &mut [Limb])",
             &mut |(mut out, mut xs)| {
-                let mut scratch = vec![0; _limbs_sqrt_rem_helper_scratch_len(out.len())];
-                _limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch);
+                let mut scratch = vec![0; limbs_sqrt_rem_helper_scratch_len(out.len())];
+                limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch);
             },
         )],
     );
@@ -276,7 +276,7 @@ fn benchmark_limbs_sqrt_rem_helper(gm: GenMode, config: GenConfig, limit: usize,
 
 fn benchmark_limbs_sqrt_helper(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
-        "_limbs_sqrt_helper(&mut [Limb], &[Limb], u64, bool)",
+        "limbs_sqrt_helper(&mut [Limb], &[Limb], u64, bool)",
         BenchmarkType::Single,
         large_type_gen_var_2().get(gm, &config),
         gm.name(),
@@ -284,8 +284,8 @@ fn benchmark_limbs_sqrt_helper(gm: GenMode, config: GenConfig, limit: usize, fil
         file_name,
         &quadruple_2_vec_len_bucketer("xs"),
         &mut [(
-            "_limbs_sqrt_helper(&mut [Limb], &[Limb], u64, bool)",
-            &mut |(mut out, xs, shift, odd)| no_out!(_limbs_sqrt_helper(&mut out, &xs, shift, odd)),
+            "limbs_sqrt_helper(&mut [Limb], &[Limb], u64, bool)",
+            &mut |(mut out, xs, shift, odd)| no_out!(limbs_sqrt_helper(&mut out, &xs, shift, odd)),
         )],
     );
 }
@@ -425,7 +425,7 @@ fn benchmark_natural_floor_sqrt_algorithms(
         &natural_bit_bucketer("x"),
         &mut [
             ("default", &mut |x| no_out!(x.floor_sqrt())),
-            ("binary", &mut |x| no_out!(_floor_sqrt_binary(&x))),
+            ("binary", &mut |x| no_out!(floor_sqrt_binary(&x))),
         ],
     );
 }
@@ -509,7 +509,7 @@ fn benchmark_natural_ceiling_sqrt_algorithms(
         &natural_bit_bucketer("x"),
         &mut [
             ("default", &mut |x| no_out!(x.ceiling_sqrt())),
-            ("binary", &mut |x| no_out!(_ceiling_sqrt_binary(&x))),
+            ("binary", &mut |x| no_out!(ceiling_sqrt_binary(&x))),
         ],
     );
 }
@@ -571,7 +571,7 @@ fn benchmark_natural_checked_sqrt_algorithms(
         &natural_bit_bucketer("x"),
         &mut [
             ("default", &mut |x| no_out!(x.checked_sqrt())),
-            ("binary", &mut |x| no_out!(_checked_sqrt_binary(&x))),
+            ("binary", &mut |x| no_out!(checked_sqrt_binary(&x))),
         ],
     );
 }
@@ -619,7 +619,7 @@ fn benchmark_natural_sqrt_rem_algorithms(
                 let square = (&sqrt).square();
                 (sqrt, x - square);
             }),
-            ("binary", &mut |x| no_out!(_sqrt_rem_binary(&x))),
+            ("binary", &mut |x| no_out!(sqrt_rem_binary(&x))),
         ],
     );
 }

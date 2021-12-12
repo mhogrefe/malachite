@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::mod_mul::{
-    _fast_mod_mul, _limbs_invert_limb_u32, _limbs_invert_limb_u64, _limbs_mod_preinverted,
-    _naive_mod_mul,
+    fast_mod_mul, limbs_invert_limb_u32, limbs_invert_limb_u64, limbs_mod_preinverted,
+    naive_mod_mul,
 };
 use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -54,9 +54,9 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_limbs_invert_limb_u32(gm: GenMode, config: GenConfig, limit: usize) {
     for x in unsigned_gen_var_12().get(gm, &config).take(limit) {
         println!(
-            "_limbs_invert_limb_u32({}) = {}",
+            "limbs_invert_limb_u32({}) = {}",
             x,
-            _limbs_invert_limb_u32(x)
+            limbs_invert_limb_u32(x)
         );
     }
 }
@@ -64,9 +64,9 @@ fn demo_limbs_invert_limb_u32(gm: GenMode, config: GenConfig, limit: usize) {
 fn demo_limbs_invert_limb_u64(gm: GenMode, config: GenConfig, limit: usize) {
     for x in unsigned_gen_var_12().get(gm, &config).take(limit) {
         println!(
-            "_limbs_invert_limb_u64({}) = {}",
+            "limbs_invert_limb_u64({}) = {}",
             x,
-            _limbs_invert_limb_u64(x)
+            limbs_invert_limb_u64(x)
         );
     }
 }
@@ -84,12 +84,12 @@ fn demo_limbs_mod_preinverted<
         .take(limit)
     {
         println!(
-            "_limbs_mod_preinverted({}, {}, {}, {}) = {}",
+            "limbs_mod_preinverted({}, {}, {}, {}) = {}",
             x_1,
             x_0,
             m,
             inv,
-            _limbs_mod_preinverted::<T, DT>(x_1, x_0, m, inv)
+            limbs_mod_preinverted::<T, DT>(x_1, x_0, m, inv)
         );
     }
 }
@@ -129,7 +129,7 @@ fn benchmark_limbs_invert_limb_u32_algorithms(
         file_name,
         &ignore_highest_bit_unsigned_bit_bucketer("m"),
         &mut [
-            ("default", &mut |x| no_out!(_limbs_invert_limb_u32(x))),
+            ("default", &mut |x| no_out!(limbs_invert_limb_u32(x))),
             ("naive", &mut |x| {
                 no_out!(limbs_invert_limb_naive::<u32, u64>(x))
             }),
@@ -152,7 +152,7 @@ fn benchmark_limbs_invert_limb_u64_algorithms(
         file_name,
         &ignore_highest_bit_unsigned_bit_bucketer("m"),
         &mut [
-            ("default", &mut |x| no_out!(_limbs_invert_limb_u64(x))),
+            ("default", &mut |x| no_out!(limbs_invert_limb_u64(x))),
             ("naive", &mut |x| {
                 no_out!(limbs_invert_limb_naive::<u64, u128>(x))
             }),
@@ -171,7 +171,7 @@ fn benchmark_limbs_mod_preinverted_algorithms<
 ) {
     run_benchmark(
         &format!(
-            "_limbs_mod_preinverted({}, {}, {}, {})",
+            "limbs_mod_preinverted({}, {}, {}, {})",
             T::NAME,
             T::NAME,
             T::NAME,
@@ -185,7 +185,7 @@ fn benchmark_limbs_mod_preinverted_algorithms<
         &quadruple_1_2_bit_bucketer("x"),
         &mut [
             ("default", &mut |(x_1, x_0, d, d_inv)| {
-                no_out!(_limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv))
+                no_out!(limbs_mod_preinverted::<T, DT>(x_1, x_0, d, d_inv))
             }),
             ("naive", &mut |(x_1, x_0, d, _)| {
                 no_out!(T::exact_from(DT::join_halves(x_1, x_0) % DT::from(d)))
@@ -210,7 +210,7 @@ fn benchmark_mod_mul_algorithms<T: PrimitiveUnsigned>(
         &triple_3_bit_bucketer("m"),
         &mut [
             ("default", &mut |(x, y, m)| no_out!(x.mod_mul(y, m))),
-            ("naive", &mut |(x, y, m)| no_out!(_naive_mod_mul(x, y, m))),
+            ("naive", &mut |(x, y, m)| no_out!(naive_mod_mul(x, y, m))),
         ],
     );
 }
@@ -234,9 +234,9 @@ fn benchmark_mod_mul_algorithms_with_fast<
         &triple_3_bit_bucketer("m"),
         &mut [
             ("default", &mut |(x, y, m)| no_out!(x.mod_mul(y, m))),
-            ("naive", &mut |(x, y, m)| no_out!(_naive_mod_mul(x, y, m))),
+            ("naive", &mut |(x, y, m)| no_out!(naive_mod_mul(x, y, m))),
             ("fast", &mut |(x, y, m)| {
-                no_out!(_fast_mod_mul::<T, DT>(
+                no_out!(fast_mod_mul::<T, DT>(
                     x,
                     y,
                     m,

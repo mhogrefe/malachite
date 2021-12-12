@@ -13,10 +13,9 @@ use malachite_base::slices::slice_leading_zeros;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{unsigned_gen_var_6, unsigned_pair_gen_var_6};
 use malachite_nz::natural::conversion::digits::general_digits::{
-    PowerTableAlgorithm, _limbs_to_digits_basecase, _limbs_to_digits_small_base,
-    _limbs_to_digits_small_base_basecase, _to_digits_asc_large, _to_digits_asc_limb,
-    _to_digits_asc_naive, _to_digits_asc_naive_primitive, _to_digits_desc_large,
-    _to_digits_desc_limb,
+    limbs_to_digits_basecase, limbs_to_digits_small_base, limbs_to_digits_small_base_basecase,
+    to_digits_asc_large, to_digits_asc_limb, to_digits_asc_naive, to_digits_asc_naive_primitive,
+    to_digits_desc_large, to_digits_desc_limb, PowerTableAlgorithm,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -38,7 +37,7 @@ fn verify_limbs_to_digits_small_base_basecase<
         assert_eq!(len, out_len);
     }
     let mut digits = Vec::new();
-    _to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(xs), base);
+    to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(xs), base);
     let digits = digits.into_iter().map(T::exact_from).collect_vec();
     let mut expected_digits = vec![T::ZERO; out_len];
     expected_digits[..digits.len()].copy_from_slice(&digits);
@@ -49,7 +48,7 @@ fn verify_limbs_to_digits_small_base_basecase<
     let result = out;
     let mut out = original_out.to_vec();
     let mut xs = xs.to_vec();
-    let out_len_alt = _limbs_to_digits_small_base(&mut out, base, &mut xs, None);
+    let out_len_alt = limbs_to_digits_small_base(&mut out, base, &mut xs, None);
     let sig_out = &result[..out_len];
     let sig_out_alt = &out[..out_len_alt];
     assert_eq!(
@@ -66,7 +65,7 @@ fn verify_limbs_to_digits_small_base<T: for<'a> CheckedFrom<&'a Natural> + Primi
     out: &[T],
 ) {
     let mut digits = Vec::new();
-    _to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(original_xs), base);
+    to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(original_xs), base);
     let digits = digits.into_iter().map(T::exact_from).collect_vec();
     let mut expected_digits = vec![T::ZERO; out_len];
     expected_digits[..digits.len()].copy_from_slice(&digits);
@@ -80,7 +79,7 @@ fn verify_limbs_to_digits_small_base<T: for<'a> CheckedFrom<&'a Natural> + Primi
 fn test_limbs_to_digits_small_base_basecase() {
     fn test(out_before: &[u8], len: usize, xs: &[Limb], base: u64, out_after: &[u8]) {
         let mut out = out_before.to_vec();
-        let out_len = _limbs_to_digits_small_base_basecase(&mut out, len, xs, base);
+        let out_len = limbs_to_digits_small_base_basecase(&mut out, len, xs, base);
         assert_eq!(&out[..out_len], out_after);
         verify_limbs_to_digits_small_base_basecase(out_before, len, xs, base, out_len, &out);
     }
@@ -153,7 +152,7 @@ fn limbs_to_digits_small_base_basecase_properties_helper<
     unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_1::<T>()
         .test_properties_with_config(&config, |(mut out, len, xs, base)| {
             let old_out = out.clone();
-            let out_len = _limbs_to_digits_small_base_basecase(&mut out, len, &xs, base);
+            let out_len = limbs_to_digits_small_base_basecase(&mut out, len, &xs, base);
             verify_limbs_to_digits_small_base_basecase(&old_out, len, &xs, base, out_len, &out);
         });
 }
@@ -169,7 +168,7 @@ fn test_limbs_to_digits_small_base() {
     fn test(out_before: &[u8], xs: &[Limb], base: u64, out_after: &[u8]) {
         let mut out = out_before.to_vec();
         let mut mut_xs = xs.to_vec();
-        let out_len = _limbs_to_digits_small_base(&mut out, base, &mut mut_xs, None);
+        let out_len = limbs_to_digits_small_base(&mut out, base, &mut mut_xs, None);
         assert_eq!(&out[..out_len], out_after);
         verify_limbs_to_digits_small_base(out_before, xs, base, out_len, &out);
     }
@@ -216,27 +215,27 @@ fn test_limbs_to_digits_small_base() {
         &[12, 82, 251, 166, 147, 176, 78],
     );
     // xs_len >= GET_STR_PRECOMPUTE_THRESHOLD
-    // power != 1 in _limbs_choose_power_table_algorithm
-    // number_of_powers > 1 in _limbs_choose_power_table_algorithm
-    // pow.odd() in _limbs_choose_power_table_algorithm
-    // n != pow << (i - 1) in _limbs_choose_power_table_algorithm
-    // pow.even() in _limbs_choose_power_table_algorithm
-    // n == pow << (i - 1) in _limbs_choose_power_table_algorithm
-    // n == pow << (i - 1) && pow.odd() in _limbs_choose_power_table_algorithm
-    // mul_cost > div_cost in _limbs_choose_power_table_algorithm
-    // number_of_powers > 0 in _limbs_compute_power_table_using_div
-    // digits_in_base == exp in _limbs_compute_power_table_using_div
-    // digits_in_base != exp in _limbs_compute_power_table_using_div
+    // power != 1 in limbs_choose_power_table_algorithm
+    // number_of_powers > 1 in limbs_choose_power_table_algorithm
+    // pow.odd() in limbs_choose_power_table_algorithm
+    // n != pow << (i - 1) in limbs_choose_power_table_algorithm
+    // pow.even() in limbs_choose_power_table_algorithm
+    // n == pow << (i - 1) in limbs_choose_power_table_algorithm
+    // n == pow << (i - 1) && pow.odd() in limbs_choose_power_table_algorithm
+    // mul_cost > div_cost in limbs_choose_power_table_algorithm
+    // number_of_powers > 0 in limbs_compute_power_table_using_div
+    // digits_in_base == exp in limbs_compute_power_table_using_div
+    // digits_in_base != exp in limbs_compute_power_table_using_div
     // remainder[adjust] == 0
     //      && remainder[adjust + 1].divisible_by_power_of_2(big_base_trailing_zeros)
-    //      in _limbs_compute_power_table_using_div
-    // xs_len >= GET_STR_DC_THRESHOLD in _limbs_to_digits_small_base_divide_and_conquer
+    //      in limbs_compute_power_table_using_div
+    // xs_len >= GET_STR_DC_THRESHOLD in limbs_to_digits_small_base_divide_and_conquer
     // xs_len > total_len || xs_len == total_len
     //      && limbs_cmp_same_length(&xs[shift..], power.power) == Ordering::Less
-    //      in _limbs_to_digits_small_base_divide_and_conquer
-    // len == 0 in _limbs_to_digits_small_base_divide_and_conquer
-    // xs_len < GET_STR_DC_THRESHOLD in _limbs_to_digits_small_base_divide_and_conquer
-    // xs_len != 0 in _limbs_to_digits_small_base_divide_and_conquer
+    //      in limbs_to_digits_small_base_divide_and_conquer
+    // len == 0 in limbs_to_digits_small_base_divide_and_conquer
+    // xs_len < GET_STR_DC_THRESHOLD in limbs_to_digits_small_base_divide_and_conquer
+    // xs_len != 0 in limbs_to_digits_small_base_divide_and_conquer
     // xs_len >= GET_STR_DC_THRESHOLD && len != 0
     test(
         &[0; 180],
@@ -261,7 +260,7 @@ fn test_limbs_to_digits_small_base() {
             52, 74, 32,
         ],
     );
-    // n == pow << (i - 1) && pow.even() in _limbs_choose_power_table_algorithm
+    // n == pow << (i - 1) && pow.even() in limbs_choose_power_table_algorithm
     test(
         &[0; 180],
         &[
@@ -284,16 +283,16 @@ fn test_limbs_to_digits_small_base() {
             19, 31, 58, 11, 63, 52, 58, 89, 56, 15, 19, 1, 88, 97, 54, 92, 60, 81, 85, 64,
         ],
     );
-    // mul_cost <= div_cost in _limbs_choose_power_table_algorithm
-    // exponents[0] != chars_per_limb << number_of_powers in _limbs_compute_power_table_using_mul
+    // mul_cost <= div_cost in limbs_choose_power_table_algorithm
+    // exponents[0] != chars_per_limb << number_of_powers in limbs_compute_power_table_using_mul
     // (digits_in_base + chars_per_limb) << (power_len - 2) > exponents[0]
-    //      in _limbs_compute_power_table_using_mul
+    //      in limbs_compute_power_table_using_mul
     // (digits_in_base + chars_per_limb) << i > exponents[0]
-    //      in _limbs_compute_power_table_using_mul
-    // row.digits_in_base < exponent in _limbs_compute_power_table_using_mul
+    //      in limbs_compute_power_table_using_mul
+    // row.digits_in_base < exponent in limbs_compute_power_table_using_mul
     // (digits_in_base + chars_per_limb) << i <= exponents[0]
-    //      in _limbs_compute_power_table_using_mul
-    // row.digits_in_base >= exponent in _limbs_compute_power_table_using_mul
+    //      in limbs_compute_power_table_using_mul
+    // row.digits_in_base >= exponent in limbs_compute_power_table_using_mul
     test(
         &[0; 150],
         &[
@@ -316,7 +315,7 @@ fn test_limbs_to_digits_small_base() {
         ],
     );
     // (digits_in_base + chars_per_limb) << (power_len - 2) <= exponents[0]
-    //      in _limbs_compute_power_table_using_mul
+    //      in limbs_compute_power_table_using_mul
     test(
         &[0; 210],
         &[
@@ -343,7 +342,7 @@ fn test_limbs_to_digits_small_base() {
             102, 102,
         ],
     );
-    // exponents[0] == chars_per_limb << number_of_powers in _limbs_compute_power_table_using_mul
+    // exponents[0] == chars_per_limb << number_of_powers in limbs_compute_power_table_using_mul
     test(
         &[0; 160],
         &[
@@ -380,30 +379,20 @@ fn limbs_to_digits_small_base_properties_helper<
         |(mut out, base, mut xs)| {
             let old_out = out.clone();
             let old_xs = xs.clone();
-            let out_len = _limbs_to_digits_small_base(&mut out, base, &mut xs, None);
+            let out_len = limbs_to_digits_small_base(&mut out, base, &mut xs, None);
             let result = out.clone();
             verify_limbs_to_digits_small_base(&old_out, &old_xs, base, out_len, &result);
 
             let mut xs = old_xs.clone();
             assert_eq!(
-                _limbs_to_digits_small_base(
-                    &mut out,
-                    base,
-                    &mut xs,
-                    Some(PowerTableAlgorithm::Mul)
-                ),
+                limbs_to_digits_small_base(&mut out, base, &mut xs, Some(PowerTableAlgorithm::Mul)),
                 out_len
             );
             assert_eq!(out, result);
 
             let mut xs = old_xs;
             assert_eq!(
-                _limbs_to_digits_small_base(
-                    &mut out,
-                    base,
-                    &mut xs,
-                    Some(PowerTableAlgorithm::Div)
-                ),
+                limbs_to_digits_small_base(&mut out, base, &mut xs, Some(PowerTableAlgorithm::Div)),
                 out_len
             );
             assert_eq!(out, result);
@@ -426,10 +415,10 @@ fn test_limbs_to_digits_basecase() {
     ) {
         let mut xs = xs_before.to_vec();
         let mut digits = Vec::new();
-        _limbs_to_digits_basecase::<T>(&mut digits, &mut xs, base);
+        limbs_to_digits_basecase::<T>(&mut digits, &mut xs, base);
         assert_eq!(digits, out);
         let mut digits = Vec::new();
-        _to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(xs_before), base);
+        to_digits_asc_naive_primitive(&mut digits, &Natural::from_limbs_asc(xs_before), base);
         assert_eq!(digits.into_iter().map(T::exact_from).collect_vec(), out);
     }
     test::<u64>(&[0, 0], 64, &[]);
@@ -486,13 +475,13 @@ fn test_limbs_to_digits_basecase() {
 }
 
 fn limbs_to_digits_basecase_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>() {
-    assert_panic!(_limbs_to_digits_basecase::<T>(&mut Vec::new(), &mut [1], 2));
-    assert_panic!(_limbs_to_digits_basecase::<T>(
+    assert_panic!(limbs_to_digits_basecase::<T>(&mut Vec::new(), &mut [1], 2));
+    assert_panic!(limbs_to_digits_basecase::<T>(
         &mut Vec::new(),
         &mut [123, 456],
         0
     ));
-    assert_panic!(_limbs_to_digits_basecase::<T>(
+    assert_panic!(limbs_to_digits_basecase::<T>(
         &mut Vec::new(),
         &mut [123, 456],
         1
@@ -503,7 +492,7 @@ fn limbs_to_digits_basecase_fail_helper<T: ConvertibleFrom<Limb> + PrimitiveUnsi
 fn limbs_to_digits_basecase_fail() {
     apply_fn_to_unsigneds!(limbs_to_digits_basecase_fail_helper);
 
-    assert_panic!(_limbs_to_digits_basecase::<u8>(
+    assert_panic!(limbs_to_digits_basecase::<u8>(
         &mut Vec::new(),
         &mut [123, 456],
         300
@@ -526,13 +515,9 @@ where
         |(mut xs, base)| {
             let xs_old = xs.clone();
             let mut digits = Vec::new();
-            _limbs_to_digits_basecase::<T>(&mut digits, &mut xs, base);
+            limbs_to_digits_basecase::<T>(&mut digits, &mut xs, base);
             let mut digits_alt = Vec::new();
-            _to_digits_asc_naive_primitive(
-                &mut digits_alt,
-                &Natural::from_limbs_asc(&xs_old),
-                base,
-            );
+            to_digits_asc_naive_primitive(&mut digits_alt, &Natural::from_limbs_asc(&xs_old), base);
             let digits_alt = digits_alt.into_iter().map(T::exact_from).collect_vec();
             assert_eq!(digits, digits_alt);
         },
@@ -555,9 +540,9 @@ fn test_to_digits_asc_limb() {
         Natural: From<T> + PowerOf2Digits<T>,
     {
         let x = Natural::from_str(x).unwrap();
-        assert_eq!(_to_digits_asc_limb::<T>(&x, base), out);
+        assert_eq!(to_digits_asc_limb::<T>(&x, base), out);
         let mut digits_alt = Vec::new();
-        _to_digits_asc_naive_primitive(&mut digits_alt, &x, T::exact_from(base));
+        to_digits_asc_naive_primitive(&mut digits_alt, &x, T::exact_from(base));
         assert_eq!(digits_alt, out);
     }
     test::<u8>("0", 10, &[]);
@@ -575,13 +560,13 @@ fn test_to_digits_asc_limb() {
         &[44, 55, 51, 10, 43, 13, 36, 15, 70, 15, 19, 57, 50, 10, 22, 74],
     );
     // x is large and base >= 256
-    // _to_digits_asc_divide_and_conquer_limb: many digits
-    // _to_digits_asc_divide_and_conquer_limb: few digits
+    // to_digits_asc_divide_and_conquer_limb: many digits
+    // to_digits_asc_divide_and_conquer_limb: few digits
     // base <= SQRT_MAX_LIMB
-    // _to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x small
-    // _to_digits_asc_divide_and_conquer_limb: q != 0
-    // _to_digits_asc_divide_and_conquer_limb: zero padding
-    // _to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x large
+    // to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x small
+    // to_digits_asc_divide_and_conquer_limb: q != 0
+    // to_digits_asc_divide_and_conquer_limb: zero padding
+    // to_digits_asc_divide_and_conquer_limb: base <= SQRT_MAX_LIMB and x large
     test::<u32>(
         "1000000000000000000000000000000000000000000000000000000000000",
         1000,
@@ -595,13 +580,13 @@ fn test_to_digits_asc_limb() {
             188, 981,
         ],
     );
-    // _to_digits_asc_divide_and_conquer_limb: base > SQRT_MAX_LIMB
+    // to_digits_asc_divide_and_conquer_limb: base > SQRT_MAX_LIMB
     test::<u32>(
         "1000000000000000000000000000000000000000000000000000000000000",
         123456,
         &[115456, 7508, 27948, 11540, 30637, 92024, 26412, 41276, 18791, 86861, 49669, 9848],
     );
-    // _to_digits_asc_divide_and_conquer_limb: q == 0
+    // to_digits_asc_divide_and_conquer_limb: q == 0
     test::<u32>(
         "958147186852538842877959980138243879940342867265688956449364129",
         9238,
@@ -619,15 +604,15 @@ where
     Limb: Digits<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
-    assert_panic!(_to_digits_asc_limb::<T>(&Natural::exact_from(10), 0));
-    assert_panic!(_to_digits_asc_limb::<T>(&Natural::exact_from(10), 1));
+    assert_panic!(to_digits_asc_limb::<T>(&Natural::exact_from(10), 0));
+    assert_panic!(to_digits_asc_limb::<T>(&Natural::exact_from(10), 1));
 }
 
 #[test]
 fn to_digits_asc_limb_fail() {
     apply_fn_to_unsigneds!(to_digits_asc_limb_fail_helper);
 
-    assert_panic!(_to_digits_asc_limb::<u8>(&Natural::from(10u32), 1000));
+    assert_panic!(to_digits_asc_limb::<u8>(&Natural::from(10u32), 1000));
 }
 
 fn to_digits_asc_limb_properties_helper<
@@ -643,12 +628,12 @@ where
     natural_unsigned_pair_gen_var_1::<Limb, T>().test_properties_with_config(
         &config,
         |(x, base)| {
-            let digits = _to_digits_asc_limb::<T>(&x, base);
+            let digits = to_digits_asc_limb::<T>(&x, base);
             let mut digits_alt = Vec::new();
-            _to_digits_asc_naive_primitive(&mut digits_alt, &x, T::exact_from(base));
+            to_digits_asc_naive_primitive(&mut digits_alt, &x, T::exact_from(base));
             assert_eq!(digits, digits_alt);
             assert_eq!(
-                _to_digits_desc_limb::<T>(&x, base)
+                to_digits_desc_limb::<T>(&x, base)
                     .into_iter()
                     .rev()
                     .collect_vec(),
@@ -677,7 +662,7 @@ fn test_to_digits_desc_limb() {
         Natural: From<T> + PowerOf2Digits<T>,
     {
         let x = Natural::from_str(x).unwrap();
-        assert_eq!(_to_digits_desc_limb::<T>(&x, base), out);
+        assert_eq!(to_digits_desc_limb::<T>(&x, base), out);
     }
     test::<u8>("0", 10, &[]);
     test::<u8>("0", 16, &[]);
@@ -723,15 +708,15 @@ where
     Limb: Digits<T>,
     Natural: From<T> + PowerOf2Digits<T>,
 {
-    assert_panic!(_to_digits_desc_limb::<T>(&Natural::exact_from(10), 0));
-    assert_panic!(_to_digits_desc_limb::<T>(&Natural::exact_from(10), 1));
+    assert_panic!(to_digits_desc_limb::<T>(&Natural::exact_from(10), 0));
+    assert_panic!(to_digits_desc_limb::<T>(&Natural::exact_from(10), 1));
 }
 
 #[test]
 fn to_digits_desc_limb_fail() {
     apply_fn_to_unsigneds!(to_digits_desc_limb_fail_helper);
 
-    assert_panic!(_to_digits_desc_limb::<u8>(&Natural::from(10u32), 1000));
+    assert_panic!(to_digits_desc_limb::<u8>(&Natural::from(10u32), 1000));
 }
 
 fn to_digits_desc_limb_properties_helper<
@@ -747,9 +732,9 @@ where
     natural_unsigned_pair_gen_var_1::<Limb, T>().test_properties_with_config(
         &config,
         |(x, base)| {
-            let digits = _to_digits_desc_limb::<T>(&x, base);
+            let digits = to_digits_desc_limb::<T>(&x, base);
             assert_eq!(
-                _to_digits_asc_limb::<T>(&x, base)
+                to_digits_asc_limb::<T>(&x, base)
                     .into_iter()
                     .rev()
                     .collect_vec(),
@@ -777,9 +762,9 @@ fn test_to_digits_asc_large() {
             .iter()
             .map(|s| Natural::from_str(s).unwrap())
             .collect_vec();
-        assert_eq!(_to_digits_asc_large(&x, &base), out);
+        assert_eq!(to_digits_asc_large(&x, &base), out);
         let mut digits_alt = Vec::new();
-        _to_digits_asc_naive(&mut digits_alt, &x, &base);
+        to_digits_asc_naive(&mut digits_alt, &x, &base);
         assert_eq!(digits_alt, out);
     }
     // x >= base
@@ -896,7 +881,7 @@ fn test_to_digits_desc_large() {
             .iter()
             .map(|s| Natural::from_str(s).unwrap())
             .collect_vec();
-        assert_eq!(_to_digits_desc_large(&x, &base), out);
+        assert_eq!(to_digits_desc_large(&x, &base), out);
     }
     test(
         "1000000000000",
@@ -998,12 +983,12 @@ fn to_digits_asc_large_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_bits_n", 256);
     natural_pair_gen_var_1().test_properties_with_config(&config, |(x, base)| {
-        let digits = _to_digits_asc_large(&x, &base);
+        let digits = to_digits_asc_large(&x, &base);
         let mut digits_alt = Vec::new();
-        _to_digits_asc_naive(&mut digits_alt, &x, &base);
+        to_digits_asc_naive(&mut digits_alt, &x, &base);
         assert_eq!(digits, digits_alt);
         assert_eq!(
-            _to_digits_desc_large(&x, &base)
+            to_digits_desc_large(&x, &base)
                 .into_iter()
                 .rev()
                 .collect_vec(),
@@ -1020,9 +1005,9 @@ fn to_digits_desc_large_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_bits_n", 256);
     natural_pair_gen_var_1().test_properties_with_config(&config, |(x, base)| {
-        let digits = _to_digits_desc_large(&x, &base);
+        let digits = to_digits_desc_large(&x, &base);
         assert_eq!(
-            _to_digits_asc_large(&x, &base)
+            to_digits_asc_large(&x, &base)
                 .into_iter()
                 .rev()
                 .collect_vec(),
@@ -1043,7 +1028,7 @@ fn test_to_digits_asc_unsigned() {
         let x = Natural::from_str(x).unwrap();
         assert_eq!(x.to_digits_asc(&base), out);
         let mut digits_alt = Vec::new();
-        _to_digits_asc_naive_primitive(&mut digits_alt, &x, base);
+        to_digits_asc_naive_primitive(&mut digits_alt, &x, base);
         assert_eq!(digits_alt, out);
     }
     test::<u8>("0", 10, &[]);
@@ -1107,7 +1092,7 @@ where
     natural_unsigned_pair_gen_var_2::<T>().test_properties_with_config(&config, |(x, base)| {
         let digits = x.to_digits_asc(&base);
         let mut digits_alt = Vec::new();
-        _to_digits_asc_naive_primitive(&mut digits_alt, &x, base);
+        to_digits_asc_naive_primitive(&mut digits_alt, &x, base);
         assert_eq!(digits_alt, digits);
         if x != 0 {
             assert_ne!(*digits.last().unwrap(), T::ZERO);
@@ -1293,7 +1278,7 @@ fn test_to_digits_asc_natural() {
             .collect_vec();
         assert_eq!(x.to_digits_asc(&base), out);
         let mut digits_alt = Vec::new();
-        _to_digits_asc_naive(&mut digits_alt, &x, &base);
+        to_digits_asc_naive(&mut digits_alt, &x, &base);
         assert_eq!(digits_alt, out);
     }
     test("0", "10", &[]);
@@ -1433,7 +1418,7 @@ fn to_digits_asc_natural_properties() {
     natural_pair_gen_var_2().test_properties_with_config(&config, |(x, base)| {
         let digits = x.to_digits_asc(&base);
         let mut digits_alt = Vec::new();
-        _to_digits_asc_naive(&mut digits_alt, &x, &base);
+        to_digits_asc_naive(&mut digits_alt, &x, &base);
         assert_eq!(digits_alt, digits);
         if x != 0 {
             assert_ne!(*digits.last().unwrap(), 0);

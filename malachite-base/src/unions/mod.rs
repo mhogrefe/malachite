@@ -202,4 +202,50 @@ union!(
 /// ```
 pub mod exhaustive;
 /// This module contains iterators that generate unions randomly.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # random_union\[n\]s
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::chars::random::random_char_inclusive_range;
+/// use malachite_base::num::random::random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::unions::Union2;
+/// use malachite_base::unions::random::random_union2s;
+///
+/// let us = random_union2s(
+///     EXAMPLE_SEED,
+///     &|seed| random_char_inclusive_range(seed, 'a', 'z'),
+///     &|seed| random_unsigned_inclusive_range::<u32>(seed, 1, 10)
+/// );
+/// assert_eq!(
+///     us.take(20).collect_vec().as_slice(),
+///     &[
+///         Union2::A('v'),
+///         Union2::B(3),
+///         Union2::A('c'),
+///         Union2::A('q'),
+///         Union2::A('i'),
+///         Union2::A('e'),
+///         Union2::A('p'),
+///         Union2::A('g'),
+///         Union2::A('s'),
+///         Union2::B(7),
+///         Union2::A('n'),
+///         Union2::A('t'),
+///         Union2::B(9),
+///         Union2::A('m'),
+///         Union2::A('z'),
+///         Union2::B(7),
+///         Union2::B(9),
+///         Union2::A('o'),
+///         Union2::A('m'),
+///         Union2::B(3),
+///     ],
+/// );
+/// ```
 pub mod random;

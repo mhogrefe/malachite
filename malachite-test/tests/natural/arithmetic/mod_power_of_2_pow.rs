@@ -62,7 +62,7 @@ fn verify_limbs_mod_power_of_2_pow(xs: &[Limb], es: &[Limb], pow: u64, out: &[Li
     assert!(x.mod_power_of_2_is_reduced(pow));
     let expected = (&x).mod_power_of_2_pow(&exp, pow);
     assert!(expected.mod_power_of_2_is_reduced(pow));
-    assert_eq!(_simple_binary_mod_power_of_2_pow(&x, &exp, pow), expected);
+    assert_eq!(simple_binary_mod_power_of_2_pow(&x, &exp, pow), expected);
     assert_eq!(Natural::from_limbs_asc(out), expected);
 }
 

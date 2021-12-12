@@ -1,12 +1,14 @@
-use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, UnsignedAbs};
+use malachite_base::num::arithmetic::traits::{Abs, AbsAssign, DivAssignMod, UnsignedAbs};
+use malachite_base::num::basic::traits::Two;
 use malachite_base::num::conversion::traits::CheckedInto;
 use malachite_base_test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
 use malachite_nz_test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz_test_util::generators::{integer_gen, integer_integer_natural_triple_gen};
 use num::{BigInt, Signed};
 use std::str::FromStr;
 
@@ -52,6 +54,15 @@ fn test_abs() {
     test("3000000000", "3000000000");
     test("-3000000000", "3000000000");
     test("-2147483648", "2147483648");
+
+    let mut n = Integer::from(-123);
+    let remainder = n.mutate_unsigned_abs(|x| x.div_assign_mod(Natural::TWO));
+    assert_eq!(n, -61);
+    assert_eq!(remainder, 1);
+
+    let mut n = Integer::from(-123);
+    n.mutate_unsigned_abs(|x| *x >>= 10);
+    assert_eq!(n, 0);
 }
 
 #[test]
@@ -98,5 +109,22 @@ fn abs_properties() {
             Integer::from(i).abs(),
             Integer::from(SignedDoubleLimb::from(i).abs())
         );
+    });
+}
+
+#[test]
+fn mutate_unsigned_abs_properties() {
+    integer_integer_natural_triple_gen().test_properties(|(mut n, out, new_abs)| {
+        let out_2 = out.clone();
+        let new_abs_2 = new_abs.clone();
+        assert_eq!(
+            n.mutate_unsigned_abs(|x| {
+                *x = new_abs;
+                out
+            }),
+            out_2
+        );
+        assert!(n.is_valid());
+        assert_eq!(n.abs(), new_abs_2);
     });
 }

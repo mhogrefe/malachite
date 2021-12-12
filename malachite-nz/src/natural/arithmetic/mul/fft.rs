@@ -858,7 +858,7 @@ pub fn limbs_mul_fft_fft(
             *xss_0_last = Limb::iverson(!limbs_sub_limb_in_place(xss_0_init, *xss_0_last - 1));
         }
         // xss[increment][n] can be -1 or -2
-        if limbs_sub_same_length_in_place_right(scratch, &mut xss[increment]) {
+        if limbs_sub_same_length_in_place_right(scratch, xss[increment]) {
             let (xss_increment_last, xss_increment_init) = xss[increment].split_last_mut().unwrap();
             *xss_increment_last = Limb::iverson(limbs_slice_add_limb_in_place(
                 xss_increment_init,
@@ -940,7 +940,7 @@ pub fn limbs_mul_fft_inverse(
             *xss_0_last = Limb::iverson(!limbs_sub_limb_in_place(xss_0_init, *xss_0_last - 1));
         }
         // Ap[1][n] can be -1 or -2
-        if limbs_sub_same_length_in_place_right(scratch, &mut xss_tail[0]) {
+        if limbs_sub_same_length_in_place_right(scratch, xss_tail[0]) {
             let (xss_1_last, xss_1_init) = xss_tail[0].split_last_mut().unwrap();
             *xss_1_last = Limb::iverson(limbs_slice_add_limb_in_place(
                 xss_1_init,
@@ -1234,10 +1234,10 @@ pub fn limbs_mul_fft_internal(
     // division of terms after inverse fft
     let mut yss = Vec::with_capacity(two_pow_k);
     yss.push(scratch_hi);
-    limbs_mul_fft_shr_mod_f_to_out(&mut yss[0], xss[0], k);
+    limbs_mul_fft_shr_mod_f_to_out(yss[0], xss[0], k);
     for i in 1..two_pow_k {
         let (xss_lo, xss_hi) = xss.split_at_mut(i);
-        limbs_mul_fft_shr_mod_f_to_out(&mut xss_lo[i - 1], xss_hi[0], k + (two_pow_k - i) * omega);
+        limbs_mul_fft_shr_mod_f_to_out(xss_lo[i - 1], xss_hi[0], k + (two_pow_k - i) * omega);
     }
     yss.extend(xss.drain(..two_pow_k - 1));
 

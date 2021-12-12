@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::log_base_power_of_2::_ceiling_log_base_power_of_2_naive;
+use malachite_base::num::arithmetic::log_base_power_of_2::ceiling_log_base_power_of_2_naive;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::float::NiceFloat;
@@ -204,7 +204,7 @@ fn benchmark_ceiling_log_base_power_of_2_algorithms_unsigned<T: PrimitiveUnsigne
                 no_out!(n.ceiling_log_base_power_of_2(pow))
             }),
             ("naive", &mut |(n, pow)| {
-                no_out!(_ceiling_log_base_power_of_2_naive(n, pow))
+                no_out!(ceiling_log_base_power_of_2_naive(n, pow))
             }),
         ],
     );

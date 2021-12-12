@@ -2,7 +2,7 @@ use num::arithmetic::traits::PowerOf2;
 use num::basic::integers::PrimitiveInt;
 use num::conversion::traits::IntegerMantissaAndExponent;
 
-fn _power_of_2_unsigned<T: PrimitiveInt>(pow: u64) -> T {
+fn power_of_2_unsigned<T: PrimitiveInt>(pow: u64) -> T {
     assert!(pow < T::WIDTH);
     T::ONE << pow
 }
@@ -24,14 +24,14 @@ macro_rules! impl_power_of_2_unsigned {
             /// See the documentation of the `num::arithmetic::power_of_2` module.
             #[inline]
             fn power_of_2(pow: u64) -> $t {
-                _power_of_2_unsigned(pow)
+                power_of_2_unsigned(pow)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_power_of_2_unsigned);
 
-fn _power_of_2_signed<T: PrimitiveInt>(pow: u64) -> T {
+fn power_of_2_signed<T: PrimitiveInt>(pow: u64) -> T {
     assert!(pow < T::WIDTH - 1);
     T::ONE << pow
 }
@@ -53,7 +53,7 @@ macro_rules! impl_power_of_2_signed {
             /// See the documentation of the `num::arithmetic::power_of_2` module.
             #[inline]
             fn power_of_2(pow: u64) -> $t {
-                _power_of_2_signed(pow)
+                power_of_2_signed(pow)
             }
         }
     };

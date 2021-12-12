@@ -28,7 +28,7 @@ use platform::{
 };
 
 /// This is MPN_SQRLO_DIAGONAL from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
-fn _limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
+fn limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let half_n = n >> 1;
     limbs_square_diagonal(out, &xs[..half_n]);
@@ -38,11 +38,12 @@ fn _limbs_square_low_diagonal(out: &mut [Limb], xs: &[Limb]) {
 }
 
 /// This is MPN_SQRLO_DIAG_ADDLSH1 from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
-pub fn _limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
+#[doc(hidden)]
+pub fn limbs_square_diagonal_shl_add(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     assert_eq!(scratch.len(), n - 1);
     assert_eq!(out.len(), n);
-    _limbs_square_low_diagonal(out, xs);
+    limbs_square_low_diagonal(out, xs);
     limbs_slice_shl_in_place(scratch, 1);
     limbs_slice_add_same_length_in_place_left(&mut out[1..], scratch);
 }
@@ -60,7 +61,8 @@ const SQRLO_BASECASE_ALLOC: usize = if SQRLO_DC_THRESHOLD_LIMIT < 2 {
 /// TODO complexity
 ///
 /// This is mpn_sqrlo_basecase from mpn/generic/sqrlo_basecase.c, GMP 6.2.1.
-pub fn _limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
+#[doc(hidden)]
+pub fn limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let out = &mut out[..n];
     assert_ne!(n, 0);
@@ -89,7 +91,7 @@ pub fn _limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
                     xs[i],
                 );
             }
-            _limbs_square_diagonal_shl_add(out, scratch, xs);
+            limbs_square_diagonal_shl_add(out, scratch, xs);
         }
     }
 }
@@ -119,7 +121,8 @@ const MAYBE_RANGE_TOOM22_MOD_SQUARE: bool = TUNE_PROGRAM_BUILD
     }) < SQR_TOOM3_THRESHOLD * 36 / (36 - 11);
 
 /// This is mpn_sqrlo_itch from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
-pub const fn _limbs_square_low_scratch_len(len: usize) -> usize {
+#[doc(hidden)]
+pub const fn limbs_square_low_scratch_len(len: usize) -> usize {
     len << 1
 }
 
@@ -129,7 +132,8 @@ pub const fn _limbs_square_low_scratch_len(len: usize) -> usize {
 ///
 /// This is mpn_dc_sqrlo from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
 #[allow(clippy::absurd_extreme_comparisons)]
-pub fn _limbs_square_low_divide_and_conquer(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+#[doc(hidden)]
+pub fn limbs_square_low_divide_and_conquer(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let len = xs.len();
     let out = &mut out[..len];
     assert!(len > 1);
@@ -186,6 +190,7 @@ const SQR_BASECASE_ALLOC: usize = if SQRLO_BASECASE_THRESHOLD_LIMIT == 0 {
 /// //TODO complexity
 ///
 /// This is mpn_sqrlo from mpn/generic/sqrlo.c, GMP 6.2.1. Investigate changes from 6.1.2?
+#[doc(hidden)]
 pub fn limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
     assert!(SQRLO_BASECASE_THRESHOLD_LIMIT >= SQRLO_BASECASE_THRESHOLD);
     let len = xs.len();
@@ -197,11 +202,11 @@ pub fn limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
         limbs_square_to_out_basecase(scratch, xs);
         out.copy_from_slice(&scratch[..len]);
     } else if len < SQRLO_DC_THRESHOLD {
-        _limbs_square_low_basecase(out, xs);
+        limbs_square_low_basecase(out, xs);
     } else {
-        let mut scratch = vec![0; _limbs_square_low_scratch_len(len)];
+        let mut scratch = vec![0; limbs_square_low_scratch_len(len)];
         if len < SQRLO_SQR_THRESHOLD {
-            _limbs_square_low_divide_and_conquer(out, xs, &mut scratch);
+            limbs_square_low_divide_and_conquer(out, xs, &mut scratch);
         } else {
             // For really large operands, use plain mpn_mul_n but throw away upper n limbs of the
             // result.
@@ -232,6 +237,7 @@ pub fn limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
 /// assert_eq!(limbs_mod_power_of_2_square(&mut vec![25], 5), &[17]);
 /// assert_eq!(limbs_mod_power_of_2_square(&mut vec![123, 456], 42), &[15129, 560]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);
@@ -271,6 +277,7 @@ pub fn limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_mod_power_of_2_square_ref(&[25], 5), &[17]);
 /// assert_eq!(limbs_mod_power_of_2_square_ref(&[123, 456], 42), &[15129, 560]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let len = xs.len();
     assert_ne!(len, 0);

@@ -4,7 +4,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use std::ops::{Shr, ShrAssign};
 
-fn _mod_shr_signed<
+fn mod_shr_signed<
     T: ModShl<U, T, Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -26,7 +26,7 @@ fn _mod_shr_signed<
     }
 }
 
-fn _mod_shr_assign_signed<
+fn mod_shr_assign_signed<
     T: ModShlAssign<U, T> + PrimitiveInt + ShrAssign<U>,
     U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -73,7 +73,7 @@ macro_rules! impl_mod_shr_signed {
                     /// See the documentation of the `num::arithmetic::mod_shr` module.
                     #[inline]
                     fn mod_shr(self, other: $u, m: $t) -> $t {
-                        _mod_shr_signed(self, other, m)
+                        mod_shr_signed(self, other, m)
                     }
                 }
 
@@ -96,7 +96,7 @@ macro_rules! impl_mod_shr_signed {
                     /// See the documentation of the `num::arithmetic::mod_shr` module.
                     #[inline]
                     fn mod_shr_assign(&mut self, other: $u, m: $t) {
-                        _mod_shr_assign_signed(self, other, m)
+                        mod_shr_assign_signed(self, other, m)
                     }
                 }
             };

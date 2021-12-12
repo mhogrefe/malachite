@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::_explicit_xx_div_mod_y_is_qr;
+use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{unsigned_gen_var_1, unsigned_triple_gen_var_15};
 use std::panic::catch_unwind;
@@ -7,7 +7,7 @@ use std::panic::catch_unwind;
 fn test_xx_div_mod_y_is_qr() {
     fn test<T: PrimitiveUnsigned>(x_1: T, x_0: T, y: T, q: T, r: T) {
         assert_eq!(T::xx_div_mod_y_is_qr(x_1, x_0, y), (q, r));
-        assert_eq!(_explicit_xx_div_mod_y_is_qr(x_1, x_0, y), (q, r));
+        assert_eq!(explicit_xx_div_mod_y_is_qr(x_1, x_0, y), (q, r));
     }
     test::<u8>(0, 0, 1, 0, 0);
     test::<u32>(0, 1, 1, 1, 0);
@@ -38,7 +38,7 @@ fn xx_div_mod_y_is_qr_fail() {
 fn xx_div_mod_y_is_qr_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_triple_gen_var_15::<T, T>().test_properties(|(x_1, x_0, y)| {
         let (q, r) = T::xx_div_mod_y_is_qr(x_1, x_0, y);
-        assert_eq!(_explicit_xx_div_mod_y_is_qr(x_1, x_0, y), (q, r));
+        assert_eq!(explicit_xx_div_mod_y_is_qr(x_1, x_0, y), (q, r));
 
         assert!(r < y);
         let (product_1, product_0) = T::x_mul_y_is_zz(q, y);

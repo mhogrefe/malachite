@@ -6,8 +6,6 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-//TODO doc hidden
-
 /// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
 /// whether that `Natural` is divisible by 2 raised to a given power.
 ///
@@ -31,6 +29,7 @@ use platform::Limb;
 /// ```
 ///
 /// This is mpz_divisible_2exp_p from mpz/divis_2exp.c, GMP 6.2.1, where a is non-negative.
+#[doc(hidden)]
 pub fn limbs_divisible_by_power_of_2(xs: &[Limb], pow: u64) -> bool {
     let zeros = usize::exact_from(pow >> Limb::LOG_WIDTH);
     zeros < xs.len()

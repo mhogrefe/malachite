@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 
-pub fn _naive_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
+pub fn naive_mod_pow<T: PrimitiveUnsigned>(x: T, exp: u64, m: T) -> T {
     if m == T::ONE {
         return T::ZERO;
     }

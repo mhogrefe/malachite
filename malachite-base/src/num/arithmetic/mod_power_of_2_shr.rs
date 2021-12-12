@@ -6,7 +6,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 use std::ops::{Shr, ShrAssign};
 
-fn _mod_power_of_2_shr_signed<
+fn mod_power_of_2_shr_signed<
     T: ModPowerOf2Shl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -29,7 +29,7 @@ fn _mod_power_of_2_shr_signed<
     }
 }
 
-fn _mod_power_of_2_shr_assign_signed<
+fn mod_power_of_2_shr_assign_signed<
     T: ModPowerOf2ShlAssign<U> + PrimitiveInt + ShrAssign<U>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -72,7 +72,7 @@ macro_rules! impl_mod_power_of_2_shr_signed {
                     /// See the documentation of the `num::arithmetic::mod_power_of_2_shr` module.
                     #[inline]
                     fn mod_power_of_2_shr(self, other: $u, pow: u64) -> $t {
-                        _mod_power_of_2_shr_signed(self, other, pow)
+                        mod_power_of_2_shr_signed(self, other, pow)
                     }
                 }
 
@@ -90,7 +90,7 @@ macro_rules! impl_mod_power_of_2_shr_signed {
                     /// See the documentation of the `num::arithmetic::mod_power_of_2_shr` module.
                     #[inline]
                     fn mod_power_of_2_shr_assign(&mut self, other: $u, pow: u64) {
-                        _mod_power_of_2_shr_assign_signed(self, other, pow)
+                        mod_power_of_2_shr_assign_signed(self, other, pow)
                     }
                 }
             };

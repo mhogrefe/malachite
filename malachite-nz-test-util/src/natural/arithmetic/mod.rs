@@ -6,6 +6,7 @@ pub mod divisible_by;
 pub mod eq_mod;
 pub mod gcd;
 pub mod log_base;
+pub mod log_base_power_of_2;
 pub mod mod_mul;
 pub mod mod_op;
 pub mod mod_pow;

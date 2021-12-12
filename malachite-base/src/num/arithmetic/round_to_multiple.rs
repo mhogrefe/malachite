@@ -11,7 +11,7 @@ use std::cmp::Ordering;
 use std::fmt::Display;
 use std::ops::{Rem, Shr, Sub};
 
-fn _round_to_multiple_unsigned<
+fn round_to_multiple_unsigned<
     T: CheckedAdd<T, Output = T>
         + Copy
         + Display
@@ -128,7 +128,7 @@ macro_rules! impl_round_to_multiple_unsigned {
             /// See the documentation of the `num::arithmetic::round_to_multiple` module.
             #[inline]
             fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
-                _round_to_multiple_unsigned(self, other, rm)
+                round_to_multiple_unsigned(self, other, rm)
             }
         }
 
@@ -168,7 +168,7 @@ macro_rules! impl_round_to_multiple_unsigned {
 }
 apply_to_unsigneds!(impl_round_to_multiple_unsigned);
 
-fn _round_to_multiple_signed<
+fn round_to_multiple_signed<
     U: Eq + RoundToMultiple<U, Output = U>,
     S: CheckedNeg<Output = S> + Copy + ExactFrom<U> + Min + Ord + UnsignedAbs<Output = U> + Zero,
 >(
@@ -244,7 +244,7 @@ macro_rules! impl_round_to_multiple_signed {
             /// See the documentation of the `num::arithmetic::round_to_multiple` module.
             #[inline]
             fn round_to_multiple(self, other: $t, rm: RoundingMode) -> $t {
-                _round_to_multiple_signed(self, other, rm)
+                round_to_multiple_signed(self, other, rm)
             }
         }
 

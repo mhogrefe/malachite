@@ -49,7 +49,7 @@ fn test_xxxx_add_yyyy_is_zzzz() {
     );
 }
 
-fn _xxxx_sub_yyyy_is_zzzz<T: PrimitiveUnsigned>(
+fn xxxx_sub_yyyy_is_zzzz<T: PrimitiveUnsigned>(
     x_3: T,
     x_2: T,
     x_1: T,
@@ -82,11 +82,11 @@ fn xxxx_add_yyyy_is_zzzz_properties_helper<T: PrimitiveUnsigned>() {
                 T::xxxx_add_yyyy_is_zzzz(x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0);
 
             assert_eq!(
-                _xxxx_sub_yyyy_is_zzzz(z_3, z_2, z_1, z_0, y_3, y_2, y_1, y_0),
+                xxxx_sub_yyyy_is_zzzz(z_3, z_2, z_1, z_0, y_3, y_2, y_1, y_0),
                 (x_3, x_2, x_1, x_0)
             );
             assert_eq!(
-                _xxxx_sub_yyyy_is_zzzz(z_3, z_2, z_1, z_0, x_3, x_2, x_1, x_0),
+                xxxx_sub_yyyy_is_zzzz(z_3, z_2, z_1, z_0, x_3, x_2, x_1, x_0),
                 (y_3, y_2, y_1, y_0)
             );
             assert_eq!(
@@ -95,9 +95,9 @@ fn xxxx_add_yyyy_is_zzzz_properties_helper<T: PrimitiveUnsigned>() {
             );
 
             let (neg_y_3, neg_y_2, neg_y_1, neg_y_0) =
-                _xxxx_sub_yyyy_is_zzzz(T::ZERO, T::ZERO, T::ZERO, T::ZERO, y_3, y_2, y_1, y_0);
+                xxxx_sub_yyyy_is_zzzz(T::ZERO, T::ZERO, T::ZERO, T::ZERO, y_3, y_2, y_1, y_0);
             assert_eq!(
-                _xxxx_sub_yyyy_is_zzzz(x_3, x_2, x_1, x_0, neg_y_3, neg_y_2, neg_y_1, neg_y_0),
+                xxxx_sub_yyyy_is_zzzz(x_3, x_2, x_1, x_0, neg_y_3, neg_y_2, neg_y_1, neg_y_0),
                 (z_3, z_2, z_1, z_0)
             );
         },
@@ -114,7 +114,7 @@ fn xxxx_add_yyyy_is_zzzz_properties_helper<T: PrimitiveUnsigned>() {
         );
 
         let (neg_x_3, neg_x_2, neg_x_1, neg_x_0) =
-            _xxxx_sub_yyyy_is_zzzz(T::ZERO, T::ZERO, T::ZERO, T::ZERO, x_3, x_2, x_1, x_0);
+            xxxx_sub_yyyy_is_zzzz(T::ZERO, T::ZERO, T::ZERO, T::ZERO, x_3, x_2, x_1, x_0);
         assert_eq!(
             T::xxxx_add_yyyy_is_zzzz(x_3, x_2, x_1, x_0, neg_x_3, neg_x_2, neg_x_1, neg_x_0),
             (T::ZERO, T::ZERO, T::ZERO, T::ZERO)

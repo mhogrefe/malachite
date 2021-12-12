@@ -4,7 +4,7 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 
 #[allow(clippy::too_many_arguments)]
-pub fn _xxxx_add_yyyy_is_zzzz<T: PrimitiveUnsigned>(
+fn xxxx_add_yyyy_is_zzzz<T: PrimitiveUnsigned>(
     x_3: T,
     x_2: T,
     x_1: T,
@@ -69,7 +69,7 @@ macro_rules! impl_xxxx_add_yyyy_is_zzzz {
                 y_1: $t,
                 y_0: $t,
             ) -> ($t, $t, $t, $t) {
-                _xxxx_add_yyyy_is_zzzz::<$t>(x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0)
+                xxxx_add_yyyy_is_zzzz::<$t>(x_3, x_2, x_1, x_0, y_3, y_2, y_1, y_0)
             }
         }
     };

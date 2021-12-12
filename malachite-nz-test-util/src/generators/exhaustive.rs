@@ -1,7 +1,8 @@
 use crate::common::{
     integer_to_bigint, integer_to_rug_integer, natural_to_biguint, natural_to_rug_integer,
 };
-use crate::natural::arithmetic::gcd::half_gcd_matrix_create;
+use crate::generators::factors_of_limb_max;
+use crate::natural::arithmetic::gcd::{half_gcd_matrix_create, OwnedHalfGcdMatrix};
 use itertools::Itertools;
 use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
 use malachite_base::iterators::bit_distributor::BitDistributorOutputType;
@@ -24,14 +25,18 @@ use malachite_base::num::exhaustive::{
     PrimitiveIntIncreasingRange,
 };
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
-use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
+use malachite_base::num::logic::traits::{
+    BitAccess, BitConvertible, LeadingZeros, SignificantBits,
+};
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
+use malachite_base::slices::slice_trailing_zeros;
 use malachite_base::tuples::exhaustive::{
     exhaustive_dependent_pairs, exhaustive_ordered_unique_pairs, exhaustive_pairs,
-    exhaustive_pairs_from_single, exhaustive_quadruples_from_single,
-    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xyyx,
-    exhaustive_quadruples_xyyz, exhaustive_triples, exhaustive_triples_custom_output,
+    exhaustive_pairs_from_single, exhaustive_quadruples_from_single, exhaustive_quadruples_xxxy,
+    exhaustive_quadruples_xxxy_custom_output, exhaustive_quadruples_xyxz,
+    exhaustive_quadruples_xyyx, exhaustive_quadruples_xyyz, exhaustive_quintuples_xyyyz,
+    exhaustive_sextuples_from_single, exhaustive_triples, exhaustive_triples_custom_output,
     exhaustive_triples_from_single, exhaustive_triples_xxy, exhaustive_triples_xxy_custom_output,
     exhaustive_triples_xyx, exhaustive_triples_xyy, exhaustive_triples_xyy_custom_output,
     lex_pairs, ExhaustiveDependentPairsYsGenerator,
@@ -42,11 +47,13 @@ use malachite_base::vecs::exhaustive::{
     LexFixedLengthVecsFromSingle,
 };
 use malachite_base_test_util::generators::common::{
-    permute_1_3_2, permute_2_1, reshape_1_3_to_4, reshape_2_1_to_3, It,
+    permute_1_3_2, permute_2_1, reshape_1_3_to_4, reshape_2_1_to_3, reshape_2_2_to_4, It,
 };
 use malachite_base_test_util::generators::exhaustive::{
-    exhaustive_unsigned_vec_unsigned_pair_gen_var_17, UnsignedVecTripleLenGenerator1,
-    UnsignedVecTripleXYYLenGenerator,
+    exhaustive_unsigned_pair_gen_var_20, exhaustive_unsigned_pair_gen_var_24,
+    exhaustive_unsigned_vec_unsigned_pair_gen_var_17, UnsignedVecPairLenGenerator1,
+    UnsignedVecPairLenGenerator2, UnsignedVecQuadrupleLenGenerator1,
+    UnsignedVecTripleLenGenerator1, UnsignedVecTripleXYYLenGenerator,
 };
 use malachite_base_test_util::generators::{exhaustive_pairs_big_small, exhaustive_pairs_big_tiny};
 use malachite_nz::integer::exhaustive::{
@@ -55,10 +62,28 @@ use malachite_nz::integer::exhaustive::{
 };
 use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
 use malachite_nz::integer::Integer;
-use malachite_nz::natural::arithmetic::gcd::half_gcd::{HalfGcdMatrix, HalfGcdMatrix1};
+use malachite_nz::natural::arithmetic::add::{
+    limbs_vec_add_in_place_left, limbs_vec_add_limb_in_place,
+};
+use malachite_nz::natural::arithmetic::div_exact::{
+    limbs_modular_invert_limb, limbs_modular_invert_scratch_len,
+};
+use malachite_nz::natural::arithmetic::div_mod::{
+    limbs_div_mod_barrett_is_len, limbs_div_mod_barrett_scratch_len, limbs_invert_limb,
+    limbs_two_limb_inverse_helper,
+};
+use malachite_nz::natural::arithmetic::eq_mod::{
+    limbs_eq_limb_mod_limb, limbs_eq_limb_mod_ref_ref, limbs_eq_mod_limb_ref_ref,
+    limbs_eq_mod_ref_ref_ref,
+};
+use malachite_nz::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use malachite_nz::natural::arithmetic::mod_mul::limbs_precompute_mod_mul_two_limbs;
 use malachite_nz::natural::arithmetic::mul::fft::*;
-use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb;
+use malachite_nz::natural::arithmetic::mul::limb::{
+    limbs_slice_mul_limb_in_place, limbs_vec_mul_limb_in_place,
+};
 use malachite_nz::natural::arithmetic::mul::limbs_mul;
+use malachite_nz::natural::arithmetic::mul::mul_mod::limbs_mul_mod_base_pow_n_minus_1_next_size;
 use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_22_input_sizes_valid,
     limbs_mul_greater_to_out_toom_32_input_sizes_valid,
@@ -77,6 +102,7 @@ use malachite_nz::natural::arithmetic::mul::toom::{
 use malachite_nz::natural::arithmetic::sub::{
     limbs_sub_greater_in_place_left, limbs_sub_limb_in_place,
 };
+use malachite_nz::natural::comparison::cmp::limbs_cmp;
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
@@ -84,9 +110,10 @@ use malachite_nz::natural::exhaustive::{
     exhaustive_natural_range, exhaustive_natural_range_to_infinity, exhaustive_naturals,
     exhaustive_positive_naturals, ExhaustiveNaturalRange,
 };
+use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use std::cmp::max;
+use std::cmp::{max, Ordering};
 use std::iter::once;
 use std::marker::PhantomData;
 use std::ops::{Shl, Shr};
@@ -896,15 +923,119 @@ pub fn exhaustive_natural_pair_gen_var_7() -> It<(Natural, Natural)> {
     )
 }
 
+pub fn exhaustive_natural_pair_gen_var_8() -> It<(Natural, Natural)> {
+    Box::new(exhaustive_ordered_unique_pairs(exhaustive_naturals()))
+}
+
 // -- (Natural, Natural, Natural) --
 
 pub fn exhaustive_natural_triple_gen() -> It<(Natural, Natural, Natural)> {
     Box::new(exhaustive_triples_from_single(exhaustive_naturals()))
 }
 
+pub fn exhaustive_natural_triple_gen_var_1() -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_naturals()).map(|(x, y, m)| (x * &m + &y, y, m)),
+    )
+}
+
+pub fn exhaustive_natural_triple_gen_var_2() -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_naturals())
+            .filter(|&(ref x, ref y, ref m)| !x.eq_mod(y, m)),
+    )
+}
+
+pub fn exhaustive_natural_triple_gen_var_3() -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_naturals()).flat_map(|(x, y, z)| {
+            let z = max(&x, &y) + z + Natural::ONE;
+            Some((x, y, z))
+        }),
+    )
+}
+
+pub fn exhaustive_natural_triple_gen_var_4() -> It<(Natural, Natural, Natural)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_naturals(),
+        exhaustive_positive_naturals(),
+    ))
+}
+
+pub fn exhaustive_natural_triple_gen_var_5() -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_triples_from_single(exhaustive_naturals()).map(|(x, y, mut z)| {
+            z += &x;
+            z += Natural::ONE;
+            (x, y, z)
+        }),
+    )
+}
+
+// -- (Natural, Natural, Natural, Natural) --
+
+pub fn exhaustive_natural_quadruple_gen_var_1() -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_quadruples_from_single(exhaustive_naturals()).map(|(x, y, z, w)| {
+            let w = max!(&x, &y, &z) + w + Natural::ONE;
+            (x, y, z, w)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_quadruple_gen_var_2() -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_quadruples_from_single(exhaustive_naturals()).map(|(x, y, z, mut w)| {
+            w += max!(&x, &y);
+            w += Natural::ONE;
+            (x, y, z, w)
+        }),
+    )
+}
+
+pub fn exhaustive_natural_quadruple_gen_var_3() -> It<(Natural, Natural, Natural, Natural)> {
+    Box::new(
+        exhaustive_quadruples_from_single(exhaustive_naturals()).map(|(x, y, z, mut w)| {
+            w += &x;
+            w += Natural::ONE;
+            (x, y, z, w)
+        }),
+    )
+}
+
+// -- (Natural, Natural, Natural, PrimitiveUnsigned) --
+
+pub fn exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(Natural, Natural, Natural, T)> {
+    Box::new(exhaustive_quadruples_xxxy_custom_output(
+        exhaustive_naturals(),
+        exhaustive_unsigneds::<T>(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+    ))
+}
+
+pub fn exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_2(
+) -> It<(Natural, Natural, Natural, u64)> {
+    Box::new(
+        exhaustive_quadruples_xxxy(exhaustive_naturals(), exhaustive_unsigneds::<u64>()).map(
+            |(x, y, z, mut m)| {
+                m += max!(
+                    x.significant_bits(),
+                    y.significant_bits(),
+                    z.significant_bits()
+                );
+                (x, y, z, m)
+            },
+        ),
+    )
+}
+
 // -- (Natural, Natural, PrimitiveUnsigned) --
 
-pub fn exhaustive_natural_natural_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+pub fn exhaustive_natural_natural_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
 ) -> It<(Natural, Natural, T)> {
     Box::new(exhaustive_triples_xxy_custom_output(
         exhaustive_naturals(),
@@ -913,6 +1044,48 @@ pub fn exhaustive_natural_natural_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
         BitDistributorOutputType::normal(1),
         BitDistributorOutputType::tiny(),
     ))
+}
+
+pub fn exhaustive_natural_natural_unsigned_triple_gen_var_2<T: PrimitiveUnsigned>(
+) -> It<(Natural, Natural, T)>
+where
+    Natural: Shl<T, Output = Natural>,
+{
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_naturals(),
+            exhaustive_unsigneds::<T>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(x, y, pow)| ((x << pow) + &y, y, pow)),
+    )
+}
+
+pub fn exhaustive_natural_natural_unsigned_triple_gen_var_3<T: PrimitiveUnsigned>(
+) -> It<(Natural, Natural, T)> {
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_naturals(),
+            exhaustive_unsigneds::<T>(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .filter(|&(ref x, ref y, pow)| !x.eq_mod_power_of_2(y, pow.exact_into())),
+    )
+}
+
+pub fn exhaustive_natural_natural_unsigned_triple_gen_var_4() -> It<(Natural, Natural, u64)> {
+    Box::new(
+        exhaustive_triples_xxy(exhaustive_naturals(), exhaustive_unsigneds::<u64>()).map(
+            |(x, y, mut m)| {
+                m += max(x.significant_bits(), y.significant_bits());
+                (x, y, m)
+            },
+        ),
+    )
 }
 
 // -- (Natural, Natural, RoundingMode) --
@@ -1137,6 +1310,49 @@ pub fn exhaustive_natural_unsigned_pair_gen_var_4<T: PrimitiveInt>() -> It<(Natu
     ))
 }
 
+struct NaturalDivisibleByP2PairsGenerator;
+
+impl ExhaustiveDependentPairsYsGenerator<u64, Natural, It<Natural>>
+    for NaturalDivisibleByP2PairsGenerator
+{
+    #[inline]
+    fn get_ys(&self, pow: &u64) -> It<Natural> {
+        let pow = *pow;
+        if pow == 0 {
+            Box::new(exhaustive_naturals())
+        } else {
+            Box::new(exhaustive_naturals().map(move |k| k << pow))
+        }
+    }
+}
+
+pub fn exhaustive_natural_unsigned_pair_gen_var_5<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
+    permute_2_1(Box::new(
+        exhaustive_dependent_pairs(
+            ruler_sequence(),
+            exhaustive_unsigneds(),
+            NaturalDivisibleByP2PairsGenerator,
+        )
+        .map(|(x, y)| (T::exact_from(x), y)),
+    ))
+}
+
+pub fn exhaustive_natural_unsigned_pair_gen_var_6<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(exhaustive_naturals(), exhaustive_unsigneds::<T>())
+            .filter(|(x, y)| !x.divisible_by_power_of_2(y.exact_into())),
+    )
+}
+
+pub fn exhaustive_natural_unsigned_pair_gen_var_7() -> It<(Natural, u64)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_naturals(), exhaustive_unsigneds::<u64>()).map(|(x, mut m)| {
+            m += x.significant_bits();
+            (x, m)
+        }),
+    )
+}
+
 // -- (Natural, PrimitiveUnsigned, bool) --
 
 pub fn exhaustive_natural_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -1195,6 +1411,17 @@ pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_3<T: PrimitiveUnsigne
         )
         .filter_map(|(x, y, z): (Natural, T, T)| y.checked_add(z).map(|new_z| (x, y, new_z))),
     )
+}
+
+pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_4<T: PrimitiveUnsigned>(
+) -> It<(Natural, T, T)> {
+    Box::new(exhaustive_triples_xyy_custom_output(
+        exhaustive_naturals(),
+        exhaustive_unsigneds(),
+        BitDistributorOutputType::normal(1),
+        BitDistributorOutputType::tiny(),
+        BitDistributorOutputType::tiny(),
+    ))
 }
 
 // -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
@@ -1392,6 +1619,33 @@ pub fn exhaustive_unsigned_natural_unsigned_triple_gen<T: PrimitiveUnsigned>() -
     ))
 }
 
+// -- (PrimitiveUnsigned * 6) --
+
+// var 1 is in malachite-base.
+
+pub fn exhaustive_unsigned_sextuple_gen_var_2() -> It<(Limb, Limb, Limb, Limb, Limb, Limb)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_pairs(
+                exhaustive_unsigned_pair_gen_var_20(),
+                exhaustive_unsigned_pair_gen_var_24(),
+            )
+            .filter(|&((n_2, n_1), (d_1, d_0))| n_2 < d_1 || n_2 == d_1 && n_1 < d_0),
+            exhaustive_unsigneds(),
+        )
+        .map(|(((n_2, n_1), (d_1, d_0)), n_0)| {
+            (
+                n_2,
+                n_1,
+                n_0,
+                d_1,
+                d_0,
+                limbs_two_limb_inverse_helper(d_1, d_0),
+            )
+        }),
+    )
+}
+
 // -- (String, String, String) --
 
 pub fn exhaustive_string_triple_gen_var_1() -> It<(String, String, String)> {
@@ -1510,6 +1764,19 @@ pub fn exhaustive_natural_vec_unsigned_pair_gen_var_1() -> It<(Vec<Natural>, u64
     )))
 }
 
+// -- Vec<PrimitiveUnsigned>
+
+// vars 1 through 4 are in malachite-base.
+
+pub fn exhaustive_unsigned_vec_gen_var_5() -> It<Vec<Limb>> {
+    Box::new(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds()).map(|mut xs| {
+            limbs_vec_mul_limb_in_place(&mut xs, 3);
+            xs
+        }),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned)
 
 // vars 1 through 3 are in malachite-base
@@ -1536,6 +1803,19 @@ pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_18() -> It<(Vec<Limb>, u64)
     )
 }
 
+pub fn exhaustive_unsigned_vec_unsigned_pair_gen_var_19() -> It<(Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_vecs_min_length(1, exhaustive_unsigneds()),
+            exhaustive_positive_primitive_ints(),
+        )
+        .map(|(mut xs, y)| {
+            limbs_vec_mul_limb_in_place(&mut xs, y);
+            (xs, y)
+        }),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned)
 
 // vars 1 through 5 are in malachite-base
@@ -1554,6 +1834,106 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_6() -> It<(Vec<L
 }
 
 // vars 7 through 8 are in malachite-base.
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_9() -> It<(Vec<Limb>, Limb, Limb)> {
+    Box::new(exhaustive_triples(
+        exhaustive_vecs(exhaustive_unsigneds()),
+        factors_of_limb_max().into_iter(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+// var 10 is in malachite-base.
+
+pub(crate) fn map_helper_3(t: (Vec<Limb>, Limb, Limb)) -> (Vec<Limb>, Limb, Limb) {
+    let (mut xs, y, m) = t;
+    let carry = limbs_slice_mul_limb_in_place(&mut xs, m);
+    if carry != 0 {
+        xs.push(carry);
+    } else if *xs.last().unwrap() == 0 {
+        xs.pop();
+    }
+    limbs_vec_add_limb_in_place(&mut xs, y);
+    (xs, y, m)
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_11() -> It<(Vec<Limb>, Limb, Limb)>
+{
+    Box::new(
+        exhaustive_triples(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_unsigneds(),
+            exhaustive_positive_primitive_ints(),
+        )
+        .map(map_helper_3),
+    )
+}
+
+pub(crate) fn filter_helper_6(t: &(Vec<Limb>, Limb, Limb)) -> bool {
+    let (xs, y, m) = t;
+    !limbs_eq_limb_mod_limb(xs, *y, *m)
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_12() -> It<(Vec<Limb>, Limb, Limb)>
+{
+    Box::new(
+        exhaustive_triples(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_unsigneds(),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter(filter_helper_6),
+    )
+}
+
+// var 13 is in malachite-base.
+
+pub(crate) fn limbs_significant_bits_helper(xs: &[Limb]) -> u64 {
+    let trailing_zeros = usize::exact_from(slice_trailing_zeros(xs));
+    if trailing_zeros == xs.len() {
+        0
+    } else {
+        limbs_significant_bits(&xs[..xs.len() - trailing_zeros])
+    }
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_14<T: PrimitiveUnsigned>(
+) -> It<(Vec<Limb>, T, u64)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_vecs(exhaustive_unsigneds::<Limb>()),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(xs, y, mut pow)| {
+            pow += max(limbs_significant_bits_helper(&xs), y.significant_bits());
+            (xs, y, pow)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_triple_gen_var_15<T: PrimitiveUnsigned>(
+) -> It<(Vec<Limb>, T, u64)> {
+    Box::new(
+        exhaustive_triples_custom_output(
+            exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()),
+            exhaustive_unsigneds::<T>(),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(xs, y, mut pow)| {
+            pow += max(limbs_significant_bits_helper(&xs), y.significant_bits());
+            (xs, y, pow)
+        }),
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>)
 
@@ -1638,6 +2018,49 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_3(
     )
 }
 
+pub(crate) fn map_helper_1(t: (Vec<Limb>, Limb, Vec<Limb>)) -> (Vec<Limb>, Limb, Vec<Limb>) {
+    let (xs, y, m) = t;
+    let mut product_limbs = if xs.is_empty() {
+        Vec::new()
+    } else {
+        limbs_mul(&xs, &m)
+    };
+    if product_limbs.last() == Some(&0) {
+        product_limbs.pop();
+    }
+    limbs_vec_add_limb_in_place(&mut product_limbs, y);
+    (product_limbs, y, m)
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_4(
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        permute_1_3_2(Box::new(exhaustive_triples_xxy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )))
+        .map(map_helper_1),
+    )
+}
+
+pub(crate) fn filter_helper_4(t: &(Vec<Limb>, Limb, Vec<Limb>)) -> bool {
+    let (xs, y, m) = t;
+    !limbs_eq_limb_mod_ref_ref(&*xs, *y, &*m)
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_5(
+) -> It<(Vec<Limb>, Limb, Vec<Limb>)> {
+    Box::new(
+        permute_1_3_2(Box::new(exhaustive_triples_xxy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )))
+        .filter(filter_helper_4),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
 struct ValidLengthsBasecaseGenerator {
@@ -1698,6 +2121,106 @@ pub fn exhaustive_unsigned_vec_unsigned_unsigned_vec_unsigned_quadruple_gen_var_
         .map(|((xs, base), (out, len))| (out, len, xs, base)),
     )
 }
+
+// -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
+
+// vars 1 through 10 are in malachite-base.
+
+pub(crate) fn gcd_input_filter(xs: &[Limb], ys: &[Limb]) -> bool {
+    *xs.last().unwrap() != 0
+        && *ys.last().unwrap() != 0
+        && limbs_cmp(xs, ys) != Ordering::Less
+        && (xs[0].odd() || ys[0].odd())
+}
+
+pub fn exhaustive_unsigned_vec_pair_gen_var_11() -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            //TODO
+            exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
+                .filter(|(x, y)| x >= y),
+            UnsignedVecPairLenGenerator2,
+        )
+        .map(|p| p.1)
+        .filter(|(xs, ys)| gcd_input_filter(xs, ys)),
+    )
+}
+
+// vars 12 through 13 are in malachite-base.
+
+pub fn exhaustive_unsigned_vec_pair_gen_var_14() -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            //TODO
+            exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
+                .filter(|(x, y)| x >= y),
+            UnsignedVecPairLenGenerator1,
+        )
+        .filter_map(|(_, (out, mut xs))| {
+            limbs_vec_mul_limb_in_place(&mut xs, 3);
+            if out.len() >= xs.len() {
+                Some((out, xs))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_pair_gen_var_15() -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_pairs_from_single(exhaustive_vecs_min_length(2, exhaustive_unsigneds()))
+            .filter_map(|(ns, ds)| {
+                if *ds.last().unwrap() == 0 {
+                    return None;
+                }
+                let mut new_ns = limbs_mul(&ns, &ds);
+                if *new_ns.last().unwrap() == 0 {
+                    new_ns.pop();
+                }
+                Some((new_ns, ds))
+            }),
+    )
+}
+
+// vars 16 through 17 are in malachite-nz.
+
+pub fn exhaustive_unsigned_vec_pair_gen_var_18() -> It<(Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_pairs_from_single(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds()).filter_map(|mut xs| {
+                let x_last = xs.last_mut().unwrap();
+                if *x_last == Limb::MAX {
+                    None
+                } else {
+                    *x_last += 1;
+                    Some(xs)
+                }
+            }),
+        )
+        .filter_map(|(ns, ds)| {
+            let mut ns = limbs_mul(&ns, &ds);
+            if *ns.last().unwrap() == 0 {
+                ns.pop();
+            }
+            if *ns.last().unwrap() == 0 {
+                None
+            } else {
+                Some((ns, ds))
+            }
+        }),
+    )
+}
+
+// var 19 is in malachite-nz.
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
@@ -1797,10 +2320,9 @@ pub(crate) fn filter_map_helper_2(
     t: (Vec<Limb>, Vec<Limb>, Limb),
 ) -> Option<(Vec<Limb>, Vec<Limb>, Limb)> {
     let (xs, ys, m) = t;
-    let mut product_limbs = if xs.is_empty() {
-        Vec::new()
-    } else {
-        limbs_mul_limb(&xs, m)
+    let mut product_limbs = xs;
+    if !product_limbs.is_empty() {
+        limbs_vec_mul_limb_in_place(&mut product_limbs, m)
     };
     if product_limbs.last() == Some(&0) {
         product_limbs.pop();
@@ -1845,7 +2367,175 @@ pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_8(
     )
 }
 
-// var 9 is in malachite-base.
+// vars 9 through 13 are in malachite-base.
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14(
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_dependent_pairs(
+                bit_distributor_sequence(
+                    BitDistributorOutputType::tiny(),
+                    BitDistributorOutputType::normal(1),
+                ),
+                //TODO
+                exhaustive_pairs_from_single(primitive_int_increasing_inclusive_range(1, u64::MAX))
+                    .filter(|(x, y)| x >= y),
+                UnsignedVecPairLenGenerator1,
+            ),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter_map(|((_, (out, mut xs)), y)| {
+            limbs_vec_mul_limb_in_place(&mut xs, y);
+            if out.len() >= xs.len() {
+                Some((out, xs, y))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub(crate) fn map_helper_2(t: (Vec<Limb>, Vec<Limb>, Limb)) -> (Vec<Limb>, Vec<Limb>, Limb) {
+    let (mut xs, ys, m) = t;
+    limbs_vec_mul_limb_in_place(&mut xs, m);
+    if xs.last() == Some(&0) {
+        xs.pop();
+    }
+    limbs_vec_add_in_place_left(&mut xs, &ys);
+    (xs, ys, m)
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_15(
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )
+        .map(map_helper_2),
+    )
+}
+
+pub(crate) fn filter_helper_5(t: &(Vec<Limb>, Vec<Limb>, Limb)) -> bool {
+    let (xs, ys, m) = t;
+    !limbs_eq_mod_limb_ref_ref(&*xs, &*ys, *m)
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_16(
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_triples_xxy(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter(filter_helper_5),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17(
+) -> It<(Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_dependent_pairs(
+                bit_distributor_sequence(
+                    BitDistributorOutputType::tiny(),
+                    BitDistributorOutputType::normal(1),
+                ),
+                exhaustive_pairs_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                    |(mut n_len, mut d_init_len)| {
+                        n_len = n_len.checked_add(3)?;
+                        d_init_len = d_init_len.checked_add(2)?;
+                        if n_len > d_init_len {
+                            Some((n_len, d_init_len))
+                        } else {
+                            None
+                        }
+                    },
+                ),
+                UnsignedVecPairLenGenerator1,
+            ),
+            primitive_int_increasing_inclusive_range(Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX),
+        )
+        .map(|((_, (n, mut d_init)), d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (n, d_init, inverse)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18(
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_vecs(exhaustive_unsigneds::<Limb>()),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(xs, ys, mut pow)| {
+            pow += max(
+                limbs_significant_bits_helper(&xs),
+                limbs_significant_bits_helper(&ys),
+            );
+            (xs, ys, pow)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19(
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        exhaustive_pairs_big_tiny(
+            exhaustive_dependent_pairs(
+                bit_distributor_sequence(
+                    BitDistributorOutputType::tiny(),
+                    BitDistributorOutputType::normal(1),
+                ),
+                //TODO
+                exhaustive_pairs_from_single(exhaustive_unsigneds()).filter(|(x, y)| x >= y),
+                UnsignedVecPairLenGenerator1,
+            ),
+            exhaustive_unsigneds(),
+        )
+        .map(|((_, (xs, ys)), mut pow)| {
+            pow += max(
+                limbs_significant_bits_helper(&xs),
+                limbs_significant_bits_helper(&ys),
+            );
+            (xs, ys, pow)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20(
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        exhaustive_triples_xxy_custom_output(
+            exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()).flat_map(|mut xs| {
+                let last_x = xs.last_mut().unwrap();
+                *last_x = last_x.checked_add(1)?;
+                Some(xs)
+            }),
+            exhaustive_unsigneds(),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::tiny(),
+        )
+        .map(|(xs, ys, mut pow)| {
+            pow += max(
+                limbs_significant_bits_helper(&xs),
+                limbs_significant_bits_helper(&ys),
+            );
+            (xs, ys, pow)
+        }),
+    )
+}
 
 // -- (Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>, Vec<PrimitiveUnsigned>) --
 
@@ -2076,13 +2766,572 @@ pub fn exhaustive_unsigned_vec_triple_gen_var_38() -> It<(Vec<Limb>, Vec<Limb>, 
     )
 }
 
-// var 39 is in malachite-base.
+// vars 39 through 41 are in malachite-base.
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_42() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_dependent_pairs(
+                bit_distributor_sequence(
+                    BitDistributorOutputType::tiny(),
+                    BitDistributorOutputType::normal(1),
+                ),
+                exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                    |(q_len, mut n_len, mut d_init_len)| {
+                        n_len = n_len.checked_add(2)?;
+                        d_init_len = d_init_len.checked_add(1)?;
+                        let d_len = d_init_len + 1;
+                        if n_len >= d_len && q_len >= n_len - d_len {
+                            Some((q_len, n_len, d_init_len))
+                        } else {
+                            None
+                        }
+                    },
+                ),
+                UnsignedVecTripleLenGenerator1,
+            )
+            .map(|p| p.1),
+            primitive_int_increasing_inclusive_range(Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX),
+        )
+        .map(|((q, n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            (q, n, d_init)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_43() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_dependent_pairs(
+                bit_distributor_sequence(
+                    BitDistributorOutputType::tiny(),
+                    BitDistributorOutputType::normal(1),
+                ),
+                exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                    |(q_len, mut n_len, mut d_init_len)| {
+                        n_len = n_len.checked_add(3)?;
+                        d_init_len = d_init_len.checked_add(1)?;
+                        let d_len = d_init_len + 1;
+                        if n_len > d_len && q_len >= n_len - d_len {
+                            Some((q_len, n_len, d_init_len))
+                        } else {
+                            None
+                        }
+                    },
+                ),
+                UnsignedVecTripleLenGenerator1,
+            )
+            .map(|p| p.1),
+            primitive_int_increasing_inclusive_range(Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX),
+        )
+        .map(|((q, n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            (q, n, d_init)
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_44() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(mut q_len, mut n_len, mut d_len)| {
+                    q_len = q_len.checked_add(1)?;
+                    n_len = n_len.checked_add(2)?;
+                    d_len = d_len.checked_add(2)?;
+                    if n_len >= d_len && q_len > n_len - d_len {
+                        Some((q_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(|(_, (q, n, d))| {
+            if *d.last().unwrap() != 0 {
+                Some((q, n, d))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_45() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(mut q_len, mut n_len, mut d_len)| {
+                    q_len = q_len.checked_add(1)?;
+                    n_len = n_len.checked_add(2)?;
+                    d_len = d_len.checked_add(2)?;
+                    if n_len >= d_len && q_len > n_len - d_len && n_len < (d_len - 1) << 1 {
+                        Some((q_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(|(_, (q, n, d))| {
+            if *d.last().unwrap() != 0 {
+                Some((q, n, d))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_46() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
+                .filter_map(|(q_len, n_len, d_len)| {
+                    if q_len >= n_len && n_len >= d_len {
+                        Some((q_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                }),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(
+            |(_, (q, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+                if d[0].odd() {
+                    Some((q, n, d))
+                } else {
+                    None
+                }
+            },
+        ),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_47() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(primitive_int_increasing_inclusive_range(1, u64::MAX))
+                .filter_map(|(q_len, n_len, d_len)| {
+                    if q_len >= n_len && n_len >= d_len {
+                        Some((q_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                }),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(
+            |(_, (q, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+                if d[0].odd() {
+                    Some((q, n, d))
+                } else {
+                    None
+                }
+            },
+        ),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_48() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(primitive_int_increasing_inclusive_range(1, u64::MAX))
+                .filter_map(|(q_len, n_len, d_len)| {
+                    if q_len + 1 >= n_len {
+                        Some((q_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                }),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(|(_, (q, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+            if *d.last().unwrap() == 0 {
+                return None;
+            }
+            let mut new_n = limbs_mul(&n, &d);
+            if *new_n.last().unwrap() == 0 {
+                new_n.pop();
+            }
+            if q.len() + d.len() >= new_n.len() + 1 {
+                Some((q, new_n, d))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_49() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(primitive_int_increasing_inclusive_range(1, u64::MAX))
+                .filter_map(|(q_len, n_len, mut d_len)| {
+                    d_len = d_len.checked_add(1)?;
+                    if q_len + 1 >= n_len {
+                        Some((q_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                }),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(|(_, (q, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+            if *d.last().unwrap() == 0 {
+                return None;
+            }
+            let mut new_n = limbs_mul(&n, &d);
+            if *new_n.last().unwrap() == 0 {
+                new_n.pop();
+            }
+            if q.len() > new_n.len() - d.len() {
+                Some((q, n, d))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+// vars 50 through 53 are in malachite-base.
+
+pub(crate) fn limbs_eq_mod_map(
+    xs: &[Limb],
+    ys: Vec<Limb>,
+    m: Vec<Limb>,
+) -> (Vec<Limb>, Vec<Limb>, Vec<Limb>) {
+    let mut product_limbs = if xs.is_empty() {
+        Vec::new()
+    } else {
+        limbs_mul(xs, &m)
+    };
+    if product_limbs.last() == Some(&0) {
+        product_limbs.pop();
+    }
+    limbs_vec_add_in_place_left(&mut product_limbs, &ys);
+    (product_limbs, ys, m)
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_54() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_triples_from_single(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+        )
+        .map(|(xs, ys, m)| limbs_eq_mod_map(&xs, ys, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_55() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_triples_from_single(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds())
+                .filter(|xs| *xs.last().unwrap() != 0),
+        )
+        .filter(|(xs, ys, m)| !limbs_eq_mod_ref_ref_ref(xs, ys, m)),
+    )
+}
+
+pub fn exhaustive_unsigned_vec_triple_gen_var_56() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_dependent_pairs(
+                bit_distributor_sequence(
+                    BitDistributorOutputType::tiny(),
+                    BitDistributorOutputType::normal(1),
+                ),
+                exhaustive_pairs_from_single(exhaustive_unsigneds()).filter_map(
+                    |(q_len, n_len): (u64, u64)| {
+                        Some((q_len.checked_add(n_len)?, n_len.checked_add(2)?))
+                    },
+                ),
+                UnsignedVecPairLenGenerator1,
+            ),
+            exhaustive_pairs(
+                primitive_int_increasing_inclusive_range(
+                    Limb::power_of_2(Limb::WIDTH - 1),
+                    Limb::MAX,
+                ),
+                exhaustive_unsigneds(),
+            ),
+        )
+        .map(|((_, (q, n)), (d_1, d_0))| (q, n, vec![d_0, d_1])),
+    )
+}
+
+// var 57 is in malachite-base.
+
+// -- (Vec<PrimitiveUnsigned> * 4) --
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_unsigned_vec_quadruple_gen_var_1(
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_quadruples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                    q_len = q_len.checked_add(1)?;
+                    r_len = r_len.checked_add(2)?;
+                    n_len = n_len.checked_add(2)?;
+                    d_len = d_len.checked_add(2)?;
+                    if r_len >= d_len && n_len >= d_len && q_len > n_len - d_len {
+                        Some((q_len, r_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecQuadrupleLenGenerator1,
+        )
+        .filter_map(|(_, (q, r, n, d))| {
+            if *d.last().unwrap() != 0 {
+                Some((q, r, n, d))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_unsigned_vec_quadruple_gen_var_2(
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_quadruples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                    q_len = q_len.checked_add(2)?;
+                    r_len = r_len.checked_add(2)?;
+                    n_len = n_len.checked_add(4)?;
+                    d_len = d_len.checked_add(2)?;
+                    if n_len >= d_len + 2 && q_len >= n_len - d_len && r_len >= d_len {
+                        Some((q_len, r_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecQuadrupleLenGenerator1,
+        )
+        .filter_map(
+            |(_, (q, r, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+                if d[0].odd() {
+                    Some((q, r, n, d))
+                } else {
+                    None
+                }
+            },
+        ),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_unsigned_vec_quadruple_gen_var_3(
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_quadruples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                    q_len = q_len.checked_add(4)?;
+                    r_len = r_len.checked_add(2)?;
+                    n_len = n_len.checked_add(4)?;
+                    d_len = d_len.checked_add(2)?;
+                    if n_len >= d_len + 2 && q_len >= n_len - d_len && r_len >= d_len {
+                        Some((q_len, r_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecQuadrupleLenGenerator1,
+        )
+        .filter_map(
+            #[allow(clippy::type_complexity)]
+            |(_, (q, r, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+                if d[0].odd() {
+                    Some((q, r, n, d))
+                } else {
+                    None
+                }
+            },
+        ),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_unsigned_vec_quadruple_gen_var_4(
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_quadruples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                    q_len = q_len.checked_add(1)?;
+                    r_len = r_len.checked_add(2)?;
+                    n_len = n_len.checked_add(2)?;
+                    d_len = d_len.checked_add(2)?;
+                    if r_len >= d_len
+                        && n_len >= d_len
+                        && q_len > n_len - d_len
+                        && (d_len << 1) > n_len + 1
+                    {
+                        Some((q_len, r_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecQuadrupleLenGenerator1,
+        )
+        .filter_map(|(_, (q, r, n, d))| {
+            if *d.last().unwrap() != 0 {
+                Some((q, r, n, d))
+            } else {
+                None
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_unsigned_vec_quadruple_gen_var_5(
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_quadruples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(mut q_len, mut r_len, mut n_len, mut d_len)| {
+                    q_len = q_len.checked_add(1)?;
+                    r_len = r_len.checked_add(2)?;
+                    n_len = n_len.checked_add(3)?;
+                    d_len = d_len.checked_add(2)?;
+                    if r_len >= d_len && n_len > d_len && q_len + d_len >= n_len {
+                        Some((q_len, r_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecQuadrupleLenGenerator1,
+        )
+        .filter_map(
+            #[allow(clippy::type_complexity)]
+            |(_, (q, r, n, mut d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+                let d_last = d.last_mut().unwrap();
+                if d_last.get_highest_bit() {
+                    None
+                } else {
+                    d_last.set_bit(Limb::WIDTH - 1);
+                    Some((q, r, n, d))
+                }
+            },
+        ),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_unsigned_vec_quadruple_gen_var_6(
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_quadruples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                |(out_len, mut b_len, e_len, mut m_len)| {
+                    b_len = b_len.checked_add(1)?;
+                    m_len = m_len.checked_add(1)?;
+                    if out_len >= m_len {
+                        Some((out_len, b_len, e_len, m_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecQuadrupleLenGenerator1,
+        )
+        .filter_map(
+            #[allow(clippy::type_complexity)]
+            |(_, (out, bs, es, ms)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+                if (es.len() > 1 || es.len() == 1 && es[0] > 1)
+                    && *bs.last().unwrap() != 0
+                    && *es.last().unwrap() != 0
+                    && *ms.last().unwrap() != 0
+                {
+                    Some((out, bs, es, ms))
+                } else {
+                    None
+                }
+            },
+        ),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_unsigned_vec_quadruple_gen_var_7(
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>)> {
+    Box::new(
+        exhaustive_unsigned_vec_quadruple_gen_var_6().filter_map(|(out, bs, es, mut ms)| {
+            let m = &mut ms[0];
+            *m = m.arithmetic_checked_shl(1)?;
+            *m |= 1;
+            Some((out, bs, es, ms))
+        }),
+    )
+}
 
 // -- large types --
 
 // vars 1 through 4 are in malachite-base
 
-fn exhaustive_half_gcd_matrices_with_size(s: usize, n: usize) -> It<HalfGcdMatrix> {
+fn exhaustive_half_gcd_matrices_with_size(s: usize, n: usize) -> It<OwnedHalfGcdMatrix> {
     assert_ne!(n, 0);
     assert!(n <= s);
     Box::new(
@@ -2102,17 +3351,17 @@ fn exhaustive_half_gcd_matrices_with_size(s: usize, n: usize) -> It<HalfGcdMatri
 
 struct HalfGcdMatrixGenerator;
 
-impl ExhaustiveDependentPairsYsGenerator<(usize, usize), HalfGcdMatrix, It<HalfGcdMatrix>>
+impl ExhaustiveDependentPairsYsGenerator<(usize, usize), OwnedHalfGcdMatrix, It<OwnedHalfGcdMatrix>>
     for HalfGcdMatrixGenerator
 {
     #[inline]
-    fn get_ys(&self, t: &(usize, usize)) -> It<HalfGcdMatrix> {
+    fn get_ys(&self, t: &(usize, usize)) -> It<OwnedHalfGcdMatrix> {
         let &(n, s) = t;
         exhaustive_half_gcd_matrices_with_size(s, n)
     }
 }
 
-fn exhaustive_half_gcd_matrices() -> It<HalfGcdMatrix> {
+fn exhaustive_half_gcd_matrices() -> It<OwnedHalfGcdMatrix> {
     Box::new(
         exhaustive_dependent_pairs(
             bit_distributor_sequence(
@@ -2131,12 +3380,12 @@ struct HalfGcdMatrixAndVecGenerator;
 impl
     ExhaustiveDependentPairsYsGenerator<
         (usize, usize, usize),
-        (HalfGcdMatrix, Vec<Limb>, u8),
-        It<(HalfGcdMatrix, Vec<Limb>, u8)>,
+        (OwnedHalfGcdMatrix, Vec<Limb>, u8),
+        It<(OwnedHalfGcdMatrix, Vec<Limb>, u8)>,
     > for HalfGcdMatrixAndVecGenerator
 {
     #[inline]
-    fn get_ys(&self, t: &(usize, usize, usize)) -> It<(HalfGcdMatrix, Vec<Limb>, u8)> {
+    fn get_ys(&self, t: &(usize, usize, usize)) -> It<(OwnedHalfGcdMatrix, Vec<Limb>, u8)> {
         let &(qs_len, m_n, m_s) = t;
         reshape_2_1_to_3(Box::new(lex_pairs(
             exhaustive_pairs(
@@ -2151,7 +3400,7 @@ impl
     }
 }
 
-pub fn exhaustive_large_type_gen_var_5() -> It<(HalfGcdMatrix, Vec<Limb>, u8)> {
+pub fn exhaustive_large_type_gen_var_5() -> It<(OwnedHalfGcdMatrix, Vec<Limb>, u8)> {
     Box::new(
         exhaustive_dependent_pairs(
             bit_distributor_sequence(
@@ -2204,7 +3453,7 @@ pub fn exhaustive_large_type_gen_var_6() -> It<(HalfGcdMatrix1, Vec<Limb>, Vec<L
     )))
 }
 
-pub fn exhaustive_large_type_gen_var_7() -> It<(HalfGcdMatrix, HalfGcdMatrix1)> {
+pub fn exhaustive_large_type_gen_var_7() -> It<(OwnedHalfGcdMatrix, HalfGcdMatrix1)> {
     Box::new(exhaustive_pairs(
         exhaustive_half_gcd_matrices(),
         exhaustive_quadruples_from_single(primitive_int_increasing_range(
@@ -2275,5 +3524,331 @@ pub fn exhaustive_large_type_gen_var_8() -> It<T8> {
             MatrixMul22Generator,
         )
         .map(|p| p.1),
+    )
+}
+
+// var 9 is in malachite-base.
+
+pub fn exhaustive_large_type_gen_var_10() -> It<(Vec<Limb>, Vec<Limb>, Limb, Limb)> {
+    reshape_2_2_to_4(Box::new(exhaustive_pairs(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            //TODO
+            exhaustive_pairs_from_single(exhaustive_positive_primitive_ints())
+                .filter(|(x, y)| x >= y),
+            UnsignedVecPairLenGenerator1,
+        )
+        .map(|p| p.1),
+        exhaustive_pairs(factors_of_limb_max().into_iter(), exhaustive_unsigneds()),
+    )))
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_11() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_dependent_pairs(
+                bit_distributor_sequence(
+                    BitDistributorOutputType::tiny(),
+                    BitDistributorOutputType::normal(1),
+                ),
+                exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                    |(q_len, mut n_len, mut d_init_len)| {
+                        n_len = n_len.checked_add(3)?;
+                        d_init_len = d_init_len.checked_add(2)?;
+                        let d_len = d_init_len + 1;
+                        if n_len >= d_len && q_len >= n_len - d_len {
+                            Some((q_len, n_len, d_init_len))
+                        } else {
+                            None
+                        }
+                    },
+                ),
+                UnsignedVecTripleLenGenerator1,
+            )
+            .map(|p| p.1),
+            primitive_int_increasing_inclusive_range(Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX),
+        )
+        .map(|((q, n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (q, n, d_init, inverse)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_12() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_pairs(
+            exhaustive_dependent_pairs(
+                bit_distributor_sequence(
+                    BitDistributorOutputType::tiny(),
+                    BitDistributorOutputType::normal(1),
+                ),
+                exhaustive_triples_from_single(exhaustive_unsigneds::<u64>()).filter_map(
+                    |(mut q_len, mut n_len, mut d_init_len)| {
+                        q_len = q_len.checked_add(3)?;
+                        n_len = n_len.checked_add(9)?;
+                        d_init_len = d_init_len.checked_add(5)?;
+                        let d_len = d_init_len + 1;
+                        if n_len >= d_len + 3 && q_len >= n_len - d_len {
+                            Some((q_len, n_len, d_init_len))
+                        } else {
+                            None
+                        }
+                    },
+                ),
+                UnsignedVecTripleLenGenerator1,
+            )
+            .map(|p| p.1),
+            primitive_int_increasing_inclusive_range(Limb::power_of_2(Limb::WIDTH - 1), Limb::MAX),
+        )
+        .map(|((q, n, mut d_init), d_last)| {
+            d_init.push(d_last);
+            let inverse =
+                limbs_two_limb_inverse_helper(d_init[d_init.len() - 1], d_init[d_init.len() - 2]);
+            (q, n, d_init, inverse)
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_13() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            //TODO
+            exhaustive_triples_from_single(exhaustive_positive_primitive_ints())
+                .filter(|&(q_len, n_len, d_len)| q_len >= n_len && n_len >= d_len),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(|(_, (q, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+            if d[0].even() {
+                None
+            } else {
+                let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+                Some((q, n, d, inverse))
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_14() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(exhaustive_positive_primitive_ints::<u64>()).filter_map(
+                |(mut q_len, mut n_len, d_len)| {
+                    q_len = q_len.checked_add(1)?;
+                    n_len = n_len.checked_add(1)?;
+                    if q_len >= n_len && n_len > d_len {
+                        Some((q_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                },
+            ),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(|(_, (q, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+            if d[0].even() {
+                None
+            } else {
+                let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+                Some((q, n, d, inverse))
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_15() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_triples_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
+                .filter_map(|(mut q_len, mut n_len, d_len)| {
+                    q_len = q_len.checked_add(1)?;
+                    n_len = n_len.checked_add(1)?;
+                    if q_len >= n_len && n_len > d_len {
+                        Some((q_len, n_len, d_len))
+                    } else {
+                        None
+                    }
+                }),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(|(_, (q, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+            if d[0].even() {
+                None
+            } else {
+                let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+                Some((q, n, d, inverse))
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_16() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::tiny(),
+                BitDistributorOutputType::normal(1),
+            ),
+            //TODO
+            exhaustive_triples_from_single(primitive_int_increasing_inclusive_range(2, u64::MAX))
+                .filter(|&(q_len, n_len, d_len)| q_len >= n_len && n_len >= d_len),
+            UnsignedVecTripleLenGenerator1,
+        )
+        .filter_map(|(_, (q, n, d)): (_, (Vec<Limb>, Vec<Limb>, Vec<Limb>))| {
+            if d[0].even() {
+                None
+            } else {
+                let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+                Some((q, n, d, inverse))
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_17() -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Limb)> {
+    Box::new(
+        exhaustive_vecs_min_length(1, exhaustive_unsigneds::<Limb>()).filter_map(|d| {
+            if d[0].even() {
+                None
+            } else {
+                let inverse = limbs_modular_invert_limb(d[0]).wrapping_neg();
+                let is = vec![0; d.len()];
+                let scratch = vec![0; limbs_modular_invert_scratch_len(d.len())];
+                Some((is, scratch, d, inverse))
+            }
+        }),
+    )
+}
+
+pub fn exhaustive_large_type_gen_var_18() -> It<(Vec<Limb>, usize, Limb, Limb, u64)> {
+    Box::new(
+        exhaustive_triples(
+            exhaustive_vecs(exhaustive_unsigneds()),
+            exhaustive_unsigneds(),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter_map(|(ns, fraction_len, d)| {
+            if ns.len() <= fraction_len {
+                None
+            } else {
+                let shift = LeadingZeros::leading_zeros(d);
+                let d_inv = limbs_invert_limb(d << shift);
+                Some((ns, fraction_len, d, d_inv, shift))
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_19() -> It<(Vec<Limb>, usize, Vec<Limb>, Limb, Limb, u64)> {
+    Box::new(
+        exhaustive_quadruples_xyxz(
+            exhaustive_vecs(exhaustive_unsigneds()),
+            exhaustive_unsigneds(),
+            exhaustive_positive_primitive_ints(),
+        )
+        .filter_map(|(out, fraction_len, ns, d)| {
+            if ns.is_empty() || out.len() < ns.len() + fraction_len {
+                None
+            } else {
+                let shift = LeadingZeros::leading_zeros(d);
+                let d_inv = limbs_invert_limb(d << shift);
+                Some((out, fraction_len, ns, d, d_inv, shift))
+            }
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_20(
+) -> It<(Vec<Limb>, Vec<Limb>, Vec<Limb>, Vec<Limb>, usize, usize)> {
+    Box::new(
+        exhaustive_quintuples_xyyyz(
+            exhaustive_vecs_min_length(2, exhaustive_unsigneds()),
+            exhaustive_vecs(exhaustive_unsigneds()),
+            primitive_int_increasing_inclusive_range(3, u32::MAX),
+        )
+        .filter_map(|(ds, mut scratch, mut qs, mut rs_hi, n_len)| {
+            let n_len = usize::wrapping_from(n_len);
+            let d_len = ds.len();
+            if n_len < d_len {
+                return None;
+            }
+            let i_len = limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
+            if i_len == 0 || qs.len() < i_len {
+                return None;
+            }
+            qs.truncate(i_len);
+            if rs_hi.len() < i_len {
+                return None;
+            }
+            rs_hi.truncate(i_len);
+            let scratch_len = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
+            let x = limbs_div_mod_barrett_scratch_len(n_len, d_len);
+            if x < i_len {
+                return None;
+            }
+            let actual_scratch_len = x - i_len;
+            if actual_scratch_len < d_len + i_len {
+                return None;
+            }
+            if scratch.len() < actual_scratch_len {
+                return None;
+            }
+            scratch.truncate(actual_scratch_len);
+            Some((scratch, ds, qs, rs_hi, scratch_len, i_len))
+        }),
+    )
+}
+
+#[allow(clippy::type_complexity)]
+pub(crate) fn large_type_filter_map_1(
+    s: (Limb, Limb, Limb, Limb, Limb, Limb),
+) -> Option<(Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb)> {
+    let (x_1, x_0, y_1, y_0, m_1, m_0) = s;
+    if m_1 == 0
+        || m_1 == 1 && m_0 == 0
+        || x_1 > m_1
+        || y_1 > m_1
+        || x_1 == m_1 && x_0 > m_0
+        || y_1 == m_1 && y_0 > m_0
+    {
+        None
+    } else {
+        let (inv_2, inv_1, inv_0) = limbs_precompute_mod_mul_two_limbs(m_1, m_0);
+        Some((x_1, x_0, y_1, y_0, m_1, m_0, inv_2, inv_1, inv_0))
+    }
+}
+
+#[allow(clippy::type_complexity)]
+pub fn exhaustive_large_type_gen_var_21(
+) -> It<(Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb, Limb)> {
+    Box::new(
+        exhaustive_sextuples_from_single(exhaustive_unsigneds())
+            .filter_map(large_type_filter_map_1),
     )
 }

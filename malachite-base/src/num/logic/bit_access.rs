@@ -1,11 +1,11 @@
 use num::basic::integers::PrimitiveInt;
 use num::logic::traits::BitAccess;
 
-fn _get_bit_unsigned<T: PrimitiveInt>(x: &T, index: u64) -> bool {
+fn get_bit_unsigned<T: PrimitiveInt>(x: &T, index: u64) -> bool {
     index < T::WIDTH && *x & T::power_of_2(index) != T::ZERO
 }
 
-fn _set_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
+fn set_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x |= T::power_of_2(index);
     } else {
@@ -17,7 +17,7 @@ fn _set_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
     }
 }
 
-fn _clear_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
+fn clear_bit_unsigned<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x &= !T::power_of_2(index);
     }
@@ -48,7 +48,7 @@ macro_rules! impl_bit_access_unsigned {
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
-                _get_bit_unsigned(self, index)
+                get_bit_unsigned(self, index)
             }
 
             /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of $2^i$
@@ -80,7 +80,7 @@ macro_rules! impl_bit_access_unsigned {
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn set_bit(&mut self, index: u64) {
-                _set_bit_unsigned(self, index)
+                set_bit_unsigned(self, index)
             }
 
             /// Sets the `index`th bit of a primitive unsigned integer, or the coefficient of $2^i$
@@ -111,14 +111,14 @@ macro_rules! impl_bit_access_unsigned {
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn clear_bit(&mut self, index: u64) {
-                _clear_bit_unsigned(self, index)
+                clear_bit_unsigned(self, index)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_bit_access_unsigned);
 
-fn _get_bit_signed<T: PrimitiveInt>(x: &T, index: u64) -> bool {
+fn get_bit_signed<T: PrimitiveInt>(x: &T, index: u64) -> bool {
     if index < T::WIDTH {
         *x & (T::ONE << index) != T::ZERO
     } else {
@@ -126,7 +126,7 @@ fn _get_bit_signed<T: PrimitiveInt>(x: &T, index: u64) -> bool {
     }
 }
 
-fn _set_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
+fn set_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x |= T::ONE << index;
     } else if *x >= T::ZERO {
@@ -138,7 +138,7 @@ fn _set_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
     }
 }
 
-fn _clear_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
+fn clear_bit_signed<T: PrimitiveInt>(x: &mut T, index: u64) {
     if index < T::WIDTH {
         *x &= !(T::ONE << index);
     } else if *x < T::ZERO {
@@ -184,7 +184,7 @@ macro_rules! impl_bit_access_signed {
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn get_bit(&self, index: u64) -> bool {
-                _get_bit_signed(self, index)
+                get_bit_signed(self, index)
             }
 
             /// Sets the `index`th bit of a primitive signed integer to 1.
@@ -230,7 +230,7 @@ macro_rules! impl_bit_access_signed {
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn set_bit(&mut self, index: u64) {
-                _set_bit_signed(self, index)
+                set_bit_signed(self, index)
             }
 
             /// Sets the `index`th bit of a primitive signed integer to 0.
@@ -277,7 +277,7 @@ macro_rules! impl_bit_access_signed {
             /// See the documentation of the `num::logic::bit_access` module.
             #[inline]
             fn clear_bit(&mut self, index: u64) {
-                _clear_bit_signed(self, index)
+                clear_bit_signed(self, index)
             }
         }
     };

@@ -14,7 +14,7 @@ use malachite_nz_test_util::generators::{
     natural_unsigned_pair_gen_var_3_nrm, natural_unsigned_pair_gen_var_4,
     natural_unsigned_unsigned_triple_gen_var_1,
 };
-use malachite_nz_test_util::natural::conversion::string::to_string::_to_string_base_naive;
+use malachite_nz_test_util::natural::conversion::string::to_string::to_string_base_naive;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_to_string);
@@ -391,7 +391,7 @@ fn benchmark_natural_to_string_algorithms(
         &mut [
             ("default", &mut |x| no_out!(x.to_string())),
             ("to_string_base", &mut |x| no_out!(x.to_string_base(10))),
-            ("naive", &mut |x| no_out!(_to_string_base_naive(&x, 10))),
+            ("naive", &mut |x| no_out!(to_string_base_naive(&x, 10))),
         ],
     );
 }
@@ -455,7 +455,7 @@ fn benchmark_natural_to_binary_string_algorithms(
         &mut [
             ("default", &mut |x| no_out!(x.to_binary_string())),
             ("to_string_base", &mut |x| no_out!(x.to_string_base(2))),
-            ("naive", &mut |x| no_out!(_to_string_base_naive(&x, 2))),
+            ("naive", &mut |x| no_out!(to_string_base_naive(&x, 2))),
             ("alt", &mut |x| no_out!(NaturalAlt(x).to_binary_string())),
             ("alt 2", &mut |x| no_out!(NaturalAlt2(x).to_binary_string())),
         ],
@@ -521,7 +521,7 @@ fn benchmark_natural_to_octal_string_algorithms(
         &mut [
             ("default", &mut |x| no_out!(x.to_octal_string())),
             ("to_string_base", &mut |x| no_out!(x.to_string_base(8))),
-            ("naive", &mut |x| no_out!(_to_string_base_naive(&x, 8))),
+            ("naive", &mut |x| no_out!(to_string_base_naive(&x, 8))),
             ("alt", &mut |x| no_out!(NaturalAlt(x).to_octal_string())),
             ("alt 2", &mut |x| no_out!(NaturalAlt2(x).to_octal_string())),
         ],
@@ -589,7 +589,7 @@ fn benchmark_natural_to_lower_hex_string_algorithms(
         &mut [
             ("default", &mut |x| no_out!(x.to_lower_hex_string())),
             ("to_string_base", &mut |x| no_out!(x.to_string_base(16))),
-            ("naive", &mut |x| no_out!(_to_string_base_naive(&x, 16))),
+            ("naive", &mut |x| no_out!(to_string_base_naive(&x, 16))),
             ("alt", &mut |x| no_out!(NaturalAlt(x).to_lower_hex_string())),
             ("alt 2", &mut |x| {
                 no_out!(NaturalAlt2(x).to_lower_hex_string())
@@ -710,7 +710,7 @@ fn benchmark_natural_to_string_base_algorithms(
                 no_out!(format!("{}", BaseFmtWrapper::new(&x, base)))
             }),
             ("naive", &mut |(x, base)| {
-                no_out!(_to_string_base_naive(&x, base))
+                no_out!(to_string_base_naive(&x, base))
             }),
         ],
     );

@@ -2,11 +2,13 @@ use num::arithmetic::traits::{CoprimeWith, DivisibleBy, Gcd, Parity};
 use num::basic::traits::{One, Zero};
 use std::ops::Rem;
 
-pub fn _coprime_with_check_2<T: Copy + Eq + Gcd<T, Output = T> + One + Parity>(x: T, y: T) -> bool {
+#[doc(hidden)]
+pub fn coprime_with_check_2<T: Copy + Eq + Gcd<T, Output = T> + One + Parity>(x: T, y: T) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == T::ONE
 }
 
-pub fn _coprime_with_check_2_3<
+#[doc(hidden)]
+pub fn coprime_with_check_2_3<
     T: Copy + DivisibleBy<T> + Eq + From<u8> + Gcd<T, Output = T> + One + Parity,
 >(
     x: T,
@@ -17,7 +19,8 @@ pub fn _coprime_with_check_2_3<
         && x.gcd(y) == T::ONE
 }
 
-pub fn _coprime_with_check_2_3_5<
+#[doc(hidden)]
+pub fn coprime_with_check_2_3_5<
     T: Copy + Eq + From<u8> + Gcd<T, Output = T> + One + Parity + Rem<T, Output = T> + Zero,
 >(
     x: T,
@@ -68,7 +71,7 @@ macro_rules! impl_coprime_with {
             /// See the documentation of the `num::arithmetic::compare_with` module.
             #[inline]
             fn coprime_with(self, other: $t) -> bool {
-                _coprime_with_check_2(self, other)
+                coprime_with_check_2(self, other)
             }
         }
     };

@@ -1,6 +1,9 @@
 use malachite_base::num::arithmetic::traits::ModIsReduced;
 use malachite_base::num::basic::traits::Zero;
+use malachite_base_test_util::generators::unsigned_pair_gen_var_12;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::natural_pair_gen_var_5;
 use std::str::FromStr;
 
 #[test]
@@ -25,4 +28,18 @@ fn test_mod_is_reduced() {
 #[should_panic]
 fn mod_is_reduced_fail() {
     Natural::from(123u32).mod_is_reduced(&Natural::ZERO);
+}
+
+#[test]
+fn mod_is_reduced_properties() {
+    natural_pair_gen_var_5().test_properties(|(n, m)| {
+        assert_eq!(n.mod_is_reduced(&m), &n % m == n);
+    });
+
+    unsigned_pair_gen_var_12::<Limb, Limb>().test_properties(|(n, m)| {
+        assert_eq!(
+            n.mod_is_reduced(&m),
+            Natural::from(n).mod_is_reduced(&Natural::from(m))
+        );
+    });
 }

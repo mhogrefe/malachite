@@ -195,8 +195,8 @@ pub fn limbs_matrix_2_2_mul_strassen(
     let (s0_last, s0_init) = s0.split_last_mut().unwrap();
     let (t0, remainder) = remainder.split_at_mut(ys_len + 1);
     let (t0_last, t0_init) = t0.split_last_mut().unwrap();
-    // u1 len is xs_len + ys_len + 2
     let (u0, u1) = remainder.split_at_mut(sum_len + 1);
+    let u1 = &mut u1[..sum_len + 2];
     let xs00_lo = &xs00[..xs_len];
     let xs01_lo = &mut xs01[..xs_len + 1];
     let (xs01_lo_last, xs01_lo_init) = xs01_lo.split_last_mut().unwrap();

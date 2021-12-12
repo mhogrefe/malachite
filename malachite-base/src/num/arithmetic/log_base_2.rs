@@ -4,15 +4,15 @@ use num::basic::traits::Zero;
 use num::conversion::traits::SciMantissaAndExponent;
 use num::logic::traits::{LeadingZeros, SignificantBits, TrailingZeros};
 
-fn _floor_log_base_2<T: Copy + Eq + SignificantBits + Zero>(x: T) -> u64 {
+fn floor_log_base_2<T: Copy + Eq + SignificantBits + Zero>(x: T) -> u64 {
     if x == T::ZERO {
         panic!("Cannot take the base-2 logarithm of 0.");
     }
     x.significant_bits() - 1
 }
 
-fn _ceiling_log_base_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(x: T) -> u64 {
-    let floor_log_base_2 = _floor_log_base_2(x);
+fn ceiling_log_base_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(x: T) -> u64 {
+    let floor_log_base_2 = floor_log_base_2(x);
     if x.is_power_of_2() {
         floor_log_base_2
     } else {
@@ -20,7 +20,7 @@ fn _ceiling_log_base_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(x: T)
     }
 }
 
-fn _checked_log_base_2<T: PrimitiveInt>(x: T) -> Option<u64> {
+fn checked_log_base_2<T: PrimitiveInt>(x: T) -> Option<u64> {
     if x == T::ZERO {
         panic!("Cannot take the base-2 logarithm of 0.");
     }
@@ -52,7 +52,7 @@ macro_rules! impl_log_base_2_unsigned {
             /// See the documentation of the `num::arithmetic::log_base_2` module.
             #[inline]
             fn floor_log_base_2(self) -> u64 {
-                _floor_log_base_2(self)
+                floor_log_base_2(self)
             }
         }
 
@@ -73,7 +73,7 @@ macro_rules! impl_log_base_2_unsigned {
             /// See the documentation of the `num::arithmetic::log_base_2` module.
             #[inline]
             fn ceiling_log_base_2(self) -> u64 {
-                _ceiling_log_base_2(self)
+                ceiling_log_base_2(self)
             }
         }
 
@@ -100,7 +100,7 @@ macro_rules! impl_log_base_2_unsigned {
             /// See the documentation of the `num::arithmetic::log_base_2` module.
             #[inline]
             fn checked_log_base_2(self) -> Option<u64> {
-                _checked_log_base_2(self)
+                checked_log_base_2(self)
             }
         }
     };

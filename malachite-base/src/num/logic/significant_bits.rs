@@ -2,7 +2,7 @@ use num::arithmetic::traits::UnsignedAbs;
 use num::basic::integers::PrimitiveInt;
 use num::logic::traits::{LeadingZeros, SignificantBits};
 
-fn _significant_bits_unsigned<T: PrimitiveInt>(x: T) -> u64 {
+fn significant_bits_unsigned<T: PrimitiveInt>(x: T) -> u64 {
     T::WIDTH - LeadingZeros::leading_zeros(x)
 }
 
@@ -27,14 +27,14 @@ macro_rules! impl_significant_bits_unsigned {
             /// See the documentation of the `num::logic::significant_bits` module.
             #[inline]
             fn significant_bits(self) -> u64 {
-                _significant_bits_unsigned(self)
+                significant_bits_unsigned(self)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_significant_bits_unsigned);
 
-fn _significant_bits_signed<U: SignificantBits, S: UnsignedAbs<Output = U>>(x: S) -> u64 {
+fn significant_bits_signed<U: SignificantBits, S: UnsignedAbs<Output = U>>(x: S) -> u64 {
     x.unsigned_abs().significant_bits()
 }
 
@@ -59,7 +59,7 @@ macro_rules! impl_significant_bits_signed {
         impl SignificantBits for $s {
             #[inline]
             fn significant_bits(self) -> u64 {
-                _significant_bits_signed(self)
+                significant_bits_signed(self)
             }
         }
     };

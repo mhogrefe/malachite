@@ -2,7 +2,7 @@ use num::arithmetic::traits::{CheckedAdd, CheckedAddMul, CheckedMul, UnsignedAbs
 use num::basic::traits::Zero;
 use num::conversion::traits::WrappingFrom;
 
-fn _checked_add_mul_unsigned<T: CheckedAdd<T, Output = T> + CheckedMul<T, Output = T>>(
+fn checked_add_mul_unsigned<T: CheckedAdd<T, Output = T> + CheckedMul<T, Output = T>>(
     x: T,
     y: T,
     z: T,
@@ -32,14 +32,14 @@ macro_rules! impl_checked_add_mul_unsigned {
             /// See the documentation of the `num::arithmetic::checked_add_mul` module.
             #[inline]
             fn checked_add_mul(self, y: $t, z: $t) -> Option<$t> {
-                _checked_add_mul_unsigned(self, y, z)
+                checked_add_mul_unsigned(self, y, z)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_checked_add_mul_unsigned);
 
-fn _checked_add_mul_signed<
+fn checked_add_mul_signed<
     U: CheckedMul<U, Output = U> + Copy + Ord + WrappingSub<U, Output = U>,
     T: CheckedAdd<T, Output = T>
         + CheckedMul<T, Output = T>
@@ -98,7 +98,7 @@ macro_rules! impl_checked_add_mul_signed {
             /// See the documentation of the `num::arithmetic::checked_add_mul` module.
             #[inline]
             fn checked_add_mul(self, y: $t, z: $t) -> Option<$t> {
-                _checked_add_mul_signed(self, y, z)
+                checked_add_mul_signed(self, y, z)
             }
         }
     };

@@ -6,6 +6,7 @@ use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz_test_util::generators::{natural_pair_gen, natural_pair_gen_nrm};
+use num::Integer;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_natural_lcm);
@@ -81,7 +82,7 @@ fn benchmark_natural_lcm_library_comparison(
         &triple_3_pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| no_out!(x.lcm(y))),
-            ("num", &mut |(_, _, (x, y))| no_out!(x.lcm(y))),
+            ("num", &mut |((x, y), _, _)| no_out!(x.lcm(&y))),
             ("rug", &mut |(_, (x, y), _)| no_out!(x.lcm(&y))),
         ],
     );

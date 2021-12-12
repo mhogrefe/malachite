@@ -521,10 +521,7 @@ fn or_properties() {
         assert_eq!(&x | &x, x);
     });
 
-    natural_triple_gen().test_properties(|(x, y, z)| {
-        let x = &x;
-        let y = &y;
-        let z = &z;
+    natural_triple_gen().test_properties(|(ref x, ref y, ref z)| {
         assert_eq!((x | y) | z, x | (y | z));
         assert_eq!(x & (y | z), (x & y) | (x & z));
         assert_eq!((x & y) | z, (x | z) & (y | z));

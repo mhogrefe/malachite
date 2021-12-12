@@ -4,14 +4,14 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::half::{wide_join_halves, wide_split_in_half, wide_upper_half};
 use num::conversion::traits::{HasHalf, SplitInHalf, WrappingFrom};
 
-fn _implicit_x_mul_y_is_zz<T, DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf>(
+fn implicit_x_mul_y_is_zz<T, DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned + SplitInHalf>(
     x: T,
     y: T,
 ) -> (T, T) {
     (DT::from(x) * DT::from(y)).split_in_half()
 }
 
-pub fn _explicit_x_mul_y_is_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
+pub fn explicit_x_mul_y_is_zz<T: PrimitiveUnsigned>(x: T, y: T) -> (T, T) {
     let (x_1, x_0) = wide_split_in_half(x);
     let (y_1, y_0) = wide_split_in_half(y);
     let x_0_y_0 = x_0 * y_0;
@@ -54,7 +54,7 @@ macro_rules! implicit_x_mul_y_is_zz {
             /// This is umul_ppmm from longlong.h, GMP 6.2.1, where (w1, w0) is returned.
             #[inline]
             fn x_mul_y_is_zz(x: $t, y: $t) -> ($t, $t) {
-                _implicit_x_mul_y_is_zz::<$t, $dt>(x, y)
+                implicit_x_mul_y_is_zz::<$t, $dt>(x, y)
             }
         }
     };
@@ -122,6 +122,6 @@ impl XMulYIsZZ for u128 {
     /// This is umul_ppmm from longlong.h, GMP 6.2.1, where (w1, w0) is returned.
     #[inline]
     fn x_mul_y_is_zz(x: u128, y: u128) -> (u128, u128) {
-        _explicit_x_mul_y_is_zz(x, y)
+        explicit_x_mul_y_is_zz(x, y)
     }
 }

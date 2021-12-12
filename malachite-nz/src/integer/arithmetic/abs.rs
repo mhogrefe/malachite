@@ -182,8 +182,38 @@ impl Integer {
         &self.abs
     }
 
-    //TODO doc and test
-    pub fn unsigned_abs_mut<F: Fn(&mut Natural) -> T, T>(&mut self, f: F) -> T {
+    /// Mutates the absolute value of an `Integer` using a provided closure.
+    ///
+    /// This function is similar to the `Integer::unsigned_abs_ref()` function, which returns a
+    /// reference to the absolute value. A function that returns a _mutable_ reference would be too
+    /// dangerous, as it could leave the `Integer` in an invalid state (specifically, with a
+    /// negative sign but a zero absolute value). So rather than returning a mutable reference,
+    /// this function allows mutation of the absolute value using a closure. After the closure
+    /// executes, this function ensures that the `Integer` remains valid.
+    ///
+    /// There is only constant time and memory overhead on top of the time and memory used by the
+    /// closure.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::arithmetic::traits::DivAssignMod;
+    /// use malachite_base::num::basic::traits::Two;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// let mut n = Integer::from(-123);
+    /// let remainder = n.mutate_unsigned_abs(|x| x.div_assign_mod(Natural::TWO));
+    /// assert_eq!(n, -61);
+    /// assert_eq!(remainder, 1);
+    ///
+    /// let mut n = Integer::from(-123);
+    /// n.mutate_unsigned_abs(|x| *x >>= 10);
+    /// assert_eq!(n, 0);
+    /// ```
+    pub fn mutate_unsigned_abs<F: FnOnce(&mut Natural) -> T, T>(&mut self, f: F) -> T {
         let out = f(&mut self.abs);
         if !self.sign && self.abs == 0 {
             self.sign = true;

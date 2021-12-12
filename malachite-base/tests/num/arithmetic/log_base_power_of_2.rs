@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::log_base_power_of_2::_ceiling_log_base_power_of_2_naive;
+use malachite_base::num::arithmetic::log_base_power_of_2::ceiling_log_base_power_of_2_naive;
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::Iverson;
@@ -364,7 +364,7 @@ fn ceiling_log_base_power_of_2_properties_helper_unsigned<T: PrimitiveUnsigned>(
     unsigned_pair_gen_var_21::<T, u64>().test_properties(|(n, pow)| {
         let ceiling_log = n.ceiling_log_base_power_of_2(pow);
         assert!(ceiling_log <= T::WIDTH);
-        assert_eq!(ceiling_log, _ceiling_log_base_power_of_2_naive(n, pow));
+        assert_eq!(ceiling_log, ceiling_log_base_power_of_2_naive(n, pow));
         assert_eq!(ceiling_log == 0, n == T::ONE);
         if pow < T::WIDTH {
             assert_eq!(n.ceiling_log_base(T::power_of_2(pow)), ceiling_log);

@@ -38,7 +38,7 @@ cargo +nightly fmt --all &&
 cargo clippy --tests --features 32_bit_limbs --features serde &&
 cargo test --release --features 32_bit_limbs --features fail_on_untested_path --features serde &&
 cargo test --release --test lib --features fail_on_untested_path --features serde && # Skip doctests when in 64-bit mode
-python extra-tests.py &&
+python3 extra-tests.py &&
 cargo clippy --tests --features serde &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps &&
 cargo build --release --features 32_bit_limbs --target wasm32-unknown-unknown &&

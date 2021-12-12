@@ -16,6 +16,5 @@ pub mod common;
 pub mod inputs {
     pub mod base;
     pub mod common;
-    pub mod integer;
     pub mod natural;
 }

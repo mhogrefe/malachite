@@ -34,10 +34,10 @@ fn test_to_power_of_2_digits_asc() {
         );
         assert_eq!(to_power_of_2_digits_asc_naive(&n, log_base), out);
     }
-    test::<u8, _>(Natural::_to_power_of_2_digits_asc_naive, "0", 1, &[]);
-    test::<u16, _>(Natural::_to_power_of_2_digits_asc_naive, "123", 10, &[123]);
+    test::<u8, _>(Natural::to_power_of_2_digits_asc_naive, "0", 1, &[]);
+    test::<u16, _>(Natural::to_power_of_2_digits_asc_naive, "123", 10, &[123]);
     test::<u16, _>(
-        Natural::_to_power_of_2_digits_asc_naive,
+        Natural::to_power_of_2_digits_asc_naive,
         "1000000000000",
         1,
         &[
@@ -46,31 +46,31 @@ fn test_to_power_of_2_digits_asc() {
         ],
     );
     test::<u32, _>(
-        Natural::_to_power_of_2_digits_asc_naive,
+        Natural::to_power_of_2_digits_asc_naive,
         "1000000000000",
         3,
         &[0, 0, 0, 0, 1, 2, 1, 5, 4, 2, 3, 4, 6, 1],
     );
     test::<u64, _>(
-        Natural::_to_power_of_2_digits_asc_naive,
+        Natural::to_power_of_2_digits_asc_naive,
         "1000000000000",
         4,
         &[0, 0, 0, 1, 5, 10, 4, 13, 8, 14],
     );
     test::<u32, _>(
-        Natural::_to_power_of_2_digits_asc_naive,
+        Natural::to_power_of_2_digits_asc_naive,
         "1000000000000",
         32,
         &[3567587328, 232],
     );
     test::<u64, _>(
-        Natural::_to_power_of_2_digits_asc_naive,
+        Natural::to_power_of_2_digits_asc_naive,
         "1000000000000",
         64,
         &[1000000000000],
     );
     test::<u64, _>(
-        Natural::_to_power_of_2_digits_asc_naive,
+        Natural::to_power_of_2_digits_asc_naive,
         "1000000000000000000000000",
         64,
         &[2003764205206896640, 54210],
@@ -161,7 +161,7 @@ fn test_to_power_of_2_digits_asc_natural() {
             out
         );
         assert_eq!(
-            n._to_power_of_2_digits_asc_natural_naive(log_base)
+            n.to_power_of_2_digits_asc_natural_naive(log_base)
                 .to_debug_string(),
             out
         );
@@ -253,7 +253,7 @@ where
     natural_unsigned_pair_gen_var_6::<T>().test_properties(|(ref n, log_base)| {
         let digits = n.to_power_of_2_digits_asc(log_base);
         assert_eq!(
-            Natural::_to_power_of_2_digits_asc_naive::<T>(n, log_base),
+            Natural::to_power_of_2_digits_asc_naive::<T>(n, log_base),
             digits
         );
         assert_eq!(
@@ -395,7 +395,7 @@ fn to_power_of_2_digits_desc_properties() {
 fn to_power_of_2_digits_asc_natural_properties() {
     natural_unsigned_pair_gen_var_7().test_properties(|(ref n, log_base)| {
         let digits: Vec<Natural> = n.to_power_of_2_digits_asc(log_base);
-        assert_eq!(n._to_power_of_2_digits_asc_natural_naive(log_base), digits);
+        assert_eq!(n.to_power_of_2_digits_asc_natural_naive(log_base), digits);
         assert_eq!(
             Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap(),
             *n

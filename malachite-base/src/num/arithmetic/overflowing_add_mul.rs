@@ -5,7 +5,7 @@ use num::arithmetic::traits::{
 use num::basic::integers::PrimitiveInt;
 use num::basic::traits::Zero;
 
-fn _overflowing_add_mul_unsigned<
+fn overflowing_add_mul_unsigned<
     T: OverflowingAdd<T, Output = T> + OverflowingMul<T, Output = T>,
 >(
     x: T,
@@ -35,7 +35,7 @@ macro_rules! impl_overflowing_add_mul_unsigned {
             /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
             #[inline]
             fn overflowing_add_mul(self, y: $t, z: $t) -> ($t, bool) {
-                _overflowing_add_mul_unsigned(self, y, z)
+                overflowing_add_mul_unsigned(self, y, z)
             }
         }
 
@@ -60,7 +60,7 @@ macro_rules! impl_overflowing_add_mul_unsigned {
 }
 apply_to_unsigneds!(impl_overflowing_add_mul_unsigned);
 
-fn _overflowing_add_mul_signed<
+fn overflowing_add_mul_signed<
     U: PrimitiveInt,
     S: Copy
         + Eq
@@ -122,7 +122,7 @@ macro_rules! impl_overflowing_add_mul_signed {
             /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
             #[inline]
             fn overflowing_add_mul(self, y: $t, z: $t) -> ($t, bool) {
-                _overflowing_add_mul_signed(self, y, z)
+                overflowing_add_mul_signed(self, y, z)
             }
         }
 

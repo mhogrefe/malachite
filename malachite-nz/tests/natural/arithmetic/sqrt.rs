@@ -17,9 +17,9 @@ use malachite_base_test_util::generators::{
     unsigned_vec_pair_gen_var_4, unsigned_vec_pair_gen_var_5, unsigned_vec_triple_gen_var_28,
 };
 use malachite_nz::natural::arithmetic::sqrt::{
-    _limbs_sqrt_helper, _limbs_sqrt_rem_helper, _limbs_sqrt_rem_helper_scratch_len,
-    _sqrt_rem_2_newton, limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_rem,
-    limbs_sqrt_rem_to_out, limbs_sqrt_to_out,
+    limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_helper, limbs_sqrt_rem,
+    limbs_sqrt_rem_helper, limbs_sqrt_rem_helper_scratch_len, limbs_sqrt_rem_to_out,
+    limbs_sqrt_to_out, sqrt_rem_2_newton,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
@@ -28,7 +28,7 @@ use malachite_nz_test_util::common::{
 };
 use malachite_nz_test_util::generators::natural_gen;
 use malachite_nz_test_util::natural::arithmetic::sqrt::{
-    _ceiling_sqrt_binary, _checked_sqrt_binary, _floor_sqrt_binary, _sqrt_rem_binary,
+    ceiling_sqrt_binary, checked_sqrt_binary, floor_sqrt_binary, sqrt_rem_binary,
 };
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -37,7 +37,7 @@ use std::str::FromStr;
 #[test]
 fn test_sqrt_rem_2_newton() {
     fn test(n_hi: Limb, n_lo: Limb, sqrt: Limb, r_hi: bool, r_lo: Limb) {
-        assert_eq!(_sqrt_rem_2_newton(n_hi, n_lo), (sqrt, r_hi, r_lo));
+        assert_eq!(sqrt_rem_2_newton(n_hi, n_lo), (sqrt, r_hi, r_lo));
         assert_eq!(
             DoubleLimb::from(sqrt)
                 .square()
@@ -55,7 +55,7 @@ fn test_sqrt_rem_2_newton() {
 
 #[test]
 fn sqrt_rem_2_newton_fail() {
-    assert_panic!(_sqrt_rem_2_newton(1, Limb::MAX));
+    assert_panic!(sqrt_rem_2_newton(1, Limb::MAX));
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -65,9 +65,9 @@ fn test_limbs_sqrt_rem_helper() {
         assert!(old_xs.len() >= n << 1);
         let mut out = vec![0; n];
         let mut xs = old_xs.to_vec();
-        let mut scratch = vec![0; _limbs_sqrt_rem_helper_scratch_len(n)];
+        let mut scratch = vec![0; limbs_sqrt_rem_helper_scratch_len(n)];
         assert_eq!(
-            _limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch),
+            limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch),
             r_hi
         );
         assert_eq!(out, out_out);
@@ -124,24 +124,24 @@ fn limbs_sqrt_rem_helper_fail() {
     assert_panic!({
         let out = &mut [];
         let xs = &mut [1, 2, 3];
-        let mut scratch = vec![0; _limbs_sqrt_rem_helper_scratch_len(out.len())];
-        _limbs_sqrt_rem_helper(out, xs, 0, &mut scratch)
+        let mut scratch = vec![0; limbs_sqrt_rem_helper_scratch_len(out.len())];
+        limbs_sqrt_rem_helper(out, xs, 0, &mut scratch)
     });
 
     // xs too short
     assert_panic!({
         let out = &mut [1, 2, 3];
         let xs = &mut [1, 2, 3, 4, Limb::MAX];
-        let mut scratch = vec![0; _limbs_sqrt_rem_helper_scratch_len(out.len())];
-        _limbs_sqrt_rem_helper(out, xs, 0, &mut scratch)
+        let mut scratch = vec![0; limbs_sqrt_rem_helper_scratch_len(out.len())];
+        limbs_sqrt_rem_helper(out, xs, 0, &mut scratch)
     });
 
     // (2 * n - 1)th element of xs too small
     assert_panic!({
         let out = &mut [1, 2, 3];
         let xs = &mut [1, 2, 3, 4, 5, 6];
-        let mut scratch = vec![0; _limbs_sqrt_rem_helper_scratch_len(out.len())];
-        _limbs_sqrt_rem_helper(out, xs, 0, &mut scratch)
+        let mut scratch = vec![0; limbs_sqrt_rem_helper_scratch_len(out.len())];
+        limbs_sqrt_rem_helper(out, xs, 0, &mut scratch)
     });
 }
 
@@ -153,7 +153,7 @@ fn test_limbs_sqrt_helper() {
         let odd = xs.len().odd();
         let shift = LeadingZeros::leading_zeros(*xs.last().unwrap()) >> 1;
         let mut out = vec![0; n];
-        assert_eq!(_limbs_sqrt_helper(&mut out, xs, shift, odd), has_remainder);
+        assert_eq!(limbs_sqrt_helper(&mut out, xs, shift, odd), has_remainder);
         assert_eq!(out, out_out);
 
         let x = Natural::from_limbs_asc(xs);
@@ -264,19 +264,19 @@ fn limbs_sqrt_helper_fail() {
     assert_panic!({
         let out = &mut [1, 2, 3, 4];
         let xs = &mut [Limb::MAX; 8];
-        _limbs_sqrt_helper(out, xs, 0, false);
+        limbs_sqrt_helper(out, xs, 0, false);
     });
     // last element of xs is 0
     assert_panic!({
         let out = &mut [1, 2, 3, 4, 5];
         let xs = &mut [10, 10, 10, 10, 10, 10, 10, 10, 10, 0];
-        _limbs_sqrt_helper(out, xs, 15, false);
+        limbs_sqrt_helper(out, xs, 15, false);
     });
     // shift too high
     assert_panic!({
         let out = &mut [1, 2, 3, 4, 5];
         let xs = &mut [Limb::MAX; 10];
-        _limbs_sqrt_helper(out, xs, 16, false);
+        limbs_sqrt_helper(out, xs, 16, false);
     });
 }
 
@@ -483,7 +483,7 @@ fn limbs_ceiling_sqrt_fail() {
 #[test]
 fn test_limbs_checked_sqrt() {
     fn test(xs: &[Limb], out: Option<&[Limb]>) {
-        assert_eq!(limbs_checked_sqrt(xs), out.map(|xs| xs.to_vec()));
+        assert_eq!(limbs_checked_sqrt(xs), out.map(<[Limb]>::to_vec));
     }
     test(&[1, 2, 3], None);
     test(&[0, 0, 1], Some(&[0, 1]));
@@ -522,7 +522,7 @@ fn test_floor_sqrt() {
         let n = Natural::from_str(s).unwrap();
         assert_eq!(n.clone().floor_sqrt().to_string(), out);
         assert_eq!((&n).floor_sqrt().to_string(), out);
-        assert_eq!(_floor_sqrt_binary(&n).to_string(), out);
+        assert_eq!(floor_sqrt_binary(&n).to_string(), out);
 
         let mut n = n;
         n.floor_sqrt_assign();
@@ -556,7 +556,7 @@ fn test_ceiling_sqrt() {
         let n = Natural::from_str(s).unwrap();
         assert_eq!(n.clone().ceiling_sqrt().to_string(), out);
         assert_eq!((&n).ceiling_sqrt().to_string(), out);
-        assert_eq!(_ceiling_sqrt_binary(&n).to_string(), out);
+        assert_eq!(ceiling_sqrt_binary(&n).to_string(), out);
 
         let mut n = n;
         n.ceiling_sqrt_assign();
@@ -593,7 +593,7 @@ fn test_checked_sqrt() {
 
         assert_eq!(n.clone().checked_sqrt().map(|x| x.to_string()), out);
         assert_eq!((&n).checked_sqrt().map(|x| x.to_string()), out);
-        assert_eq!(_checked_sqrt_binary(&n).map(|x| x.to_string()), out);
+        assert_eq!(checked_sqrt_binary(&n).map(|x| x.to_string()), out);
     };
     test("0", Some("0"));
     test("1", Some("1"));
@@ -627,7 +627,7 @@ fn test_sqrt_rem() {
         assert_eq!(sqrt.to_string(), sqrt_out);
         assert_eq!(rem.to_string(), rem_out);
 
-        let (sqrt, rem) = _sqrt_rem_binary(&n);
+        let (sqrt, rem) = sqrt_rem_binary(&n);
         assert_eq!(sqrt.to_string(), sqrt_out);
         assert_eq!(rem.to_string(), rem_out);
 
@@ -662,7 +662,7 @@ fn test_sqrt_rem() {
 #[test]
 fn sqrt_rem_2_newton_properties() {
     unsigned_pair_gen_var_31().test_properties(|(n_hi, n_lo)| {
-        let (sqrt, r_hi, r_lo) = _sqrt_rem_2_newton(n_hi, n_lo);
+        let (sqrt, r_hi, r_lo) = sqrt_rem_2_newton(n_hi, n_lo);
         assert_eq!(
             DoubleLimb::from(sqrt)
                 .square()
@@ -680,9 +680,9 @@ fn limbs_sqrt_rem_helper_properties() {
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     unsigned_vec_pair_gen_var_4().test_properties_with_config(&config, |(mut out, mut xs)| {
         let n = out.len();
-        let mut scratch = vec![0; _limbs_sqrt_rem_helper_scratch_len(n)];
+        let mut scratch = vec![0; limbs_sqrt_rem_helper_scratch_len(n)];
         let old_xs = xs.clone();
-        let r_hi = _limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch);
+        let r_hi = limbs_sqrt_rem_helper(&mut out, &mut xs, 0, &mut scratch);
         let x = Natural::from_limbs_asc(&old_xs[..n << 1]);
         let sqrt = Natural::from_limbs_asc(&out);
         let mut rem = Natural::from_limbs_asc(&xs[..n]);
@@ -702,7 +702,7 @@ fn limbs_sqrt_helper_properties() {
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
     large_type_gen_var_2().test_properties_with_config(&config, |(mut out, xs, shift, odd)| {
-        let has_remainder = _limbs_sqrt_helper(&mut out, &xs, shift, odd);
+        let has_remainder = limbs_sqrt_helper(&mut out, &xs, shift, odd);
         let x = Natural::from_limbs_asc(&xs);
         let sqrt = Natural::from_limbs_asc(&out);
         let (sqrt_alt, rem) = (&x).sqrt_rem();
@@ -820,7 +820,7 @@ fn floor_sqrt_properties() {
         let mut n_alt = n.clone();
         n_alt.floor_sqrt_assign();
         assert_eq!(n_alt, sqrt);
-        assert_eq!(_floor_sqrt_binary(&n), sqrt);
+        assert_eq!(floor_sqrt_binary(&n), sqrt);
         assert_eq!((&n).floor_root(2), sqrt);
         assert_eq!(biguint_to_natural(&natural_to_biguint(&n).sqrt()), sqrt);
         assert_eq!(
@@ -852,7 +852,7 @@ fn ceiling_sqrt_properties() {
         let mut n_alt = n.clone();
         n_alt.ceiling_sqrt_assign();
         assert_eq!(n_alt, sqrt);
-        assert_eq!(_ceiling_sqrt_binary(&n), sqrt);
+        assert_eq!(ceiling_sqrt_binary(&n), sqrt);
         assert_eq!((&n).ceiling_root(2), sqrt);
         let square = (&sqrt).square();
         let floor_sqrt = (&n).floor_sqrt();
@@ -877,7 +877,7 @@ fn checked_sqrt_properties() {
     natural_gen().test_properties(|n| {
         let sqrt = n.clone().checked_sqrt();
         assert_eq!((&n).checked_sqrt(), sqrt);
-        assert_eq!(_checked_sqrt_binary(&n), sqrt);
+        assert_eq!(checked_sqrt_binary(&n), sqrt);
         assert_eq!((&n).checked_root(2), sqrt);
         if let Some(sqrt) = sqrt {
             assert_eq!((&sqrt).square(), n);
@@ -902,7 +902,7 @@ fn sqrt_rem_properties() {
         let mut n_alt = n.clone();
         assert_eq!(n_alt.sqrt_assign_rem(), rem);
         assert_eq!(n_alt, sqrt);
-        assert_eq!(_sqrt_rem_binary(&n), (sqrt.clone(), rem.clone()));
+        assert_eq!(sqrt_rem_binary(&n), (sqrt.clone(), rem.clone()));
         assert_eq!((&n).root_rem(2), (sqrt.clone(), rem.clone()));
         let (rug_sqrt, rug_rem) = natural_to_rug_integer(&n).sqrt_rem(rug::Integer::new());
         assert_eq!(rug_integer_to_natural(&rug_sqrt), sqrt);

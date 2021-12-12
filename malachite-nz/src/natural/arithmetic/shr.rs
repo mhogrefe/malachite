@@ -217,7 +217,7 @@ pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
     }
 }
 
-fn _shr_unsigned_ref<T: Copy + Eq + Ord + WrappingFrom<u64> + Zero>(x: &Natural, bits: T) -> Natural
+fn shr_unsigned_ref<T: Copy + Eq + Ord + WrappingFrom<u64> + Zero>(x: &Natural, bits: T) -> Natural
 where
     u64: ExactFrom<T>,
     Limb: Shr<T, Output = Limb>,
@@ -233,7 +233,7 @@ where
     }
 }
 
-fn _shr_assign_unsigned<T: Copy + Eq + Ord + WrappingFrom<u64> + Zero>(x: &mut Natural, bits: T)
+fn shr_assign_unsigned<T: Copy + Eq + Ord + WrappingFrom<u64> + Zero>(x: &mut Natural, bits: T)
 where
     u64: ExactFrom<T>,
     Limb: ShrAssign<T>,
@@ -313,7 +313,7 @@ macro_rules! impl_natural_shr_unsigned {
             /// ```
             #[inline]
             fn shr(self, bits: $t) -> Natural {
-                _shr_unsigned_ref(self, bits)
+                shr_unsigned_ref(self, bits)
             }
         }
 
@@ -339,14 +339,14 @@ macro_rules! impl_natural_shr_unsigned {
             /// ```
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
-                _shr_assign_unsigned(self, bits);
+                shr_assign_unsigned(self, bits);
             }
         }
     };
 }
 apply_to_unsigneds!(impl_natural_shr_unsigned);
 
-fn _shr_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
+fn shr_signed_ref<'a, U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &'a Natural,
     bits: S,
 ) -> Natural
@@ -360,7 +360,7 @@ where
     }
 }
 
-fn _shr_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Natural, bits: S)
+fn shr_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Natural, bits: S)
 where
     Natural: ShlAssign<U> + ShrAssign<U>,
 {
@@ -434,7 +434,7 @@ macro_rules! impl_natural_shr_signed {
             /// ```
             #[inline]
             fn shr(self, bits: $t) -> Natural {
-                _shr_signed_ref(self, bits)
+                shr_signed_ref(self, bits)
             }
         }
 
@@ -470,7 +470,7 @@ macro_rules! impl_natural_shr_signed {
             /// ```
             #[inline]
             fn shr_assign(&mut self, bits: $t) {
-                _shr_assign_signed(self, bits);
+                shr_assign_signed(self, bits);
             }
         }
     };

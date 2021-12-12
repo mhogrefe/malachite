@@ -13,10 +13,9 @@ use malachite_base_test_util::generators::{
 };
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::conversion::digits::general_digits::{
-    _from_digits_asc_large, _from_digits_asc_limb, _from_digits_desc_basecase,
-    _from_digits_desc_large, _from_digits_desc_limb, _from_digits_desc_naive,
-    _from_digits_desc_naive_primitive, _limbs_from_digits_small_base,
-    _limbs_from_digits_small_base_basecase,
+    from_digits_asc_large, from_digits_asc_limb, from_digits_desc_basecase, from_digits_desc_large,
+    from_digits_desc_limb, from_digits_desc_naive, from_digits_desc_naive_primitive,
+    limbs_from_digits_small_base, limbs_from_digits_small_base_basecase,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
@@ -79,9 +78,9 @@ fn demo_limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
         .take(limit)
     {
         let old_out = out.to_vec();
-        let out_len = _limbs_from_digits_small_base_basecase(&mut out, &xs, base);
+        let out_len = limbs_from_digits_small_base_basecase(&mut out, &xs, base);
         println!(
-            "out := {:?}; _limbs_from_digits_small_base_basecase(&mut out, {:?}, {}) = {:?}; \
+            "out := {:?}; limbs_from_digits_small_base_basecase(&mut out, {:?}, {}) = {:?}; \
             out = {:?}",
             old_out, xs, base, out_len, out
         );
@@ -100,9 +99,9 @@ fn demo_limbs_from_digits_small_base_basecase_targeted<T: PrimitiveUnsigned>(
         .take(limit)
     {
         let old_out = out.to_vec();
-        let out_len = _limbs_from_digits_small_base_basecase(&mut out, &xs, base).unwrap();
+        let out_len = limbs_from_digits_small_base_basecase(&mut out, &xs, base).unwrap();
         println!(
-            "out := {:?}; _limbs_from_digits_small_base_basecase(&mut out, {:?}, {}) = {}; \
+            "out := {:?}; limbs_from_digits_small_base_basecase(&mut out, {:?}, {}) = {}; \
             out = {:?}",
             old_out, xs, base, out_len, out
         );
@@ -121,9 +120,9 @@ fn demo_limbs_from_digits_small_base<T: PrimitiveUnsigned>(
         .take(limit)
     {
         let old_out = out.to_vec();
-        let out_len = _limbs_from_digits_small_base(&mut out, &xs, base);
+        let out_len = limbs_from_digits_small_base(&mut out, &xs, base);
         println!(
-            "out := {:?}; _limbs_from_digits_small_base(&mut out, {:?}, {}) = {:?}; out = {:?}",
+            "out := {:?}; limbs_from_digits_small_base(&mut out, {:?}, {}) = {:?}; out = {:?}",
             old_out, xs, base, out_len, out
         );
     }
@@ -141,9 +140,9 @@ fn demo_limbs_from_digits_small_base_targeted<T: PrimitiveUnsigned>(
         .take(limit)
     {
         let old_out = out.to_vec();
-        let out_len = _limbs_from_digits_small_base(&mut out, &xs, base).unwrap();
+        let out_len = limbs_from_digits_small_base(&mut out, &xs, base).unwrap();
         println!(
-            "out := {:?}; _limbs_from_digits_small_base(&mut out, {:?}, {}) = {}; \
+            "out := {:?}; limbs_from_digits_small_base(&mut out, {:?}, {}) = {}; \
             out = {:?}",
             old_out, xs, base, out_len, out
         );
@@ -162,10 +161,10 @@ fn demo_from_digits_desc_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         .take(limit)
     {
         println!(
-            "_from_digits_desc_basecase(&{:?}, {}) = {:?}",
+            "from_digits_desc_basecase(&{:?}, {}) = {:?}",
             xs,
             base,
-            _from_digits_desc_basecase(&xs, base)
+            from_digits_desc_basecase(&xs, base)
         );
     }
 }
@@ -182,10 +181,10 @@ fn demo_from_digits_desc_basecase_targeted<T: ConvertibleFrom<Limb> + PrimitiveU
         .take(limit)
     {
         println!(
-            "_from_digits_desc_basecase(&{:?}, {}) = {}",
+            "from_digits_desc_basecase(&{:?}, {}) = {}",
             xs,
             base,
-            _from_digits_desc_basecase(&xs, base).unwrap()
+            from_digits_desc_basecase(&xs, base).unwrap()
         );
     }
 }
@@ -203,10 +202,10 @@ fn demo_from_digits_asc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         .take(limit)
     {
         println!(
-            "_from_digits_asc_limb(&{:?}, {}) = {:?}",
+            "from_digits_asc_limb(&{:?}, {}) = {:?}",
             xs.clone(),
             base,
-            _from_digits_asc_limb(xs.into_iter(), base)
+            from_digits_asc_limb(xs.into_iter(), base)
         );
     }
 }
@@ -224,10 +223,10 @@ fn demo_from_digits_desc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         .take(limit)
     {
         println!(
-            "_from_digits_desc_limb(&{:?}, {}) = {:?}",
+            "from_digits_desc_limb(&{:?}, {}) = {:?}",
             xs.clone(),
             base,
-            _from_digits_desc_limb(xs.into_iter(), base)
+            from_digits_desc_limb(xs.into_iter(), base)
         );
     }
 }
@@ -245,10 +244,10 @@ fn demo_from_digits_asc_limb_targeted<T: ConvertibleFrom<Limb> + PrimitiveUnsign
         .take(limit)
     {
         println!(
-            "_from_digits_asc_limb(&{:?}, {}) = {}",
+            "from_digits_asc_limb(&{:?}, {}) = {}",
             xs.clone(),
             base,
-            _from_digits_asc_limb(xs.into_iter(), base).unwrap()
+            from_digits_asc_limb(xs.into_iter(), base).unwrap()
         );
     }
 }
@@ -266,10 +265,10 @@ fn demo_from_digits_desc_limb_targeted<T: ConvertibleFrom<Limb> + PrimitiveUnsig
         .take(limit)
     {
         println!(
-            "_from_digits_desc_limb(&{:?}, {}) = {}",
+            "from_digits_desc_limb(&{:?}, {}) = {}",
             xs.clone(),
             base,
-            _from_digits_desc_limb(xs.into_iter(), base).unwrap()
+            from_digits_desc_limb(xs.into_iter(), base).unwrap()
         );
     }
 }
@@ -280,10 +279,10 @@ fn demo_from_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize) {
         .take(limit)
     {
         println!(
-            "_from_digits_asc_large(&{:?}, {}) = {:?}",
+            "from_digits_asc_large(&{:?}, {}) = {:?}",
             xs.clone(),
             base,
-            _from_digits_asc_large(xs.into_iter(), &base)
+            from_digits_asc_large(xs.into_iter(), &base)
         );
     }
 }
@@ -294,10 +293,10 @@ fn demo_from_digits_desc_large(gm: GenMode, config: GenConfig, limit: usize) {
         .take(limit)
     {
         println!(
-            "_from_digits_desc_large(&{:?}, {}) = {:?}",
+            "from_digits_desc_large(&{:?}, {}) = {:?}",
             xs.clone(),
             base,
-            _from_digits_desc_large(xs.into_iter(), &base)
+            from_digits_desc_large(xs.into_iter(), &base)
         );
     }
 }
@@ -308,10 +307,10 @@ fn demo_from_digits_asc_large_targeted(gm: GenMode, config: GenConfig, limit: us
         .take(limit)
     {
         println!(
-            "_from_digits_asc_large(&{:?}, {}) = {}",
+            "from_digits_asc_large(&{:?}, {}) = {}",
             xs.clone(),
             base,
-            _from_digits_asc_large(xs.into_iter(), &base).unwrap()
+            from_digits_asc_large(xs.into_iter(), &base).unwrap()
         );
     }
 }
@@ -322,10 +321,10 @@ fn demo_from_digits_desc_large_targeted(gm: GenMode, config: GenConfig, limit: u
         .take(limit)
     {
         println!(
-            "_from_digits_desc_large(&{:?}, {}) = {}",
+            "from_digits_desc_large(&{:?}, {}) = {}",
             xs.clone(),
             base,
-            _from_digits_desc_large(xs.into_iter(), &base).unwrap()
+            from_digits_desc_large(xs.into_iter(), &base).unwrap()
         );
     }
 }
@@ -489,7 +488,7 @@ fn benchmark_limbs_from_digits_small_base_basecase_algorithms<T: PrimitiveUnsign
 {
     run_benchmark(
         &format!(
-            "_limbs_from_digits_small_base_basecase(&mut [Limb], &[{}], u64)",
+            "limbs_from_digits_small_base_basecase(&mut [Limb], &[{}], u64)",
             T::NAME
         ),
         BenchmarkType::Algorithms,
@@ -500,10 +499,10 @@ fn benchmark_limbs_from_digits_small_base_basecase_algorithms<T: PrimitiveUnsign
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("basecase", &mut |(mut out, xs, base)| {
-                no_out!(_limbs_from_digits_small_base_basecase(&mut out, &xs, base).unwrap())
+                no_out!(limbs_from_digits_small_base_basecase(&mut out, &xs, base).unwrap())
             }),
             ("naive", &mut |(_, xs, base)| {
-                _from_digits_desc_naive_primitive(&xs, T::exact_from(base))
+                from_digits_desc_naive_primitive(&xs, T::exact_from(base))
                     .unwrap()
                     .into_limbs_asc();
             }),
@@ -522,7 +521,7 @@ fn benchmark_limbs_from_digits_small_base_algorithms<T: PrimitiveUnsigned>(
 {
     run_benchmark(
         &format!(
-            "_limbs_from_digits_small_base(&mut [Limb], &[{}], u64)",
+            "limbs_from_digits_small_base(&mut [Limb], &[{}], u64)",
             T::NAME
         ),
         BenchmarkType::Algorithms,
@@ -533,10 +532,10 @@ fn benchmark_limbs_from_digits_small_base_algorithms<T: PrimitiveUnsigned>(
         &triple_2_vec_len_bucketer("xs"),
         &mut [
             ("full", &mut |(mut out, xs, base)| {
-                no_out!(_limbs_from_digits_small_base(&mut out, &xs, base))
+                no_out!(limbs_from_digits_small_base(&mut out, &xs, base))
             }),
             ("basecase", &mut |(mut out, xs, base)| {
-                no_out!(_limbs_from_digits_small_base_basecase(&mut out, &xs, base))
+                no_out!(limbs_from_digits_small_base_basecase(&mut out, &xs, base))
             }),
         ],
     );
@@ -561,10 +560,10 @@ fn benchmark_from_digits_desc_basecase_algorithms<T: ConvertibleFrom<Limb> + Pri
         &pair_1_vec_len_bucketer("xs"),
         &mut [
             ("default", &mut |(xs, base)| {
-                no_out!(_from_digits_desc_basecase(&xs, base).unwrap())
+                no_out!(from_digits_desc_basecase(&xs, base).unwrap())
             }),
             ("naive", &mut |(xs, base)| {
-                _from_digits_desc_naive_primitive(&xs, T::exact_from(base))
+                from_digits_desc_naive_primitive(&xs, T::exact_from(base))
                     .unwrap()
                     .into_limbs_asc();
             }),
@@ -590,7 +589,7 @@ fn benchmark_from_digits_asc_limb<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
         file_name,
         &pair_1_vec_len_times_pair_2_bits_bucketer("xs", "base"),
         &mut [("Malachite", &mut |(xs, base)| {
-            no_out!(_from_digits_asc_limb(xs.into_iter(), base))
+            no_out!(from_digits_asc_limb(xs.into_iter(), base))
         })],
     );
 }
@@ -614,10 +613,10 @@ fn benchmark_from_digits_desc_limb_algorithms<T: ConvertibleFrom<Limb> + Primiti
         &pair_1_vec_len_times_pair_2_bits_bucketer("xs", "base"),
         &mut [
             ("full", &mut |(xs, base)| {
-                no_out!(_from_digits_desc_limb(xs.into_iter(), base))
+                no_out!(from_digits_desc_limb(xs.into_iter(), base))
             }),
             ("basecase", &mut |(xs, base)| {
-                no_out!(_from_digits_desc_basecase(&xs, base))
+                no_out!(from_digits_desc_basecase(&xs, base))
             }),
         ],
     );
@@ -633,7 +632,7 @@ fn benchmark_from_digits_asc_large(gm: GenMode, config: GenConfig, limit: usize,
         file_name,
         &pair_1_vec_len_times_pair_2_natural_bits_bucketer("xs", "base"),
         &mut [("Malachite", &mut |(xs, base)| {
-            no_out!(_from_digits_desc_large(xs.into_iter(), &base))
+            no_out!(from_digits_desc_large(xs.into_iter(), &base))
         })],
     );
 }
@@ -654,10 +653,10 @@ fn benchmark_from_digits_desc_large_algorithms(
         &pair_1_vec_len_times_pair_2_natural_bits_bucketer("xs", "base"),
         &mut [
             ("large", &mut |(xs, base)| {
-                no_out!(_from_digits_desc_large(xs.into_iter(), &base))
+                no_out!(from_digits_desc_large(xs.into_iter(), &base))
             }),
             ("naive", &mut |(xs, base)| {
-                no_out!(_from_digits_desc_naive(&xs, &base))
+                no_out!(from_digits_desc_naive(&xs, &base))
             }),
         ],
     );
@@ -718,7 +717,7 @@ fn benchmark_from_digits_desc_unsigned_algorithms<
                 no_out!(Natural::from_digits_desc(&base, xs.into_iter()))
             }),
             ("naive", &mut |(xs, base)| {
-                _from_digits_desc_naive_primitive(&xs, T::exact_from(base));
+                from_digits_desc_naive_primitive(&xs, T::exact_from(base));
             }),
         ],
     );
@@ -758,7 +757,7 @@ fn benchmark_from_digits_desc_algorithms(
                 no_out!(Natural::from_digits_desc(&base, xs.into_iter()))
             }),
             ("naive", &mut |(xs, base)| {
-                _from_digits_desc_naive(&xs, &base);
+                from_digits_desc_naive(&xs, &base);
             }),
         ],
     );

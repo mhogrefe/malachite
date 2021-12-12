@@ -1003,7 +1003,7 @@ pub fn limbs_div_approx_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_
 
 /// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
 /// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
-/// `_limbs_invert_approx` for an explanation of the return value.
+/// `limbs_invert_approx` for an explanation of the return value.
 ///
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
@@ -1052,7 +1052,7 @@ pub fn limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut 
 
 /// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
 /// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
-/// `_limbs_invert_approx` for an explanation of the return value.
+/// `limbs_invert_approx` for an explanation of the return value.
 ///
 /// Uses Newton's iterations (at least one). Inspired by Algorithm "ApproximateReciprocal",
 /// published in "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann, algorithm
@@ -1454,7 +1454,6 @@ pub fn limbs_div_mod_barrett_helper(
         limbs_invert_approx(is, scratch_lo, scratch_hi);
         slice_move_left(is, 1);
     } else if limbs_add_limb_to_out(scratch_hi, &ds[d_len - i_len_plus_1..], 1) {
-        fail_on_untested_path("limbs_div_mod_barrett_helper, limbs_add_limb_to_out");
         slice_set_zero(&mut is[..i_len]);
     } else {
         let (scratch_lo, scratch_hi) = scratch_hi.split_at_mut(i_len_plus_1);
@@ -1538,10 +1537,6 @@ pub fn limbs_div_mod_barrett_large_helper(
         scratch_hi,
         limbs_sub_same_length_to_out(rs_lo, ns_lo, scratch_lo),
     ) {
-        fail_on_untested_path(
-            "limbs_div_mod_barrett_large_helper, \
-            limbs_sub_same_length_with_borrow_in_in_place_left",
-        );
         if limbs_sub_limb_in_place(qs, 1) {
             assert!(highest_q);
             highest_q = false;
@@ -1818,7 +1813,6 @@ pub(crate) fn limbs_div_mod_balanced(
         } else if q_len < MU_DIV_QR_THRESHOLD {
             limbs_div_mod_divide_and_conquer(qs, ns_shifted, ds_shifted, d_inv);
         } else {
-            fail_on_untested_path("limbs_div_mod_balanced, q_len >= MU_DIV_QR_THRESHOLD");
             let mut scratch = vec![0; limbs_div_mod_barrett_scratch_len(q_len_2, q_len)];
             limbs_div_mod_barrett(qs, rs, ns_shifted, ds_shifted, &mut scratch);
             ns_shifted[..q_len].copy_from_slice(&rs[..q_len]);

@@ -123,7 +123,7 @@ fn benchmark_to_power_of_2_digits_asc_algorithms<
                 no_out!(PowerOf2Digits::<T>::to_power_of_2_digits_asc(&n, log_base))
             }),
             ("naive", &mut |(n, log_base)| {
-                no_out!(Natural::_to_power_of_2_digits_asc_naive::<T>(&n, log_base))
+                no_out!(Natural::to_power_of_2_digits_asc_naive::<T>(&n, log_base))
             }),
             ("using iterator", &mut |(n, log_base)| {
                 no_out!(
@@ -231,7 +231,7 @@ fn benchmark_natural_to_power_of_2_digits_asc_natural_algorithms(
                 ))
             }),
             ("naive", &mut |(n, log_base)| {
-                no_out!(n._to_power_of_2_digits_asc_natural_naive(log_base))
+                no_out!(n.to_power_of_2_digits_asc_natural_naive(log_base))
             }),
             ("using iterator", &mut |(n, log_base)| {
                 no_out!(

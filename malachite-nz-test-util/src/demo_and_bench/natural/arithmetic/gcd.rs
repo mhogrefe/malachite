@@ -4,24 +4,32 @@ use crate::bench::bucketers::{
 };
 use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
 use malachite_base_test_util::bench::bucketers::{
-    pair_1_vec_len_bucketer, quadruple_3_vec_len_bucketer, unsigned_direct_bucketer,
+    pair_1_vec_len_bucketer, quadruple_3_vec_len_bucketer, quadruple_max_bit_bucketer,
+    unsigned_direct_bucketer,
 };
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{
-    unsigned_gen_var_11, unsigned_vec_unsigned_pair_gen_var_23,
+    unsigned_gen_var_11, unsigned_quadruple_gen_var_11, unsigned_vec_unsigned_pair_gen_var_23,
 };
 use malachite_base_test_util::runner::Runner;
-use malachite_nz::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix;
+use malachite_nz::natural::arithmetic::gcd::half_gcd::{
+    limbs_gcd_div, limbs_gcd_reduced, limbs_half_gcd_matrix_1_mul_vector, HalfGcdMatrix,
+};
+use malachite_nz::natural::arithmetic::gcd::limbs_gcd_limb;
 use malachite_nz::natural::arithmetic::gcd::matrix_2_2::{
     limbs_matrix_2_2_mul, limbs_matrix_2_2_mul_small, limbs_matrix_2_2_mul_strassen,
     limbs_matrix_mul_2_2_scratch_len,
 };
-use malachite_nz::natural::arithmetic::gcd::{gcd_binary_nz, gcd_euclidean_nz, limbs_gcd_limb};
 use malachite_nz_test_util::generators::{
     large_type_gen_var_5, large_type_gen_var_6, large_type_gen_var_7, large_type_gen_var_8,
     natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_var_4, natural_pair_gen_var_4_nrm,
+    unsigned_vec_pair_gen_var_10,
 };
+use malachite_nz_test_util::natural::arithmetic::gcd::{
+    gcd_binary_nz, gcd_euclidean_nz, limbs_gcd_div_alt, limbs_gcd_div_naive, OwnedHalfGcdMatrix,
+};
+use num::Integer;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_gcd_limb);
@@ -30,6 +38,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_half_gcd_matrix_mul_matrix_1);
     register_demo!(runner, demo_half_gcd_matrix_1_mul_vector);
     register_demo!(runner, demo_limbs_matrix_2_2_mul);
+    register_demo!(runner, demo_limbs_gcd_div);
+    register_demo!(runner, demo_limbs_gcd_reduced);
     register_demo!(runner, demo_natural_gcd);
     register_demo!(runner, demo_natural_gcd_val_ref);
     register_demo!(runner, demo_natural_gcd_ref_val);
@@ -44,6 +54,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_half_gcd_matrix_mul_matrix_1);
     register_bench!(runner, benchmark_half_gcd_matrix_1_mul_vector);
     register_bench!(runner, benchmark_limbs_matrix_2_2_mul_algorithms);
+    register_bench!(runner, benchmark_limbs_gcd_div_algorithms);
+    register_bench!(runner, benchmark_limbs_gcd_reduced);
     register_bench!(runner, benchmark_natural_gcd_algorithms);
     register_bench!(runner, benchmark_natural_gcd_library_comparison);
     register_bench!(runner, benchmark_natural_gcd_evaluation_strategy);
@@ -74,7 +86,7 @@ fn demo_half_gcd_matrix_init(gm: GenMode, config: GenConfig, limit: usize) {
             "HalfGcdMatrix::init({}, vec![0; {}]) = {:?}",
             n,
             scratch_len,
-            HalfGcdMatrix::init(n, vec![0; scratch_len])
+            OwnedHalfGcdMatrix::init(n, vec![0; scratch_len])
         );
     }
 }
@@ -82,7 +94,7 @@ fn demo_half_gcd_matrix_init(gm: GenMode, config: GenConfig, limit: usize) {
 fn demo_half_gcd_matrix_update_q(gm: GenMode, config: GenConfig, limit: usize) {
     for (mut m, qs, column) in large_type_gen_var_5().get(gm, &config).take(limit) {
         let old_m = m.clone();
-        let mut scratch = vec![0; HalfGcdMatrix::update_q_scratch_len(&m, qs.len())];
+        let mut scratch = vec![0; OwnedHalfGcdMatrix::update_q_scratch_len(&m, qs.len())];
         m.update_q(&qs, column, &mut scratch);
         println!(
             "HalfGcdMatrix::update_q({:?}, {:?}, {}) = {:?}",
@@ -104,10 +116,10 @@ fn demo_half_gcd_matrix_1_mul_vector(gm: GenMode, config: GenConfig, limit: usiz
     for (m, mut out, xs, mut ys) in large_type_gen_var_6().get(gm, &config).take(limit) {
         let old_out = out.clone();
         let old_ys = ys.clone();
-        let out_len = m.mul_vector(&mut out, &xs, &mut ys);
+        let out_len = limbs_half_gcd_matrix_1_mul_vector(&m, &mut out, &xs, &mut ys);
         println!(
             "out := {:?}; ys := {:?}; \
-            HalfGcdMatrix1::mul_vector({:?}, &mut out, {:?}, &mut ys) = {}; \
+            limbs_half_gcd_matrix_1_mul_vector({:?}, &mut out, {:?}, &mut ys) = {}; \
             out = {:?}; ys = {:?}",
             old_out, old_ys, m, xs, out_len, out, ys
         );
@@ -146,6 +158,33 @@ fn demo_limbs_matrix_2_2_mul(gm: GenMode, config: GenConfig, limit: usize) {
             ys10,
             ys11,
             (xs00, xs01, xs10, xs11)
+        );
+    }
+}
+
+fn demo_limbs_gcd_div(gm: GenMode, config: GenConfig, limit: usize) {
+    for (n1, n0, d1, d0) in unsigned_quadruple_gen_var_11().get(gm, &config).take(limit) {
+        println!(
+            "limbs_gcd_div({}, {}, {}, {}) = {:?}",
+            n1,
+            n0,
+            d1,
+            d0,
+            limbs_gcd_div(n1, n0, d1, d0)
+        );
+    }
+}
+
+fn demo_limbs_gcd_reduced(gm: GenMode, config: GenConfig, limit: usize) {
+    for (mut xs, mut ys) in unsigned_vec_pair_gen_var_10().get(gm, &config).take(limit) {
+        let xs_old = xs.clone();
+        let ys_old = ys.clone();
+        let mut out = vec![0; xs.len()];
+        let out_len = limbs_gcd_reduced(&mut out, &mut xs, &mut ys);
+        out.resize(out_len, 0);
+        println!(
+            "limbs_gcd_reduced(&mut out, {:?}, {:?}); out = {:?}",
+            xs_old, ys_old, out
         );
     }
 }
@@ -204,6 +243,19 @@ fn demo_natural_gcd_2(gm: GenMode, config: GenConfig, limit: usize) {
 
 fn benchmark_limbs_gcd_limb(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
+        "HalfGcdMatrix::init(usize, Vec<Limb>)",
+        BenchmarkType::Single,
+        unsigned_vec_unsigned_pair_gen_var_23().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_bucketer("xs"),
+        &mut [("Malachite", &mut |(xs, y)| no_out!(limbs_gcd_limb(&xs, y)))],
+    );
+}
+
+fn benchmark_half_gcd_matrix_init(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
         "limbs_gcd_limb(&[Limb], Limb)",
         BenchmarkType::Single,
         unsigned_gen_var_11().get(gm, &config),
@@ -213,21 +265,8 @@ fn benchmark_limbs_gcd_limb(gm: GenMode, config: GenConfig, limit: usize, file_n
         &unsigned_direct_bucketer(),
         &mut [("Malachite", &mut |n| {
             let scratch_len = HalfGcdMatrix::min_init_scratch(n);
-            HalfGcdMatrix::init(n, vec![0; scratch_len]);
+            OwnedHalfGcdMatrix::init(n, vec![0; scratch_len]);
         })],
-    );
-}
-
-fn benchmark_half_gcd_matrix_init(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
-    run_benchmark(
-        "HalfGcdMatrix::init(usize, Vec<Limb>)",
-        BenchmarkType::Single,
-        unsigned_vec_unsigned_pair_gen_var_23().get(gm, &config),
-        gm.name(),
-        limit,
-        file_name,
-        &pair_1_vec_len_bucketer("xs"),
-        &mut [("Malachite", &mut |(xs, y)| no_out!(limbs_gcd_limb(&xs, y)))],
     );
 }
 
@@ -246,7 +285,7 @@ fn benchmark_half_gcd_matrix_update_q(
         file_name,
         &triple_1_half_gcd_matrix_bucketer("m"),
         &mut [("Malachite", &mut |(mut m, qs, column)| {
-            let mut scratch = vec![0; HalfGcdMatrix::update_q_scratch_len(&m, qs.len())];
+            let mut scratch = vec![0; OwnedHalfGcdMatrix::update_q_scratch_len(&m, qs.len())];
             m.update_q(&qs, column, &mut scratch);
         })],
     );
@@ -280,7 +319,7 @@ fn benchmark_half_gcd_matrix_1_mul_vector(
     file_name: &str,
 ) {
     run_benchmark(
-        "HalfGcdMatrix1::mul_vector(&mut [Limb], &[Limb], &mut [Limb])",
+        "limbs_half_gcd_matrix_1_mul_vector(&HalfGcdMatrix1, &mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Single,
         large_type_gen_var_6().get(gm, &config),
         gm.name(),
@@ -288,7 +327,9 @@ fn benchmark_half_gcd_matrix_1_mul_vector(
         file_name,
         &quadruple_3_vec_len_bucketer("xs"),
         &mut [("Malachite", &mut |(m, mut out, xs, mut ys)| {
-            no_out!(m.mul_vector(&mut out, &xs, &mut ys))
+            no_out!(limbs_half_gcd_matrix_1_mul_vector(
+                &m, &mut out, &xs, &mut ys
+            ))
         })],
     );
 }
@@ -390,6 +431,50 @@ fn benchmark_limbs_matrix_2_2_mul_algorithms(
     );
 }
 
+fn benchmark_limbs_gcd_div_algorithms(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) {
+    run_benchmark(
+        "limbs_gcd_div(Limb, Limb, Limb, Limb)",
+        BenchmarkType::Algorithms,
+        unsigned_quadruple_gen_var_11().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &quadruple_max_bit_bucketer("n1", "n0", "d1", "d0"),
+        &mut [
+            ("default", &mut |(n1, n0, d1, d0)| {
+                no_out!(limbs_gcd_div(n1, n0, d1, d0))
+            }),
+            ("alt", &mut |(n1, n0, d1, d0)| {
+                no_out!(limbs_gcd_div_alt(n1, n0, d1, d0))
+            }),
+            ("naive", &mut |(n1, n0, d1, d0)| {
+                no_out!(limbs_gcd_div_naive(n1, n0, d1, d0))
+            }),
+        ],
+    );
+}
+
+fn benchmark_limbs_gcd_reduced(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
+    run_benchmark(
+        "limbs_gcd_reduced(&mut [Limb], &mut [Limb], &mut [Limb])",
+        BenchmarkType::Single,
+        unsigned_vec_pair_gen_var_10().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_1_vec_len_bucketer("xs"),
+        &mut [("Malachite", &mut |(mut xs, mut ys)| {
+            let mut out = vec![0; xs.len()];
+            limbs_gcd_reduced(&mut out, &mut xs, &mut ys);
+        })],
+    );
+}
+
 fn benchmark_natural_gcd_algorithms(gm: GenMode, config: GenConfig, limit: usize, file_name: &str) {
     run_benchmark(
         "Natural.gcd(Natural)",
@@ -423,7 +508,7 @@ fn benchmark_natural_gcd_library_comparison(
         &triple_3_pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| no_out!(x.gcd(y))),
-            ("num", &mut |(_, _, (x, y))| no_out!(x.gcd(y))),
+            ("num", &mut |((x, y), _, _)| no_out!(x.gcd(&y))),
             ("rug", &mut |(_, (x, y), _)| no_out!(x.gcd(&y))),
         ],
     );
@@ -493,7 +578,7 @@ fn benchmark_natural_gcd_library_comparison_2(
         &triple_3_pair_natural_max_bit_bucketer("x", "y"),
         &mut [
             ("Malachite", &mut |(_, _, (x, y))| no_out!(x.gcd(y))),
-            ("num", &mut |(_, _, (x, y))| no_out!(x.gcd(y))),
+            ("num", &mut |((x, y), _, _)| no_out!(x.gcd(&y))),
             ("rug", &mut |(_, (x, y), _)| no_out!(x.gcd(&y))),
         ],
     );

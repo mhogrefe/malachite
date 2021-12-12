@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::digits::general_digits::_unsigned_to_digits_asc_naive;
+use malachite_base::num::conversion::digits::general_digits::unsigned_to_digits_asc_naive;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, SaturatingFrom, WrappingFrom};
 use malachite_base_test_util::generators::{
     unsigned_gen, unsigned_gen_var_4, unsigned_pair_gen_var_6,
@@ -79,7 +79,7 @@ fn to_digits_asc_helper<
 >() {
     unsigned_pair_gen_var_6::<T, U>().test_properties(|(u, base)| {
         let digits = u.to_digits_asc(&base);
-        assert_eq!(_unsigned_to_digits_asc_naive(&u, base), digits);
+        assert_eq!(unsigned_to_digits_asc_naive(&u, base), digits);
         assert_eq!(
             T::from_digits_asc(&base, digits.iter().copied()).unwrap(),
             u

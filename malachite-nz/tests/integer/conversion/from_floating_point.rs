@@ -287,18 +287,21 @@ fn test_from_f32() {
 
 #[test]
 #[should_panic]
+#[allow(unused_must_use)]
 fn from_f32_fail_1() {
     Integer::from(f32::NAN);
 }
 
 #[test]
 #[should_panic]
+#[allow(unused_must_use)]
 fn from_f32_fail_2() {
     Integer::from(f32::POSITIVE_INFINITY);
 }
 
 #[test]
 #[should_panic]
+#[allow(unused_must_use)]
 fn from_f32_fail_3() {
     Integer::from(f32::NEGATIVE_INFINITY);
 }
@@ -378,18 +381,21 @@ fn test_from_f64() {
 
 #[test]
 #[should_panic]
+#[allow(unused_must_use)]
 fn from_f64_fail_1() {
     Integer::from(f64::NAN);
 }
 
 #[test]
 #[should_panic]
+#[allow(unused_must_use)]
 fn from_f64_fail_2() {
     Integer::from(f64::POSITIVE_INFINITY);
 }
 
 #[test]
 #[should_panic]
+#[allow(unused_must_use)]
 fn from_f64_fail_3() {
     Integer::from(f64::NEGATIVE_INFINITY);
 }

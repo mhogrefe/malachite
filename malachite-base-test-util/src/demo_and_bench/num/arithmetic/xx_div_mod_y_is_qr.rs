@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::_explicit_xx_div_mod_y_is_qr;
+use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::bucketers::triple_max_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -51,7 +51,7 @@ fn benchmark_xx_div_mod_y_is_qr_algorithms<T: PrimitiveUnsigned>(
                 no_out!(T::xx_div_mod_y_is_qr(x_1, x_0, y))
             }),
             ("explicit", &mut |(x_1, x_0, y)| {
-                no_out!(_explicit_xx_div_mod_y_is_qr(x_1, x_0, y))
+                no_out!(explicit_xx_div_mod_y_is_qr(x_1, x_0, y))
             }),
         ],
     );

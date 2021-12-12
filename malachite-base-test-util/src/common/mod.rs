@@ -49,7 +49,7 @@ pub fn test_cmp_helper<T: Debug + FromStr + Ord>(strings: &[&str])
 where
     T::Err: Debug,
 {
-    test_helper_helper(strings, |i, j| i.cmp(&j), |x: &T, y: &T| x.cmp(y));
+    test_helper_helper::<T, _, _, _>(strings, |i, j| i.cmp(&j), Ord::cmp);
 }
 
 pub fn test_custom_cmp_helper<T: Debug + FromStr, F: FnMut(&T, &T) -> Ordering>(

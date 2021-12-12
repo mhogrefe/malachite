@@ -73,8 +73,8 @@ impl Seed {
         Seed::from_bytes(bytes)
     }
 
-    /// Generates a new `Seed` from this seed. Passing a different `key` will, with very high
-    /// probability, generate a different seed. Determining the initial seed from the resulting seed
+    /// Generates a new `Seed` from this seed. Passing different `key`s will, with very high
+    /// probability, generate different seeds. Determining the initial seed from the resulting seed
     /// will be (cryptographically) difficult, even if the key is known.
     ///
     /// # Worst-case complexity

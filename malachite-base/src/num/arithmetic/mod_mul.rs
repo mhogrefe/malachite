@@ -8,7 +8,7 @@ use num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, Wrapp
 use num::logic::traits::LeadingZeros;
 
 #[doc(hidden)]
-pub fn _naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
+pub fn naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
     let (product_1, product_0) = T::x_mul_y_is_zz(x, y);
     T::xx_div_mod_y_is_qr(product_1, product_0, m).1
 }
@@ -69,6 +69,7 @@ const INVERT_U32_TABLE: [u32; INVERT_U32_TABLE_SIZE] = [
 ///
 /// test_invert_u32_table();
 /// ```
+#[doc(hidden)]
 pub fn test_invert_u32_table() {
     for (i, &x) in INVERT_U32_TABLE.iter().enumerate() {
         let value = (u32::power_of_2(24) - u32::power_of_2(14) + u32::power_of_2(9))
@@ -93,7 +94,8 @@ pub fn test_invert_u32_table() {
 /// Constant time and additional memory.
 ///
 /// This is invert_limb from longlong.h, FLINT 2.7.1, when GMP_LIMB_BITS == 32.
-pub fn _limbs_invert_limb_u32(x: u32) -> u32 {
+#[doc(hidden)]
+pub fn limbs_invert_limb_u32(x: u32) -> u32 {
     assert!(x.get_highest_bit());
     let a = INVERT_U32_TABLE[usize::exact_from(x << 1 >> 23)];
     let b = (a << 4)
@@ -144,6 +146,7 @@ const INVERT_U64_TABLE: [u64; INVERT_U64_TABLE_SIZE] = [
 ///
 /// test_invert_u64_table();
 /// ```
+#[doc(hidden)]
 pub fn test_invert_u64_table() {
     for (i, &x) in INVERT_U64_TABLE.iter().enumerate() {
         let value = (u64::power_of_2(19) - 3 * u64::power_of_2(8))
@@ -168,7 +171,8 @@ pub fn test_invert_u64_table() {
 /// Constant time and additional memory.
 ///
 /// This is invert_limb from longlong.h, FLINT 2.7.1, when GMP_LIMB_BITS == 64.
-pub fn _limbs_invert_limb_u64(x: u64) -> u64 {
+#[doc(hidden)]
+pub fn limbs_invert_limb_u64(x: u64) -> u64 {
     assert!(x.get_highest_bit());
     let a = (x >> 24) + 1;
     let b = INVERT_U64_TABLE[usize::exact_from(x << 1 >> 56)];
@@ -190,7 +194,7 @@ pub fn _limbs_invert_limb_u64(x: u64) -> u64 {
 
 /// This is n_ll_mod_preinv from ulong_extras/ll_mod_preinv.c, FLINT 2.7.1.
 #[doc(hidden)]
-pub fn _limbs_mod_preinverted<
+pub fn limbs_mod_preinverted<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -257,7 +261,7 @@ pub fn _limbs_mod_preinverted<
 
 /// This is n_mulmod2_preinv from ulong_extras.h, FLINT 2.7.1.
 #[doc(hidden)]
-pub fn _fast_mod_mul<
+pub fn fast_mod_mul<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -268,7 +272,7 @@ pub fn _fast_mod_mul<
 ) -> T {
     assert_ne!(m, T::ZERO);
     let (product_1, product_0) = (DT::from(x) * DT::from(y)).split_in_half();
-    _limbs_mod_preinverted::<T, DT>(product_1, product_0, m, inv)
+    limbs_mod_preinverted::<T, DT>(product_1, product_0, m, inv)
 }
 
 macro_rules! impl_mod_mul_precomputed_fast {
@@ -302,13 +306,13 @@ macro_rules! impl_mod_mul_precomputed_fast {
             ///
             /// This is n_mulmod2_preinv from ulong_extras.h, FLINT 2.7.1.
             fn mod_mul_precomputed(self, other: $t, m: $t, data: &$t) -> $t {
-                _fast_mod_mul::<$t, $dt>(self, other, m, *data)
+                fast_mod_mul::<$t, $dt>(self, other, m, *data)
             }
         }
     };
 }
-impl_mod_mul_precomputed_fast!(u32, u64, _limbs_invert_limb_u32);
-impl_mod_mul_precomputed_fast!(u64, u128, _limbs_invert_limb_u64);
+impl_mod_mul_precomputed_fast!(u32, u64, limbs_invert_limb_u32);
+impl_mod_mul_precomputed_fast!(u64, u128, limbs_invert_limb_u64);
 
 macro_rules! impl_mod_mul_precomputed_promoted {
     ($t:ident) => {
@@ -379,7 +383,7 @@ impl ModMulPrecomputed<u128, u128> for u128 {
     /// This is n_mulmod2_preinv from ulong_extras.h, FLINT 2.7.1.
     #[inline]
     fn mod_mul_precomputed(self, other: u128, m: u128, _data: &()) -> u128 {
-        _naive_mod_mul(self, other, m)
+        naive_mod_mul(self, other, m)
     }
 }
 
@@ -469,7 +473,7 @@ macro_rules! impl_mod_mul {
             /// This is nmod_mul from nmod_vec.h, FLINT 2.7.1.
             #[inline]
             fn mod_mul(self, other: $t, m: $t) -> $t {
-                _naive_mod_mul(self, other, m)
+                naive_mod_mul(self, other, m)
             }
         }
 
@@ -488,7 +492,7 @@ macro_rules! impl_mod_mul {
             /// This is nmod_mul from nmod_vec.h, FLINT 2.7.1, where the result is assigned to a.
             #[inline]
             fn mod_mul_assign(&mut self, other: $t, m: $t) {
-                *self = _naive_mod_mul(*self, other, m);
+                *self = naive_mod_mul(*self, other, m);
             }
         }
     };

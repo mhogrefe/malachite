@@ -31,6 +31,7 @@ use platform::Limb;
 /// assert_eq!(limbs_mod_power_of_2_add_limb(&[u32::MAX, 3], 2, 34), &[1, 0]);
 /// assert_eq!(limbs_mod_power_of_2_add_limb(&[u32::MAX, 3], 2, 35), &[1, 4]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
         limbs_add_limb(xs, y)
@@ -69,6 +70,7 @@ pub fn limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb
 /// assert_eq!(limbs_slice_mod_power_of_2_add_limb_in_place(&mut xs, 2, 32), false);
 /// assert_eq!(xs, &[1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_slice_mod_power_of_2_add_limb_in_place(xs: &mut [Limb], y: Limb, pow: u64) -> bool {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
         limbs_slice_add_limb_in_place(xs, y)
@@ -109,6 +111,7 @@ pub fn limbs_slice_mod_power_of_2_add_limb_in_place(xs: &mut [Limb], y: Limb, po
 /// limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, 2, 32);
 /// assert_eq!(xs, &[1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, pow: u64) {
     assert!(!xs.is_empty());
     if limbs_slice_mod_power_of_2_add_limb_in_place(xs, y, pow) {
@@ -144,6 +147,7 @@ pub fn limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, p
 ///     &[202, 202, 1]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     let mut out = xs.to_vec();
     if limbs_slice_mod_power_of_2_add_greater_in_place_left(&mut out, ys, pow) {
@@ -176,6 +180,7 @@ pub fn limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> V
 ///     &[202, 202, 1]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_mod_power_of_2_add_greater(xs, ys, pow)
@@ -221,6 +226,7 @@ pub fn limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb>
 /// );
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_slice_mod_power_of_2_add_greater_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -262,6 +268,7 @@ pub fn limbs_slice_mod_power_of_2_add_greater_in_place_left(
 /// limbs_vec_mod_power_of_2_add_in_place_left(&mut xs, &[102, 101, 2], 96);
 /// assert_eq!(xs, &[202, 202, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -326,6 +333,7 @@ pub fn limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb
 /// assert_eq!(xs, &[202, 202, 1]);
 /// assert_eq!(ys, &[102, 101, 2]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_add_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,

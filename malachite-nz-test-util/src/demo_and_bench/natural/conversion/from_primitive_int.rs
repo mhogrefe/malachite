@@ -82,6 +82,7 @@ fn demo_natural_convertible_from_signed<T: PrimitiveSigned>(
     }
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_from_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,

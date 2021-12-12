@@ -5,7 +5,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::to_string::digit_to_display_byte_lower;
 use malachite_base::num::conversion::traits::WrappingFrom;
 
-pub fn _to_string_base_unsigned_naive<T: PrimitiveUnsigned>(mut x: T, base: u64) -> String
+pub fn to_string_base_unsigned_naive<T: PrimitiveUnsigned>(mut x: T, base: u64) -> String
 where
     u8: WrappingFrom<T>,
 {
@@ -24,7 +24,7 @@ where
     }
 }
 
-pub fn _to_string_base_signed_naive<T: PrimitiveSigned>(x: T, base: u64) -> String
+pub fn to_string_base_signed_naive<T: PrimitiveSigned>(x: T, base: u64) -> String
 where
     u8: WrappingFrom<<T as UnsignedAbs>::Output>,
     <T as UnsignedAbs>::Output: PrimitiveUnsigned,

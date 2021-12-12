@@ -5,9 +5,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::{run_benchmark_old, BenchmarkType};
 use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
-    _limbs_square_low_basecase, _limbs_square_low_divide_and_conquer,
-    _limbs_square_low_scratch_len, limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref,
-    limbs_square_low,
+    limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref, limbs_square_low,
+    limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::natural::arithmetic::mod_power_of_2_square::*;
@@ -61,9 +60,9 @@ fn demo_limbs_square_low_basecase(gm: GenerationMode, limit: usize) {
     for (out, xs) in pairs_of_unsigned_vec_var_26(gm).take(limit) {
         let out_old = out;
         let mut out = out_old.clone();
-        _limbs_square_low_basecase(&mut out, &xs);
+        limbs_square_low_basecase(&mut out, &xs);
         println!(
-            "out := {:?}; _limbs_square_low_basecase(&mut out, {:?}); out = {:?}",
+            "out := {:?}; limbs_square_low_basecase(&mut out, {:?}); out = {:?}",
             out_old, xs, out
         );
     }
@@ -73,10 +72,10 @@ fn demo_limbs_square_low_divide_and_conquer(gm: GenerationMode, limit: usize) {
     for (out, xs) in pairs_of_unsigned_vec_var_27(gm).take(limit) {
         let out_old = out;
         let mut out = out_old.clone();
-        let mut scratch = vec![0; _limbs_square_low_scratch_len(xs.len())];
-        _limbs_square_low_divide_and_conquer(&mut out, &xs, &mut scratch);
+        let mut scratch = vec![0; limbs_square_low_scratch_len(xs.len())];
+        limbs_square_low_divide_and_conquer(&mut out, &xs, &mut scratch);
         println!(
-            "out := {:?}; _limbs_square_low_divide_and_conquer(&mut out, {:?}, &mut scratch); \
+            "out := {:?}; limbs_square_low_divide_and_conquer(&mut out, {:?}, &mut scratch); \
             out = {:?}",
             out_old, xs, out
         );
@@ -155,7 +154,7 @@ fn demo_natural_mod_power_of_2_square_ref(gm: GenerationMode, limit: usize) {
 
 fn benchmark_limbs_square_low_basecase(gm: GenerationMode, limit: usize, file_name: &str) {
     run_benchmark_old(
-        "_limbs_square_low_basecase(&mut [Limb], &[Limb])",
+        "limbs_square_low_basecase(&mut [Limb], &[Limb])",
         BenchmarkType::Single,
         pairs_of_unsigned_vec_var_26(gm),
         gm.name(),
@@ -165,7 +164,7 @@ fn benchmark_limbs_square_low_basecase(gm: GenerationMode, limit: usize, file_na
         "xs.len()",
         &mut [(
             "Malachite",
-            &mut (|(mut out, xs)| _limbs_square_low_basecase(&mut out, &xs)),
+            &mut (|(mut out, xs)| limbs_square_low_basecase(&mut out, &xs)),
         )],
     );
 }
@@ -176,7 +175,7 @@ fn benchmark_limbs_square_low_divide_and_conquer_algorithms(
     file_name: &str,
 ) {
     run_benchmark_old(
-        "_limbs_square_low_divide_and_conquer(&mut [Limb], &[Limb], &mut [Limb])",
+        "limbs_square_low_divide_and_conquer(&mut [Limb], &[Limb], &mut [Limb])",
         BenchmarkType::Algorithms,
         pairs_of_unsigned_vec_var_27(gm),
         gm.name(),
@@ -187,13 +186,13 @@ fn benchmark_limbs_square_low_divide_and_conquer_algorithms(
         &mut [
             (
                 "basecase",
-                &mut (|(mut out, xs)| _limbs_square_low_basecase_unrestricted(&mut out, &xs)),
+                &mut (|(mut out, xs)| limbs_square_low_basecase_unrestricted(&mut out, &xs)),
             ),
             (
                 "divide and conquer",
                 &mut (|(mut out, xs)| {
-                    let mut scratch = vec![0; _limbs_square_low_scratch_len(xs.len())];
-                    _limbs_square_low_divide_and_conquer(&mut out, &xs, &mut scratch)
+                    let mut scratch = vec![0; limbs_square_low_scratch_len(xs.len())];
+                    limbs_square_low_divide_and_conquer(&mut out, &xs, &mut scratch)
                 }),
             ),
         ],

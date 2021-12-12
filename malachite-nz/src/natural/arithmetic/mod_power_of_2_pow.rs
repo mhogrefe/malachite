@@ -22,6 +22,7 @@ use platform::Limb;
 ///
 /// This is mpn_powlo from mpn/generic/powlo.c, GMP 6.2.1, where rp == bp. Investigate changes from
 /// 6.1.2?
+#[doc(hidden)]
 pub fn limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
@@ -106,6 +107,7 @@ pub fn limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb]) {
 /// limbs_mod_power_of_2_pow(&mut xs, &[789, 987], 42);
 /// assert_eq!(xs, &[426102667, 987]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
     let out_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
     xs.resize(out_len, 0);

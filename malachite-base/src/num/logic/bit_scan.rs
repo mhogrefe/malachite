@@ -1,7 +1,7 @@
 use num::basic::integers::PrimitiveInt;
 use num::logic::traits::{BitScan, TrailingZeros};
 
-fn _index_of_next_false_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> u64 {
+fn index_of_next_false_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> u64 {
     if start >= T::WIDTH {
         start
     } else {
@@ -9,7 +9,7 @@ fn _index_of_next_false_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> u64 {
     }
 }
 
-fn _index_of_next_true_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
+fn index_of_next_true_bit_unsigned<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH {
         None
     } else {
@@ -40,7 +40,7 @@ macro_rules! impl_bit_scan_unsigned {
             /// See the documentation of the `num::logic::bit_scan` module.
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
-                Some(_index_of_next_false_bit_unsigned(self, start))
+                Some(index_of_next_false_bit_unsigned(self, start))
             }
 
             /// Finds the smallest index of a `true` bit that is greater than or equal to
@@ -56,14 +56,14 @@ macro_rules! impl_bit_scan_unsigned {
             /// See the documentation of the `num::logic::bit_scan` module.
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
-                _index_of_next_true_bit_unsigned(self, start)
+                index_of_next_true_bit_unsigned(self, start)
             }
         }
     };
 }
 apply_to_unsigneds!(impl_bit_scan_unsigned);
 
-fn _index_of_next_false_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
+fn index_of_next_false_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH - 1 {
         if x >= T::ZERO {
             Some(start)
@@ -80,7 +80,7 @@ fn _index_of_next_false_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<
     }
 }
 
-fn _index_of_next_true_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
+fn index_of_next_true_bit_signed<T: PrimitiveInt>(x: T, start: u64) -> Option<u64> {
     if start >= T::WIDTH - 1 {
         if x >= T::ZERO {
             None
@@ -114,7 +114,7 @@ macro_rules! impl_bit_scan_signed {
             /// See the documentation of the `num::logic::bit_scan` module.
             #[inline]
             fn index_of_next_false_bit(self, start: u64) -> Option<u64> {
-                _index_of_next_false_bit_signed(self, start)
+                index_of_next_false_bit_signed(self, start)
             }
 
             /// Finds the smallest index of a `true` bit that is greater than or equal to
@@ -131,7 +131,7 @@ macro_rules! impl_bit_scan_signed {
             /// See the documentation of the `num::logic::bit_scan` module.
             #[inline]
             fn index_of_next_true_bit(self, start: u64) -> Option<u64> {
-                _index_of_next_true_bit_signed(self, start)
+                index_of_next_true_bit_signed(self, start)
             }
         }
     };

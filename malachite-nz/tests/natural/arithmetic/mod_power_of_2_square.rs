@@ -12,9 +12,8 @@ use malachite_base::num::conversion::traits::ExactFrom;
 
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
-    _limbs_square_low_basecase, _limbs_square_low_divide_and_conquer,
-    _limbs_square_low_scratch_len, limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref,
-    limbs_square_low,
+    limbs_mod_power_of_2_square, limbs_mod_power_of_2_square_ref, limbs_square_low,
+    limbs_square_low_basecase, limbs_square_low_divide_and_conquer, limbs_square_low_scratch_len,
 };
 use malachite_nz::natural::Natural;
 #[cfg(feature = "32_bit_limbs")]
@@ -25,7 +24,7 @@ use malachite_nz::platform::Limb;
 fn test_limbs_square_low_basecase() {
     let test = |out_before: &[Limb], xs: &[Limb], out_after: &[Limb]| {
         let mut out = out_before.to_vec();
-        _limbs_square_low_basecase(&mut out, xs);
+        limbs_square_low_basecase(&mut out, xs);
         assert_eq!(out, out_after);
 
         let len = xs.len();
@@ -42,9 +41,9 @@ fn test_limbs_square_low_basecase() {
     // n == 2
     test(&[10; 3], &[123, 456], &[15129, 112176, 10]);
     // n > 2
-    // n.odd() in _limbs_square_low_diagonal
+    // n.odd() in limbs_square_low_diagonal
     test(&[10; 4], &[123, 456, 789], &[15129, 112176, 402030, 10]);
-    // n.even() in _limbs_square_low_diagonal
+    // n.even() in limbs_square_low_diagonal
     test(
         &[10; 5],
         &[123, 456, 789, 987],
@@ -56,14 +55,14 @@ fn test_limbs_square_low_basecase() {
 #[test]
 #[should_panic]
 fn limbs_square_low_basecase_fail_1() {
-    _limbs_square_low_basecase(&mut [10], &[10, 10]);
+    limbs_square_low_basecase(&mut [10], &[10, 10]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_square_low_basecase_fail_2() {
-    _limbs_square_low_basecase(&mut [10, 10], &[]);
+    limbs_square_low_basecase(&mut [10, 10], &[]);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -71,8 +70,8 @@ fn limbs_square_low_basecase_fail_2() {
 fn test_limbs_square_low_divide_and_conquer() {
     let test = |out_before: &[Limb], xs: &[Limb], out_after: &[Limb]| {
         let mut out = out_before.to_vec();
-        let mut scratch = vec![0; _limbs_square_low_scratch_len(xs.len())];
-        _limbs_square_low_divide_and_conquer(&mut out, xs, &mut scratch);
+        let mut scratch = vec![0; limbs_square_low_scratch_len(xs.len())];
+        limbs_square_low_divide_and_conquer(&mut out, xs, &mut scratch);
         assert_eq!(out, out_after);
 
         let len = xs.len();
@@ -97,24 +96,24 @@ fn test_limbs_square_low_divide_and_conquer() {
 #[test]
 #[should_panic]
 fn limbs_square_low_divide_and_conquer_fail_1() {
-    let mut scratch = vec![0; _limbs_square_low_scratch_len(2)];
-    _limbs_square_low_divide_and_conquer(&mut [10], &[10, 10], &mut scratch);
+    let mut scratch = vec![0; limbs_square_low_scratch_len(2)];
+    limbs_square_low_divide_and_conquer(&mut [10], &[10, 10], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_square_low_divide_and_conquer_fail_2() {
-    let mut scratch = vec![0; _limbs_square_low_scratch_len(0)];
-    _limbs_square_low_divide_and_conquer(&mut [10, 10], &[], &mut scratch);
+    let mut scratch = vec![0; limbs_square_low_scratch_len(0)];
+    limbs_square_low_divide_and_conquer(&mut [10, 10], &[], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
 #[should_panic]
 fn limbs_square_low_divide_and_conquer_fail_3() {
-    let mut scratch = vec![0; _limbs_square_low_scratch_len(1)];
-    _limbs_square_low_divide_and_conquer(&mut [10, 10], &[1], &mut scratch);
+    let mut scratch = vec![0; limbs_square_low_scratch_len(1)];
+    limbs_square_low_divide_and_conquer(&mut [10, 10], &[1], &mut scratch);
 }
 
 #[cfg(feature = "32_bit_limbs")]
@@ -200,18 +199,20 @@ fn limbs_mod_power_of_2_square_ref_fail() {
 
 #[test]
 fn test_mod_power_of_2_square() {
-    let test = |u, pow, out| {
-        assert!(Natural::from_str(u).unwrap().mod_power_of_2_is_reduced(pow));
-        let n = Natural::from_str(u).unwrap().mod_power_of_2_square(pow);
+    let test = |s, pow, out| {
+        let u = Natural::from_str(s).unwrap();
+
+        assert!(u.mod_power_of_2_is_reduced(pow));
+        let n = u.clone().mod_power_of_2_square(pow);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
         assert!(n.mod_power_of_2_is_reduced(pow));
 
-        let n = (&Natural::from_str(u).unwrap()).mod_power_of_2_square(pow);
+        let n = (&u).mod_power_of_2_square(pow);
         assert!(n.is_valid());
         assert_eq!(n.to_string(), out);
 
-        let mut n = Natural::from_str(u).unwrap();
+        let mut n = u;
         n.mod_power_of_2_square_assign(pow);
         assert_eq!(n.to_string(), out);
     };

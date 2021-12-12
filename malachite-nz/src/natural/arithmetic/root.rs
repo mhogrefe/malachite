@@ -135,7 +135,7 @@ fn log_based_root(out: &mut Limb, x: Limb, mut bit_count: u64, exp: u64) -> u64 
 // If approx is non-zero, does not compute the final remainder.
 //
 // This is mpn_rootrem_internal from mpn/generic/rootrem.c, GMP 6.2.1.
-fn _limbs_root_to_out_internal(
+fn limbs_root_to_out_internal(
     out_root: &mut [Limb],
     out_rem: Option<&mut [Limb]>,
     xs: &[Limb],
@@ -380,7 +380,7 @@ fn _limbs_root_to_out_internal(
                     qs_len += 1;
                 }
             } else {
-                fail_on_untested_path("_limbs_root_to_out_internal, qs_len > b_rem");
+                fail_on_untested_path("limbs_root_to_out_internal, qs_len > b_rem");
             }
             // Current buffers: &ss[..ss_len], &qs[..qs_len]
             // Note: &rs[..rs_len]is not needed any more since we'll compute it from scratch at
@@ -449,7 +449,7 @@ fn _limbs_root_to_out_internal(
 //
 // This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where k != 2 and remp is not NULL.
 #[doc(hidden)]
-pub fn _limbs_root_rem_to_out(
+pub fn limbs_root_rem_to_out(
     out_root: &mut [Limb],
     out_rem: &mut [Limb],
     xs: &[Limb],
@@ -460,14 +460,14 @@ pub fn _limbs_root_rem_to_out(
     assert_ne!(xs[xs_len - 1], 0);
     assert!(exp > 2);
     // (xs_len - 1) / exp > 2 <=> xs_len > 3 * exp <=> (xs_len + 2) / 3 > exp
-    _limbs_root_to_out_internal(out_root, Some(out_rem), xs, exp, false)
+    limbs_root_to_out_internal(out_root, Some(out_rem), xs, exp, false)
 }
 
 // Returns a non-zero value iff the remainder is non-zero.
 //
 // This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where remp is NULL.
 #[doc(hidden)]
-pub fn _limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> bool {
+pub fn limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> bool {
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
     assert_ne!(xs[xs_len - 1], 0);
@@ -484,7 +484,7 @@ pub fn _limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) ->
         // ss is the approximate root of padded input.
         let (ws, ss) = scratch.split_at_mut(ws_len);
         ws[u_exp..].copy_from_slice(xs);
-        let rs_len = _limbs_root_to_out_internal(ss, None, ws, exp, true);
+        let rs_len = limbs_root_to_out_internal(ss, None, ws, exp, true);
         // The approximate root S = ss is either the correct root of ss, or 1 too large. Thus,
         // unless the least significant limb of S is 0 or 1, we can deduce the root of xs is S
         // truncated by one limb. (In case xs[0] = 1, we can deduce the root, but not decide
@@ -492,7 +492,7 @@ pub fn _limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) ->
         out_root[..ss_len - 1].copy_from_slice(&ss[1..]);
         rs_len != 0
     } else {
-        _limbs_root_to_out_internal(out_root, None, xs, exp, false) != 0
+        limbs_root_to_out_internal(out_root, None, xs, exp, false) != 0
     }
 }
 
@@ -503,7 +503,7 @@ pub fn limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
         xs.len()
             .div_round(usize::exact_from(exp), RoundingMode::Ceiling)
     ];
-    let inexact = _limbs_floor_root_to_out(&mut out, xs, exp);
+    let inexact = limbs_floor_root_to_out(&mut out, xs, exp);
     (out, inexact)
 }
 
@@ -515,7 +515,7 @@ pub fn limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
             .div_round(usize::exact_from(exp), RoundingMode::Ceiling)
     ];
     let mut rem_out = vec![0; xs.len()];
-    let rem_len = _limbs_root_rem_to_out(&mut root_out, &mut rem_out, xs, exp);
+    let rem_len = limbs_root_rem_to_out(&mut root_out, &mut rem_out, xs, exp);
     rem_out.truncate(rem_len);
     (root_out, rem_out)
 }

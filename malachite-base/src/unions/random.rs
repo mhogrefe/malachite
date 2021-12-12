@@ -10,12 +10,13 @@ macro_rules! random_unions {
         $n: expr,
         $([$i: expr, $t: ident, $it: ident, $variant: ident, $xs: ident, $xs_gen: ident]),*
     ) => {
+        /// Generates random $n$-unions with elements from $n$ iterators.
+        ///
+        /// This `struct` is created by `random_union[n]s`. See its documentation for more.
         #[derive(Clone, Debug)]
         pub struct $random_struct<$($t, $it: Iterator<Item=$t>),*> {
             indices: RandomUnsignedRange<usize>,
-            $(
-                $xs: $it,
-            )*
+            $($xs: $it,)*
         }
 
         impl<$($t, $it: Iterator<Item=$t>),*> Iterator for $random_struct<$($t, $it),*> {
@@ -23,22 +24,41 @@ macro_rules! random_unions {
 
             fn next(&mut self) -> Option<Self::Item> {
                 match self.indices.next().unwrap() {
-                    $(
-                        $i => self.$xs.next().map($union::$variant),
-                    )*
+                    $($i => self.$xs.next().map($union::$variant),)*
                     _ => unreachable!(),
                 }
             }
         }
 
+        /// Generates random $n$-unions with elements from $n$ iterators.
+        ///
+        /// The probability of a particular $n$-union being generated is the probability of its
+        /// element divided by $n$.
+        ///
+        /// `xs`, `ys`, `zs`, ... must be infinite.
+        ///
+        /// # Expected complexity per iteration
+        /// We have
+        ///
+        /// $$
+        /// T(n) = O(\max_{j=0}^{n-1}T_j)
+        /// $$
+        ///
+        /// $$
+        /// M(n) = O(\max_{j=0}^{n-1}M_j)
+        /// $$
+        ///
+        /// where $T$ is time, $M$ is additional memory, $n$ is the number of input iterators, and
+        /// $T_j$ and $M_j$ are the time and additional memory of the $j$th input iterator.
+        ///
+        /// # Examples
+        /// See the documentation of the `unions::random` module.
         pub fn $random_fn<$($t, $it: Iterator<Item=$t>),*>(
             seed: Seed, $($xs_gen: &dyn Fn(Seed) -> $it),*
         ) -> $random_struct<$($t, $it),*> {
             $random_struct {
                 indices: random_unsigned_range(seed.fork("indices"), 0, $n),
-                $(
-                    $xs: $xs_gen(seed.fork(stringify!($xs))),
-                )*
+                $($xs: $xs_gen(seed.fork(stringify!($xs))),)*
             }
         }
     }

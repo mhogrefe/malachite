@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::coprime_with::{
-    _coprime_with_check_2, _coprime_with_check_2_3, _coprime_with_check_2_3_5,
+    coprime_with_check_2, coprime_with_check_2_3, coprime_with_check_2_3_5,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::bucketers::pair_max_bit_bucketer;
@@ -44,13 +44,13 @@ fn benchmark_coprime_with_algorithms<T: PrimitiveUnsigned>(
                 no_out!(x.gcd(y) == T::ONE)
             }),
             ("check divisibility by 2", &mut |(x, y)| {
-                no_out!(_coprime_with_check_2(x, y))
+                no_out!(coprime_with_check_2(x, y))
             }),
             ("check divisibility by 2 and 3", &mut |(x, y)| {
-                no_out!(_coprime_with_check_2_3(x, y))
+                no_out!(coprime_with_check_2_3(x, y))
             }),
             ("check divisibility by 2, 3, and 5", &mut |(x, y)| {
-                no_out!(_coprime_with_check_2_3_5(x, y))
+                no_out!(coprime_with_check_2_3_5(x, y))
             }),
         ],
     );

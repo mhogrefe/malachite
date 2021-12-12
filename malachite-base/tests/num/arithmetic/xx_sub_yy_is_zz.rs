@@ -1,4 +1,4 @@
-use malachite_base::num::arithmetic::xx_sub_yy_is_zz::_explicit_xx_sub_yy_is_zz;
+use malachite_base::num::arithmetic::xx_sub_yy_is_zz::explicit_xx_sub_yy_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_quadruple_gen_var_10,
@@ -8,7 +8,7 @@ use malachite_base_test_util::generators::{
 fn test_xx_sub_yy_is_zz() {
     fn test<T: PrimitiveUnsigned>(x_1: T, x_0: T, y_1: T, y_0: T, z_1: T, z_0: T) {
         assert_eq!(T::xx_sub_yy_is_zz(x_1, x_0, y_1, y_0), (z_1, z_0));
-        assert_eq!(_explicit_xx_sub_yy_is_zz(x_1, x_0, y_1, y_0), (z_1, z_0));
+        assert_eq!(explicit_xx_sub_yy_is_zz(x_1, x_0, y_1, y_0), (z_1, z_0));
     }
     test::<u32>(0, 0, 0, 0, 0, 0);
     test::<u64>(0x67, 0x89, 0x33, 0x33, 0x34, 0x56);
@@ -20,7 +20,7 @@ fn test_xx_sub_yy_is_zz() {
 fn xx_sub_yy_is_zz_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_quadruple_gen_var_10::<T>().test_properties(|(x_1, x_0, y_1, y_0)| {
         let (z_1, z_0) = T::xx_sub_yy_is_zz(x_1, x_0, y_1, y_0);
-        assert_eq!(_explicit_xx_sub_yy_is_zz(x_1, x_0, y_1, y_0), (z_1, z_0));
+        assert_eq!(explicit_xx_sub_yy_is_zz(x_1, x_0, y_1, y_0), (z_1, z_0));
 
         assert_eq!(T::xx_add_yy_is_zz(z_1, z_0, y_1, y_0), (x_1, x_0));
         assert_eq!(

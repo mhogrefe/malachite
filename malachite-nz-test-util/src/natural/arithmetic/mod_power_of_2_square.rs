@@ -1,11 +1,11 @@
 use malachite_base::num::arithmetic::traits::{Square, WrappingSquare};
 use malachite_base::num::conversion::traits::SplitInHalf;
 use malachite_nz::natural::arithmetic::add_mul::limbs_slice_add_mul_limb_same_length_in_place_left;
-use malachite_nz::natural::arithmetic::mod_power_of_2_square::_limbs_square_diagonal_shl_add;
+use malachite_nz::natural::arithmetic::mod_power_of_2_square::limbs_square_diagonal_shl_add;
 use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
 use malachite_nz::platform::{DoubleLimb, Limb};
 
-pub fn _limbs_square_low_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) {
+pub fn limbs_square_low_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let out = &mut out[..n];
     assert_ne!(n, 0);
@@ -31,7 +31,7 @@ pub fn _limbs_square_low_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) {
                     xs[i],
                 );
             }
-            _limbs_square_diagonal_shl_add(out, &mut scratch, xs);
+            limbs_square_diagonal_shl_add(out, &mut scratch, xs);
         }
     }
 }

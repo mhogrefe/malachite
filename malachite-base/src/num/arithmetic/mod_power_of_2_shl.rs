@@ -4,7 +4,7 @@ use num::basic::traits::Zero;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
-fn _mod_power_of_2_shl_unsigned<
+fn mod_power_of_2_shl_unsigned<
     T: ModPowerOf2<Output = T> + PrimitiveInt + Shl<U, Output = T>,
     U: ExactFrom<u64> + Ord,
 >(
@@ -20,7 +20,7 @@ fn _mod_power_of_2_shl_unsigned<
     }
 }
 
-fn _mod_power_of_2_shl_assign_unsigned<T: PrimitiveInt + ShlAssign<U>, U: ExactFrom<u64> + Ord>(
+fn mod_power_of_2_shl_assign_unsigned<T: PrimitiveInt + ShlAssign<U>, U: ExactFrom<u64> + Ord>(
     x: &mut T,
     other: U,
     pow: u64,
@@ -53,7 +53,7 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                     /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
                     #[inline]
                     fn mod_power_of_2_shl(self, other: $u, pow: u64) -> $t {
-                        _mod_power_of_2_shl_unsigned(self, other, pow)
+                        mod_power_of_2_shl_unsigned(self, other, pow)
                     }
                 }
 
@@ -70,7 +70,7 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
                     /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
                     #[inline]
                     fn mod_power_of_2_shl_assign(&mut self, other: $u, pow: u64) {
-                        _mod_power_of_2_shl_assign_unsigned(self, other, pow);
+                        mod_power_of_2_shl_assign_unsigned(self, other, pow);
                     }
                 }
             };
@@ -80,7 +80,7 @@ macro_rules! impl_mod_power_of_2_shl_unsigned {
 }
 apply_to_unsigneds!(impl_mod_power_of_2_shl_unsigned);
 
-fn _mod_power_of_2_shl_signed<
+fn mod_power_of_2_shl_signed<
     T: ModPowerOf2Shl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
     U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -103,7 +103,7 @@ fn _mod_power_of_2_shl_signed<
     }
 }
 
-fn _mod_power_of_2_shl_assign_signed<
+fn mod_power_of_2_shl_assign_signed<
     T: ModPowerOf2ShlAssign<U> + PrimitiveInt + ShrAssign<U>,
     U: Copy + Ord + WrappingFrom<u64> + Zero,
     S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
@@ -146,7 +146,7 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                     /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
                     #[inline]
                     fn mod_power_of_2_shl(self, other: $u, pow: u64) -> $t {
-                        _mod_power_of_2_shl_signed(self, other, pow)
+                        mod_power_of_2_shl_signed(self, other, pow)
                     }
                 }
 
@@ -164,7 +164,7 @@ macro_rules! impl_mod_power_of_2_shl_signed {
                     /// See the documentation of the `num::arithmetic::mod_power_of_2_shl` module.
                     #[inline]
                     fn mod_power_of_2_shl_assign(&mut self, other: $u, pow: u64) {
-                        _mod_power_of_2_shl_assign_signed(self, other, pow);
+                        mod_power_of_2_shl_assign_signed(self, other, pow);
                     }
                 }
             };

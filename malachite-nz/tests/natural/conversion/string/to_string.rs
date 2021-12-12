@@ -19,7 +19,7 @@ use malachite_nz_test_util::generators::{
     natural_gen, natural_unsigned_pair_gen_var_3, natural_unsigned_pair_gen_var_4,
     natural_unsigned_unsigned_triple_gen_var_1,
 };
-use malachite_nz_test_util::natural::conversion::string::to_string::_to_string_base_naive;
+use malachite_nz_test_util::natural::conversion::string::to_string::to_string_base_naive;
 use std::cmp::max;
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -40,7 +40,7 @@ pub fn test_to_string() {
         let x = Natural::from_str(u).unwrap();
         assert_eq!(x.to_string(), u);
         assert_eq!(x.to_debug_string(), u);
-        assert_eq!(_to_string_base_naive(&x, 10), u);
+        assert_eq!(to_string_base_naive(&x, 10), u);
         assert_eq!(format!("{:00}", x), u);
         assert_eq!(format!("{:00?}", x), u);
     }
@@ -88,7 +88,7 @@ fn to_string_properties() {
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(&x, 10)), s);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(&x, 10)), s);
         assert_eq!(format!("{:00?}", BaseFmtWrapper::new(&x, 10)), s);
-        assert_eq!(_to_string_base_naive(&x, 10), s);
+        assert_eq!(to_string_base_naive(&x, 10), s);
         assert_eq!(natural_to_biguint(&x).to_string(), s);
         assert_eq!(natural_to_rug_integer(&x).to_string(), s);
         assert!(string_is_subset(&s, "0123456789"));
@@ -137,7 +137,7 @@ pub fn test_to_binary_string() {
     fn test(u: &str, out: &str, out_prefixed: &str) {
         let x = Natural::from_str(u).unwrap();
         assert_eq!(x.to_binary_string(), out);
-        assert_eq!(_to_string_base_naive(&x, 2), out);
+        assert_eq!(to_string_base_naive(&x, 2), out);
         assert_eq!(format!("{:00b}", x), out);
         assert_eq!(format!("{:#b}", x), out_prefixed);
     }
@@ -203,7 +203,7 @@ fn to_binary_string_properties() {
         assert_eq!(format!("{:00b}", x), s);
         assert_eq!(format!("{:#00b}", x), prefixed_s);
         assert_eq!(x.to_string_base(2), s);
-        assert_eq!(_to_string_base_naive(&x, 2), s);
+        assert_eq!(to_string_base_naive(&x, 2), s);
         assert_eq!(NaturalAlt(x.clone()).to_binary_string(), s);
         assert_eq!(format!("{:#b}", NaturalAlt(x.clone())), prefixed_s);
         assert_eq!(NaturalAlt2(x.clone()).to_binary_string(), s);
@@ -282,7 +282,7 @@ pub fn test_to_octal_string() {
     fn test(u: &str, out: &str, out_prefixed: &str) {
         let x = Natural::from_str(u).unwrap();
         assert_eq!(x.to_octal_string(), out);
-        assert_eq!(_to_string_base_naive(&x, 8), out);
+        assert_eq!(to_string_base_naive(&x, 8), out);
         assert_eq!(format!("{:00o}", x), out);
         assert_eq!(format!("{:#o}", x), out_prefixed);
     }
@@ -350,7 +350,7 @@ fn to_octal_string_properties() {
         assert_eq!(format!("{:00o}", x), s);
         assert_eq!(format!("{:#00o}", x), prefixed_s);
         assert_eq!(x.to_string_base(8), s);
-        assert_eq!(_to_string_base_naive(&x, 8), s);
+        assert_eq!(to_string_base_naive(&x, 8), s);
         assert_eq!(NaturalAlt(x.clone()).to_octal_string(), s);
         assert_eq!(format!("{:#o}", NaturalAlt(x.clone())), prefixed_s);
         assert_eq!(NaturalAlt2(x.clone()).to_octal_string(), s);
@@ -429,7 +429,7 @@ pub fn test_to_lower_hex_string() {
     fn test(u: &str, out: &str, out_prefixed: &str) {
         let x = Natural::from_str(u).unwrap();
         assert_eq!(x.to_lower_hex_string(), out);
-        assert_eq!(_to_string_base_naive(&x, 16), out);
+        assert_eq!(to_string_base_naive(&x, 16), out);
         assert_eq!(format!("{:00x}", x), out);
         assert_eq!(format!("{:#x}", x), out_prefixed);
     }
@@ -474,7 +474,7 @@ pub fn test_to_upper_hex_string() {
     fn test(u: &str, out: &str, out_prefixed: &str) {
         let x = Natural::from_str(u).unwrap();
         assert_eq!(x.to_upper_hex_string(), out);
-        assert_eq!(_to_string_base_naive(&x, 16).to_uppercase(), out);
+        assert_eq!(to_string_base_naive(&x, 16).to_uppercase(), out);
         assert_eq!(format!("{:00X}", x), out);
         assert_eq!(format!("{:#X}", x), out_prefixed);
     }
@@ -533,7 +533,7 @@ fn to_hex_string_properties() {
             "0x".to_owned() + &s.to_ascii_uppercase()
         );
         assert_eq!(x.to_string_base(16), s);
-        assert_eq!(_to_string_base_naive(&x, 16), s);
+        assert_eq!(to_string_base_naive(&x, 16), s);
         assert_eq!(NaturalAlt(x.clone()).to_lower_hex_string(), s);
         assert_eq!(format!("{:#x}", NaturalAlt(x.clone())), prefixed_s);
         assert_eq!(NaturalAlt2(x.clone()).to_lower_hex_string(), s);
@@ -655,7 +655,7 @@ pub fn test_to_string_base() {
     fn test(u: &str, base: u64, out: &str) {
         let x = Natural::from_str(u).unwrap();
         assert_eq!(x.to_string_base(base), out);
-        assert_eq!(_to_string_base_naive(&x, base), out);
+        assert_eq!(to_string_base_naive(&x, base), out);
         assert_eq!(format!("{}", BaseFmtWrapper::new(&x, base)), out);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(&x, base)), out);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(&x, base)), out);
@@ -744,7 +744,7 @@ fn to_string_base_fail() {
 fn to_string_base_properties() {
     natural_unsigned_pair_gen_var_3().test_properties(|(x, base)| {
         let s = x.to_string_base(base);
-        assert_eq!(_to_string_base_naive(&x, base), s);
+        assert_eq!(to_string_base_naive(&x, base), s);
         assert_eq!(format!("{}", BaseFmtWrapper::new(&x, base)), s);
         assert_eq!(format!("{:?}", BaseFmtWrapper::new(&x, base)), s);
         assert_eq!(format!("{:00}", BaseFmtWrapper::new(&x, base)), s);

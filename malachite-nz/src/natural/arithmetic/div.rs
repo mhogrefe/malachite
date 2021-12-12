@@ -841,7 +841,6 @@ pub fn limbs_div_schoolbook_approx(
                 let carry = limbs_sub_mul_limb_same_length_in_place_left(&mut ns[b..j + 1], ds, q);
                 if n_1 != carry {
                     if flag && n_1 < carry {
-                        fail_on_untested_path("limbs_div_schoolbook_approx, flag && n_1 < carry");
                         q.wrapping_sub_assign(1);
                         limbs_slice_add_same_length_in_place_left(&mut ns[b..j + 1], ds);
                     } else {
@@ -1057,10 +1056,6 @@ pub fn limbs_div_divide_and_conquer_approx(
                 if carry {
                     n_1.wrapping_add_assign(d_1);
                     if limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a]) {
-                        fail_on_untested_path(
-                            "limbs_div_divide_and_conquer_approx, \
-                            limbs_slice_add_same_length_in_place_left(&mut ns_hi[..a], &ds[..a])",
-                        );
                         n_1.wrapping_add_assign(1);
                     }
                     if q == 0 {
@@ -1998,9 +1993,10 @@ impl Natural {
         }
     }
 
+    #[doc(hidden)]
     #[inline]
-    pub fn _div_limb_naive(mut self, other: Limb) -> Natural {
-        self._div_assign_limb_naive(other);
+    pub fn div_limb_naive(mut self, other: Limb) -> Natural {
+        self.div_assign_limb_naive(other);
         self
     }
 
@@ -2016,7 +2012,8 @@ impl Natural {
         }
     }
 
-    pub fn _div_assign_limb_naive(&mut self, other: Limb) {
+    #[doc(hidden)]
+    pub fn div_assign_limb_naive(&mut self, other: Limb) {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => {}

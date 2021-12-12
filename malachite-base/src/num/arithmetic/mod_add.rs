@@ -1,7 +1,7 @@
 use num::arithmetic::traits::{ModAdd, ModAddAssign};
 use std::ops::{Add, AddAssign, Sub};
 
-fn _mod_add<T: Add<T, Output = T> + Copy + Ord + Sub<T, Output = T>>(x: T, other: T, m: T) -> T {
+fn mod_add<T: Add<T, Output = T> + Copy + Ord + Sub<T, Output = T>>(x: T, other: T, m: T) -> T {
     let neg = m - x;
     if neg > other {
         x + other
@@ -10,7 +10,7 @@ fn _mod_add<T: Add<T, Output = T> + Copy + Ord + Sub<T, Output = T>>(x: T, other
     }
 }
 
-fn _mod_add_assign<T: AddAssign<T> + Copy + Ord + Sub<T, Output = T>>(x: &mut T, other: T, m: T) {
+fn mod_add_assign<T: AddAssign<T> + Copy + Ord + Sub<T, Output = T>>(x: &mut T, other: T, m: T) {
     let neg = m - *x;
     if neg > other {
         *x += other;
@@ -37,7 +37,7 @@ macro_rules! impl_mod_add {
             /// This is nmod_add from nmod_vec.h, FLINT 2.7.1.
             #[inline]
             fn mod_add(self, other: $t, m: $t) -> $t {
-                _mod_add(self, other, m)
+                mod_add(self, other, m)
             }
         }
 
@@ -56,7 +56,7 @@ macro_rules! impl_mod_add {
             /// This is nmod_add from nmod_vec.h, FLINT 2.7.1, where the result is assigned to a.
             #[inline]
             fn mod_add_assign(&mut self, other: $t, m: $t) {
-                _mod_add_assign(self, other, m);
+                mod_add_assign(self, other, m);
             }
         }
     };

@@ -34,7 +34,7 @@ fn test_from_power_of_2_digits_asc() {
             out
         );
         assert_eq!(
-            Natural::_from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned())
+            Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned())
                 .unwrap()
                 .to_string(),
             out
@@ -71,7 +71,7 @@ fn test_from_power_of_2_digits_asc() {
     {
         assert!(Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).is_none());
         assert!(
-            Natural::_from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned()).is_none()
+            Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned()).is_none()
         );
     }
     test_err::<u8>(1, &[2]);
@@ -173,7 +173,7 @@ fn test_from_power_of_2_digits_asc_natural() {
             out
         );
         assert_eq!(
-            Natural::_from_power_of_2_digits_asc_natural_naive(log_base, digits.iter().cloned())
+            Natural::from_power_of_2_digits_asc_natural_naive(log_base, digits.iter().cloned())
                 .unwrap()
                 .to_string(),
             out
@@ -210,7 +210,7 @@ fn test_from_power_of_2_digits_asc_natural() {
     let test_err = |log_base, digits| {
         let digits = vec_from_str(digits).unwrap();
         assert!(Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).is_none());
-        assert!(Natural::_from_power_of_2_digits_asc_natural_naive(
+        assert!(Natural::from_power_of_2_digits_asc_natural_naive(
             log_base,
             digits.iter().cloned()
         )
@@ -304,7 +304,7 @@ where
         |(digits, log_base)| {
             let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
             assert_eq!(
-                Natural::_from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned())
+                Natural::from_power_of_2_digits_asc_naive(log_base, digits.iter().cloned())
                     .unwrap(),
                 n
             );
@@ -451,11 +451,8 @@ fn from_power_of_2_digits_asc_natural_properties() {
         |(digits, log_base)| {
             let n = Natural::from_power_of_2_digits_asc(log_base, digits.iter().cloned()).unwrap();
             assert_eq!(
-                Natural::_from_power_of_2_digits_asc_natural_naive(
-                    log_base,
-                    digits.iter().cloned()
-                )
-                .unwrap(),
+                Natural::from_power_of_2_digits_asc_natural_naive(log_base, digits.iter().cloned())
+                    .unwrap(),
                 n
             );
             assert_eq!(

@@ -285,10 +285,8 @@ macro_rules! random_custom_tuples {
         /// `xs`, `ys`, `zs`, ... must be infinite.
         ///
         /// # Expected complexity per iteration
-        /// Let $j$ be the largest index of any output associated with `xs`, $X$ the set of outputs
-        /// with indices higher than $j$, $P$ the product of the lengths of all the iterators
-        /// associated with the outputs in $X$, including multiplicities, and $T^\prime$ and
-        /// $M^\prime$ the time and additional memory complexities of `xs`.
+        /// Let $j$ be the largest index of any output associated with `xs`, and $T_j$ and
+        /// $M_j$ the time and additional memory complexities of `xs`.
         ///
         /// We have
         ///
@@ -353,6 +351,14 @@ random_custom_tuples!(
     [Y, J, ys, ys_gen, [y_2, x_3]]
 );
 random_custom_tuples!(
+    RandomQuadruplesXYXZ,
+    (X, Y, X, Z),
+    random_quadruples_xyxz,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_2, y_1]],
+    [Y, J, ys, ys_gen, [y_1, x_2]],
+    [Z, K, zs, zs_gen, [z_3, z_3]]
+);
+random_custom_tuples!(
     RandomQuadruplesXYYX,
     (X, Y, Y, X),
     random_quadruples_xyyx,
@@ -366,6 +372,14 @@ random_custom_tuples!(
     [X, I, xs, xs_gen, [x_0, x_0]],
     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]],
     [Z, K, zs, zs_gen, [z_3, z_3]]
+);
+random_custom_tuples!(
+    RandomQuintuplesXYYYZ,
+    (X, Y, Y, Y, Z),
+    random_quintuples_xyyyz,
+    [X, I, xs, xs_gen, [x_0, x_0]],
+    [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2], [y_3, y_3]],
+    [Z, K, zs, zs_gen, [z_4, z_4]]
 );
 
 /// Generates random pairs using elements from a single iterator, where the first element is less

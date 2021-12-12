@@ -6,7 +6,7 @@ use num::conversion::traits::{
 };
 use rounding_modes::RoundingMode;
 
-fn _from_other_type_slice_ident<T: Copy + Zero>(xs: &[T]) -> T {
+fn from_other_type_slice_ident<T: Copy + Zero>(xs: &[T]) -> T {
     if xs.is_empty() {
         T::ZERO
     } else {
@@ -40,7 +40,7 @@ macro_rules! impl_slice_traits_ident {
             /// See the documentation of the `num::conversion::slice` module.
             #[inline]
             fn from_other_type_slice(xs: &[$a]) -> Self {
-                _from_other_type_slice_ident(xs)
+                from_other_type_slice_ident(xs)
             }
         }
 
@@ -82,7 +82,7 @@ macro_rules! impl_slice_traits_ident {
     };
 }
 
-fn _from_other_type_slice_large_to_small<A: Copy, B: WrappingFrom<A> + Zero>(xs: &[A]) -> B {
+fn from_other_type_slice_large_to_small<A: Copy, B: WrappingFrom<A> + Zero>(xs: &[A]) -> B {
     if xs.is_empty() {
         B::ZERO
     } else {
@@ -90,7 +90,7 @@ fn _from_other_type_slice_large_to_small<A: Copy, B: WrappingFrom<A> + Zero>(xs:
     }
 }
 
-fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+fn vec_from_other_type_slice_large_to_small<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
     xs: &[A],
 ) -> Vec<B> {
     let log_size_ratio = A::LOG_WIDTH - B::LOG_WIDTH;
@@ -105,7 +105,7 @@ fn _vec_from_other_type_slice_large_to_small<A: PrimitiveInt, B: PrimitiveInt + 
     out
 }
 
-fn _vec_from_other_type_large_to_small<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+fn vec_from_other_type_large_to_small<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
     mut x: A,
 ) -> Vec<B> {
     let mut xs = vec![B::ZERO; 1 << (A::LOG_WIDTH - B::LOG_WIDTH)];
@@ -143,7 +143,7 @@ macro_rules! impl_slice_traits_large_to_small {
             /// See the documentation of the `num::conversion::slice` module.
             #[inline]
             fn from_other_type_slice(xs: &[$a]) -> Self {
-                _from_other_type_slice_large_to_small(xs)
+                from_other_type_slice_large_to_small(xs)
             }
         }
 
@@ -175,7 +175,7 @@ macro_rules! impl_slice_traits_large_to_small {
             /// See the documentation of the `num::conversion::slice` module.
             #[inline]
             fn vec_from_other_type_slice(xs: &[$a]) -> Vec<Self> {
-                _vec_from_other_type_slice_large_to_small(xs)
+                vec_from_other_type_slice_large_to_small(xs)
             }
         }
 
@@ -195,13 +195,13 @@ macro_rules! impl_slice_traits_large_to_small {
             /// See the documentation of the `num::conversion::slice` module.
             #[inline]
             fn vec_from_other_type(x: $a) -> Vec<Self> {
-                _vec_from_other_type_large_to_small(x)
+                vec_from_other_type_large_to_small(x)
             }
         }
     };
 }
 
-fn _from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+fn from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
     xs: &[A],
 ) -> B {
     let mut result = B::ZERO;
@@ -213,18 +213,18 @@ fn _from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + Wrap
     result
 }
 
-fn _vec_from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
+fn vec_from_other_type_slice_small_to_large<A: PrimitiveInt, B: PrimitiveInt + WrappingFrom<A>>(
     xs: &[A],
 ) -> Vec<B> {
     let log_size_ratio = B::LOG_WIDTH - A::LOG_WIDTH;
     let mut out = vec![B::ZERO; xs.len().shr_round(log_size_ratio, RoundingMode::Ceiling)];
     for (x, chunk) in out.iter_mut().zip(xs.chunks(1 << log_size_ratio)) {
-        *x = _from_other_type_slice_small_to_large(chunk);
+        *x = from_other_type_slice_small_to_large(chunk);
     }
     out
 }
 
-fn _vec_from_other_type_small_to_large<A, B: WrappingFrom<A>>(x: A) -> Vec<B> {
+fn vec_from_other_type_small_to_large<A, B: WrappingFrom<A>>(x: A) -> Vec<B> {
     vec![B::wrapping_from(x)]
 }
 
@@ -255,7 +255,7 @@ macro_rules! impl_slice_traits_small_to_large {
             /// See the documentation of the `num::conversion::slice` module.
             #[inline]
             fn from_other_type_slice(xs: &[$a]) -> Self {
-                _from_other_type_slice_small_to_large(xs)
+                from_other_type_slice_small_to_large(xs)
             }
         }
 
@@ -288,7 +288,7 @@ macro_rules! impl_slice_traits_small_to_large {
             /// See the documentation of the `num::conversion::slice` module.
             #[inline]
             fn vec_from_other_type_slice(xs: &[$a]) -> Vec<Self> {
-                _vec_from_other_type_slice_small_to_large(xs)
+                vec_from_other_type_slice_small_to_large(xs)
             }
         }
 
@@ -306,7 +306,7 @@ macro_rules! impl_slice_traits_small_to_large {
             /// See the documentation of the `num::conversion::slice` module.
             #[inline]
             fn vec_from_other_type(x: $a) -> Vec<Self> {
-                _vec_from_other_type_small_to_large(x)
+                vec_from_other_type_small_to_large(x)
             }
         }
     };
