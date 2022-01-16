@@ -26,6 +26,7 @@
     clippy::float_cmp,
     clippy::many_single_char_names,
     clippy::too_many_arguments,
+    clippy::type_complexity,
     clippy::upper_case_acronyms,
     unstable_name_collisions
 )]
@@ -60,6 +61,13 @@ pub mod options;
 pub mod orderings;
 /// This module contains functions for generating random values with `ChaCha20Rng`.
 pub mod random;
+/// This module defines `RationalSequence`s.
+///
+/// A rational sequence is a sequence that is finite or eventually repeating, just like the digits
+/// of a rational number.
+pub mod rational_sequences;
+/// This module contains functions for working with `Result`s.
+pub mod results;
 /// This module contains the `RoundingMode` enum.
 ///
 /// A `RoundingMode` can often be specified when a function conceptually returns a value of one

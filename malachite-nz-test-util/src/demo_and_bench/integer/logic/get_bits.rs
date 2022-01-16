@@ -1,4 +1,3 @@
-use crate::bench::bucketers::triple_1_integer_bit_bucketer;
 use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base_test_util::bench::bucketers::{triple_1_vec_len_bucketer, triple_3_bucketer};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -13,6 +12,7 @@ use malachite_nz::integer::logic::bit_block_access::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::triple_1_integer_bit_bucketer;
 use malachite_nz_test_util::generators::integer_unsigned_unsigned_triple_gen_var_2;
 
 pub(crate) fn register(runner: &mut Runner) {

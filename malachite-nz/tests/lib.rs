@@ -81,6 +81,9 @@ pub mod integer {
     }
     pub mod basic {
         pub mod constants;
+        pub mod default;
+        pub mod from_sign_and_abs;
+        pub mod named;
         pub mod size;
     }
     pub mod comparison {
@@ -162,6 +165,10 @@ pub mod integer {
         pub mod random_negative_integers;
         pub mod random_nonzero_integers;
         pub mod random_positive_integers;
+        pub mod striped_random_integer_inclusive_range;
+        pub mod striped_random_integer_range;
+        pub mod striped_random_integer_range_to_infinity;
+        pub mod striped_random_integer_range_to_negative_infinity;
         pub mod striped_random_integers;
         pub mod striped_random_natural_integers;
         pub mod striped_random_negative_integers;
@@ -235,6 +242,8 @@ pub mod natural {
     }
     pub mod basic {
         pub mod constants;
+        pub mod default;
+        pub mod named;
         pub mod size;
     }
     pub mod comparison {
@@ -314,6 +323,9 @@ pub mod natural {
         pub mod random_naturals;
         pub mod random_naturals_less_than;
         pub mod random_positive_naturals;
+        pub mod striped_random_natural_inclusive_range;
+        pub mod striped_random_natural_range;
+        pub mod striped_random_natural_range_to_infinity;
         pub mod striped_random_naturals;
         pub mod striped_random_positive_naturals;
         pub mod uniform_random_natural_inclusive_range;

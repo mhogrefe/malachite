@@ -474,7 +474,8 @@ impl<'a, 'b> ModPowerOf2Sub<&'a Natural> for &'b Natural {
 
 impl ModPowerOf2SubAssign<Natural> for Natural {
     /// Subtracts a `Natural` from a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural`
-    /// on the RHS by value. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// on the right-hand side by value. Assumes the inputs are already reduced mod
+    /// 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(`pow`)
     ///
@@ -516,7 +517,8 @@ impl ModPowerOf2SubAssign<Natural> for Natural {
 
 impl<'a> ModPowerOf2SubAssign<&'a Natural> for Natural {
     /// Subtracts a `Natural` from a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural`
-    /// on the RHS by reference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// on the right-hand side by reference. Assumes the inputs are already reduced mod
+    /// 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(`pow`)
     ///

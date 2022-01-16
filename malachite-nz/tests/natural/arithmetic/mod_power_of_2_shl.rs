@@ -1,7 +1,21 @@
 use malachite_base::num::arithmetic::traits::{
-    ModPowerOf2, ModPowerOf2IsReduced, ModPowerOf2Shl, ModPowerOf2ShlAssign,
+    IsPowerOf2, ModPowerOf2, ModPowerOf2IsReduced, ModPowerOf2Neg, ModPowerOf2Shl,
+    ModPowerOf2ShlAssign, ModPowerOf2Shr,
+};
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::generators::{
+    signed_unsigned_pair_gen_var_14, unsigned_pair_gen_var_28,
+    unsigned_signed_unsigned_triple_gen_var_1, unsigned_triple_gen_var_17,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    natural_signed_unsigned_triple_gen_var_1, natural_unsigned_pair_gen_var_11,
+    natural_unsigned_unsigned_triple_gen_var_6,
+};
+use std::ops::Shl;
 use std::str::FromStr;
 
 macro_rules! test_mod_power_of_2_shl_unsigned {
@@ -68,4 +82,110 @@ macro_rules! test_mod_power_of_2_shl_signed {
 fn test_mod_power_of_2_shl() {
     apply_to_unsigneds!(test_mod_power_of_2_shl_unsigned);
     apply_to_signeds!(test_mod_power_of_2_shl_signed);
+}
+
+fn unsigned_properties<T: PrimitiveUnsigned>()
+where
+    Natural: ModPowerOf2Shl<T, Output = Natural> + ModPowerOf2ShlAssign<T>,
+    for<'a> &'a Natural: ModPowerOf2Shl<T, Output = Natural> + Shl<T, Output = Natural>,
+    Limb: ModPowerOf2Shl<T, Output = Limb>,
+{
+    natural_unsigned_unsigned_triple_gen_var_6::<T>().test_properties(|(n, u, pow)| {
+        assert!(n.mod_power_of_2_is_reduced(pow));
+        let mut mut_n = n.clone();
+        mut_n.mod_power_of_2_shl_assign(u, pow);
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+        assert!(shifted.mod_power_of_2_is_reduced(pow));
+
+        let shifted_alt = (&n).mod_power_of_2_shl(u, pow);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+        let shifted_alt = n.clone().mod_power_of_2_shl(u, pow);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        assert_eq!((&n << u).mod_power_of_2(pow), shifted);
+        assert_eq!(
+            (&n).mod_power_of_2_neg(pow).mod_power_of_2_shl(u, pow),
+            n.mod_power_of_2_shl(u, pow).mod_power_of_2_neg(pow)
+        );
+    });
+
+    natural_unsigned_pair_gen_var_11().test_properties(|(n, pow)| {
+        assert_eq!((&n).mod_power_of_2_shl(T::ZERO, pow), n);
+    });
+
+    unsigned_pair_gen_var_28::<T, u64>().test_properties(|(u, pow)| {
+        assert_eq!(Natural::ZERO.mod_power_of_2_shl(u, pow), 0);
+        if pow != 0 {
+            let shifted = Natural::ONE.mod_power_of_2_shl(u, pow);
+            assert!(shifted == 0 || shifted.is_power_of_2());
+        }
+    });
+
+    unsigned_triple_gen_var_17::<Limb, T>().test_properties(|(n, u, pow)| {
+        assert_eq!(
+            Natural::from(n).mod_power_of_2_shl(u, pow),
+            n.mod_power_of_2_shl(u, pow)
+        );
+    });
+}
+
+fn signed_properties<T: PrimitiveSigned>()
+where
+    Natural: ModPowerOf2Shl<T, Output = Natural>
+        + ModPowerOf2Shr<T, Output = Natural>
+        + ModPowerOf2ShlAssign<T>,
+    for<'a> &'a Natural: ModPowerOf2Shl<T, Output = Natural>
+        + ModPowerOf2Shr<T, Output = Natural>
+        + Shl<T, Output = Natural>,
+    Limb: ModPowerOf2Shl<T, Output = Limb>,
+{
+    natural_signed_unsigned_triple_gen_var_1::<T>().test_properties(|(n, i, pow)| {
+        assert!(n.mod_power_of_2_is_reduced(pow));
+        let mut mut_n = n.clone();
+        mut_n.mod_power_of_2_shl_assign(i, pow);
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+        assert!(shifted.mod_power_of_2_is_reduced(pow));
+
+        let shifted_alt = (&n).mod_power_of_2_shl(i, pow);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+        let shifted_alt = n.clone().mod_power_of_2_shl(i, pow);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        assert_eq!((&n << i).mod_power_of_2(pow), shifted);
+
+        if i != T::MIN {
+            assert_eq!(n.mod_power_of_2_shr(-i, pow), shifted);
+        }
+    });
+
+    natural_unsigned_pair_gen_var_11().test_properties(|(n, pow)| {
+        assert_eq!((&n).mod_power_of_2_shl(T::ZERO, pow), n);
+    });
+
+    signed_unsigned_pair_gen_var_14::<T, u64>().test_properties(|(i, pow)| {
+        assert_eq!(Natural::ZERO.mod_power_of_2_shl(i, pow), 0);
+        if pow != 0 {
+            let shifted = Natural::ONE.mod_power_of_2_shl(i, pow);
+            assert!(shifted == 0 || shifted.is_power_of_2());
+        }
+    });
+
+    unsigned_signed_unsigned_triple_gen_var_1::<Limb, T>().test_properties(|(n, i, pow)| {
+        assert_eq!(
+            Natural::from(n).mod_power_of_2_shl(i, pow),
+            n.mod_power_of_2_shl(i, pow)
+        );
+    });
+}
+
+#[test]
+fn mod_power_of_2_shl_properties() {
+    apply_fn_to_unsigneds!(unsigned_properties);
+    apply_fn_to_signeds!(signed_properties);
 }

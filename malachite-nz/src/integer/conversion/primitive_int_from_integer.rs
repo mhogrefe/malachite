@@ -125,9 +125,8 @@ macro_rules! impl_from {
             /// `Integer` by reference and returning `None` if the `Integer` is negative or too
             /// large.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -164,9 +163,8 @@ macro_rules! impl_from {
             /// Converts an `Integer` to a value of a primitive unsigned integer type, taking the
             /// `Integer` by reference and wrapping mod 2<sup>`$u::WIDTH`</sup>.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -192,9 +190,8 @@ macro_rules! impl_from {
             /// `Integer` by reference. If the `Integer` is too large to fit in a `$u`, `$u::MAX` is
             /// returned. If it is negative, 0 is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -220,9 +217,8 @@ macro_rules! impl_from {
             /// `Integer` by reference and wrapping mod 2<sup>`$u::WIDTH`</sup>. The returned
             /// boolean value indicates whether wrapping occurred.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -256,9 +252,8 @@ macro_rules! impl_from {
             /// Determines whether an `Integer` can be converted to a value of a primitive unsigned
             /// integer type. Takes the `Integer` by reference.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -284,9 +279,8 @@ macro_rules! impl_from {
             /// `Integer` by reference and returning `None` if the `Integer` is outside the range of
             /// an `$s`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -311,9 +305,8 @@ macro_rules! impl_from {
             /// Converts an `Integer` to a value of a primitive signed integer type, taking the
             /// `Integer` by reference and wrapping mod 2<sup>`$u::WIDTH`</sup>.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -339,9 +332,8 @@ macro_rules! impl_from {
             /// `Integer` by reference. If the `Integer` is larger than `$s::MAX`, `$s::MAX` is
             /// returned. If it is smaller than `$s::MIN`, `$s::MIN` is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -367,9 +359,8 @@ macro_rules! impl_from {
             /// `Integer` by reference and wrapping mod 2<sup>`$u::WIDTH`</sup>. The returned
             /// boolean value indicates whether wrapping occurred.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -400,9 +391,8 @@ macro_rules! impl_from {
             /// Determines whether an `Integer` can be converted to a value of a primitive signed
             /// integer type. Takes the `Integer` by reference.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```

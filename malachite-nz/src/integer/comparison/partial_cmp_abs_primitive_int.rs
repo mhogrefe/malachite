@@ -8,26 +8,12 @@ macro_rules! impl_unsigned {
             /// Compares the absolute value of an `Integer` to a value of unsigned primitive integer
             /// type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            ///
-            /// use malachite_base::num::comparison::traits::PartialOrdAbs;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(Integer::from(-122).lt_abs(&123u64));
-            /// assert!(Integer::from(-122).le_abs(&123u64));
-            /// assert!(Integer::from(-123).lt_abs(&124u64));
-            /// assert!(Integer::from(-123).le_abs(&124u64));
-            /// assert!(Integer::trillion().gt_abs(&123u64));
-            /// assert!(Integer::trillion().ge_abs(&123u64));
-            /// assert!((-Integer::trillion()).gt_abs(&123u64));
-            /// assert!((-Integer::trillion()).ge_abs(&123u64));
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_cmp_abs_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 self.abs.partial_cmp(other)
@@ -38,26 +24,12 @@ macro_rules! impl_unsigned {
             /// Compares a value of unsigned primitive integer type to the absolute value of an
             /// `Integer`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            ///
-            /// use malachite_base::num::comparison::traits::PartialOrdAbs;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(123u64.gt_abs(&Integer::from(-122)));
-            /// assert!(123u64.ge_abs(&Integer::from(-122)));
-            /// assert!(124u64.gt_abs(&Integer::from(-123)));
-            /// assert!(124u64.ge_abs(&Integer::from(-123)));
-            /// assert!(123u64.lt_abs(&Integer::trillion()));
-            /// assert!(123u64.le_abs(&Integer::trillion()));
-            /// assert!(123u64.lt_abs(&-Integer::trillion()));
-            /// assert!(123u64.le_abs(&-Integer::trillion()));
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_cmp_abs_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)
@@ -73,26 +45,12 @@ macro_rules! impl_signed {
             /// Compares the absolute value of an `Integer` to the absolute value of a value of
             /// signed primitive integer type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            ///
-            /// use malachite_base::num::comparison::traits::PartialOrdAbs;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(Integer::from(-122).lt_abs(&-123i64));
-            /// assert!(Integer::from(-122).le_abs(&-123i64));
-            /// assert!(Integer::from(-124).gt_abs(&-123i64));
-            /// assert!(Integer::from(-124).ge_abs(&-123i64));
-            /// assert!(Integer::trillion().gt_abs(&123i64));
-            /// assert!(Integer::trillion().ge_abs(&123i64));
-            /// assert!((-Integer::trillion()).gt_abs(&123i64));
-            /// assert!((-Integer::trillion()).ge_abs(&123i64));
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_cmp_abs_primitive_int`
+            /// module.
             fn partial_cmp_abs(&self, other: &$t) -> Option<Ordering> {
                 self.abs.partial_cmp(&other.unsigned_abs())
             }
@@ -102,26 +60,12 @@ macro_rules! impl_signed {
             /// Compares the absolute value of a value of signed primitive integer type to the
             /// absolute value of an `Integer`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// extern crate malachite_base;
-            ///
-            /// use malachite_base::num::comparison::traits::PartialOrdAbs;
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!((-123i64).gt_abs(&Integer::from(-122)));
-            /// assert!((-123i64).ge_abs(&Integer::from(-122)));
-            /// assert!((-123i64).lt_abs(&Integer::from(-124)));
-            /// assert!((-123i64).le_abs(&Integer::from(-124)));
-            /// assert!(123i64.lt_abs(&Integer::trillion()));
-            /// assert!(123i64.le_abs(&Integer::trillion()));
-            /// assert!(123i64.lt_abs(&-Integer::trillion()));
-            /// assert!(123i64.le_abs(&-Integer::trillion()));
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_cmp_abs_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp_abs(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp_abs(self).map(Ordering::reverse)

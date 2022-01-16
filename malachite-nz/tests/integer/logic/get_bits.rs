@@ -237,7 +237,7 @@ fn get_bit_properties() {
         );
     });
 
-    signed_unsigned_unsigned_triple_gen_var_2::<SignedLimb, u64>().test_properties(
+    signed_unsigned_unsigned_triple_gen_var_2::<Limb, SignedLimb, u64>().test_properties(
         |(n, start, end)| {
             assert_eq!(
                 Integer::from(n).get_bits(start, end),

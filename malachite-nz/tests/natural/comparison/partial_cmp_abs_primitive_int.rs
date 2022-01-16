@@ -6,9 +6,9 @@ use malachite_base_test_util::generators::{signed_pair_gen_var_7, unsigned_pair_
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::generators::{
-    natural_signed_natural_triple_gen, natural_signed_pair_gen, natural_signed_pair_gen_var_1,
-    natural_unsigned_natural_triple_gen, natural_unsigned_pair_gen,
-    signed_natural_signed_triple_gen, unsigned_natural_unsigned_triple_gen,
+    natural_natural_signed_triple_gen, natural_natural_unsigned_triple_gen,
+    natural_signed_pair_gen, natural_signed_pair_gen_var_1, natural_signed_signed_triple_gen,
+    natural_unsigned_pair_gen, natural_unsigned_unsigned_triple_gen,
 };
 use std::cmp::Ordering;
 use std::str::FromStr;
@@ -300,7 +300,7 @@ where
         assert_eq!(Some(Natural::from(u).cmp(&n)), cmp_rev);
     });
 
-    natural_unsigned_natural_triple_gen::<T>().test_properties(|(n, u, m)| {
+    natural_natural_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n.lt_abs(&u) && u.lt_abs(&m) {
             assert_eq!(n.cmp(&m), Ordering::Less);
         } else if n.gt_abs(&u) && u.gt_abs(&m) {
@@ -308,7 +308,7 @@ where
         }
     });
 
-    unsigned_natural_unsigned_triple_gen::<T>().test_properties(|(u, n, v)| {
+    natural_unsigned_unsigned_triple_gen::<T>().test_properties(|(n, u, v)| {
         if u.lt_abs(&n) && n.lt_abs(&v) {
             assert!(u.lt_abs(&v));
         } else if u.gt_abs(&n) && n.gt_abs(&v) {
@@ -344,7 +344,7 @@ where
         assert_eq!(Some(Natural::exact_from(i).cmp(&n)), cmp_rev);
     });
 
-    natural_signed_natural_triple_gen::<T>().test_properties(|(n, i, m)| {
+    natural_natural_signed_triple_gen::<T>().test_properties(|(n, m, i)| {
         if n.lt_abs(&i) && i.lt_abs(&m) {
             assert_eq!(n.cmp(&m), Ordering::Less);
         } else if n.gt_abs(&i) && i.gt_abs(&m) {
@@ -352,7 +352,7 @@ where
         }
     });
 
-    signed_natural_signed_triple_gen::<T>().test_properties(|(i, n, j)| {
+    natural_signed_signed_triple_gen::<T>().test_properties(|(n, i, j)| {
         if i.lt_abs(&n) && n.lt_abs(&j) {
             assert!(i.lt_abs(&j));
         } else if i.gt_abs(&n) && n.gt_abs(&j) {

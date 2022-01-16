@@ -1,8 +1,8 @@
-use crate::bench::bucketers::{natural_bit_bucketer, pair_1_natural_bit_bucketer};
 use itertools::Itertools;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
+use malachite_nz_test_util::bench::bucketers::{natural_bit_bucketer, pair_1_natural_bit_bucketer};
 use malachite_nz_test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_4};
 
 pub(crate) fn register(runner: &mut Runner) {

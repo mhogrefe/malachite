@@ -68,8 +68,10 @@ impl TryFrom<SerdeInteger> for Integer {
 }
 
 impl Integer {
-    /// Returns true iff `self` is valid. To be valid, its absolute value must be valid, and if the
-    /// absolute value is zero, the sign must be true. All `Integer`s must be valid.
+    /// Returns true iff `self` is valid.
+    ///
+    /// To be valid, its absolute value must be valid, and if the absolute value is zero, the sign
+    /// must be true. All `Integer`s must be valid.
     #[doc(hidden)]
     pub fn is_valid(&self) -> bool {
         self.abs.is_valid() && (self.sign || self.abs != 0)
@@ -80,7 +82,22 @@ impl Integer {
         Integer::from_str("1000000000000").unwrap()
     }
 
-    //TODO doc, test
+    /// Converts a sign and an `Natural` to an `Integer`, taking the `Natural` by value. The
+    /// `Natural` becomes the `Integer`'s absolute value, and the sign indicates whether the
+    /// `Integer` should be non-negative. If the `Natural` is zero, then the `Integer` will be
+    /// non-negative regardless of the sign.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Integer::from_sign_and_abs(true, Natural::from(123u32)), 123);
+    /// assert_eq!(Integer::from_sign_and_abs(false, Natural::from(123u32)), -123);
+    /// ```
     pub fn from_sign_and_abs(sign: bool, abs: Natural) -> Integer {
         Integer {
             sign: sign || abs == 0,
@@ -88,7 +105,26 @@ impl Integer {
         }
     }
 
-    //TODO doc, test
+    /// Converts a sign and an `Natural` to an `Integer`, taking the `Natural` by reference. The
+    /// `Natural` becomes the `Integer`'s absolute value, and the sign indicates whether the
+    /// `Integer` should be non-negative. If the `Natural` is zero, then the `Integer` will be
+    /// non-negative regardless of the sign.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, $n$ is `abs.significant_bits()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::natural::Natural;
+    ///
+    /// assert_eq!(Integer::from_sign_and_abs_ref(true, &Natural::from(123u32)), 123);
+    /// assert_eq!(Integer::from_sign_and_abs_ref(false, &Natural::from(123u32)), -123);
+    /// ```
     pub fn from_sign_and_abs_ref(sign: bool, abs: &Natural) -> Integer {
         Integer {
             sign: sign || *abs == 0,
@@ -135,42 +171,45 @@ macro_rules! integer_negative_one {
 
 /// The constant 0.
 ///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl Zero for Integer {
     const ZERO: Integer = integer_zero!();
 }
 
 /// The constant 1.
 ///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl One for Integer {
     const ONE: Integer = integer_one!();
 }
 
 /// The constant 2.
 ///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl Two for Integer {
     const TWO: Integer = integer_two!();
 }
 
 /// The constant -1.
 ///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl NegativeOne for Integer {
     const NEGATIVE_ONE: Integer = integer_negative_one!();
 }
 
-//TODO doc
+/// The constant -1.
+///
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl Default for Integer {
+    /// The default value of an `Integer`, 0.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn default() -> Integer {
         Integer::ZERO
     }
@@ -211,16 +250,7 @@ pub mod arithmetic {
     pub mod sub;
     pub mod sub_mul;
 }
-pub mod comparison {
-    pub mod cmp;
-    pub mod cmp_abs;
-    pub mod partial_cmp_abs_natural;
-    pub mod partial_cmp_abs_primitive_int;
-    pub mod partial_cmp_natural;
-    pub mod partial_cmp_primitive_int;
-    pub mod partial_eq_natural;
-    pub mod partial_eq_primitive_int;
-}
+pub mod comparison;
 pub mod conversion;
 /// This module contains iterators that generate `Integer`s without repetition.
 pub mod exhaustive;

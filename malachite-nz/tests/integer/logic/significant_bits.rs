@@ -32,21 +32,18 @@ fn test_significant_bits() {
 #[test]
 fn significant_bits_properties() {
     integer_gen().test_properties(|x| {
-        let significant_bits = x.significant_bits();
-        assert_eq!(
-            u64::wrapping_from(integer_to_bigint(&x).bits()),
-            significant_bits
-        );
+        let bits = x.significant_bits();
+        assert_eq!(u64::wrapping_from(integer_to_bigint(&x).bits()), bits);
         assert_eq!(
             u64::from(integer_to_rug_integer(&x).significant_bits()),
-            significant_bits
+            bits
         );
-
+        assert_eq!((-&x).significant_bits(), bits);
         let x_abs = x.abs();
-        assert_eq!(x_abs <= Limb::MAX, significant_bits <= Limb::WIDTH);
+        assert_eq!(x_abs <= Limb::MAX, bits <= Limb::WIDTH);
         if x_abs != 0 {
-            assert!(Natural::power_of_2(significant_bits - 1) <= x_abs);
-            assert!(x_abs < Natural::power_of_2(significant_bits));
+            assert!(Natural::power_of_2(bits - 1) <= x_abs);
+            assert!(x_abs < Natural::power_of_2(bits));
         }
     });
 

@@ -19,6 +19,7 @@ use platform::Limb;
 /// assert_eq!(limbs_count_ones(&[0, 1, 2]), 2);
 /// assert_eq!(limbs_count_ones(&[1, u32::MAX]), 33);
 /// ```
+#[doc(hidden)]
 pub fn limbs_count_ones(xs: &[Limb]) -> u64 {
     xs.iter().map(|&x| CountOnes::count_ones(x)).sum()
 }

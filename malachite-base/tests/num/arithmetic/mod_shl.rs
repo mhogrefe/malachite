@@ -2,6 +2,7 @@ use malachite_base::num::arithmetic::traits::{ArithmeticCheckedShl, ModShl, ModS
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base_test_util::generators::{
     signed_gen_var_5, signed_unsigned_pair_gen_var_13, unsigned_gen_var_5,
     unsigned_pair_gen_var_16, unsigned_pair_gen_var_25, unsigned_signed_unsigned_triple_gen_var_2,
@@ -70,14 +71,15 @@ fn mod_shl_properties_unsigned_unsigned_helper<
 }
 
 fn mod_shl_properties_unsigned_signed_helper<
-    T: ArithmeticCheckedShl<U, Output = T>
-        + ModShl<U, Output = T>
-        + ModShr<U, Output = T>
-        + ModShlAssign<U>
+    T: ArithmeticCheckedShl<S, Output = T>
+        + ModShl<S, Output = T>
+        + ModShr<S, Output = T>
+        + ModShlAssign<S>
         + PrimitiveUnsigned,
-    U: PrimitiveSigned,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
 >() {
-    unsigned_signed_unsigned_triple_gen_var_2::<T, U>().test_properties(|(n, i, m)| {
+    unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>().test_properties(|(n, i, m)| {
         assert!(n.mod_is_reduced(&m));
         let shifted = n.mod_shl(i, m);
         assert!(shifted.mod_is_reduced(&m));
@@ -90,20 +92,20 @@ fn mod_shl_properties_unsigned_signed_helper<
             assert_eq!(shifted_alt % m, shifted);
         }
 
-        if i != U::MIN {
+        if i != S::MIN {
             assert_eq!(n.mod_shr(-i, m), shifted);
         }
     });
 
     unsigned_pair_gen_var_16::<T>().test_properties(|(n, m)| {
-        assert_eq!(n.mod_shl(U::ZERO, m), n);
+        assert_eq!(n.mod_shl(S::ZERO, m), n);
     });
 
-    signed_unsigned_pair_gen_var_13::<U, T>().test_properties(|(i, m)| {
+    signed_unsigned_pair_gen_var_13::<U, S, T>().test_properties(|(i, m)| {
         assert_eq!(T::ZERO.mod_shl(i, m), T::ZERO);
     });
 
-    signed_gen_var_5::<U>().test_properties(|i| {
+    signed_gen_var_5::<S>().test_properties(|i| {
         assert_eq!(T::ZERO.mod_shl(i, T::ONE), T::ZERO);
     });
 }
@@ -111,5 +113,5 @@ fn mod_shl_properties_unsigned_signed_helper<
 #[test]
 fn mod_shl_properties() {
     apply_fn_to_unsigneds_and_unsigneds!(mod_shl_properties_unsigned_unsigned_helper);
-    apply_fn_to_unsigneds_and_signeds!(mod_shl_properties_unsigned_signed_helper);
+    apply_fn_to_unsigneds_and_unsigned_signed_pairs!(mod_shl_properties_unsigned_signed_helper);
 }

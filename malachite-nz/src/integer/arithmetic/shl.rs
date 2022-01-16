@@ -2,7 +2,7 @@ use integer::Integer;
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_base::num::basic::traits::Zero;
 use natural::Natural;
-use std::ops::{Shl, ShlAssign, Shr};
+use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
 fn shl_unsigned<T>(x: Integer, bits: T) -> Integer
 where
@@ -141,6 +141,17 @@ where
     }
 }
 
+fn shl_assign_signed<U, S: Copy + Ord + UnsignedAbs<Output = U> + Zero>(x: &mut Integer, bits: S)
+where
+    Integer: ShlAssign<U> + ShrAssign<U>,
+{
+    if bits >= S::ZERO {
+        *x <<= bits.unsigned_abs();
+    } else {
+        *x >>= bits.unsigned_abs();
+    }
+}
+
 macro_rules! impl_shl_signed {
     ($t:ident) => {
         impl Shl<$t> for Integer {
@@ -251,11 +262,7 @@ macro_rules! impl_shl_signed {
             /// assert_eq!(x.to_string(), "1");
             /// ```
             fn shl_assign(&mut self, bits: $t) {
-                if bits >= 0 {
-                    *self <<= bits.unsigned_abs();
-                } else {
-                    *self >>= bits.unsigned_abs();
-                }
+                shl_assign_signed(self, bits)
             }
         }
     };

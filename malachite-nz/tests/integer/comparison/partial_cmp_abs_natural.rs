@@ -1,16 +1,17 @@
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_nz_test_util::generators::{
-    integer_natural_integer_triple_gen, integer_natural_pair_gen,
-    natural_integer_natural_triple_gen, natural_pair_gen,
+    integer_gen, integer_integer_natural_triple_gen, integer_natural_natural_triple_gen,
+    integer_natural_pair_gen, natural_pair_gen,
 };
 use std::cmp::Ordering;
 use std::str::FromStr;
 
 #[test]
-fn test_partial_ord_integer_natural() {
+fn test_partial_cmp_abs_integer_natural() {
     let test = |s, t, cmp, lt: bool, gt: bool, le: bool, ge: bool| {
         let u = Integer::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
@@ -106,7 +107,7 @@ fn partial_cmp_abs_natural_properties() {
         assert_eq!(y.partial_cmp_abs(&x), cmp.map(Ordering::reverse));
     });
 
-    integer_natural_integer_triple_gen().test_properties(|(x, y, z)| {
+    integer_integer_natural_triple_gen().test_properties(|(x, z, y)| {
         if x.lt_abs(&y) && y.lt_abs(&z) {
             assert!(x.lt_abs(&z));
         } else if x.gt_abs(&y) && y.gt_abs(&z) {
@@ -114,12 +115,16 @@ fn partial_cmp_abs_natural_properties() {
         }
     });
 
-    natural_integer_natural_triple_gen().test_properties(|(x, y, z)| {
+    integer_natural_natural_triple_gen().test_properties(|(y, x, z)| {
         if x.lt_abs(&y) && y.lt_abs(&z) {
             assert!(x < z);
         } else if x.gt_abs(&y) && y.gt_abs(&z) {
             assert!(x > z);
         }
+    });
+
+    integer_gen().test_properties(|x| {
+        assert!(x.ge_abs(&Natural::ZERO));
     });
 
     natural_pair_gen().test_properties(|(x, y)| {

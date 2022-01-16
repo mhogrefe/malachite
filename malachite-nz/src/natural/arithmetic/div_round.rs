@@ -410,8 +410,8 @@ impl<'a, 'b> DivRound<&'b Natural> for &'a Natural {
 
 impl DivRoundAssign<Natural> for Natural {
     /// Divides a `Natural` by a `Natural` in place and rounds according to a specified rounding
-    /// mode, taking the `Natural` on the RHS by value. See the `RoundingMode` documentation for
-    /// details.
+    /// mode, taking the `Natural` on the right-hand side by value. See the `RoundingMode`
+    /// documentation for details.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -488,8 +488,8 @@ impl DivRoundAssign<Natural> for Natural {
 
 impl<'a> DivRoundAssign<&'a Natural> for Natural {
     /// Divides a `Natural` by a `Natural` in place and rounds according to a specified rounding
-    /// mode, taking the `Natural` on the RHS by reference. See the `RoundingMode` documentation for
-    /// details.
+    /// mode, taking the `Natural` on the right-hand side by reference. See the `RoundingMode`
+    /// documentation for details.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///

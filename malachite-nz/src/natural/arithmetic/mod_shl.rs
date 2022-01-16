@@ -7,8 +7,6 @@ use natural::Natural;
 use std::cmp::Ordering;
 use std::ops::{Shr, ShrAssign};
 
-// TODO #[doc(hidden)]
-
 fn mod_shl_ref_val_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T, m: Natural) -> Natural
 where
     Natural: From<T>,

@@ -55,7 +55,12 @@ fn square_properties() {
     });
 
     integer_pair_gen().test_properties(|(x, y)| {
-        assert_eq!((&x * &y).square(), x.square() * y.square());
+        let x_squared = (&x).square();
+        let y_squared = (&y).square();
+        let xy = &x * &y;
+        assert_eq!((&x + &y).square(), &x_squared + &y_squared + (&xy << 1));
+        assert_eq!((&x - &y).square(), &x_squared + &y_squared - (&xy << 1));
+        assert_eq!(xy.square(), x_squared * y_squared);
     });
 
     natural_gen().test_properties(|x| {

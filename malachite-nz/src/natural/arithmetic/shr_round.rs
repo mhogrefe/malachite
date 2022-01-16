@@ -43,6 +43,7 @@ use std::ops::{Shl, ShlAssign};
 ///
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
 /// the result is returned.
+#[doc(hidden)]
 pub fn limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -106,6 +107,7 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_round_nearest(&[u32::MAX, 1], 1), &[0, 1]);
 /// assert_eq!(limbs_shr_round_nearest(&[u32::MAX, u32::MAX], 32), &[0, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
     if bits == 0 {
         xs.to_vec()
@@ -144,6 +146,7 @@ pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// assert_eq!(limbs_shr_exact(&[u32::MAX, 1], 1), None);
 /// assert_eq!(limbs_shr_exact(&[u32::MAX, u32::MAX], 32), None);
 /// ```
+#[doc(hidden)]
 pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
     if limbs_divisible_by_power_of_2(xs, bits) {
         Some(limbs_shr(xs, bits))
@@ -184,6 +187,7 @@ pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 /// assert_eq!(limbs_shr_round(&[u32::MAX, u32::MAX], 32, RoundingMode::Down),
 ///     Some(vec![u32::MAX]));
 /// ```
+#[doc(hidden)]
 pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => Some(limbs_shr(xs, bits)),
@@ -254,6 +258,7 @@ pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<L
 ///
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
 /// w == u.
+#[doc(hidden)]
 pub fn limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -347,6 +352,7 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 /// limbs_vec_shr_round_nearest_in_place(&mut xs, 32);
 /// assert_eq!(xs, &[0, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
     if bits == 0 {
     } else if !limbs_get_bit(xs, bits - 1) {
@@ -408,6 +414,7 @@ pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
 /// let mut xs = vec![u32::MAX, u32::MAX];
 /// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 32), false);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
     if limbs_divisible_by_power_of_2(xs, bits) {
         limbs_vec_shr_in_place(xs, bits);
@@ -480,6 +487,7 @@ pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 /// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 32, RoundingMode::Down), true);
 /// assert_eq!(xs, vec![u32::MAX]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => {

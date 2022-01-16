@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_1_integer_bit_bucketer;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
@@ -6,6 +5,7 @@ use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::bench::bucketers::pair_1_integer_bit_bucketer;
 use malachite_nz_test_util::generators::{integer_signed_pair_gen, integer_unsigned_pair_gen};
 use std::cmp::Ordering;
 

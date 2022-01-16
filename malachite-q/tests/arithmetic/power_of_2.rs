@@ -1,0 +1,58 @@
+use malachite_base::num::arithmetic::traits::{NextPowerOf2, PowerOf2, Reciprocal};
+use malachite_base::num::basic::traits::One;
+use malachite_base_test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
+use malachite_nz::natural::Natural;
+use malachite_q::Rational;
+
+#[test]
+fn test_power_of_2() {
+    let test = |pow: u64, out| assert_eq!(Rational::power_of_2(pow).to_string(), out);
+    test(0, "1");
+    test(1, "2");
+    test(2, "4");
+    test(3, "8");
+    test(32, "4294967296");
+    test(100, "1267650600228229401496703205376");
+
+    let test = |pow: i64, out| assert_eq!(Rational::power_of_2(pow).to_string(), out);
+    test(0, "1");
+    test(1, "2");
+    test(2, "4");
+    test(3, "8");
+    test(32, "4294967296");
+    test(100, "1267650600228229401496703205376");
+    test(-1, "1/2");
+    test(-2, "1/4");
+    test(-3, "1/8");
+    test(-32, "1/4294967296");
+    test(-100, "1/1267650600228229401496703205376");
+}
+
+#[test]
+fn power_of_2_properties() {
+    unsigned_gen_var_5().test_properties(|pow| {
+        let x = Rational::power_of_2(pow);
+        assert!(x.is_valid());
+
+        assert_eq!(x, Rational::ONE << pow);
+        //TODO assert_eq!(x, Natural::TWO.pow(pow));
+        //TODO checked log two
+        assert_eq!((&x).next_power_of_2(), x);
+        assert_eq!(Natural::power_of_2(pow), x);
+    });
+
+    signed_gen_var_5::<i64>().test_properties(|pow| {
+        let x = Rational::power_of_2(pow);
+        assert!(x.is_valid());
+
+        assert_eq!(x, Rational::ONE << pow);
+        //TODO assert_eq!(x, Natural::TWO.pow(pow));
+        //TODO checked log two
+        assert_eq!((&x).next_power_of_2(), x);
+        if pow >= 0 {
+            assert_eq!(Natural::power_of_2(pow.unsigned_abs()), x);
+        } else {
+            assert_eq!(Natural::power_of_2(pow.unsigned_abs()), x.reciprocal());
+        }
+    });
+}

@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::iter::{empty, Empty};
 use std::str::FromStr;
 
@@ -13,6 +14,13 @@ use std::str::FromStr;
 /// ```
 #[derive(Clone, Copy, Debug, Hash, Eq, Ord, PartialEq, PartialOrd)]
 pub enum Never {}
+
+impl Display for Never {
+    /// Would convert a `Never` to a `String`.
+    fn fmt(&self, _f: &mut Formatter) -> std::fmt::Result {
+        unreachable!()
+    }
+}
 
 impl FromStr for Never {
     type Err = &'static str;

@@ -57,7 +57,7 @@ pub(crate) fn limbs_square_diagonal(out: &mut [Limb], xs: &[Limb]) {
 /// scratch must have length 2 * xs.len() - 2 and out must have length 2 * xs.len().
 ///
 /// This is MPN_SQR_DIAG_ADDLSH1 from mpn/generic/sqr_basecase.c, GMP 6.1.2.
-#[inline]
+#[doc(hidden)]
 pub fn limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
     limbs_square_diagonal(out, xs);
     let (out_last, out_init) = out.split_last_mut().unwrap();
@@ -83,6 +83,7 @@ pub fn limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb], x
 /// `xs` is empty.
 ///
 /// This is mpn_sqr_basecase from mpn/generic/sqr_basecase.c, GMP 6.1.2.
+#[doc(hidden)]
 pub fn limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let (xs_head, xs_tail) = xs.split_first().unwrap();
@@ -107,13 +108,14 @@ pub fn limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
 }
 
 /// This is mpn_toom2_sqr_itch from gmp-impl.h, GMP 6.2.1.
+#[doc(hidden)]
 pub const fn limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
     (xs_len + Limb::WIDTH as usize) << 1
 }
 
 //TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom2_sqr.c, GMP 6.1.2.
-pub const TOOM2_MAYBE_SQR_TOOM2: bool =
+const TOOM2_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD >= 2 * SQR_TOOM2_THRESHOLD;
 
 /// This is TOOM2_SQR_REC from mpn/generic/toom2_sqr.c, GMP 6.1.2.
@@ -155,6 +157,7 @@ fn limbs_square_to_out_toom_2_recursive(p: &mut [Limb], a: &[Limb], ws: &mut [Li
 /// May panic if the input slice conditions are not met.
 ///
 /// This is mpn_toom2_sqr from mpn/generic/toom2_sqr.c, GMP 6.1.2.
+#[doc(hidden)]
 pub fn limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len > 1);
@@ -217,12 +220,14 @@ pub fn limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut [
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
+#[doc(hidden)]
 #[inline]
 pub const fn limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
     xs_len == 3 || xs_len > 4
 }
 
 /// This is mpn_toom3_sqr_itch from gmp-impl.h, GMP 6.2.1.
+#[doc(hidden)]
 pub const fn limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
@@ -232,11 +237,13 @@ const SMALLER_RECURSION_TOOM_3: bool = true;
 
 //TODO tune
 /// This is MAYBE_sqr_toom3 from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+#[doc(hidden)]
 pub const TOOM3_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM4_THRESHOLD >= 3 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_basecase from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+#[doc(hidden)]
 pub const TOOM3_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD < 3 * SQR_TOOM2_THRESHOLD;
 
@@ -284,6 +291,7 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 /// May panic if the input slice conditions are not met.
 ///
 /// This is mpn_toom3_sqr from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+#[doc(hidden)]
 pub fn limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     let n = xs_len.div_round(3, RoundingMode::Ceiling);
@@ -382,29 +390,26 @@ pub fn limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
+#[doc(hidden)]
 #[inline]
 pub const fn limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool {
     xs_len == 4 || xs_len == 7 || xs_len == 8 || xs_len > 9
 }
 
 /// This is mpn_toom4_sqr_itch from gmp-impl.h, GMP 6.2.1.
+#[doc(hidden)]
 pub const fn limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
 }
 
 //TODO tune
-/// This is MAYBE_sqr_basecase from mpn/generic/toom4_sqr.c, GMP 6.1.2.
-pub const TOOM4_MAYBE_SQR_BASECASE: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM2_THRESHOLD;
-
-//TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
-pub const TOOM4_MAYBE_SQR_TOOM2: bool =
+const TOOM4_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM4_THRESHOLD < 4 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_toom4 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
-pub const TOOM4_MAYBE_SQR_TOOM4: bool =
+const TOOM4_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD >= 4 * SQR_TOOM4_THRESHOLD;
 
 // This is TOOM4_SQR_REC from mpn/generic/toom4_sqr.c, GMP 6.1.2.
@@ -457,6 +462,7 @@ fn limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 /// May panic if the input slice conditions are not met.
 ///
 /// This is mpn_toom4_sqr from mpn/generic/toom4_sqr.c, GMP 6.1.2.
+#[doc(hidden)]
 pub fn limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     let n = (xs_len + 3) >> 2;
@@ -518,12 +524,14 @@ pub fn limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
+#[doc(hidden)]
 #[inline]
 pub const fn limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
     xs_len == 18 || xs_len > 21 && xs_len != 25 && xs_len != 26 && xs_len != 31
 }
 
 // This is mpn_toom6_sqr_itch from gmp-impl.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
     (n << 1)
         + max(
@@ -539,37 +547,32 @@ const SQR_TOOM6_MAX: usize = (SQR_TOOM8_THRESHOLD + 6 * 2 - 1 + 5) / 6;
 
 //TODO tune
 /// This is MAYBE_sqr_basecase from mpn/generic/toom6_sqr.c, GMP 6.1.2.
-pub const TOOM6_MAYBE_SQR_BASECASE: bool =
+const TOOM6_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM2_THRESHOLD;
 
 //TODO tune
-/// This is MAYBE_sqr_above_basecase from mpn/generic/toom6_sqr.c, GMP 6.1.2.
-pub const TOOM6_MAYBE_SQR_ABOVE_BASECASE: bool =
-    TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM2_THRESHOLD;
-
-//TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
-pub const TOOM6_MAYBE_SQR_TOOM2: bool =
+const TOOM6_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_above_toom2 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
-pub const TOOM6_MAYBE_SQR_ABOVE_TOOM2: bool =
+const TOOM6_MAYBE_SQR_ABOVE_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM3_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_toom3 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
-pub const TOOM6_MAYBE_SQR_TOOM3: bool =
+const TOOM6_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_THRESHOLD < 6 * SQR_TOOM4_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_above_toom3 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
-pub const TOOM6_MAYBE_SQR_ABOVE_TOOM3: bool =
+const TOOM6_MAYBE_SQR_ABOVE_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM4_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_above_toom4 from mpn/generic/toom6_sqr.c, GMP 6.1.2.
-pub const TOOM6_MAYBE_SQR_ABOVE_TOOM4: bool =
+const TOOM6_MAYBE_SQR_ABOVE_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM6_MAX >= SQR_TOOM6_THRESHOLD;
 
 // This is TOOM6_SQR_REC from mpn/generic/toom6_sqr.c, GMP 6.1.2.
@@ -608,6 +611,7 @@ fn limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 /// May panic if the input slice conditions are not met.
 ///
 /// This is mpn_toom6_sqr from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+#[doc(hidden)]
 pub fn limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 18);
@@ -671,7 +675,7 @@ pub fn limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [
 }
 
 //TODO tune
-pub const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
+pub(crate) const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
 
 /// This function can be used to determine whether the size of the input slice to
 /// `limbs_square_to_out_toom_8` is valid.
@@ -679,12 +683,14 @@ pub const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
+#[doc(hidden)]
 #[inline]
 pub const fn limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
     xs_len == 40 || xs_len > 43 && xs_len != 49 && xs_len != 50 && xs_len != 57
 }
 
 // This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
     ((n * 15) >> 3)
         + max(
@@ -696,7 +702,7 @@ pub fn limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
 
 //TODO tune
 /// This is SQR_TOOM8_MAX from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
+const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1 + 7) {
     (SQR_FFT_THRESHOLD + 8 * 2 - 1 + 7) / 8
 } else {
     usize::MAX
@@ -704,47 +710,47 @@ pub const SQR_TOOM8_MAX: usize = if SQR_FFT_THRESHOLD <= usize::MAX - (8 * 2 - 1
 
 //TODO tune
 /// This is MAYBE_sqr_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_BASECASE: bool =
+const TOOM8_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM2_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_above_basecase from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_ABOVE_BASECASE: bool =
+const TOOM8_MAYBE_SQR_ABOVE_BASECASE: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM2_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_TOOM2: bool =
+const TOOM8_MAYBE_SQR_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_above_toom2 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_ABOVE_TOOM2: bool =
+const TOOM8_MAYBE_SQR_ABOVE_TOOM2: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM3_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_TOOM3: bool =
+const TOOM8_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM4_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_above_toom3 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_ABOVE_TOOM3: bool =
+const TOOM8_MAYBE_SQR_ABOVE_TOOM3: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM4_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_TOOM4: bool =
+const TOOM8_MAYBE_SQR_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_THRESHOLD < 8 * SQR_TOOM6_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_above_toom4 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_ABOVE_TOOM4: bool =
+const TOOM8_MAYBE_SQR_ABOVE_TOOM4: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM6_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_above_toom6 from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-pub const TOOM8_MAYBE_SQR_ABOVE_TOOM6: bool =
+const TOOM8_MAYBE_SQR_ABOVE_TOOM6: bool =
     TUNE_PROGRAM_BUILD || SQR_TOOM8_MAX >= SQR_TOOM8_THRESHOLD;
 
 // This is TOOM8_SQR_REC from mpn/generic/toom8_sqr.c, GMP 6.1.2, when f is false.
@@ -785,6 +791,7 @@ fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
 /// May panic if the input slice conditions are not met.
 ///
 /// This is mpn_toom8_sqr from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+#[doc(hidden)]
 pub fn limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 40);
@@ -878,9 +885,10 @@ pub fn limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [
 }
 
 //TODO tune
-pub const SQR_TOOM3_THRESHOLD_LIMIT: usize = SQR_TOOM3_THRESHOLD;
+const SQR_TOOM3_THRESHOLD_LIMIT: usize = SQR_TOOM3_THRESHOLD;
 
 /// This is mpn_sqr from mpn/generic/sqr.c, GMP 6.1.2.
+#[doc(hidden)]
 #[allow(clippy::absurd_extreme_comparisons)]
 pub fn limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
@@ -915,6 +923,7 @@ pub fn limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
     }
 }
 
+#[doc(hidden)]
 pub fn limbs_square(xs: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len() << 1];
     limbs_square_to_out(&mut out, xs);

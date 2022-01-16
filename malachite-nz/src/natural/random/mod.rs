@@ -1,11 +1,13 @@
 use itertools::Itertools;
-use malachite_base::num::arithmetic::traits::{CeilingLogBase2, PowerOf2, ShrRound};
+use malachite_base::num::arithmetic::traits::{
+    CeilingLogBase2, PowerOf2, RoundToMultipleOfPowerOf2, ShrRound,
+};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::iterators::iterator_to_bit_chunks;
-use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::num::logic::traits::{BitAccess, LowMask, SignificantBits};
 use malachite_base::num::random::geometric::{
     geometric_random_positive_unsigneds, geometric_random_unsigned_inclusive_range,
     geometric_random_unsigneds, GeometricRandomNaturalValues,
@@ -1077,5 +1079,315 @@ pub fn random_natural_inclusive_range(
                 b,
             ),
         })
+    }
+}
+
+#[inline]
+fn ranges_intersect<T: Ord>(lo_0: &T, hi_0: &T, lo: &T, hi: &T) -> bool {
+    lo <= hi_0 && lo_0 <= hi
+}
+
+/// Generates random striped `Natural`s from a range.
+#[derive(Clone, Debug)]
+pub struct StripedRandomNaturalInclusiveRange {
+    a: Natural,
+    b: Natural,
+    lo_template: Natural,
+    hi_template: Natural,
+    next_bit: u64,
+    bit_source: StripedBitSource,
+}
+
+impl Iterator for StripedRandomNaturalInclusiveRange {
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        if self.next_bit == 0 {
+            return Some(self.lo_template.clone());
+        }
+        let mut lo_template = self.lo_template.clone();
+        let mut hi_template = self.hi_template.clone();
+        let mut first = true;
+        let mut previous_forced = true;
+        let mut previous_bit = lo_template.get_bit(self.next_bit);
+        for next_bit in (0..self.next_bit).rev() {
+            let false_possible;
+            let true_possible;
+            if first {
+                false_possible = true;
+                true_possible = true;
+                lo_template.assign_bit(next_bit, true);
+                hi_template.assign_bit(next_bit, true);
+                first = false;
+            } else {
+                lo_template.assign_bit(next_bit, false);
+                hi_template.assign_bit(next_bit, false);
+                false_possible = ranges_intersect(&lo_template, &hi_template, &self.a, &self.b);
+                lo_template.assign_bit(next_bit, true);
+                hi_template.assign_bit(next_bit, true);
+                true_possible = ranges_intersect(&lo_template, &hi_template, &self.a, &self.b);
+            }
+            assert!(false_possible || true_possible);
+            let bit = if !false_possible {
+                previous_forced = true;
+                true
+            } else if !true_possible {
+                previous_forced = true;
+                false
+            } else {
+                if previous_forced {
+                    self.bit_source.end_block();
+                    self.bit_source.set_previous_bit(previous_bit);
+                    previous_forced = false;
+                }
+                self.bit_source.next().unwrap()
+            };
+            if !bit {
+                lo_template.assign_bit(next_bit, false);
+                hi_template.assign_bit(next_bit, false);
+            }
+            previous_bit = bit;
+        }
+        Some(lo_template)
+    }
+}
+
+/// Generates random striped `Natural`s in the range $[a, b)$.
+///
+/// The `Natural` are generated using a striped bit sequence with mean run length
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// Because the `Natural` are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::basic::traits::One;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::random::striped_random_natural_range;
+///
+/// let xss = striped_random_natural_range(
+///     EXAMPLE_SEED,
+///     Natural::ONE,
+///     Natural::from(7u32),
+///     4,
+///     1
+/// ).take(10).map(|x| x.to_binary_string()).collect_vec();
+/// let xss = xss.iter().map(String::as_str).collect_vec();
+/// assert_eq!(xss, &["1", "1", "1", "110", "1", "110", "10", "11", "11", "100"]);
+/// ```
+#[inline]
+pub fn striped_random_natural_range(
+    seed: Seed,
+    a: Natural,
+    b: Natural,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomNaturalInclusiveRange {
+    assert!(a < b);
+    striped_random_natural_inclusive_range(
+        seed,
+        a,
+        b - Natural::ONE,
+        mean_stripe_numerator,
+        mean_stripe_denominator,
+    )
+}
+
+/// Generates random striped `Natural`s in the range $[a, b]$.
+///
+/// The `Natural`s are generated using a striped bit sequence with mean run length
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// Because the `Natural` are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::basic::traits::One;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+/// use malachite_nz::natural::Natural;
+/// use malachite_nz::natural::random::striped_random_natural_inclusive_range;
+///
+/// let xss = striped_random_natural_inclusive_range(
+///     EXAMPLE_SEED,
+///     Natural::ONE,
+///     Natural::from(6u32),
+///     4,
+///     1
+/// ).take(10).map(|x| x.to_binary_string()).collect_vec();
+/// let xss = xss.iter().map(String::as_str).collect_vec();
+/// assert_eq!(xss, &["1", "1", "1", "110", "1", "110", "10", "11", "11", "100"]);
+/// ```
+pub fn striped_random_natural_inclusive_range(
+    seed: Seed,
+    a: Natural,
+    b: Natural,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomNaturalInclusiveRange {
+    assert!(a <= b);
+    let diff_bits = (&a ^ &b).significant_bits();
+    let mask = Natural::low_mask(diff_bits);
+    let lo_template = (&a).round_to_multiple_of_power_of_2(diff_bits, RoundingMode::Floor);
+    let hi_template = &lo_template | mask;
+    StripedRandomNaturalInclusiveRange {
+        a,
+        b,
+        lo_template,
+        hi_template,
+        next_bit: diff_bits,
+        bit_source: StripedBitSource::new(seed, mean_stripe_numerator, mean_stripe_denominator),
+    }
+}
+
+/// Generates striped random `Natural`s greater than or equal to a lower bound.
+#[derive(Clone, Debug)]
+pub struct StripedRandomNaturalRangeToInfinity {
+    min_bits: u64,
+    bits: GeometricRandomNaturalValues<u64>,
+    bit_source: StripedBitSource,
+    min_bit_xs: StripedRandomNaturalInclusiveRange,
+}
+
+impl Iterator for StripedRandomNaturalRangeToInfinity {
+    type Item = Natural;
+
+    fn next(&mut self) -> Option<Natural> {
+        let bits = self.bits.next().unwrap();
+        if bits == self.min_bits {
+            self.min_bit_xs.next()
+        } else {
+            Some(get_striped_random_natural_with_bits(
+                &mut self.bit_source,
+                bits,
+            ))
+        }
+    }
+}
+
+/// Generates striped random `Natural`s greater than or equal to a lower bound $a$.
+///
+/// The mean bit length $m$ of the `Natural`s is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+///
+/// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
+/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$,
+/// which is not typical).
+///
+/// The `Natural`s are generated using a striped bit sequence with mean run length
+/// $\mu$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level
+/// documentation.
+///
+/// Because the `Natural` are constrained to be within a certain range, the actual mean run length
+/// will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher mean run
+/// length.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
+/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
+/// `mean_bits_denominator` are zero, if their ratio is less than or equal to `a`, or if they are
+/// too large and manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::natural::random::striped_random_natural_range_to_infinity;
+/// use malachite_nz::natural::Natural;
+///
+/// assert_eq!(
+///     striped_random_natural_range_to_infinity(
+///         EXAMPLE_SEED,
+///         Natural::from(1000u32),
+///         20,
+///         1,
+///         14,
+///         1
+///     ).take(10).map(|x| Natural::to_string(&x)).collect_vec(),
+///     &["8192", "14336", "16376", "1024", "1024", "1023", "2047", "245760", "8195", "131070"]
+/// )
+/// ```
+pub fn striped_random_natural_range_to_infinity(
+    seed: Seed,
+    a: Natural,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomNaturalRangeToInfinity {
+    let min_bits = a.significant_bits();
+    StripedRandomNaturalRangeToInfinity {
+        min_bits,
+        bits: geometric_random_unsigned_inclusive_range(
+            seed.fork("bits"),
+            min_bits,
+            u64::MAX,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+        bit_source: StripedBitSource::new(
+            seed.fork("bit_source"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
+        min_bit_xs: striped_random_natural_range(
+            seed.fork("min_bit_xs"),
+            a,
+            Natural::power_of_2(min_bits),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
     }
 }

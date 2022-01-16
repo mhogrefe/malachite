@@ -182,6 +182,49 @@ macro_rules! apply_fn_to_unsigneds_and_signeds {
 
 #[doc(hidden)]
 #[macro_export]
+macro_rules! apply_fn_to_unsigneds_and_unsigned_signed_pairs {
+    ($f: ident) => {
+        $f::<u8, u8, i8>();
+        $f::<u8, u16, i16>();
+        $f::<u8, u32, i32>();
+        $f::<u8, u64, i64>();
+        $f::<u8, u128, i128>();
+        $f::<u8, usize, isize>();
+        $f::<u16, u8, i8>();
+        $f::<u16, u16, i16>();
+        $f::<u16, u32, i32>();
+        $f::<u16, u64, i64>();
+        $f::<u16, u128, i128>();
+        $f::<u16, usize, isize>();
+        $f::<u32, u8, i8>();
+        $f::<u32, u16, i16>();
+        $f::<u32, u32, i32>();
+        $f::<u32, u64, i64>();
+        $f::<u32, u128, i128>();
+        $f::<u32, usize, isize>();
+        $f::<u64, u8, i8>();
+        $f::<u64, u16, i16>();
+        $f::<u64, u32, i32>();
+        $f::<u64, u64, i64>();
+        $f::<u64, u128, i128>();
+        $f::<u64, usize, isize>();
+        $f::<u128, u8, i8>();
+        $f::<u128, u16, i16>();
+        $f::<u128, u32, i32>();
+        $f::<u128, u64, i64>();
+        $f::<u128, u128, i128>();
+        $f::<u128, usize, isize>();
+        $f::<usize, u8, i8>();
+        $f::<usize, u16, i16>();
+        $f::<usize, u32, i32>();
+        $f::<usize, u64, i64>();
+        $f::<usize, u128, i128>();
+        $f::<usize, usize, isize>();
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
 macro_rules! apply_fn_to_unsigneds_and_primitive_floats {
     ($f: ident) => {
         $f::<u8, f32>();
@@ -262,6 +305,25 @@ macro_rules! apply_fn_to_primitive_floats_and_signeds {
         $f::<f64, i64>();
         $f::<f64, i128>();
         $f::<f64, isize>();
+    };
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! apply_fn_to_primitive_floats_and_unsigned_signed_pairs {
+    ($f: ident) => {
+        $f::<f32, u8, i8>();
+        $f::<f32, u16, i16>();
+        $f::<f32, u32, i32>();
+        $f::<f32, u64, i64>();
+        $f::<f32, u128, i128>();
+        $f::<f32, usize, isize>();
+        $f::<f64, u8, i8>();
+        $f::<f64, u16, i16>();
+        $f::<f64, u32, i32>();
+        $f::<f64, u64, i64>();
+        $f::<f64, u128, i128>();
+        $f::<f64, usize, isize>();
     };
 }
 

@@ -108,9 +108,10 @@ impl Natural {
         self.demote_if_small();
     }
 
-    /// Returns true iff `self` is valid. To be valid, `self` can only be `Large` when it is at
-    /// least 2<sup>`Limb::WIDTH`</sup>, and cannot have leading zero limbs. All `Natural`s must be
-    /// valid.
+    /// Returns true iff `self` is valid. To be valid,
+    ///
+    /// `self` can only be `Large` when it is at least 2<sup>`Limb::WIDTH`</sup>, and cannot have
+    /// leading zero limbs. All `Natural`s must be valid.
     #[doc(hidden)]
     pub fn is_valid(&self) -> bool {
         match *self {
@@ -128,42 +129,41 @@ impl Natural {
 
 /// The constant 0.
 ///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl Zero for Natural {
     const ZERO: Natural = natural_zero!();
 }
 
 /// The constant 1.
 ///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl One for Natural {
     const ONE: Natural = natural_one!();
 }
 
 /// The constant 2.
 ///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl Two for Natural {
     const TWO: Natural = natural_two!();
 }
 
 /// The minimum value of a `Natural`, 0.
 ///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+/// # Worst-case complexity
+/// Constant time and additional memory.
 impl Min for Natural {
     const MIN: Natural = natural_zero!();
 }
 
-//TODO doc
 impl Default for Natural {
+    /// The default value of a `Natural`, 0.
+    ///
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn default() -> Natural {
         Natural::ZERO
     }
@@ -233,13 +233,8 @@ pub mod arithmetic {
     pub mod sub;
     pub mod sub_mul;
 }
+pub mod comparison;
 pub mod conversion;
-pub mod comparison {
-    pub mod cmp;
-    pub mod partial_cmp_abs_primitive_int;
-    pub mod partial_cmp_primitive_int;
-    pub mod partial_eq_primitive_int;
-}
 /// This module contains iterators that generate `Natural`s without repetition.
 pub mod exhaustive;
 pub mod logic {

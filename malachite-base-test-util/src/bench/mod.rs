@@ -10,10 +10,15 @@ use time::precise_time_ns;
 fn escape_label_string(s: &str) -> String {
     let mut escaped = String::new();
     for c in s.chars() {
-        if c == '_' || c == '&' {
-            escaped.push_str("\\\\");
+        if c == '_' {
+            escaped.push_str("\\\\_");
+        } else if c == '&' {
+            // Ugly, but don't know what else to do. "&" and "\&" never worked, and "\\&" no longer
+            // works.
+            escaped.push_str("<amp>");
+        } else {
+            escaped.push(c);
         }
-        escaped.push(c);
     }
     escaped
 }

@@ -762,6 +762,7 @@ const fn extract_number(count: u64, x1: Limb, x0: Limb) -> Limb {
 }
 
 /// This is div2 from mpn/generic/hgcd2.c, GMP 6.2.1, where HGCD2_DIV2_METHOD == 1.
+#[doc(hidden)]
 pub fn limbs_gcd_div(mut n1: Limb, mut n0: Limb, mut d1: Limb, mut d0: Limb) -> (Limb, Limb, Limb) {
     let (mut q, r) = n1.div_mod(d1);
     if q > d1 {
@@ -1070,6 +1071,7 @@ fn limbs_half_gcd_scratch_len(n: usize) -> usize {
 const HGCD_REDUCE_THRESHOLD: usize = 1679;
 
 /// This is mpn_hgcd_reduce_itch from mpn/generic/hgcd_reduce.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_half_gcd_reduce_scratch_len(n: usize, p: usize) -> usize {
     assert!(n >= p);
     let diff = n - p;

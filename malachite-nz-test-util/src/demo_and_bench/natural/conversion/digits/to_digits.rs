@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{natural_bit_ratio_bucketer, pair_1_natural_bit_bucketer};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, PowerOf2Digits, SaturatingFrom,
@@ -16,6 +15,9 @@ use malachite_nz::natural::conversion::digits::general_digits::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::bench::bucketers::{
+    natural_bit_ratio_bucketer, pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::*;
 
 pub(crate) fn register(runner: &mut Runner) {

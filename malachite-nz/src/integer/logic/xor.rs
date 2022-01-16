@@ -1573,8 +1573,8 @@ impl<'a, 'b> BitXor<&'a Integer> for &'b Integer {
 }
 
 impl BitXorAssign<Integer> for Integer {
-    /// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the RHS
-    /// by value.
+    /// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the
+    /// right-hand side by value.
     ///
     /// Time: worst case O(n)
     ///
@@ -1614,8 +1614,8 @@ impl BitXorAssign<Integer> for Integer {
 }
 
 impl<'a> BitXorAssign<&'a Integer> for Integer {
-    /// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the RHS
-    /// by reference.
+    /// Bitwise-xors an `Integer` with another `Integer` in place, taking the `Integer` on the
+    /// right-hand side by reference.
     ///
     /// Time: worst case O(n)
     ///

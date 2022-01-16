@@ -3,7 +3,9 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom, RoundingFrom};
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
+};
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::{
@@ -373,14 +375,15 @@ fn rounding_from_helper_primitive_float_unsigned<
 }
 
 fn rounding_from_helper_primitive_float_signed<
-    T: ConvertibleFrom<U> + PrimitiveFloat + RoundingFrom<U>,
-    U: CheckedFrom<T> + PrimitiveSigned + RoundingFrom<T>,
+    T: ConvertibleFrom<S> + PrimitiveFloat + RoundingFrom<S>,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: CheckedFrom<T> + PrimitiveSigned + RoundingFrom<T> + WrappingFrom<U>,
 >() {
-    signed_rounding_mode_pair_gen_var_4::<U, T>().test_properties(|(i, rm)| {
+    signed_rounding_mode_pair_gen_var_4::<S, T>().test_properties(|(i, rm)| {
         T::rounding_from(i, rm);
     });
 
-    signed_gen_var_7::<U, T>().test_properties(|i| {
+    signed_gen_var_7::<S, T>().test_properties(|i| {
         let f = T::rounding_from(i, RoundingMode::Exact);
         assert_eq!(
             NiceFloat(f),
@@ -402,18 +405,18 @@ fn rounding_from_helper_primitive_float_signed<
             NiceFloat(f),
             NiceFloat(T::rounding_from(i, RoundingMode::Nearest))
         );
-        assert_eq!(U::rounding_from(f, RoundingMode::Exact), i);
+        assert_eq!(S::rounding_from(f, RoundingMode::Exact), i);
     });
 
-    if U::WIDTH > T::MANTISSA_WIDTH {
-        signed_gen_var_8::<U, T>().test_properties(|i| {
+    if S::WIDTH > T::MANTISSA_WIDTH {
+        signed_gen_var_8::<U, S, T>().test_properties(|i| {
             let f_below = T::rounding_from(i, RoundingMode::Floor);
             let f_above = f_below.next_higher();
             assert_eq!(
                 NiceFloat(f_above),
                 NiceFloat(T::rounding_from(i, RoundingMode::Ceiling))
             );
-            if i >= U::ZERO {
+            if i >= S::ZERO {
                 assert_eq!(
                     NiceFloat(f_below),
                     NiceFloat(T::rounding_from(i, RoundingMode::Down))
@@ -443,7 +446,7 @@ fn rounding_from_helper_primitive_float_signed<
             );
         });
 
-        signed_gen_var_9::<U, T>().test_properties(|i| {
+        signed_gen_var_9::<U, S, T>().test_properties(|i| {
             let floor = T::rounding_from(i, RoundingMode::Floor);
             let ceiling = floor.next_higher();
             let nearest = T::rounding_from(i, RoundingMode::Nearest);
@@ -464,5 +467,7 @@ fn rounding_from_properties() {
     apply_fn_to_unsigneds_and_primitive_floats!(rounding_from_helper_unsigned_primitive_float);
     apply_fn_to_signeds_and_primitive_floats!(rounding_from_helper_signed_primitive_float);
     apply_fn_to_primitive_floats_and_unsigneds!(rounding_from_helper_primitive_float_unsigned);
-    apply_fn_to_primitive_floats_and_signeds!(rounding_from_helper_primitive_float_signed);
+    apply_fn_to_primitive_floats_and_unsigned_signed_pairs!(
+        rounding_from_helper_primitive_float_signed
+    );
 }

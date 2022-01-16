@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{natural_bit_bucketer, pair_1_natural_bit_bucketer};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
@@ -14,6 +13,7 @@ use malachite_base_test_util::generators::{
 };
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::{natural_bit_bucketer, pair_1_natural_bit_bucketer};
 use malachite_nz_test_util::generators::{natural_gen_var_2, natural_rounding_mode_pair_gen_var_2};
 
 pub(crate) fn register(runner: &mut Runner) {

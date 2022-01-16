@@ -1,0 +1,279 @@
+use malachite_base::comparison::traits::{Max, Min};
+use malachite_base::named::Named;
+use malachite_base::num::arithmetic::traits::{DivRound, DivisibleByPowerOf2};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::conversion::traits::{
+    CheckedFrom, ConvertibleFrom, RoundingFrom, WrappingFrom,
+};
+use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
+use std::ops::Neg;
+use Rational;
+
+fn checked_from_unsigned<'a, T: CheckedFrom<&'a Natural>>(x: &'a Rational) -> Option<T> {
+    if x.sign && x.denominator == 1u32 {
+        T::checked_from(&x.numerator)
+    } else {
+        None
+    }
+}
+
+fn convertible_from_unsigned<T: for<'a> ConvertibleFrom<&'a Natural>>(x: &Rational) -> bool {
+    x.sign && x.denominator == 1u32 && T::convertible_from(&x.numerator)
+}
+
+fn rounding_from_unsigned<'a, T: for<'b> CheckedFrom<&'b Natural> + Max + Named + Zero>(
+    x: &'a Rational,
+    rm: RoundingMode,
+) -> T {
+    if x.sign {
+        if let Some(q) = T::checked_from(&(&x.numerator).div_round(&x.denominator, rm)) {
+            q
+        } else if rm == RoundingMode::Down
+            || rm == RoundingMode::Floor
+            || rm == RoundingMode::Nearest
+        {
+            T::MAX
+        } else {
+            panic!(
+                "Rational is too large to round to {} using RoundingMode {}",
+                rm,
+                T::NAME
+            );
+        }
+    } else if rm == RoundingMode::Down || rm == RoundingMode::Ceiling || rm == RoundingMode::Nearest
+    {
+        T::ZERO
+    } else {
+        panic!(
+            "Cannot round negative Rational to {} using RoundingMode {}",
+            rm,
+            T::NAME
+        );
+    }
+}
+
+fn checked_from_signed<
+    'a,
+    U: WrappingFrom<&'a Natural>,
+    S: Neg<Output = S> + PrimitiveInt + WrappingFrom<U> + WrappingFrom<&'a Natural>,
+>(
+    x: &'a Rational,
+) -> Option<S> {
+    if x.denominator != 1u32 {
+        return None;
+    }
+    match *x {
+        Rational {
+            sign: true,
+            ref numerator,
+            ..
+        } => {
+            if numerator.significant_bits() < S::WIDTH {
+                Some(S::wrapping_from(numerator))
+            } else {
+                None
+            }
+        }
+        Rational {
+            sign: false,
+            ref numerator,
+            ..
+        } => {
+            let significant_bits = numerator.significant_bits();
+            if significant_bits < S::WIDTH
+                || significant_bits == S::WIDTH && numerator.divisible_by_power_of_2(S::WIDTH - 1)
+            {
+                Some(-S::wrapping_from(U::wrapping_from(numerator)))
+            } else {
+                None
+            }
+        }
+    }
+}
+
+fn convertible_from_signed<T: PrimitiveInt>(x: &Rational) -> bool {
+    if x.denominator != 1u32 {
+        return false;
+    }
+    match *x {
+        Rational {
+            sign: true,
+            ref numerator,
+            ..
+        } => numerator.significant_bits() < T::WIDTH,
+        Rational {
+            sign: false,
+            ref numerator,
+            ..
+        } => {
+            let significant_bits = numerator.significant_bits();
+            significant_bits < T::WIDTH
+                || significant_bits == T::WIDTH && numerator.divisible_by_power_of_2(T::WIDTH - 1)
+        }
+    }
+}
+
+fn rounding_from_signed<'a, T: Max + Min + Named + for<'b> WrappingFrom<&'b Integer>>(
+    x: &'a Rational,
+    rm: RoundingMode,
+) -> T
+where
+    Integer: PartialOrd<T>,
+{
+    let i = Integer::rounding_from(x, rm);
+    if i > T::MAX {
+        if rm == RoundingMode::Down || rm == RoundingMode::Floor || rm == RoundingMode::Nearest {
+            T::MAX
+        } else {
+            panic!(
+                "Rational is too large to round to {} using RoundingMode {}",
+                rm,
+                T::NAME
+            );
+        }
+    } else if i < T::MIN {
+        if rm == RoundingMode::Down || rm == RoundingMode::Ceiling || rm == RoundingMode::Nearest {
+            T::MIN
+        } else {
+            panic!(
+                "Rational is too small to round to {} using RoundingMode {}",
+                rm,
+                T::NAME
+            );
+        }
+    } else {
+        T::wrapping_from(&i)
+    }
+}
+
+macro_rules! impl_from_unsigned {
+    ($u: ident) => {
+        impl<'a> CheckedFrom<&'a Rational> for $u {
+            /// Converts a `Rational` to an unsigned integer, taking the `Rational` by reference.
+            /// If the `Rational` is negative, too large, or not an integer, `None` is returned.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            #[inline]
+            fn checked_from(value: &Rational) -> Option<$u> {
+                checked_from_unsigned(value)
+            }
+        }
+
+        impl<'a> ConvertibleFrom<&'a Rational> for $u {
+            /// Determines whether a `Rational` can be converted to an unsigned integer, taking
+            /// the `Rational` by reference.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            #[inline]
+            fn convertible_from(value: &Rational) -> bool {
+                convertible_from_unsigned::<$u>(value)
+            }
+        }
+
+        impl<'a> RoundingFrom<&'a Rational> for $u {
+            /// Converts a `Rational` to an unsigned integer, using a specified `RoundingMode` and
+            /// taking the `Rational` by reference.
+            ///
+            /// If the `Rational` is negative, then it will be rounded to zero when the
+            /// `RoundingMode` is `Ceiling`, `Down`, or `Nearest`. Otherwise, this function will
+            /// panic.
+            ///
+            /// If the `Rational` is larger than the maximum value of the unsigned type, then it
+            /// will be rounded to the maximum value when the `RoundingMode` is `Floor`, `Down`, or
+            /// `Nearest`. Otherwise, this function will panic.
+            ///
+            /// # Worst-case complexity
+            /// TODO
+            ///
+            /// # Panics
+            /// Panics if the `Rational` is not an integer and `RoundingMode` is `Exact`, if the
+            /// `Rational` is less than zero and `RoundingMode` is not `Down`, `Ceiling`, or
+            /// `Nearest`, or if the `Rational` is greater than `T::MAX` and `RoundingMode` is not
+            /// `Down`, `Floor`, or `Nearest`.
+            ///
+            /// # Examples
+            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            #[inline]
+            fn rounding_from(value: &Rational, rm: RoundingMode) -> $u {
+                rounding_from_unsigned(value, rm)
+            }
+        }
+    };
+}
+apply_to_unsigneds!(impl_from_unsigned);
+
+macro_rules! impl_from_signed {
+    ($u: ident, $s: ident) => {
+        impl<'a> CheckedFrom<&'a Rational> for $s {
+            /// Converts a `Rational` to a signed integer, taking the `Rational` by reference. If
+            /// the `Rational` is too small, too large, or not an integer, `None` is returned.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            #[inline]
+            fn checked_from(value: &Rational) -> Option<$s> {
+                checked_from_signed::<$u, $s>(value)
+            }
+        }
+
+        impl<'a> ConvertibleFrom<&'a Rational> for $s {
+            /// Determines whether a `Rational` can be converted to a signed integer, taking the
+            /// `Rational` by reference.
+            ///
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
+            ///
+            /// # Examples
+            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            #[inline]
+            fn convertible_from(value: &Rational) -> bool {
+                convertible_from_signed::<$s>(value)
+            }
+        }
+
+        impl<'a> RoundingFrom<&'a Rational> for $s {
+            /// Converts a `Rational` to a signed integer, using a specified `RoundingMode` and
+            /// taking the `Rational` by reference.
+            ///
+            /// If the `Rational` is smaller than the minimum value of the unsigned type, then it
+            /// will be rounded to the minimum value when the `RoundingMode` is `Ceiling`, `Down`,
+            /// or `Nearest`. Otherwise, this function will panic.
+            ///
+            /// If the `Rational` is larger than the maximum value of the unsigned type, then it
+            /// will be rounded to the maximum value when the `RoundingMode` is `Floor`, `Down`, or
+            /// `Nearest`. Otherwise, this function will panic.
+            ///
+            /// # Worst-case complexity
+            /// TODO
+            ///
+            /// # Panics
+            /// Panics if the `Rational` is not an integer and `RoundingMode` is `Exact`, if the
+            /// `Rational` is less than `T::MIN` and `RoundingMode` is not `Down`, `Ceiling`, or
+            /// `Nearest`, or if the `Rational` is greater than `T::MAX` and `RoundingMode` is not
+            /// `Down`, `Floor`, or `Nearest`.
+            ///
+            /// # Examples
+            /// See the documentation of the `conversion::primitive_int_from_rational` module.
+            #[inline]
+            fn rounding_from(value: &Rational, rm: RoundingMode) -> $s {
+                rounding_from_signed(value, rm)
+            }
+        }
+    };
+}
+apply_to_unsigned_signed_pairs!(impl_from_signed);

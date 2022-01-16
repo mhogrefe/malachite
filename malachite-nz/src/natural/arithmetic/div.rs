@@ -655,7 +655,6 @@ pub fn limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mu
             limbs_sub_same_length_in_place_left(rs_hi, ds);
         }
         if limbs_div_barrett_approx(&mut scratch_2, &rs, ds, scratch) {
-            fail_on_untested_path("limbs_div_barrett, !limbs_div_barrett_approx");
             // Since the partial remainder fed to limbs_div_barrett_approx_preinverted was
             // canonically reduced, replace the returned value of B ^ (q_len - d_len) + epsilon by
             // the largest possible value.
@@ -712,7 +711,6 @@ pub fn limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mu
             {
                 // At most is wrong by one, no cycle.
                 if limbs_sub_limb_to_out(qs, scratch_2_tail, 1) {
-                    fail_on_untested_path("limbs_div_barrett, limbs_sub_greater_to_out 2");
                     assert!(highest_q);
                     return false;
                 }
@@ -880,9 +878,6 @@ pub fn limbs_div_schoolbook_approx(
             q = Limb::MAX;
             let carry = limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..2], &ds[..2], q);
             if flag && n_1 < carry {
-                fail_on_untested_path(
-                    "limbs_div_schoolbook_approx, !flag || n_1 >= carry second time",
-                );
                 q.wrapping_sub_assign(1);
                 limbs_slice_add_same_length_in_place_left(&mut ns[..2], &ds[..2]);
             }
@@ -1213,7 +1208,6 @@ fn limbs_div_barrett_approx_helper(
         limbs_invert_approx(is, scratch_2_lo, scratch_2_hi);
         slice_move_left(is, 1);
     } else if limbs_add_limb_to_out(scratch_2, &ds[d_len_s - n..], 1) {
-        fail_on_untested_path("limbs_div_barrett_approx_helper, limbs_add_limb_to_out");
         slice_set_zero(&mut is[..i_len]);
     } else {
         let (scratch_2_lo, scratch_2_hi) = scratch_2.split_at_mut(n);
@@ -1340,9 +1334,6 @@ fn limbs_div_barrett_approx_preinverted(
         }
     }
     if limbs_slice_add_limb_in_place(qs, 3) || carry {
-        fail_on_untested_path(
-            "limbs_div_barrett_approx_preinverted, limbs_slice_add_limb_in_place",
-        );
         if highest_q {
             // Return a quotient of just 1-bits, with highest_q set.
             for q in qs.iter_mut() {
@@ -1480,6 +1471,7 @@ pub fn limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [L
     }
 }
 
+#[doc(hidden)]
 pub fn limbs_div_q_dc_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();

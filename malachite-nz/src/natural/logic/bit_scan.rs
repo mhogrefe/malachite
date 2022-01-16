@@ -30,6 +30,7 @@ use platform::Limb;
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 35), 36);
 /// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 100), 100);
 /// ```
+#[doc(hidden)]
 pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
     let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
     if starting_index >= xs.len() {
@@ -82,6 +83,7 @@ pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 36), None);
 /// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 100), None);
 /// ```
+#[doc(hidden)]
 pub fn limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
     let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
     if starting_index >= xs.len() {

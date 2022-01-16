@@ -32,7 +32,7 @@ impl<'a> Display for BaseFmtWrapper<&'a Integer> {
     /// assert_eq!(format!("{:#010}", x), "-000GJDGXS");
     /// ```
     fn fmt(&self, f: &mut Formatter) -> Result {
-        if *self.x < 0 {
+        if !self.x.sign {
             f.write_char('-')?;
             if let Some(width) = f.width() {
                 return if f.alternate() {

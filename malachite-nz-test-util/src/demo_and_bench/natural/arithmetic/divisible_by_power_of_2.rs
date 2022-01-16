@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{pair_1_natural_bit_bucketer, pair_2_pair_1_natural_bit_bucketer};
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::bucketers::pair_1_vec_len_bucketer;
@@ -9,6 +8,9 @@ use malachite_base_test_util::generators::{
 };
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
+use malachite_nz_test_util::bench::bucketers::{
+    pair_1_natural_bit_bucketer, pair_2_pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     natural_unsigned_pair_gen_var_4, natural_unsigned_pair_gen_var_4_rm,
 };

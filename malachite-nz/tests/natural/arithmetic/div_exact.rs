@@ -32,7 +32,7 @@ use malachite_nz_test_util::generators::{
     natural_gen, natural_gen_var_2, natural_pair_gen_var_6, unsigned_vec_gen_var_5,
     unsigned_vec_pair_gen_var_13, unsigned_vec_quadruple_gen_var_2, unsigned_vec_triple_gen_var_46,
     unsigned_vec_triple_gen_var_47, unsigned_vec_triple_gen_var_48,
-    unsigned_vec_unsigned_pair_gen_var_24, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14,
+    unsigned_vec_unsigned_pair_gen_var_29, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14,
 };
 use malachite_nz_test_util::natural::arithmetic::div_exact::{
     limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
@@ -11559,7 +11559,7 @@ fn limbs_div_exact_limb_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    unsigned_vec_unsigned_pair_gen_var_24().test_properties_with_config(&config, |(xs, y)| {
+    unsigned_vec_unsigned_pair_gen_var_29().test_properties_with_config(&config, |(xs, y)| {
         let expected_result = Natural::from_limbs_asc(&xs).div_exact(Natural::from(y));
         assert_eq!(
             Natural::from_owned_limbs_asc(limbs_div_exact_limb(&xs, y)),
@@ -11602,7 +11602,7 @@ fn limbs_div_exact_limb_in_place_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    unsigned_vec_unsigned_pair_gen_var_24().test_properties_with_config(&config, |(mut xs, y)| {
+    unsigned_vec_unsigned_pair_gen_var_29().test_properties_with_config(&config, |(mut xs, y)| {
         let old_xs = xs.clone();
         limbs_div_exact_limb_in_place(&mut xs, y);
         let expected_result = Natural::from_limbs_asc(&old_xs).div_exact(Natural::from(y));

@@ -13,21 +13,12 @@ macro_rules! impl_partial_ord_limb {
         impl PartialOrd<$u> for Natural {
             /// Compares a `Natural` to a `Limb`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert!(Natural::from(123u32) > 122u32);
-            /// assert!(Natural::from(123u32) >= 122u32);
-            /// assert!(Natural::from(123u32) < 124u32);
-            /// assert!(Natural::from(123u32) <= 124u32);
-            /// assert!(Natural::trillion() > 123u32);
-            /// assert!(Natural::trillion() >= 123u32);
-            /// ```
+            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
+            /// module.
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 match *self {
                     Natural(Small(small)) => small.partial_cmp(other),
@@ -39,21 +30,12 @@ macro_rules! impl_partial_ord_limb {
         impl PartialOrd<Natural> for $u {
             /// Compares a `Limb` to a `Natural`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert!(122u32 < Natural::from(123u32));
-            /// assert!(122u32 <= Natural::from(123u32));
-            /// assert!(124u32 > Natural::from(123u32));
-            /// assert!(124u32 >= Natural::from(123u32));
-            /// assert!(123u32 < Natural::trillion());
-            /// assert!(123u32 <= Natural::trillion());
-            /// ```
+            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -68,21 +50,12 @@ macro_rules! impl_partial_ord_smaller_than_limb {
             /// Compares a `Natural` to a value of a primitive unsigned integer type that's smaller
             /// than a `Limb`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert!(Natural::from(123u32) > 122u8);
-            /// assert!(Natural::from(123u32) >= 122u8);
-            /// assert!(Natural::from(123u32) < 124u8);
-            /// assert!(Natural::from(123u32) <= 124u8);
-            /// assert!(Natural::trillion() > 123u8);
-            /// assert!(Natural::trillion() >= 123u8);
-            /// ```
+            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 self.partial_cmp(&Limb::from(*other))
@@ -93,21 +66,12 @@ macro_rules! impl_partial_ord_smaller_than_limb {
             /// Compares a value of a primitive unsigned integer type that's smaller than a `Limb`
             /// to a `Natural`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert!(122u8 < Natural::from(123u32));
-            /// assert!(122u8 <= Natural::from(123u32));
-            /// assert!(124u8 > Natural::from(123u32));
-            /// assert!(124u8 >= Natural::from(123u32));
-            /// assert!(123u8 < Natural::trillion());
-            /// assert!(123u8 <= Natural::trillion());
-            /// ```
+            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -123,21 +87,12 @@ macro_rules! impl_partial_ord_larger_than_limb_or_usize {
             /// `Limb` to a `Natural`. This implementation is general enough to also work for
             /// `usize`, regardless of whether it is equal in width to `Limb`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert!(122u64 < Natural::from(123u32));
-            /// assert!(122u64 <= Natural::from(123u32));
-            /// assert!(124u64 > Natural::from(123u32));
-            /// assert!(124u64 >= Natural::from(123u32));
-            /// assert!(123u64 < Natural::trillion());
-            /// assert!(123u64 <= Natural::trillion());
-            /// ```
+            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -154,21 +109,12 @@ macro_rules! impl_partial_ord_larger_than_limb {
             /// Compares a `Natural` to a value of a primitive unsigned integer type that's larger
             /// than a `Limb`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert!(Natural::from(123u32) > 122u64);
-            /// assert!(Natural::from(123u32) >= 122u64);
-            /// assert!(Natural::from(123u32) < 124u64);
-            /// assert!(Natural::from(123u32) <= 124u64);
-            /// assert!(Natural::trillion() > 123u64);
-            /// assert!(Natural::trillion() >= 123u64);
-            /// ```
+            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &$u) -> Option<Ordering> {
                 let limb_count = other
@@ -200,23 +146,12 @@ macro_rules! impl_signed {
         impl PartialOrd<$t> for Natural {
             /// Compares a `Natural` to a a value of signed primitive integer type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert!(Natural::from(123u32) > 122i64);
-            /// assert!(Natural::from(123u32) >= 122i64);
-            /// assert!(Natural::from(123u32) < 124i64);
-            /// assert!(Natural::from(123u32) <= 124i64);
-            /// assert!(Natural::from(123u32) > -124i64);
-            /// assert!(Natural::from(123u32) >= -124i64);
-            /// assert!(Natural::trillion() > 123i64);
-            /// assert!(Natural::trillion() >= 123i64);
-            /// ```
+            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
+            /// module.
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 if *other < 0 {
                     Some(Ordering::Greater)
@@ -229,23 +164,12 @@ macro_rules! impl_signed {
         impl PartialOrd<Natural> for $t {
             /// Compares a value of signed primitive integer type to a `Natural`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::natural::Natural;
-            ///
-            /// assert!(122i64 < Natural::from(123u32));
-            /// assert!(122i64 <= Natural::from(123u32));
-            /// assert!(124i64 > Natural::from(123u32));
-            /// assert!(124i64 >= Natural::from(123u32));
-            /// assert!(-124i64 < Natural::from(123u32));
-            /// assert!(-124i64 <= Natural::from(123u32));
-            /// assert!(123i64 < Natural::trillion());
-            /// assert!(123i64 <= Natural::trillion());
-            /// ```
+            /// See the documentation of the `natural::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &Natural) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -272,9 +196,11 @@ apply_to_signeds!(impl_signed);
 impl PartialOrd<usize> for Natural {
     /// Compares a `Natural` to a `usize`.
     ///
-    /// Time: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     ///
-    /// Additional memory: worst case O(1)
+    /// # Examples
+    /// See the documentation of the `natural::comparison::partial_cmp_primitive_int` module.
     #[inline]
     fn partial_cmp(&self, other: &usize) -> Option<Ordering> {
         if usize::WIDTH == u32::WIDTH {

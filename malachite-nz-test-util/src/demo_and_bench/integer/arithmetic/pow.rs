@@ -1,11 +1,10 @@
-use crate::bench::bucketers::{
-    pair_1_integer_bits_times_pair_2_bucketer, triple_3_pair_1_integer_bits_times_pair_2_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::bench::bucketers::pair_1_bits_times_pair_2_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
+use malachite_nz_test_util::bench::bucketers::triple_3_pair_1_integer_bits_times_pair_2_bucketer;
 use malachite_nz_test_util::generators::{
     integer_unsigned_pair_gen_var_2, integer_unsigned_pair_gen_var_2_nrm,
 };
@@ -59,7 +58,7 @@ fn benchmark_integer_pow_assign(gm: GenMode, config: GenConfig, limit: usize, fi
         gm.name(),
         limit,
         file_name,
-        &pair_1_integer_bits_times_pair_2_bucketer("n", "pow"),
+        &pair_1_bits_times_pair_2_bucketer("n", "pow"),
         &mut [("Malachite", &mut |(mut x, exp)| x.pow_assign(exp))],
     );
 }
@@ -103,7 +102,7 @@ fn benchmark_integer_pow_evaluation_strategy(
         gm.name(),
         limit,
         file_name,
-        &pair_1_integer_bits_times_pair_2_bucketer("n", "pow"),
+        &pair_1_bits_times_pair_2_bucketer("n", "pow"),
         &mut [
             ("Integer.pow(u64)", &mut |(x, exp)| no_out!(x.pow(exp))),
             (

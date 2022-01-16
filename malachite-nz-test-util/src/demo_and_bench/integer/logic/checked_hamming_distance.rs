@@ -1,6 +1,3 @@
-use crate::bench::bucketers::{
-    pair_2_pair_integer_max_bit_bucketer, pair_integer_max_bit_bucketer,
-};
 use malachite_base::num::logic::traits::CheckedHammingDistance;
 use malachite_base_test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_vec_max_len_bucketer,
@@ -13,6 +10,9 @@ use malachite_base_test_util::generators::{
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::integer::logic::checked_hamming_distance::{
     limbs_hamming_distance_limb_neg, limbs_hamming_distance_neg,
+};
+use malachite_nz_test_util::bench::bucketers::{
+    pair_2_pair_integer_max_bit_bucketer, pair_integer_max_bit_bucketer,
 };
 use malachite_nz_test_util::generators::{integer_pair_gen, integer_pair_gen_rm};
 use malachite_nz_test_util::integer::logic::checked_hamming_distance::rug_checked_hamming_distance;

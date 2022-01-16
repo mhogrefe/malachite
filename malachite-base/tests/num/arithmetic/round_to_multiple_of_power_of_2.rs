@@ -1,6 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::generators::{
     signed_rounding_mode_pair_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_16,
@@ -217,8 +218,11 @@ fn round_to_multiple_of_power_of_2_properties_helper_unsigned<T: PrimitiveUnsign
     });
 }
 
-fn round_to_multiple_of_power_of_2_properties_helper_signed<T: PrimitiveSigned>() {
-    signed_unsigned_rounding_mode_triple_gen_var_1::<T>().test_properties(|(n, pow, rm)| {
+fn round_to_multiple_of_power_of_2_properties_helper_signed<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() {
+    signed_unsigned_rounding_mode_triple_gen_var_1::<S>().test_properties(|(n, pow, rm)| {
         let rounded = n.round_to_multiple_of_power_of_2(pow, rm);
 
         let mut mut_n = n;
@@ -233,7 +237,7 @@ fn round_to_multiple_of_power_of_2_properties_helper_signed<T: PrimitiveSigned>(
             RoundingMode::Up => assert!(rounded.ge_abs(&n)),
             RoundingMode::Exact => assert_eq!(rounded, n),
             RoundingMode::Nearest => {
-                if let Some(k) = T::ONE.arithmetic_checked_shl(pow) {
+                if let Some(k) = S::ONE.arithmetic_checked_shl(pow) {
                     let mut closest = None;
                     let mut second_closest = None;
                     if rounded <= n {
@@ -256,8 +260,8 @@ fn round_to_multiple_of_power_of_2_properties_helper_signed<T: PrimitiveSigned>(
         }
     });
 
-    signed_unsigned_pair_gen_var_1::<T, u64>().test_properties(|(n, pow)| {
-        if pow < T::WIDTH {
+    signed_unsigned_pair_gen_var_1::<S, u64>().test_properties(|(n, pow)| {
+        if pow < S::WIDTH {
             if let Some(shifted) = n.arithmetic_checked_shl(pow) {
                 assert_eq!(
                     shifted.round_to_multiple_of_power_of_2(pow, RoundingMode::Down),
@@ -287,16 +291,16 @@ fn round_to_multiple_of_power_of_2_properties_helper_signed<T: PrimitiveSigned>(
         }
     });
 
-    signed_unsigned_pair_gen_var_8::<T, u64>().test_properties(|(n, pow)| {
+    signed_unsigned_pair_gen_var_8::<S, u64>().test_properties(|(n, pow)| {
         let down = n.round_to_multiple_of_power_of_2(pow, RoundingMode::Down);
-        if let Some(k) = T::ONE.arithmetic_checked_shl(pow) {
-            if let Some(up) = if n >= T::ZERO {
+        if let Some(k) = S::ONE.arithmetic_checked_shl(pow) {
+            if let Some(up) = if n >= S::ZERO {
                 down.checked_add(k)
             } else {
                 down.checked_sub(k)
             } {
                 assert_eq!(n.round_to_multiple_of_power_of_2(pow, RoundingMode::Up), up);
-                if n >= T::ZERO {
+                if n >= S::ZERO {
                     assert_eq!(
                         n.round_to_multiple_of_power_of_2(pow, RoundingMode::Floor),
                         down
@@ -321,55 +325,55 @@ fn round_to_multiple_of_power_of_2_properties_helper_signed<T: PrimitiveSigned>(
         }
     });
 
-    signed_unsigned_pair_gen_var_16::<T, u64>().test_properties(|(i, pow)| {
-        if let Some(shift) = pow.checked_add(T::WIDTH - 1) {
+    signed_unsigned_pair_gen_var_16::<S, u64>().test_properties(|(i, pow)| {
+        if let Some(shift) = pow.checked_add(S::WIDTH - 1) {
             assert_eq!(
                 i.round_to_multiple_of_power_of_2(shift, RoundingMode::Down),
-                T::ZERO
+                S::ZERO
             );
             assert_eq!(
                 i.round_to_multiple_of_power_of_2(shift, RoundingMode::Floor),
-                T::ZERO
+                S::ZERO
             );
             if let Some(extra_shift) = shift.checked_add(1) {
                 assert_eq!(
                     i.round_to_multiple_of_power_of_2(extra_shift, RoundingMode::Nearest),
-                    T::ZERO
+                    S::ZERO
                 );
             }
         }
     });
 
-    signed_unsigned_pair_gen_var_17::<T, u64>().test_properties(|(i, pow)| {
-        if let Some(shift) = pow.checked_add(T::WIDTH - 1) {
+    signed_unsigned_pair_gen_var_17::<U, S, u64>().test_properties(|(i, pow)| {
+        if let Some(shift) = pow.checked_add(S::WIDTH - 1) {
             assert_eq!(
                 i.round_to_multiple_of_power_of_2(shift, RoundingMode::Down),
-                T::ZERO
+                S::ZERO
             );
             assert_eq!(
                 i.round_to_multiple_of_power_of_2(shift, RoundingMode::Ceiling),
-                T::ZERO
+                S::ZERO
             );
             if let Some(extra_shift) = shift.checked_add(1) {
                 assert_eq!(
                     i.round_to_multiple_of_power_of_2(extra_shift, RoundingMode::Nearest),
-                    T::ZERO
+                    S::ZERO
                 );
             }
         }
     });
 
-    signed_rounding_mode_pair_gen::<T>().test_properties(|(n, rm)| {
+    signed_rounding_mode_pair_gen::<S>().test_properties(|(n, rm)| {
         assert_eq!(n.round_to_multiple_of_power_of_2(0, rm), n);
     });
 
     unsigned_rounding_mode_pair_gen().test_properties(|(pow, rm)| {
-        assert_eq!(T::ZERO.round_to_multiple_of_power_of_2(pow, rm), T::ZERO);
+        assert_eq!(S::ZERO.round_to_multiple_of_power_of_2(pow, rm), S::ZERO);
     });
 }
 
 #[test]
 fn round_to_multiple_of_power_of_2_properties() {
     apply_fn_to_unsigneds!(round_to_multiple_of_power_of_2_properties_helper_unsigned);
-    apply_fn_to_signeds!(round_to_multiple_of_power_of_2_properties_helper_signed);
+    apply_fn_to_unsigned_signed_pairs!(round_to_multiple_of_power_of_2_properties_helper_signed);
 }

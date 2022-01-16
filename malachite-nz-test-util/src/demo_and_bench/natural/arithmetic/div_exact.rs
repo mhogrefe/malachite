@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer};
 use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign};
 use malachite_base_test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_2_vec_len_bucketer, quadruple_2_vec_len_bucketer,
@@ -25,13 +24,16 @@ use malachite_nz::natural::arithmetic::div_exact::{
     limbs_modular_div_schoolbook, limbs_modular_div_scratch_len, limbs_modular_invert,
     limbs_modular_invert_limb, limbs_modular_invert_scratch_len, limbs_modular_invert_small,
 };
+use malachite_nz_test_util::bench::bucketers::{
+    pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     large_type_gen_var_13, large_type_gen_var_14, large_type_gen_var_15, large_type_gen_var_16,
     large_type_gen_var_17, natural_pair_gen_var_6, natural_pair_gen_var_6_nrm,
     unsigned_vec_gen_var_5, unsigned_vec_pair_gen_var_13, unsigned_vec_pair_gen_var_14,
     unsigned_vec_quadruple_gen_var_2, unsigned_vec_quadruple_gen_var_3,
     unsigned_vec_triple_gen_var_46, unsigned_vec_triple_gen_var_47, unsigned_vec_triple_gen_var_48,
-    unsigned_vec_triple_gen_var_49, unsigned_vec_unsigned_pair_gen_var_24,
+    unsigned_vec_triple_gen_var_49, unsigned_vec_unsigned_pair_gen_var_29,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14,
 };
 use malachite_nz_test_util::natural::arithmetic::div_exact::{
@@ -112,7 +114,7 @@ fn demo_limbs_modular_invert_limb(gm: GenMode, config: GenConfig, limit: usize) 
 }
 
 fn demo_limbs_div_exact_limb(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, y) in unsigned_vec_unsigned_pair_gen_var_24()
+    for (xs, y) in unsigned_vec_unsigned_pair_gen_var_29()
         .get(gm, &config)
         .take(limit)
     {
@@ -141,7 +143,7 @@ fn demo_limbs_div_exact_limb_to_out(gm: GenMode, config: GenConfig, limit: usize
 }
 
 fn demo_limbs_div_exact_limb_in_place(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, y) in unsigned_vec_unsigned_pair_gen_var_24()
+    for (mut xs, y) in unsigned_vec_unsigned_pair_gen_var_29()
         .get(gm, &config)
         .take(limit)
     {
@@ -454,7 +456,7 @@ fn benchmark_limbs_div_exact_limb_algorithms(
     run_benchmark(
         "limbs_div_exact_limb(&[Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_24().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_29().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -502,7 +504,7 @@ fn benchmark_limbs_div_exact_limb_in_place_algorithms(
     run_benchmark(
         "limbs_div_exact_limb_in_place(&mut [Limb], Limb)",
         BenchmarkType::Algorithms,
-        unsigned_vec_unsigned_pair_gen_var_24().get(gm, &config),
+        unsigned_vec_unsigned_pair_gen_var_29().get(gm, &config),
         gm.name(),
         limit,
         file_name,

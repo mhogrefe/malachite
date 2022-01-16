@@ -36,7 +36,7 @@ macro_rules! impl_div_exact {
 
         impl DivExactAssign<$t> for $t {
             /// Divides a value by another value in place. The value being assigned to must be
-            /// exactly divisible by the value on the RHS.
+            /// exactly divisible by the value on the right-hand side.
             ///
             /// If `self` is not exactly divisible by `other`, this function may crash or return a
             /// meaningless result.

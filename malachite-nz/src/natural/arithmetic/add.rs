@@ -860,7 +860,8 @@ impl<'a, 'b> Add<&'a Natural> for &'b Natural {
 }
 
 impl AddAssign<Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the RHS by value.
+    /// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the right-hand side by
+    /// value.
     ///
     /// Time: worst case O(n)
     ///
@@ -897,7 +898,8 @@ impl AddAssign<Natural> for Natural {
 }
 
 impl<'a> AddAssign<&'a Natural> for Natural {
-    /// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the RHS by reference.
+    /// Adds a `Natural` to a `Natural` in place, taking the `Natural` on the right-hand side by
+    /// reference.
     ///
     /// Time: worst case O(n)
     ///

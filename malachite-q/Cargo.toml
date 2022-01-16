@@ -1,0 +1,30 @@
+[package]
+name = "malachite-q"
+version = "0.1.0"
+authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+
+[features]
+32_bit_limbs = ["malachite-nz/32_bit_limbs"]
+fail_on_untested_path = ["malachite-nz/fail_on_untested_path"]
+
+[dependencies]
+itertools = "0.9.0"
+malachite-base = { path = "../malachite-base" }
+malachite-nz = { path = "../malachite-nz" }
+serde = { version = "^1.0.0", optional = true, features = ["derive"] }
+
+[profile.release]
+lto = true
+
+[dev-dependencies]
+num = "0.3.1"
+malachite-base-test-util = { path = "../malachite-base-test-util" }
+malachite-nz-test-util = { path = "../malachite-nz-test-util" }
+malachite-q-test-util = { path = "../malachite-q-test-util" }
+serde = "^1.0.0"
+serde_json = "^1.0.32"
+
+[dev-dependencies.rug]
+version = "1.11.0"
+default-features = false
+features = ["rational"]

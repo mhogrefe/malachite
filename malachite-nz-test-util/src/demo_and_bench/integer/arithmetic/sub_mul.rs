@@ -1,4 +1,3 @@
-use crate::bench::bucketers::triple_integer_max_bit_bucketer;
 use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
 use malachite_base_test_util::bench::bucketers::{
     triple_1_2_vec_max_len_bucketer, triple_vec_max_len_bucketer,
@@ -14,6 +13,7 @@ use malachite_nz::integer::arithmetic::sub_mul::{
     limbs_overflowing_sub_mul_limb, limbs_overflowing_sub_mul_limb_in_place_either,
     limbs_overflowing_sub_mul_limb_in_place_left, limbs_overflowing_sub_mul_limb_in_place_right,
 };
+use malachite_nz_test_util::bench::bucketers::triple_integer_max_bit_bucketer;
 use malachite_nz_test_util::generators::integer_triple_gen;
 
 pub(crate) fn register(runner: &mut Runner) {

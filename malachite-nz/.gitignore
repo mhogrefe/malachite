@@ -2,5 +2,3 @@ target
 *.bk
 .idea*
 *.iml
-src/integer_old.rs
-

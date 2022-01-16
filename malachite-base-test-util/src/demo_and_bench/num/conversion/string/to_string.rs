@@ -161,6 +161,7 @@ fn demo_to_string_base_upper_signed<T: PrimitiveSigned>(
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
@@ -181,6 +182,7 @@ fn demo_base_fmt_wrapper_fmt_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
@@ -202,6 +204,7 @@ fn demo_base_fmt_wrapper_fmt_with_width_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
@@ -222,6 +225,7 @@ fn demo_base_fmt_wrapper_fmt_signed<T: PrimitiveSigned>(
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
@@ -243,6 +247,7 @@ fn demo_base_fmt_wrapper_fmt_with_width_signed<T: PrimitiveSigned>(
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_upper_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
@@ -263,6 +268,7 @@ fn demo_base_fmt_wrapper_fmt_upper_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
@@ -284,6 +290,7 @@ fn demo_base_fmt_wrapper_fmt_upper_with_width_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_upper_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,
@@ -304,6 +311,7 @@ fn demo_base_fmt_wrapper_fmt_upper_signed<T: PrimitiveSigned>(
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_base_fmt_wrapper_fmt_upper_with_width_signed<T: PrimitiveSigned>(
     gm: GenMode,
     config: GenConfig,

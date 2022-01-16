@@ -1,10 +1,18 @@
 use malachite_base::num::arithmetic::traits::{
-    RoundToMultipleOfPowerOf2, RoundToMultipleOfPowerOf2Assign, ShrRound,
+    Abs, DivisibleByPowerOf2, PowerOf2, RoundToMultiple, RoundToMultipleOfPowerOf2,
+    RoundToMultipleOfPowerOf2Assign, ShrRound,
 };
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::Zero;
+use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_rounding_mode_pair_gen, unsigned_unsigned_rounding_mode_triple_gen_var_3,
+    unsigned_vec_unsigned_pair_gen_var_16, unsigned_vec_unsigned_pair_gen_var_20,
+    unsigned_vec_unsigned_rounding_mode_triple_gen_var_2,
+};
+use malachite_nz::integer::Integer;
 use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::{
     limbs_round_to_multiple_of_power_of_2, limbs_round_to_multiple_of_power_of_2_down,
     limbs_round_to_multiple_of_power_of_2_down_in_place,
@@ -13,8 +21,13 @@ use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::{
     limbs_round_to_multiple_of_power_of_2_up, limbs_round_to_multiple_of_power_of_2_up_in_place,
 };
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    natural_rounding_mode_pair_gen, natural_unsigned_pair_gen_var_10,
+    natural_unsigned_pair_gen_var_13, natural_unsigned_pair_gen_var_4,
+    natural_unsigned_rounding_mode_triple_gen_var_1,
+};
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -752,4 +765,265 @@ fn round_to_multiple_of_power_of_2_ref_fail_3() {
 fn round_to_multiple_of_power_of_2_ref_fail_4() {
     (&Natural::from_str("1000000000001").unwrap())
         .round_to_multiple_of_power_of_2(100, RoundingMode::Exact);
+}
+
+#[test]
+fn limbs_round_to_multiple_of_power_of_2_down_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16().test_properties_with_config(&config, |(xs, pow)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_round_to_multiple_of_power_of_2_down(&xs, pow)),
+            Natural::from_owned_limbs_asc(xs) >> pow << pow
+        );
+    });
+}
+
+#[test]
+fn limbs_round_to_multiple_of_power_of_2_up_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_20().test_properties_with_config(&config, |(xs, pow)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_round_to_multiple_of_power_of_2_up(&xs, pow)),
+            Natural::from_owned_limbs_asc(xs)
+                .round_to_multiple_of_power_of_2(pow, RoundingMode::Up),
+        );
+    });
+}
+
+#[test]
+fn limbs_round_to_multiple_of_power_of_2_nearest_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16().test_properties_with_config(&config, |(xs, pow)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_round_to_multiple_of_power_of_2_nearest(&xs, pow)),
+            Natural::from_owned_limbs_asc(xs)
+                .round_to_multiple_of_power_of_2(pow, RoundingMode::Nearest)
+        );
+    });
+}
+
+#[test]
+fn limbs_round_to_multiple_of_power_of_2_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().test_properties_with_config(
+        &config,
+        |(xs, pow, rm)| {
+            let n = Natural::from_limbs_asc(&xs);
+            if let Some(result_limbs) = limbs_round_to_multiple_of_power_of_2(&xs, pow, rm) {
+                let m = (&n).round_to_multiple_of_power_of_2(pow, rm);
+                assert_eq!(Natural::from_owned_limbs_asc(result_limbs), m);
+                if rm == RoundingMode::Exact {
+                    assert_eq!(m, n);
+                }
+            } else {
+                assert_eq!(rm, RoundingMode::Exact);
+                assert!(!n.divisible_by_power_of_2(pow));
+            }
+        },
+    );
+}
+
+#[test]
+fn limbs_round_to_multiple_of_power_of_2_down_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16().test_properties_with_config(
+        &config,
+        |(mut xs, pow)| {
+            let old_xs = xs.clone();
+            limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, pow);
+            let n = Natural::from_owned_limbs_asc(old_xs) >> pow << pow;
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_round_to_multiple_of_power_of_2_up_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_20().test_properties_with_config(
+        &config,
+        |(mut xs, pow)| {
+            let old_xs = xs.clone();
+            limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, pow);
+            let n = Natural::from_owned_limbs_asc(old_xs)
+                .round_to_multiple_of_power_of_2(pow, RoundingMode::Up);
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_round_to_multiple_of_power_of_2_nearest_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16().test_properties_with_config(
+        &config,
+        |(mut xs, pow)| {
+            let old_xs = xs.clone();
+            limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, pow);
+            let n = Natural::from_owned_limbs_asc(old_xs)
+                .round_to_multiple_of_power_of_2(pow, RoundingMode::Nearest);
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_round_to_multiple_of_power_of_2_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().test_properties_with_config(
+        &config,
+        |(mut xs, pow, rm)| {
+            let n = Natural::from_limbs_asc(&xs);
+            if limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, pow, rm) {
+                let m = (&n).round_to_multiple_of_power_of_2(pow, rm);
+                assert_eq!(Natural::from_owned_limbs_asc(xs), m);
+                if rm == RoundingMode::Exact {
+                    assert_eq!(m, n);
+                }
+            } else {
+                assert_eq!(rm, RoundingMode::Exact);
+                assert!(!n.divisible_by_power_of_2(pow));
+            }
+        },
+    );
+}
+
+#[test]
+fn round_to_multiple_of_power_of_2_properties() {
+    natural_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(n, pow, rm)| {
+        let r = (&n).round_to_multiple_of_power_of_2(pow, rm);
+        assert!(r.is_valid());
+
+        let r_alt = n.clone().round_to_multiple_of_power_of_2(pow, rm);
+        assert!(r_alt.is_valid());
+        assert_eq!(r_alt, r);
+
+        let mut mut_n = n.clone();
+        mut_n.round_to_multiple_of_power_of_2_assign(pow, rm);
+        assert!(mut_n.is_valid());
+        assert_eq!(mut_n, r);
+
+        assert!(r.divisible_by_power_of_2(pow));
+        assert_eq!((&n).shr_round(pow, rm) << pow, r);
+        assert!((Integer::from(&r) - Integer::from(&n)).abs() <= Natural::power_of_2(pow));
+        assert_eq!((&n).round_to_multiple(Natural::power_of_2(pow), rm), r);
+        match rm {
+            RoundingMode::Floor | RoundingMode::Down => assert!(r <= n),
+            RoundingMode::Ceiling | RoundingMode::Up => assert!(r >= n),
+            RoundingMode::Exact => assert_eq!(r, n),
+            RoundingMode::Nearest => {
+                let k = Natural::power_of_2(pow);
+                let closest;
+                let second_closest;
+                if r <= n {
+                    closest = &n - &r;
+                    second_closest = &r + k - n;
+                } else {
+                    closest = &r - &n;
+                    second_closest = n + k - &r;
+                }
+                assert!(closest <= second_closest);
+                if closest == second_closest {
+                    assert!(!r.get_bit(pow));
+                }
+            }
+        }
+    });
+
+    natural_unsigned_pair_gen_var_4::<u64>().test_properties(|(n, pow)| {
+        let shifted = n << pow;
+        assert_eq!(
+            (&shifted).round_to_multiple_of_power_of_2(pow, RoundingMode::Down),
+            shifted
+        );
+        assert_eq!(
+            (&shifted).round_to_multiple_of_power_of_2(pow, RoundingMode::Up),
+            shifted
+        );
+        assert_eq!(
+            (&shifted).round_to_multiple_of_power_of_2(pow, RoundingMode::Floor),
+            shifted
+        );
+        assert_eq!(
+            (&shifted).round_to_multiple_of_power_of_2(pow, RoundingMode::Ceiling),
+            shifted
+        );
+        assert_eq!(
+            (&shifted).round_to_multiple_of_power_of_2(pow, RoundingMode::Nearest),
+            shifted
+        );
+        assert_eq!(
+            (&shifted).round_to_multiple_of_power_of_2(pow, RoundingMode::Exact),
+            shifted
+        );
+    });
+
+    natural_unsigned_pair_gen_var_10().test_properties(|(n, pow)| {
+        let down = (&n).round_to_multiple_of_power_of_2(pow, RoundingMode::Down);
+        let up = &down + Natural::power_of_2(pow);
+        assert_eq!(
+            (&n).round_to_multiple_of_power_of_2(pow, RoundingMode::Up),
+            up
+        );
+        assert_eq!(
+            (&n).round_to_multiple_of_power_of_2(pow, RoundingMode::Floor),
+            down
+        );
+        assert_eq!(
+            (&n).round_to_multiple_of_power_of_2(pow, RoundingMode::Ceiling),
+            up
+        );
+        let nearest = n.round_to_multiple_of_power_of_2(pow, RoundingMode::Nearest);
+        assert!(nearest == down || nearest == up);
+    });
+
+    natural_unsigned_pair_gen_var_13::<u64>().test_properties(|(n, pow)| {
+        if let Some(shift) = pow.checked_add(n.significant_bits()) {
+            assert_eq!(
+                (&n).round_to_multiple_of_power_of_2(shift, RoundingMode::Down),
+                0
+            );
+            assert_eq!(
+                (&n).round_to_multiple_of_power_of_2(shift, RoundingMode::Floor),
+                0
+            );
+            if let Some(extra_shift) = shift.checked_add(1) {
+                assert_eq!(
+                    n.round_to_multiple_of_power_of_2(extra_shift, RoundingMode::Nearest),
+                    0
+                );
+            }
+        }
+    });
+
+    natural_rounding_mode_pair_gen().test_properties(|(n, rm)| {
+        assert_eq!((&n).round_to_multiple_of_power_of_2(0, rm), n);
+    });
+
+    unsigned_rounding_mode_pair_gen().test_properties(|(pow, rm)| {
+        assert_eq!(Natural::ZERO.round_to_multiple_of_power_of_2(pow, rm), 0);
+    });
+
+    unsigned_unsigned_rounding_mode_triple_gen_var_3::<Limb>().test_properties(|(n, pow, rm)| {
+        assert_eq!(
+            n.round_to_multiple_of_power_of_2(pow, rm),
+            Natural::from(n).round_to_multiple_of_power_of_2(pow, rm)
+        );
+    });
 }

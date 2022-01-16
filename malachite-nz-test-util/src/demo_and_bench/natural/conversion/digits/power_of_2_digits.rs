@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{pair_1_natural_bit_bucketer, triple_1_natural_bit_bucketer};
 use itertools::Itertools;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -9,6 +8,9 @@ use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::{
+    pair_1_natural_bit_bucketer, triple_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     natural_unsigned_pair_gen_var_6, natural_unsigned_pair_gen_var_7,
     natural_unsigned_unsigned_triple_gen_var_2, natural_unsigned_unsigned_triple_gen_var_3,

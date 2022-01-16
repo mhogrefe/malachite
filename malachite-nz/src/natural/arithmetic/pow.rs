@@ -23,6 +23,7 @@ use std::mem::swap;
 /// This is GMP_NUMB_HALFMAX from mpz/n_pow_ui.c, GMP 6.1.2.
 const HALF_MAX: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
 
+#[doc(hidden)]
 pub fn limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
     let mut out = Vec::new();
     let out_len = limbs_pow_to_out(&mut out, xs, exp);
@@ -380,6 +381,7 @@ fn limbs_pow_alt(xs: &[Limb], exp: u64) -> Vec<Limb> {
 }
 
 impl Natural {
+    #[doc(hidden)]
     pub fn pow_ref_alt(&self, exp: u64) -> Natural {
         match (self, exp) {
             (_, 0) | (natural_one!(), _) => Natural::ONE,
@@ -400,6 +402,7 @@ impl Natural {
         }
     }
 
+    #[doc(hidden)]
     pub fn pow_assign_alt(&mut self, exp: u64) {
         match (&mut *self, exp) {
             (x, 0) => *x = Natural::ONE,

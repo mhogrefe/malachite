@@ -1248,7 +1248,8 @@ impl<'a, 'b> BitAnd<&'a Integer> for &'b Integer {
 }
 
 impl BitAndAssign<Integer> for Integer {
-    /// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the RHS
+    /// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the
+    /// right-hand side
     /// by value.
     ///
     /// Time: worst case O(n)
@@ -1286,8 +1287,8 @@ impl BitAndAssign<Integer> for Integer {
 }
 
 impl<'a> BitAndAssign<&'a Integer> for Integer {
-    /// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the RHS
-    /// by reference.
+    /// Bitwise-ands an `Integer` with another `Integer` in place, taking the `Integer` on the
+    /// right-hand side by reference.
     ///
     /// Time: worst case O(n)
     ///

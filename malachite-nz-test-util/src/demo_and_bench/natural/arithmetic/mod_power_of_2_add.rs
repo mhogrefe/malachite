@@ -17,8 +17,8 @@ use malachite_nz::natural::Natural;
 use malachite_nz_test_util::generators::{
     natural_natural_unsigned_triple_gen_var_4, unsigned_vec_unsigned_unsigned_triple_gen_var_14,
     unsigned_vec_unsigned_unsigned_triple_gen_var_15,
-    unsigned_vec_unsigned_unsigned_triple_gen_var_18,
-    unsigned_vec_unsigned_unsigned_triple_gen_var_19,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -110,7 +110,7 @@ fn demo_limbs_vec_mod_power_of_2_add_limb_in_place(gm: GenMode, config: GenConfi
 }
 
 fn demo_limbs_mod_power_of_2_add_greater(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_19()
+    for (xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19()
         .get(gm, &config)
         .take(limit)
     {
@@ -125,7 +125,7 @@ fn demo_limbs_mod_power_of_2_add_greater(gm: GenMode, config: GenConfig, limit: 
 }
 
 fn demo_limbs_mod_power_of_2_add(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_18()
+    for (xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18()
         .get(gm, &config)
         .take(limit)
     {
@@ -144,7 +144,7 @@ fn demo_limbs_slice_mod_power_of_2_add_greater_in_place_left(
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut xs, ys, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_19()
+    for (mut xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19()
         .get(gm, &config)
         .take(limit)
     {
@@ -159,7 +159,7 @@ fn demo_limbs_slice_mod_power_of_2_add_greater_in_place_left(
 }
 
 fn demo_limbs_vec_mod_power_of_2_add_in_place_left(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, ys, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_18()
+    for (mut xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18()
         .get(gm, &config)
         .take(limit)
     {
@@ -174,7 +174,7 @@ fn demo_limbs_vec_mod_power_of_2_add_in_place_left(gm: GenMode, config: GenConfi
 }
 
 fn demo_limbs_mod_power_of_2_add_in_place_either(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, mut ys, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_18()
+    for (mut xs, mut ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18()
         .get(gm, &config)
         .take(limit)
     {
@@ -353,7 +353,7 @@ fn benchmark_limbs_mod_power_of_2_add_greater(
     run_benchmark(
         "limbs_mod_power_of_2_add_greater(&[Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_19().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -373,7 +373,7 @@ fn benchmark_limbs_mod_power_of_2_add(
     run_benchmark(
         "limbs_mod_power_of_2_add(&[Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_18().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -393,7 +393,7 @@ fn benchmark_limbs_slice_mod_power_of_2_add_greater_in_place_left(
     run_benchmark(
         "limbs_slice_mod_power_of_2_add_greater_in_place_left(&mut [Limb], &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_19().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -415,7 +415,7 @@ fn benchmark_limbs_vec_mod_power_of_2_add_in_place_left(
     run_benchmark(
         "limbs_vec_mod_power_of_2_add_in_place_left(&Vec<Limb>, &[Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_18().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -437,7 +437,7 @@ fn benchmark_limbs_mod_power_of_2_add_in_place_either(
     run_benchmark(
         "limbs_mod_power_of_2_add_in_place_either(&mut [Limb], &mut [Limb], u64)",
         BenchmarkType::Single,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_18().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().get(gm, &config),
         gm.name(),
         limit,
         file_name,

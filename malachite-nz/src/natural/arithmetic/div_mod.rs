@@ -1,4 +1,3 @@
-use fail_on_untested_path;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem,
     WrappingAddAssign, WrappingSub, WrappingSubAssign, XMulYIsZZ, XXDivModYIsQR,
@@ -810,6 +809,7 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     highest_q
 }
 
+#[doc(hidden)]
 pub fn limbs_div_dc_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -885,7 +885,6 @@ pub fn limbs_div_mod_divide_and_conquer(
             assert!(n_2 < d_1 || n_2 == d_1 && n_1 <= d_0);
             let mut q;
             if n_2 == d_1 && n_1 == d_0 {
-                fail_on_untested_path("limbs_div_mod_divide_and_conquer, n_2 != d_1 || n_1 != d_0");
                 q = Limb::MAX;
                 assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(ns, ds, q), n_2);
             } else {
@@ -993,6 +992,7 @@ pub fn limbs_div_mod_divide_and_conquer(
     highest_q
 }
 
+#[doc(hidden)]
 pub fn limbs_div_approx_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     if ds.len() < DC_DIVAPPR_Q_THRESHOLD {
         limbs_div_schoolbook_approx(qs, ns, ds, d_inv);

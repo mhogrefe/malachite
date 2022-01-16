@@ -1,6 +1,3 @@
-use crate::bench::bucketers::{
-    triple_1_3_prod_natural_bits_bucketer, triple_3_triple_1_3_prod_natural_bits_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{ModPow, ModPowAssign};
 use malachite_base_test_util::bench::bucketers::quadruple_4_vec_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -8,6 +5,9 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::mod_pow::{
     limbs_mod_pow, limbs_mod_pow_odd, limbs_mod_pow_odd_scratch_len,
+};
+use malachite_nz_test_util::bench::bucketers::{
+    triple_1_3_prod_natural_bits_bucketer, triple_3_triple_1_3_prod_natural_bits_bucketer,
 };
 use malachite_nz_test_util::generators::{
     natural_triple_gen_var_5, natural_triple_gen_var_5_nrm, unsigned_vec_quadruple_gen_var_6,

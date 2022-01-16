@@ -84,6 +84,30 @@ macro_rules! register_generic_demos_2 {
 }
 
 #[macro_export]
+macro_rules! register_generic_demos_3_only_1_3_in_key {
+    ($runner: ident, $f: ident $(,[$t:ty, $u:ty, $v:ty])*) => {
+        $(
+            $runner.register_demo(
+                concat!(stringify!($f), "_", stringify!($t), "_", stringify!($v)),
+                &$f::<$t, $u, $v>
+            );
+        )*
+    };
+}
+
+#[macro_export]
+macro_rules! register_generic_benches_3_only_1_3_in_key {
+    ($runner: ident, $f: ident $(,[$t:ty, $u:ty, $v:ty])*) => {
+        $(
+            $runner.register_bench(
+                concat!(stringify!($f), "_", stringify!($t), "_", stringify!($v)),
+                &$f::<$t, $u, $v>
+            );
+        )*
+    };
+}
+
+#[macro_export]
 macro_rules! register_generic_demos_2_only_first_in_key {
     ($runner: ident, $f: ident $(,[$t:ty, $u:ty])*) => {
         $(
@@ -172,6 +196,22 @@ macro_rules! register_signed_unsigned_match_demos {
             [i64, u64],
             [i128, u128],
             [isize, usize]
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! register_unsigned_signed_match_demos {
+    ($runner: ident, $f: ident) => {
+        register_generic_demos_2_only_first_in_key!(
+            $runner,
+            $f,
+            [u8, i8],
+            [u16, i16],
+            [u32, i32],
+            [u64, i64],
+            [u128, i128],
+            [usize, isize]
         );
     };
 }
@@ -326,6 +366,52 @@ macro_rules! register_unsigned_signed_demos {
             [usize, i64],
             [usize, i128],
             [usize, isize]
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! register_unsigned_unsigned_signed_match_demos {
+    ($runner: ident, $f: ident) => {
+        register_generic_demos_3_only_1_3_in_key!(
+            $runner,
+            $f,
+            [u8, u8, i8],
+            [u8, u16, i16],
+            [u8, u32, i32],
+            [u8, u64, i64],
+            [u8, u128, i128],
+            [u8, usize, isize],
+            [u16, u8, i8],
+            [u16, u16, i16],
+            [u16, u32, i32],
+            [u16, u64, i64],
+            [u16, u128, i128],
+            [u16, usize, isize],
+            [u32, u8, i8],
+            [u32, u16, i16],
+            [u32, u32, i32],
+            [u32, u64, i64],
+            [u32, u128, i128],
+            [u32, usize, isize],
+            [u64, u8, i8],
+            [u64, u16, i16],
+            [u64, u32, i32],
+            [u64, u64, i64],
+            [u64, u128, i128],
+            [u64, usize, isize],
+            [u128, u8, i8],
+            [u128, u16, i16],
+            [u128, u32, i32],
+            [u128, u64, i64],
+            [u128, u128, i128],
+            [u128, usize, isize],
+            [usize, u8, i8],
+            [usize, u16, i16],
+            [usize, u32, i32],
+            [usize, u64, i64],
+            [usize, u128, i128],
+            [usize, usize, isize]
         );
     };
 }
@@ -558,6 +644,22 @@ macro_rules! register_signed_unsigned_match_benches {
 }
 
 #[macro_export]
+macro_rules! register_unsigned_signed_match_benches {
+    ($runner: ident, $f: ident) => {
+        register_generic_benches_2_only_first_in_key!(
+            $runner,
+            $f,
+            [u8, i8],
+            [u16, i16],
+            [u32, i32],
+            [u64, i64],
+            [u128, i128],
+            [usize, isize]
+        );
+    };
+}
+
+#[macro_export]
 macro_rules! register_primitive_int_benches {
     ($runner: ident, $f: ident) => {
         register_unsigned_benches!($runner, $f);
@@ -707,6 +809,52 @@ macro_rules! register_unsigned_signed_benches {
             [usize, i64],
             [usize, i128],
             [usize, isize]
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! register_unsigned_unsigned_signed_match_benches {
+    ($runner: ident, $f: ident) => {
+        register_generic_benches_3_only_1_3_in_key!(
+            $runner,
+            $f,
+            [u8, u8, i8],
+            [u8, u16, i16],
+            [u8, u32, i32],
+            [u8, u64, i64],
+            [u8, u128, i128],
+            [u8, usize, isize],
+            [u16, u8, i8],
+            [u16, u16, i16],
+            [u16, u32, i32],
+            [u16, u64, i64],
+            [u16, u128, i128],
+            [u16, usize, isize],
+            [u32, u8, i8],
+            [u32, u16, i16],
+            [u32, u32, i32],
+            [u32, u64, i64],
+            [u32, u128, i128],
+            [u32, usize, isize],
+            [u64, u8, i8],
+            [u64, u16, i16],
+            [u64, u32, i32],
+            [u64, u64, i64],
+            [u64, u128, i128],
+            [u64, usize, isize],
+            [u128, u8, i8],
+            [u128, u16, i16],
+            [u128, u32, i32],
+            [u128, u64, i64],
+            [u128, u128, i128],
+            [u128, usize, isize],
+            [usize, u8, i8],
+            [usize, u16, i16],
+            [usize, u32, i32],
+            [usize, u64, i64],
+            [usize, u128, i128],
+            [usize, usize, isize]
         );
     };
 }

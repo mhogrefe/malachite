@@ -6,7 +6,8 @@
     clippy::range_plus_one,
     clippy::suspicious_arithmetic_impl,
     clippy::suspicious_op_assign_impl,
-    clippy::too_many_arguments
+    clippy::too_many_arguments,
+    clippy::type_complexity
 )]
 #![warn(
     clippy::cast_lossless,
@@ -37,6 +38,7 @@ extern crate itertools;
 extern crate malachite_base;
 extern crate num;
 
+pub mod bench;
 pub mod common;
 pub mod generators;
 pub mod integer;

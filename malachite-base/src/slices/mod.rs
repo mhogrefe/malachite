@@ -1,3 +1,4 @@
+use num::arithmetic::traits::DivisibleBy;
 use num::basic::traits::Zero;
 use num::conversion::traits::ExactFrom;
 use num::random::{random_unsigneds_less_than, RandomUnsignedsLessThan};
@@ -442,4 +443,40 @@ pub fn random_slice_permutations<T>(seed: Seed, xs: &[T]) -> RandomSlicePermutat
         indices: (0..xs.len()).collect(),
         rng: seed.get_rng(),
     }
+}
+
+/// Given a slice with nonzero length $\ell$, returns the smallest $n$ such that the slice consists
+/// of $n/\ell$ copies of a length-$\ell$ subslice. Typically $\ell = n$.
+///
+/// # Worst-case complexity
+/// $T(n) = O(n^{1+\epsilon})$ for all $\epsilon > 0$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `xs.len()`.
+///
+/// # Panics
+/// Panics if `xs` is empty.
+///
+/// # Examples
+/// ```
+/// use malachite_base::slices::min_repeating_len;
+///
+/// assert_eq!(min_repeating_len(&[1, 2, 1, 2, 1, 2]), 2);
+/// assert_eq!(min_repeating_len(&[1, 2, 1, 2, 1, 3]), 6);
+/// assert_eq!(min_repeating_len(&[5, 5, 5]), 1);
+/// ```
+pub fn min_repeating_len<T: Eq>(xs: &[T]) -> usize {
+    let len = xs.len();
+    assert_ne!(len, 0);
+    for start_i in 1..=len >> 1 {
+        if !len.divisible_by(start_i) {
+            continue;
+        }
+        let (xs_lo, xs_hi) = xs.split_at(start_i);
+        if Iterator::eq(xs_lo.iter().cycle().take(len - start_i), xs_hi.iter()) {
+            return start_i;
+        }
+    }
+    len
 }

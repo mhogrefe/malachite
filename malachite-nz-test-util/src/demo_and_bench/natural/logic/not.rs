@@ -1,10 +1,10 @@
-use crate::bench::bucketers::{natural_bit_bucketer, pair_2_natural_bit_bucketer};
 use malachite_base_test_util::bench::bucketers::{pair_2_vec_len_bucketer, vec_len_bucketer};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{unsigned_vec_gen, unsigned_vec_pair_gen_var_1};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};
+use malachite_nz_test_util::bench::bucketers::{natural_bit_bucketer, pair_2_natural_bit_bucketer};
 use malachite_nz_test_util::generators::{natural_gen, natural_gen_rm};
 
 pub(crate) fn register(runner: &mut Runner) {

@@ -57,7 +57,7 @@ use malachite_base::vecs::random::{
 };
 use malachite_base::vecs::{random_values_from_vec, RandomValuesFromVec};
 use malachite_base_test_util::generators::common::{
-    permute_1_3_2, reshape_1_3_to_4, reshape_2_2_to_4, GenConfig, It,
+    permute_1_3_2, reshape_1_3_to_4, reshape_2_1_to_3, reshape_2_2_to_4, GenConfig, It,
 };
 use malachite_base_test_util::generators::random::{
     get_two_highest, random_primitive_int_vec_unsigned_pair_gen_var_10,
@@ -80,6 +80,8 @@ use malachite_nz::natural::arithmetic::div_mod::{
 };
 use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
 use malachite_nz::natural::arithmetic::gcd::half_gcd::HalfGcdMatrix1;
+use malachite_nz::natural::arithmetic::mod_power_of_2::limbs_slice_mod_power_of_2_in_place;
+use malachite_nz::natural::arithmetic::mod_power_of_2_square::SQRLO_DC_THRESHOLD_LIMIT;
 use malachite_nz::natural::arithmetic::mul::fft::*;
 use malachite_nz::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
 use malachite_nz::natural::arithmetic::mul::limbs_mul;
@@ -99,6 +101,10 @@ use malachite_nz::natural::arithmetic::mul::toom::{
     limbs_mul_greater_to_out_toom_6h_input_sizes_valid,
     limbs_mul_greater_to_out_toom_8h_input_sizes_valid,
 };
+use malachite_nz::natural::arithmetic::square::{
+    limbs_square_to_out_toom_3_input_size_valid, limbs_square_to_out_toom_4_input_size_valid,
+    limbs_square_to_out_toom_6_input_size_valid, limbs_square_to_out_toom_8_input_size_valid,
+};
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_digit_count, limbs_per_digit_in_base, GET_STR_PRECOMPUTE_THRESHOLD,
 };
@@ -107,7 +113,7 @@ use malachite_nz::natural::random::{
     random_positive_naturals, RandomNaturalRangeToInfinity, RandomNaturals,
 };
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::Limb;
+use malachite_nz::platform::{Limb, SQR_TOOM2_THRESHOLD};
 use std::cmp::{max, Ordering};
 use std::collections::HashMap;
 use std::marker::PhantomData;
@@ -425,6 +431,24 @@ pub fn random_integer_integer_natural_triple_gen_var_2(
     )
 }
 
+// -- (Integer, Integer, PrimitiveInt) --
+
+pub fn random_integer_integer_primitive_int_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Integer, Integer, T)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
 // -- (Integer, Integer, PrimitiveUnsigned) --
 
 pub fn random_integer_integer_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -584,12 +608,12 @@ pub fn random_integer_natural_pair_gen(config: &GenConfig) -> It<(Integer, Natur
     ))
 }
 
-// -- (Integer, Natural, Integer) --
+// -- (Integer, Natural, Natural) --
 
-pub fn random_integer_natural_integer_triple_gen(
+pub fn random_integer_natural_natural_triple_gen(
     config: &GenConfig,
-) -> It<(Integer, Natural, Integer)> {
-    Box::new(random_triples_xyx(
+) -> It<(Integer, Natural, Natural)> {
+    Box::new(random_triples_xyy(
         EXAMPLE_SEED,
         &|seed| {
             random_integers(
@@ -626,24 +650,6 @@ pub fn random_integer_primitive_int_pair_gen<T: PrimitiveInt>(
     ))
 }
 
-// -- (Integer, PrimitiveInt, Integer) --
-
-pub fn random_integer_primitive_int_integer_triple_gen<T: PrimitiveInt>(
-    config: &GenConfig,
-) -> It<(Integer, T, Integer)> {
-    Box::new(random_triples_xyx(
-        EXAMPLE_SEED,
-        &|seed| {
-            random_integers(
-                seed,
-                config.get_or("mean_bits_n", 64),
-                config.get_or("mean_bits_d", 1),
-            )
-        },
-        &random_primitive_ints,
-    ))
-}
-
 // -- (Integer, PrimitiveInt, Natural) --
 
 pub fn random_integer_primitive_int_natural_triple_gen<T: PrimitiveInt>(
@@ -666,6 +672,24 @@ pub fn random_integer_primitive_int_natural_triple_gen<T: PrimitiveInt>(
                 config.get_or("mean_bits_d", 1),
             )
         },
+    ))
+}
+
+// -- (Integer, PrimitiveInt, PrimitiveInt) --
+
+pub fn random_integer_primitive_int_primitive_int_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Integer, T, T)> {
+    Box::new(random_triples_xyy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_integers(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
     ))
 }
 
@@ -1367,6 +1391,22 @@ where
     Box::new(random_natural_signeds(EXAMPLE_SEED).map(Natural::exact_from))
 }
 
+// -- (Natural, bool) --
+
+pub fn random_natural_bool_pair_gen(config: &GenConfig) -> It<(Natural, bool)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_bools,
+    ))
+}
+
 // -- (Natural, Integer, Natural) --
 
 pub fn random_natural_integer_natural_triple_gen(
@@ -1550,6 +1590,51 @@ pub fn random_natural_pair_gen_var_8(config: &GenConfig) -> It<(Natural, Natural
     )))
 }
 
+pub fn random_natural_pair_gen_var_9(config: &GenConfig) -> It<(Natural, Natural)> {
+    Box::new(random_pairs_from_single(random_positive_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
+pub fn random_natural_pair_gen_var_10(config: &GenConfig) -> It<(Natural, Natural)> {
+    //TODO
+    Box::new(
+        random_pairs_from_single(random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .filter(|(x, y)| x >= y),
+    )
+}
+
+// -- (Natural, Natural, bool) --
+
+pub fn random_natural_natural_bool_triple_gen_var_1(
+    config: &GenConfig,
+) -> It<(Natural, Natural, bool)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            random_positive_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_bools,
+    ))
+}
+
 // -- (Natural, Natural, Natural) --
 
 pub fn random_natural_triple_gen(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
@@ -1628,6 +1713,25 @@ pub fn random_natural_triple_gen_var_5(config: &GenConfig) -> It<(Natural, Natur
             z += Natural::ONE;
             (x, y, z)
         }),
+    )
+}
+
+pub fn random_natural_triple_gen_var_6(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
+    Box::new(random_triples_from_single(random_positive_naturals(
+        EXAMPLE_SEED,
+        config.get_or("mean_bits_n", 64),
+        config.get_or("mean_bits_d", 1),
+    )))
+}
+
+pub fn random_natural_triple_gen_var_7(config: &GenConfig) -> It<(Natural, Natural, Natural)> {
+    Box::new(
+        random_triples_from_single(random_naturals(
+            EXAMPLE_SEED,
+            config.get_or("mean_bits_n", 64),
+            config.get_or("mean_bits_d", 1),
+        ))
+        .map(|(x, y, z)| (x + &y * &z, y, z)),
     )
 }
 
@@ -1749,6 +1853,104 @@ pub fn random_natural_natural_natural_unsigned_quadruple_gen_var_2(
     )
 }
 
+pub fn random_natural_natural_natural_unsigned_quadruple_gen_var_3(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, u64)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, z, mut m)| {
+            m += max(x.significant_bits(), y.significant_bits());
+            (x, y, z, m)
+        }),
+    )
+}
+
+pub fn random_natural_natural_natural_unsigned_quadruple_gen_var_4(
+    config: &GenConfig,
+) -> It<(Natural, Natural, Natural, u64)> {
+    Box::new(
+        random_quadruples_xxxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, z, mut m)| {
+            m += x.significant_bits();
+            (x, y, z, m)
+        }),
+    )
+}
+
+// -- (Natural, Natural, PrimitiveInt) --
+
+pub fn random_natural_natural_primitive_int_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Natural, Natural, T)> {
+    Box::new(random_triples_xxy(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+// -- (Natural, Natural, PrimitiveSigned) --
+
+pub fn random_natural_natural_signed_triple_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Natural, Natural, T)> {
+    reshape_2_1_to_3(Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_ordered_unique_pairs(random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+        },
+        &|seed| {
+            geometric_random_signeds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    )))
+}
+
 // -- (Natural, Natural, PrimitiveUnsigned) --
 
 pub fn random_natural_natural_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -1854,6 +2056,56 @@ pub fn random_natural_natural_unsigned_triple_gen_var_4(
     )
 }
 
+pub fn random_natural_natural_unsigned_triple_gen_var_5(
+    config: &GenConfig,
+) -> It<(Natural, Natural, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, mut m)| {
+            m += x.significant_bits();
+            (x, y, m)
+        }),
+    )
+}
+
+pub fn random_natural_natural_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, Natural, T)> {
+    reshape_2_1_to_3(Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_ordered_unique_pairs(random_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            ))
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    )))
+}
+
 // -- (Natural, Natural, RoundingMode) --
 
 pub fn random_natural_natural_rounding_mode_triple_gen_var_1(
@@ -1932,12 +2184,28 @@ pub fn random_natural_primitive_int_pair_gen<T: PrimitiveInt>(
     ))
 }
 
-// -- (Natural, PrimitiveInt, Natural) --
-
-pub fn random_natural_primitive_int_natural_triple_gen<T: PrimitiveInt>(
+pub fn random_natural_primitive_int_pair_gen_var_1<T: PrimitiveInt>(
     config: &GenConfig,
-) -> It<(Natural, T, Natural)> {
-    Box::new(random_triples_xyx(
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_positive_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &random_primitive_ints,
+    ))
+}
+
+// -- (Natural, PrimitiveInt, PrimitiveInt) --
+
+pub fn random_natural_primitive_int_primitive_int_triple_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Natural, T, T)> {
+    Box::new(random_triples_xyy(
         EXAMPLE_SEED,
         &|seed| {
             random_naturals(
@@ -1988,6 +2256,43 @@ pub fn random_natural_signed_pair_gen_var_2<T: PrimitiveSigned>(
             )
         },
     ))
+}
+
+// -- (Natural, PrimitiveSigned, PrimitiveUnsigned) --
+
+pub fn random_natural_signed_unsigned_triple_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_signeds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, mut m)| {
+            m += x.significant_bits();
+            (x, y, m)
+        }),
+    )
 }
 
 // -- (Natural, PrimitiveSigned, RoundingMode) --
@@ -2307,6 +2612,28 @@ pub fn random_natural_unsigned_pair_gen_var_11(config: &GenConfig) -> It<(Natura
     )
 }
 
+pub fn random_natural_unsigned_pair_gen_var_12<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_positive_naturals(
+                seed,
+                config.get_or("mean_bits_n", 64),
+                config.get_or("mean_bits_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 64),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (Natural, PrimitiveUnsigned, bool) --
 
 pub fn random_natural_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -2460,6 +2787,41 @@ pub fn random_natural_unsigned_unsigned_triple_gen_var_5<T: PrimitiveUnsigned>(
             )
         },
     ))
+}
+
+pub fn random_natural_unsigned_unsigned_triple_gen_var_6<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(Natural, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_naturals(
+                    seed,
+                    config.get_or("mean_bits_n", 64),
+                    config.get_or("mean_bits_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 64),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(x, y, mut m)| {
+            m += x.significant_bits();
+            (x, y, m)
+        }),
+    )
 }
 
 // -- (Natural, PrimitiveUnsigned, PrimitiveUnsigned, Natural) --
@@ -2699,42 +3061,6 @@ pub fn random_natural_bool_vec_pair_gen_var_2(config: &GenConfig) -> It<(Natural
         ),
         bs: random_bools(EXAMPLE_SEED.fork("bs")),
     })
-}
-
-// -- (PrimitiveInt, Integer, PrimitiveInt) --
-
-pub fn random_primitive_int_integer_primitive_int_triple_gen<T: PrimitiveInt>(
-    config: &GenConfig,
-) -> It<(T, Integer, T)> {
-    Box::new(random_triples_xyx(
-        EXAMPLE_SEED,
-        &random_primitive_ints,
-        &|seed| {
-            random_integers(
-                seed,
-                config.get_or("mean_bits_n", 64),
-                config.get_or("mean_bits_d", 1),
-            )
-        },
-    ))
-}
-
-// -- (PrimitiveInt, Natural, PrimitiveInt) --
-
-pub fn random_primitive_int_natural_primitive_int_triple_gen<T: PrimitiveInt>(
-    config: &GenConfig,
-) -> It<(T, Natural, T)> {
-    Box::new(random_triples_xyx(
-        EXAMPLE_SEED,
-        &random_primitive_ints,
-        &|seed| {
-            random_naturals(
-                seed,
-                config.get_or("mean_bits_n", 64),
-                config.get_or("mean_bits_d", 1),
-            )
-        },
-    ))
 }
 
 // -- (PrimitiveUnsigned * 6) --
@@ -3153,6 +3479,125 @@ pub fn random_primitive_int_vec_pair_gen_var_14(config: &GenConfig) -> It<(Vec<L
     )
 }
 
+// var 15 is in malachite-base.
+
+pub fn random_primitive_int_vec_pair_gen_var_16<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(PrimitiveIntVecPairLenGenerator1 {
+        phantom: PhantomData,
+        lengths: random_pairs(
+            EXAMPLE_SEED.fork("lengths"),
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    1,
+                    usize::MAX,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigned_inclusive_range(
+                    seed,
+                    1,
+                    SQRLO_DC_THRESHOLD_LIMIT,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+        )
+        .filter(|(x, y)| x >= y),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
+
+fn random_square_helper<T: PrimitiveInt, F: Fn(usize) -> bool>(
+    config: &GenConfig,
+    valid: &'static F,
+    min_x: usize,
+) -> It<(Vec<T>, Vec<T>)> {
+    Box::new(PrimitiveIntVecPairLenGenerator1 {
+        phantom: PhantomData,
+        lengths: random_pairs_from_single(geometric_random_unsigneds::<usize>(
+            EXAMPLE_SEED.fork("lengths"),
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ))
+        .flat_map(move |(o, x)| {
+            let x = x.checked_add(min_x)?;
+            let ux = usize::exact_from(x);
+            if valid(ux) {
+                let o = x.arithmetic_checked_shl(1u64)?.checked_add(o)?;
+                Some((o, x))
+            } else {
+                None
+            }
+        }),
+        xs: random_primitive_ints(EXAMPLE_SEED.fork("xs")),
+    })
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_17<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(config, &|x| x <= SQR_TOOM2_THRESHOLD, 1)
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_18<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(config, &|_| true, 2)
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_19<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(config, &limbs_square_to_out_toom_3_input_size_valid, 3)
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_20<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(config, &limbs_square_to_out_toom_4_input_size_valid, 4)
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_21<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(config, &|x| x == 7 || x == 8 || x > 9, 7)
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_22<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(config, &limbs_square_to_out_toom_6_input_size_valid, 18)
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_23<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(config, &limbs_square_to_out_toom_8_input_size_valid, 40)
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_24<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(config, &|_| true, 1)
+}
+
+pub fn random_primitive_int_vec_pair_gen_var_25<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>)> {
+    random_square_helper(
+        config,
+        &|x| limbs_mul_greater_to_out_fft_input_sizes_threshold(x, x),
+        15,
+    )
+}
+
+// var 26 is in malachite-base.
+
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveInt>, Vec<PrimitiveInt>) --
 
 // vars 1 through 3 are in malachite-base
@@ -3473,7 +3918,23 @@ pub fn random_primitive_int_vec_triple_gen_var_37(
     )
 }
 
-// var 39 through 43 are in malachite-base.
+// var 39 through 44 are in malachite-base.
+
+pub fn random_primitive_int_vec_triple_gen_var_45<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<T>, Vec<T>, Vec<T>)> {
+    random_mul_helper(
+        config,
+        &|x, y| {
+            limbs_mul_greater_to_out_toom_44_input_sizes_valid(x, y)
+                && limbs_mul_greater_to_out_toom_44_input_sizes_valid(x, y)
+        },
+        7,
+        7,
+    )
+}
+
+// var 46 is in malachite-base.
 
 // -- (Vec<PrimitiveInt>, Vec<PrimitiveUnsigned>, PrimitiveUnsigned) --
 
@@ -3657,6 +4118,36 @@ pub fn random_unsigned_vec_unsigned_pair_gen_var_10(config: &GenConfig) -> It<(V
     )
 }
 
+pub fn random_unsigned_vec_unsigned_pair_gen_var_11(config: &GenConfig) -> It<(Vec<Limb>, u64)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &random_primitive_ints::<Limb>,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 4),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .flat_map(|(mut xs, mut pow)| {
+            let xs_last = xs.last_mut().unwrap();
+            *xs_last = xs_last.checked_add(1)?;
+            pow += limbs_significant_bits_helper(&xs);
+            Some((xs, pow))
+        }),
+    )
+}
+
 // -- (Vec<PrimitiveUnsigned>, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn random_unsigned_vec_unsigned_unsigned_triple_gen_var_1(
@@ -3805,6 +4296,39 @@ pub fn random_unsigned_vec_unsigned_unsigned_triple_gen_var_7<T: PrimitiveInt>(
         )
         .map(|(xs, y, mut pow)| {
             pow += max(limbs_significant_bits_helper(&xs), y.significant_bits());
+            (xs, y, pow)
+        }),
+    )
+}
+
+pub fn random_unsigned_vec_unsigned_unsigned_triple_gen_var_8<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, T, u64)> {
+    Box::new(
+        random_triples(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs(
+                    seed,
+                    &random_primitive_ints::<Limb>,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &random_primitive_ints::<T>,
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 4),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .map(|(xs, y, mut pow)| {
+            pow += max(limbs_significant_bits_helper(&xs), y.significant_bits());
+            if pow == 0 {
+                pow = 1;
+            }
             (xs, y, pow)
         }),
     )
@@ -4230,6 +4754,45 @@ pub fn random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_9(
                 limbs_significant_bits_helper(&ys),
             );
             (xs, ys, pow)
+        }),
+    )
+}
+
+pub fn random_unsigned_vec_unsigned_unsigned_vec_triple_gen_var_10(
+    config: &GenConfig,
+) -> It<(Vec<Limb>, Vec<Limb>, u64)> {
+    Box::new(
+        random_triples_xxy(
+            EXAMPLE_SEED,
+            &|seed| {
+                random_vecs_min_length(
+                    seed,
+                    1,
+                    &random_primitive_ints::<Limb>,
+                    config.get_or("mean_length_n", 4),
+                    config.get_or("mean_length_d", 1),
+                )
+            },
+            &|seed| {
+                geometric_random_unsigneds(
+                    seed,
+                    config.get_or("mean_small_n", 4),
+                    config.get_or("mean_small_d", 1),
+                )
+            },
+        )
+        .flat_map(|(mut xs, mut es, pow)| {
+            let last_e = es.last_mut().unwrap();
+            *last_e = last_e.checked_add(1)?;
+            if es == [1] {
+                return None;
+            }
+            limbs_slice_mod_power_of_2_in_place(&mut xs, pow);
+            if *xs.last().unwrap() == 0 {
+                None
+            } else {
+                Some((xs, es, pow))
+            }
         }),
     )
 }

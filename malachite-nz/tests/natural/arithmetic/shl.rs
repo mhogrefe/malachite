@@ -1,16 +1,34 @@
-use malachite_base::num::conversion::traits::ExactFrom;
-use num::BigUint;
-use rug;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, ShlRound};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+use malachite_base::rounding_modes::RoundingMode;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    signed_gen, unsigned_gen_var_5, unsigned_vec_unsigned_pair_gen_var_16,
+    unsigned_vec_unsigned_pair_gen_var_32, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23,
+};
 use malachite_nz::natural::arithmetic::shl::{
     limbs_shl, limbs_shl_to_out, limbs_shl_with_complement_to_out, limbs_slice_shl_in_place,
     limbs_vec_shl_in_place,
 };
+use malachite_nz::natural::logic::not::limbs_not_in_place;
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_nz_test_util::generators::{
+    natural_gen, natural_signed_pair_gen_var_2, natural_unsigned_pair_gen_var_4,
+    natural_unsigned_unsigned_triple_gen_var_5,
+};
+use num::BigUint;
+use rug;
+use std::ops::{Shl, ShlAssign, Shr};
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -181,178 +199,391 @@ fn limbs_shl_with_complement_to_out_fail_4() {
     limbs_shl_with_complement_to_out(&mut [10, 10, 10], &[], 100);
 }
 
-macro_rules! tests_unsigned {
-    (
-        $t: ident,
-        $test_shl_u: ident,
-        $u: ident,
-        $v: ident,
-        $out: ident,
-        $library_comparison_tests: expr
-    ) => {
-        #[test]
-        fn $test_shl_u() {
-            let test = |$u, $v: $t, $out| {
-                let mut n = Natural::from_str($u).unwrap();
-                n <<= $v;
-                assert_eq!(n.to_string(), $out);
-                assert!(n.is_valid());
+fn test_shl_unsigned_helper<T: PrimitiveUnsigned, F: Fn(&str, T, &str)>(f: F)
+where
+    Natural: Shl<T, Output = Natural> + ShlAssign<T>,
+    for<'a> &'a Natural: Shl<T, Output = Natural>,
+{
+    let test = |s, v: u8, out| {
+        let u = Natural::from_str(s).unwrap();
+        let v = T::from(v);
 
-                let n = Natural::from_str($u).unwrap() << $v;
-                assert_eq!(n.to_string(), $out);
-                assert!(n.is_valid());
+        let mut n = u.clone();
+        n <<= v;
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
-                let n = &Natural::from_str($u).unwrap() << $v;
-                assert_eq!(n.to_string(), $out);
-                assert!(n.is_valid());
+        let n = u.clone() << v;
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
-                $library_comparison_tests
-            };
-            test("0", 0, "0");
-            test("0", 10, "0");
-            test("123", 0, "123");
-            test("123", 1, "246");
-            test("123", 2, "492");
-            test("123", 25, "4127195136");
-            test("123", 26, "8254390272");
-            test("123", 100, "155921023828072216384094494261248");
-            test("2147483648", 1, "4294967296");
-            test("1000000000000", 0, "1000000000000");
-            test("1000000000000", 3, "8000000000000");
-            test("1000000000000", 24, "16777216000000000000");
-            test("1000000000000", 25, "33554432000000000000");
-            test("1000000000000", 31, "2147483648000000000000");
-            test("1000000000000", 32, "4294967296000000000000");
-            test("1000000000000", 33, "8589934592000000000000");
-            test(
-                "1000000000000",
-                100,
-                "1267650600228229401496703205376000000000000",
-            );
-        }
+        let n = &u << v;
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        f(s, v, out);
     };
+    test("0", 0, "0");
+    test("0", 10, "0");
+    test("123", 0, "123");
+    test("123", 1, "246");
+    test("123", 2, "492");
+    test("123", 25, "4127195136");
+    test("123", 26, "8254390272");
+    test("123", 100, "155921023828072216384094494261248");
+    test("2147483648", 1, "4294967296");
+    test("1000000000000", 0, "1000000000000");
+    test("1000000000000", 3, "8000000000000");
+    test("1000000000000", 24, "16777216000000000000");
+    test("1000000000000", 25, "33554432000000000000");
+    test("1000000000000", 31, "2147483648000000000000");
+    test("1000000000000", 32, "4294967296000000000000");
+    test("1000000000000", 33, "8589934592000000000000");
+    test(
+        "1000000000000",
+        100,
+        "1267650600228229401496703205376000000000000",
+    );
 }
-tests_unsigned!(u8, test_shl_u8, u, v, out, {});
-tests_unsigned!(u16, test_shl_u16, u, v, out, {});
-tests_unsigned!(u32, test_shl_limb, u, v, out, {
-    let mut n = rug::Integer::from_str(u).unwrap();
-    n <<= v;
-    assert_eq!(n.to_string(), out);
 
-    let n = rug::Integer::from_str(u).unwrap() << v;
-    assert_eq!(n.to_string(), out);
+#[test]
+fn test_shl_unsigned() {
+    test_shl_unsigned_helper::<u8, _>(|_, _, _| {});
+    test_shl_unsigned_helper::<u16, _>(|_, _, _| {});
+    test_shl_unsigned_helper::<u32, _>(|u, v, out| {
+        let mut n = rug::Integer::from_str(u).unwrap();
+        n <<= v;
+        assert_eq!(n.to_string(), out);
 
-    let n = BigUint::from_str(u).unwrap() << usize::exact_from(v);
-    assert_eq!(n.to_string(), out);
+        let n = rug::Integer::from_str(u).unwrap() << v;
+        assert_eq!(n.to_string(), out);
 
-    let n = &BigUint::from_str(u).unwrap() << usize::exact_from(v);
-    assert_eq!(n.to_string(), out);
-});
-tests_unsigned!(u64, test_shl_u64, u, v, out, {});
-tests_unsigned!(u128, test_shl_u128, u, v, out, {});
-tests_unsigned!(usize, test_shl_usize, u, v, out, {});
+        let n = BigUint::from_str(u).unwrap() << usize::exact_from(v);
+        assert_eq!(n.to_string(), out);
 
-macro_rules! tests_signed {
-    (
-        $t:ident,
-        $test_shl_i:ident,
-        $i:ident,
-        $j:ident,
-        $out:ident,
-        $shl_library_comparison_tests:expr
-    ) => {
-        #[test]
-        fn $test_shl_i() {
-            let test = |$i, $j: $t, $out| {
-                let mut n = Natural::from_str($i).unwrap();
-                n <<= $j;
-                assert_eq!(n.to_string(), $out);
-                assert!(n.is_valid());
+        let n = &BigUint::from_str(u).unwrap() << usize::exact_from(v);
+        assert_eq!(n.to_string(), out);
+    });
+    test_shl_unsigned_helper::<u64, _>(|_, _, _| {});
+    test_shl_unsigned_helper::<u128, _>(|_, _, _| {});
+    test_shl_unsigned_helper::<usize, _>(|_, _, _| {});
+}
 
-                let n = Natural::from_str($i).unwrap() << $j;
-                assert_eq!(n.to_string(), $out);
-                assert!(n.is_valid());
+fn test_shl_signed_helper<T: PrimitiveSigned, F: Fn(&str, T, &str)>(f: F)
+where
+    Natural: Shl<T, Output = Natural> + ShlAssign<T>,
+    for<'a> &'a Natural: Shl<T, Output = Natural>,
+{
+    let test = |s, v: i8, out| {
+        let u = Natural::from_str(s).unwrap();
+        let v = T::from(v);
 
-                let n = &Natural::from_str($i).unwrap() << $j;
-                assert_eq!(n.to_string(), $out);
-                assert!(n.is_valid());
+        let mut n = u.clone();
+        n <<= v;
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
-                $shl_library_comparison_tests
-            };
-            test("0", 0, "0");
-            test("0", 10, "0");
-            test("123", 0, "123");
-            test("123", 1, "246");
-            test("123", 2, "492");
-            test("123", 25, "4127195136");
-            test("123", 26, "8254390272");
-            test("123", 100, "155921023828072216384094494261248");
-            test("2147483648", 1, "4294967296");
-            test("1000000000000", 0, "1000000000000");
-            test("1000000000000", 3, "8000000000000");
-            test("1000000000000", 24, "16777216000000000000");
-            test("1000000000000", 25, "33554432000000000000");
-            test("1000000000000", 31, "2147483648000000000000");
-            test("1000000000000", 32, "4294967296000000000000");
-            test("1000000000000", 33, "8589934592000000000000");
-            test(
-                "1000000000000",
-                100,
-                "1267650600228229401496703205376000000000000",
-            );
+        let n = u.clone() << v;
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
 
-            test("0", -10, "0");
-            test("123", 0, "123");
-            test("245", -1, "122");
-            test("246", -1, "123");
-            test("247", -1, "123");
-            test("491", -2, "122");
-            test("492", -2, "123");
-            test("493", -2, "123");
-            test("4127195135", -25, "122");
-            test("4127195136", -25, "123");
-            test("4127195137", -25, "123");
-            test("8254390271", -26, "122");
-            test("8254390272", -26, "123");
-            test("8254390273", -26, "123");
-            test("155921023828072216384094494261247", -100, "122");
-            test("155921023828072216384094494261248", -100, "123");
-            test("155921023828072216384094494261249", -100, "123");
-            test("4294967295", -1, "2147483647");
-            test("4294967296", -1, "2147483648");
-            test("4294967297", -1, "2147483648");
-            test("7999999999999", -3, "999999999999");
-            test("8000000000000", -3, "1000000000000");
-            test("8000000000001", -3, "1000000000000");
-            test("16777216000000000000", -24, "1000000000000");
-            test("33554432000000000000", -25, "1000000000000");
-            test("2147483648000000000000", -31, "1000000000000");
-            test("4294967296000000000000", -32, "1000000000000");
-            test("8589934592000000000000", -33, "1000000000000");
-            test(
-                "1267650600228229401496703205376000000000000",
-                -100,
-                "1000000000000",
-            );
-            test("1000000000000", -10, "976562500");
-            test("980657949", -72, "0");
-            test("4294967295", -31, "1");
-            test("4294967295", -32, "0");
-            test("4294967296", -32, "1");
-            test("4294967296", -33, "0");
-        }
+        let n = &u << v;
+        assert_eq!(n.to_string(), out);
+        assert!(n.is_valid());
+
+        f(s, v, out);
     };
-}
-tests_signed!(i8, test_shl_i8, i, j, out, {});
-tests_signed!(i16, test_shl_i16, i, j, out, {});
-tests_signed!(i32, test_shl_signed_limb, i, j, out, {
-    let mut n = rug::Integer::from_str(i).unwrap();
-    n <<= j;
-    assert_eq!(n.to_string(), out);
+    test("0", 0, "0");
+    test("0", 10, "0");
+    test("123", 0, "123");
+    test("123", 1, "246");
+    test("123", 2, "492");
+    test("123", 25, "4127195136");
+    test("123", 26, "8254390272");
+    test("123", 100, "155921023828072216384094494261248");
+    test("2147483648", 1, "4294967296");
+    test("1000000000000", 0, "1000000000000");
+    test("1000000000000", 3, "8000000000000");
+    test("1000000000000", 24, "16777216000000000000");
+    test("1000000000000", 25, "33554432000000000000");
+    test("1000000000000", 31, "2147483648000000000000");
+    test("1000000000000", 32, "4294967296000000000000");
+    test("1000000000000", 33, "8589934592000000000000");
+    test(
+        "1000000000000",
+        100,
+        "1267650600228229401496703205376000000000000",
+    );
 
-    let n = rug::Integer::from_str(i).unwrap() << j;
-    assert_eq!(n.to_string(), out);
-});
-tests_signed!(i64, test_shl_i64, i, j, out, {});
-tests_signed!(i128, test_shl_i128, i, j, out, {});
-tests_signed!(isize, test_shl_isize, i, j, out, {});
+    test("0", -10, "0");
+    test("123", 0, "123");
+    test("245", -1, "122");
+    test("246", -1, "123");
+    test("247", -1, "123");
+    test("491", -2, "122");
+    test("492", -2, "123");
+    test("493", -2, "123");
+    test("4127195135", -25, "122");
+    test("4127195136", -25, "123");
+    test("4127195137", -25, "123");
+    test("8254390271", -26, "122");
+    test("8254390272", -26, "123");
+    test("8254390273", -26, "123");
+    test("155921023828072216384094494261247", -100, "122");
+    test("155921023828072216384094494261248", -100, "123");
+    test("155921023828072216384094494261249", -100, "123");
+    test("4294967295", -1, "2147483647");
+    test("4294967296", -1, "2147483648");
+    test("4294967297", -1, "2147483648");
+    test("7999999999999", -3, "999999999999");
+    test("8000000000000", -3, "1000000000000");
+    test("8000000000001", -3, "1000000000000");
+    test("16777216000000000000", -24, "1000000000000");
+    test("33554432000000000000", -25, "1000000000000");
+    test("2147483648000000000000", -31, "1000000000000");
+    test("4294967296000000000000", -32, "1000000000000");
+    test("8589934592000000000000", -33, "1000000000000");
+    test(
+        "1267650600228229401496703205376000000000000",
+        -100,
+        "1000000000000",
+    );
+    test("1000000000000", -10, "976562500");
+    test("980657949", -72, "0");
+    test("4294967295", -31, "1");
+    test("4294967295", -32, "0");
+    test("4294967296", -32, "1");
+    test("4294967296", -33, "0");
+}
+
+#[test]
+fn test_shl_signed() {
+    test_shl_signed_helper::<i8, _>(|_, _, _| {});
+    test_shl_signed_helper::<i16, _>(|_, _, _| {});
+    test_shl_signed_helper::<i32, _>(|u, v, out| {
+        let mut n = rug::Integer::from_str(u).unwrap();
+        n <<= v;
+        assert_eq!(n.to_string(), out);
+
+        let n = rug::Integer::from_str(u).unwrap() << v;
+        assert_eq!(n.to_string(), out);
+    });
+    test_shl_signed_helper::<i64, _>(|_, _, _| {});
+    test_shl_signed_helper::<i128, _>(|_, _, _| {});
+    test_shl_signed_helper::<isize, _>(|_, _, _| {});
+}
+
+#[test]
+fn limbs_shl_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16().test_properties_with_config(&config, |(xs, bits)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_shl(&xs, bits)),
+            Natural::from_owned_limbs_asc(xs) << bits
+        );
+    });
+}
+
+#[test]
+fn limbs_shl_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_22::<Limb, Limb>()
+        .test_properties_with_config(&config, |(mut out, xs, bits)| {
+            let old_out = out.clone();
+            let carry = limbs_shl_to_out(&mut out, &xs, bits);
+            let len = xs.len();
+            let n = Natural::from_owned_limbs_asc(xs) << bits;
+            let mut xs = n.into_limbs_asc();
+            assert_eq!(carry != 0, xs.len() == len + 1);
+            let mut actual_xs = out[..len].to_vec();
+            if carry != 0 {
+                actual_xs.push(carry);
+            }
+            xs.resize(actual_xs.len(), 0);
+            assert_eq!(xs, actual_xs);
+            assert_eq!(&out[len..], &old_out[len..]);
+        });
+}
+
+#[test]
+fn limbs_slice_shl_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_32::<Limb, Limb>().test_properties_with_config(
+        &config,
+        |(mut xs, bits)| {
+            let old_xs = xs.clone();
+            let carry = limbs_slice_shl_in_place(&mut xs, bits);
+            let n = Natural::from_owned_limbs_asc(old_xs) << bits;
+            let mut expected_xs = n.into_limbs_asc();
+            assert_eq!(carry != 0, expected_xs.len() == xs.len() + 1);
+            if carry != 0 {
+                xs.push(carry);
+            }
+            expected_xs.resize(xs.len(), 0);
+            assert_eq!(xs, expected_xs);
+        },
+    );
+}
+
+#[test]
+fn limbs_vec_shl_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16::<Limb, u64>().test_properties_with_config(
+        &config,
+        |(mut xs, bits)| {
+            let old_xs = xs.clone();
+            limbs_vec_shl_in_place(&mut xs, bits);
+            let n = Natural::from_owned_limbs_asc(old_xs) << bits;
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_shl_with_complement_to_out_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_23::<Limb, Limb>()
+        .test_properties_with_config(&config, |(mut out, xs, bits)| {
+            let old_out = out.clone();
+            let len = xs.len();
+            let carry = limbs_shl_with_complement_to_out(&mut out, &xs, bits);
+            limbs_not_in_place(&mut out[..len]);
+            let n = Natural::from_owned_limbs_asc(xs) << bits;
+            let mut xs = n.into_limbs_asc();
+            assert_eq!(carry != 0, xs.len() == len + 1);
+            let mut actual_xs = out[..len].to_vec();
+            if carry != 0 {
+                actual_xs.push(carry);
+            }
+            xs.resize(actual_xs.len(), 0);
+            assert_eq!(xs, actual_xs);
+            assert_eq!(&out[len..], &old_out[len..]);
+        });
+}
+
+fn unsigned_properties<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>>()
+where
+    Natural: Shl<U, Output = Natural> + ShlAssign<U> + Shr<S, Output = Natural>,
+    for<'a> &'a Natural:
+        Shl<U, Output = Natural> + Shl<S, Output = Natural> + Shr<U, Output = Natural>,
+{
+    natural_unsigned_pair_gen_var_4::<U>().test_properties(|(n, u)| {
+        let mut mut_n = n.clone();
+        mut_n <<= u;
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+
+        let shifted_alt = &n << u;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        let shifted_alt = n.clone() << u;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        assert!(shifted >= n);
+        assert_eq!(shifted, &n * (Natural::ONE << u));
+        assert_eq!(&shifted >> u, n);
+
+        if u <= U::low_mask(U::WIDTH - 1) {
+            let u = S::wrapping_from(u);
+            assert_eq!(&n << u, shifted);
+            assert_eq!(n >> -u, shifted);
+        }
+    });
+
+    natural_unsigned_unsigned_triple_gen_var_5::<U>().test_properties(|(n, u, v)| {
+        if let Some(sum) = u.checked_add(v) {
+            assert_eq!(&n << u << v, n << sum);
+        }
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!(&n << U::ZERO, n);
+        assert_eq!(&n << U::ONE, n * Natural::from(2u32));
+    });
+
+    unsigned_gen_var_5::<U>().test_properties(|u| {
+        assert_eq!(Natural::ZERO << u, 0);
+        assert!((Natural::ONE << u).is_power_of_2());
+    });
+}
+
+fn signed_properties<T: PrimitiveSigned>()
+where
+    Natural: Shl<T, Output = Natural> + ShlAssign<T> + ShlRound<T, Output = Natural>,
+    for<'a> &'a Natural: Shl<T, Output = Natural>,
+{
+    natural_signed_pair_gen_var_2::<T>().test_properties(|(n, i)| {
+        let mut mut_n = n.clone();
+        mut_n <<= i;
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+
+        let shifted_alt = &n << i;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        let shifted_alt = n.clone() << i;
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        assert_eq!(n.shl_round(i, RoundingMode::Floor), shifted);
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!(&n << T::ZERO, n);
+    });
+
+    signed_gen::<T>().test_properties(|i| {
+        assert_eq!(Natural::ZERO << i, 0);
+    });
+}
+
+#[test]
+fn shl_properties() {
+    apply_fn_to_unsigned_signed_pairs!(unsigned_properties);
+    apply_fn_to_signeds!(signed_properties);
+
+    natural_unsigned_pair_gen_var_4::<u32>().test_properties(|(n, u)| {
+        let shifted = &n << u;
+        let mut rug_n = natural_to_rug_integer(&n);
+        rug_n <<= u;
+        assert_eq!(rug_integer_to_natural(&rug_n), shifted);
+
+        assert_eq!(
+            biguint_to_natural(&(&natural_to_biguint(&n) << usize::exact_from(u))),
+            shifted
+        );
+        assert_eq!(
+            biguint_to_natural(&(natural_to_biguint(&n) << usize::exact_from(u))),
+            shifted
+        );
+        assert_eq!(
+            rug_integer_to_natural(&(natural_to_rug_integer(&n) << u)),
+            shifted
+        );
+    });
+
+    natural_signed_pair_gen_var_2::<i32>().test_properties(|(n, i)| {
+        let shifted = &n << i;
+        let mut rug_n = natural_to_rug_integer(&n);
+        rug_n <<= i;
+        assert_eq!(rug_integer_to_natural(&rug_n), shifted);
+
+        assert_eq!(
+            rug_integer_to_natural(&(natural_to_rug_integer(&n) << i)),
+            shifted
+        );
+    });
+}

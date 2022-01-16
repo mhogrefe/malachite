@@ -12,7 +12,7 @@ use malachite_base_test_util::generators::{
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz::platform::SignedLimb;
+use malachite_nz::platform::{Limb, SignedLimb};
 use malachite_nz_test_util::generators::{
     integer_gen, integer_integer_unsigned_triple_gen_var_1, integer_unsigned_pair_gen_var_2,
     integer_unsigned_pair_gen_var_4, integer_unsigned_pair_gen_var_5,
@@ -448,7 +448,7 @@ fn ceiling_mod_power_of_2_properties() {
         assert_ne!(n.ceiling_mod_power_of_2(u), 0);
     });
 
-    signed_unsigned_pair_gen_var_11::<SignedLimb>().test_properties(|(i, pow)| {
+    signed_unsigned_pair_gen_var_11::<Limb, SignedLimb>().test_properties(|(i, pow)| {
         assert_eq!(
             i.ceiling_mod_power_of_2(pow),
             Integer::from(i).ceiling_mod_power_of_2(pow)

@@ -1,21 +1,34 @@
-use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::arithmetic::traits::{
+    ArithmeticCheckedShr, DivRound, DivisibleByPowerOf2, ShlRound, ShrRound, ShrRoundAssign,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
-use std::panic::catch_unwind;
-use std::str::FromStr;
-
-use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    signed_rounding_mode_pair_gen, unsigned_pair_gen_var_37, unsigned_rounding_mode_pair_gen,
+    unsigned_signed_rounding_mode_triple_gen_var_1,
+    unsigned_unsigned_rounding_mode_triple_gen_var_4, unsigned_vec_unsigned_pair_gen_var_16,
+    unsigned_vec_unsigned_pair_gen_var_20, unsigned_vec_unsigned_rounding_mode_triple_gen_var_2,
+};
 use malachite_nz::natural::arithmetic::shr_round::{
     limbs_shr_exact, limbs_shr_round, limbs_shr_round_nearest, limbs_shr_round_up,
     limbs_vec_shr_exact_in_place, limbs_vec_shr_round_in_place,
     limbs_vec_shr_round_nearest_in_place, limbs_vec_shr_round_up_in_place,
 };
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    natural_rounding_mode_pair_gen, natural_signed_rounding_mode_triple_gen_var_2,
+    natural_unsigned_pair_gen_var_10, natural_unsigned_pair_gen_var_4,
+    natural_unsigned_rounding_mode_triple_gen_var_1,
+};
+use std::ops::Shl;
+use std::panic::catch_unwind;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -1315,4 +1328,266 @@ macro_rules! shr_round_signed_fail_helper {
 #[test]
 fn shr_round_signed_fail() {
     apply_to_signeds!(shr_round_signed_fail_helper);
+}
+
+#[test]
+fn limbs_shr_round_up_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_20().test_properties_with_config(&config, |(xs, bits)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_shr_round_up(&xs, bits)),
+            Natural::from_owned_limbs_asc(xs).shr_round(bits, RoundingMode::Up),
+        );
+    });
+}
+
+#[test]
+fn limbs_shr_round_nearest_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16().test_properties_with_config(&config, |(xs, bits)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_shr_round_nearest(&xs, bits)),
+            Natural::from_owned_limbs_asc(xs).shr_round(bits, RoundingMode::Nearest),
+        );
+    });
+}
+
+#[test]
+fn limbs_shr_exact_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_20().test_properties_with_config(&config, |(xs, bits)| {
+        let n = Natural::from_limbs_asc(&xs);
+        if let Some(result_xs) = limbs_shr_exact(&xs, bits) {
+            let m = (&n).shr_round(bits, RoundingMode::Exact);
+            assert_eq!(Natural::from_owned_limbs_asc(result_xs), m);
+            assert_eq!(m << bits, n);
+        } else {
+            assert!(!n.divisible_by_power_of_2(bits));
+        }
+    });
+}
+
+#[test]
+fn limbs_shr_round_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().test_properties_with_config(
+        &config,
+        |(xs, bits, rm)| {
+            let n = Natural::from_limbs_asc(&xs);
+            if let Some(result_xs) = limbs_shr_round(&xs, bits, rm) {
+                let m = (&n).shr_round(bits, rm);
+                assert_eq!(Natural::from_owned_limbs_asc(result_xs), m);
+                if rm == RoundingMode::Exact {
+                    assert_eq!(m << bits, n);
+                }
+            } else {
+                assert_eq!(rm, RoundingMode::Exact);
+                assert!(!n.divisible_by_power_of_2(bits));
+            }
+        },
+    );
+}
+
+#[test]
+fn limbs_vec_shr_round_up_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_20().test_properties_with_config(
+        &config,
+        |(mut xs, bits)| {
+            let old_xs = xs.clone();
+            limbs_vec_shr_round_up_in_place(&mut xs, bits);
+            let n = Natural::from_owned_limbs_asc(old_xs).shr_round(bits, RoundingMode::Up);
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_vec_shr_round_nearest_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_16().test_properties_with_config(
+        &config,
+        |(mut xs, bits)| {
+            let old_xs = xs.clone();
+            limbs_vec_shr_round_nearest_in_place(&mut xs, bits);
+            let n = Natural::from_owned_limbs_asc(old_xs).shr_round(bits, RoundingMode::Nearest);
+            assert_eq!(Natural::from_owned_limbs_asc(xs), n);
+        },
+    );
+}
+
+#[test]
+fn limbs_vec_shr_exact_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_20().test_properties_with_config(
+        &config,
+        |(mut xs, bits)| {
+            let n = Natural::from_limbs_asc(&xs);
+            if limbs_vec_shr_exact_in_place(&mut xs, bits) {
+                let m = (&n).shr_round(bits, RoundingMode::Exact);
+                assert_eq!(Natural::from_owned_limbs_asc(xs), m);
+                assert_eq!(m << bits, n);
+            } else {
+                assert!(!n.divisible_by_power_of_2(bits));
+            }
+        },
+    );
+}
+
+#[test]
+fn limbs_vec_shr_round_in_place_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_rounding_mode_triple_gen_var_2().test_properties_with_config(
+        &config,
+        |(mut xs, bits, rm)| {
+            let n = Natural::from_limbs_asc(&xs);
+            if limbs_vec_shr_round_in_place(&mut xs, bits, rm) {
+                let m = (&n).shr_round(bits, rm);
+                assert_eq!(Natural::from_owned_limbs_asc(xs), m);
+                if rm == RoundingMode::Exact {
+                    assert_eq!(m << bits, n);
+                }
+            } else {
+                assert_eq!(rm, RoundingMode::Exact);
+                assert!(!n.divisible_by_power_of_2(bits));
+            }
+        },
+    );
+}
+
+fn unsigned_properties<T: PrimitiveUnsigned>()
+where
+    Natural: Shl<T, Output = Natural> + ShrRound<T, Output = Natural> + ShrRoundAssign<T>,
+    for<'a> &'a Natural: Shl<T, Output = Natural> + ShrRound<T, Output = Natural>,
+    Limb: ShrRound<T, Output = Limb>,
+{
+    natural_unsigned_rounding_mode_triple_gen_var_1::<T>().test_properties(|(n, u, rm)| {
+        let mut mut_n = n.clone();
+        mut_n.shr_round_assign(u, rm);
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+
+        let shifted_alt = (&n).shr_round(u, rm);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        let shifted_alt = n.clone().shr_round(u, rm);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        assert!(shifted <= n);
+        assert_eq!(n.div_round(Natural::ONE << u, rm), shifted);
+    });
+
+    natural_unsigned_pair_gen_var_4::<T>().test_properties(|(n, u)| {
+        let left_shifted = &n << u;
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Down), n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Up), n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Floor), n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Ceiling), n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Nearest), n);
+        assert_eq!((&left_shifted).shr_round(u, RoundingMode::Exact), n);
+    });
+
+    natural_unsigned_pair_gen_var_10::<T>().test_properties(|(n, u)| {
+        let down = (&n).shr_round(u, RoundingMode::Down);
+        let up = &down + Natural::ONE;
+        assert_eq!((&n).shr_round(u, RoundingMode::Up), up);
+        assert_eq!((&n).shr_round(u, RoundingMode::Floor), down);
+        assert_eq!((&n).shr_round(u, RoundingMode::Ceiling), up);
+        let nearest = n.shr_round(u, RoundingMode::Nearest);
+        assert!(nearest == down || nearest == up);
+    });
+
+    unsigned_pair_gen_var_37::<Limb, T>().test_properties(|(u, v)| {
+        if let Some(shift) = v.checked_add(T::exact_from(Limb::WIDTH)) {
+            assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Down), 0);
+            assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Floor), 0);
+            assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Up), 1);
+            assert_eq!(Natural::from(u).shr_round(shift, RoundingMode::Ceiling), 1);
+            if let Some(extra_shift) = shift.checked_add(T::ONE) {
+                assert_eq!(
+                    Natural::from(u).shr_round(extra_shift, RoundingMode::Nearest),
+                    0
+                );
+            }
+        }
+    });
+
+    natural_rounding_mode_pair_gen().test_properties(|(n, rm)| {
+        assert_eq!((&n).shr_round(T::ZERO, rm), n);
+    });
+
+    unsigned_rounding_mode_pair_gen::<T>().test_properties(|(u, rm)| {
+        assert_eq!(Natural::ZERO.shr_round(u, rm), 0);
+    });
+
+    unsigned_unsigned_rounding_mode_triple_gen_var_4::<Limb, T>().test_properties(|(n, u, rm)| {
+        assert_eq!(n.shr_round(u, rm), Natural::from(n).shr_round(u, rm));
+    });
+}
+
+fn signed_properties<T: PrimitiveSigned>()
+where
+    Natural: Shl<T, Output = Natural>
+        + ShlRound<T, Output = Natural>
+        + ShrRound<T, Output = Natural>
+        + ShrRoundAssign<T>,
+    for<'a> &'a Natural: ShrRound<T, Output = Natural>,
+    Limb: ArithmeticCheckedShr<T, Output = Limb> + ShrRound<T, Output = Limb>,
+{
+    natural_signed_rounding_mode_triple_gen_var_2::<T>().test_properties(|(n, i, rm)| {
+        let mut mut_n = n.clone();
+        mut_n.shr_round_assign(i, rm);
+        assert!(mut_n.is_valid());
+        let shifted = mut_n;
+
+        let shifted_alt = (&n).shr_round(i, rm);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        let shifted_alt = n.clone().shr_round(i, rm);
+        assert!(shifted_alt.is_valid());
+        assert_eq!(shifted_alt, shifted);
+
+        if i != T::MIN {
+            assert_eq!(n.shl_round(-i, rm), shifted);
+        }
+    });
+
+    natural_rounding_mode_pair_gen().test_properties(|(n, rm)| {
+        assert_eq!((&n).shr_round(T::ZERO, rm), n);
+    });
+
+    signed_rounding_mode_pair_gen::<T>().test_properties(|(i, rm)| {
+        assert_eq!(Natural::ZERO.shr_round(i, rm), 0);
+    });
+
+    unsigned_signed_rounding_mode_triple_gen_var_1::<Limb, T>().test_properties(|(n, i, rm)| {
+        if n.arithmetic_checked_shr(i).is_some() {
+            assert_eq!(n.shr_round(i, rm), Natural::from(n).shr_round(i, rm));
+        }
+    });
+}
+
+#[test]
+fn shr_round_properties() {
+    apply_fn_to_unsigneds!(unsigned_properties);
+    apply_fn_to_signeds!(signed_properties);
 }

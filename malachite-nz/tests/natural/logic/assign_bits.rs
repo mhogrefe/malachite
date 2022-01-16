@@ -9,7 +9,7 @@ use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::{
-    natural_gen, natural_unsigned_natural_triple_gen, natural_unsigned_pair_gen_var_4,
+    natural_gen, natural_natural_unsigned_triple_gen, natural_unsigned_pair_gen_var_4,
     natural_unsigned_unsigned_natural_quadruple_gen_var_1,
 };
 use std::str::FromStr;
@@ -178,7 +178,7 @@ fn assign_bits_properties() {
         },
     );
 
-    natural_unsigned_natural_triple_gen().test_properties(|(n, start, bits)| {
+    natural_natural_unsigned_triple_gen().test_properties(|(n, bits, start)| {
         let old_n = n;
         let mut n = old_n.clone();
         n.assign_bits(start, start, &bits);

@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_1_vec_len_times_pair_2_natural_bits_bucketer;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom, WrappingFrom,
@@ -19,6 +18,7 @@ use malachite_nz::natural::conversion::digits::general_digits::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::bench::bucketers::pair_1_vec_len_times_pair_2_natural_bits_bucketer;
 use malachite_nz_test_util::generators::{
     natural_vec_natural_pair_gen_var_1, natural_vec_natural_pair_gen_var_2,
     natural_vec_natural_pair_gen_var_3, natural_vec_natural_pair_gen_var_4,

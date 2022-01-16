@@ -41,6 +41,5 @@ fn main() {
     }
 }
 
-mod bench;
 mod demo_and_bench;
 mod generate;

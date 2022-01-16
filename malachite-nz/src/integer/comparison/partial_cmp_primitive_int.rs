@@ -20,23 +20,12 @@ macro_rules! impl_unsigned {
         impl PartialOrd<$t> for Integer {
             /// Compares an `Integer` to a value of unsigned primitive integer type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(Integer::from(-123) < 122u64);
-            /// assert!(Integer::from(-123) <= 122u64);
-            /// assert!(Integer::from(-123) < 124u64);
-            /// assert!(Integer::from(-123) <= 124u64);
-            /// assert!(Integer::trillion() > 123u64);
-            /// assert!(Integer::trillion() >= 123u64);
-            /// assert!(-Integer::trillion() < 123u64);
-            /// assert!(-Integer::trillion() <= 123u64);
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 partial_cmp_unsigned(self, other)
@@ -46,23 +35,12 @@ macro_rules! impl_unsigned {
         impl PartialOrd<Integer> for $t {
             /// Compares a value of unsigned primitive integer type to an `Integer`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(122u64 > Integer::from(-123));
-            /// assert!(122u64 >= Integer::from(-123));
-            /// assert!(124u64 > Integer::from(-123));
-            /// assert!(124u64 >= Integer::from(-123));
-            /// assert!(123u64 < Integer::trillion());
-            /// assert!(123u64 <= Integer::trillion());
-            /// assert!(123u64 > -Integer::trillion());
-            /// assert!(123u64 >= -Integer::trillion());
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)
@@ -97,23 +75,12 @@ macro_rules! impl_signed {
         impl PartialOrd<$t> for Integer {
             /// Compares an `Integer` to a value of signed primitive integer type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(Integer::from(-123) < -122i64);
-            /// assert!(Integer::from(-123) <= -122i64);
-            /// assert!(Integer::from(-123) > -124i64);
-            /// assert!(Integer::from(-123) >= -124i64);
-            /// assert!(Integer::trillion() > 123i64);
-            /// assert!(Integer::trillion() >= 123i64);
-            /// assert!(-Integer::trillion() < 123i64);
-            /// assert!(-Integer::trillion() <= 123i64);
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &$t) -> Option<Ordering> {
                 partial_cmp_signed(self, other)
@@ -123,23 +90,12 @@ macro_rules! impl_signed {
         impl PartialOrd<Integer> for $t {
             /// Compares a value of signed primitive integer type to an `Integer`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(-122i64 > Integer::from(-123));
-            /// assert!(-122i64 >= Integer::from(-123));
-            /// assert!(-124i64 < Integer::from(-123));
-            /// assert!(-124i64 <= Integer::from(-123));
-            /// assert!(123i64 < Integer::trillion());
-            /// assert!(123i64 <= Integer::trillion());
-            /// assert!(123i64 > -Integer::trillion());
-            /// assert!(123i64 >= -Integer::trillion());
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_cmp_primitive_int`
+            /// module.
             #[inline]
             fn partial_cmp(&self, other: &Integer) -> Option<Ordering> {
                 other.partial_cmp(self).map(Ordering::reverse)

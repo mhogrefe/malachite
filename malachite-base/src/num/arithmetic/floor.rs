@@ -3,6 +3,8 @@ use num::arithmetic::traits::{Floor, FloorAssign};
 macro_rules! impl_floor {
     ($f:ident) => {
         impl Floor for $f {
+            type Output = $f;
+
             #[inline]
             fn floor(self) -> $f {
                 $f::floor(self)

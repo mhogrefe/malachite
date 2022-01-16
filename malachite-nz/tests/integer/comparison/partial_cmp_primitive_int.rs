@@ -4,9 +4,9 @@ use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_va
 use malachite_nz::integer::Integer;
 use malachite_nz_test_util::common::{integer_to_bigint, integer_to_rug_integer};
 use malachite_nz_test_util::generators::{
-    integer_signed_integer_triple_gen, integer_signed_pair_gen,
-    integer_unsigned_integer_triple_gen, integer_unsigned_pair_gen,
-    signed_integer_signed_triple_gen, unsigned_integer_unsigned_triple_gen,
+    integer_integer_signed_triple_gen, integer_integer_unsigned_triple_gen,
+    integer_signed_pair_gen, integer_signed_signed_triple_gen, integer_unsigned_pair_gen,
+    integer_unsigned_unsigned_triple_gen,
 };
 use malachite_nz_test_util::integer::comparison::partial_cmp_primitive_int::*;
 use num::BigInt;
@@ -168,7 +168,7 @@ where
         assert_eq!(Some(Integer::from(u).cmp(&n)), cmp_rev);
     });
 
-    integer_unsigned_integer_triple_gen::<T>().test_properties(|(n, u, m)| {
+    integer_integer_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n < u && u < m {
             assert_eq!(n.cmp(&m), Ordering::Less);
         } else if n > u && u > m {
@@ -176,7 +176,7 @@ where
         }
     });
 
-    unsigned_integer_unsigned_triple_gen::<T>().test_properties(|(u, n, v)| {
+    integer_unsigned_unsigned_triple_gen::<T>().test_properties(|(n, u, v)| {
         if u < n && n < v {
             assert!(u < v);
         } else if u > n && n > v {
@@ -210,7 +210,7 @@ where
         assert_eq!(Some(Integer::from(i).cmp(&n)), cmp_rev);
     });
 
-    integer_signed_integer_triple_gen::<T>().test_properties(|(n, i, m)| {
+    integer_integer_signed_triple_gen::<T>().test_properties(|(n, m, i)| {
         if n < i && i < m {
             assert_eq!(n.cmp(&m), Ordering::Less);
         } else if n > i && i > m {
@@ -218,7 +218,7 @@ where
         }
     });
 
-    signed_integer_signed_triple_gen::<T>().test_properties(|(i, n, j)| {
+    integer_signed_signed_triple_gen::<T>().test_properties(|(n, i, j)| {
         if i < n && n < j {
             assert!(i < j);
         } else if i > n && n > j {

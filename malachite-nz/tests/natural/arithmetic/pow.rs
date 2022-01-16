@@ -1,5 +1,23 @@
-use malachite_base::num::arithmetic::traits::{Pow, PowAssign};
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogBase, CheckedRoot, Pow, PowAssign, PowerOf2, Square,
+};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_gen_var_5, unsigned_pair_gen_var_29, unsigned_vec_unsigned_pair_gen_var_31,
+};
+use malachite_nz::natural::arithmetic::pow::limbs_pow;
+use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::common::{
+    biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
+};
+use malachite_nz_test_util::generators::{
+    natural_gen, natural_natural_unsigned_triple_gen_var_1, natural_unsigned_pair_gen_var_4,
+    natural_unsigned_unsigned_triple_gen_var_5,
+};
 use malachite_nz_test_util::natural::arithmetic::pow::{
     natural_pow_naive, natural_pow_simple_binary,
 };
@@ -7,12 +25,6 @@ use num::traits::Pow as NumPow;
 use num::BigUint;
 use rug::ops::Pow as RugPow;
 use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::natural::arithmetic::pow::limbs_pow;
-use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
-use malachite_nz::platform::Limb;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -303,4 +315,75 @@ fn test_pow() {
         "702954903302866311524348366058883550484761300374963994159100861262489870076604686210427395\
         8248045324225063677698694075567381512070601339698619038564352000000000"
     );
+}
+
+#[test]
+fn limbs_pow_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_pair_gen_var_31().test_properties_with_config(&config, |(xs, exp)| {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(limbs_pow(&xs, exp)),
+            Natural::from_owned_limbs_asc(xs).pow(exp)
+        );
+    });
+}
+
+#[test]
+fn pow_properties() {
+    natural_unsigned_pair_gen_var_4().test_properties(|(x, exp)| {
+        let power = (&x).pow(exp);
+        assert!(power.is_valid());
+
+        let power_alt = x.clone().pow(exp);
+        assert!(power_alt.is_valid());
+        assert_eq!(power_alt, power);
+
+        let mut power_alt = x.clone();
+        power_alt.pow_assign(exp);
+        assert!(power_alt.is_valid());
+        assert_eq!(power_alt, power);
+
+        assert_eq!(biguint_to_natural(&natural_to_biguint(&x).pow(exp)), power);
+        assert_eq!(
+            rug_integer_to_natural(&natural_to_rug_integer(&x).pow(u32::exact_from(exp))),
+            power
+        );
+
+        assert_eq!(power, natural_pow_naive(&x, exp));
+        assert_eq!(power, natural_pow_simple_binary(&x, exp));
+        assert_eq!(power, x.pow_ref_alt(exp));
+        if exp != 0 {
+            assert_eq!((&power).checked_root(exp).unwrap(), x);
+        }
+        if x > 1 {
+            assert_eq!(power.checked_log_base(&x).unwrap(), exp);
+        }
+    });
+
+    natural_gen().test_properties(|x| {
+        assert_eq!((&x).pow(0), 1);
+        assert_eq!((&x).pow(1), x);
+        assert_eq!((&x).pow(2), (&x).square());
+    });
+
+    unsigned_gen_var_5().test_properties(|exp| {
+        assert_eq!(Natural::ZERO.pow(exp), u64::iverson(exp == 0));
+        assert_eq!(Natural::ONE.pow(exp), 1);
+        assert_eq!(Natural::TWO.pow(exp), Natural::power_of_2(exp));
+    });
+
+    natural_natural_unsigned_triple_gen_var_1().test_properties(|(x, y, exp)| {
+        assert_eq!((&x * &y).pow(exp), x.pow(exp) * y.pow(exp));
+    });
+
+    natural_unsigned_unsigned_triple_gen_var_5().test_properties(|(x, e, f)| {
+        assert_eq!((&x).pow(e + f), (&x).pow(e) * (&x).pow(f));
+        assert_eq!((&x).pow(e * f), x.pow(e).pow(f));
+    });
+
+    unsigned_pair_gen_var_29::<Limb>().test_properties(|(x, y)| {
+        assert_eq!(Pow::pow(x, y), Natural::from(x).pow(y));
+    });
 }

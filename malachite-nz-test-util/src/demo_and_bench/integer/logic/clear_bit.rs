@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_integer_bit_u64_max_bucketer;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base_test_util::bench::bucketers::pair_2_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -8,6 +7,7 @@ use malachite_base_test_util::runner::Runner;
 use malachite_nz::integer::logic::bit_access::{
     limbs_slice_clear_bit_neg, limbs_vec_clear_bit_neg,
 };
+use malachite_nz_test_util::bench::bucketers::pair_integer_bit_u64_max_bucketer;
 use malachite_nz_test_util::generators::integer_unsigned_pair_gen_var_2;
 use malachite_nz_test_util::generators::unsigned_vec_unsigned_pair_gen_var_21;
 

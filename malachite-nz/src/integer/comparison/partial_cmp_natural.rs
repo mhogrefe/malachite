@@ -5,11 +5,12 @@ use std::cmp::Ordering;
 impl PartialOrd<Natural> for Integer {
     /// Compares an `Integer` to a `Natural`.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    /// where n = `min(self.significant_bits(), other.significant_bits())`
     ///
     /// # Examples
     /// ```

@@ -42,6 +42,7 @@ use platform::Limb;
 /// let empty: Vec<Limb> = Vec::new();
 /// assert_eq!(limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 10, 10), empty);
 /// ```
+#[doc(hidden)]
 pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
@@ -92,6 +93,7 @@ pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
 /// );
 /// assert_eq!(limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 10, 10), &[0]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
@@ -203,6 +205,7 @@ pub(crate) fn limbs_assign_bits_helper(
 /// limbs_assign_bits(&mut xs, 80, 100, &[789, 321]);
 /// assert_eq!(xs, &[123, 456, 51707904, 0]);
 /// ```
+#[doc(hidden)]
 #[inline]
 pub fn limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);

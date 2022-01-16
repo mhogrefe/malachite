@@ -1,15 +1,23 @@
-use malachite_base::num::arithmetic::traits::{SubMul, SubMulAssign};
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul, SubMul, SubMulAssign};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::{
+    unsigned_triple_gen_var_2, unsigned_vec_triple_gen_var_59,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12,
+};
 use malachite_nz::natural::arithmetic::sub_mul::{
     limbs_sub_mul, limbs_sub_mul_in_place_left, limbs_sub_mul_limb_greater,
     limbs_sub_mul_limb_greater_in_place_left, limbs_sub_mul_limb_greater_in_place_right,
     limbs_sub_mul_limb_same_length_in_place_left, limbs_sub_mul_limb_same_length_in_place_right,
 };
 use malachite_nz::natural::Natural;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::{
+    natural_gen, natural_pair_gen, natural_pair_gen_var_10, natural_triple_gen_var_7,
+};
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -437,4 +445,253 @@ fn sub_mul_ref_ref_ref_fail_2() {
         &Natural::from_str("1000000000000").unwrap(),
         &Natural::from_str("100").unwrap(),
     );
+}
+
+#[test]
+fn limbs_sub_mul_limb_greater_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1().test_properties_with_config(
+        &config,
+        |(xs, ys, z)| {
+            assert_eq!(
+                limbs_sub_mul_limb_greater(&xs, &ys, z).map(Natural::from_owned_limbs_asc),
+                Natural::from_owned_limbs_asc(xs)
+                    .checked_sub_mul(Natural::from_owned_limbs_asc(ys), Natural::from(z))
+            );
+        },
+    );
+}
+
+fn limbs_sub_mul_limb_in_place_left_helper(
+    f: &mut dyn FnMut(&mut [Limb], &[Limb], Limb) -> Limb,
+    mut xs: Vec<Limb>,
+    ys: Vec<Limb>,
+    z: Limb,
+) {
+    let xs_old = xs.clone();
+    let borrow = f(&mut xs, &ys, z);
+    if borrow == 0 {
+        assert_eq!(
+            Natural::from_owned_limbs_asc(xs),
+            Natural::from_owned_limbs_asc(xs_old)
+                .sub_mul(Natural::from_owned_limbs_asc(ys), Natural::from(z))
+        );
+    } else {
+        let mut extended_xs = xs_old;
+        extended_xs.push(0);
+        extended_xs.push(1);
+        let mut expected_xs = Natural::from_owned_limbs_asc(extended_xs)
+            .sub_mul(Natural::from_owned_limbs_asc(ys), Natural::from(z))
+            .into_limbs_asc();
+        assert_eq!(expected_xs.pop().unwrap(), borrow.wrapping_neg());
+        assert_eq!(xs, expected_xs);
+    }
+}
+
+#[test]
+fn limbs_sub_mul_limb_same_length_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12().test_properties_with_config(
+        &config,
+        |(xs, ys, z)| {
+            limbs_sub_mul_limb_in_place_left_helper(
+                &mut limbs_sub_mul_limb_same_length_in_place_left,
+                xs,
+                ys,
+                z,
+            )
+        },
+    );
+}
+
+#[test]
+fn limbs_sub_mul_limb_greater_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1().test_properties_with_config(
+        &config,
+        |(xs, ys, z)| {
+            limbs_sub_mul_limb_in_place_left_helper(
+                &mut limbs_sub_mul_limb_greater_in_place_left,
+                xs,
+                ys,
+                z,
+            )
+        },
+    );
+}
+
+macro_rules! limbs_sub_mul_limb_in_place_right_helper {
+    ($f: ident, $xs: ident, $ys: ident, $z: ident) => {{
+        let ys_old = $ys.clone();
+        let borrow = $f(&$xs, &mut $ys, $z);
+        if borrow == 0 {
+            assert_eq!(
+                Natural::from_owned_limbs_asc($ys),
+                Natural::from_owned_limbs_asc($xs)
+                    .sub_mul(Natural::from_owned_limbs_asc(ys_old), Natural::from($z))
+            );
+        } else {
+            let mut extended_xs = $xs.clone();
+            extended_xs.push(0);
+            extended_xs.push(1);
+            let mut expected_xs = Natural::from_owned_limbs_asc(extended_xs)
+                .sub_mul(Natural::from_owned_limbs_asc(ys_old), Natural::from($z))
+                .into_limbs_asc();
+            assert_eq!(expected_xs.pop().unwrap(), borrow.wrapping_neg());
+            assert_eq!($ys, expected_xs);
+        }
+    }};
+}
+
+#[test]
+fn limbs_sub_mul_limb_same_length_in_place_right_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12().test_properties_with_config(
+        &config,
+        |(xs, mut ys, z)| {
+            limbs_sub_mul_limb_in_place_right_helper!(
+                limbs_sub_mul_limb_same_length_in_place_right,
+                xs,
+                ys,
+                z
+            )
+        },
+    );
+}
+
+#[test]
+fn limbs_sub_mul_limb_greater_in_place_right_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12().test_properties_with_config(
+        &config,
+        |(xs, mut ys, z)| {
+            limbs_sub_mul_limb_in_place_right_helper!(
+                limbs_sub_mul_limb_greater_in_place_right,
+                xs,
+                ys,
+                z
+            )
+        },
+    );
+}
+
+#[test]
+fn limbs_sub_mul_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_59().test_properties_with_config(&config, |(xs, ys, zs)| {
+        let expected = limbs_sub_mul(&xs, &ys, &zs).map(Natural::from_owned_limbs_asc);
+        assert_eq!(
+            expected,
+            Natural::from_owned_limbs_asc(xs).checked_sub_mul(
+                Natural::from_owned_limbs_asc(ys),
+                Natural::from_owned_limbs_asc(zs)
+            )
+        );
+    });
+}
+
+#[test]
+fn limbs_sub_mul_in_place_left_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_triple_gen_var_59().test_properties_with_config(&config, |(mut xs, ys, zs)| {
+        let xs_old = xs.clone();
+        let expected = if limbs_sub_mul_in_place_left(&mut xs, &ys, &zs) {
+            None
+        } else {
+            Some(Natural::from_owned_limbs_asc(xs))
+        };
+        assert_eq!(
+            expected,
+            Natural::from_owned_limbs_asc(xs_old).checked_sub_mul(
+                Natural::from_owned_limbs_asc(ys),
+                Natural::from_owned_limbs_asc(zs)
+            )
+        );
+    });
+}
+
+#[allow(clippy::useless_conversion)]
+#[test]
+fn sub_mul_properties() {
+    natural_triple_gen_var_7().test_properties(|(a, b, c)| {
+        let mut mut_a = a.clone();
+        mut_a.sub_mul_assign(&b, &c);
+        assert!(mut_a.is_valid());
+        let result = mut_a;
+
+        let mut mut_a = a.clone();
+        mut_a.sub_mul_assign(&b, c.clone());
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let mut mut_a = a.clone();
+        mut_a.sub_mul_assign(b.clone(), &c);
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let mut mut_a = a.clone();
+        mut_a.sub_mul_assign(b.clone(), c.clone());
+        assert!(mut_a.is_valid());
+        assert_eq!(mut_a, result);
+
+        let result_alt = (&a).sub_mul(&b, &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result_alt = a.clone().sub_mul(&b, &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result_alt = a.clone().sub_mul(&b, c.clone());
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result_alt = a.clone().sub_mul(b.clone(), &c);
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        let result_alt = a.clone().sub_mul(b.clone(), c.clone());
+        assert!(result_alt.is_valid());
+        assert_eq!(result_alt, result);
+
+        assert_eq!(&a - &b * &c, result);
+        assert_eq!((&a).checked_sub(&b * &c), Some(result));
+    });
+
+    natural_gen().test_properties(|n| {
+        assert_eq!((&n).sub_mul(&n, &Natural::ONE), 0);
+    });
+
+    natural_pair_gen().test_properties(|(a, b)| {
+        assert_eq!((&a).sub_mul(&Natural::ZERO, &b), a);
+        assert_eq!((&a).sub_mul(&b, &Natural::ZERO), a);
+        assert_eq!((&a * &b).sub_mul(a, b), 0);
+    });
+
+    natural_pair_gen_var_10().test_properties(|(a, b)| {
+        assert_eq!((&a).sub_mul(&Natural::ZERO, &b), a);
+        assert_eq!((&a).sub_mul(&b, &Natural::ZERO), a);
+        assert_eq!((&a * &b).sub_mul(a, b), 0);
+    });
+
+    unsigned_triple_gen_var_2::<Limb>().test_properties(|(x, y, z)| {
+        assert_eq!(
+            Limb::from(x).sub_mul(Limb::from(y), Limb::from(z)),
+            Natural::from(x).sub_mul(Natural::from(y), Natural::from(z))
+        );
+    });
 }

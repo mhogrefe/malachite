@@ -26,6 +26,7 @@ use platform::Limb;
 /// assert_eq!(limbs_trailing_zeros(&[4]), 2);
 /// assert_eq!(limbs_trailing_zeros(&[0, 4]), 34);
 /// ```
+#[doc(hidden)]
 pub fn limbs_trailing_zeros(xs: &[Limb]) -> u64 {
     let zeros = slice_leading_zeros(xs);
     let remaining_zeros = TrailingZeros::trailing_zeros(xs[zeros]);

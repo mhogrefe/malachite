@@ -473,8 +473,12 @@ pub mod num {
             pub mod striped_random_nonzero_signeds;
             pub mod striped_random_positive_signeds;
             pub mod striped_random_positive_unsigneds;
+            pub mod striped_random_signed_inclusive_range;
+            pub mod striped_random_signed_range;
             pub mod striped_random_signeds;
             pub mod striped_random_unsigned_bit_chunks;
+            pub mod striped_random_unsigned_inclusive_range;
+            pub mod striped_random_unsigned_range;
             pub mod striped_random_unsigned_vecs;
             pub mod striped_random_unsigned_vecs_from_length_iterator;
             pub mod striped_random_unsigned_vecs_length_inclusive_range;
@@ -511,6 +515,33 @@ pub mod random {
     pub mod from_bytes;
     pub mod get_rng;
     pub mod next;
+}
+pub mod rational_sequences {
+    pub mod access {
+        pub mod get;
+        pub mod mutate;
+    }
+    pub mod basic {
+        pub mod component_len;
+        pub mod is_empty;
+        pub mod is_finite;
+        pub mod iter;
+        pub mod len;
+    }
+    pub mod comparison {
+        pub mod cmp;
+        pub mod eq;
+        pub mod hash;
+    }
+    pub mod conversion {
+        pub mod clone;
+        pub mod from_vec;
+        pub mod from_vecs;
+        pub mod to_vecs;
+    }
+    pub mod exhaustive;
+    pub mod random;
+    pub mod to_string;
 }
 pub mod rounding_modes {
     pub mod clone;
@@ -572,6 +603,7 @@ pub mod sets {
 }
 pub mod slices {
     pub mod exhaustive_slice_permutations;
+    pub mod min_repeating_len;
     pub mod random_slice_permutations;
     pub mod slice_leading_zeros;
     pub mod slice_move_left;

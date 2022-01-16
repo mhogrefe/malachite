@@ -1,4 +1,3 @@
-use crate::bench::bucketers::natural_bit_bucketer;
 use malachite_base::num::logic::traits::CountOnes;
 use malachite_base_test_util::bench::bucketers::vec_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -6,6 +5,7 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_vec_gen;
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
+use malachite_nz_test_util::bench::bucketers::natural_bit_bucketer;
 use malachite_nz_test_util::generators::natural_gen;
 use malachite_nz_test_util::natural::logic::count_ones::{
     natural_count_ones_alt_1, natural_count_ones_alt_2,

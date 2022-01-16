@@ -1,9 +1,9 @@
-use crate::bench::bucketers::{
-    triple_3_integer_bit_bucketer, triple_3_pair_integer_max_bit_bucketer,
-};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
+use malachite_nz_test_util::bench::bucketers::{
+    triple_3_integer_bit_bucketer, triple_3_pair_integer_max_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     integer_gen, integer_gen_nrm, integer_pair_gen, integer_pair_gen_nrm,
 };

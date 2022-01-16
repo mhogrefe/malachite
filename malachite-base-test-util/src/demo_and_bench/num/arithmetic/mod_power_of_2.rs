@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::ModPowerOf2;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base_test_util::bench::bucketers::pair_1_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
@@ -22,8 +23,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_demos!(runner, demo_rem_power_of_2_assign_signed);
     register_unsigned_demos!(runner, demo_neg_mod_power_of_2);
     register_unsigned_demos!(runner, demo_neg_mod_power_of_2_assign);
-    register_signed_demos!(runner, demo_ceiling_mod_power_of_2);
-    register_signed_demos!(runner, demo_ceiling_mod_power_of_2_assign);
+    register_unsigned_signed_match_demos!(runner, demo_ceiling_mod_power_of_2);
+    register_unsigned_signed_match_demos!(runner, demo_ceiling_mod_power_of_2_assign);
 
     register_unsigned_benches!(runner, benchmark_mod_power_of_2_unsigned);
     register_signed_benches!(runner, benchmark_mod_power_of_2_signed);
@@ -35,8 +36,8 @@ pub(crate) fn register(runner: &mut Runner) {
     register_signed_benches!(runner, benchmark_rem_power_of_2_assign_signed);
     register_unsigned_benches!(runner, benchmark_neg_mod_power_of_2);
     register_unsigned_benches!(runner, benchmark_neg_mod_power_of_2_assign);
-    register_signed_benches!(runner, benchmark_ceiling_mod_power_of_2);
-    register_signed_benches!(runner, benchmark_ceiling_mod_power_of_2_assign);
+    register_unsigned_signed_match_benches!(runner, benchmark_ceiling_mod_power_of_2);
+    register_unsigned_signed_match_benches!(runner, benchmark_ceiling_mod_power_of_2_assign);
 }
 
 fn demo_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
@@ -186,8 +187,15 @@ fn demo_neg_mod_power_of_2_assign<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_ceiling_mod_power_of_2<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize) {
-    for (n, pow) in signed_unsigned_pair_gen_var_11::<T>()
+fn demo_ceiling_mod_power_of_2<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+) {
+    for (n, pow) in signed_unsigned_pair_gen_var_11::<U, S>()
         .get(gm, &config)
         .take(limit)
     {
@@ -200,12 +208,15 @@ fn demo_ceiling_mod_power_of_2<T: PrimitiveSigned>(gm: GenMode, config: GenConfi
     }
 }
 
-fn demo_ceiling_mod_power_of_2_assign<T: PrimitiveSigned>(
+fn demo_ceiling_mod_power_of_2_assign<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut n, pow) in signed_unsigned_pair_gen_var_11::<T>()
+    for (mut n, pow) in signed_unsigned_pair_gen_var_11::<U, S>()
         .get(gm, &config)
         .take(limit)
     {
@@ -420,16 +431,19 @@ fn benchmark_neg_mod_power_of_2_assign<T: PrimitiveUnsigned>(
     );
 }
 
-fn benchmark_ceiling_mod_power_of_2<T: PrimitiveSigned>(
+fn benchmark_ceiling_mod_power_of_2<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.ceiling_mod_power_of_2(u64)", T::NAME),
+        &format!("{}.ceiling_mod_power_of_2(u64)", S::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_11::<T>().get(gm, &config),
+        signed_unsigned_pair_gen_var_11::<U, S>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -440,16 +454,19 @@ fn benchmark_ceiling_mod_power_of_2<T: PrimitiveSigned>(
     );
 }
 
-fn benchmark_ceiling_mod_power_of_2_assign<T: PrimitiveSigned>(
+fn benchmark_ceiling_mod_power_of_2_assign<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.ceiling_mod_power_of_2_assign(u64)", T::NAME),
+        &format!("{}.ceiling_mod_power_of_2_assign(u64)", S::NAME),
         BenchmarkType::Single,
-        signed_unsigned_pair_gen_var_11::<T>().get(gm, &config),
+        signed_unsigned_pair_gen_var_11::<U, S>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

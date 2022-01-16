@@ -3,6 +3,7 @@ use itertools::Itertools;
 use num::basic::traits::Zero;
 use random::Seed;
 use std::collections::{HashSet, VecDeque};
+use std::fmt::Display;
 use std::hash::Hash;
 use vecs::{random_values_from_vec, RandomValuesFromVec};
 
@@ -517,6 +518,37 @@ where
         window: VecDeque::with_capacity(window_size),
         window_size,
     }
+}
+
+//TODO test
+
+pub fn prefix_to_string<I: Iterator>(mut xs: I, max_len: usize) -> String
+where
+    I::Item: Display,
+{
+    assert_ne!(max_len, 0);
+    let mut s = String::new();
+    s.push('[');
+    let mut first = true;
+    let mut done = false;
+    for _ in 0..max_len {
+        if let Some(x) = xs.next() {
+            if first {
+                first = false;
+            } else {
+                s.push_str(", ");
+            }
+            s.push_str(&x.to_string());
+        } else {
+            done = true;
+            break;
+        }
+    }
+    if !done && xs.next().is_some() {
+        s.push_str(", ...");
+    }
+    s.push(']');
+    s
 }
 
 /// This module contains `BitDistributor`, which helps generate tuples exhaustively.

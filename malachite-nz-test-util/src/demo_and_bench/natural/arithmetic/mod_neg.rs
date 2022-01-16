@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_2_natural_bit_bucketer;
 use malachite_base::num::arithmetic::traits::{Mod, ModNeg, ModNegAssign};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -6,6 +5,7 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::pair_2_natural_bit_bucketer;
 use malachite_nz_test_util::generators::natural_pair_gen_var_8;
 
 pub(crate) fn register(runner: &mut Runner) {

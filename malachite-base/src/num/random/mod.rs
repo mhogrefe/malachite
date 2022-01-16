@@ -2458,7 +2458,6 @@ fn mantissas_inclusive<T: PrimitiveFloat>(
     }
 }
 
-#[allow(clippy::type_complexity)]
 #[derive(Clone, Debug)]
 pub struct SpecialRandomPositiveFiniteFloatInclusiveRange<T: PrimitiveFloat> {
     phantom: PhantomData<*const T>,

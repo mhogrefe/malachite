@@ -467,8 +467,8 @@ impl<'a, 'b> DivRound<&'b Integer> for &'a Integer {
 
 impl DivRoundAssign<Integer> for Integer {
     /// Divides an `Integer` by an `Integer` in place and rounds according to a specified rounding
-    /// mode, taking the `Natural` on the RHS by value. See the `RoundingMode` documentation for
-    /// details.
+    /// mode, taking the `Natural` on the right-hand side by value. See the `RoundingMode`
+    /// documentation for details.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///
@@ -570,8 +570,8 @@ impl DivRoundAssign<Integer> for Integer {
 
 impl<'a> DivRoundAssign<&'a Integer> for Integer {
     /// Divides an `Integer` by an `Integer` in place and rounds according to a specified rounding
-    /// mode, taking the `Natural` on the RHS by reference. See the `RoundingMode` documentation for
-    /// details.
+    /// mode, taking the `Natural` on the right-hand side by reference. See the `RoundingMode`
+    /// documentation for details.
     ///
     /// Time: Worst case O(n * log(n) * log(log(n)))
     ///

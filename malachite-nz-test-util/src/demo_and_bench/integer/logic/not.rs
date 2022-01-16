@@ -1,8 +1,8 @@
-use crate::bench::bucketers::{integer_bit_bucketer, pair_2_integer_bit_bucketer};
 use malachite_base::num::logic::traits::NotAssign;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
+use malachite_nz_test_util::bench::bucketers::{integer_bit_bucketer, pair_2_integer_bit_bucketer};
 use malachite_nz_test_util::generators::{integer_gen, integer_gen_rm};
 
 pub(crate) fn register(runner: &mut Runner) {

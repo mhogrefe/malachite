@@ -1,8 +1,3 @@
-use crate::bench::bucketers::{
-    limbs_div_mod_barrett_helper_bucketer, limbs_div_mod_barrett_product_bucketer,
-    limbs_div_mod_extra_bucketer, pair_1_natural_bit_bucketer, pair_2_pair_1_natural_bit_bucketer,
-    triple_3_pair_1_natural_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{
     CeilingDivAssignNegMod, CeilingDivNegMod, DivAssignMod, DivAssignRem, DivMod, DivRem, DivRound,
     NegMod,
@@ -35,6 +30,11 @@ use malachite_nz::natural::arithmetic::div_mod::{
 };
 use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::bench::bucketers::{
+    limbs_div_mod_barrett_helper_bucketer, limbs_div_mod_barrett_product_bucketer,
+    limbs_div_mod_extra_bucketer, pair_1_natural_bit_bucketer, pair_2_pair_1_natural_bit_bucketer,
+    triple_3_pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     large_type_gen_var_11, large_type_gen_var_12, large_type_gen_var_18, large_type_gen_var_19,
     large_type_gen_var_20, natural_pair_gen_var_5, natural_pair_gen_var_5_nrm,

@@ -132,6 +132,51 @@ impl StripedBitSource {
     pub fn end_block(&mut self) {
         self.first_bit_of_block = true;
     }
+
+    /// Sets the previous bit of a `StripedBitSource`. This will affect the probability of the next
+    /// bit.
+    ///
+    /// # Expected worst-case complexity
+    /// Constant time and additional memory.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::num::random::striped::StripedBitSource;
+    /// use malachite_base::random::EXAMPLE_SEED;
+    ///
+    /// fn generate_string(bit_source: &mut StripedBitSource) -> String {
+    ///     let mut string = String::with_capacity(40);
+    ///     for bit in bit_source.take(40) {
+    ///         if bit {
+    ///             string.push('1');
+    ///         } else {
+    ///             string.push('0');
+    ///         }
+    ///     }
+    ///     string
+    /// }
+    ///
+    /// let mut bit_source = StripedBitSource::new(EXAMPLE_SEED, 1000000, 1);
+    /// bit_source.next();
+    /// let mut strings = Vec::with_capacity(3);
+    /// bit_source.set_previous_bit(true);
+    /// strings.push(generate_string(&mut bit_source));
+    /// bit_source.set_previous_bit(false);
+    /// strings.push(generate_string(&mut bit_source));
+    /// bit_source.set_previous_bit(true);
+    /// strings.push(generate_string(&mut bit_source));
+    /// assert_eq!(
+    ///     strings,
+    ///     &[
+    ///         "1111111111111111111111111111111111111111",
+    ///         "0000000000000000000000000000000000000000",
+    ///         "1111111111111111111111111111111111111111",
+    ///     ]
+    /// );
+    /// ```
+    pub fn set_previous_bit(&mut self, bit: bool) {
+        self.previous_bit = bit;
+    }
 }
 
 /// Generates random unsigned integers from a random striped distribution.
@@ -1658,4 +1703,386 @@ pub fn striped_random_unsigned_vecs_length_inclusive_range<T: PrimitiveUnsigned>
         mean_stripe_numerator,
         mean_stripe_denominator,
     )
+}
+
+#[inline]
+fn ranges_intersect<T: Copy + Ord>(lo_0: T, hi_0: T, lo: T, hi: T) -> bool {
+    lo <= hi_0 && lo_0 <= hi
+}
+
+/// Generates random striped unsigneds from a range.
+#[derive(Clone, Debug)]
+pub struct StripedRandomUnsignedInclusiveRange<T: PrimitiveUnsigned> {
+    a: T,
+    b: T,
+    lo_template: T,
+    hi_template: T,
+    next_bit: u64,
+    bit_source: StripedBitSource,
+}
+
+impl<T: PrimitiveUnsigned> Iterator for StripedRandomUnsignedInclusiveRange<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
+        if self.next_bit == 0 {
+            return Some(self.lo_template);
+        }
+        let mut lo_template = self.lo_template;
+        let mut hi_template = self.hi_template;
+        let mut first = true;
+        let mut previous_forced = true;
+        let mut previous_bit = lo_template.get_bit(self.next_bit);
+        for next_bit in (0..self.next_bit).rev() {
+            let false_possible;
+            let true_possible;
+            if first {
+                false_possible = true;
+                true_possible = true;
+                lo_template.assign_bit(next_bit, true);
+                hi_template.assign_bit(next_bit, true);
+                first = false;
+            } else {
+                lo_template.assign_bit(next_bit, false);
+                hi_template.assign_bit(next_bit, false);
+                false_possible = ranges_intersect(lo_template, hi_template, self.a, self.b);
+                lo_template.assign_bit(next_bit, true);
+                hi_template.assign_bit(next_bit, true);
+                true_possible = ranges_intersect(lo_template, hi_template, self.a, self.b);
+            }
+            assert!(false_possible || true_possible);
+            let bit = if !false_possible {
+                previous_forced = true;
+                true
+            } else if !true_possible {
+                previous_forced = true;
+                false
+            } else {
+                if previous_forced {
+                    self.bit_source.end_block();
+                    self.bit_source.set_previous_bit(previous_bit);
+                    previous_forced = false;
+                }
+                self.bit_source.next().unwrap()
+            };
+            if !bit {
+                lo_template.assign_bit(next_bit, false);
+                hi_template.assign_bit(next_bit, false);
+            }
+            previous_bit = bit;
+        }
+        Some(lo_template)
+    }
+}
+
+/// Generates random striped unsigneds in the range $[a, b)$.
+///
+/// The unsigneds are generated using a striped bit sequence with mean run length
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// Because the unsigneds are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::random::striped::striped_random_unsigned_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// let xss = striped_random_unsigned_range::<u8>(EXAMPLE_SEED, 1, 7, 4, 1)
+///     .take(10)
+///     .map(|x: u8| x.to_binary_string())
+///     .collect_vec();
+/// let xss = xss.iter().map(String::as_str).collect_vec();
+/// assert_eq!(xss, &["1", "1", "1", "110", "1", "110", "10", "11", "11", "100"]);
+/// ```
+#[inline]
+pub fn striped_random_unsigned_range<T: PrimitiveUnsigned>(
+    seed: Seed,
+    a: T,
+    b: T,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomUnsignedInclusiveRange<T> {
+    assert!(a < b);
+    striped_random_unsigned_inclusive_range(
+        seed,
+        a,
+        b - T::ONE,
+        mean_stripe_numerator,
+        mean_stripe_denominator,
+    )
+}
+
+/// Generates random striped unsigneds in the range $[a, b]$.
+///
+/// The unsigneds are generated using a striped bit sequence with mean run length
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// Because the unsigneds are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is `b.significant_bits()`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::random::striped::striped_random_unsigned_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// let xss = striped_random_unsigned_inclusive_range::<u8>(EXAMPLE_SEED, 1, 6, 4, 1)
+///     .take(10)
+///     .map(|x: u8| x.to_binary_string())
+///     .collect_vec();
+/// let xss = xss.iter().map(String::as_str).collect_vec();
+/// assert_eq!(xss, &["1", "1", "1", "110", "1", "110", "10", "11", "11", "100"]);
+/// ```
+pub fn striped_random_unsigned_inclusive_range<T: PrimitiveUnsigned>(
+    seed: Seed,
+    a: T,
+    b: T,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomUnsignedInclusiveRange<T> {
+    assert!(a <= b);
+    let diff_bits = T::WIDTH - (a ^ b).leading_zeros();
+    let mask = T::low_mask(diff_bits);
+    let lo_template = a & !mask;
+    let hi_template = lo_template | mask;
+    StripedRandomUnsignedInclusiveRange {
+        a,
+        b,
+        lo_template,
+        hi_template,
+        next_bit: diff_bits,
+        bit_source: StripedBitSource::new(seed, mean_stripe_numerator, mean_stripe_denominator),
+    }
+}
+
+/// Generates random striped signeds from a range.
+#[derive(Clone, Debug)]
+pub enum StripedRandomSignedInclusiveRange<
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + WrappingFrom<U>,
+> {
+    NonNegative(PhantomData<S>, StripedRandomUnsignedInclusiveRange<U>),
+    Negative(PhantomData<S>, StripedRandomUnsignedInclusiveRange<U>),
+    Both(
+        PhantomData<S>,
+        Box<RandomBools>,
+        StripedRandomUnsignedInclusiveRange<U>,
+        StripedRandomUnsignedInclusiveRange<U>,
+    ),
+}
+
+impl<U: PrimitiveUnsigned, S: PrimitiveSigned + WrappingFrom<U>> Iterator
+    for StripedRandomSignedInclusiveRange<U, S>
+{
+    type Item = S;
+
+    fn next(&mut self) -> Option<S> {
+        match self {
+            StripedRandomSignedInclusiveRange::NonNegative(_, xs) => {
+                xs.next().map(S::wrapping_from)
+            }
+            StripedRandomSignedInclusiveRange::Negative(_, xs) => {
+                xs.next().map(|x| -S::wrapping_from(x))
+            }
+            StripedRandomSignedInclusiveRange::Both(_, bs, xs_nn, xs_n) => {
+                if bs.next().unwrap() {
+                    xs_nn.next().map(S::wrapping_from)
+                } else {
+                    xs_n.next().map(|x| -S::wrapping_from(x))
+                }
+            }
+        }
+    }
+}
+
+/// Generates random striped signeds in the range $[a, b]$.
+///
+/// The unsigneds are generated using a striped bit sequence with mean run length
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// Because the signeds are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `max(a.significant_bits(), b.significant_bits())`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::random::striped::striped_random_signed_inclusive_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// let xss = striped_random_signed_inclusive_range::<u8, i8>(EXAMPLE_SEED, -5, 10, 4, 1)
+///     .take(10)
+///     .map(|x: i8| x.to_binary_string())
+///     .collect_vec();
+/// let xss = xss.iter().map(String::as_str).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &["11111011", "11111100", "1000", "111", "11111111", "1000", "11", "1000", "0", "1000"]
+/// );
+/// ```
+#[inline]
+pub fn striped_random_signed_range<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    seed: Seed,
+    a: S,
+    b: S,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomSignedInclusiveRange<U, S> {
+    assert!(a < b);
+    striped_random_signed_inclusive_range(
+        seed,
+        a,
+        b - S::ONE,
+        mean_stripe_numerator,
+        mean_stripe_denominator,
+    )
+}
+
+/// Generates random striped signeds in the range $[a, b)$.
+///
+/// The unsigneds are generated using a striped bit sequence with mean run length
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// Because the signeds are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `max(a.significant_bits(), b.significant_bits())`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a \geq b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::num::random::striped::striped_random_signed_range;
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+///
+/// let xss = striped_random_signed_range::<u8, i8>(EXAMPLE_SEED, -5, 11, 4, 1)
+///     .take(10)
+///     .map(|x: i8| x.to_binary_string())
+///     .collect_vec();
+/// let xss = xss.iter().map(String::as_str).collect_vec();
+/// assert_eq!(
+///     xss,
+///     &["11111011", "11111100", "1000", "111", "11111111", "1000", "11", "1000", "0", "1000"]
+/// );
+/// ```
+pub fn striped_random_signed_inclusive_range<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
+    seed: Seed,
+    a: S,
+    b: S,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomSignedInclusiveRange<U, S> {
+    assert!(a <= b);
+    if a >= S::ZERO {
+        StripedRandomSignedInclusiveRange::NonNegative(
+            PhantomData,
+            striped_random_unsigned_inclusive_range(
+                seed,
+                U::wrapping_from(a),
+                U::wrapping_from(b),
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            ),
+        )
+    } else if b < S::ZERO {
+        StripedRandomSignedInclusiveRange::Negative(
+            PhantomData,
+            striped_random_unsigned_inclusive_range(
+                seed,
+                U::wrapping_from(b.wrapping_neg()),
+                U::wrapping_from(a.wrapping_neg()),
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            ),
+        )
+    } else {
+        StripedRandomSignedInclusiveRange::Both(
+            PhantomData,
+            Box::new(random_bools(seed.fork("sign"))),
+            striped_random_unsigned_inclusive_range(
+                seed.fork("non-negative"),
+                U::ZERO,
+                U::wrapping_from(b),
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            ),
+            striped_random_unsigned_inclusive_range(
+                seed.fork("negative"),
+                U::ONE,
+                U::wrapping_from(a.wrapping_neg()),
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            ),
+        )
+    }
 }

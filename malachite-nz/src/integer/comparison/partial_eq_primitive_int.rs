@@ -9,17 +9,12 @@ macro_rules! impl_unsigned {
             /// Determines whether an `Integer` is equal to a value of unsigned primitive integer
             /// type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(Integer::from(123) == 123u64);
-            /// assert!(Integer::from(-123) != 123u64);
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_eq_primitive_int`
+            /// module.
             #[inline]
             fn eq(&self, other: &$t) -> bool {
                 self.sign && self.abs == *other
@@ -30,17 +25,12 @@ macro_rules! impl_unsigned {
             /// Determines whether a value of unsigned primitive integer type is equal to an
             /// `Integer`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(123u64 == Integer::from(123));
-            /// assert!(123u64 != Integer::from(-123));
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_eq_primitive_int`
+            /// module.
             #[inline]
             fn eq(&self, other: &Integer) -> bool {
                 other == self
@@ -63,17 +53,12 @@ macro_rules! impl_signed {
             /// Determines whether an `Integer` is equal to a value of signed primitive integer
             /// type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(Integer::from(123) != 23i64);
-            /// assert!(Integer::from(-123) == -123i64);
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_eq_primitive_int`
+            /// module.
             fn eq(&self, other: &$t) -> bool {
                 eq_signed(self, other)
             }
@@ -83,17 +68,12 @@ macro_rules! impl_signed {
             /// Determines whether a value of signed primitive integer type is equal to an
             /// `Integer`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
-            /// ```
-            /// use malachite_nz::integer::Integer;
-            ///
-            /// assert!(23i64 != Integer::from(123));
-            /// assert!(-123i64 == Integer::from(-123));
-            /// ```
+            /// See the documentation of the `integer::comparison::partial_eq_primitive_int`
+            /// module.
             #[inline]
             fn eq(&self, other: &Integer) -> bool {
                 other == self

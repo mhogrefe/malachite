@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_1_natural_bit_bucketer;
 use malachite_base::num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, FloorLogBasePowerOf2,
 };
@@ -11,6 +10,7 @@ use malachite_nz::natural::arithmetic::log_base_power_of_2::{
     limbs_ceiling_log_base_power_of_2, limbs_checked_log_base_power_of_2,
     limbs_floor_log_base_power_of_2,
 };
+use malachite_nz_test_util::bench::bucketers::pair_1_natural_bit_bucketer;
 use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_8;
 use malachite_nz_test_util::natural::arithmetic::log_base_power_of_2::*;
 

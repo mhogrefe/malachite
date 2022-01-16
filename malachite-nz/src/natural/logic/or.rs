@@ -22,6 +22,7 @@ use std::ops::{BitOr, BitOrAssign};
 ///
 /// assert_eq!(limbs_or_limb(&[123, 456], 789), &[895, 456]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut result = xs.to_vec();
     limbs_or_limb_in_place(&mut result, y);
@@ -49,6 +50,7 @@ pub fn limbs_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 /// limbs_or_limb_to_out(&mut out, &[123, 456], 789);
 /// assert_eq!(out, &[895, 456, 0]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     out[..xs.len()].copy_from_slice(xs);
     limbs_or_limb_in_place(out, y);
@@ -72,6 +74,8 @@ pub fn limbs_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 /// limbs_or_limb_in_place(&mut xs, 789);
 /// assert_eq!(xs, &[895, 456]);
 /// ```
+#[doc(hidden)]
+#[inline]
 pub fn limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
     xs[0] |= y;
 }
@@ -98,6 +102,7 @@ pub fn limbs_or_limb_in_place(xs: &mut [Limb], y: Limb) {
 /// assert_eq!(limbs_or_same_length(&[6, 7], &[1, 2]), &[7, 7]);
 /// assert_eq!(limbs_or_same_length(&[100, 101, 102], &[102, 101, 100]), &[102, 101, 102]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     assert_eq!(xs.len(), ys.len());
     xs.iter().zip(ys.iter()).map(|(x, y)| x | y).collect()
@@ -123,6 +128,7 @@ pub fn limbs_or_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_or(&[6, 7], &[1, 2, 3]), &[7, 7, 3]);
 /// assert_eq!(limbs_or(&[100, 101, 102], &[102, 101, 100]), &[102, 101, 102]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -164,6 +170,7 @@ pub fn limbs_or(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_or_same_length_to_out(xs, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(xs, &[102, 101, 102, 10]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -200,6 +207,7 @@ pub fn limbs_or_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// limbs_or_to_out(xs, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(xs, &[102, 101, 102, 10]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -240,6 +248,7 @@ pub fn limbs_or_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// limbs_or_same_length_in_place_left(xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[102, 101, 102]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
@@ -275,6 +284,7 @@ pub fn limbs_or_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// limbs_or_in_place_left(&mut xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[102, 101, 102]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -322,6 +332,7 @@ pub fn limbs_or_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// assert_eq!(xs, &[102, 101, 102]);
 /// assert_eq!(ys, &[102, 101, 100]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_or_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -481,8 +492,8 @@ impl<'a, 'b> BitOr<&'a Natural> for &'b Natural {
 }
 
 impl BitOrAssign<Natural> for Natural {
-    /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
-    /// value.
+    /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the
+    /// right-hand side by value.
     ///
     /// Time: worst case O(n)
     ///
@@ -519,8 +530,8 @@ impl BitOrAssign<Natural> for Natural {
 }
 
 impl<'a> BitOrAssign<&'a Natural> for Natural {
-    /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
-    /// reference.
+    /// Bitwise-ors a `Natural` with another `Natural` in place, taking the `Natural` on the
+    /// right-hand side by reference.
     ///
     /// Time: worst case O(n)
     ///

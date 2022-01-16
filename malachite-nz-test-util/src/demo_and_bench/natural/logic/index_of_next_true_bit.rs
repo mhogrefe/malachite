@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_1_natural_bit_bucketer;
 use malachite_base::num::logic::traits::BitScan;
 use malachite_base_test_util::bench::bucketers::pair_1_vec_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -6,6 +5,7 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen_var_16;
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
+use malachite_nz_test_util::bench::bucketers::pair_1_natural_bit_bucketer;
 use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_4;
 use malachite_nz_test_util::natural::logic::index_of_next_true_bit::*;
 

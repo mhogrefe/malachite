@@ -1,17 +1,20 @@
-use crate::bench::bucketers::{integer_deserialize_bucketer, triple_3_integer_bit_bucketer};
 use malachite_base_test_util::bench::bucketers::string_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::{string_gen, string_gen_var_9};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::bench::bucketers::{
+    integer_deserialize_bucketer, triple_3_integer_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{integer_gen, integer_gen_nrm, string_triple_gen_var_2};
-use num::BigUint;
+use num::BigInt;
 
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_integer_serialize_json);
     register_demo!(runner, demo_integer_deserialize_json);
     register_demo!(runner, demo_integer_deserialize_json_targeted);
+
     register_bench!(runner, benchmark_integer_serialize_json_library_comparison);
     register_bench!(runner, benchmark_integer_deserialize_json);
     register_bench!(
@@ -111,7 +114,7 @@ fn benchmark_integer_deserialize_json_library_comparison(
                 let _n: Integer = serde_json::from_str(&s).unwrap();
             }),
             ("num", &mut |(s, _, _)| {
-                let _n: BigUint = serde_json::from_str(&s).unwrap();
+                let _n: BigInt = serde_json::from_str(&s).unwrap();
             }),
             ("rug", &mut |(_, s, _)| {
                 let _n: rug::Integer = serde_json::from_str(&s).unwrap();

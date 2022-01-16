@@ -93,9 +93,9 @@ pub fn random_vecs_fixed_length_from_single<I: Iterator>(
 
 macro_rules! random_vecs_fixed_length {
     (
-        $exhaustive_struct: ident,
-        $exhaustive_fn: ident,
-        $exhaustive_1_to_1_fn: ident,
+        $random_struct: ident,
+        $random_fn: ident,
+        $random_1_to_1_fn: ident,
         $([$i: expr, $it: ident, $xs: ident, $xs_gen: ident]),*
     ) => {
         /// Generates random `Vec`s of a given length using elements from $m$ iterators.
@@ -105,13 +105,13 @@ macro_rules! random_vecs_fixed_length {
         /// This struct is macro-generated. The value of $m$ is in the struct's name. Remember that
         /// $m$ is the number of input iterators, not the length of the output `Vec`s!
         #[derive(Clone, Debug)]
-        pub struct $exhaustive_struct<T, $($it: Iterator<Item = T>),*> {
+        pub struct $random_struct<T, $($it: Iterator<Item = T>),*> {
             $($xs: $it,)*
             output_to_input_map: Vec<usize>,
         }
 
         impl<T, $($it: Iterator<Item = T>),*> Iterator
-            for $exhaustive_struct<T, $($it),*>
+            for $random_struct<T, $($it),*>
         {
             type Item = Vec<T>;
 
@@ -163,16 +163,16 @@ macro_rules! random_vecs_fixed_length {
         ///
         /// # Examples
         /// See the documentation of the `vecs::random` module.
-        pub fn $exhaustive_fn<T, $($it: Iterator<Item = T>),*>(
+        pub fn $random_fn<T, $($it: Iterator<Item = T>),*>(
             seed: Seed,
             $($xs_gen: &dyn Fn(Seed) -> $it,)*
             output_to_input_map: &[usize],
-        ) -> $exhaustive_struct<T, $($it),*> {
+        ) -> $random_struct<T, $($it),*> {
             $(
                 let _max_input_index = $i;
             )*
             validate_oi_map(_max_input_index, output_to_input_map.iter().cloned());
-            $exhaustive_struct {
+            $random_struct {
                 $($xs: $xs_gen(seed.fork(stringify!($xs))),)*
                 output_to_input_map: output_to_input_map.to_vec(),
             }
@@ -203,11 +203,11 @@ macro_rules! random_vecs_fixed_length {
         /// # Examples
         /// See the documentation of the `vecs::random` module.
         #[inline]
-        pub fn $exhaustive_1_to_1_fn<T, $($it: Iterator<Item = T>),*>(
+        pub fn $random_1_to_1_fn<T, $($it: Iterator<Item = T>),*>(
             seed: Seed,
             $($xs_gen: &dyn Fn(Seed) -> $it,)*
-        ) -> $exhaustive_struct<T, $($it),*> {
-            $exhaustive_fn(seed, $($xs_gen,)* &[$($i),*])
+        ) -> $random_struct<T, $($it),*> {
+            $random_fn(seed, $($xs_gen,)* &[$($i),*])
         }
     }
 }

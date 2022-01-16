@@ -1,8 +1,8 @@
-use crate::bench::bucketers::triple_3_natural_bit_bucketer;
 use malachite_base::num::arithmetic::traits::{ModAdd, ModAddAssign};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
+use malachite_nz_test_util::bench::bucketers::triple_3_natural_bit_bucketer;
 use malachite_nz_test_util::generators::natural_triple_gen_var_3;
 
 pub(crate) fn register(runner: &mut Runner) {

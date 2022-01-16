@@ -6,9 +6,9 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use malachite_nz_test_util::generators::{
-    natural_signed_natural_triple_gen, natural_signed_pair_gen, natural_signed_pair_gen_var_1,
-    natural_unsigned_natural_triple_gen, natural_unsigned_pair_gen,
-    signed_natural_signed_triple_gen, unsigned_natural_unsigned_triple_gen,
+    natural_gen, natural_natural_signed_triple_gen, natural_natural_unsigned_triple_gen,
+    natural_signed_pair_gen, natural_signed_pair_gen_var_1, natural_signed_signed_triple_gen,
+    natural_unsigned_pair_gen, natural_unsigned_unsigned_triple_gen,
 };
 use malachite_nz_test_util::natural::comparison::partial_cmp_primitive_int::*;
 use num::BigUint;
@@ -136,7 +136,7 @@ where
         assert_eq!(Some(Natural::from(u).cmp(&n)), cmp_rev);
     });
 
-    natural_unsigned_natural_triple_gen::<T>().test_properties(|(n, u, m)| {
+    natural_natural_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n < u && u < m {
             assert_eq!(n.cmp(&m), Ordering::Less);
         } else if n > u && u > m {
@@ -144,12 +144,16 @@ where
         }
     });
 
-    unsigned_natural_unsigned_triple_gen::<T>().test_properties(|(u, n, v)| {
+    natural_unsigned_unsigned_triple_gen::<T>().test_properties(|(n, u, v)| {
         if u < n && n < v {
             assert!(u < v);
         } else if u > n && n > v {
             assert!(u > v);
         }
+    });
+
+    natural_gen().test_properties(|x| {
+        assert!(x >= T::ZERO);
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
@@ -183,7 +187,7 @@ where
         assert_eq!(Some(Natural::exact_from(i).cmp(&n)), cmp_rev);
     });
 
-    natural_signed_natural_triple_gen::<T>().test_properties(|(n, i, m)| {
+    natural_natural_signed_triple_gen::<T>().test_properties(|(n, m, i)| {
         if n < i && i < m {
             assert_eq!(n.cmp(&m), Ordering::Less);
         } else if n > i && i > m {
@@ -191,12 +195,16 @@ where
         }
     });
 
-    signed_natural_signed_triple_gen::<T>().test_properties(|(i, n, j)| {
+    natural_signed_signed_triple_gen::<T>().test_properties(|(n, i, j)| {
         if i < n && n < j {
             assert!(i < j);
         } else if i > n && n > j {
             assert!(i > j);
         }
+    });
+
+    natural_gen().test_properties(|x| {
+        assert!(x >= T::ZERO);
     });
 
     signed_pair_gen_var_7::<T>().test_properties(|(x, y)| {

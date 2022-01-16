@@ -49,7 +49,9 @@ pub trait ArithmeticCheckedShr<RHS> {
 
 /// Calculates the ceiling of `self`.
 pub trait Ceiling {
-    fn ceiling(self) -> Self;
+    type Output;
+
+    fn ceiling(self) -> Self::Output;
 }
 
 /// Replaces `self` with its ceiling.
@@ -277,7 +279,9 @@ pub trait EqMod<RHS = Self, M = Self> {
 
 /// Calculates the floor of `self`.
 pub trait Floor {
-    fn floor(self) -> Self;
+    type Output;
+
+    fn floor(self) -> Self::Output;
 }
 
 /// Replaces `self` with its floor.
@@ -1029,6 +1033,18 @@ pub trait PowAssign<RHS = Self> {
 /// Calculates $2^p$.
 pub trait PowerOf2<POW> {
     fn power_of_2(pow: POW) -> Self;
+}
+
+/// Computes the reciprocal of `self`.
+pub trait Reciprocal {
+    type Output;
+
+    fn reciprocal(self) -> Self::Output;
+}
+
+/// Replaces `self` with its reciprocal.
+pub trait ReciprocalAssign {
+    fn reciprocal_assign(&mut self);
 }
 
 /// Provides a function to get the floor of the $n$th root of `self`.

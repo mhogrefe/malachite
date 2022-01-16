@@ -1,10 +1,8 @@
-use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
-use malachite_nz_test_util::natural::arithmetic::square::limbs_square_to_out_basecase_unrestricted;
-use std::str::FromStr;
-
-#[cfg(feature = "32_bit_limbs")]
+use malachite_base::num::arithmetic::traits::{CheckedLogBase, CheckedSqrt, Square, SquareAssign};
+use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base_test_util::generators::unsigned_gen_var_21;
 use malachite_nz::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
-#[cfg(feature = "32_bit_limbs")]
 use malachite_nz::natural::arithmetic::square::{
     limbs_square_to_out_basecase, limbs_square_to_out_toom_4,
     limbs_square_to_out_toom_4_scratch_len, limbs_square_to_out_toom_6,
@@ -19,8 +17,19 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::SQR_TOOM2_THRESHOLD;
+use malachite_nz_test_util::generators::{
+    natural_gen, natural_pair_gen, unsigned_vec_pair_gen_var_22, unsigned_vec_pair_gen_var_23,
+    unsigned_vec_pair_gen_var_24, unsigned_vec_pair_gen_var_25, unsigned_vec_pair_gen_var_27,
+    unsigned_vec_pair_gen_var_28, unsigned_vec_pair_gen_var_29, unsigned_vec_pair_gen_var_30,
+};
+use malachite_nz_test_util::natural::arithmetic::square::limbs_square_to_out_basecase_unrestricted;
+use std::str::FromStr;
 
-fn limbs_square_basecase_helper(out_before: &[Limb], xs: &[Limb], out_after: &[Limb]) -> Vec<Limb> {
+fn limbs_square_basecase_helper_1(
+    out_before: &[Limb],
+    xs: &[Limb],
+    out_after: &[Limb],
+) -> Vec<Limb> {
     let mut out = out_before.to_vec();
     let old_out = out.clone();
     limbs_square_to_out_basecase_unrestricted(&mut out, xs);
@@ -38,7 +47,7 @@ fn limbs_square_basecase_helper(out_before: &[Limb], xs: &[Limb], out_after: &[L
 #[test]
 fn test_limbs_square_to_out_basecase() {
     let test = |out_before: &[Limb], xs: &[Limb], out_after: &[Limb]| {
-        limbs_square_basecase_helper(out_before, xs, out_after);
+        limbs_square_basecase_helper_1(out_before, xs, out_after);
         let mut out = out_before.to_vec();
         limbs_square_to_out_basecase(&mut out, xs);
         assert_eq!(out, out_after);
@@ -80,7 +89,7 @@ fn limbs_square_to_out_basecase_fail_3() {
 #[test]
 fn test_limbs_square_to_out_toom_2() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
-        limbs_square_basecase_helper(out_before, xs, out_after);
+        limbs_square_basecase_helper_1(out_before, xs, out_after);
         let mut out = out_before.to_vec();
         let mut scratch = vec![0; limbs_square_to_out_toom_2_scratch_len(xs.len())];
         limbs_square_to_out_toom_2(&mut out, xs, &mut scratch);
@@ -1710,7 +1719,7 @@ fn limbs_square_to_out_toom_2_fail_2() {
 #[test]
 fn test_limbs_square_to_out_toom_3() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
-        limbs_square_basecase_helper(out_before, xs, out_after);
+        limbs_square_basecase_helper_1(out_before, xs, out_after);
         let mut out = out_before.to_vec();
         let mut scratch = vec![0; limbs_square_to_out_toom_3_scratch_len(xs.len())];
         limbs_square_to_out_toom_3(&mut out, xs, &mut scratch);
@@ -2413,7 +2422,7 @@ fn limbs_square_to_out_toom_3_fail_2() {
 #[test]
 fn test_limbs_square_to_out_toom_4() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
-        limbs_square_basecase_helper(out_before, xs, out_after);
+        limbs_square_basecase_helper_1(out_before, xs, out_after);
         let mut out = out_before.to_vec();
         let mut scratch = vec![0; limbs_square_to_out_toom_4_scratch_len(xs.len())];
         limbs_square_to_out_toom_4(&mut out, xs, &mut scratch);
@@ -3118,7 +3127,7 @@ fn limbs_square_to_out_toom_4_fail_2() {
 #[test]
 fn test_limbs_square_to_out_toom_6() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
-        limbs_square_basecase_helper(out_before, xs, out_after);
+        limbs_square_basecase_helper_1(out_before, xs, out_after);
         let mut out = out_before.to_vec();
         let mut scratch = vec![0; limbs_square_to_out_toom_6_scratch_len(xs.len())];
         limbs_square_to_out_toom_6(&mut out, xs, &mut scratch);
@@ -3836,7 +3845,7 @@ fn limbs_square_to_out_toom_6_fail_2() {
 #[test]
 fn test_limbs_square_to_out_toom_8() {
     let test = |xs: &[Limb], out_before: &[Limb], out_after: &[Limb]| {
-        limbs_square_basecase_helper(out_before, xs, out_after);
+        limbs_square_basecase_helper_1(out_before, xs, out_after);
         let mut out = out_before.to_vec();
         let mut scratch = vec![0; limbs_square_to_out_toom_8_scratch_len(xs.len())];
         limbs_square_to_out_toom_8(&mut out, xs, &mut scratch);
@@ -5772,4 +5781,128 @@ fn test_square() {
     test("123", "15129");
     test("1000", "1000000");
     test("123456789", "15241578750190521");
+}
+
+fn limbs_square_basecase_helper_2(out: &[Limb], xs: &[Limb]) -> Vec<Limb> {
+    let mut out = out.to_vec();
+    let old_out = out.clone();
+    limbs_square_to_out_basecase_unrestricted(&mut out, xs);
+    let n = Natural::from_limbs_asc(xs).square();
+    let len = xs.len() << 1;
+    let mut limbs = n.into_limbs_asc();
+    limbs.resize(len, 0);
+    assert_eq!(limbs, &out[..len]);
+    assert_eq!(&out[len..], &old_out[len..]);
+    out
+}
+
+#[test]
+fn limbs_square_to_out_basecase_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_22().test_properties_with_config(&config, |(mut out, xs)| {
+        let expected_out = limbs_square_basecase_helper_2(&out, &xs);
+        limbs_square_to_out_basecase(&mut out, &xs);
+        assert_eq!(out, expected_out);
+    });
+}
+
+macro_rules! square_properties_helper {
+    ($properties: ident, $square: ident, $scratch: ident, $gen: ident) => {
+        #[test]
+        fn $properties() {
+            let mut config = GenConfig::new();
+            config.insert("mean_length_n", 2048);
+            config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+            $gen().test_properties_with_config(&config, |(mut out, xs)| {
+                let expected_out = limbs_square_basecase_helper_2(&out, &xs);
+                let mut scratch = vec![0; $scratch(xs.len())];
+                $square(&mut out, &xs, &mut scratch);
+                assert_eq!(out, expected_out);
+            });
+        }
+    };
+}
+
+square_properties_helper!(
+    limbs_square_to_out_toom_2_properties,
+    limbs_square_to_out_toom_2,
+    limbs_square_to_out_toom_2_scratch_len,
+    unsigned_vec_pair_gen_var_23
+);
+square_properties_helper!(
+    limbs_square_to_out_toom_3_properties,
+    limbs_square_to_out_toom_3,
+    limbs_square_to_out_toom_3_scratch_len,
+    unsigned_vec_pair_gen_var_24
+);
+square_properties_helper!(
+    limbs_square_to_out_toom_4_properties,
+    limbs_square_to_out_toom_4,
+    limbs_square_to_out_toom_4_scratch_len,
+    unsigned_vec_pair_gen_var_25
+);
+square_properties_helper!(
+    limbs_square_to_out_toom_6_properties,
+    limbs_square_to_out_toom_6,
+    limbs_square_to_out_toom_6_scratch_len,
+    unsigned_vec_pair_gen_var_27
+);
+square_properties_helper!(
+    limbs_square_to_out_toom_8_properties,
+    limbs_square_to_out_toom_8,
+    limbs_square_to_out_toom_8_scratch_len,
+    unsigned_vec_pair_gen_var_28
+);
+
+#[test]
+fn limbs_mul_greater_to_out_fft_square_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 2048);
+    config.insert("mean_stripe_n", 64 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_29().test_properties_with_config(&config, |(mut out, xs)| {
+        let expected_out = limbs_square_basecase_helper_2(&out, &xs);
+        limbs_mul_greater_to_out_fft(&mut out, &xs, &xs);
+        assert_eq!(out, expected_out);
+    });
+    config.insert("mean_length_n", 64);
+    config.insert("mean_stripe_n", 4 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_30().test_properties_with_config(&config, |(mut out, xs)| {
+        let expected_out = limbs_square_basecase_helper_2(&out, &xs);
+        limbs_mul_greater_to_out_fft(&mut out, &xs, &xs);
+        assert_eq!(out, expected_out);
+    });
+}
+
+#[test]
+fn sign_properties() {
+    natural_gen().test_properties(|x| {
+        let square = (&x).square();
+        assert!(square.is_valid());
+
+        let mut mut_x = x.clone();
+        mut_x.square_assign();
+        assert!(mut_x.is_valid());
+        assert_eq!(mut_x, square);
+
+        assert_eq!(&x * &x, square);
+        assert!(square >= x);
+        assert_eq!((&square).checked_sqrt().unwrap(), x);
+        if x > 1 {
+            assert_eq!(square.checked_log_base(&x).unwrap(), 2);
+        }
+    });
+
+    natural_pair_gen().test_properties(|(x, y)| {
+        let x_squared = (&x).square();
+        let y_squared = (&y).square();
+        let xy = &x * &y;
+        assert_eq!((&x + &y).square(), &x_squared + &y_squared + (&xy << 1));
+        assert_eq!(xy.square(), x_squared * y_squared);
+    });
+
+    unsigned_gen_var_21::<Limb>().test_properties(|x| {
+        assert_eq!(x.square(), Natural::from(x).square());
+    });
 }

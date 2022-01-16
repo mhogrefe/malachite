@@ -35,6 +35,7 @@ use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 /// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the result is returned.
+#[doc(hidden)]
 pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
@@ -79,6 +80,7 @@ pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let len = xs.len();
     assert_ne!(len, 0);
@@ -126,6 +128,7 @@ pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 /// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the rp == up.
+#[doc(hidden)]
 pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
@@ -204,6 +207,7 @@ pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where rp == up and if cnt is
 /// sufficiently large, limbs are removed from rp.
+#[doc(hidden)]
 pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {

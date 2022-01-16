@@ -1,7 +1,3 @@
-use crate::bench::bucketers::{
-    pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
-    triple_3_pair_natural_max_bit_bucketer,
-};
 use malachite_base_test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_2_vec_len_bucketer, pair_vec_max_len_bucketer,
     triple_2_3_vec_max_len_bucketer, triple_2_vec_len_bucketer,
@@ -18,6 +14,10 @@ use malachite_nz::natural::logic::xor::{
     limbs_xor, limbs_xor_in_place_either, limbs_xor_in_place_left, limbs_xor_limb,
     limbs_xor_limb_in_place, limbs_xor_limb_to_out, limbs_xor_same_length,
     limbs_xor_same_length_in_place_left, limbs_xor_same_length_to_out, limbs_xor_to_out,
+};
+use malachite_nz_test_util::bench::bucketers::{
+    pair_2_pair_natural_max_bit_bucketer, pair_natural_max_bit_bucketer,
+    triple_3_pair_natural_max_bit_bucketer,
 };
 use malachite_nz_test_util::generators::{
     natural_pair_gen, natural_pair_gen_nrm, natural_pair_gen_rm,

@@ -69,7 +69,7 @@ pub fn string_unique(s: &str) -> String {
 /// ```
 /// use malachite_base::strings::string_is_subset;
 ///
-/// assert_eq!(string_is_subset("o, well", "Hello, world!"), true);
+/// assert_eq!(string_is_subset("oH, well", "Hello, world!"), true);
 /// assert_eq!(string_is_subset("MMM", "Mississippi"), true);
 /// assert_eq!(string_is_subset("Hello, World!", "Hello, world!"), false);
 /// assert_eq!(string_is_subset("j", "Mississippi"), false);
@@ -260,6 +260,12 @@ impl<I: Iterator<Item = Vec<char>>> Iterator for StringsFromCharVecs<I> {
 #[inline]
 pub fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(css: I) -> StringsFromCharVecs<I> {
     StringsFromCharVecs { css }
+}
+
+//TODO doc and test
+
+pub trait ExtraToString {
+    fn to_string(&self) -> String;
 }
 
 /// This module contains iterators that generate `String`s without repetition.

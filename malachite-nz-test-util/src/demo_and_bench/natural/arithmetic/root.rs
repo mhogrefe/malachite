@@ -1,8 +1,3 @@
-use crate::bench::bucketers::{
-    natural_bit_bucketer, pair_1_natural_bit_bucketer, pair_2_natural_bit_bucketer,
-    pair_2_pair_1_natural_bit_bucketer, triple_3_natural_bit_bucketer,
-    triple_3_pair_1_natural_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{
     CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Pow, RootAssignRem,
     RootRem,
@@ -14,6 +9,11 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen_var_14;
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::root::{limbs_floor_root, limbs_root_rem};
+use malachite_nz_test_util::bench::bucketers::{
+    natural_bit_bucketer, pair_1_natural_bit_bucketer, pair_2_natural_bit_bucketer,
+    pair_2_pair_1_natural_bit_bucketer, triple_3_natural_bit_bucketer,
+    triple_3_pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     natural_gen, natural_gen_nrm, natural_gen_rm, natural_unsigned_pair_gen_var_7,
     natural_unsigned_pair_gen_var_7_nrm, natural_unsigned_pair_gen_var_7_rm,

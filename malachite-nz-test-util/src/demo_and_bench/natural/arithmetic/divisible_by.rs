@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer};
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::slices::slice_test_zero;
 use malachite_base_test_util::bench::bucketers::pair_1_vec_len_bucketer;
@@ -14,6 +13,9 @@ use malachite_nz::natural::arithmetic::divisible_by::{
     limbs_divisible_by_ref_val, limbs_divisible_by_val_ref,
 };
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
+use malachite_nz_test_util::bench::bucketers::{
+    pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{natural_pair_gen, natural_pair_gen_nrm};
 use malachite_nz_test_util::natural::arithmetic::divisible_by::{
     combined_limbs_divisible_by_limb, num_divisible_by,

@@ -11,9 +11,8 @@ macro_rules! impl_from_limb {
         impl From<$t> for Natural {
             /// Converts a `Limb` to a `Natural`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -35,9 +34,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// Converts a value to a `Natural`, where the value is of a primitive unsigned integer
             /// type that's smaller than a `Limb`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -60,9 +58,8 @@ macro_rules! impl_from_larger_than_limb_or_usize {
             /// type that's larger than a `Limb`. This implementation is general enough to also work
             /// for `usize`, regardless of whether it is equal in width to `Limb`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -84,9 +81,8 @@ macro_rules! impl_signed {
             /// Converts a value of signed primitive integer type to a `Natural`. If the value is
             /// negative, `None` is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -112,9 +108,8 @@ macro_rules! impl_signed {
             /// Determines whether a value of signed primitive integer type can be converted to a
             /// `Natural`.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -136,9 +131,8 @@ macro_rules! impl_signed {
             /// Converts a value of signed primitive integer type to a `Natural`. If the value is
             /// negative, 0 is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```

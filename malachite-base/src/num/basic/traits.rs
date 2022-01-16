@@ -22,6 +22,12 @@ pub trait NegativeOne {
     const NEGATIVE_ONE: Self;
 }
 
+/// Provides the constant 1/2.
+#[allow(clippy::declare_interior_mutable_const)]
+pub trait OneHalf {
+    const ONE_HALF: Self;
+}
+
 /// The Iverson bracket: converts a `bool` to 0 or 1.
 pub trait Iverson {
     fn iverson(b: bool) -> Self;

@@ -1,6 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::BitBlockAccess;
 use malachite_base_test_util::generators::{
     signed_unsigned_pair_gen_var_1, signed_unsigned_unsigned_triple_gen_var_2, unsigned_gen_var_5,
@@ -86,29 +87,32 @@ fn properties_helper_unsigned<T: BitBlockAccess<Bits = T> + PrimitiveUnsigned>()
     });
 }
 
-fn properties_helper_signed<U: PrimitiveUnsigned, T: BitBlockAccess<Bits = U> + PrimitiveSigned>() {
-    signed_unsigned_unsigned_triple_gen_var_2::<T, u64>().test_properties(|(n, start, end)| {
+fn properties_helper_signed<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: BitBlockAccess<Bits = U> + PrimitiveSigned + WrappingFrom<U>,
+>() {
+    signed_unsigned_unsigned_triple_gen_var_2::<U, S, u64>().test_properties(|(n, start, end)| {
         let bits = n.get_bits(start, end);
-        assert_eq!(get_bits_naive::<T, U>(&n, start, end), bits);
+        assert_eq!(get_bits_naive::<S, U>(&n, start, end), bits);
         let mut n_alt = n;
         n_alt.assign_bits(start, end, &bits);
         assert_eq!(n_alt, n);
     });
 
-    signed_unsigned_pair_gen_var_1::<T, _>().test_properties(|(n, start)| {
+    signed_unsigned_pair_gen_var_1::<S, _>().test_properties(|(n, start)| {
         assert_eq!(n.get_bits(start, start), U::ZERO);
         assert_eq!(
-            n.get_bits(start + T::WIDTH, start + (T::WIDTH << 1)),
-            if n >= T::ZERO { U::ZERO } else { U::MAX }
+            n.get_bits(start + S::WIDTH, start + (S::WIDTH << 1)),
+            if n >= S::ZERO { U::ZERO } else { U::MAX }
         );
     });
 
     unsigned_pair_gen_var_7().test_properties(|(start, end)| {
-        assert_eq!(T::ZERO.get_bits(start, end), U::ZERO);
+        assert_eq!(S::ZERO.get_bits(start, end), U::ZERO);
     });
 
     unsigned_gen_var_5().test_properties(|start| {
-        assert_eq!(T::NEGATIVE_ONE.get_bits(start, start + T::WIDTH), U::MAX);
+        assert_eq!(S::NEGATIVE_ONE.get_bits(start, start + S::WIDTH), U::MAX);
     });
 }
 

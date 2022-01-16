@@ -1,6 +1,7 @@
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
+    min_repeating_len::register(runner);
     slice_leading_zeros::register(runner);
     slice_move_left::register(runner);
     slice_set_zero::register(runner);
@@ -9,6 +10,7 @@ pub(crate) fn register(runner: &mut Runner) {
     split_into_chunks::register(runner);
 }
 
+mod min_repeating_len;
 mod slice_leading_zeros;
 mod slice_move_left;
 mod slice_set_zero;

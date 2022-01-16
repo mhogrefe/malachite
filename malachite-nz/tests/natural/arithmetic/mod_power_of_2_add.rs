@@ -21,8 +21,8 @@ use malachite_nz_test_util::generators::{
     natural_natural_unsigned_triple_gen_var_4, natural_unsigned_pair_gen_var_11,
     unsigned_vec_unsigned_unsigned_triple_gen_var_14,
     unsigned_vec_unsigned_unsigned_triple_gen_var_15,
-    unsigned_vec_unsigned_unsigned_triple_gen_var_18,
-    unsigned_vec_unsigned_unsigned_triple_gen_var_19,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19,
 };
 use std::str::FromStr;
 
@@ -355,7 +355,7 @@ fn limbs_mod_power_of_2_add_greater_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    unsigned_vec_unsigned_unsigned_triple_gen_var_19().test_properties_with_config(
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19().test_properties_with_config(
         &config,
         |(xs, ys, pow)| {
             limbs_mod_power_of_2_add_helper(&limbs_mod_power_of_2_add_greater, xs, ys, pow);
@@ -368,7 +368,7 @@ fn limbs_mod_power_of_2_add_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    unsigned_vec_unsigned_unsigned_triple_gen_var_18().test_properties_with_config(
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().test_properties_with_config(
         &config,
         |(xs, ys, pow)| {
             limbs_mod_power_of_2_add_helper(&limbs_mod_power_of_2_add, xs, ys, pow);
@@ -381,7 +381,7 @@ fn limbs_slice_mod_power_of_2_add_greater_in_place_left_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    unsigned_vec_unsigned_unsigned_triple_gen_var_19().test_properties_with_config(
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_19().test_properties_with_config(
         &config,
         |(mut xs, ys, pow)| {
             let xs_old = xs.clone();
@@ -402,7 +402,7 @@ fn limbs_vec_mod_power_of_2_add_in_place_left_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    unsigned_vec_unsigned_unsigned_triple_gen_var_18().test_properties_with_config(
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().test_properties_with_config(
         &config,
         |(mut xs, ys, pow)| {
             let xs_old = xs.clone();
@@ -421,7 +421,7 @@ fn limbs_mod_power_of_2_add_in_place_either_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    unsigned_vec_unsigned_unsigned_triple_gen_var_18().test_properties_with_config(
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_18().test_properties_with_config(
         &config,
         |(mut xs, mut ys, pow)| {
             let xs_old = xs.clone();

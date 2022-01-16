@@ -76,6 +76,7 @@ pub fn sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
     (sqrt, r_hi == 1, r_lo)
 }
 
+#[doc(hidden)]
 pub const fn limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
     (n >> 1) + 1
 }
@@ -198,6 +199,7 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
 /// The return value is true iff there is a remainder (that is, x is not a perfect square).
 ///
 /// This is mpn_dc_sqrt from mpn/generic/sqrtrem.c, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
     let odd = usize::iverson(odd);
@@ -331,6 +333,7 @@ pub fn limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -
 /// ```
 ///
 /// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is NULL.
+#[doc(hidden)]
 pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
     let xs_len = xs.len();
     let high = xs[xs_len - 1];
@@ -415,6 +418,7 @@ pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
 /// ```
 ///
 /// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is not NULL.
+#[doc(hidden)]
 pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[Limb]) -> usize {
     let xs_len = xs.len();
     let high = xs[xs_len - 1];
@@ -537,6 +541,7 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
 ///
 /// assert_eq!(limbs_floor_sqrt(&[1, 2, 3]), &[3144134278, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
     limbs_sqrt_to_out(&mut out, xs);
@@ -559,6 +564,7 @@ pub fn limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
 ///
 /// assert_eq!(limbs_ceiling_sqrt(&[1, 2, 3]), &[3144134279, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
@@ -595,6 +601,7 @@ pub fn limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_checked_sqrt(&[1, 2, 3]), None);
 /// assert_eq!(limbs_checked_sqrt(&[0, 0, 1]), Some(vec![0, 1]));
 /// ```
+#[doc(hidden)]
 pub fn limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
@@ -626,6 +633,7 @@ pub fn limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
 ///
 /// assert_eq!(limbs_sqrt_rem(&[1, 2, 3]), (vec![3144134278, 1], vec![1429311965, 0]));
 /// ```
+#[doc(hidden)]
 pub fn limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];

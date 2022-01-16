@@ -69,6 +69,7 @@ pub(crate) fn register(runner: &mut Runner) {
     chars::register(runner);
     comparison::register(runner);
     num::register(runner);
+    rational_sequences::register(runner);
     rounding_modes::register(runner);
     slices::register(runner);
     strings::register(runner);
@@ -79,6 +80,7 @@ mod bools;
 mod chars;
 mod comparison;
 mod num;
+mod rational_sequences;
 mod rounding_modes;
 mod slices;
 mod strings;

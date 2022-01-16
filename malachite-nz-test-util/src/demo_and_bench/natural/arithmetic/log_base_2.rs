@@ -1,4 +1,3 @@
-use crate::bench::bucketers::natural_bit_bucketer;
 use malachite_base::num::arithmetic::traits::{CeilingLogBase2, CheckedLogBase2, FloorLogBase2};
 use malachite_base_test_util::bench::bucketers::vec_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -8,6 +7,7 @@ use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::log_base_2::{
     limbs_ceiling_log_base_2, limbs_checked_log_base_2, limbs_floor_log_base_2,
 };
+use malachite_nz_test_util::bench::bucketers::natural_bit_bucketer;
 use malachite_nz_test_util::generators::natural_gen_var_2;
 
 pub(crate) fn register(runner: &mut Runner) {

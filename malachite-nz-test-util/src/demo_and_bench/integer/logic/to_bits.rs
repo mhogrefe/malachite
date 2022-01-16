@@ -1,4 +1,3 @@
-use crate::bench::bucketers::integer_bit_bucketer;
 use itertools::Itertools;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_base_test_util::bench::bucketers::vec_len_bucketer;
@@ -11,6 +10,7 @@ use malachite_nz::integer::logic::bit_convertible::{
     bits_slice_to_twos_complement_bits_negative, bits_to_twos_complement_bits_non_negative,
     bits_vec_to_twos_complement_bits_negative,
 };
+use malachite_nz_test_util::bench::bucketers::integer_bit_bucketer;
 use malachite_nz_test_util::generators::integer_gen;
 use malachite_nz_test_util::integer::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
 

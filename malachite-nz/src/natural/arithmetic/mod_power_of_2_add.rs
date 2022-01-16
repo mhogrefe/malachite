@@ -541,7 +541,7 @@ impl<'a, 'b> ModPowerOf2Add<&'a Natural> for &'b Natural {
 
 impl ModPowerOf2AddAssign<Natural> for Natural {
     /// Adds a `Natural` to a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural` on the
-    /// RHS by value. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// right-hand side by value. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(n)
     ///
@@ -584,7 +584,7 @@ impl ModPowerOf2AddAssign<Natural> for Natural {
 
 impl<'a> ModPowerOf2AddAssign<&'a Natural> for Natural {
     /// Adds a `Natural` to a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural` on the
-    /// RHS by reference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// right-hand side by reference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(n)
     ///

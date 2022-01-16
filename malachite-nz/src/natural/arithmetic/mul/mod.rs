@@ -541,7 +541,8 @@ impl<'a, 'b> Mul<&'a Natural> for &'b Natural {
 }
 
 impl MulAssign<Natural> for Natural {
-    /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the RHS by value.
+    /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the right-hand side
+    /// by value.
     ///
     /// Time: worst case O(n * log(n) * log(log(n)))
     ///
@@ -581,8 +582,8 @@ impl MulAssign<Natural> for Natural {
 }
 
 impl<'a> MulAssign<&'a Natural> for Natural {
-    /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the RHS by
-    /// reference.
+    /// Multiplies a `Natural` by a `Natural` in place, taking the `Natural` on the right-hand side
+    /// by reference.
     ///
     /// Time: worst case O(n * log(n) * log(log(n)))
     ///

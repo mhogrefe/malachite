@@ -367,7 +367,7 @@ impl<'a, 'b> RoundToMultiple<&'b Natural> for &'a Natural {
 
 impl RoundToMultipleAssign<Natural> for Natural {
     /// Rounds a `Natural` to a multiple of another `Natural` in place according to a specified
-    /// rounding mode, taking the `Natural` on the RHS by value.
+    /// rounding mode, taking the `Natural` on the right-hand side by value.
     ///
     /// The following two expressions are equivalent:
     ///
@@ -471,7 +471,7 @@ impl RoundToMultipleAssign<Natural> for Natural {
 
 impl<'a> RoundToMultipleAssign<&'a Natural> for Natural {
     /// Rounds a `Natural` to a multiple of another `Natural` in place according to a specified
-    /// rounding mode, taking the `Natural` on the RHS by reference.
+    /// rounding mode, taking the `Natural` on the right-hand side by reference.
     ///
     /// The following two expressions are equivalent:
     ///

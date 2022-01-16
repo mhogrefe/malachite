@@ -88,6 +88,7 @@ fn limbs_digit_count_helper(bit_count: u64, base: u64) -> u64 {
 ///
 /// This is MPN_SIZEINBASE from gmp-impl.h, GMP 6.2.1, where result is returned and base is not a
 /// power of 2.
+#[doc(hidden)]
 pub fn limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
     assert!(base > 2);
     assert!(base < u64::wrapping_from(BASES.len()));
@@ -628,10 +629,9 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
         {
             fail_on_untested_path(
                 "limbs_to_digits_small_base_divide_and_conquer, \
-                xs_len < pwn + sn || \
-                xs_len == pwn + sn && \
-                limbs_cmp_same_length(&xs[sn..xs_len], &powtab_mem[pwp..pwp + xs_len - sn]) == \
-                Ordering::Less",
+                xs_len < total_len || \
+                xs_len == total_len && \
+                limbs_cmp_same_length(&xs[shift..], power.power) == Ordering::Less",
             );
             limbs_to_digits_small_base_divide_and_conquer(
                 out,

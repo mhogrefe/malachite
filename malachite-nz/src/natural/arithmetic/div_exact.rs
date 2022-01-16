@@ -2092,8 +2092,9 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
 
 impl DivExactAssign<Natural> for Natural {
     /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by value. The
-    /// `Natural` being assigned to must be exactly divisible by the `Natural` on the RHS. If it
-    /// isn't, this function may crash or assign a meaningless value to the first `Natural`.
+    /// `Natural` being assigned to must be exactly divisible by the `Natural` on the right-hand
+    /// side. If it isn't, this function may crash or assign a meaningless value to the first
+    /// `Natural`.
     ///
     /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
@@ -2152,8 +2153,9 @@ impl DivExactAssign<Natural> for Natural {
 
 impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// Divides a `Natural` by a `Natural` in place, taking the second `Natural` by reference. The
-    /// `Natural` being assigned to must be exactly divisible by the `Natural` on the RHS. If it
-    /// isn't, this function may crash or assign a meaningless value to the first `Natural`.
+    /// `Natural` being assigned to must be exactly divisible by the `Natural` on the right-hand
+    /// side. If it isn't, this function may crash or assign a meaningless value to the first
+    /// `Natural`.
     ///
     /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the

@@ -1,6 +1,3 @@
-use crate::bench::bucketers::{
-    natural_bit_bucketer, pair_2_natural_bit_bucketer, triple_3_natural_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{
     CeilingSqrt, CeilingSqrtAssign, CheckedSqrt, FloorSqrt, FloorSqrtAssign, SqrtAssignRem,
     SqrtRem, Square,
@@ -20,6 +17,9 @@ use malachite_nz::natural::arithmetic::sqrt::{
     limbs_ceiling_sqrt, limbs_checked_sqrt, limbs_floor_sqrt, limbs_sqrt_helper, limbs_sqrt_rem,
     limbs_sqrt_rem_helper, limbs_sqrt_rem_helper_scratch_len, limbs_sqrt_rem_to_out,
     limbs_sqrt_to_out, sqrt_rem_2_newton,
+};
+use malachite_nz_test_util::bench::bucketers::{
+    natural_bit_bucketer, pair_2_natural_bit_bucketer, triple_3_natural_bit_bucketer,
 };
 use malachite_nz_test_util::generators::{natural_gen, natural_gen_nrm, natural_gen_rm};
 use malachite_nz_test_util::natural::arithmetic::sqrt::{

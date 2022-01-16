@@ -1,5 +1,9 @@
-use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, Parity};
+use malachite_base::num::basic::traits::{One, Two};
+use malachite_base_test_util::generators::unsigned_gen;
 use malachite_nz::natural::Natural;
+use malachite_nz::platform::Limb;
+use malachite_nz_test_util::generators::natural_gen;
 use std::str::FromStr;
 
 #[test]
@@ -28,4 +32,34 @@ fn test_odd() {
     test("123", true);
     test("1000000000000", false);
     test("1000000000001", true);
+}
+
+#[test]
+fn even_properties() {
+    natural_gen().test_properties(|x| {
+        let even = x.even();
+        assert_eq!((&x).divisible_by(Natural::TWO), even);
+        assert_eq!((&x).divisible_by_power_of_2(1), even);
+        assert_eq!(!x.odd(), even);
+        assert_eq!((x + Natural::ONE).odd(), even);
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        assert_eq!(u.even(), Natural::from(u).even());
+    });
+}
+
+#[test]
+fn odd_properties() {
+    natural_gen().test_properties(|x| {
+        let odd = x.odd();
+        assert_eq!(!(&x).divisible_by(Natural::TWO), odd);
+        assert_eq!(!(&x).divisible_by_power_of_2(1), odd);
+        assert_eq!(!x.even(), odd);
+        assert_eq!((x + Natural::ONE).even(), odd);
+    });
+
+    unsigned_gen::<Limb>().test_properties(|u| {
+        assert_eq!(u.odd(), Natural::from(u).odd());
+    });
 }

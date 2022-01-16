@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_natural_max_bit_bucketer;
 use malachite_base::num::arithmetic::traits::{CoprimeWith, Gcd};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
@@ -6,6 +5,7 @@ use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::coprime_with::{
     coprime_with_check_2, coprime_with_check_2_3, coprime_with_check_2_3_5,
 };
+use malachite_nz_test_util::bench::bucketers::pair_natural_max_bit_bucketer;
 use malachite_nz_test_util::generators::natural_pair_gen;
 
 pub(crate) fn register(runner: &mut Runner) {

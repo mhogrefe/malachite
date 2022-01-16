@@ -1,7 +1,3 @@
-use crate::bench::bucketers::{
-    pair_1_natural_bit_bucketer, pair_2_pair_1_natural_bit_bucketer, triple_1_natural_bit_bucketer,
-    triple_3_pair_1_natural_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{CeilingDivNegMod, DivRound, DivRoundAssign};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base_test_util::bench::bucketers::triple_1_vec_len_bucketer;
@@ -10,6 +6,10 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_vec_unsigned_rounding_mode_triple_gen_var_1;
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
+use malachite_nz_test_util::bench::bucketers::{
+    pair_1_natural_bit_bucketer, pair_2_pair_1_natural_bit_bucketer, triple_1_natural_bit_bucketer,
+    triple_3_pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     natural_natural_rounding_mode_triple_gen_var_1, natural_pair_gen_var_5,
     natural_pair_gen_var_5_nrm, natural_pair_gen_var_5_rm,

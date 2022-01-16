@@ -1,4 +1,5 @@
 use malachite_base::num::arithmetic::traits::Abs;
+use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base_test_util::common::test_custom_cmp_helper;
 use malachite_base_test_util::generators::signed_pair_gen;
@@ -34,6 +35,7 @@ fn cmp_abs_properties() {
     integer_gen().test_properties(|x| {
         assert_eq!(x.cmp_abs(&x), Ordering::Equal);
         assert_eq!(x.cmp_abs(&-&x), Ordering::Equal);
+        assert!(x.ge_abs(&Integer::ZERO));
     });
 
     integer_triple_gen().test_properties(|(x, y, z)| {

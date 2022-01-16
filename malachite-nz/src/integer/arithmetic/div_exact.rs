@@ -195,8 +195,9 @@ impl<'a, 'b> DivExact<&'b Integer> for &'a Integer {
 
 impl DivExactAssign<Integer> for Integer {
     /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by value. The
-    /// `Integer` being assigned to must be exactly divisible by the `Integer` on the RHS. If it
-    /// isn't, this function may crash or assign a meaningless value to the first `Integer`.
+    /// `Integer` being assigned to must be exactly divisible by the `Integer` on the right-hand
+    /// side. If it isn't, this function may crash or assign a meaningless value to the first
+    /// `Integer`.
     ///
     /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the
@@ -239,8 +240,9 @@ impl DivExactAssign<Integer> for Integer {
 
 impl<'a> DivExactAssign<&'a Integer> for Integer {
     /// Divides an `Integer` by an `Integer` in place, taking the second `Integer` by reference. The
-    /// `Integer` being assigned to must be exactly divisible by the `Integer` on the RHS. If it
-    /// isn't, this function may crash or assign a meaningless value to the first `Integer`.
+    /// `Integer` being assigned to must be exactly divisible by the `Integer` on the right-hand
+    /// side. If it isn't, this function may crash or assign a meaningless value to the first
+    /// `Integer`.
     ///
     /// If you are unsure whether the division will be exact use `self /= other` instead. If you're
     /// unsure and you want to know, use `self.div_assign_mod(other)` and check whether the

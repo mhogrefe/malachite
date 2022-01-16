@@ -24,17 +24,7 @@ impl Neg for Natural {
     /// assert_eq!((-Natural::from(123u32)).to_string(), "-123");
     /// ```
     fn neg(self) -> Integer {
-        if self == 0 {
-            Integer {
-                sign: true,
-                abs: self,
-            }
-        } else {
-            Integer {
-                sign: false,
-                abs: self,
-            }
-        }
+        Integer::from_sign_and_abs(self == 0, self)
     }
 }
 
@@ -62,16 +52,6 @@ impl<'a> Neg for &'a Natural {
     /// assert_eq!((-&Natural::from(123u32)).to_string(), "-123");
     /// ```
     fn neg(self) -> Integer {
-        if *self == 0 {
-            Integer {
-                sign: true,
-                abs: self.clone(),
-            }
-        } else {
-            Integer {
-                sign: false,
-                abs: self.clone(),
-            }
-        }
+        Integer::from_sign_and_abs_ref(*self == 0, self)
     }
 }

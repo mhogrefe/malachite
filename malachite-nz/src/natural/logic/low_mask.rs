@@ -22,6 +22,7 @@ use platform::Limb;
 /// assert_eq!(limbs_low_mask(3), vec![0x7]);
 /// assert_eq!(limbs_low_mask(100), vec![u32::MAX, u32::MAX, u32::MAX, 0xf]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_low_mask(bits: u64) -> Vec<Limb> {
     let len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);
     let remaining_bits = bits & Limb::WIDTH_MASK;

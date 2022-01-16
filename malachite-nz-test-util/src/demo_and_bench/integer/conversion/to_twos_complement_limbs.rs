@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{integer_bit_bucketer, pair_1_integer_bit_bucketer};
 use itertools::Itertools;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::bucketers::vec_len_bucketer;
@@ -11,6 +10,7 @@ use malachite_nz::integer::conversion::to_twos_complement_limbs::{
     limbs_twos_complement_and_maybe_sign_extend_negative_in_place, limbs_twos_complement_in_place,
 };
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::bench::bucketers::{integer_bit_bucketer, pair_1_integer_bit_bucketer};
 use malachite_nz_test_util::generators::{integer_gen, integer_unsigned_pair_gen_var_2};
 use malachite_nz_test_util::integer::conversion::to_twos_complement_limbs::{
     limbs_twos_complement_in_place_alt_1, limbs_twos_complement_in_place_alt_2,

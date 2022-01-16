@@ -28,6 +28,7 @@ use platform::Limb;
 /// assert_eq!(limbs_next_power_of_2(&[123, 456]), &[0, 512]);
 /// assert_eq!(limbs_next_power_of_2(&[123, 456, u32::MAX]), &[0, 0, 0, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
     let (xs_last, xs_init) = xs.split_last().unwrap();
     let mut out;
@@ -82,6 +83,7 @@ pub fn limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
 /// assert_eq!(limbs_slice_next_power_of_2_in_place(&mut xs), true);
 /// assert_eq!(xs, &[0, 0, 0]);
 /// ```
+#[doc(hidden)]
 #[allow(clippy::branches_sharing_code)]
 pub fn limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
@@ -138,6 +140,7 @@ pub fn limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
 /// limbs_vec_next_power_of_2_in_place(&mut xs);
 /// assert_eq!(xs, &[0, 0, 0, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_next_power_of_2_in_place(xs: &mut Vec<Limb>) {
     if limbs_slice_next_power_of_2_in_place(xs) {
         xs.push(1);

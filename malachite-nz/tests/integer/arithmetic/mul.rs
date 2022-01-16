@@ -154,7 +154,7 @@ fn mul_properties() {
         }
 
         assert_eq!(-&x * &y, -&product);
-        assert_eq!(&x * -&y, -product);
+        assert_eq!(x * -y, -product);
     });
 
     integer_gen().test_properties(|ref x| {

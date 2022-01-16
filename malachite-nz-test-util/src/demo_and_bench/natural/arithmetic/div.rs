@@ -1,7 +1,3 @@
-use crate::bench::bucketers::{
-    limbs_div_to_out_balancing_bucketer, pair_1_natural_bit_bucketer,
-    triple_3_pair_1_natural_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base_test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_2_3_diff_vec_len_bucketer, quadruple_2_vec_len_bucketer,
@@ -27,6 +23,10 @@ use malachite_nz::natural::arithmetic::div_mod::{
     limbs_div_mod, limbs_div_mod_barrett, limbs_div_mod_barrett_scratch_len,
     limbs_div_mod_divide_and_conquer, limbs_div_mod_schoolbook, limbs_div_mod_to_out,
     limbs_two_limb_inverse_helper,
+};
+use malachite_nz_test_util::bench::bucketers::{
+    limbs_div_to_out_balancing_bucketer, pair_1_natural_bit_bucketer,
+    triple_3_pair_1_natural_bit_bucketer,
 };
 use malachite_nz_test_util::generators::{
     large_type_gen_var_10, large_type_gen_var_11, large_type_gen_var_12, natural_pair_gen_var_5,

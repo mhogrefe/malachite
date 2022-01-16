@@ -1,7 +1,3 @@
-use crate::bench::bucketers::{
-    limbs_matrix_2_2_mul_bucketer, pair_1_half_gcd_matrix_bucketer, pair_natural_max_bit_bucketer,
-    triple_1_half_gcd_matrix_bucketer, triple_3_pair_natural_max_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{Gcd, GcdAssign};
 use malachite_base_test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, quadruple_3_vec_len_bucketer, quadruple_max_bit_bucketer,
@@ -20,6 +16,10 @@ use malachite_nz::natural::arithmetic::gcd::limbs_gcd_limb;
 use malachite_nz::natural::arithmetic::gcd::matrix_2_2::{
     limbs_matrix_2_2_mul, limbs_matrix_2_2_mul_small, limbs_matrix_2_2_mul_strassen,
     limbs_matrix_mul_2_2_scratch_len,
+};
+use malachite_nz_test_util::bench::bucketers::{
+    limbs_matrix_2_2_mul_bucketer, pair_1_half_gcd_matrix_bucketer, pair_natural_max_bit_bucketer,
+    triple_1_half_gcd_matrix_bucketer, triple_3_pair_natural_max_bit_bucketer,
 };
 use malachite_nz_test_util::generators::{
     large_type_gen_var_5, large_type_gen_var_6, large_type_gen_var_7, large_type_gen_var_8,

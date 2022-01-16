@@ -183,7 +183,8 @@ impl<'a, 'b> Add<&'a Integer> for &'b Integer {
 }
 
 impl AddAssign<Integer> for Integer {
-    /// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the RHS by value.
+    /// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the right-hand side by
+    /// value.
     ///
     /// Time: worst case O(n)
     ///
@@ -241,7 +242,8 @@ impl AddAssign<Integer> for Integer {
 }
 
 impl<'a> AddAssign<&'a Integer> for Integer {
-    /// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the RHS by reference.
+    /// Adds an `Integer` to an `Integer` in place, taking the `Integer` on the right-hand side by
+    /// reference.
     ///
     /// Time: worst case O(n)
     ///

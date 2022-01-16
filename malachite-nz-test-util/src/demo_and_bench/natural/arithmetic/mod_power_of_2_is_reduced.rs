@@ -1,9 +1,9 @@
-use crate::bench::bucketers::pair_1_natural_bit_bucketer;
 use malachite_base::num::arithmetic::traits::{ModIsReduced, ModPowerOf2IsReduced, PowerOf2};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::pair_1_natural_bit_bucketer;
 use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_4;
 
 pub(crate) fn register(runner: &mut Runner) {

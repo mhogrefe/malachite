@@ -1,4 +1,3 @@
-use crate::bench::bucketers::triple_1_integer_bit_bucketer;
 use malachite_base::num::arithmetic::traits::{ShrRound, ShrRoundAssign};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -6,6 +5,7 @@ use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::bench::bucketers::triple_1_integer_bit_bucketer;
 use malachite_nz_test_util::generators::{
     integer_signed_rounding_mode_triple_gen_var_2, integer_unsigned_rounding_mode_triple_gen_var_2,
 };

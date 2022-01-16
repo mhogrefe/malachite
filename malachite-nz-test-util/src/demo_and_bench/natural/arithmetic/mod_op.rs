@@ -1,7 +1,3 @@
-use crate::bench::bucketers::{
-    limbs_mod_limb_small_unnormalized_bucketer, pair_1_natural_bit_bucketer,
-    pair_2_pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::DivMod;
 use malachite_base::num::arithmetic::traits::{
     CeilingDivNegMod, Mod, ModAssign, NegMod, NegModAssign,
@@ -13,6 +9,7 @@ use malachite_base_test_util::bench::bucketers::{
 };
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
+use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen_var_24;
 use malachite_base_test_util::generators::{
     unsigned_vec_pair_gen_var_11, unsigned_vec_pair_gen_var_18, unsigned_vec_triple_gen_var_57,
     unsigned_vec_unsigned_pair_gen_var_22, unsigned_vec_unsigned_pair_gen_var_25,
@@ -34,12 +31,15 @@ use malachite_nz::natural::arithmetic::mod_op::{
     limbs_mod_limb_small_unnormalized_large, limbs_mod_schoolbook,
     limbs_mod_three_limb_by_two_limb, limbs_mod_to_out,
 };
+use malachite_nz_test_util::bench::bucketers::{
+    limbs_mod_limb_small_unnormalized_bucketer, pair_1_natural_bit_bucketer,
+    pair_2_pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     large_type_gen_var_11, large_type_gen_var_12, natural_pair_gen_var_5,
     natural_pair_gen_var_5_nrm, natural_pair_gen_var_5_rm, unsigned_sextuple_gen_var_2,
     unsigned_vec_quadruple_gen_var_1, unsigned_vec_quadruple_gen_var_5,
-    unsigned_vec_triple_gen_var_56, unsigned_vec_unsigned_pair_gen_var_24,
-    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17,
+    unsigned_vec_triple_gen_var_56, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_17,
 };
 use malachite_nz_test_util::natural::arithmetic::mod_op::{limbs_mod_limb_alt_3, rug_neg_mod};
 use num::Integer;

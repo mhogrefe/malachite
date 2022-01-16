@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_2_triple_1_2_integer_max_bit_bucketer;
 use malachite_base::num::arithmetic::traits::EqModPowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::bucketers::{
@@ -14,6 +13,7 @@ use malachite_base_test_util::runner::Runner;
 use malachite_nz::integer::arithmetic::eq_mod_power_of_2::{
     limbs_eq_mod_power_of_2_neg_limb, limbs_eq_mod_power_of_2_neg_pos,
 };
+use malachite_nz_test_util::bench::bucketers::pair_2_triple_1_2_integer_max_bit_bucketer;
 use malachite_nz_test_util::generators::{
     integer_integer_unsigned_triple_gen_var_1, integer_integer_unsigned_triple_gen_var_1_rm,
 };

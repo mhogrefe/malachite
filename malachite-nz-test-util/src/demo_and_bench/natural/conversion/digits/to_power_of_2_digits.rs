@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_1_natural_bit_bucketer;
 use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, PowerOf2DigitIterable, PowerOf2Digits};
@@ -6,6 +5,7 @@ use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::pair_1_natural_bit_bucketer;
 use malachite_nz_test_util::generators::{
     natural_unsigned_pair_gen_var_6, natural_unsigned_pair_gen_var_7,
 };

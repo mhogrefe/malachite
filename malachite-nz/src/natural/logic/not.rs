@@ -21,6 +21,7 @@ use std::ops::Not;
 ///
 /// assert_eq!(limbs_not(&[0, 1, 2]), [0xffffffff, 0xfffffffe, 0xfffffffd]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_not(xs: &[Limb]) -> Vec<Limb> {
     xs.iter().map(|x| !x).collect()
 }
@@ -47,6 +48,7 @@ pub fn limbs_not(xs: &[Limb]) -> Vec<Limb> {
 /// limbs_not_to_out(&mut out, &[0xffff0000, 0xf0f0f0f0]);
 /// assert_eq!(out, [0x0000ffff, 0x0f0f0f0f, 2]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
     assert!(out.len() >= xs.len());
     for (x, y) in out.iter_mut().zip(xs.iter()) {
@@ -73,6 +75,7 @@ pub fn limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
 /// limbs_not_in_place(&mut limbs);
 /// assert_eq!(limbs, [0xffffffff, 0xfffffffe, 0xfffffffd]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_not_in_place(xs: &mut [Limb]) {
     for x in xs.iter_mut() {
         x.not_assign();

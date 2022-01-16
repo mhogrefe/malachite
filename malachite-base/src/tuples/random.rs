@@ -100,7 +100,6 @@ macro_rules! random_tuples {
             xs: I
         }
 
-        #[allow(clippy::type_complexity)]
         impl<I: Iterator> Iterator for $random_struct_from_single<I> {
             type Item = $single_out;
 
@@ -351,6 +350,14 @@ random_custom_tuples!(
     [Y, J, ys, ys_gen, [y_2, x_3]]
 );
 random_custom_tuples!(
+    RandomQuadruplesXXYZ,
+    (X, X, Y, Z),
+    random_quadruples_xxyz,
+    [X, I, xs, xs_gen, [x_0, x_0], [x_1, x_1]],
+    [Y, J, ys, ys_gen, [y_2, y_2]],
+    [Z, K, zs, zs_gen, [z_3, z_3]]
+);
+random_custom_tuples!(
     RandomQuadruplesXYXZ,
     (X, Y, X, Z),
     random_quadruples_xyxz,
@@ -372,6 +379,14 @@ random_custom_tuples!(
     [X, I, xs, xs_gen, [x_0, x_0]],
     [Y, J, ys, ys_gen, [y_1, y_1], [y_2, y_2]],
     [Z, K, zs, zs_gen, [z_3, z_3]]
+);
+random_custom_tuples!(
+    RandomQuadruplesXYZZ,
+    (X, Y, Z, Z),
+    random_quadruples_xyzz,
+    [X, I, xs, xs_gen, [x_0, x_0]],
+    [Y, J, ys, ys_gen, [y_1, y_1]],
+    [Z, K, zs, zs_gen, [z_2, z_2], [z_3, z_3]]
 );
 random_custom_tuples!(
     RandomQuintuplesXYYYZ,
@@ -478,7 +493,6 @@ macro_rules! random_ordered_unique_tuples {
             xs: RandomBTreeSetsFixedLength<I>,
         }
 
-        #[allow(clippy::type_complexity)]
         impl<I: Iterator> Iterator for $struct<I>
         where
             I::Item: Ord,

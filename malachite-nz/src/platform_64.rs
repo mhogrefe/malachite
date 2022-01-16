@@ -11,18 +11,18 @@ pub const AORSMUL_FASTER_3AORSLSH: bool = true;
 pub const AORSMUL_FASTER_AORS_AORSLSH: bool = true;
 pub const AORSMUL_FASTER_AORS_2AORSLSH: bool = true;
 
-pub const MUL_TOOM22_THRESHOLD: usize = 106;
-pub const MUL_TOOM33_THRESHOLD: usize = 74;
-pub const MUL_TOOM44_THRESHOLD: usize = 178;
-pub const MUL_TOOM6H_THRESHOLD: usize = 624;
-pub const MUL_TOOM8H_THRESHOLD: usize = 371;
+pub const MUL_TOOM22_THRESHOLD: usize = 20;
+pub const MUL_TOOM33_THRESHOLD: usize = 39;
+pub const MUL_TOOM44_THRESHOLD: usize = usize::MAX; // unclear when 44 is better than 33
+pub const MUL_TOOM6H_THRESHOLD: usize = 345;
+pub const MUL_TOOM8H_THRESHOLD: usize = 640;
 
-pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 310;
+pub const MUL_TOOM32_TO_TOOM43_THRESHOLD: usize = 60;
 pub const MUL_TOOM32_TO_TOOM53_THRESHOLD: usize = 300;
-pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 314;
+pub const MUL_TOOM42_TO_TOOM53_THRESHOLD: usize = 600;
 pub const MUL_TOOM42_TO_TOOM63_THRESHOLD: usize = 103;
 
-pub const MUL_FFT_THRESHOLD: usize = 4037;
+pub const MUL_FFT_THRESHOLD: usize = 3000;
 
 pub const DC_DIV_QR_THRESHOLD: usize = 85;
 pub const DC_DIVAPPR_Q_THRESHOLD: usize = 211;

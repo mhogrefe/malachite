@@ -1,13 +1,13 @@
-use crate::bench::bucketers::{
-    integer_bit_bucketer, pair_1_integer_bit_bucketer, triple_1_integer_bit_bucketer,
-    triple_3_integer_bit_bucketer, triple_3_pair_1_integer_bit_bucketer,
-};
 use malachite_base::num::conversion::traits::{ToStringBase, WrappingFrom};
 use malachite_base::strings::{ToBinaryString, ToLowerHexString, ToOctalString, ToUpperHexString};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::conversion::string::BaseFmtWrapper;
+use malachite_nz_test_util::bench::bucketers::{
+    integer_bit_bucketer, pair_1_integer_bit_bucketer, triple_1_integer_bit_bucketer,
+    triple_3_integer_bit_bucketer, triple_3_pair_1_integer_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     integer_gen, integer_gen_nrm, integer_unsigned_pair_gen_var_1,
     integer_unsigned_pair_gen_var_1_nrm, integer_unsigned_pair_gen_var_2,
@@ -78,6 +78,7 @@ fn demo_integer_to_string(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, width) in integer_unsigned_pair_gen_var_2()
         .get(gm, &config)
@@ -104,6 +105,7 @@ fn demo_integer_to_binary_string_with_0b(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_binary_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, width) in integer_unsigned_pair_gen_var_2()
         .get(gm, &config)
@@ -118,6 +120,7 @@ fn demo_integer_to_binary_string_with_width(gm: GenMode, config: GenConfig, limi
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_binary_string_with_0b_and_width(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, width) in integer_unsigned_pair_gen_var_2()
         .get(gm, &config)
@@ -144,6 +147,7 @@ fn demo_integer_to_octal_string_with_0o(gm: GenMode, config: GenConfig, limit: u
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_octal_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, width) in integer_unsigned_pair_gen_var_2()
         .get(gm, &config)
@@ -158,6 +162,7 @@ fn demo_integer_to_octal_string_with_width(gm: GenMode, config: GenConfig, limit
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_octal_string_with_0o_and_width(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, width) in integer_unsigned_pair_gen_var_2()
         .get(gm, &config)
@@ -184,6 +189,7 @@ fn demo_integer_to_lower_hex_string_with_0x(gm: GenMode, config: GenConfig, limi
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_lower_hex_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, width) in integer_unsigned_pair_gen_var_2()
         .get(gm, &config)
@@ -198,6 +204,7 @@ fn demo_integer_to_lower_hex_string_with_width(gm: GenMode, config: GenConfig, l
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_lower_hex_string_with_0x_and_width(
     gm: GenMode,
     config: GenConfig,
@@ -228,6 +235,7 @@ fn demo_integer_to_upper_hex_string_with_0x(gm: GenMode, config: GenConfig, limi
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_upper_hex_string_with_width(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, width) in integer_unsigned_pair_gen_var_2()
         .get(gm, &config)
@@ -242,6 +250,7 @@ fn demo_integer_to_upper_hex_string_with_width(gm: GenMode, config: GenConfig, l
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_to_upper_hex_string_with_0x_and_width(
     gm: GenMode,
     config: GenConfig,
@@ -288,6 +297,7 @@ fn demo_integer_to_string_base_upper(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_base_fmt_wrapper_fmt(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, base) in integer_unsigned_pair_gen_var_1()
         .get(gm, &config)
@@ -302,6 +312,7 @@ fn demo_integer_base_fmt_wrapper_fmt(gm: GenMode, config: GenConfig, limit: usiz
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_base_fmt_wrapper_fmt_upper(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, base) in integer_unsigned_pair_gen_var_1()
         .get(gm, &config)
@@ -316,6 +327,7 @@ fn demo_integer_base_fmt_wrapper_fmt_upper(gm: GenMode, config: GenConfig, limit
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_base_fmt_wrapper_fmt_with_width(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, base, width) in integer_unsigned_unsigned_triple_gen_var_1()
         .get(gm, &config)
@@ -331,6 +343,7 @@ fn demo_integer_base_fmt_wrapper_fmt_with_width(gm: GenMode, config: GenConfig, 
     }
 }
 
+#[allow(clippy::format_in_format_args)]
 fn demo_integer_base_fmt_wrapper_fmt_upper_with_width(
     gm: GenMode,
     config: GenConfig,

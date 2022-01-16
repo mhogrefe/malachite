@@ -187,7 +187,7 @@ fn unwrap_quadruple<X, Y, Z, W>(
     (a.unwrap(), b.unwrap(), c.unwrap(), d.unwrap())
 }
 
-#[allow(clippy::missing_const_for_fn, clippy::type_complexity)]
+#[allow(clippy::missing_const_for_fn)]
 fn unwrap_quintuple<X, Y, Z, W, V>(
     (a, b, c, d, e): (Option<X>, Option<Y>, Option<Z>, Option<W>, Option<V>),
 ) -> (X, Y, Z, W, V) {
@@ -230,6 +230,7 @@ fn clone_helper<T: Clone>(x: &T, _i: usize) -> T {
 
 macro_rules! lex_tuples {
     (
+        $k: expr,
         $exhaustive_struct: ident,
         $exhaustive_struct_from_single: ident,
         $exhaustive_fn: ident,
@@ -247,7 +248,7 @@ macro_rules! lex_tuples {
             first: bool,
             done: bool,
             $($xs: IteratorCache<$it>,)*
-            counters: Vec<usize>,
+            counters: [usize; $k],
         }
 
         impl<$($t: Clone, $it: Iterator<Item = $t>,)*> $exhaustive_struct<$($t, $it,)*> {
@@ -342,7 +343,7 @@ macro_rules! lex_tuples {
                 first: true,
                 done: false,
                 $($xs: IteratorCache::new($xs),)*
-                counters: vec![$($i * 0,)*],
+                counters: [$($i * 0,)*],
             }
         }
 
@@ -356,7 +357,7 @@ macro_rules! lex_tuples {
             first: bool,
             done: bool,
             xs: IteratorCache<I>,
-            counters: Vec<usize>,
+            counters: [usize; $k],
         }
 
         impl<T: Clone, I: Iterator<Item = T>> $exhaustive_struct_from_single<T, I> {
@@ -430,12 +431,13 @@ macro_rules! lex_tuples {
                 first: true,
                 done: false,
                 xs: IteratorCache::new(xs),
-                counters: vec![$($i * 0,)*],
+                counters: [$($i * 0,)*],
             }
         }
     }
 }
 lex_tuples!(
+    2,
     LexPairs,
     LexPairsFromSingle,
     lex_pairs,
@@ -445,6 +447,7 @@ lex_tuples!(
     [1, Y, J, ys, y]
 );
 lex_tuples!(
+    3,
     LexTriples,
     LexTriplesFromSingle,
     lex_triples,
@@ -455,6 +458,7 @@ lex_tuples!(
     [2, Z, K, zs, z]
 );
 lex_tuples!(
+    4,
     LexQuadruples,
     LexQuadruplesFromSingle,
     lex_quadruples,
@@ -466,6 +470,7 @@ lex_tuples!(
     [3, W, L, ws, w]
 );
 lex_tuples!(
+    5,
     LexQuintuples,
     LexQuintuplesFromSingle,
     lex_quintuples,
@@ -478,6 +483,7 @@ lex_tuples!(
     [4, V, M, vs, v]
 );
 lex_tuples!(
+    6,
     LexSextuples,
     LexSextuplesFromSingle,
     lex_sextuples,
@@ -491,6 +497,7 @@ lex_tuples!(
     [5, U, N, us, u]
 );
 lex_tuples!(
+    7,
     LexSeptuples,
     LexSeptuplesFromSingle,
     lex_septuples,
@@ -505,6 +512,7 @@ lex_tuples!(
     [6, T, O, ts, t]
 );
 lex_tuples!(
+    8,
     LexOctuples,
     LexOctuplesFromSingle,
     lex_octuples,
@@ -531,7 +539,6 @@ macro_rules! exhaustive_tuples_1_input {
         /// Generates all $n$-tuples of a given length with elements from a single iterator.
         ///
         /// This struct is macro-generated.
-        #[allow(clippy::type_complexity)]
         #[derive(Clone, Debug)]
         pub struct $exhaustive_struct<I: Iterator>
         where
@@ -549,7 +556,6 @@ macro_rules! exhaustive_tuples_1_input {
         where
             I::Item: Clone,
         {
-            #[allow(clippy::type_complexity)]
             type Item = $out_type;
 
             fn next(&mut self) -> Option<Self::Item> {
@@ -1350,6 +1356,17 @@ custom_tuples!(
     [Y, J, ys, ys_done, [2, output_type_ys_2]]
 );
 custom_tuples!(
+    ExhaustiveQuadruplesXXYZ,
+    (X, X, Y, Z),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xxyz,
+    exhaustive_quadruples_xxyz_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0], [1, output_type_xs_1]],
+    [Y, J, ys, ys_done, [2, output_type_ys_2]],
+    [Z, K, zs, zs_done, [3, output_type_zs_3]]
+);
+custom_tuples!(
     ExhaustiveQuadruplesXYYX,
     (X, Y, Y, X),
     (None, None, None, None),
@@ -1380,6 +1397,17 @@ custom_tuples!(
     [X, I, xs, xs_done, [0, output_type_xs_0]],
     [Y, J, ys, ys_done, [1, output_type_ys_1], [2, output_type_ys_2]],
     [Z, K, zs, zs_done, [3, output_type_zs_3]]
+);
+custom_tuples!(
+    ExhaustiveQuadruplesXYZZ,
+    (X, Y, Z, Z),
+    (None, None, None, None),
+    unwrap_quadruple,
+    exhaustive_quadruples_xyzz,
+    exhaustive_quadruples_xyzz_custom_output,
+    [X, I, xs, xs_done, [0, output_type_xs_0]],
+    [Y, J, ys, ys_done, [1, output_type_ys_1]],
+    [Z, K, zs, zs_done, [2, output_type_zs_2], [3, output_type_zs_3]]
 );
 custom_tuples!(
     ExhaustiveQuintuplesXYYYZ,
@@ -2085,11 +2113,10 @@ macro_rules! lex_ordered_unique_tuples {
             first: bool,
             done: bool,
             xs: IteratorCache<I>,
-            indices: Vec<usize>,
+            indices: [usize; $k],
             phantom: PhantomData<*const I::Item>,
         }
 
-        #[allow(clippy::type_complexity)]
         impl<I: Iterator> Iterator
             for $struct<I>
         where
@@ -2166,7 +2193,7 @@ macro_rules! lex_ordered_unique_tuples {
                 first: true,
                 done: false,
                 xs: IteratorCache::new(xs),
-                indices: (0..$k).collect(),
+                indices: [$($i),*],
                 phantom: PhantomData,
             }
         }
@@ -2262,7 +2289,6 @@ macro_rules! exhaustive_ordered_unique_tuples {
             pattern: Vec<bool>,
         }
 
-        #[allow(clippy::type_complexity)]
         impl<I: Iterator> Iterator for $struct<I>
         where
             I::Item: Clone,
@@ -2424,7 +2450,6 @@ macro_rules! lex_unique_tuples {
             indices: UniqueIndices,
         }
 
-        #[allow(clippy::type_complexity)]
         impl<I: Iterator> Iterator for $struct<I>
         where
             I::Item: Clone,
@@ -2682,7 +2707,6 @@ macro_rules! exhaustive_unique_tuples {
             >,
         }
 
-        #[allow(clippy::type_complexity)]
         impl<I: Iterator> Iterator for $struct<I>
         where
             I::Item: Clone,

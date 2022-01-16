@@ -2,14 +2,14 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
 use malachite_nz_test_util::generators::{
-    integer_natural_integer_triple_gen, integer_natural_pair_gen,
-    natural_integer_natural_triple_gen, natural_pair_gen,
+    integer_integer_natural_triple_gen, integer_natural_natural_triple_gen,
+    integer_natural_pair_gen, natural_pair_gen,
 };
 use std::cmp::Ordering;
 use std::str::FromStr;
 
 #[test]
-fn test_partial_ord_integer_natural() {
+fn test_partial_cmp_natural() {
     let test = |s, t, out| {
         let u = Integer::from_str(s).unwrap();
         let v = Natural::from_str(t).unwrap();
@@ -41,7 +41,7 @@ fn partial_cmp_natural_properties() {
         assert_eq!(y.partial_cmp(&x), cmp.map(Ordering::reverse));
     });
 
-    integer_natural_integer_triple_gen().test_properties(|(x, y, z)| {
+    integer_integer_natural_triple_gen().test_properties(|(x, z, y)| {
         if x < y && y < z {
             assert!(x < z);
         } else if x > y && y > z {
@@ -49,7 +49,7 @@ fn partial_cmp_natural_properties() {
         }
     });
 
-    natural_integer_natural_triple_gen().test_properties(|(x, y, z)| {
+    integer_natural_natural_triple_gen().test_properties(|(y, x, z)| {
         if x < y && y < z {
             assert!(x < z);
         } else if x > y && y > z {

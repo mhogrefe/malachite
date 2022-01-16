@@ -1,3 +1,4 @@
+use crate::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use malachite_base::max;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
@@ -6,7 +7,6 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use std::cmp::{max, min};
 
 pub fn natural_bit_bucketer(var_name: &str) -> Bucketer<Natural> {
@@ -526,16 +526,6 @@ pub fn limbs_matrix_2_2_mul_bucketer<'a>() -> Bucketer<
     Bucketer {
         bucketing_function: &|(_, _, _, _, xs_len, ys00, _, _, _)| max(*xs_len, ys00.len()),
         bucketing_label: "max(xs_len, ys_len)".to_string(),
-    }
-}
-
-pub fn pair_1_integer_bits_times_pair_2_bucketer<'a>(
-    x_name: &'a str,
-    y_name: &'a str,
-) -> Bucketer<'a, (Integer, u64)> {
-    Bucketer {
-        bucketing_function: &|&(ref x, y)| usize::exact_from(x.significant_bits() * y),
-        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
     }
 }
 

@@ -42,6 +42,7 @@ use platform::Limb;
 ///     &[0, u32::MAX]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -87,6 +88,7 @@ pub fn limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> Vec<
 ///     &[0, 0, 1]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -170,6 +172,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(xs: &[Limb], pow: 
 ///     &[0, 0, 1]
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         xs.to_vec()
@@ -246,6 +249,7 @@ pub fn limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> V
 ///     Some(vec![0, u32::MAX])
 /// );
 /// ```
+#[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2(
     xs: &[Limb],
     pow: u64,
@@ -326,6 +330,7 @@ pub fn limbs_round_to_multiple_of_power_of_2(
 /// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 32);
 /// assert_eq!(xs, &[0, u32::MAX]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -398,6 +403,7 @@ pub fn limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, p
 /// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 32);
 /// assert_eq!(xs, &[0, 0, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
@@ -506,6 +512,7 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
 /// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 32);
 /// assert_eq!(xs, &[0, 0, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
     } else if !limbs_get_bit(xs, pow - 1) {
@@ -613,6 +620,7 @@ pub fn limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<Limb>
 /// );
 /// assert_eq!(xs, vec![0, u32::MAX]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_in_place(
     xs: &mut Vec<Limb>,
     pow: u64,

@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2IsReduced}
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::ExactFrom;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base_test_util::generators::{
     signed_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_10,
     signed_unsigned_pair_gen_var_11, signed_unsigned_pair_gen_var_4, unsigned_gen,
@@ -593,27 +593,30 @@ fn neg_mod_power_of_2_properties() {
     apply_fn_to_unsigneds!(neg_mod_power_of_2_properties_helper);
 }
 
-fn ceiling_mod_power_of_2_properties_helper<T: PrimitiveSigned>() {
-    signed_unsigned_pair_gen_var_11::<T>().test_properties(|(n, pow)| {
+fn ceiling_mod_power_of_2_properties_helper<
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>() {
+    signed_unsigned_pair_gen_var_11::<U, S>().test_properties(|(n, pow)| {
         let mut mut_n = n;
         mut_n.ceiling_mod_power_of_2_assign(pow);
         let result = mut_n;
         assert_eq!(n.ceiling_mod_power_of_2(pow), result);
 
-        assert!(result <= T::ZERO);
-        assert_eq!(result == T::ZERO, n.divisible_by_power_of_2(pow));
+        assert!(result <= S::ZERO);
+        assert_eq!(result == S::ZERO, n.divisible_by_power_of_2(pow));
     });
 
-    signed_gen::<T>().test_properties(|n| {
-        assert_eq!(n.ceiling_mod_power_of_2(0), T::ZERO);
+    signed_gen::<S>().test_properties(|n| {
+        assert_eq!(n.ceiling_mod_power_of_2(0), S::ZERO);
     });
 
     unsigned_gen().test_properties(|pow| {
-        assert_eq!(T::ZERO.ceiling_mod_power_of_2(pow), T::ZERO);
+        assert_eq!(S::ZERO.ceiling_mod_power_of_2(pow), S::ZERO);
     });
 }
 
 #[test]
 fn ceiling_mod_power_of_2_properties() {
-    apply_fn_to_signeds!(ceiling_mod_power_of_2_properties_helper);
+    apply_fn_to_unsigned_signed_pairs!(ceiling_mod_power_of_2_properties_helper);
 }

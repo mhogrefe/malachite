@@ -1,6 +1,7 @@
 use integer::Integer;
-use malachite_base::num::arithmetic::traits::PowerOf2;
-use malachite_base::num::basic::traits::One;
+use malachite_base::bools::random::{random_bools, RandomBools};
+use malachite_base::num::arithmetic::traits::{PowerOf2, UnsignedAbs};
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::num::random::geometric::{
@@ -15,7 +16,8 @@ use malachite_base::num::random::{random_primitive_ints, RandomPrimitiveInts};
 use malachite_base::random::Seed;
 use natural::random::{
     get_random_natural_with_bits, get_striped_random_natural_with_bits, random_naturals_less_than,
-    RandomNaturalsLessThan,
+    striped_random_natural_inclusive_range, RandomNaturalsLessThan,
+    StripedRandomNaturalInclusiveRange,
 };
 use natural::Natural;
 
@@ -64,7 +66,7 @@ impl<I: Iterator<Item = i64>> Iterator for RandomIntegers<I> {
 ///
 /// $E\[M\] = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
+/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` /
 /// `mean_bits_denominator`.
 ///
 /// # Panics
@@ -140,7 +142,7 @@ pub fn random_natural_integers(
 ///
 /// $E\[M\] = O(n)$
 ///
-/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` +
+/// where $T$ is time, $M$ is additional memory, and $n$ = `mean_bits_numerator` /
 /// `mean_bits_denominator`.
 ///
 /// # Panics
@@ -956,40 +958,28 @@ fn signed_significant_bits(a: &Integer) -> (u64, i64) {
 }
 
 fn signed_min_bit_range(
-    seed: &Seed,
+    seed: Seed,
     a: Integer,
     unsigned_min_bits: u64,
 ) -> UniformRandomIntegerRange {
     if a >= 0 {
-        uniform_random_integer_range(
-            seed.fork("min_bit_xs"),
-            a,
-            Integer::power_of_2(unsigned_min_bits),
-        )
+        uniform_random_integer_range(seed, a, Integer::power_of_2(unsigned_min_bits))
     } else {
-        uniform_random_integer_inclusive_range(
-            seed.fork("min_bit_xs"),
-            a,
-            -Integer::power_of_2(unsigned_min_bits - 1),
-        )
+        uniform_random_integer_inclusive_range(seed, a, -Integer::power_of_2(unsigned_min_bits - 1))
     }
 }
 
 fn signed_max_bit_range(
-    seed: &Seed,
+    seed: Seed,
     a: Integer,
     unsigned_max_bits: u64,
 ) -> UniformRandomIntegerRange {
     if a > 0 {
-        uniform_random_integer_inclusive_range(
-            seed.fork("max_bit_xs"),
-            Integer::power_of_2(unsigned_max_bits - 1),
-            a,
-        )
+        uniform_random_integer_inclusive_range(seed, Integer::power_of_2(unsigned_max_bits - 1), a)
     } else {
         // also handles a == 0
         uniform_random_integer_inclusive_range(
-            seed.fork("max_bit_xs"),
+            seed,
             -Integer::power_of_2(unsigned_max_bits) + Integer::ONE,
             a,
         )
@@ -1080,7 +1070,7 @@ pub fn random_integer_range_to_infinity(
             mean_bits_denominator,
         ),
         limbs: random_primitive_ints(seed.fork("limbs")),
-        boundary_bit_xs: signed_min_bit_range(&seed, a, unsigned_min_bits),
+        boundary_bit_xs: signed_min_bit_range(seed.fork("min_bit_xs"), a, unsigned_min_bits),
     }
 }
 
@@ -1153,7 +1143,7 @@ pub fn random_integer_range_to_negative_infinity(
             mean_bits_denominator,
         ),
         limbs: random_primitive_ints(seed.fork("limbs")),
-        boundary_bit_xs: signed_max_bit_range(&seed, a, unsigned_max_bits),
+        boundary_bit_xs: signed_max_bit_range(seed.fork("max_bit_xs"), a, unsigned_max_bits),
     }
 }
 
@@ -1383,8 +1373,449 @@ pub fn random_integer_inclusive_range(
                 mean_bits_denominator,
             ),
             limbs: random_primitive_ints(seed.fork("limbs")),
-            min_bit_xs: signed_min_bit_range(&seed, a, unsigned_min_bits),
-            max_bit_xs: signed_max_bit_range(&seed, b, unsigned_max_bits),
+            min_bit_xs: signed_min_bit_range(seed.fork("min_bit_xs"), a, unsigned_min_bits),
+            max_bit_xs: signed_max_bit_range(seed.fork("max_bit_xs"), b, unsigned_max_bits),
         })
+    }
+}
+
+/// Generates random striped `Integer`s from a range.
+#[derive(Clone, Debug)]
+pub enum StripedRandomIntegerInclusiveRange {
+    NonNegative(StripedRandomNaturalInclusiveRange),
+    Negative(StripedRandomNaturalInclusiveRange),
+    Both(
+        RandomBools,
+        Box<StripedRandomNaturalInclusiveRange>,
+        Box<StripedRandomNaturalInclusiveRange>,
+    ),
+}
+
+impl Iterator for StripedRandomIntegerInclusiveRange {
+    type Item = Integer;
+
+    fn next(&mut self) -> Option<Integer> {
+        match self {
+            StripedRandomIntegerInclusiveRange::NonNegative(xs) => xs.next().map(Integer::from),
+            StripedRandomIntegerInclusiveRange::Negative(xs) => {
+                xs.next().map(|x| Integer::from_sign_and_abs(false, x))
+            }
+            StripedRandomIntegerInclusiveRange::Both(bs, xs_nn, xs_n) => {
+                if bs.next().unwrap() {
+                    xs_nn.next().map(Integer::from)
+                } else {
+                    xs_n.next().map(|x| Integer::from_sign_and_abs(false, x))
+                }
+            }
+        }
+    }
+}
+
+/// Generates random striped `Integer`s in the range $[a, b)$.
+///
+/// The `Integer`s are generated using a striped bit sequence with mean run length
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// Because the `Integer` are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `max(a.significant_bits(), b.significant_bits())`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::striped_random_integer_range;
+///
+/// let xss = striped_random_integer_range(
+///     EXAMPLE_SEED,
+///     Integer::from(-4),
+///     Integer::from(7),
+///     4,
+///     1
+/// ).take(10).map(|x| x.to_binary_string()).collect_vec();
+/// let xss = xss.iter().map(String::as_str).collect_vec();
+/// assert_eq!(xss, &["-100", "-100", "110", "11", "-100", "0", "110", "11", "0", "110"]);
+/// ```
+#[inline]
+pub fn striped_random_integer_range(
+    seed: Seed,
+    a: Integer,
+    b: Integer,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomIntegerInclusiveRange {
+    assert!(a < b);
+    striped_random_integer_inclusive_range(
+        seed,
+        a,
+        b - Integer::ONE,
+        mean_stripe_numerator,
+        mean_stripe_denominator,
+    )
+}
+
+/// Generates random striped `Integer`s in the range $[a, b]$.
+///
+/// The `Integer`s are generated using a striped bit sequence with mean run length
+/// $m$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level documentation.
+///
+/// Because the `Integer` are constrained to be within a certain range, the actual mean run length
+/// will usually not be $m$. Nonetheless, setting a higher $m$ will result in a higher mean run
+/// length.
+///
+/// # Expected complexity per iteration
+/// $T(n) = O(n)$
+///
+/// $M(n) = O(n)$
+///
+/// where $T$ is time, $M$ is additional memory, and $n$ is
+/// `max(a.significant_bits(), b.significant_bits())`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator` <= `mean_stripe_denominator`, or if $a > b$.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_base::strings::ToBinaryString;
+/// use malachite_nz::integer::Integer;
+/// use malachite_nz::integer::random::striped_random_integer_inclusive_range;
+///
+/// let xss = striped_random_integer_inclusive_range(
+///     EXAMPLE_SEED,
+///     Integer::from(-4),
+///     Integer::from(6),
+///     4,
+///     1
+/// ).take(10).map(|x| x.to_binary_string()).collect_vec();
+/// let xss = xss.iter().map(String::as_str).collect_vec();
+/// assert_eq!(xss, &["-100", "-100", "110", "11", "-100", "0", "110", "11", "0", "110"]);
+/// ```
+pub fn striped_random_integer_inclusive_range(
+    seed: Seed,
+    a: Integer,
+    b: Integer,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomIntegerInclusiveRange {
+    assert!(a <= b);
+    if a >= 0u32 {
+        StripedRandomIntegerInclusiveRange::NonNegative(striped_random_natural_inclusive_range(
+            seed,
+            a.unsigned_abs(),
+            b.unsigned_abs(),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ))
+    } else if b < 0u32 {
+        StripedRandomIntegerInclusiveRange::Negative(striped_random_natural_inclusive_range(
+            seed,
+            b.unsigned_abs(),
+            a.unsigned_abs(),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ))
+    } else {
+        StripedRandomIntegerInclusiveRange::Both(
+            random_bools(seed.fork("sign")),
+            Box::new(striped_random_natural_inclusive_range(
+                seed.fork("non-negative"),
+                Natural::ZERO,
+                b.unsigned_abs(),
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            )),
+            Box::new(striped_random_natural_inclusive_range(
+                seed.fork("negative"),
+                Natural::ONE,
+                a.unsigned_abs(),
+                mean_stripe_numerator,
+                mean_stripe_denominator,
+            )),
+        )
+    }
+}
+
+fn striped_signed_min_bit_range(
+    seed: Seed,
+    a: Integer,
+    unsigned_min_bits: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomIntegerInclusiveRange {
+    if a >= 0 {
+        striped_random_integer_range(
+            seed.fork("min_bit_xs"),
+            a,
+            Integer::power_of_2(unsigned_min_bits),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        )
+    } else {
+        striped_random_integer_inclusive_range(
+            seed.fork("min_bit_xs"),
+            a,
+            -Integer::power_of_2(unsigned_min_bits - 1),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        )
+    }
+}
+
+fn striped_signed_max_bit_range(
+    seed: Seed,
+    a: Integer,
+    unsigned_max_bits: u64,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+) -> StripedRandomIntegerInclusiveRange {
+    if a > 0 {
+        striped_random_integer_inclusive_range(
+            seed.fork("max_bit_xs"),
+            Integer::power_of_2(unsigned_max_bits - 1),
+            a,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        )
+    } else {
+        // also handles a == 0
+        striped_random_integer_inclusive_range(
+            seed.fork("max_bit_xs"),
+            -Integer::power_of_2(unsigned_max_bits) + Integer::ONE,
+            a,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        )
+    }
+}
+
+/// Generates striped random `Integer`s greater than or equal to a lower bound, or less than or
+/// equal to an upper bound.
+#[derive(Clone, Debug)]
+pub struct StripedRandomIntegerRangeToInfinity {
+    boundary_bits: i64,
+    bits: GeometricRandomSignedRange<i64>,
+    bit_source: StripedBitSource,
+    boundary_bit_xs: StripedRandomIntegerInclusiveRange,
+}
+
+impl Iterator for StripedRandomIntegerRangeToInfinity {
+    type Item = Integer;
+
+    fn next(&mut self) -> Option<Integer> {
+        let bits = self.bits.next().unwrap();
+        if bits == self.boundary_bits {
+            self.boundary_bit_xs.next()
+        } else {
+            Some(Integer::from_sign_and_abs(
+                bits >= 0,
+                get_striped_random_natural_with_bits(&mut self.bit_source, bits.unsigned_abs()),
+            ))
+        }
+    }
+}
+
+/// Generates striped random `Integer`s greater than or equal to a lower bound $a$.
+///
+/// The mean bit length $m$ of the `Integer`s is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+///
+/// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
+/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$,
+/// which is not typical).
+///
+/// The `Integer`s are generated using a striped bit sequence with mean run length
+/// $\mu$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level
+/// documentation.
+///
+/// Because the `Integer` are constrained to be within a certain range, the actual mean run length
+/// will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher mean run
+/// length.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
+/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
+/// `mean_bits_denominator` are zero, if $a > 0$ and their ratio is less than or equal to the bit
+/// length of `a`, or if they are too large and manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::random::striped_random_integer_range_to_infinity;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     striped_random_integer_range_to_infinity(
+///         EXAMPLE_SEED,
+///         Integer::from(-1000),
+///         20,
+///         1,
+///         10,
+///         1
+///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     &["8192", "2", "1024", "33554400", "-128", "1023", "8", "14745599", "-256", "-67"]
+/// )
+/// ```
+pub fn striped_random_integer_range_to_infinity(
+    seed: Seed,
+    a: Integer,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomIntegerRangeToInfinity {
+    let (unsigned_min_bits, min_bits) = signed_significant_bits(&a);
+    StripedRandomIntegerRangeToInfinity {
+        boundary_bits: min_bits,
+        bits: geometric_random_signed_inclusive_range(
+            seed.fork("bits"),
+            min_bits,
+            i64::MAX,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+        bit_source: StripedBitSource::new(
+            seed.fork("bit_source"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
+        boundary_bit_xs: striped_signed_min_bit_range(
+            seed.fork("min_bit_xs"),
+            a,
+            unsigned_min_bits,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
+    }
+}
+
+/// Generates striped random `Integer`s less than or equal to an upper bound $a$.
+///
+/// The mean bit length $m$ of the `Integer`s is specified; it must be greater than the bit length
+/// of $a$. $m$ is equal to `mean_bits_numerator / mean_bits_denominator`.
+///
+/// The actual bit length is chosen from a geometric distribution with lower bound $a$ and mean $m$.
+/// The resulting distribution has no mean or higher-order statistics (unless $a < m < a + 1$,
+/// which is not typical).
+///
+/// The `Integer`s are generated using a striped bit sequence with mean run length
+/// $\mu$ = `mean_stripe_numerator` / `mean_stripe_denominator`. See the module-level
+/// documentation.
+///
+/// Because the `Integer` are constrained to be within a certain range, the actual mean run length
+/// will usually not be $\mu$. Nonetheless, setting a higher $\mu$ will result in a higher mean run
+/// length.
+///
+/// The output length is infinite.
+///
+/// # Expected complexity per iteration
+/// $E\[T\] = O(n)$
+///
+/// $E\[M\] = O(m)$
+///
+/// where $T$ is time, $M$ is additional memory, $n$ = `mean_bits_numerator` +
+/// `mean_bits_denominator`, and $m$ = `mean_bits_numerator` / `mean_bits_denominator`.
+///
+/// # Panics
+/// Panics if `mean_stripe_denominator` is zero, if
+/// `mean_stripe_numerator < mean_stripe_denominator`, if `mean_bits_numerator` or
+/// `mean_bits_denominator` are zero, if $b < 0$ and their ratio is less than or equal to the bit
+/// length of `b`, or if they are too large and manipulating them leads to arithmetic overflow.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+/// extern crate malachite_base;
+///
+/// use itertools::Itertools;
+///
+/// use malachite_base::random::EXAMPLE_SEED;
+/// use malachite_nz::integer::random::striped_random_integer_range_to_negative_infinity;
+/// use malachite_nz::integer::Integer;
+///
+/// assert_eq!(
+///     striped_random_integer_range_to_negative_infinity(
+///         EXAMPLE_SEED,
+///         Integer::from(1000),
+///         20,
+///         1,
+///         10,
+///         1
+///     ).take(10).map(|x| Integer::to_string(&x)).collect_vec(),
+///     &[
+///         "4", "2", "-1024", "-144115188075919360", "-516096", "992", "-15", "-16776704", "511",
+///         "64"
+///     ]
+/// )
+/// ```
+pub fn striped_random_integer_range_to_negative_infinity(
+    seed: Seed,
+    a: Integer,
+    mean_stripe_numerator: u64,
+    mean_stripe_denominator: u64,
+    mean_bits_numerator: u64,
+    mean_bits_denominator: u64,
+) -> StripedRandomIntegerRangeToInfinity {
+    let (unsigned_max_bits, max_bits) = signed_significant_bits(&a);
+    StripedRandomIntegerRangeToInfinity {
+        boundary_bits: max_bits,
+        bits: geometric_random_signed_inclusive_range(
+            seed.fork("bits"),
+            i64::MIN,
+            max_bits,
+            mean_bits_numerator,
+            mean_bits_denominator,
+        ),
+        bit_source: StripedBitSource::new(
+            seed.fork("bit_source"),
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
+        boundary_bit_xs: striped_signed_max_bit_range(
+            seed.fork("max_bit_xs"),
+            a,
+            unsigned_max_bits,
+            mean_stripe_numerator,
+            mean_stripe_denominator,
+        ),
     }
 }

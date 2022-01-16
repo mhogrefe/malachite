@@ -1,6 +1,3 @@
-use crate::bench::bucketers::{
-    pair_2_pair_integer_max_bit_bucketer, pair_integer_max_bit_bucketer,
-};
 use malachite_base_test_util::bench::bucketers::{
     pair_1_vec_len_bucketer, pair_vec_max_len_bucketer, triple_2_3_vec_max_len_bucketer,
     triple_2_vec_len_bucketer,
@@ -23,6 +20,9 @@ use malachite_nz::integer::logic::xor::{
     limbs_xor_neg_neg_in_place_left, limbs_xor_neg_neg_to_out, limbs_xor_pos_neg,
     limbs_xor_pos_neg_in_place_either, limbs_xor_pos_neg_in_place_left,
     limbs_xor_pos_neg_in_place_right, limbs_xor_pos_neg_to_out,
+};
+use malachite_nz_test_util::bench::bucketers::{
+    pair_2_pair_integer_max_bit_bucketer, pair_integer_max_bit_bucketer,
 };
 use malachite_nz_test_util::generators::{integer_pair_gen, integer_pair_gen_rm};
 use malachite_nz_test_util::integer::logic::xor::{integer_xor_alt_1, integer_xor_alt_2};

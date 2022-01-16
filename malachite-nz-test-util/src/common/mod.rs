@@ -34,6 +34,22 @@ pub fn natural_to_biguint(n: &Natural) -> BigUint {
     BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc()))
 }
 
+#[cfg(feature = "32_bit_limbs")]
+pub fn natural_to_bigint(n: &Natural) -> BigInt {
+    BigInt::from_biguint(
+        if *n == 0 { Sign::NoSign } else { Sign::Plus },
+        BigUint::new(n.to_limbs_asc()),
+    )
+}
+
+#[cfg(not(feature = "32_bit_limbs"))]
+pub fn natural_to_bigint(n: &Natural) -> BigInt {
+    BigInt::from_biguint(
+        if *n == 0 { Sign::NoSign } else { Sign::Plus },
+        BigUint::new(u32::vec_from_other_type_slice(&n.to_limbs_asc())),
+    )
+}
+
 #[inline]
 pub fn rug_integer_to_natural(n: &rug::Integer) -> Natural {
     assert!(*n >= 0);

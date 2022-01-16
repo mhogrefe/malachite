@@ -1,5 +1,4 @@
-use malachite_base::num::arithmetic::traits::DivisibleBy;
-use malachite_base::num::arithmetic::traits::Parity;
+use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, Parity};
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base_test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
@@ -53,6 +52,7 @@ fn even_properties() {
         let even = x.even();
         assert_eq!(!x.odd(), even);
         assert_eq!(x.divisible_by(Integer::TWO), even);
+        assert_eq!(x.divisible_by_power_of_2(1), even);
         assert_eq!((x + Integer::ONE).odd(), even);
         assert_eq!((x - Integer::ONE).odd(), even);
         assert_eq!((-x).even(), even);
@@ -69,6 +69,7 @@ fn odd_properties() {
         let odd = x.odd();
         assert_eq!(!x.even(), odd);
         assert_eq!(!x.divisible_by(Integer::TWO), odd);
+        assert_eq!(!(x).divisible_by_power_of_2(1), odd);
         assert_eq!((x + Integer::ONE).even(), odd);
         assert_eq!((x - Integer::ONE).even(), odd);
         assert_eq!((-x).odd(), odd);

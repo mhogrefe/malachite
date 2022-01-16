@@ -1,7 +1,3 @@
-use crate::bench::bucketers::{
-    limb_pair_significant_bits_bucketer, limbs_mod_mul_two_limbs_bucketer,
-    triple_3_natural_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{ModMul, ModMulAssign, ModMulPrecomputed};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
@@ -11,6 +7,10 @@ use malachite_nz::natural::arithmetic::mod_mul::{
     limbs_mod_mul_two_limbs, limbs_precompute_mod_mul_two_limbs,
 };
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::{
+    limb_pair_significant_bits_bucketer, limbs_mod_mul_two_limbs_bucketer,
+    triple_3_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{large_type_gen_var_21, natural_triple_gen_var_3};
 use malachite_nz_test_util::natural::arithmetic::mod_mul::{
     limbs_mod_mul_two_limbs_naive, limbs_precompute_mod_mul_two_limbs_alt,

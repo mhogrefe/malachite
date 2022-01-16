@@ -6,6 +6,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rational_sequences::RationalSequence;
 use std::cmp::{max, min};
 
 pub struct Bucketer<'a, T> {
@@ -604,10 +605,20 @@ pub fn triple_2_3_vec_max_len_bucketer<'a, T, U, V>(
     }
 }
 
+pub fn triple_1_2_vec_min_len_bucketer<'a, T, U, V>(
+    ys_name: &str,
+    zs_name: &str,
+) -> Bucketer<'a, (Vec<T>, Vec<U>, V)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys, _)| min(xs.len(), ys.len()),
+        bucketing_label: format!("min({}.len(), {}.len())", ys_name, zs_name),
+    }
+}
+
 pub fn triple_2_3_vec_min_len_bucketer<'a, T, U, V>(
     ys_name: &str,
     zs_name: &str,
-) -> Bucketer<'a, (Vec<T>, Vec<U>, Vec<V>)> {
+) -> Bucketer<'a, (T, Vec<U>, Vec<V>)> {
     Bucketer {
         bucketing_function: &|(_, xs, ys)| min(xs.len(), ys.len()),
         bucketing_label: format!("min({}.len(), {}.len())", ys_name, zs_name),
@@ -709,5 +720,129 @@ pub fn pair_1_vec_len_times_pair_2_bits_bucketer<'a, T, U: PrimitiveUnsigned>(
                 .unwrap()
         },
         bucketing_label: format!("{}.len() * {}.significant_bits()", xs_name, y_name),
+    }
+}
+
+pub fn pair_product_vec_len_bucketer<'a, T, U>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (Vec<T>, Vec<U>)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys)| xs.len().checked_mul(ys.len()).unwrap(),
+        bucketing_label: format!("{}.len() * {}.len()", xs_name, ys_name),
+    }
+}
+
+pub fn triple_1_2_product_vec_len_bucketer<'a, T, U, V>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (Vec<T>, Vec<U>, V)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys, _)| xs.len().checked_mul(ys.len()).unwrap(),
+        bucketing_label: format!("{}.len() * {}.len()", xs_name, ys_name),
+    }
+}
+
+pub fn triple_2_bits_times_triple_3_bucketer<'a, T, U, V: Copy>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U, V)>
+where
+    usize: ExactFrom<V>,
+    for<'b> &'b U: SignificantBits,
+{
+    Bucketer {
+        bucketing_function: &|(_, ref x, y)| {
+            let x_bits: usize = ExactFrom::<u64>::exact_from(x.significant_bits());
+            x_bits.checked_mul(ExactFrom::<V>::exact_from(*y)).unwrap()
+        },
+        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
+    }
+}
+
+pub fn pair_1_vec_len_times_pair_2_bucketer<'a, T, U: Copy>(
+    xs_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Vec<T>, U)>
+where
+    usize: ExactFrom<U>,
+{
+    Bucketer {
+        bucketing_function: &|(ref xs, y)| xs.len().checked_mul(usize::exact_from(*y)).unwrap(),
+        bucketing_label: format!("{}.len() * {}", xs_name, y_name),
+    }
+}
+
+pub fn pair_1_bits_times_pair_2_bucketer<'a, T, U: Copy>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U)>
+where
+    usize: ExactFrom<U>,
+    for<'b> &'b T: SignificantBits,
+{
+    Bucketer {
+        bucketing_function: &|(ref x, y)| {
+            let x_bits: usize = ExactFrom::<u64>::exact_from(x.significant_bits());
+            x_bits.checked_mul(ExactFrom::<U>::exact_from(*y)).unwrap()
+        },
+        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
+    }
+}
+
+pub fn triple_3_pair_1_bits_times_pair_2_bucketer<'a, T, U, V, W: Copy>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U, (V, W))>
+where
+    usize: ExactFrom<W>,
+    for<'b> &'b V: SignificantBits,
+{
+    Bucketer {
+        bucketing_function: &|(_, _, (ref x, y))| {
+            let x_bits: usize = ExactFrom::<u64>::exact_from(x.significant_bits());
+            x_bits.checked_mul(ExactFrom::<W>::exact_from(*y)).unwrap()
+        },
+        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
+    }
+}
+
+pub fn rational_sequence_len_bucketer<'a, T: Eq>(
+    xs_name: &str,
+) -> Bucketer<'a, RationalSequence<T>> {
+    Bucketer {
+        bucketing_function: &RationalSequence::component_len,
+        bucketing_label: format!("{}.component_len()", xs_name),
+    }
+}
+
+pub fn pair_rational_sequence_max_len_bucketer<'a, T: Eq, U: Eq>(
+    xs_name: &str,
+    ys_name: &str,
+) -> Bucketer<'a, (RationalSequence<T>, RationalSequence<U>)> {
+    Bucketer {
+        bucketing_function: &|(xs, ys)| max(xs.component_len(), ys.component_len()),
+        bucketing_label: format!(
+            "max({}.component_len(), {}.component_len())",
+            xs_name, ys_name
+        ),
+    }
+}
+
+pub fn pair_1_rational_sequence_len_bucketer<'a, T: Eq, U>(
+    xs_name: &str,
+) -> Bucketer<'a, (RationalSequence<T>, U)> {
+    Bucketer {
+        bucketing_function: &|(xs, _)| xs.component_len(),
+        bucketing_label: format!("{}.component_len()", xs_name),
+    }
+}
+
+pub fn quadruple_1_rational_sequence_len_bucketer<'a, T: Eq, U, V, W>(
+    xs_name: &str,
+) -> Bucketer<'a, (RationalSequence<T>, U, V, W)> {
+    Bucketer {
+        bucketing_function: &|(xs, _, _, _)| xs.component_len(),
+        bucketing_label: format!("{}.component_len()", xs_name),
     }
 }

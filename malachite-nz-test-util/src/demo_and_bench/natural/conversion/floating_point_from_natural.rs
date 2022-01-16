@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{natural_bit_bucketer, pair_1_natural_bit_bucketer};
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom,
@@ -8,6 +7,7 @@ use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::{natural_bit_bucketer, pair_1_natural_bit_bucketer};
 use malachite_nz_test_util::generators::{
     natural_gen, natural_gen_var_3, natural_rounding_mode_pair_gen_var_1,
 };

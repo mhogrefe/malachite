@@ -138,7 +138,8 @@ impl<'a, 'b> Mul<&'a Integer> for &'b Integer {
 }
 
 impl MulAssign<Integer> for Integer {
-    /// Multiplies an `Integer` by an `Integer` in place, taking the `Integer` on the RHS by value.
+    /// Multiplies an `Integer` by an `Integer` in place, taking the `Integer` on the right-hand
+    /// side by value.
     ///
     /// Time: worst case O(n * log(n) * log(log(n)))
     ///
@@ -169,8 +170,8 @@ impl MulAssign<Integer> for Integer {
 }
 
 impl<'a> MulAssign<&'a Integer> for Integer {
-    /// Multiplies an `Integer` by an `Integer` in place, taking the `Integer` on the RHS by
-    /// reference.
+    /// Multiplies an `Integer` by an `Integer` in place, taking the `Integer` on the right-hand
+    /// side by reference.
     ///
     /// Time: worst case O(n * log(n) * log(log(n)))
     ///

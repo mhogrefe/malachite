@@ -4,9 +4,9 @@ use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
 use malachite_nz_test_util::generators::{
-    integer_signed_integer_triple_gen, integer_signed_pair_gen,
-    integer_unsigned_integer_triple_gen, integer_unsigned_pair_gen,
-    signed_integer_signed_triple_gen, unsigned_integer_unsigned_triple_gen,
+    integer_gen, integer_integer_signed_triple_gen, integer_integer_unsigned_triple_gen,
+    integer_signed_pair_gen, integer_signed_signed_triple_gen, integer_unsigned_pair_gen,
+    integer_unsigned_unsigned_triple_gen,
 };
 use std::cmp::Ordering;
 use std::str::FromStr;
@@ -475,7 +475,7 @@ where
         assert_eq!(Some(Integer::from(u).cmp_abs(&n)), cmp_rev);
     });
 
-    integer_unsigned_integer_triple_gen::<T>().test_properties(|(n, u, m)| {
+    integer_integer_unsigned_triple_gen::<T>().test_properties(|(n, m, u)| {
         if n.lt_abs(&u) && u.lt_abs(&m) {
             assert_eq!(n.cmp_abs(&m), Ordering::Less);
         } else if n.gt_abs(&u) && u.gt_abs(&m) {
@@ -483,12 +483,16 @@ where
         }
     });
 
-    unsigned_integer_unsigned_triple_gen::<T>().test_properties(|(u, n, v)| {
+    integer_unsigned_unsigned_triple_gen::<T>().test_properties(|(n, u, v)| {
         if u.lt_abs(&n) && n.lt_abs(&v) {
             assert!(u.lt_abs(&v));
         } else if u.gt_abs(&n) && n.gt_abs(&v) {
             assert!(u.gt_abs(&v));
         }
+    });
+
+    integer_gen().test_properties(|x| {
+        assert!(x.ge_abs(&T::ZERO));
     });
 
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
@@ -512,7 +516,7 @@ where
         assert_eq!(Some(Integer::from(i).cmp_abs(&n)), cmp_rev);
     });
 
-    integer_signed_integer_triple_gen::<T>().test_properties(|(n, i, m)| {
+    integer_integer_signed_triple_gen::<T>().test_properties(|(n, m, i)| {
         if n.lt_abs(&i) && i.lt_abs(&m) {
             assert_eq!(n.cmp_abs(&m), Ordering::Less);
         } else if n.gt_abs(&i) && i.gt_abs(&m) {
@@ -520,12 +524,16 @@ where
         }
     });
 
-    signed_integer_signed_triple_gen::<T>().test_properties(|(i, n, j)| {
+    integer_signed_signed_triple_gen::<T>().test_properties(|(n, i, j)| {
         if i.lt_abs(&n) && n.lt_abs(&j) {
             assert!(i.lt_abs(&j));
         } else if i.gt_abs(&n) && n.gt_abs(&j) {
             assert!(i.gt_abs(&j));
         }
+    });
+
+    integer_gen().test_properties(|x| {
+        assert!(x.ge_abs(&T::ZERO));
     });
 
     signed_pair_gen::<T>().test_properties(|(x, y)| {

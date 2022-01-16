@@ -1,6 +1,3 @@
-use crate::bench::bucketers::{
-    pair_2_triple_1_2_natural_max_bit_bucketer, triple_1_2_natural_max_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{EqModPowerOf2, ModPowerOf2};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::bench::bucketers::{
@@ -15,6 +12,9 @@ use malachite_base_test_util::generators::{
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::eq_mod_power_of_2::{
     limbs_eq_limb_mod_power_of_2, limbs_eq_mod_power_of_2,
+};
+use malachite_nz_test_util::bench::bucketers::{
+    pair_2_triple_1_2_natural_max_bit_bucketer, triple_1_2_natural_max_bit_bucketer,
 };
 use malachite_nz_test_util::generators::{
     natural_natural_unsigned_triple_gen_var_1, natural_natural_unsigned_triple_gen_var_1_rm,

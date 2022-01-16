@@ -181,7 +181,8 @@ impl<'a, 'b> Sub<&'a Integer> for &'b Integer {
 }
 
 impl SubAssign<Integer> for Integer {
-    /// Subtracts an `Integer` from an `Integer` in place, taking the `Integer` on the RHS by value.
+    /// Subtracts an `Integer` from an `Integer` in place, taking the `Integer` on the right-hand
+    /// side by value.
     ///
     /// Time: worst case O(n)
     ///
@@ -240,7 +241,8 @@ impl SubAssign<Integer> for Integer {
     }
 }
 
-/// Subtracts an `Integer` from an `Integer` in place, taking the `Integer` on the RHS by reference.
+/// Subtracts an `Integer` from an `Integer` in place, taking the `Integer` on the right-hand side
+/// by reference.
 ///
 /// Time: worst case O(n)
 ///

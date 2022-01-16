@@ -14,7 +14,7 @@ use malachite_nz::platform::Limb;
 use malachite_nz_test_util::generators::{
     natural_natural_natural_unsigned_quadruple_gen_var_2,
     natural_natural_unsigned_triple_gen_var_4, natural_unsigned_pair_gen_var_11,
-    unsigned_vec_unsigned_unsigned_triple_gen_var_20,
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20,
 };
 use std::str::FromStr;
 
@@ -153,7 +153,7 @@ fn limbs_mod_power_of_2_mul_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
     config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
-    unsigned_vec_unsigned_unsigned_triple_gen_var_20().test_properties_with_config(
+    unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20().test_properties_with_config(
         &config,
         |(mut xs, mut ys, pow)| {
             let old_xs = xs.clone();

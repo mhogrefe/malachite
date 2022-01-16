@@ -7,7 +7,7 @@ use malachite_nz::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::natural_to_rug_integer;
-use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz_test_util::generators::{natural_gen, natural_gen_var_2};
 use rug;
 use std::str::FromStr;
 
@@ -73,12 +73,14 @@ fn is_power_of_2_properties() {
     natural_gen().test_properties(|x| {
         let is_power_of_2 = x.is_power_of_2();
         assert_eq!(natural_to_rug_integer(&x).is_power_of_two(), is_power_of_2);
-        if x != 0 {
-            let trailing_zeros = x.trailing_zeros().unwrap();
-            assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_2);
-            if trailing_zeros <= u64::from(Limb::MAX) {
-                assert_eq!(x >> trailing_zeros == 1, is_power_of_2);
-            }
+    });
+
+    natural_gen_var_2().test_properties(|x| {
+        let is_power_of_2 = x.is_power_of_2();
+        let trailing_zeros = x.trailing_zeros().unwrap();
+        assert_eq!(trailing_zeros == x.significant_bits() - 1, is_power_of_2);
+        if trailing_zeros <= u64::from(Limb::MAX) {
+            assert_eq!(x >> trailing_zeros == 1, is_power_of_2);
         }
     });
 

@@ -4,11 +4,12 @@ use natural::Natural;
 impl PartialEq<Natural> for Integer {
     /// Determines whether an `Integer` is equal to a `Natural`.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    /// where n = `min(self.significant_bits(), other.significant_bits())`
     ///
     /// # Examples
     /// ```
@@ -26,11 +27,12 @@ impl PartialEq<Natural> for Integer {
 impl PartialEq<Integer> for Natural {
     /// Determines whether a `Natural` is equal to an `Integer`.
     ///
-    /// Time: worst case O(n)
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
     ///
-    /// Additional memory: worst case O(1)
+    /// $M(n) = O(1)$
     ///
-    /// where n = min(`self.significant_bits()`, `other.significant_bits()`)
+    /// where n = `min(self.significant_bits(), other.significant_bits())`
     ///
     /// # Examples
     /// ```

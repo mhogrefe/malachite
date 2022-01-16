@@ -1540,7 +1540,6 @@ impl<Y: Clone, J: Clone + Iterator<Item = Y>>
     }
 }
 
-#[allow(clippy::type_complexity)]
 #[inline]
 fn exhaustive_vecs_from_element_iterator_helper<
     T: Clone,
@@ -1566,7 +1565,6 @@ fn exhaustive_vecs_from_element_iterator_helper<
 
 /// Generates all `Vec`s with elements from a specified iterator and with lengths from another
 /// iterator.
-#[allow(clippy::type_complexity)]
 #[derive(Clone, Debug)]
 pub struct ExhaustiveVecs<T: Clone, I: Iterator<Item = u64>, J: Clone + Iterator<Item = T>>(
     ExhaustiveDependentPairs<
@@ -4035,7 +4033,6 @@ fn compare_indexed_vecs_lex<T>(xs: &[(usize, T)], ys: &[(usize, T)]) -> Ordering
 
 /// Generates all collections of elements from an iterator in lexicographic order, where the
 /// collections have no repetitions.
-#[allow(clippy::type_complexity)]
 #[derive(Clone)]
 pub struct LexUniqueVecs<I: Clone + Iterator>
 where
@@ -4524,7 +4521,6 @@ impl<T: Clone, I: Iterator<Item = T>>
 
 /// Generates all fixed-length `Vec`s of elements from an iterator, where the `Vec`s have no
 /// repetitions and are ordered the same way as in the iterator.
-#[allow(clippy::type_complexity)]
 #[derive(Clone)]
 pub enum ExhaustiveUniqueVecsFixedLength<I: Iterator>
 where
@@ -4654,7 +4650,6 @@ where
 
 /// Generates all `Vec`s of elements from an iterator, where the `Vec`s have no repetitions and are
 /// ordered the same way as in the iterator.
-#[allow(clippy::type_complexity)]
 #[derive(Clone)]
 pub struct ExhaustiveUniqueVecs<I: Iterator>
 where

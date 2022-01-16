@@ -1,6 +1,7 @@
 use malachite_base::num::arithmetic::traits::{ModShr, ModShrAssign};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base_test_util::bench::bucketers::triple_2_3_product_bit_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
@@ -8,19 +9,23 @@ use malachite_base_test_util::generators::unsigned_signed_unsigned_triple_gen_va
 use malachite_base_test_util::runner::Runner;
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_unsigned_signed_demos!(runner, demo_mod_shr);
-    register_unsigned_signed_demos!(runner, demo_mod_shr_assign);
+    register_unsigned_unsigned_signed_match_demos!(runner, demo_mod_shr);
+    register_unsigned_unsigned_signed_match_demos!(runner, demo_mod_shr_assign);
 
-    register_unsigned_signed_benches!(runner, benchmark_mod_shr);
-    register_unsigned_signed_benches!(runner, benchmark_mod_shr_assign);
+    register_unsigned_unsigned_signed_match_benches!(runner, benchmark_mod_shr);
+    register_unsigned_unsigned_signed_match_benches!(runner, benchmark_mod_shr_assign);
 }
 
-fn demo_mod_shr<T: ModShr<U, Output = T> + PrimitiveUnsigned, U: PrimitiveSigned>(
+fn demo_mod_shr<
+    T: ModShr<S, Output = T> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
 ) {
-    for (x, u, m) in unsigned_signed_unsigned_triple_gen_var_2::<T, U>()
+    for (x, u, m) in unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>()
         .get(gm, &config)
         .take(limit)
     {
@@ -28,12 +33,16 @@ fn demo_mod_shr<T: ModShr<U, Output = T> + PrimitiveUnsigned, U: PrimitiveSigned
     }
 }
 
-fn demo_mod_shr_assign<T: ModShrAssign<U> + PrimitiveUnsigned, U: PrimitiveSigned>(
+fn demo_mod_shr_assign<
+    T: ModShrAssign<S> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
 ) {
-    for (mut x, u, m) in unsigned_signed_unsigned_triple_gen_var_2::<T, U>()
+    for (mut x, u, m) in unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>()
         .get(gm, &config)
         .take(limit)
     {
@@ -43,16 +52,20 @@ fn demo_mod_shr_assign<T: ModShrAssign<U> + PrimitiveUnsigned, U: PrimitiveSigne
     }
 }
 
-fn benchmark_mod_shr<T: ModShr<U, Output = T> + PrimitiveUnsigned, U: PrimitiveSigned>(
+fn benchmark_mod_shr<
+    T: ModShr<S, Output = T> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.mod_shr({}, {})", T::NAME, U::NAME, T::NAME),
+        &format!("{}.mod_shr({}, {})", T::NAME, S::NAME, T::NAME),
         BenchmarkType::Single,
-        unsigned_signed_unsigned_triple_gen_var_2::<T, U>().get(gm, &config),
+        unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>().get(gm, &config),
         gm.name(),
         limit,
         file_name,
@@ -61,16 +74,20 @@ fn benchmark_mod_shr<T: ModShr<U, Output = T> + PrimitiveUnsigned, U: PrimitiveS
     );
 }
 
-fn benchmark_mod_shr_assign<T: ModShrAssign<U> + PrimitiveUnsigned, U: PrimitiveSigned>(
+fn benchmark_mod_shr_assign<
+    T: ModShrAssign<S> + PrimitiveUnsigned,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
+>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.mod_shr_assign({}, u64)", T::NAME, U::NAME),
+        &format!("{}.mod_shr_assign({}, u64)", T::NAME, S::NAME),
         BenchmarkType::Single,
-        unsigned_signed_unsigned_triple_gen_var_2::<T, U>().get(gm, &config),
+        unsigned_signed_unsigned_triple_gen_var_2::<T, U, S>().get(gm, &config),
         gm.name(),
         limit,
         file_name,

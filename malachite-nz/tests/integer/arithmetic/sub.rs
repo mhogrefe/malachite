@@ -109,7 +109,7 @@ fn sub_properties() {
         assert_eq!(x - Integer::ZERO, *x);
         assert_eq!(Integer::ZERO - x, -x);
         assert_eq!(x - -x, x << 1);
-        assert_eq!(x - x, 0)
+        assert_eq!(x - x, 0);
     });
 
     natural_pair_gen().test_properties(|(x, y)| {

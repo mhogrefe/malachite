@@ -10,7 +10,7 @@ use malachite_nz::natural::arithmetic::mod_power_of_2_mul::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz_test_util::generators::{
-    natural_natural_unsigned_triple_gen_var_4, unsigned_vec_unsigned_unsigned_triple_gen_var_20,
+    natural_natural_unsigned_triple_gen_var_4, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20,
 };
 
 pub(crate) fn register(runner: &mut Runner) {
@@ -40,7 +40,7 @@ pub(crate) fn register(runner: &mut Runner) {
 }
 
 fn demo_limbs_mod_power_of_2_mul(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, mut ys, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_20()
+    for (mut xs, mut ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20()
         .get(gm, &config)
         .take(limit)
     {
@@ -57,7 +57,7 @@ fn demo_limbs_mod_power_of_2_mul(gm: GenMode, config: GenConfig, limit: usize) {
 }
 
 fn demo_limbs_mod_power_of_2_mul_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (mut xs, ys, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_20()
+    for (mut xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20()
         .get(gm, &config)
         .take(limit)
     {
@@ -73,7 +73,7 @@ fn demo_limbs_mod_power_of_2_mul_val_ref(gm: GenMode, config: GenConfig, limit: 
 }
 
 fn demo_limbs_mod_power_of_2_mul_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
-    for (xs, ys, pow) in unsigned_vec_unsigned_unsigned_triple_gen_var_20()
+    for (xs, ys, pow) in unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20()
         .get(gm, &config)
         .take(limit)
     {
@@ -189,7 +189,7 @@ fn benchmark_limbs_mod_power_of_2_mul_evaluation_strategy(
     run_benchmark(
         "limbs_mod_power_of_2_mul(&[Limb], &[Limb], u64)",
         BenchmarkType::EvaluationStrategy,
-        unsigned_vec_unsigned_unsigned_triple_gen_var_20().get(gm, &config),
+        unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20().get(gm, &config),
         gm.name(),
         limit,
         file_name,

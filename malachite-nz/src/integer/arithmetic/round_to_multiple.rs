@@ -369,7 +369,7 @@ impl<'a, 'b> RoundToMultiple<&'b Integer> for &'a Integer {
 
 impl RoundToMultipleAssign<Integer> for Integer {
     /// Rounds an `Integer` to a multiple of another `Integer` in place according to a specified
-    /// rounding mode, taking the `Integer` on the RHS by value.
+    /// rounding mode, taking the `Integer` on the right-hand side by value.
     ///
     /// The following two expressions are equivalent:
     ///
@@ -470,7 +470,7 @@ impl RoundToMultipleAssign<Integer> for Integer {
 
 impl<'a> RoundToMultipleAssign<&'a Integer> for Integer {
     /// Rounds an `Integer` to a multiple of another `Integer` in place according to a specified
-    /// rounding mode, taking the `Integer` on the RHS by reference.
+    /// rounding mode, taking the `Integer` on the right-hand side by reference.
     ///
     /// The following two expressions are equivalent:
     ///

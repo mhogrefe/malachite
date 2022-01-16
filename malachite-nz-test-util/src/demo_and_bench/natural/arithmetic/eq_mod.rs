@@ -1,6 +1,3 @@
-use crate::bench::bucketers::{
-    pair_2_triple_1_2_natural_max_bit_bucketer, triple_1_2_natural_max_bit_bucketer,
-};
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, UnsignedAbs};
 use malachite_base_test_util::bench::bucketers::{
     triple_1_2_vec_max_len_bucketer, triple_1_bit_bucketer, triple_1_vec_len_bucketer,
@@ -23,6 +20,9 @@ use malachite_nz::natural::arithmetic::eq_mod::{
     limbs_limb_mod_exact_odd_limb, limbs_mod_exact_odd_limb,
 };
 use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
+use malachite_nz_test_util::bench::bucketers::{
+    pair_2_triple_1_2_natural_max_bit_bucketer, triple_1_2_natural_max_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{natural_triple_gen, natural_triple_gen_rm};
 use malachite_nz_test_util::natural::arithmetic::eq_mod::{
     combined_limbs_eq_limb_mod_limb, limbs_eq_limb_mod_naive_1, limbs_eq_limb_mod_naive_2,

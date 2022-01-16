@@ -1176,8 +1176,8 @@ impl<'a, 'b> BitOr<&'a Integer> for &'b Integer {
 }
 
 impl BitOrAssign<Integer> for Integer {
-    /// Bitwise-ors an `Integer` with another `Integer` in place, taking the `Integer` on the RHS by
-    /// value.
+    /// Bitwise-ors an `Integer` with another `Integer` in place, taking the `Integer` on the
+    /// right-hand side by value.
     ///
     /// Time: worst case O(m)
     ///
@@ -1215,8 +1215,8 @@ impl BitOrAssign<Integer> for Integer {
 }
 
 impl<'a> BitOrAssign<&'a Integer> for Integer {
-    /// Bitwise-ors an `Integer` with another `Integer` in place, taking the `Integer` on the RHS by
-    /// reference.
+    /// Bitwise-ors an `Integer` with another `Integer` in place, taking the `Integer` on the
+    /// right-hand side by reference.
     ///
     /// Time: worst case O(m)
     ///

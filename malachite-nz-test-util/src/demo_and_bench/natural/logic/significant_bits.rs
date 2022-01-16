@@ -1,4 +1,3 @@
-use crate::bench::bucketers::triple_3_natural_bit_bucketer;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base_test_util::bench::bucketers::vec_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -7,6 +6,7 @@ use malachite_base_test_util::generators::unsigned_vec_gen_var_1;
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::platform::Limb;
+use malachite_nz_test_util::bench::bucketers::triple_3_natural_bit_bucketer;
 use malachite_nz_test_util::generators::{natural_gen, natural_gen_nrm};
 
 pub(crate) fn register(runner: &mut Runner) {

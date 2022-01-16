@@ -1,4 +1,3 @@
-use crate::bench::bucketers::{integer_bit_bucketer, pair_2_integer_bit_bucketer};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -9,6 +8,7 @@ use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::integer::Integer;
+use malachite_nz_test_util::bench::bucketers::{integer_bit_bucketer, pair_2_integer_bit_bucketer};
 use malachite_nz_test_util::generators::{
     integer_gen, integer_gen_rm, integer_gen_var_5, integer_gen_var_6,
 };

@@ -1,12 +1,12 @@
-use crate::bench::bucketers::{
-    pair_2_pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
-};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::{
+    pair_2_pair_1_natural_bit_bucketer, triple_3_pair_1_natural_bit_bucketer,
+};
 use malachite_nz_test_util::generators::{
     natural_signed_pair_gen, natural_signed_pair_gen_rm, natural_unsigned_pair_gen,
     natural_unsigned_pair_gen_nrm, natural_unsigned_pair_gen_rm,

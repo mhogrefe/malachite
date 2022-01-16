@@ -182,7 +182,8 @@ impl Integer {
         &self.abs
     }
 
-    /// Mutates the absolute value of an `Integer` using a provided closure.
+    /// Mutates the absolute value of an `Integer` using a provided closure, and then returns
+    /// whatever the closure returns.
     ///
     /// This function is similar to the `Integer::unsigned_abs_ref()` function, which returns a
     /// reference to the absolute value. A function that returns a _mutable_ reference would be too

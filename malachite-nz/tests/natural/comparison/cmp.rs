@@ -1,19 +1,27 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base_test_util::common::test_cmp_helper;
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_vec_gen, unsigned_vec_gen_var_3,
-    unsigned_vec_pair_gen_var_6, unsigned_vec_pair_gen_var_7, unsigned_vec_triple_gen_var_29,
-    unsigned_vec_triple_gen_var_30,
+    unsigned_vec_pair_gen_var_19, unsigned_vec_pair_gen_var_6, unsigned_vec_pair_gen_var_7,
+    unsigned_vec_triple_gen_var_29, unsigned_vec_triple_gen_var_30,
 };
-use malachite_nz::natural::comparison::cmp::{limbs_cmp, limbs_cmp_same_length};
+use malachite_nz::natural::comparison::cmp::{
+    limbs_cmp, limbs_cmp_normalized, limbs_cmp_same_length,
+};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
+use malachite_nz_test_util::generators::{
+    natural_gen, natural_gen_var_2, natural_pair_gen, natural_pair_gen_var_9, natural_triple_gen,
+    natural_triple_gen_var_6,
+};
+use malachite_nz_test_util::natural::comparison::cmp::natural_cmp_normalized_naive;
 use num::BigUint;
 use rug;
 use std::cmp::Ordering;
+use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]
 #[test]
@@ -46,12 +54,80 @@ fn test_limbs_cmp() {
     test(&[1, 2, 3], &[1, 2, 3], Ordering::Equal);
 }
 
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+fn test_limbs_cmp_normalized() {
+    let test = |xs: &[Limb], ys: &[Limb], out| {
+        assert_eq!(limbs_cmp_normalized(xs, ys), out);
+    };
+    test(&[5], &[6], Ordering::Less);
+    test(&[1], &[8], Ordering::Equal);
+    test(&[0, 0, 1], &[8], Ordering::Equal);
+    test(&[17], &[3], Ordering::Less);
+    test(&[1, 1, 1], &[1, 1], Ordering::Greater);
+    test(&[1, 0, 1], &[1, 1], Ordering::Less);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_cmp_normalized_fail_1() {
+    limbs_cmp_normalized(&[], &[1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_cmp_normalized_fail_2() {
+    limbs_cmp_normalized(&[1, 2, 3], &[]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_cmp_normalized_fail_3() {
+    limbs_cmp_normalized(&[1, 0], &[1, 2, 3]);
+}
+
+#[cfg(feature = "32_bit_limbs")]
+#[test]
+#[should_panic]
+fn limbs_cmp_normalized_fail_4() {
+    limbs_cmp_normalized(&[1, 2, 3], &[1, 0]);
+}
+
 #[test]
 fn test_cmp() {
     let strings = vec!["0", "1", "2", "123", "999999999999", "1000000000000", "1000000000001"];
     test_cmp_helper::<Natural>(&strings);
     test_cmp_helper::<BigUint>(&strings);
     test_cmp_helper::<rug::Integer>(&strings);
+}
+
+#[test]
+fn test_cmp_normalized() {
+    let test = |x, y, out| {
+        let x = Natural::from_str(x).unwrap();
+        let y = Natural::from_str(y).unwrap();
+        assert_eq!(x.cmp_normalized(&y), out);
+        assert_eq!(natural_cmp_normalized_naive(&x, &y), out);
+    };
+    test("1", "4", Ordering::Equal);
+    test("5", "6", Ordering::Less);
+    test("3", "17", Ordering::Greater);
+    test("9", "36", Ordering::Equal);
+}
+
+#[test]
+#[should_panic]
+fn cmp_normalized_fail_1() {
+    Natural::ZERO.cmp_normalized(&Natural::ONE);
+}
+
+#[test]
+#[should_panic]
+fn cmp_normalized_fail_2() {
+    Natural::ONE.cmp_normalized(&Natural::ZERO);
 }
 
 #[test]
@@ -115,6 +191,21 @@ fn limbs_cmp_properties() {
 }
 
 #[test]
+fn limbs_cmp_normalized_properties() {
+    let mut config = GenConfig::new();
+    config.insert("mean_length_n", 32);
+    config.insert("mean_stripe_n", 16 << Limb::LOG_WIDTH);
+    unsigned_vec_pair_gen_var_19().test_properties_with_config(&config, |(xs, ys)| {
+        let cmp = limbs_cmp_normalized(&xs, &ys);
+        assert_eq!(
+            Natural::from_limbs_asc(&xs).cmp_normalized(&Natural::from_limbs_asc(&ys)),
+            cmp
+        );
+        assert_eq!(limbs_cmp_normalized(&ys, &xs).reverse(), cmp);
+    });
+}
+
+#[test]
 fn cmp_properties() {
     natural_pair_gen().test_properties(|(x, y)| {
         let cmp = x.cmp(&y);
@@ -124,11 +215,13 @@ fn cmp_properties() {
             cmp
         );
         assert_eq!(y.cmp(&x).reverse(), cmp);
+        assert_eq!(x == y, x.cmp(&y) == Ordering::Equal);
         assert_eq!((-y).cmp(&(-x)), cmp);
     });
 
     natural_gen().test_properties(|x| {
         assert_eq!(x.cmp(&x), Ordering::Equal);
+        assert!(x >= Natural::ZERO);
     });
 
     natural_triple_gen().test_properties(|(x, y, z)| {
@@ -141,5 +234,28 @@ fn cmp_properties() {
 
     unsigned_pair_gen_var_27::<Limb>().test_properties(|(x, y)| {
         assert_eq!(Natural::from(x).cmp(&Natural::from(y)), x.cmp(&y));
+    });
+}
+
+#[test]
+fn cmp_normalized_properties() {
+    natural_pair_gen_var_9().test_properties(|(x, y)| {
+        let cmp = x.cmp_normalized(&y);
+        assert_eq!(natural_cmp_normalized_naive(&x, &y), cmp);
+        assert_eq!(y.cmp_normalized(&x).reverse(), cmp);
+    });
+
+    natural_gen_var_2().test_properties(|x| {
+        assert_eq!(x.cmp_normalized(&x), Ordering::Equal);
+    });
+
+    natural_triple_gen_var_6().test_properties(|(x, y, z)| {
+        if x.cmp_normalized(&y) == Ordering::Less && y.cmp_normalized(&z) == Ordering::Less {
+            assert_eq!(x.cmp_normalized(&z), Ordering::Less);
+        } else if x.cmp_normalized(&y) == Ordering::Greater
+            && y.cmp_normalized(&z) == Ordering::Greater
+        {
+            assert_eq!(x.cmp_normalized(&z), Ordering::Greater);
+        }
     });
 }

@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_2_natural_bit_bucketer;
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base_test_util::bench::bucketers::vec_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
@@ -6,6 +5,7 @@ use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::generators::unsigned_vec_gen_var_1;
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
+use malachite_nz_test_util::bench::bucketers::pair_2_natural_bit_bucketer;
 use malachite_nz_test_util::generators::{natural_gen, natural_gen_rm};
 
 pub(crate) fn register(runner: &mut Runner) {

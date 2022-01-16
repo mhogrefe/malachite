@@ -1,4 +1,3 @@
-use crate::bench::bucketers::pair_1_vec_len_times_pair_2_bucketer;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_base_test_util::bench::bucketers::pair_1_vec_len_bucketer;
@@ -9,6 +8,7 @@ use malachite_base_test_util::generators::{
 };
 use malachite_base_test_util::runner::Runner;
 use malachite_nz::natural::Natural;
+use malachite_nz_test_util::bench::bucketers::pair_1_vec_len_times_pair_2_bucketer;
 use malachite_nz_test_util::generators::{
     natural_vec_unsigned_pair_gen_var_1, natural_vec_unsigned_pair_gen_var_2,
 };

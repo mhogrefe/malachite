@@ -1,10 +1,10 @@
-use crate::bench::bucketers::natural_bit_bucketer;
 use itertools::Itertools;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
 use malachite_base_test_util::runner::Runner;
+use malachite_nz_test_util::bench::bucketers::natural_bit_bucketer;
 use malachite_nz_test_util::generators::natural_gen;
 use malachite_nz_test_util::natural::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
 

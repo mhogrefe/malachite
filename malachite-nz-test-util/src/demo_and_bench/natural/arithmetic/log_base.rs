@@ -1,9 +1,9 @@
-use crate::bench::bucketers::{natural_bit_bucketer, natural_bit_ratio_bucketer};
 use malachite_base::num::arithmetic::traits::{CeilingLogBase, CheckedLogBase, FloorLogBase};
 use malachite_base::num::float::NiceFloat;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
 use malachite_base_test_util::runner::Runner;
+use malachite_nz_test_util::bench::bucketers::{natural_bit_bucketer, natural_bit_ratio_bucketer};
 use malachite_nz_test_util::generators::{natural_gen_var_2, natural_pair_gen_var_3};
 use malachite_nz_test_util::natural::arithmetic::log_base::{
     ceiling_log_base_by_squaring, ceiling_log_base_naive, checked_log_base_by_squaring,

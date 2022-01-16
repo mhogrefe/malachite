@@ -3,6 +3,8 @@ use num::arithmetic::traits::{Ceiling, CeilingAssign};
 macro_rules! impl_ceiling {
     ($f:ident) => {
         impl Ceiling for $f {
+            type Output = $f;
+
             #[inline]
             fn ceiling(self) -> $f {
                 $f::ceil(self)

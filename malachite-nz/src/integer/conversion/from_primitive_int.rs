@@ -7,9 +7,8 @@ macro_rules! impl_from_unsigned {
             /// Converts a value to an `Integer`, where the value is of a primitive unsigned integer
             /// type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -35,9 +34,8 @@ macro_rules! impl_from_signed {
             /// Converts a value to an `Integer`, where the value is of a primitive signed integer
             /// type.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```

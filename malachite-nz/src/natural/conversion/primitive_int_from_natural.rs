@@ -12,9 +12,8 @@ macro_rules! impl_from_limb {
             /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference and returning
             /// `None` if the `Natural` is too large.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -39,9 +38,8 @@ macro_rules! impl_from_limb {
             /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference and wrapping mod
             /// 2<sup>`Limb::WIDTH`</sup>.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -66,9 +64,8 @@ macro_rules! impl_from_limb {
             /// Converts a `Natural` to a `Limb`, taking the `Natural` by reference. If the
             /// `Natural` is too large to fit in a `Limb`, `Limb::MAX` is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -94,9 +91,8 @@ macro_rules! impl_from_limb {
             /// 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether wrapping
             /// occurred.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -124,9 +120,8 @@ macro_rules! impl_from_limb {
             /// Determines whether a `Natural` can be converted to a `Limb`. Takes the `Natural` by
             /// reference.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -151,9 +146,8 @@ macro_rules! impl_from_limb {
             /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by reference and
             /// returning `None` if the `Natural` is too large.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -178,9 +172,8 @@ macro_rules! impl_from_limb {
             /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by reference and
             /// wrapping mod 2<sup>`Limb::WIDTH`</sup>.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -203,9 +196,8 @@ macro_rules! impl_from_limb {
             /// Converts a `Natural` to a `SignedLimb`, taking the `Natural` by reference. If the
             /// `Natural` is too large to fit in a `SignedLimb`, `SignedLimb::MAX` is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -229,9 +221,8 @@ macro_rules! impl_from_limb {
             /// wrapping mod 2<sup>`Limb::WIDTH`</sup>. The returned boolean value indicates whether
             /// wrapping occurred.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -258,9 +249,8 @@ macro_rules! impl_from_limb {
             /// Determines whether a `Natural` can be converted to a `SignedLimb`. Takes the
             /// `Natural` by reference.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -290,9 +280,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// than a `Limb`, taking the `Natural` by reference and returning `None` if the
             /// `Natural` is too large.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -316,9 +305,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// than a `Limb`, taking the `Natural` by reference and wrapping mod
             /// 2<sup>`$u::WIDTH`</sup>.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -342,9 +330,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// than a `Limb`, taking the `Natural` by reference. If the `Natural` is too large to
             /// fit in `$u`, `$u::MAX` is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -369,9 +356,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// 2<sup>`$u::WIDTH`</sup>. The returned boolean value indicates whether wrapping
             /// occurred.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -396,9 +382,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// Determines whether a `Natural` can be converted to a value of a primitive unsigned
             /// integer type that's smaller than a `Limb`. Takes the `Natural` by reference.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -424,9 +409,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// than a `Limb`, taking the `Natural` by reference and returning `None` if the
             /// `Natural` is too large.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -450,9 +434,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// than a `Limb`, taking the `Natural` by reference and wrapping mod
             /// 2<sup>`$u::WIDTH`</sup>.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -476,9 +459,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// than a `Limb`, taking the `Natural` by reference. If the `Natural` is too large to
             /// fit in `$u`, `$u::MAX` is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -503,9 +485,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// 2<sup>`$u::WIDTH`</sup>. The returned boolean value indicates whether wrapping
             /// occurred.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -530,9 +511,8 @@ macro_rules! impl_from_smaller_than_limb {
             /// Determines whether a `Natural` can be converted to a value of a primitive signed
             /// integer type that's smaller than a `Limb`. Takes the `Natural` by reference.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -562,9 +542,8 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// that's larger than a `Limb`, taking the `Natural` by reference and wrapping mod
             /// 2<sup>`$u::WIDTH`</sup>.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -591,9 +570,8 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// that's larger than a `Limb`, taking the `Natural` by reference and returning `None`
             /// if the `Natural` is too large.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -618,9 +596,8 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// that's larger than a `Limb`, taking the `Natural` by reference and wrapping mod
             /// 2<sup>`$u::WIDTH`</sup>.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -645,9 +622,8 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// that's larger than a `Limb`, taking the `Natural` by reference. If the `Natural` is
             /// too large to fit in `$s`, `$s::MAX` is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -676,9 +652,8 @@ macro_rules! impl_from_larger_than_limb_or_xsize {
             /// 2<sup>`$u::WIDTH`</sup>. The returned boolean value indicates whether wrapping
             /// occurred.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -710,9 +685,8 @@ macro_rules! impl_from_larger_than_limb {
             /// than a `Limb`, taking the `Natural` by reference and returning `None` if the
             /// `Natural` is too large.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -743,9 +717,8 @@ macro_rules! impl_from_larger_than_limb {
             /// than a `Limb`, taking the `Natural` by reference. If the `Natural` is too large to
             /// fit in `$u`, `$u::MAX` is returned.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -780,9 +753,8 @@ macro_rules! impl_from_larger_than_limb {
             /// 2<sup>`$u::WIDTH`</sup>. The returned boolean value indicates whether wrapping
             /// occurred.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -811,9 +783,8 @@ macro_rules! impl_from_larger_than_limb {
             /// Determines whether a `Natural` can be converted to a value of a primitive unsigned
             /// integer type that's larger than a `Limb`. Takes the `Natural` by reference.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -840,9 +811,8 @@ macro_rules! impl_from_larger_than_limb {
             /// Determines whether a `Natural` can be converted to a value of a primitive signed
             /// integer type that's larger than a `Limb`. Takes the `Natural` by reference.
             ///
-            /// Time: worst case O(1)
-            ///
-            /// Additional memory: worst case O(1)
+            /// # Worst-case complexity
+            /// Constant time and additional memory.
             ///
             /// # Examples
             /// ```
@@ -874,9 +844,8 @@ impl<'a> CheckedFrom<&'a Natural> for usize {
     /// Converts a `Natural` to a `usize`, taking the `Natural` by reference and returning `None` if
     /// the `Natural` is too large.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn checked_from(value: &Natural) -> Option<usize> {
         if usize::WIDTH == u32::WIDTH {
             u32::checked_from(value).map(usize::wrapping_from)
@@ -891,9 +860,8 @@ impl<'a> SaturatingFrom<&'a Natural> for usize {
     /// Converts a `Natural` to a `usize`, taking the `Natural` by reference. If the `Natural` is
     /// too large to fit in a `usize`, `usize::MAX` is returned.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn saturating_from(value: &Natural) -> usize {
         if usize::WIDTH == u32::WIDTH {
             usize::wrapping_from(u32::saturating_from(value))
@@ -908,9 +876,8 @@ impl<'a> OverflowingFrom<&'a Natural> for usize {
     /// Converts a `Natural` to a `usize`, taking the `Natural` by reference and wrapping mod
     /// 2<sup>`usize::WIDTH`</sup>. The returned boolean value indicates whether wrapping occurred.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn overflowing_from(value: &Natural) -> (usize, bool) {
         if usize::WIDTH == u32::WIDTH {
             let (result, overflow) = u32::overflowing_from(value);
@@ -927,9 +894,8 @@ impl<'a> ConvertibleFrom<&'a Natural> for usize {
     /// Determines whether a `Natural` can be converted to a `usize`. Takes the `Natural` by
     /// reference.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn convertible_from(value: &Natural) -> bool {
         if usize::WIDTH == u32::WIDTH {
             u32::convertible_from(value)
@@ -944,9 +910,8 @@ impl<'a> ConvertibleFrom<&'a Natural> for isize {
     /// Determines whether a `Natural` can be converted to an `isize`. Takes the `Natural` by
     /// reference.
     ///
-    /// Time: worst case O(1)
-    ///
-    /// Additional memory: worst case O(1)
+    /// # Worst-case complexity
+    /// Constant time and additional memory.
     fn convertible_from(value: &Natural) -> bool {
         if usize::WIDTH == u32::WIDTH {
             i32::convertible_from(value)

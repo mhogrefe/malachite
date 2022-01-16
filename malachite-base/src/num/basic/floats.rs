@@ -88,7 +88,7 @@ pub trait PrimitiveFloat:
     + AddAssign<Self>
     + AddMul<Output = Self>
     + AddMulAssign<Self, Self>
-    + Ceiling
+    + Ceiling<Output = Self>
     + CeilingAssign
     + CeilingLogBase2<Output = i64>
     + CeilingLogBasePowerOf2<Output = i64>
@@ -137,7 +137,7 @@ pub trait PrimitiveFloat:
     + Div<Output = Self>
     + DivAssign
     + Display
-    + Floor
+    + Floor<Output = Self>
     + FloorAssign
     + FloorLogBase2<Output = i64>
     + FloorLogBasePowerOf2<Output = i64>

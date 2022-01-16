@@ -24,6 +24,7 @@ use std::ops::{BitAnd, BitAndAssign};
 /// assert_eq!(limbs_and_limb(&[6, 7], 2), 2);
 /// assert_eq!(limbs_and_limb(&[100, 101, 102], 10), 0);
 /// ```
+#[doc(hidden)]
 pub const fn limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
     xs[0] & y
 }
@@ -48,6 +49,7 @@ pub const fn limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
 /// assert_eq!(limbs_and(&[6, 7], &[1, 2, 3]), &[0, 2]);
 /// assert_eq!(limbs_and(&[100, 101, 102], &[102, 101, 100]), &[100, 101, 100]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x & y).collect()
 }
@@ -79,6 +81,7 @@ pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// limbs_and_same_length_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(out, &[100, 101, 100, 10]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -115,6 +118,7 @@ pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// limbs_and_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
 /// assert_eq!(out, &[100, 101, 100, 10]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -155,6 +159,7 @@ pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// limbs_slice_and_same_length_in_place_left(&mut xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[100, 101, 100]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
@@ -193,6 +198,7 @@ pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// assert_eq!(limbs_slice_and_in_place_left(&mut xs, &[102, 101, 100]), None);
 /// assert_eq!(xs, &[100, 101, 100]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usize> {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -243,6 +249,7 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usi
 /// limbs_vec_and_in_place_left(&mut xs, &[102, 101, 100]);
 /// assert_eq!(xs, &[100, 101, 100]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if let Some(truncate_size) = limbs_slice_and_in_place_left(xs, ys) {
         xs.truncate(truncate_size);
@@ -285,6 +292,7 @@ pub fn limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// assert_eq!(xs, &[100, 101, 100]);
 /// assert_eq!(ys, &[102, 101, 100]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -444,8 +452,8 @@ impl<'a, 'b> BitAnd<&'a Natural> for &'b Natural {
     }
 }
 
-/// Bitwise-ands a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
-/// value.
+/// Bitwise-ands a `Natural` with another `Natural` in place, taking the `Natural` on the
+/// right-hand side by value.
 ///
 /// Time: worst case O(n)
 ///
@@ -479,8 +487,8 @@ impl BitAndAssign<Natural> for Natural {
     }
 }
 
-/// Bitwise-ands a `Natural` with another `Natural` in place, taking the `Natural` on the RHS by
-/// reference.
+/// Bitwise-ands a `Natural` with another `Natural` in place, taking the `Natural` on the
+/// right-hand side by reference.
 ///
 /// Time: worst case O(n)
 ///

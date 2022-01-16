@@ -25,6 +25,7 @@ use platform::Limb;
 /// assert_eq!(limbs_get_bit(&[0, 0b1011], 35), true);
 /// assert_eq!(limbs_get_bit(&[0, 0b1011], 100), false);
 /// ```
+#[doc(hidden)]
 pub fn limbs_get_bit(xs: &[Limb], index: u64) -> bool {
     xs.get(usize::exact_from(index >> Limb::LOG_WIDTH))
         .map_or(false, |x| x.get_bit(index & Limb::WIDTH_MASK))
@@ -60,6 +61,7 @@ fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
 ///
 /// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative and bit_idx small
 /// enough that no additional memory needs to be given to d.
+#[doc(hidden)]
 pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
     limbs_set_bit_helper(xs, index, usize::exact_from(index >> Limb::LOG_WIDTH));
 }
@@ -88,6 +90,7 @@ pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
 /// ```
 ///
 /// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative.
+#[doc(hidden)]
 pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
     let small_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if small_index >= xs.len() {
@@ -116,6 +119,7 @@ pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
 /// limbs_clear_bit(xs, 1);
 /// assert_eq!(xs, &[1, 1]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_clear_bit(xs: &mut [Limb], index: u64) {
     let small_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if small_index < xs.len() {

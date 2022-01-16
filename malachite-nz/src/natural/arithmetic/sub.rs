@@ -24,6 +24,7 @@ use std::ops::{Sub, SubAssign};
 /// ```
 ///
 /// This is mpn_sub_1 from gmp.h, GMP 6.2.1, where the result is returned.
+#[doc(hidden)]
 pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
     let len = xs.len();
     let mut out = Vec::with_capacity(len);
@@ -73,6 +74,7 @@ pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 /// ```
 ///
 /// This is mpn_sub_1 from gmp.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
@@ -117,6 +119,7 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 /// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
+#[doc(hidden)]
 pub fn limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
     for x in xs.iter_mut() {
         if x.overflowing_sub_assign(y) {
@@ -161,6 +164,7 @@ fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
 /// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is returned.
+#[doc(hidden)]
 pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -208,6 +212,7 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 /// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
@@ -248,6 +253,7 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.2.1.
+#[doc(hidden)]
 pub fn limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -292,6 +298,7 @@ pub fn limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
+#[doc(hidden)]
 pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = false;
@@ -330,6 +337,7 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 /// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is written to the first input.
+#[doc(hidden)]
 pub fn limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -372,6 +380,7 @@ pub fn limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
 /// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input.
+#[doc(hidden)]
 pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = false;
@@ -410,6 +419,7 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input (which
 /// has `len` limbs) and the second input has enough space past `len` to accomodate the output.
+#[doc(hidden)]
 pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
@@ -453,6 +463,7 @@ pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) 
 /// assert_eq!(limbs_vec_sub_in_place_right(&[123, 456], &mut ys), true);
 /// assert_eq!(ys, &[4294966963, 4294966962]);
 /// ```
+#[doc(hidden)]
 pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -501,6 +512,7 @@ pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input, and the
 /// two inputs are possibly-overlapping subslices of a single slice.
+#[doc(hidden)]
 pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start: usize) -> bool {
     let len = xs.len() - right_start;
     let mut borrow = false;
@@ -536,6 +548,7 @@ pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start:
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is a prefix of a slice and the left
 /// operand of the subtraction is a suffix of the same slice, and the prefix and suffix may overlap.
+#[doc(hidden)]
 pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
@@ -563,6 +576,7 @@ pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -
 /// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp, up, and vp are disjoint.
+#[doc(hidden)]
 pub fn limbs_sub_same_length_with_borrow_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
@@ -591,6 +605,7 @@ pub fn limbs_sub_same_length_with_borrow_in_to_out(
 /// Panics if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
+#[doc(hidden)]
 pub fn limbs_sub_same_length_with_borrow_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
@@ -618,6 +633,7 @@ pub fn limbs_sub_same_length_with_borrow_in_in_place_left(
 /// Panics if `xs` and `ys` have different lengths.
 ///
 /// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as vp.
+#[doc(hidden)]
 pub fn limbs_sub_same_length_with_borrow_in_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
@@ -782,7 +798,8 @@ impl<'a, 'b> Sub<&'a Natural> for &'b Natural {
 }
 
 impl SubAssign<Natural> for Natural {
-    /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by value.
+    /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the right-hand
+    /// side by value.
     ///
     /// Time: worst case O(n)
     ///
@@ -812,8 +829,8 @@ impl SubAssign<Natural> for Natural {
 }
 
 impl<'a> SubAssign<&'a Natural> for Natural {
-    /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the RHS by
-    /// reference.
+    /// Subtracts a `Natural` from a `Natural` in place, taking the `Natural` on the right-hand
+    /// side by reference.
     ///
     /// Time: worst case O(n)
     ///

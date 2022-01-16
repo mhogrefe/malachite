@@ -407,7 +407,8 @@ impl<'a, 'b> ModPowerOf2Mul<&'b Natural> for &'a Natural {
 
 impl ModPowerOf2MulAssign<Natural> for Natural {
     /// Multiplies a `Natural` by a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural`
-    /// on the RHS by value. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// on the right-hand side by value. Assumes the inputs are already reduced mod
+    /// 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(n)
     ///
@@ -448,7 +449,8 @@ impl ModPowerOf2MulAssign<Natural> for Natural {
 
 impl<'a> ModPowerOf2MulAssign<&'a Natural> for Natural {
     /// Multiplies a `Natural` by a `Natural` mod 2<sup>`pow`</sup> in place, taking the `Natural`
-    /// on the RHS by reference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+    /// on the right-hand side by reference. Assumes the inputs are already reduced mod
+    /// 2<sup>`pow`</sup>.
     ///
     /// Time: worst case O(n)
     ///
