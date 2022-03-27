@@ -1,12 +1,11 @@
-use comparison::traits::Min;
 use num::arithmetic::traits::{ArithmeticCheckedShl, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{CheckedFrom, WrappingFrom};
-use std::ops::{Neg, Shl, Shr};
+use std::ops::{Shl, Shr};
 
 fn arithmetic_checked_shl_unsigned_unsigned<
-    T: PrimitiveInt + Shl<U, Output = T> + Shr<U, Output = T>,
+    T: PrimitiveUnsigned + Shl<U, Output = T> + Shr<U, Output = T>,
     U: Copy + Ord + WrappingFrom<u64>,
 >(
     x: T,
@@ -65,9 +64,9 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_unsigned {
 apply_to_unsigneds!(impl_arithmetic_checked_shl_unsigned_unsigned);
 
 fn arithmetic_checked_shl_unsigned_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
-    U: Ord + WrappingFrom<u64>,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveUnsigned + Shr<U, Output = T>,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     bits: S,
@@ -126,8 +125,8 @@ macro_rules! impl_arithmetic_checked_shl_unsigned_signed {
 apply_to_unsigneds!(impl_arithmetic_checked_shl_unsigned_signed);
 
 fn arithmetic_checked_shl_signed_unsigned<
-    U: ArithmeticCheckedShl<B, Output = U> + Eq,
-    S: CheckedFrom<U> + Copy + Min + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + Zero,
+    U: ArithmeticCheckedShl<B, Output = U> + PrimitiveUnsigned,
+    S: CheckedFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
     B,
 >(
     x: S,
@@ -187,9 +186,9 @@ macro_rules! impl_arithmetic_checked_shl_signed_unsigned {
 apply_to_signeds!(impl_arithmetic_checked_shl_signed_unsigned);
 
 fn arithmetic_checked_shl_signed_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + Neg<Output = T> + PrimitiveInt + Shr<U, Output = T>,
-    U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveSigned + Shr<U, Output = T>,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     bits: S,

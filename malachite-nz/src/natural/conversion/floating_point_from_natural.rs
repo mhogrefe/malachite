@@ -1,7 +1,9 @@
 use malachite_base::named::Named;
+use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ConvertibleFrom, ExactFrom, RoundingFrom, SciMantissaAndExponent,
+    CheckedFrom, ConvertibleFrom, ExactFrom, RawMantissaAndExponent, RoundingFrom,
+    SciMantissaAndExponent, WrappingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
 use natural::Natural;
@@ -205,8 +207,26 @@ macro_rules! float_impls {
             /// );
             /// ```
             fn convertible_from(value: &'a Natural) -> bool {
-                //TODO
-                $f::checked_from(value).is_some()
+                if *value == 0 {
+                    true
+                } else {
+                    if let Some((mantissa, exponent)) =
+                        value.sci_mantissa_and_exponent_with_rounding::<$f>(RoundingMode::Exact)
+                    {
+                        let exponent = i64::exact_from(exponent);
+                        if exponent < $f::MIN_EXPONENT || exponent > $f::MAX_EXPONENT {
+                            return false;
+                        }
+                        let (orig_mantissa, orig_exponent) = mantissa.raw_mantissa_and_exponent();
+                        orig_exponent == u64::wrapping_from($f::MAX_EXPONENT)
+                            && exponent >= $f::MIN_NORMAL_EXPONENT
+                            || orig_mantissa.divisible_by_power_of_2(u64::wrapping_from(
+                                $f::MIN_NORMAL_EXPONENT - exponent,
+                            ))
+                    } else {
+                        false
+                    }
+                }
             }
         }
     };

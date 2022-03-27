@@ -22,33 +22,6 @@ use std::cmp::Ordering;
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::rounding_modes::RoundingMode;
-/// use malachite_nz::natural::arithmetic::div_round::limbs_limb_div_round_limbs;
-/// use malachite_nz::natural::Natural;
-///
-/// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Down), Some(0));
-/// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Floor), Some(0));
-/// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Up), Some(1));
-/// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Ceiling), Some(1));
-/// assert_eq!(limbs_limb_div_round_limbs(0, &[123, 456], RoundingMode::Exact), Some(0));
-/// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Exact), None);
-/// assert_eq!(limbs_limb_div_round_limbs(789, &[123, 456], RoundingMode::Nearest), Some(0));
-/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[123, 1], RoundingMode::Nearest), Some(1));
-/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[u32::MAX, 1],
-///     RoundingMode::Nearest), Some(0));
-///
-/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[u32::MAX - 1, 1],
-///     RoundingMode::Nearest), Some(0));
-///
-/// assert_eq!(limbs_limb_div_round_limbs(u32::MAX, &[0xfffffffd, 1],
-///     RoundingMode::Nearest), Some(1));
-/// ```
 #[doc(hidden)]
 pub fn limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) -> Option<Limb> {
     if n == 0 {

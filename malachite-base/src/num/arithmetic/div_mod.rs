@@ -1,40 +1,23 @@
 use num::arithmetic::traits::{
-    CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, CheckedDiv,
-    DivAssignMod, DivAssignRem, DivMod, DivRem, UnsignedAbs, WrappingNeg,
+    CeilingDivAssignMod, CeilingDivAssignNegMod, CeilingDivMod, CeilingDivNegMod, DivAssignMod,
+    DivAssignRem, DivMod, DivRem, UnsignedAbs,
 };
-use num::basic::traits::{One, Zero};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, Neg, Sub};
 
-fn div_mod_unsigned<T: Copy + Div<T, Output = T> + Mul<T, Output = T> + Sub<T, Output = T>>(
-    x: T,
-    other: T,
-) -> (T, T) {
+fn div_mod_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> (T, T) {
     let q = x / other;
     (q, x - q * other)
 }
 
-fn div_assign_mod_unsigned<T: Copy + DivAssign<T> + Mul<T, Output = T> + Sub<T, Output = T>>(
-    x: &mut T,
-    other: T,
-) -> T {
+fn div_assign_mod_unsigned<T: PrimitiveUnsigned>(x: &mut T, other: T) -> T {
     let original = *x;
     *x /= other;
     original - *x * other
 }
 
-fn ceiling_div_neg_mod_unsigned<
-    T: Add<T, Output = T>
-        + Copy
-        + DivMod<T, DivOutput = T, ModOutput = T>
-        + Eq
-        + One
-        + Sub<T, Output = T>
-        + Zero,
->(
-    x: T,
-    other: T,
-) -> (T, T) {
+fn ceiling_div_neg_mod_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> (T, T) {
     let (quotient, remainder) = x.div_mod(other);
     if remainder == T::ZERO {
         (quotient, T::ZERO)
@@ -44,12 +27,7 @@ fn ceiling_div_neg_mod_unsigned<
     }
 }
 
-fn ceiling_div_assign_neg_mod_unsigned<
-    T: AddAssign<T> + Copy + DivAssignMod<T, ModOutput = T> + Eq + One + Sub<T, Output = T> + Zero,
->(
-    x: &mut T,
-    other: T,
-) -> T {
+fn ceiling_div_assign_neg_mod_unsigned<T: PrimitiveUnsigned>(x: &mut T, other: T) -> T {
     let remainder = x.div_assign_mod(other);
     if remainder == T::ZERO {
         T::ZERO
@@ -241,15 +219,8 @@ macro_rules! impl_div_mod_unsigned {
 apply_to_unsigneds!(impl_div_mod_unsigned);
 
 fn div_mod_signed<
-    U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
-    S: Copy
-        + ExactFrom<U>
-        + Neg<Output = S>
-        + Ord
-        + UnsignedAbs<Output = U>
-        + WrappingFrom<U>
-        + WrappingNeg<Output = S>
-        + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + ExactFrom<U> + UnsignedAbs<Output = U> + WrappingFrom<U>,
 >(
     x: S,
     other: S,
@@ -271,35 +242,20 @@ fn div_mod_signed<
     )
 }
 
-fn div_rem_signed<T: CheckedDiv<T, Output = T> + Copy + Mul<T, Output = T> + Sub<T, Output = T>>(
-    x: T,
-    other: T,
-) -> (T, T) {
+fn div_rem_signed<T: PrimitiveSigned>(x: T, other: T) -> (T, T) {
     let q = x.checked_div(other).unwrap();
     (q, x - q * other)
 }
 
-fn div_assign_rem_signed<
-    T: CheckedDiv<T, Output = T> + Copy + Mul<T, Output = T> + Sub<T, Output = T>,
->(
-    x: &mut T,
-    other: T,
-) -> T {
+fn div_assign_rem_signed<T: PrimitiveSigned>(x: &mut T, other: T) -> T {
     let original = *x;
     *x = x.checked_div(other).unwrap();
     original - *x * other
 }
 
 fn ceiling_div_mod_signed<
-    U: CeilingDivNegMod<U, DivOutput = U, ModOutput = U> + DivMod<U, DivOutput = U, ModOutput = U>,
-    T: Copy
-        + ExactFrom<U>
-        + Neg<Output = T>
-        + Ord
-        + UnsignedAbs<Output = U>
-        + WrappingFrom<U>
-        + WrappingNeg<Output = T>
-        + Zero,
+    U: PrimitiveUnsigned,
+    T: PrimitiveSigned + ExactFrom<U> + UnsignedAbs<Output = U> + WrappingFrom<U>,
 >(
     x: T,
     other: T,

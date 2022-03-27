@@ -241,19 +241,19 @@ fn test_limbs_mod_limb_at_least_2_leading_zeros() {
     };
     test(&[0, 0], 2, 0);
     test(&[0], 2, 0);
-    // len === 1 mod 4
+    // len ≡ 1 mod 4
     // len < 4
     test(&[6], 2, 0);
     test(&[6], 4, 2);
-    // len === 2 mod 4
+    // len ≡ 2 mod 4
     test(&[6, 7], 1, 0);
     test(&[6, 7], 2, 0);
-    // len === 3 mod 4
+    // len ≡ 3 mod 4
     test(&[100, 101, 102], 10, 8);
     test(&[123, 456], 789, 636);
     test(&[u32::MAX, u32::MAX], 2, 1);
     test(&[u32::MAX, u32::MAX], 3, 0);
-    // len === 0 mod 4
+    // len ≡ 0 mod 4
     test(&[1, 2, 3, 4], 6, 1);
     // len >= 4
     test(&[1, 2, 3, 4, 5], 6, 3);

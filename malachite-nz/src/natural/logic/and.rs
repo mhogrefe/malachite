@@ -16,14 +16,6 @@ use std::ops::{BitAnd, BitAndAssign};
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::and::limbs_and_limb;
-///
-/// assert_eq!(limbs_and_limb(&[6, 7], 2), 2);
-/// assert_eq!(limbs_and_limb(&[100, 101, 102], 10), 0);
-/// ```
 #[doc(hidden)]
 pub const fn limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
     xs[0] & y
@@ -41,14 +33,6 @@ pub const fn limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
 ///
 /// This is mpz_and from mpz/and.c, GMP 6.1.2, where res is returned and both inputs are non-
 /// negative.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::and::limbs_and;
-///
-/// assert_eq!(limbs_and(&[6, 7], &[1, 2, 3]), &[0, 2]);
-/// assert_eq!(limbs_and(&[100, 101, 102], &[102, 101, 100]), &[100, 101, 100]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x & y).collect()
@@ -68,19 +52,6 @@ pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::and::limbs_and_same_length_to_out;
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_and_same_length_to_out(&mut out, &[6, 7], &[1, 2]);
-/// assert_eq!(out, &[0, 2, 10, 10]);
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_and_same_length_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(out, &[100, 101, 100, 10]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
@@ -105,19 +76,6 @@ pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// # Panics
 /// Panics if `out` is too short.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::and::limbs_and_to_out;
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_and_to_out(&mut out, &[6, 7], &[1, 2, 3]);
-/// assert_eq!(out, &[0, 2, 0, 10]);
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_and_to_out(&mut out, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(out, &[100, 101, 100, 10]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
@@ -146,19 +104,6 @@ pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::and::limbs_slice_and_same_length_in_place_left;
-///
-/// let mut xs = vec![6, 7];
-/// limbs_slice_and_same_length_in_place_left(&mut xs, &[1, 2]);
-/// assert_eq!(xs, &[0, 2]);
-///
-/// let mut xs = vec![100, 101, 102];
-/// limbs_slice_and_same_length_in_place_left(&mut xs, &[102, 101, 100]);
-/// assert_eq!(xs, &[100, 101, 100]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
@@ -181,23 +126,6 @@ pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// where n = min(`xs.len()`, `ys.len()`)
 ///
 /// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::and::limbs_slice_and_in_place_left;
-///
-/// let mut xs = vec![6, 7];
-/// assert_eq!(limbs_slice_and_in_place_left(&mut xs, &[1, 2, 3]), None);
-/// assert_eq!(xs, &[0, 2]);
-///
-/// let mut xs = vec![1, 2, 3];
-/// assert_eq!(limbs_slice_and_in_place_left(&mut xs, &[6, 7]), Some(2));
-/// assert_eq!(xs, &[0, 2, 3]);
-///
-/// let mut xs = vec![100, 101, 102];
-/// assert_eq!(limbs_slice_and_in_place_left(&mut xs, &[102, 101, 100]), None);
-/// assert_eq!(xs, &[100, 101, 100]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usize> {
     let xs_len = xs.len();
@@ -232,23 +160,6 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usi
 /// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative and
 /// have the same length, and res is truncated afterwards to remove the max(0, xs.len() - ys.len())
 /// trailing zero limbs.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::and::limbs_vec_and_in_place_left;
-///
-/// let mut xs = vec![6, 7];
-/// limbs_vec_and_in_place_left(&mut xs, &[1, 2, 3]);
-/// assert_eq!(xs, &[0, 2]);
-///
-/// let mut xs = vec![1, 2, 3];
-/// limbs_vec_and_in_place_left(&mut xs, &[6, 7]);
-/// assert_eq!(xs, &[0, 2]);
-///
-/// let mut xs = vec![100, 101, 102];
-/// limbs_vec_and_in_place_left(&mut xs, &[102, 101, 100]);
-/// assert_eq!(xs, &[100, 101, 100]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if let Some(truncate_size) = limbs_slice_and_in_place_left(xs, ys) {
@@ -269,29 +180,6 @@ pub fn limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative and the result is
 /// written to the shorter input slice.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::and::limbs_and_in_place_either;
-///
-/// let mut xs = vec![6, 7];
-/// let mut ys = vec![1, 2, 3];
-/// assert_eq!(limbs_and_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, &[0, 2]);
-/// assert_eq!(ys, &[1, 2, 3]);
-///
-/// let mut xs = vec![1, 2, 3];
-/// let mut ys = vec![6, 7];
-/// assert_eq!(limbs_and_in_place_either(&mut xs, &mut ys), true);
-/// assert_eq!(xs, &[1, 2, 3]);
-/// assert_eq!(ys, &[0, 2]);
-///
-/// let mut xs = vec![100, 101, 102];
-/// let mut ys = vec![102, 101, 100];
-/// assert_eq!(limbs_and_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, &[100, 101, 100]);
-/// assert_eq!(ys, &[102, 101, 100]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();

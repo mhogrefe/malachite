@@ -47,7 +47,7 @@ use platform::{
     Limb, MUL_FFT_THRESHOLD, MUL_TOOM22_THRESHOLD, MUL_TOOM33_THRESHOLD, MUL_TOOM44_THRESHOLD,
     MUL_TOOM6H_THRESHOLD, MUL_TOOM8H_THRESHOLD,
 };
-use std::cmp::{max, Ordering};
+use std::cmp::Ordering;
 
 //TODO tune
 pub(crate) const MUL_TOOM33_THRESHOLD_LIMIT: usize = MUL_TOOM33_THRESHOLD;
@@ -648,8 +648,8 @@ pub fn limbs_mul_greater_to_out_toom_32(
 ///
 /// This is mpn_toom33_mul_itch from gmp-impl.h, GMP 6.2.1.
 #[doc(hidden)]
-pub fn limbs_mul_greater_to_out_toom_33_scratch_len(xs_len: usize) -> usize {
-    3 * xs_len + usize::wrapping_from(Limb::WIDTH)
+pub const fn limbs_mul_greater_to_out_toom_33_scratch_len(xs_len: usize) -> usize {
+    3 * xs_len + (Limb::WIDTH as usize)
 }
 
 //TODO tune
@@ -1334,8 +1334,8 @@ pub fn limbs_mul_greater_to_out_toom_44_input_sizes_valid(xs_len: usize, ys_len:
 ///
 /// This is mpn_toom44_mul_itch from gmp-impl.h, GMP 6.2.1.
 #[doc(hidden)]
-pub fn limbs_mul_greater_to_out_toom_44_scratch_len(xs_len: usize) -> usize {
-    3 * xs_len + usize::wrapping_from(Limb::WIDTH)
+pub const fn limbs_mul_greater_to_out_toom_44_scratch_len(xs_len: usize) -> usize {
+    3 * xs_len + (Limb::WIDTH as usize)
 }
 
 /// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
@@ -2835,10 +2835,15 @@ fn limbs_mul_to_out_toom_6h_recursive(out: &mut [Limb], xs: &[Limb], ys: &[Limb]
     limbs_mul_greater_to_out(out, xs, ys);
 }
 
-/// TODO make this a constant once possible
+/// TODO use max once that's possible in a const fn
+///
 /// This is MUL_TOOM6H_MIN from gmp-impl.h, GMP 6.2.1.
-fn limbs_mul_toom_6h_min_threshold() -> usize {
-    max(MUL_TOOM6H_THRESHOLD, MUL_TOOM44_THRESHOLD)
+const fn limbs_mul_toom_6h_min_threshold() -> usize {
+    if MUL_TOOM6H_THRESHOLD > MUL_TOOM44_THRESHOLD {
+        MUL_TOOM6H_THRESHOLD
+    } else {
+        MUL_TOOM44_THRESHOLD
+    }
 }
 
 /// Time: worst case O(1)
@@ -2846,14 +2851,12 @@ fn limbs_mul_toom_6h_min_threshold() -> usize {
 /// Additional memory: worst case O(1)
 ///
 /// This is mpn_toom6_mul_n_itch from gmp-impl.h, GMP 6.2.1.
-pub(crate) fn limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usize {
+pub(crate) const fn limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usize {
     let t = limbs_mul_toom_6h_min_threshold() << 1;
-    (n << 1)
-        + max(
-            t + usize::wrapping_from(Limb::WIDTH) * 6,
-            limbs_mul_greater_to_out_toom_44_scratch_len(limbs_mul_toom_6h_min_threshold()),
-        )
-        - t
+    let a = t + (Limb::WIDTH as usize) * 6;
+    let b = limbs_mul_greater_to_out_toom_44_scratch_len(limbs_mul_toom_6h_min_threshold());
+    // TODO use max once possible
+    (n << 1) + if a > b { a } else { b } - t
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in
@@ -2865,7 +2868,7 @@ pub(crate) fn limbs_mul_same_length_to_out_toom_6h_scratch_len(n: usize) -> usiz
 ///
 /// This is mpn_toom6h_mul_itch from gmp-impl.h, GMP 6.2.1.
 #[doc(hidden)]
-pub fn limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+pub const fn limbs_mul_greater_to_out_toom_6h_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     let estimated_n = (xs_len + ys_len) / 10 + 1;
     limbs_mul_same_length_to_out_toom_6h_scratch_len(6 * estimated_n)
 }
@@ -3225,21 +3228,24 @@ fn limbs_mul_to_out_toom_8h_recursive(out: &mut [Limb], xs: &[Limb], ys: &[Limb]
     limbs_mul_greater_to_out(out, xs, ys);
 }
 
-/// TODO make this a constant once possible
 /// This is MUL_TOOM8H_MIN from gmp-impl.h, GMP 6.2.1.
-fn limbs_mul_toom_8h_min_threshold() -> usize {
-    max(MUL_TOOM8H_THRESHOLD, limbs_mul_toom_6h_min_threshold())
+const fn limbs_mul_toom_8h_min_threshold() -> usize {
+    // TODO use max when possible
+    let x = limbs_mul_toom_6h_min_threshold();
+    if MUL_TOOM8H_THRESHOLD > x {
+        MUL_TOOM8H_THRESHOLD
+    } else {
+        x
+    }
 }
 
 // This is mpn_toom8_mul_n_itch from gmp-impl.h, GMP 6.2.1.
 pub(crate) fn limbs_mul_same_length_to_out_toom_8h_scratch_len(n: usize) -> usize {
     let t = (limbs_mul_toom_8h_min_threshold() * 15) >> 3;
-    ((n * 15) >> 3)
-        + max(
-            t + usize::wrapping_from(Limb::WIDTH) * 6,
-            limbs_mul_same_length_to_out_toom_6h_scratch_len(limbs_mul_toom_8h_min_threshold()),
-        )
-        - t
+    // TODO use max when possible
+    let a = t + usize::wrapping_from(Limb::WIDTH) * 6;
+    let b = limbs_mul_same_length_to_out_toom_6h_scratch_len(limbs_mul_toom_8h_min_threshold());
+    ((n * 15) >> 3) + if a > b { a } else { b } - t
 }
 
 /// This function can be used to determine the length of the input `scratch` slice in

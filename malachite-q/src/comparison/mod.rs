@@ -2,8 +2,35 @@ pub mod cmp;
 pub mod cmp_abs;
 pub mod partial_cmp_abs_integer;
 pub mod partial_cmp_abs_natural;
-/// This module provides trait implementations for comparing the absolute value of a `Rational` to
-/// the absolute value of a primitive integer.
+/// Trait implementations for comparing the absolute value of a `Rational` and the absolute value
+/// of a primitive float.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # Rational.partial_cmp_abs(&PrimitiveFloat)
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
+/// use malachite_q::Rational;
+///
+/// assert!(Rational::from_signeds(1, 3).gt_abs(&-0.33f32));
+/// assert!(Rational::from_signeds(1, 3).lt_abs(&-0.34f32));
+/// ```
+///
+/// # PrimitiveFloat.partial_cmp_abs(&Rational)
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
+/// use malachite_q::Rational;
+///
+/// assert!((-0.33f32).lt_abs(&Rational::from_signeds(1, 3)));
+/// assert!((-0.34f32).gt_abs(&Rational::from_signeds(1, 3)));
+/// ```
+pub mod partial_cmp_abs_primitive_float;
+/// Trait implementations for comparing the absolute value of a `Rational` to the absolute value of
+/// a primitive integer.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -51,7 +78,27 @@ pub mod partial_cmp_abs_natural;
 pub mod partial_cmp_abs_primitive_int;
 pub mod partial_cmp_integer;
 pub mod partial_cmp_natural;
-/// This module provides trait implementations for comparing a `Rational` to a primitive integer.
+/// Trait implementations for comparing an `Rational` and a primitive float.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # Rational.partial_cmp(&PrimitiveFloat)
+/// ```
+/// use malachite_q::Rational;
+///
+/// assert!(Rational::from_signeds(1, 3) > 0.33f32);
+/// assert!(Rational::from_signeds(1, 3) < 0.34f32);
+/// ```
+///
+/// # PrimitiveFloat.partial_cmp(&Rational)
+/// ```
+/// use malachite_q::Rational;
+///
+/// assert!(0.33f32 < Rational::from_signeds(1, 3));
+/// assert!(0.34f32 > Rational::from_signeds(1, 3));
+/// ```
+pub mod partial_cmp_primitive_float;
+/// Trait implementations for comparing a `Rational` to a primitive integer.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -89,8 +136,27 @@ pub mod partial_cmp_natural;
 pub mod partial_cmp_primitive_int;
 pub mod partial_eq_integer;
 pub mod partial_eq_natural;
-/// This module provides trait implementations for comparing the equality of a `Rational` and a
-/// primitive integer.
+/// Trait implementations for comparing the equality of a `Rational` and a primitive float.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # Rational == PrimitiveFloat
+/// ```
+/// use malachite_q::Rational;
+///
+/// assert!(Rational::from_signeds(3, 2) == 1.5f32);
+/// assert!(Rational::from_signeds(3, 2) != 1.4f32);
+/// ```
+///
+/// # PrimitiveFloat == Rational
+/// ```
+/// use malachite_q::Rational;
+///
+/// assert!(1.5f32 == Rational::from_signeds(3, 2));
+/// assert!(1.4f32 != Rational::from_signeds(3, 2));
+/// ```
+pub mod partial_eq_primitive_float;
+/// Trait implementations for comparing the equality of a `Rational` and a primitive integer.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///

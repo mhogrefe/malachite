@@ -101,7 +101,7 @@ fn demo_natural_mod_power_of_2_pow(gm: GenMode, config: GenConfig, limit: usize)
         let x_old = x.clone();
         let exp_old = exp.clone();
         println!(
-            "{}.pow({}) === {} mod 2^{}",
+            "{}.pow({}) ≡ {} mod 2^{}",
             x_old,
             exp_old,
             x.mod_power_of_2_pow(exp, pow),
@@ -117,7 +117,7 @@ fn demo_natural_mod_power_of_2_pow_val_ref(gm: GenMode, config: GenConfig, limit
     {
         let x_old = x.clone();
         println!(
-            "{}.pow({}) === {} mod 2^{}",
+            "{}.pow({}) ≡ {} mod 2^{}",
             x_old,
             exp,
             x.mod_power_of_2_pow(&exp, pow),
@@ -133,7 +133,7 @@ fn demo_natural_mod_power_of_2_pow_ref_val(gm: GenMode, config: GenConfig, limit
     {
         let exp_old = exp.clone();
         println!(
-            "{}.pow({}) === {} mod 2^{}",
+            "{}.pow({}) ≡ {} mod 2^{}",
             x,
             exp_old,
             (&x).mod_power_of_2_pow(exp, pow),
@@ -148,7 +148,7 @@ fn demo_natural_mod_power_of_2_pow_ref_ref(gm: GenMode, config: GenConfig, limit
         .take(limit)
     {
         println!(
-            "{}.pow({}) === {} mod 2^{}",
+            "{}.pow({}) ≡ {} mod 2^{}",
             x,
             exp,
             (&x).mod_power_of_2_pow(&exp, pow),

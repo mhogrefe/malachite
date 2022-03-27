@@ -8,7 +8,7 @@ use std::str::FromStr;
 /// `Display`, and `FromStr` instances.
 ///
 /// It's well-known that in most languages, floats behave weirdly due to the IEEE 754 standard. The
-/// `NiceFloat` type ignores this standard.
+/// `NiceFloat` type ignores the standard in favor of more intuitive behavior.
 /// - Using `NiceFloat`, `NaN`s are equal to themselves. There is a single, unique `NaN`; there's no
 ///   concept of signalling `NaN`s. Positive and negative zero are two distinct values, not equal to
 ///   each other.
@@ -29,7 +29,7 @@ use std::str::FromStr;
 ///   - All finite floats have a decimal point. For example, Ryu by itself would convert
 ///     `f32::MIN_POSITIVE_SUBNORMAL` to `1e-45`.
 ///   - Positive infinity, negative infinity, and NaN are converted to the strings `"Infinity"`,
-///     `"-Infinity"`, and "`NaN`", respectively. This is just a personal preference.
+///     `"-Infinity"`, and "`NaN`", respectively.
 /// - `FromStr` accepts these strings.
 #[derive(Clone, Copy, Default)]
 pub struct NiceFloat<T: PrimitiveFloat>(pub T);
@@ -198,7 +198,9 @@ macro_rules! impl_fmt_ryu_string {
                         _ => {}
                     }
                 }
-                if !found_dot {
+                if found_dot {
+                    f.write_str(printed)
+                } else {
                     if let Some(e_index) = e_index {
                         let mut out_bytes = vec![0; printed.len() + 2];
                         let (in_bytes_lo, in_bytes_hi) = printed.as_bytes().split_at(e_index);
@@ -211,8 +213,6 @@ macro_rules! impl_fmt_ryu_string {
                     } else {
                         panic!("Unexpected Ryu string: {}", printed);
                     }
-                } else {
-                    f.write_str(printed)
                 }
             }
         }
@@ -231,7 +231,7 @@ impl<T: PrimitiveFloat> Display for NiceFloat<T> {
     /// - All finite floats have a decimal point. For example, Ryu by itself would convert
     ///   `f32::MIN_POSITIVE_SUBNORMAL` to `1e-45`.
     /// - Positive infinity, negative infinity, and NaN are converted to the strings `"Infinity"`,
-    ///   `"-Infinity"`, and "`NaN`", respectively. This is just a personal preference.
+    ///   `"-Infinity"`, and "`NaN`", respectively.
     ///
     /// # Worst-case complexity
     /// Constant time and additional memory.

@@ -2,11 +2,11 @@ use generators::common::{
     reshape_1_2_to_3, reshape_2_1_to_3, reshape_2_2_to_4, reshape_3_1_to_4, GenConfig, It,
 };
 use generators::{
-    digits_valid, float_rounding_mode_filter_var_1, get_two_highest, reduce_to_fit_add_mul_signed,
-    reduce_to_fit_add_mul_unsigned, reduce_to_fit_sub_mul_signed, reduce_to_fit_sub_mul_unsigned,
-    round_to_multiple_of_power_of_2_filter_map, round_to_multiple_signed_filter_map,
-    round_to_multiple_unsigned_filter_map, shift_integer_mantissa_and_exponent,
-    signed_assign_bits_valid, unsigned_assign_bits_valid,
+    digits_valid, float_rounding_mode_filter_var_1, get_two_highest, large_exponent,
+    reduce_to_fit_add_mul_signed, reduce_to_fit_add_mul_unsigned, reduce_to_fit_sub_mul_signed,
+    reduce_to_fit_sub_mul_unsigned, round_to_multiple_of_power_of_2_filter_map,
+    round_to_multiple_signed_filter_map, round_to_multiple_unsigned_filter_map,
+    shift_integer_mantissa_and_exponent, signed_assign_bits_valid, unsigned_assign_bits_valid,
 };
 use itertools::repeat_n;
 use itertools::Itertools;
@@ -25,6 +25,10 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::random::{
+    random_from_sci_string_options, random_to_sci_options,
+};
+use malachite_base::num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, ExactFrom, HasHalf, JoinHalves, RoundingFrom, SaturatingFrom,
     SplitInHalf, WrappingFrom, WrappingInto,
@@ -118,6 +122,26 @@ pub fn special_random_char_pair_gen(config: &GenConfig) -> It<(char, char)> {
         config.get_or("graphic_char_prob_n", 50),
         config.get_or("graphic_char_prob_d", 51),
     )))
+}
+
+// -- (FromSciStringOptions, PrimitiveUnsigned> --
+
+pub fn special_random_from_sci_string_options_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(FromSciStringOptions, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_from_sci_string_options,
+        &|seed| {
+            striped_random_unsigned_inclusive_range(
+                seed,
+                T::TWO,
+                T::from(36u8),
+                config.get_or("mean_stripe_n", T::WIDTH),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
 }
 
 // -- PrimitiveFloat --
@@ -813,6 +837,17 @@ pub fn special_random_signed_gen_var_9<T: PrimitiveFloat>(config: &GenConfig) ->
         config.get_or("mean_stripe_n", T::WIDTH >> 1),
         config.get_or("mean_stripe_d", 1),
     ))
+}
+
+pub fn special_random_signed_gen_var_10<T: PrimitiveSigned>(config: &GenConfig) -> It<T> {
+    Box::new(
+        striped_random_signeds(
+            EXAMPLE_SEED,
+            config.get_or("mean_stripe_n", T::WIDTH >> 1),
+            config.get_or("mean_stripe_d", 1),
+        )
+        .filter(|&x| x != T::ZERO && x != T::MIN),
+    )
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned) --
@@ -2257,6 +2292,55 @@ pub fn special_random_signed_rounding_mode_pair_gen_var_4<
     )
 }
 
+// -- (PrimitiveUnsigned, ToSciOptions) --
+
+pub fn special_random_signed_to_sci_options_pair_gen<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, ToSciOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_positive_signeds::<T>(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_signed_to_sci_options_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(T, ToSciOptions)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_positive_signeds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                random_to_sci_options(
+                    seed,
+                    config.get_or("mean_size_n", 32),
+                    config.get_or("mean_size_d", 1),
+                )
+            },
+        )
+        .filter(|(x, options)| x.fmt_sci_valid(*options)),
+    )
+}
+
 // -- (PrimitiveSigned, Vec<bool>) --
 
 struct SignedBoolVecPairGeneratorVar1<T: PrimitiveSigned> {
@@ -3652,6 +3736,32 @@ pub fn special_random_unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsign
     )))
 }
 
+pub fn special_random_unsigned_unsigned_bool_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    config: &GenConfig,
+) -> It<(T, U, bool)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_unsigneds::<T>(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_positive_unsigneds::<U>(
+                seed,
+                config.get_or("mean_stripe_n", U::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &random_bools,
+    ))
+}
+
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
 
 pub fn special_random_unsigned_triple_gen_var_1<T: PrimitiveUnsigned>(
@@ -4915,7 +5025,7 @@ pub fn special_random_unsigned_rounding_mode_pair_gen_var_2<
 
 // -- (PrimitiveUnsigned, String) --
 
-pub fn special_random_unsigned_string_pair_gen_var_1(config: &GenConfig) -> It<(u64, String)> {
+pub fn special_random_unsigned_string_pair_gen_var_1(config: &GenConfig) -> It<(u8, String)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
         &|seed| {
@@ -4942,6 +5052,55 @@ pub fn special_random_unsigned_string_pair_gen_var_1(config: &GenConfig) -> It<(
             )
         },
     ))
+}
+
+// -- (PrimitiveUnsigned, ToSciOptions) --
+
+pub fn special_random_unsigned_to_sci_options_pair_gen<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, ToSciOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            striped_random_positive_unsigneds::<T>(
+                seed,
+                config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn special_random_unsigned_to_sci_options_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(T, ToSciOptions)> {
+    Box::new(
+        random_pairs(
+            EXAMPLE_SEED,
+            &|seed| {
+                striped_random_positive_unsigneds::<T>(
+                    seed,
+                    config.get_or("mean_stripe_n", T::WIDTH >> 1),
+                    config.get_or("mean_stripe_d", 1),
+                )
+            },
+            &|seed| {
+                random_to_sci_options(
+                    seed,
+                    config.get_or("mean_size_n", 32),
+                    config.get_or("mean_size_d", 1),
+                )
+            },
+        )
+        .filter(|(x, options)| x.fmt_sci_valid(*options)),
+    )
 }
 
 // -- (PrimitiveUnsigned, Vec<bool>) --
@@ -5143,6 +5302,107 @@ pub fn special_random_string_gen_var_1(config: &GenConfig) -> It<String> {
     ))
 }
 
+// vars 2 and 3 are in malachite-q.
+
+pub fn special_random_string_gen_var_4(config: &GenConfig) -> It<String> {
+    Box::new(
+        random_strings_using_chars(
+            EXAMPLE_SEED,
+            &|seed| {
+                graphic_weighted_random_chars(
+                    seed,
+                    config.get_or("graphic_char_prob_n", 50),
+                    config.get_or("graphic_char_prob_d", 51),
+                )
+            },
+            config.get_or("mean_length_n", 32),
+            config.get_or("mean_length_d", 1),
+        )
+        .filter(|s| !large_exponent(s)),
+    )
+}
+
+// -- (String, FromSciStringOptions) --
+
+pub fn special_random_string_from_sci_string_options_pair_gen(
+    config: &GenConfig,
+) -> It<(String, FromSciStringOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_strings_using_chars(
+                seed,
+                &|seed_2| {
+                    graphic_weighted_random_chars(
+                        seed_2,
+                        config.get_or("graphic_char_prob_n", 50),
+                        config.get_or("graphic_char_prob_d", 51),
+                    )
+                },
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_from_sci_string_options,
+    ))
+}
+
+pub fn special_random_string_from_sci_string_options_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(String, FromSciStringOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_strings_using_chars(
+                seed,
+                &|seed_2| {
+                    graphic_weighted_random_chars(
+                        seed_2,
+                        config.get_or("graphic_char_prob_n", 50),
+                        config.get_or("graphic_char_prob_d", 51),
+                    )
+                },
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|s| !large_exponent(s))
+        },
+        &random_from_sci_string_options,
+    ))
+}
+
+// -- (String, PrimitiveUnsigned) --
+
+pub fn special_random_string_unsigned_pair_gen_var_1(config: &GenConfig) -> It<(String, u8)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_strings_using_chars(
+                seed,
+                &|seed_2| {
+                    graphic_weighted_random_chars(
+                        seed_2,
+                        config.get_or("graphic_char_prob_n", 50),
+                        config.get_or("graphic_char_prob_d", 51),
+                    )
+                },
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|s| !large_exponent(s))
+        },
+        &|seed| {
+            striped_random_unsigned_inclusive_range(
+                seed,
+                2,
+                36,
+                config.get_or("mean_stripe_n", 4),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
+}
+
 // -- (String, String) --
 
 pub fn special_random_string_pair_gen(config: &GenConfig) -> It<(String, String)> {
@@ -5173,6 +5433,32 @@ pub fn special_random_string_pair_gen_var_1(config: &GenConfig) -> It<(String, S
         config.get_or("mean_length_n", 32),
         config.get_or("mean_length_d", 1),
     )))
+}
+
+// -- (ToSciOptions, PrimitiveUnsigned> --
+
+pub fn special_random_to_sci_options_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(ToSciOptions, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+        &|seed| {
+            striped_random_unsigned_inclusive_range(
+                seed,
+                T::TWO,
+                T::from(36u8),
+                config.get_or("mean_stripe_n", T::WIDTH),
+                config.get_or("mean_stripe_d", 1),
+            )
+        },
+    ))
 }
 
 // -- Vec<bool> --

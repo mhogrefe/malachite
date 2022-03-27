@@ -108,9 +108,8 @@ pub fn limbs_sqrt_rem_helper(
     let xs_hi = &mut xs[two_h1..];
     let out_hi = &mut out[h1..];
     let q = if h2 == 1 {
-        let (sqrt, r_hi, r_lo) = sqrt_rem_2_newton(xs_hi[1], xs_hi[0]);
-        out_hi[0] = sqrt;
-        xs_hi[0] = r_lo;
+        let r_hi;
+        (out_hi[0], r_hi, xs_hi[0]) = sqrt_rem_2_newton(xs_hi[1], xs_hi[0]);
         r_hi
     } else {
         limbs_sqrt_rem_helper(out_hi, xs_hi, 0, scratch)
@@ -323,15 +322,6 @@ pub fn limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -
 /// # Worst-case complexity
 /// TODO
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sqrt::limbs_sqrt_to_out;
-///
-/// let out = &mut [10, 10];
-/// limbs_sqrt_to_out(out, &[1, 2, 3]);
-/// assert_eq!(out, &[3144134278, 1]);
-/// ```
-///
 /// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is NULL.
 #[doc(hidden)]
 pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
@@ -405,18 +395,6 @@ pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
 /// # Worst-case complexity
 /// TODO
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sqrt::limbs_sqrt_rem_to_out;
-///
-/// let out_sqrt = &mut [10, 10];
-/// let out_rem = &mut [10; 3];
-/// let rem_len = limbs_sqrt_rem_to_out(out_sqrt, out_rem, &[1, 2, 3]);
-/// assert_eq!(out_sqrt, &[3144134278, 1]);
-/// assert_eq!(rem_len, 2);
-/// assert_eq!(&out_rem[..rem_len], &[1429311965, 0]);
-/// ```
-///
 /// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is not NULL.
 #[doc(hidden)]
 pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[Limb]) -> usize {
@@ -428,8 +406,8 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
     match xs_len {
         1 => {
             let r_lo = if shift == 0 {
-                let (sqrt, r) = sqrt_rem_newton::<Limb, SignedLimb>(high);
-                out_sqrt[0] = sqrt;
+                let r;
+                (out_sqrt[0], r) = sqrt_rem_newton::<Limb, SignedLimb>(high);
                 r
             } else {
                 let sqrt = sqrt_rem_newton::<Limb, SignedLimb>(high << two_shift).0 >> shift;
@@ -441,14 +419,13 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
         }
         2 => {
             if shift == 0 {
-                let (sqrt, r_hi, r_lo) = sqrt_rem_2_newton(xs[1], xs[0]);
-                out_rem[0] = r_lo;
-                out_sqrt[0] = sqrt;
+                let r_hi;
+                (out_sqrt[0], r_hi, out_rem[0]) = sqrt_rem_2_newton(xs[1], xs[0]);
                 if r_hi {
                     out_rem[1] = 1;
                     2
                 } else {
-                    usize::iverson(r_lo != 0)
+                    usize::iverson(out_rem[0] != 0)
                 }
             } else {
                 let mut lo = xs[0];
@@ -534,13 +511,6 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
 ///
 /// # Worst-case complexity
 /// TODO
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sqrt::limbs_floor_sqrt;
-///
-/// assert_eq!(limbs_floor_sqrt(&[1, 2, 3]), &[3144134278, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
@@ -557,13 +527,6 @@ pub fn limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
 ///
 /// # Worst-case complexity
 /// TODO
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sqrt::limbs_ceiling_sqrt;
-///
-/// assert_eq!(limbs_ceiling_sqrt(&[1, 2, 3]), &[3144134279, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
@@ -593,14 +556,6 @@ pub fn limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
 ///
 /// # Worst-case complexity
 /// TODO
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sqrt::limbs_checked_sqrt;
-///
-/// assert_eq!(limbs_checked_sqrt(&[1, 2, 3]), None);
-/// assert_eq!(limbs_checked_sqrt(&[0, 0, 1]), Some(vec![0, 1]));
-/// ```
 #[doc(hidden)]
 pub fn limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
@@ -626,13 +581,6 @@ pub fn limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
 ///
 /// # Worst-case complexity
 /// TODO
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sqrt::limbs_sqrt_rem;
-///
-/// assert_eq!(limbs_sqrt_rem(&[1, 2, 3]), (vec![3144134278, 1], vec![1429311965, 0]));
-/// ```
 #[doc(hidden)]
 pub fn limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let xs_len = xs.len();
@@ -859,7 +807,7 @@ impl CheckedSqrt for Natural {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
+    ///     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
     ///     \operatorname{None} & \textrm{otherwise},
     /// \\end{cases}
     /// $$
@@ -896,7 +844,7 @@ impl<'a> CheckedSqrt for &'a Natural {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
+    ///     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
     ///     \operatorname{None} & \textrm{otherwise},
     /// \\end{cases}
     /// $$
@@ -975,8 +923,8 @@ impl SqrtAssignRem for Natural {
     /// ```
     #[inline]
     fn sqrt_assign_rem(&mut self) -> Natural {
-        let (sqrt, rem) = (&*self).sqrt_rem();
-        *self = sqrt;
+        let rem;
+        (*self, rem) = (&*self).sqrt_rem();
         rem
     }
 }

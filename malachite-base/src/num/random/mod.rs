@@ -3132,12 +3132,10 @@ pub fn variable_range_generator(seed: Seed) -> VariableRangeGenerator {
     }
 }
 
-/// This module contains iterators that generate primitive integers from geometric-like
-/// distributions.
+/// Iterators that generate primitive integers from geometric-like distributions.
 pub mod geometric;
 
-/// This module contains iterators that generate primitive integers that tend to have long runs of
-/// binary 0s and 1s.
+/// Iterators that generate primitive integers that tend to have long runs of binary 0s and 1s.
 ///
 /// Integers with long runs of 0s and 1s are good for testing; they're more likely to result in
 /// carries and borrows than uniformly random integers. This idea was inspired by GMP's

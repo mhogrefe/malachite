@@ -42,27 +42,27 @@ fn demo_natural_mod_neg(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
-        println!("-{} === {} mod {}", n_old, n.mod_neg(m), m_old);
+        println!("-{} ≡ {} mod {}", n_old, n.mod_neg(m), m_old);
     }
 }
 
 fn demo_natural_mod_neg_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
         let n_old = n.clone();
-        println!("-{} === {} mod &{}", n_old, n.mod_neg(&m), m);
+        println!("-{} ≡ {} mod &{}", n_old, n.mod_neg(&m), m);
     }
 }
 
 fn demo_natural_mod_neg_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
         let m_old = m.clone();
-        println!("&(-{}) === {} mod {}", n, (&n).mod_neg(m), m_old);
+        println!("&(-{}) ≡ {} mod {}", n, (&n).mod_neg(m), m_old);
     }
 }
 
 fn demo_natural_mod_neg_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
-        println!("&(-{}) === {} mod &{}", n, (&n).mod_neg(&m), m);
+        println!("&(-{}) ≡ {} mod &{}", n, (&n).mod_neg(&m), m);
     }
 }
 

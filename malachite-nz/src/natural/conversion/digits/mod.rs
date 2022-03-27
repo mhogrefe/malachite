@@ -1,5 +1,4 @@
-/// This module provides traits for extracting digits from numbers and constructing numbers from
-/// digits.
+/// Traits for extracting digits from numbers and constructing numbers from digits.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///

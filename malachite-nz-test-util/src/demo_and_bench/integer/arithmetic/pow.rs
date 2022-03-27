@@ -37,7 +37,7 @@ fn demo_integer_pow(gm: GenMode, config: GenConfig, limit: usize) {
         .take(limit)
     {
         let n_old = n.clone();
-        println!("{}.pow({}) = {}", n_old, pow, n.pow(pow));
+        println!("({}).pow({}) = {}", n_old, pow, n.pow(pow));
     }
 }
 

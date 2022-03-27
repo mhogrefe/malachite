@@ -50,14 +50,6 @@ use std::mem::swap;
 /// # Panics
 /// Panics if `d` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_invert_limb;
-///
-/// assert_eq!(limbs_invert_limb(0x80000002), 0xfffffff8);
-/// assert_eq!(limbs_invert_limb(u32::MAX - 1), 2);
-/// ```
-///
 /// This is mpn_invert_limb, or invert_limb, from gmp-impl.h, GMP 6.2.1.
 #[doc(hidden)]
 #[inline]
@@ -102,15 +94,6 @@ pub fn div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) 
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_div_limb_mod;
-///
-/// assert_eq!(limbs_div_limb_mod(&[123, 456], 789), (vec![2482262467, 0], 636));
-/// assert_eq!(limbs_div_limb_mod(&[u32::MAX, u32::MAX], 3),
-///     (vec![0x55555555, 0x55555555], 0));
-/// ```
-///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0, un > 1, and both
 /// results are returned. Experiments show that DIVREM_1_NORM_THRESHOLD and
 /// DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be 0).
@@ -134,19 +117,6 @@ pub fn limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
 ///
 /// # Panics
 /// Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_div_limb_to_out_mod;
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// assert_eq!(limbs_div_limb_to_out_mod(&mut out, &[123, 456], 789), 636);
-/// assert_eq!(out, &[2482262467, 0, 10, 10]);
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// assert_eq!(limbs_div_limb_to_out_mod(&mut out, &[u32::MAX, u32::MAX], 3), 0);
-/// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
-/// ```
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0 and un > 1.
 /// Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary
@@ -172,9 +142,7 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for (out_q, &n) in out_init.iter_mut().zip(ns_init.iter()).rev() {
-            let (q, new_r) = div_mod_by_preinversion(r, n, d, d_inv);
-            *out_q = q;
-            r = new_r;
+            (*out_q, r) = div_mod_by_preinversion(r, n, d, d_inv);
         }
         r
     } else {
@@ -197,14 +165,12 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb
         let (out_head, out_tail) = out.split_first_mut().unwrap();
         for (out_q, &n) in out_tail.iter_mut().zip(ns_init.iter()).rev() {
             let n_shifted = (previous_n << bits) | (n >> cobits);
-            let (q, new_r) = div_mod_by_preinversion(r, n_shifted, d, d_inv);
-            *out_q = q;
-            r = new_r;
+            (*out_q, r) = div_mod_by_preinversion(r, n_shifted, d, d_inv);
             previous_n = n;
         }
-        let (q, r) = div_mod_by_preinversion(r, previous_n << bits, d, d_inv);
-        *out_head = q;
-        r >> bits
+        let out_r;
+        (*out_head, out_r) = div_mod_by_preinversion(r, previous_n << bits, d, d_inv);
+        out_r >> bits
     }
 }
 
@@ -221,19 +187,6 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb
 ///
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_div_limb_in_place_mod;
-///
-/// let mut ns = vec![123, 456];
-/// assert_eq!(limbs_div_limb_in_place_mod(&mut ns, 789), 636);
-/// assert_eq!(ns, &[2482262467, 0]);
-///
-/// let mut ns = vec![u32::MAX, u32::MAX];
-/// assert_eq!(limbs_div_limb_in_place_mod(&mut ns, 3), 0);
-/// assert_eq!(ns, &[0x55555555, 0x55555555]);
-/// ```
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qp == up, qxn is 0, and
 /// un > 1. Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are
@@ -256,9 +209,7 @@ pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for n in ns_init.iter_mut().rev() {
-            let (q, new_r) = div_mod_by_preinversion(r, *n, d, d_inv);
-            *n = q;
-            r = new_r;
+            (*n, r) = div_mod_by_preinversion(r, *n, d, d_inv);
         }
         r
     } else {
@@ -281,14 +232,12 @@ pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
         for i in (0..last_index).rev() {
             let n = ns[i];
             let shifted_n = (previous_n << bits) | (n >> cobits);
-            let (q, new_r) = div_mod_by_preinversion(r, shifted_n, d, d_inv);
-            ns[i + 1] = q;
-            r = new_r;
+            (ns[i + 1], r) = div_mod_by_preinversion(r, shifted_n, d, d_inv);
             previous_n = n;
         }
-        let (q, r) = div_mod_by_preinversion(r, previous_n << bits, d, d_inv);
-        ns[0] = q;
-        r >> bits
+        let out_r;
+        (ns[0], out_r) = div_mod_by_preinversion(r, previous_n << bits, d, d_inv);
+        out_r >> bits
     }
 }
 
@@ -308,22 +257,6 @@ pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
 /// # Panics
 /// Panics if `out` is shorter than `ns.len()` + `fraction_len`, if `ns` is empty, or if `d` is
 /// zero.
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::num::logic::traits::LeadingZeros;
-/// use malachite_nz::natural::arithmetic::div_mod::{limbs_div_mod_extra, limbs_invert_limb};
-///
-/// let mut out = vec![10; 4];
-/// let ns = &[123, 456];
-/// let d = 7;
-/// let shift = LeadingZeros::leading_zeros(d);
-/// let d_inv = limbs_invert_limb(d << shift);
-/// assert_eq!(limbs_div_mod_extra(&mut out, 1, ns, d, d_inv, shift), 4);
-/// assert_eq!(out, &[613566756, 613566774, 65, 10]);
-/// ```
 ///
 /// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp != ap.
 #[doc(hidden)]
@@ -352,17 +285,15 @@ pub fn limbs_div_mod_extra(
         let (integer_out_last, integer_out_init) = integer_out.split_last_mut().unwrap();
         *integer_out_last = Limb::iverson(q_high);
         for (q, &n) in integer_out_init.iter_mut().zip(ns_init.iter()).rev() {
-            let (new_q, new_r) = div_mod_by_preinversion(r, n, d_norm, d_inv);
-            *q = new_q;
-            r = new_r;
+            (*q, r) = div_mod_by_preinversion(r, n, d_norm, d_inv);
         }
     } else {
         r = 0;
         if ns_last < d {
             r = ns_last << shift;
-            let (integer_out_last, integer_out_init) = integer_out.split_last_mut().unwrap();
+            let integer_out_last;
+            (integer_out_last, integer_out) = integer_out.split_last_mut().unwrap();
             *integer_out_last = 0;
-            integer_out = integer_out_init;
             ns = ns_init;
         }
         if !ns.is_empty() {
@@ -373,25 +304,19 @@ pub fn limbs_div_mod_extra(
             let (integer_out_head, integer_out_tail) = integer_out.split_first_mut().unwrap();
             for (q, &n) in integer_out_tail.iter_mut().zip(ns_init.iter()).rev() {
                 assert!(r < d_norm);
-                let (new_q, new_r) = div_mod_by_preinversion(
+                (*q, r) = div_mod_by_preinversion(
                     r,
                     (previous_n << shift) | (n >> co_shift),
                     d_norm,
                     d_inv,
                 );
-                *q = new_q;
-                r = new_r;
                 previous_n = n;
             }
-            let (new_q, new_r) = div_mod_by_preinversion(r, previous_n << shift, d_norm, d_inv);
-            *integer_out_head = new_q;
-            r = new_r;
+            (*integer_out_head, r) = div_mod_by_preinversion(r, previous_n << shift, d_norm, d_inv);
         }
     }
     for q in fraction_out.iter_mut().rev() {
-        let (new_q, new_r) = div_mod_by_preinversion(r, 0, d_norm, d_inv);
-        *q = new_q;
-        r = new_r;
+        (*q, r) = div_mod_by_preinversion(r, 0, d_norm, d_inv);
     }
     r >> shift
 }
@@ -411,24 +336,6 @@ pub fn limbs_div_mod_extra(
 ///
 /// # Panics
 /// Panics if `ns` is empty, if `ns.len()` is less than `fraction_len`, or if `d` is zero.
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-///
-/// use malachite_base::num::logic::traits::LeadingZeros;
-/// use malachite_nz::natural::arithmetic::div_mod::{
-///     limbs_div_mod_extra_in_place,
-///     limbs_invert_limb
-/// };
-///
-/// let ns = &mut [10, 123, 456];
-/// let d = 7;
-/// let shift = LeadingZeros::leading_zeros(d);
-/// let d_inv = limbs_invert_limb(d << shift);
-/// assert_eq!(limbs_div_mod_extra_in_place(ns, 1, d, d_inv, shift), 4);
-/// assert_eq!(ns, &[613566756, 613566774, 65]);
-/// ```
 ///
 /// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp == ap.
 #[doc(hidden)]
@@ -453,17 +360,15 @@ pub fn limbs_div_mod_extra_in_place(
         let (integer_ns_last, integer_ns_init) = integer_ns.split_last_mut().unwrap();
         *integer_ns_last = Limb::iverson(q_high);
         for q in integer_ns_init.iter_mut().rev() {
-            let (new_q, new_r) = div_mod_by_preinversion(r, *q, d_norm, d_inv);
-            *q = new_q;
-            r = new_r;
+            (*q, r) = div_mod_by_preinversion(r, *q, d_norm, d_inv);
         }
     } else {
         r = 0;
         if ns_last < d {
             r = ns_last << shift;
-            let (integer_ns_last, integer_ns_init) = integer_ns.split_last_mut().unwrap();
+            let integer_ns_last;
+            (integer_ns_last, integer_ns) = integer_ns.split_last_mut().unwrap();
             *integer_ns_last = 0;
-            integer_ns = integer_ns_init;
         }
         if !integer_ns.is_empty() {
             let co_shift = Limb::WIDTH - shift;
@@ -472,25 +377,19 @@ pub fn limbs_div_mod_extra_in_place(
             for i in (1..integer_ns.len()).rev() {
                 assert!(r < d_norm);
                 let n = integer_ns[i - 1];
-                let (new_q, new_r) = div_mod_by_preinversion(
+                (integer_ns[i], r) = div_mod_by_preinversion(
                     r,
                     (previous_n << shift) | (n >> co_shift),
                     d_norm,
                     d_inv,
                 );
-                integer_ns[i] = new_q;
-                r = new_r;
                 previous_n = n;
             }
-            let (new_q, new_r) = div_mod_by_preinversion(r, previous_n << shift, d_norm, d_inv);
-            integer_ns[0] = new_q;
-            r = new_r;
+            (integer_ns[0], r) = div_mod_by_preinversion(r, previous_n << shift, d_norm, d_inv);
         }
     }
     for q in fraction_ns.iter_mut().rev() {
-        let (new_q, new_r) = div_mod_by_preinversion(r, 0, d_norm, d_inv);
-        *q = new_q;
-        r = new_r;
+        (*q, r) = div_mod_by_preinversion(r, 0, d_norm, d_inv);
     }
     r >> shift
 }
@@ -504,14 +403,6 @@ pub fn limbs_div_mod_extra_in_place(
 ///
 /// # Panics
 /// Panics if `hi` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
-///
-/// assert_eq!(limbs_two_limb_inverse_helper(0x80000001, 3), 0xfffffffb);
-/// assert_eq!(limbs_two_limb_inverse_helper(2325651385, 3907343530), 3636893938);
-/// ```
 ///
 /// This is invert_pi1 from gmp-impl.h, GMP 6.2.1, where the result is returned instead of being
 /// written to dinv.
@@ -546,29 +437,6 @@ pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::*;
-///
-/// let d_1 = 0x80000004;
-/// let d_0 = 5;
-/// assert_eq!(
-///     limbs_div_mod_three_limb_by_two_limb(
-///         1, 2, 3, d_1, d_0,
-///         limbs_two_limb_inverse_helper(d_1, d_0)),
-///     (1, 0x7ffffffdfffffffe)
-/// );
-///
-/// let d_1 = 0x80000000;
-/// let d_0 = 0;
-/// assert_eq!(
-///     limbs_div_mod_three_limb_by_two_limb(
-///         2, 0x40000000, 4, d_1, d_0,
-///         limbs_two_limb_inverse_helper(d_1, d_0)),
-///     (4, 0x4000000000000004)
-/// );
-/// ```
 ///
 /// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.2.1.
 #[doc(hidden)]
@@ -618,17 +486,6 @@ pub fn limbs_div_mod_three_limb_by_two_limb(
 /// Panics if `ds` does not have length 2, `ns` has length less than 2, `qs` has length less than
 /// `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_by_two_limb_normalized;
-///
-/// let qs = &mut [10, 10, 10, 10];
-/// let ns = &mut [1, 2, 3, 4, 5];
-/// assert_eq!(limbs_div_mod_by_two_limb_normalized(qs, ns, &[3, 0x80000000]), false);
-/// assert_eq!(qs, &[4294967241, 7, 10, 10]);
-/// assert_eq!(ns, &[166, 2147483626, 3, 4, 5]);
-/// ```
-///
 /// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_div_mod_by_two_limb_normalized(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
@@ -648,11 +505,9 @@ pub fn limbs_div_mod_by_two_limb_normalized(qs: &mut [Limb], ns: &mut [Limb], ds
     let (mut r_1, mut r_0) = r.split_in_half();
     let d_inv = limbs_two_limb_inverse_helper(d_1, d_0);
     for (&n, q) in ns[..n_limit].iter().zip(qs[..n_limit].iter_mut()).rev() {
-        let (new_q, r) = limbs_div_mod_three_limb_by_two_limb(r_1, r_0, n, d_1, d_0, d_inv);
-        let (new_r_1, new_r_0) = r.split_in_half();
-        r_1 = new_r_1;
-        r_0 = new_r_0;
-        *q = new_q;
+        let r;
+        (*q, r) = limbs_div_mod_three_limb_by_two_limb(r_1, r_0, n, d_1, d_0, d_inv);
+        (r_1, r_0) = r.split_in_half();
     }
     ns[1] = r_1;
     ns[0] = r_0;
@@ -712,11 +567,10 @@ pub fn limbs_div_mod_schoolbook(
         } else {
             let carry;
             let (ns_lo, ns_hi) = ns.split_at_mut(i - 2);
-            let (new_q, new_n) =
-                limbs_div_mod_three_limb_by_two_limb(n_1, ns_hi[1], ns_hi[0], d_1, d_0, d_inv);
-            let (new_n_1, mut n_0) = new_n.split_in_half();
-            q = new_q;
-            n_1 = new_n_1;
+            let n;
+            (q, n) = limbs_div_mod_three_limb_by_two_limb(n_1, ns_hi[1], ns_hi[0], d_1, d_0, d_inv);
+            let mut n_0;
+            (n_1, n_0) = n.split_in_half();
             let local_carry_1 = limbs_sub_mul_limb_same_length_in_place_left(
                 &mut ns_lo[j..],
                 ds_except_last_two,
@@ -888,12 +742,9 @@ pub fn limbs_div_mod_divide_and_conquer(
                 q = Limb::MAX;
                 assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(ns, ds, q), n_2);
             } else {
-                let (new_q, new_n) =
-                    limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, d_inv);
-                q = new_q;
-                let (new_n_1, new_n_0) = new_n.split_in_half();
-                n_1 = new_n_1;
-                n_0 = new_n_0;
+                let n;
+                (q, n) = limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, d_inv);
+                (n_1, n_0) = n.split_in_half();
                 // d_len > 2 because of precondition. No need to check
                 let local_carry_1 =
                     limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..b], &ds[..b], q);
@@ -1800,9 +1651,8 @@ pub(crate) fn limbs_div_mod_balanced(
     };
     // Get an approximate quotient using the extracted operands.
     if q_len == 1 {
-        let (q, r) = Limb::xx_div_mod_y_is_qr(ns_shifted[1], ns_shifted[0], ds_shifted[0]);
-        qs[0] = q;
-        ns_shifted[0] = r;
+        (qs[0], ns_shifted[0]) =
+            Limb::xx_div_mod_y_is_qr(ns_shifted[1], ns_shifted[0], ds_shifted[0]);
     } else if q_len == 2 {
         limbs_div_mod_by_two_limb_normalized(qs, ns_shifted, ds_shifted);
     } else {
@@ -1858,9 +1708,7 @@ pub(crate) fn limbs_div_mod_balanced(
             assert!(*ns_shifted_last >= carry_2);
             ns_shifted_last.wrapping_sub_assign(carry_2);
         } else {
-            let (diff, overflow) = carry_1.overflowing_sub(carry_2);
-            *ns_shifted_last = diff;
-            q_too_large = overflow;
+            (*ns_shifted_last, q_too_large) = carry_1.overflowing_sub(carry_2);
             r_len += 1;
         }
         i_len_alt -= 1;
@@ -1905,14 +1753,6 @@ pub(crate) fn limbs_div_mod_balanced(
 /// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
 /// of `ds` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod;
-///
-/// assert_eq!(limbs_div_mod(&[1, 2], &[3, 4]), (vec![0], vec![1, 2]));
-/// assert_eq!(limbs_div_mod(&[1, 2, 3], &[4, 5]), (vec![2576980377, 0], vec![2576980381, 2]));
-/// ```
-///
 /// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1 and qp and rp are
 /// returned.
 #[doc(hidden)]
@@ -1941,23 +1781,6 @@ pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
 /// # Panics
 /// Panics if `qs` or `rs` are too short, `ns` is shorter than `ds`, `ds` has length less than 2, or
 /// the most-significant limb of `ds` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_div_mod_to_out;
-///
-/// let qs = &mut [10; 4];
-/// let rs = &mut [10; 4];
-/// limbs_div_mod_to_out(qs, rs, &[1, 2], &[3, 4]);
-/// assert_eq!(qs, &[0, 10, 10, 10]);
-/// assert_eq!(rs, &[1, 2, 10, 10]);
-///
-/// let qs = &mut [10; 4];
-/// let rs = &mut [10; 4];
-/// limbs_div_mod_to_out(qs, rs, &[1, 2, 3], &[4, 5]);
-/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
-/// assert_eq!(rs, &[2576980381, 2, 10, 10]);
-/// ```
 ///
 /// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1.
 #[doc(hidden)]
@@ -2155,6 +1978,9 @@ impl<'a> DivMod<Natural> for &'a Natural {
     /// );
     /// ```
     fn div_mod(self, mut other: Natural) -> (Natural, Natural) {
+        if *self == other {
+            return (Natural::ONE, Natural::ZERO);
+        }
         match (self, &mut other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => (n.clone(), Natural::ZERO),
@@ -2217,10 +2043,12 @@ impl<'a, 'b> DivMod<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn div_mod(self, other: &'b Natural) -> (Natural, Natural) {
+        if self == other {
+            return (Natural::ONE, Natural::ZERO);
+        }
         match (self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => (n.clone(), Natural::ZERO),
-            (n, d) if std::ptr::eq(n, d) => (Natural::ONE, Natural::ZERO),
             (n, Natural(Small(d))) => {
                 let (q, r) = n.div_mod_limb_ref(*d);
                 (q, Natural(Small(r)))
@@ -2278,6 +2106,10 @@ impl DivAssignMod<Natural> for Natural {
     /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign_mod(&mut self, mut other: Natural) -> Natural {
+        if *self == other {
+            *self = Natural::ONE;
+            return Natural::ZERO;
+        }
         match (&mut *self, &mut other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (_, natural_one!()) => Natural::ZERO,
@@ -2342,6 +2174,10 @@ impl<'a> DivAssignMod<&'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign_mod(&mut self, other: &'a Natural) -> Natural {
+        if self == other {
+            *self = Natural::ONE;
+            return Natural::ZERO;
+        }
         match (&mut *self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (_, natural_one!()) => Natural::ZERO,

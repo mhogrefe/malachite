@@ -1,13 +1,12 @@
 use num::arithmetic::traits::{ArithmeticCheckedShl, ArithmeticCheckedShr, UnsignedAbs};
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
-use num::conversion::traits::WrappingFrom;
-use std::ops::{Neg, Shr};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
+use std::ops::Shr;
 
 fn arithmetic_checked_shr_unsigned_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
-    U: Ord + WrappingFrom<u64>,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveUnsigned + Shr<U, Output = T>,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     bits: S,
@@ -66,9 +65,9 @@ macro_rules! impl_arithmetic_checked_shr_unsigned_signed {
 apply_to_unsigneds!(impl_arithmetic_checked_shr_unsigned_signed);
 
 fn arithmetic_checked_shr_signed_signed<
-    T: ArithmeticCheckedShl<U, Output = T> + Neg<Output = T> + PrimitiveInt + Shr<U, Output = T>,
-    U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    T: ArithmeticCheckedShl<U, Output = T> + PrimitiveSigned + Shr<U, Output = T>,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     bits: S,

@@ -1,4 +1,4 @@
-/// This module contains functions for getting the absolute value of a number.
+/// Functions for getting the absolute value of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -37,7 +37,7 @@
 /// assert_eq!(NiceFloat(x), NiceFloat(100.0));
 /// ```
 pub mod abs;
-/// This module contains functions for adding a number and the product of two other numbers.
+/// Functions for adding a number and the product of two other numbers.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -67,8 +67,7 @@ pub mod abs;
 /// assert_eq!(x, 7.0);
 /// ```
 pub mod add_mul;
-/// This module contains functions for left-shifting a number and checking whether the result is
-/// representable.
+/// Functions for left-shifting a number and checking whether the result is representable.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -109,8 +108,7 @@ pub mod add_mul;
 /// assert_eq!((-100i8).arithmetic_checked_shl(-100), Some(-1i8));
 /// ```
 pub mod arithmetic_checked_shl;
-/// This module contains functions for right-shifting a number and checking whether the result is
-/// representable.
+/// Functions for right-shifting a number and checking whether the result is representable.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -138,7 +136,7 @@ pub mod arithmetic_checked_shl;
 /// assert_eq!(0i8.arithmetic_checked_shr(-100), Some(0i8));
 /// ```
 pub mod arithmetic_checked_shr;
-/// This module contains functions for computing the ceiling of a number.
+/// Functions for computing the ceiling of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -155,12 +153,12 @@ pub mod arithmetic_checked_shr;
 /// assert_eq!(x, -1.0);
 /// ```
 pub mod ceiling;
-/// This module wraps the `checked_abs` function into an implementation of `CheckedAbs`.
+/// Wraps the `checked_abs` function into an implementation of `CheckedAbs`.
 pub mod checked_abs;
-/// This module wraps the `checked_add` function into an implementation of `CheckedAdd`.
+/// Wraps the `checked_add` function into an implementation of `CheckedAdd`.
 pub mod checked_add;
-/// This module contains functions for adding a number and the product of two other numbers, and
-/// checking whether the result is representable.
+/// Functions for adding a number and the product of two other numbers, and checking whether the
+/// result is representable.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -175,19 +173,17 @@ pub mod checked_add;
 /// assert_eq!((-127i8).checked_add_mul(-2, 100), None);
 /// ```
 pub mod checked_add_mul;
-/// This module wraps the `checked_div` function into an implementation of `CheckedDiv`.
+/// Wraps the `checked_div` function into an implementation of `CheckedDiv`.
 pub mod checked_div;
-/// This module wraps the `checked_mul` function into an implementation of `CheckedMul`.
+/// Wraps the `checked_mul` function into an implementation of `CheckedMul`.
 pub mod checked_mul;
-/// This module wraps the `checked_neg` function into an implementation of `CheckedNeg`.
+/// Wraps the `checked_neg` function into an implementation of `CheckedNeg`.
 pub mod checked_neg;
-/// This module wraps the `checked_next_power_of_2` function into an implementation of
-/// `CheckedNextPowerOf2`.
+/// Wraps the `checked_next_power_of_2` function into an implementation of `CheckedNextPowerOf2`.
 pub mod checked_next_power_of_2;
-/// This module wraps the `checked_pow` function into an implementation of `CheckedPow`.
+/// Wraps the `checked_pow` function into an implementation of `CheckedPow`.
 pub mod checked_pow;
-/// This module contains functions for squaring a number and checking whether the result is
-/// representable.
+/// Functions for squaring a number and checking whether the result is representable.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -200,10 +196,10 @@ pub mod checked_pow;
 /// assert_eq!((1000u16).checked_square(), None);
 /// ```
 pub mod checked_square;
-/// This module wraps the `checked_sub` function into an implementation of `CheckedSub`.
+/// Wraps the `checked_sub` function into an implementation of `CheckedSub`.
 pub mod checked_sub;
-/// This module contains functions for subtracting the product of two numbers from another number,
-/// and checking whether the result is representable.
+/// Functions for subtracting the product of two numbers from another number, and checking whether
+/// the result is representable.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -218,7 +214,7 @@ pub mod checked_sub;
 /// assert_eq!((-127i8).checked_sub_mul(2, 100), None);
 /// ```
 pub mod checked_sub_mul;
-/// This module contains functions determining whether two numbers are coprime.
+/// Functions determining whether two numbers are coprime.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -234,7 +230,7 @@ pub mod checked_sub_mul;
 /// assert_eq!(6u8.coprime_with(35), true);
 /// ```
 pub mod coprime_with;
-/// This module contains functions for unchecked exact division.
+/// Functions for unchecked exact division.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -264,8 +260,8 @@ pub mod coprime_with;
 /// assert_eq!(x, -123);
 /// ```
 pub mod div_exact;
-/// This module contains functions for simultaneously finding the quotient and remainder of two
-/// numbers, subject to various rounding rules.
+/// Functions for simultaneously finding the quotient and remainder of two numbers, subject to
+/// various rounding rules.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -453,7 +449,7 @@ pub mod div_exact;
 /// assert_eq!(x, 3);
 /// ```
 pub mod div_mod;
-/// This module contains functions dividing two numbers according to a specified `RoundingMode`.
+/// Functions dividing two numbers according to a specified `RoundingMode`.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -577,7 +573,7 @@ pub mod div_mod;
 /// assert_eq!(x, 4);
 /// ```
 pub mod div_round;
-/// This module contains functions determining whether one number is divisible by another.
+/// Functions determining whether one number is divisible by another.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -594,7 +590,7 @@ pub mod div_round;
 /// assert_eq!(102i32.divisible_by(-3), true);
 /// ```
 pub mod divisible_by;
-/// This module contains functions determining whether one number is divisible by a power of 2.
+/// Functions determining whether one number is divisible by a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -611,7 +607,7 @@ pub mod divisible_by;
 /// assert_eq!(96i32.divisible_by_power_of_2(6), false);
 /// ```
 pub mod divisible_by_power_of_2;
-/// This module contains functions determining whether one number is equal by another, mod a third.
+/// Functions determining whether one number is equal by another, mod a third.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -624,8 +620,7 @@ pub mod divisible_by_power_of_2;
 /// assert_eq!((-123i64).eq_mod(278, 100), false);
 /// ```
 pub mod eq_mod;
-/// This module contains functions determining whether one number is equal by another, mod a power
-/// of 2.
+/// Functions determining whether one number is equal by another, mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -638,7 +633,7 @@ pub mod eq_mod;
 /// assert_eq!((-0b1101i64).eq_mod_power_of_2(0b11011, 4), false);
 /// ```
 pub mod eq_mod_power_of_2;
-/// This module contains functions for computing the floor of a number.
+/// Functions for computing the floor of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -655,7 +650,7 @@ pub mod eq_mod_power_of_2;
 /// assert_eq!(x, -2.0);
 /// ```
 pub mod floor;
-/// This module contains functions for computing the GCD (greatest common divisor) of two numbers.
+/// Functions for computing the GCD (greatest common divisor) of two numbers.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -680,7 +675,7 @@ pub mod floor;
 /// assert_eq!(x, 6);
 /// ```
 pub mod gcd;
-/// This module contains functions for determining whether a number is an integer power of 2.
+/// Functions for determining whether a number is an integer power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -694,7 +689,7 @@ pub mod gcd;
 /// assert_eq!((-4.0).is_power_of_2(), false);
 /// ```
 pub mod is_power_of_2;
-/// This module contains functions for computing the LCM (least common multiple) of two numbers.
+/// Functions for computing the LCM (least common multiple) of two numbers.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -728,7 +723,7 @@ pub mod is_power_of_2;
 /// assert_eq!(120u8.checked_lcm(90), None);
 /// ```
 pub mod lcm;
-/// This module contains functions for taking the base-$b$ logarithm of a number.
+/// Functions for taking the base-$b$ logarithm of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -765,7 +760,7 @@ pub mod lcm;
 /// assert_eq!(101u64.checked_log_base(10), None);
 /// ```
 pub mod log_base;
-/// This module contains functions for taking the base-2 logarithm of a number.
+/// Functions for taking the base-2 logarithm of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -808,8 +803,7 @@ pub mod log_base;
 /// assert_eq!(0.0625f32.checked_log_base_2(), Some(-4));
 /// ```
 pub mod log_base_2;
-/// This module contains functions for taking the base-$b$ logarithm of a number, where $b$ is a
-/// power of 2.
+/// Functions for taking the base-$b$ logarithm of a number, where $b$ is a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -845,7 +839,7 @@ pub mod log_base_2;
 /// assert_eq!(0.0625f32.checked_log_base_power_of_2(2), Some(-2));
 /// ```
 pub mod log_base_power_of_2;
-/// This module contains functions for adding two numbers mod another number.
+/// Functions for adding two numbers mod another number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -870,7 +864,7 @@ pub mod log_base_power_of_2;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_add;
-/// This module contains functions for checking whether a number is reduced mod another number.
+/// Functions for checking whether a number is reduced mod another number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -883,7 +877,7 @@ pub mod mod_add;
 /// assert_eq!(100u16.mod_is_reduced(&101), true);
 /// ```
 pub mod mod_is_reduced;
-/// This module contains functions for multiplying two numbers mod another number.
+/// Functions for multiplying two numbers mod another number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -976,7 +970,7 @@ pub mod mod_is_reduced;
 /// assert_eq!(x, 0);
 /// ```
 pub mod mod_mul;
-/// This module contains functions for negating a number mod another number.
+/// Functions for negating a number mod another number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1006,8 +1000,7 @@ pub mod mod_mul;
 /// assert_eq!(n, 1);
 /// ```
 pub mod mod_neg;
-/// This module contains functions for finding the remainder of two numbers, subject to various
-/// rounding rules.
+/// Functions for finding the remainder of two numbers, subject to various rounding rules.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1137,7 +1130,7 @@ pub mod mod_neg;
 /// assert_eq!(x, 7);
 /// ```
 pub mod mod_op;
-/// This module contains functions for raising a number to a power mod another number.
+/// Functions for raising a number to a power mod another number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1230,8 +1223,8 @@ pub mod mod_op;
 /// assert_eq!(x, 25);
 /// ```
 pub mod mod_pow;
-/// This module contains functions for finding the remainder of a number divided by a power of 2,
-/// subject to various rounding rules.
+/// Functions for finding the remainder of a number divided by a power of 2, subject to various
+/// rounding rules.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1371,7 +1364,7 @@ pub mod mod_pow;
 /// assert_eq!(x, -11);
 /// ```
 pub mod mod_power_of_2;
-/// This module contains functions for adding two numbers mod a power of 2.
+/// Functions for adding two numbers mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1396,7 +1389,7 @@ pub mod mod_power_of_2;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_power_of_2_add;
-/// This module contains functions for checking whether a number is reduced mod a power of 2.
+/// Functions for checking whether a number is reduced mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1409,7 +1402,7 @@ pub mod mod_power_of_2_add;
 /// assert_eq!(100u16.mod_power_of_2_is_reduced(8), true);
 /// ```
 pub mod mod_power_of_2_is_reduced;
-/// This module contains functions for multiplying two numbers mod a power of 2.
+/// Functions for multiplying two numbers mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1434,7 +1427,7 @@ pub mod mod_power_of_2_is_reduced;
 /// assert_eq!(n, 12);
 /// ```
 pub mod mod_power_of_2_mul;
-/// This module contains functions for negating a number mod a power of 2.
+/// Functions for negating a number mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1464,7 +1457,7 @@ pub mod mod_power_of_2_mul;
 /// assert_eq!(n, 156);
 /// ```
 pub mod mod_power_of_2_neg;
-/// This module contains functions for raising a number to a power mod a power of 2.
+/// Functions for raising a number to a power mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1489,7 +1482,7 @@ pub mod mod_power_of_2_neg;
 /// assert_eq!(n, 1);
 /// ```
 pub mod mod_power_of_2_pow;
-/// This module contains functions for left-shifting a number mod a power of 2.
+/// Functions for left-shifting a number mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1525,7 +1518,7 @@ pub mod mod_power_of_2_pow;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_power_of_2_shl;
-/// This module contains functions for right-shifting a number mod a power of 2.
+/// Functions for right-shifting a number mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1550,7 +1543,7 @@ pub mod mod_power_of_2_shl;
 /// assert_eq!(n, 16);
 /// ```
 pub mod mod_power_of_2_shr;
-/// This module contains functions for squaring a number mod a power of 2.
+/// Functions for squaring a number mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1575,7 +1568,7 @@ pub mod mod_power_of_2_shr;
 /// assert_eq!(n, 16);
 /// ```
 pub mod mod_power_of_2_square;
-/// This module contains functions for subtracting one number by another, mod a power of 2.
+/// Functions for subtracting one number by another, mod a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1600,7 +1593,7 @@ pub mod mod_power_of_2_square;
 /// assert_eq!(n, 12);
 /// ```
 pub mod mod_power_of_2_sub;
-/// This module contains functions for left-shifting a number mod another number
+/// Functions for left-shifting a number mod another number
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1636,7 +1629,7 @@ pub mod mod_power_of_2_sub;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_shl;
-/// This module contains functions for right-shifting a number mod another number
+/// Functions for right-shifting a number mod another number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1661,7 +1654,7 @@ pub mod mod_shl;
 /// assert_eq!(n, 2);
 /// ```
 pub mod mod_shr;
-/// This module contains functions for squaring a number mod another number.
+/// Functions for squaring a number mod another number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1715,7 +1708,7 @@ pub mod mod_shr;
 /// assert_eq!(x, 43);
 /// ```
 pub mod mod_square;
-/// This module contains functions for subtracting one number by another, mod a third number.
+/// Functions for subtracting one number by another, mod a third number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1740,7 +1733,7 @@ pub mod mod_square;
 /// assert_eq!(n, 8);
 /// ```
 pub mod mod_sub;
-/// This module contains functions for negating a number.
+/// Functions for negating a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1765,7 +1758,7 @@ pub mod mod_sub;
 /// assert_eq!(x, -1.2f32);
 /// ```
 pub mod neg;
-/// This module contains functions for getting the next-highest power of 2.
+/// Functions for getting the next-highest power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1806,8 +1799,8 @@ pub mod neg;
 /// assert_eq!(x, 0.015625);
 /// ```
 pub mod next_power_of_2;
-/// This module contains functions for taking the absolute value of a number and returning a
-/// boolean indicating whether an overflow occurred.
+/// Functions for taking the absolute value of a number and returning a boolean indicating whether
+/// an overflow occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1832,8 +1825,8 @@ pub mod next_power_of_2;
 /// assert_eq!(x, -128);
 /// ```
 pub mod overflowing_abs;
-/// This module contains functions for adding two numbers and returning a boolean indicating
-/// whether an overflow occurred.
+/// Functions for adding two numbers and returning a boolean indicating whether an overflow
+/// occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1850,8 +1843,8 @@ pub mod overflowing_abs;
 /// assert_eq!(x, 67);
 /// ```
 pub mod overflowing_add;
-/// This module contains functions for adding a number and the product of two other numbers, and
-/// returning a boolean indicating whether an overflow occurred.
+/// Functions for adding a number and the product of two other numbers, and returning a boolean
+/// indicating whether an overflow occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1887,8 +1880,8 @@ pub mod overflowing_add;
 /// assert_eq!(x, -71);
 /// ```
 pub mod overflowing_add_mul;
-/// This module contains functions for dividing a number by another number and returning a boolean
-/// indicating whether an overflow occurred.
+/// Functions for dividing a number by another number and returning a boolean indicating whether an
+/// overflow occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1905,8 +1898,8 @@ pub mod overflowing_add_mul;
 /// assert_eq!(x, -128);
 /// ```
 pub mod overflowing_div;
-/// This module contains functions for multiplying two numbers and returning a boolean indicating
-/// whether an overflow occurred.
+/// Functions for multiplying two numbers and returning a boolean indicating whether an overflow
+/// occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1923,8 +1916,8 @@ pub mod overflowing_div;
 /// assert_eq!(x, 24);
 /// ```
 pub mod overflowing_mul;
-/// This module contains functions for negating a number and returning a boolean indicating whether
-/// an overflow occurred.
+/// Functions for negating a number and returning a boolean indicating whether an overflow
+/// occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1949,8 +1942,8 @@ pub mod overflowing_mul;
 /// assert_eq!(x, -128);
 /// ```
 pub mod overflowing_neg;
-/// This module contains functions for raising a number to a power and returning a boolean
-/// indicating whether an overflow occurred.
+/// Functions for raising a number to a power and returning a boolean indicating whether an
+/// overflow occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1971,8 +1964,8 @@ pub mod overflowing_neg;
 /// assert_eq!(x, 13824);
 /// ```
 pub mod overflowing_pow;
-/// This module contains functions for squaring a number and returning a boolean indicating whether
-/// an overflow occurred.
+/// Functions for squaring a number and returning a boolean indicating whether an overflow
+/// occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -1993,8 +1986,8 @@ pub mod overflowing_pow;
 /// assert_eq!(x, 16960);
 /// ```
 pub mod overflowing_square;
-/// This module contains functions for subtracting a number by another number and returning a
-/// boolean indicating whether an overflow occurred.
+/// Functions for subtracting a number by another number and returning a boolean indicating whether
+/// an overflow occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2020,8 +2013,8 @@ pub mod overflowing_square;
 /// assert_eq!(x, 65203);
 /// ```
 pub mod overflowing_sub;
-/// This module contains functions for subtracting a number by the product of two other numbers,
-/// and returning a boolean indicating whether an overflow occurred.
+/// Functions for subtracting a number by the product of two other numbers, and returning a boolean
+/// indicating whether an overflow occurred.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2057,7 +2050,7 @@ pub mod overflowing_sub;
 /// assert_eq!(x, -71);
 /// ```
 pub mod overflowing_sub_mul;
-/// This module contains functions for determining whether a number is even or odd.
+/// Functions for determining whether a number is even or odd.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2079,7 +2072,7 @@ pub mod overflowing_sub_mul;
 /// assert_eq!(4u32.odd(), false);
 /// ```
 pub mod parity;
-/// This module contains functions for raising a number to a power.
+/// Functions for raising a number to a power.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2104,7 +2097,7 @@ pub mod parity;
 /// assert_eq!(x, 32.0);
 /// ```
 pub mod pow;
-/// This module contains functions for computing a power of 2.
+/// Functions for computing a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2125,7 +2118,7 @@ pub mod pow;
 /// assert_eq!(f32::power_of_2(-3), 0.125);
 /// ```
 pub mod power_of_2;
-/// This module contains functions for taking the $n$th root of a number.
+/// Functions for taking the $n$th root of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2245,7 +2238,7 @@ pub mod power_of_2;
 /// assert_eq!(x, 158);
 /// ```
 pub mod root;
-/// This module contains functions for rounding a number to a multiple of another number.
+/// Functions for rounding a number to a multiple of another number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2381,7 +2374,7 @@ pub mod root;
 /// assert_eq!(x, -16);
 /// ```
 pub mod round_to_multiple;
-/// This module contains functions for rounding a number to a multiple of a power of 2.
+/// Functions for rounding a number to a multiple of a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2494,8 +2487,8 @@ pub mod round_to_multiple;
 /// assert_eq!(x, -12);
 /// ```
 pub mod round_to_multiple_of_power_of_2;
-/// This module contains functions for taking the absolute value of a number, saturating at numeric
-/// bounds instead of overflowing.
+/// Functions for taking the absolute value of a number, saturating at numeric bounds instead of
+/// overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2520,7 +2513,7 @@ pub mod round_to_multiple_of_power_of_2;
 /// assert_eq!(x, 127);
 /// ```
 pub mod saturating_abs;
-/// This module contains functions for adding two numbers, saturating at numeric bounds instead of
+/// Functions for adding two numbers, saturating at numeric bounds instead of
 /// overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -2538,8 +2531,8 @@ pub mod saturating_abs;
 /// assert_eq!(x, 255);
 /// ```
 pub mod saturating_add;
-/// This module contains functions for adding the product of two numbers to a number, saturating
-/// at numeric bounds instead of overflowing.
+/// Functions for adding the product of two numbers to a number, saturating at numeric bounds
+/// instead of overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2575,8 +2568,7 @@ pub mod saturating_add;
 /// assert_eq!(x, -128);
 /// ```
 pub mod saturating_add_mul;
-/// This module contains functions for multiplying two numbers, saturating at numeric bounds
-/// instead of overflowing.
+/// Functions for multiplying two numbers, saturating at numeric bounds instead of overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2593,8 +2585,7 @@ pub mod saturating_add_mul;
 /// assert_eq!(x, 255);
 /// ```
 pub mod saturating_mul;
-/// This module contains functions for negating a number, saturating at numeric bounds instead of
-/// overflowing.
+/// Functions for negating a number, saturating at numeric bounds instead of overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2619,8 +2610,7 @@ pub mod saturating_mul;
 /// assert_eq!(x, 127);
 /// ```
 pub mod saturating_neg;
-/// This module contains functions for raising a number to a power, saturating at numeric bounds
-/// instead of overflowing.
+/// Functions for raising a number to a power, saturating at numeric bounds instead of overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2641,8 +2631,7 @@ pub mod saturating_neg;
 /// assert_eq!(x, -32768);
 /// ```
 pub mod saturating_pow;
-/// This module contains functions for squaring a number, saturating at numeric bounds instead of
-/// overflowing.
+/// Functions for squaring a number, saturating at numeric bounds instead of overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2672,8 +2661,7 @@ pub mod saturating_pow;
 /// assert_eq!(x, u16::MAX);
 /// ```
 pub mod saturating_square;
-/// This module contains functions for subtracting two numbers, saturating at numeric bounds
-/// instead of overflowing.
+/// Functions for subtracting two numbers, saturating at numeric bounds instead of overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2690,8 +2678,8 @@ pub mod saturating_square;
 /// assert_eq!(x, 0);
 /// ```
 pub mod saturating_sub;
-/// This module contains functions for subtracting a number by the product of two numbers,
-/// saturating at numeric bounds instead of overflowing.
+/// Functions for subtracting a number by the product of two numbers, saturating at numeric bounds
+/// instead of overflowing.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2727,8 +2715,8 @@ pub mod saturating_sub;
 /// assert_eq!(x, -128);
 /// ```
 pub mod saturating_sub_mul;
-/// This module contains functions for multiplying a number by a power of 2 and rounding according
-/// to a specified rounding mode.
+/// Functions for multiplying a number by a power of 2 and rounding according to a specified
+/// rounding mode.
 ///
 /// # shl_round
 /// ```
@@ -2785,8 +2773,8 @@ pub mod saturating_sub_mul;
 /// assert_eq!(x, 1);
 /// ```
 pub mod shl_round;
-/// This module contains functions for multiplying a number by a power of 2 and rounding according
-/// to a specified rounding mode.
+/// Functions for multiplying a number by a power of 2 and rounding according to a specified
+/// rounding mode.
 ///
 /// # shr_round
 /// ```
@@ -2929,7 +2917,7 @@ pub mod shl_round;
 /// assert_eq!(x, 1);
 /// ```
 pub mod shr_round;
-/// This module contains functions for determining the sign of a number.
+/// Functions for determining the sign of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -2954,7 +2942,7 @@ pub mod shr_round;
 /// assert_eq!(f64::NAN.sign(), Ordering::Equal);
 /// ```
 pub mod sign;
-/// This module contains functions for taking the square root of a number.
+/// Functions for taking the square root of a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3077,7 +3065,7 @@ pub mod sign;
 /// assert_eq!(x, 100000);
 /// ```
 pub mod sqrt;
-/// This module contains functions for squaring a number.
+/// Functions for squaring a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3107,7 +3095,7 @@ pub mod sqrt;
 /// assert_eq!(x, 2.25);
 /// ```
 pub mod square;
-/// This module contains functions for subtracting the product of two numbers from a number.
+/// Functions for subtracting the product of two numbers from a number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3137,10 +3125,9 @@ pub mod square;
 /// assert_eq!(x, -5.0);
 /// ```
 pub mod sub_mul;
-/// This module defines various traits for performing arithmetic operations on numbers.
+/// Various traits for performing arithmetic operations on numbers.
 pub mod traits;
-/// This module contains functions for computing the absolute value of a number, wrapping at the
-/// boundary of the type.
+/// Functions for computing the absolute value of a number, wrapping at the boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3165,7 +3152,7 @@ pub mod traits;
 /// assert_eq!(x, -128);
 /// ```
 pub mod wrapping_abs;
-/// This module contains functions for adding two numbers, wrapping at the boundary of the type.
+/// Functions for adding two numbers, wrapping at the boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3182,8 +3169,8 @@ pub mod wrapping_abs;
 /// assert_eq!(x, 67);
 /// ```
 pub mod wrapping_add;
-/// This module contains functions for adding the product of two numbers to a third, wrapping at
-/// the boundary of the type.
+/// Functions for adding the product of two numbers to a third, wrapping at the boundary of the
+/// type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3208,7 +3195,7 @@ pub mod wrapping_add;
 /// assert_eq!(x, -71);
 /// ```
 pub mod wrapping_add_mul;
-/// This module contains functions for dividing two numbers, wrapping at the boundary of the type.
+/// Functions for dividing two numbers, wrapping at the boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3225,8 +3212,7 @@ pub mod wrapping_add_mul;
 /// assert_eq!(x, -128);
 /// ```
 pub mod wrapping_div;
-/// This module contains functions for multiplying two numbers, wrapping at the boundary of the
-/// type.
+/// Functions for multiplying two numbers, wrapping at the boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3243,7 +3229,7 @@ pub mod wrapping_div;
 /// assert_eq!(x, 24);
 /// ```
 pub mod wrapping_mul;
-/// This module contains functions for negating a number, wrapping at the boundary of the type.
+/// Functions for negating a number, wrapping at the boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3268,8 +3254,7 @@ pub mod wrapping_mul;
 /// assert_eq!(x, -128);
 /// ```
 pub mod wrapping_neg;
-/// This module contains functions for raising a number to a power, wrapping at the boundary of the
-/// type.
+/// Functions for raising a number to a power, wrapping at the boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3290,7 +3275,7 @@ pub mod wrapping_neg;
 /// assert_eq!(x, 13824);
 /// ```
 pub mod wrapping_pow;
-/// This module contains functions for squaring a number, wrapping at the boundary of the type.
+/// Functions for squaring a number, wrapping at the boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3320,8 +3305,7 @@ pub mod wrapping_pow;
 /// assert_eq!(x, 16960);
 /// ```
 pub mod wrapping_square;
-/// This module contains functions for subtracting two numbers, wrapping at the boundary of the
-/// type.
+/// Functions for subtracting two numbers, wrapping at the boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3338,8 +3322,8 @@ pub mod wrapping_square;
 /// assert_eq!(x, 65203);
 /// ```
 pub mod wrapping_sub;
-/// This module contains functions for subtracting a number by the product of two other numbers,
-/// wrapping at the boundary of the type.
+/// Functions for subtracting a number by the product of two other numbers, wrapping at the
+/// boundary of the type.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3364,8 +3348,7 @@ pub mod wrapping_sub;
 /// assert_eq!(x, -71);
 /// ```
 pub mod wrapping_sub_mul;
-/// This module contains functions for multiplying two numbers and returning the result as a
-/// double-width number.
+/// Functions for multiplying two numbers and returning the result as a double-width number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3377,8 +3360,8 @@ pub mod wrapping_sub_mul;
 /// assert_eq!(u8::x_mul_y_is_zz(0x78, 0x9a), (0x48, 0x30));
 /// ```
 pub mod x_mul_y_is_zz;
-/// This module contains functions for adding two double-width numbers and returning the result as
-/// a double-width number.
+/// Functions for adding two double-width numbers and returning the result as a double-width
+/// number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3390,8 +3373,8 @@ pub mod x_mul_y_is_zz;
 /// assert_eq!(u8::xx_add_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0x35, 0x78));
 /// ```
 pub mod xx_add_yy_is_zz;
-/// This module contains functions for dividing a double-width number by a single-width number and
-/// returning the quotient and remainder.
+/// Functions for dividing a double-width number by a single-width number and returning the
+/// quotient and remainder.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3406,8 +3389,8 @@ pub mod xx_add_yy_is_zz;
 /// assert_eq!(u8::xx_div_mod_y_is_qr(0x78, 0x9a, 0xbc), (0xa4, 0x2a));
 /// ```
 pub mod xx_div_mod_y_is_qr;
-/// This module contains functions for subtracting two double-width numbers and returning the
-/// result as a double-width number.
+/// Functions for subtracting two double-width numbers and returning the result as a double-width
+/// number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3419,8 +3402,8 @@ pub mod xx_div_mod_y_is_qr;
 /// assert_eq!(u8::xx_sub_yy_is_zz(0x78, 0x9a, 0xbc, 0xde), (0xbb, 0xbc));
 /// ```
 pub mod xx_sub_yy_is_zz;
-/// This module contains functions for adding two triple-width numbers and returning the result as
-/// a triple-width number.
+/// Functions for adding two triple-width numbers and returning the result as a triple-width
+/// number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3438,8 +3421,8 @@ pub mod xx_sub_yy_is_zz;
 /// );
 /// ```
 pub mod xxx_add_yyy_is_zzz;
-/// This module contains functions for subtracting two triple-width numbers and returning the
-/// result as a triple-width number.
+/// Functions for subtracting two triple-width numbers and returning the result as a triple-width
+/// number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -3457,8 +3440,8 @@ pub mod xxx_add_yyy_is_zzz;
 /// );
 /// ```
 pub mod xxx_sub_yyy_is_zzz;
-/// This module contains functions for adding two quadruple-width numbers and returning the result
-/// as a quadruple-width number.
+/// Functions for adding two quadruple-width numbers and returning the result as a quadruple-width
+/// number.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///

@@ -129,7 +129,7 @@ macro_rules! float_impls {
 
         impl<'a> CheckedFrom<&'a Integer> for $f {
             /// Converts an `Integer` to an `f32` or an `f64`. The `Integer` is taken by value. If
-            /// the input isn't exactly equal to some float, `None` is returned.
+            /// the input isn't exactly equal to any float, `None` is returned.
             ///
             /// Time: worst case O(1)
             ///

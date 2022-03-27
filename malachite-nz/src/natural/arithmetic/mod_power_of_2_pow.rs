@@ -94,19 +94,6 @@ pub fn limbs_pow_low(xs: &mut [Limb], es: &[Limb], scratch: &mut [Limb]) {
 ///
 /// # Panics
 /// Panics if the exponent has trailing zeros or is 1.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_pow::limbs_mod_power_of_2_pow;
-///
-/// let mut xs = vec![3];
-/// limbs_mod_power_of_2_pow(&mut xs, &[3], 4);
-/// assert_eq!(xs, &[11]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_mod_power_of_2_pow(&mut xs, &[789, 987], 42);
-/// assert_eq!(xs, &[426102667, 987]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_pow(xs: &mut Vec<Limb>, es: &[Limb], pow: u64) {
     let out_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));

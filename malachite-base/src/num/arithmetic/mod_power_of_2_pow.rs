@@ -1,8 +1,8 @@
-use num::arithmetic::traits::{ModPowerOf2MulAssign, ModPowerOf2Pow, ModPowerOf2PowAssign};
-use num::basic::integers::PrimitiveInt;
+use num::arithmetic::traits::{ModPowerOf2Pow, ModPowerOf2PowAssign};
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::logic::traits::BitIterable;
 
-fn mod_power_of_2_pow<T: ModPowerOf2MulAssign<T> + PrimitiveInt>(x: T, exp: u64, pow: u64) -> T {
+fn mod_power_of_2_pow<T: PrimitiveUnsigned>(x: T, exp: u64, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
     if pow == 0 {
         return T::ZERO;

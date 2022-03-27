@@ -81,12 +81,12 @@ fn fmt_unsigned<T: Copy + Digits<u8> + Eq + Zero>(
     f.pad_integral(true, "", std::str::from_utf8(&digits).unwrap())
 }
 
-fn to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) -> String {
+fn to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u8) -> String {
     assert!((2..=36).contains(&base), "base out of range");
     if *x == T::ZERO {
         "0".to_string()
     } else {
-        let mut digits = x.to_digits_desc(&u8::wrapping_from(base));
+        let mut digits = x.to_digits_desc(&base);
         for digit in &mut digits {
             *digit = digit_to_display_byte_lower(*digit).unwrap();
         }
@@ -94,12 +94,12 @@ fn to_string_base_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) -
     }
 }
 
-fn to_string_base_upper_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u64) -> String {
+fn to_string_base_upper_unsigned<T: Copy + Digits<u8> + Eq + Zero>(x: &T, base: u8) -> String {
     assert!((2..=36).contains(&base), "base out of range");
     if *x == T::ZERO {
         "0".to_string()
     } else {
-        let mut digits = x.to_digits_desc(&u8::wrapping_from(base));
+        let mut digits = x.to_digits_desc(&base);
         for digit in &mut digits {
             *digit = digit_to_display_byte_upper(*digit).unwrap();
         }
@@ -166,7 +166,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// # Examples
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
-            fn to_string_base(&self, base: u64) -> String {
+            fn to_string_base(&self, base: u8) -> String {
                 to_string_base_unsigned(self, base)
             }
 
@@ -184,7 +184,7 @@ macro_rules! impl_to_string_base_unsigned {
             /// # Examples
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
-            fn to_string_base_upper(&self, base: u64) -> String {
+            fn to_string_base_upper(&self, base: u8) -> String {
                 to_string_base_upper_unsigned(self, base)
             }
         }
@@ -224,7 +224,7 @@ where
 
 fn to_string_base_signed<U: Digits<u8>, S: Copy + Eq + Ord + UnsignedAbs<Output = U> + Zero>(
     x: &S,
-    base: u64,
+    base: u8,
 ) -> String {
     assert!((2..=36).contains(&base), "base out of range");
     if *x == S::ZERO {
@@ -246,13 +246,13 @@ fn to_string_base_upper_signed<
     S: Copy + Eq + Ord + UnsignedAbs<Output = U> + Zero,
 >(
     x: &S,
-    base: u64,
+    base: u8,
 ) -> String {
     assert!((2..=36).contains(&base), "base out of range");
     if *x == S::ZERO {
         "0".to_string()
     } else {
-        let mut digits = x.unsigned_abs().to_digits_desc(&u8::wrapping_from(base));
+        let mut digits = x.unsigned_abs().to_digits_desc(&base);
         for digit in &mut digits {
             *digit = digit_to_display_byte_upper(*digit).unwrap();
         }
@@ -334,7 +334,7 @@ macro_rules! impl_to_string_base_signed {
             /// # Examples
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
-            fn to_string_base(&self, base: u64) -> String {
+            fn to_string_base(&self, base: u8) -> String {
                 to_string_base_signed::<$u, $s>(self, base)
             }
 
@@ -356,7 +356,7 @@ macro_rules! impl_to_string_base_signed {
             /// # Examples
             /// See the documentation of the `num::conversion::string::to_string` module.
             #[inline]
-            fn to_string_base_upper(&self, base: u64) -> String {
+            fn to_string_base_upper(&self, base: u8) -> String {
                 to_string_base_upper_signed::<$u, $s>(self, base)
             }
         }

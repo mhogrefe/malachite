@@ -1039,7 +1039,6 @@ fn div_round_properties_helper_unsigned<T: PrimitiveUnsigned>() {
         assert_eq!(x.div_round(y, RoundingMode::Exact), q);
     });
 
-    //TODO test using Rationals
     unsigned_pair_gen_var_13::<T>().test_properties(|(x, y)| {
         let down = x.div_round(y, RoundingMode::Down);
         let up = down + T::ONE;
@@ -1087,7 +1086,6 @@ fn div_round_properties_helper_signed<T: PrimitiveSigned>() {
         assert_eq!(x.div_round(y, RoundingMode::Exact), q);
     });
 
-    //TODO test using Rationals
     signed_pair_gen_var_5::<T>().test_properties(|(x, y)| {
         let down = x.div_round(y, RoundingMode::Down);
         let up = if (x >= T::ZERO) == (y >= T::ZERO) {

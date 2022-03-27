@@ -14,15 +14,6 @@ use platform::{DoubleLimb, Limb};
 ///
 /// where n = `xs.len()`
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb;
-///
-/// assert_eq!(limbs_mul_limb(&[123, 456], 789), &[97047, 359784]);
-/// assert_eq!(limbs_mul_limb(&[u32::MAX, 5], 2), &[u32::MAX - 1, 11]);
-/// assert_eq!(limbs_mul_limb(&[u32::MAX], 2), &[u32::MAX - 1, 1]);
-/// ```
-///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the result is returned.
 #[doc(hidden)]
 pub fn limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
@@ -52,19 +43,6 @@ pub fn limbs_mul_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb_with_carry_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_mul_limb_with_carry_to_out(&mut out, &[123, 456], 789, 10), 0);
-/// assert_eq!(out, &[97057, 359784, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_mul_limb_with_carry_to_out(&mut out, &[u32::MAX], 2, 3), 2);
-/// assert_eq!(out, &[1, 0, 0]);
-/// ```
 ///
 /// This is mul_1c from gmp-impl.h, GMP 6.2.1.
 #[doc(hidden)]
@@ -96,19 +74,6 @@ pub fn limbs_mul_limb_with_carry_to_out(
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limb::limbs_mul_limb_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_mul_limb_to_out(&mut out, &[123, 456], 789), 0);
-/// assert_eq!(out, &[97047, 359784, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_mul_limb_to_out(&mut out, &[u32::MAX], 2), 1);
-/// assert_eq!(out, &[u32::MAX - 1, 0, 0]);
-/// ```
-///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2.
 #[doc(hidden)]
 #[inline]
@@ -125,19 +90,6 @@ pub fn limbs_mul_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> Limb {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limb::limbs_slice_mul_limb_with_carry_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_slice_mul_limb_with_carry_in_place(&mut xs, 789, 10), 0);
-/// assert_eq!(xs, &[97057, 359784]);
-///
-/// let mut xs = vec![u32::MAX];
-/// assert_eq!(limbs_slice_mul_limb_with_carry_in_place(&mut xs, 2, 3), 2);
-/// assert_eq!(xs, &[1]);
-/// ```
 ///
 /// This is mul_1c from gmp-impl.h, GMP 6.2.1, where the output is the same as the input.
 #[doc(hidden)]
@@ -158,19 +110,6 @@ pub fn limbs_slice_mul_limb_with_carry_in_place(xs: &mut [Limb], y: Limb, mut ca
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_slice_mul_limb_in_place(&mut xs, 789), 0);
-/// assert_eq!(xs, &[97047, 359784]);
-///
-/// let mut xs = vec![u32::MAX];
-/// assert_eq!(limbs_slice_mul_limb_in_place(&mut xs, 2), 1);
-/// assert_eq!(xs, &[u32::MAX - 1]);
-/// ```
-///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where rp == up.
 #[doc(hidden)]
 #[inline]
@@ -184,19 +123,6 @@ pub fn limbs_slice_mul_limb_in_place(xs: &mut [Limb], y: Limb) -> Limb {
 /// Time: worst case O(n)
 ///
 /// Additional memory: worst case O(1)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limb::limbs_vec_mul_limb_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_mul_limb_in_place(&mut xs, 789);
-/// assert_eq!(xs, &[97047, 359784]);
-///
-/// let mut xs = vec![u32::MAX];
-/// limbs_vec_mul_limb_in_place(&mut xs, 2);
-/// assert_eq!(xs, &[u32::MAX - 1, 1]);
-/// ```
 ///
 /// This is mpn_mul_1 from mpn/generic/mul_1.c, GMP 6.1.2, where the rp == up and instead of
 /// returning the carry, it is appended to rp.

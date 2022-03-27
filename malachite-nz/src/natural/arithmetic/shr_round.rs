@@ -24,23 +24,6 @@ use std::ops::{Shl, ShlAssign};
 ///
 /// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr_round::limbs_shr_round_up;
-///
-/// assert_eq!(limbs_shr_round_up(&[1], 1), &[1]);
-/// assert_eq!(limbs_shr_round_up(&[3], 1), &[2]);
-/// assert_eq!(limbs_shr_round_up(&[122, 456], 1), &[61, 228]);
-/// assert_eq!(limbs_shr_round_up(&[123, 456], 1), &[62, 228]);
-/// assert_eq!(limbs_shr_round_up(&[123, 455], 1), &[2147483710, 227]);
-/// assert_eq!(limbs_shr_round_up(&[123, 456], 31), &[913, 0]);
-/// assert_eq!(limbs_shr_round_up(&[123, 456], 32), &[457]);
-/// assert_eq!(limbs_shr_round_up(&[123, 456], 100), &[1]);
-/// assert_eq!(limbs_shr_round_up(&[256, 456], 8), &[3355443201, 1]);
-/// assert_eq!(limbs_shr_round_up(&[u32::MAX, 1], 1), &[0, 1]);
-/// assert_eq!(limbs_shr_round_up(&[u32::MAX, u32::MAX], 32), &[0, 1]);
-/// ```
-///
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
 /// the result is returned.
 #[doc(hidden)]
@@ -90,23 +73,6 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// Additional memory: worst case O(m)
 ///
 /// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr_round::limbs_shr_round_nearest;
-///
-/// assert_eq!(limbs_shr_round_nearest(&[1], 1), &[0]);
-/// assert_eq!(limbs_shr_round_nearest(&[3], 1), &[2]);
-/// assert_eq!(limbs_shr_round_nearest(&[122, 456], 1), &[61, 228]);
-/// assert_eq!(limbs_shr_round_nearest(&[123, 456], 1), &[62, 228]);
-/// assert_eq!(limbs_shr_round_nearest(&[123, 455], 1), &[2147483710, 227]);
-/// assert_eq!(limbs_shr_round_nearest(&[123, 456], 31), &[912, 0]);
-/// assert_eq!(limbs_shr_round_nearest(&[123, 456], 32), &[456]);
-/// assert_eq!(limbs_shr_round_nearest(&[123, 456], 100), Vec::<u32>::new());
-/// assert_eq!(limbs_shr_round_nearest(&[256, 456], 8), &[3355443201, 1]);
-/// assert_eq!(limbs_shr_round_nearest(&[u32::MAX, 1], 1), &[0, 1]);
-/// assert_eq!(limbs_shr_round_nearest(&[u32::MAX, u32::MAX], 32), &[0, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
     if bits == 0 {
@@ -129,23 +95,6 @@ pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// Additional memory: worst case O(m)
 ///
 /// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr_round::limbs_shr_exact;
-///
-/// assert_eq!(limbs_shr_exact(&[1], 1), None);
-/// assert_eq!(limbs_shr_exact(&[3], 1), None);
-/// assert_eq!(limbs_shr_exact(&[122, 456], 1), Some(vec![61, 228]));
-/// assert_eq!(limbs_shr_exact(&[123, 456], 1), None);
-/// assert_eq!(limbs_shr_exact(&[123, 455], 1), None);
-/// assert_eq!(limbs_shr_exact(&[123, 456], 31), None);
-/// assert_eq!(limbs_shr_exact(&[123, 456], 32), None);
-/// assert_eq!(limbs_shr_exact(&[123, 456], 100), None);
-/// assert_eq!(limbs_shr_exact(&[256, 456], 8), Some(vec![3355443201, 1]));
-/// assert_eq!(limbs_shr_exact(&[u32::MAX, 1], 1), None);
-/// assert_eq!(limbs_shr_exact(&[u32::MAX, u32::MAX], 32), None);
-/// ```
 #[doc(hidden)]
 pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
     if limbs_divisible_by_power_of_2(xs, bits) {
@@ -164,29 +113,6 @@ pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
 /// Additional memory: worst case O(m)
 ///
 /// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::rounding_modes::RoundingMode;
-/// use malachite_nz::natural::arithmetic::shr_round::limbs_shr_round;
-///
-/// assert_eq!(limbs_shr_round(&[1], 1, RoundingMode::Nearest), Some(vec![0]));
-/// assert_eq!(limbs_shr_round(&[3], 1, RoundingMode::Nearest), Some(vec![2]));
-/// assert_eq!(limbs_shr_round(&[122, 456], 1, RoundingMode::Floor), Some(vec![61, 228]));
-/// assert_eq!(limbs_shr_round(&[123, 456], 1, RoundingMode::Floor), Some(vec![61, 228]));
-/// assert_eq!(limbs_shr_round(&[123, 455], 1, RoundingMode::Floor),
-///     Some(vec![2147483709, 227]));
-/// assert_eq!(limbs_shr_round(&[123, 456], 31, RoundingMode::Ceiling), Some(vec![913, 0]));
-/// assert_eq!(limbs_shr_round(&[123, 456], 32, RoundingMode::Up), Some(vec![457]));
-/// assert_eq!(limbs_shr_round(&[123, 456], 100, RoundingMode::Down), Some(vec![]));
-/// assert_eq!(limbs_shr_round(&[256, 456], 8, RoundingMode::Exact), Some(vec![3355443201, 1]));
-/// assert_eq!(limbs_shr_round(&[u32::MAX, 1], 1, RoundingMode::Exact), None);
-/// assert_eq!(limbs_shr_round(&[u32::MAX, u32::MAX], 32, RoundingMode::Down),
-///     Some(vec![u32::MAX]));
-/// ```
 #[doc(hidden)]
 pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
     match rm {
@@ -206,55 +132,6 @@ pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<L
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr_round::limbs_vec_shr_round_up_in_place;
-///
-/// let mut xs = vec![1];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[1]);
-///
-/// let mut xs = vec![3];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2]);
-///
-/// let mut xs = vec![122, 456];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[61, 228]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[62, 228]);
-///
-/// let mut xs = vec![123, 455];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2147483710, 227]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 31);
-/// assert_eq!(xs, &[913, 0]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[457]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 100);
-/// assert_eq!(xs, &[1]);
-///
-/// let mut xs = vec![256, 456];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[3355443201, 1]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[0, 1]);
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// limbs_vec_shr_round_up_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, 1]);
-/// ```
 ///
 /// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
 /// w == u.
@@ -303,55 +180,6 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr_round::limbs_vec_shr_round_nearest_in_place;
-///
-/// let mut xs = vec![1];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[0]);
-///
-/// let mut xs = vec![3];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2]);
-///
-/// let mut xs = vec![122, 456];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[61, 228]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[62, 228]);
-///
-/// let mut xs = vec![123, 455];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2147483710, 227]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 31);
-/// assert_eq!(xs, &[912, 0]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 100);
-/// assert_eq!(xs, Vec::<u32>::new());
-///
-/// let mut xs = vec![256, 456];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[3355443201, 1]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[0, 1]);
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// limbs_vec_shr_round_nearest_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
     if bits == 0 {
@@ -374,46 +202,6 @@ pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr_round::limbs_vec_shr_exact_in_place;
-///
-/// let mut xs = vec![1];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 1), false);
-///
-/// let mut xs = vec![3];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 1), false);
-///
-/// let mut xs = vec![122, 456];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 1), true);
-/// assert_eq!(xs, &[61, 228]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 1), false);
-///
-/// let mut xs = vec![123, 455];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 1), false);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 31), false);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 32), false);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 100), false);
-///
-/// let mut xs = vec![256, 456];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 8), true);
-/// assert_eq!(xs, &[3355443201, 1]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 1), false);
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// assert_eq!(limbs_vec_shr_exact_in_place(&mut xs, 32), false);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
     if limbs_divisible_by_power_of_2(xs, bits) {
@@ -435,58 +223,6 @@ pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::rounding_modes::RoundingMode;
-/// use malachite_nz::natural::arithmetic::shr_round::limbs_vec_shr_round_in_place;
-///
-/// let mut xs = vec![1];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 1, RoundingMode::Nearest), true);
-/// assert_eq!(xs, &[0]);
-///
-/// let mut xs = vec![3];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 1, RoundingMode::Nearest), true);
-/// assert_eq!(xs, &[2]);
-///
-/// let mut xs = vec![122, 456];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 1, RoundingMode::Floor), true);
-/// assert_eq!(xs, &[61, 228]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 1, RoundingMode::Floor), true);
-/// assert_eq!(xs, &[61, 228]);
-///
-/// let mut xs = vec![123, 455];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 1, RoundingMode::Floor), true);
-/// assert_eq!(xs, &[2147483709, 227]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 31, RoundingMode::Ceiling), true);
-/// assert_eq!(xs, &[913, 0]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 32, RoundingMode::Up), true);
-/// assert_eq!(xs, &[457]);
-///
-/// let mut limbs = vec![123, 456];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut limbs, 100, RoundingMode::Down), true);
-/// assert_eq!(limbs, Vec::<u32>::new());
-///
-/// let mut xs = vec![256, 456];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 8, RoundingMode::Exact), true);
-/// assert_eq!(xs, vec![3355443201, 1]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 1, RoundingMode::Exact), false);
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// assert_eq!(limbs_vec_shr_round_in_place(&mut xs, 32, RoundingMode::Down), true);
-/// assert_eq!(xs, vec![u32::MAX]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
     match rm {

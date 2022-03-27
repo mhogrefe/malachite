@@ -47,10 +47,8 @@ use std::cmp::{max, Ordering};
 #[inline]
 pub(crate) fn limbs_square_diagonal(out: &mut [Limb], xs: &[Limb]) {
     for (i, &x) in xs.iter().enumerate() {
-        let (square_hi, square_lo) = DoubleLimb::from(x).square().split_in_half();
         let i_2 = i << 1;
-        out[i_2] = square_lo;
-        out[i_2 | 1] = square_hi;
+        (out[i_2 | 1], out[i_2]) = DoubleLimb::from(x).square().split_in_half();
     }
 }
 
@@ -87,9 +85,7 @@ pub fn limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb], x
 pub fn limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let (xs_head, xs_tail) = xs.split_first().unwrap();
-    let (square_hi, square_lo) = DoubleLimb::from(*xs_head).square().split_in_half();
-    out[0] = square_lo;
-    out[1] = square_hi;
+    (out[1], out[0]) = DoubleLimb::from(*xs_head).square().split_in_half();
     if n > 1 {
         assert!(n <= SQR_TOOM2_THRESHOLD);
         let scratch = &mut [0; SQR_TOOM2_THRESHOLD << 1];

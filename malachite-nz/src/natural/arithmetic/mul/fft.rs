@@ -801,8 +801,8 @@ fn limbs_mul_fft_decompose<'a>(
     let mut remainder: &mut [Limb] = a_s;
     for i in 0..k {
         // force remainder to move rather than be borrowed
-        let (a_lo, a_hi) = { remainder }.split_at_mut(width);
-        remainder = a_hi;
+        let a_lo;
+        (a_lo, remainder) = { remainder }.split_at_mut(width);
         // store the next m bits of xs into a[0..width_minus_one]
         // len is the number of remaining limbs
         if len == 0 {
@@ -1213,9 +1213,9 @@ pub fn limbs_mul_fft_internal(
         let mut remainder: &mut [Limb] = ys;
         for _ in 0..two_pow_k {
             // force remainder to move rather than be borrowed
-            let (ys_lo, ys_hi) = { remainder }.split_at_mut(width);
+            let ys_lo;
+            (ys_lo, remainder) = { remainder }.split_at_mut(width);
             yss.push(ys_lo);
-            remainder = ys_hi;
         }
         limbs_mul_fft_fft(
             &mut yss,

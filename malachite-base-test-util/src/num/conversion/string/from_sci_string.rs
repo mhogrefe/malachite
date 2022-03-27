@@ -1,0 +1,1 @@
+pub const DECIMAL_SCI_STRING_CHARS: &str = "+-.0123456789Ee";

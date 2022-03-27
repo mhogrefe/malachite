@@ -22,19 +22,6 @@ use std::cmp::Ordering;
 ///
 /// where n = `xs.len()`
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_access::limbs_get_bit_neg;
-/// use std::cmp::Ordering;
-///
-/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 0), false);
-/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 32), true);
-/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 33), false);
-/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 34), true);
-/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 35), false);
-/// assert_eq!(limbs_get_bit_neg(&[0, 0b1011], 100), true);
-/// ```
-///
 /// This is mpz_tstbit from mpz/tstbit.c, GMP 6.2.1, where d is negative.
 #[doc(hidden)]
 pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
@@ -64,16 +51,6 @@ pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
 ///
 /// # Panics
 /// If the slice contains only zeros a panic may occur.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
-/// use std::cmp::Ordering;
-///
-/// let mut xs = &mut [3, 2, 1];
-/// limbs_set_bit_neg(xs, 1);
-/// assert_eq!(xs, &[1, 2, 1]);
-/// ```
 ///
 /// This is mpz_setbit from mpz/setbit.c, GMP 6.2.1, where d is negative.
 #[doc(hidden)]
@@ -137,16 +114,6 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
 /// Panics if evaluation would require new `true` bits outside of the slice. If the slice contains
 /// only zeros a panic may occur.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_access::limbs_slice_clear_bit_neg;
-/// use std::cmp::Ordering;
-///
-/// let mut xs = vec![3, 2, 1];
-/// limbs_slice_clear_bit_neg(&mut xs, 0);
-/// assert_eq!(xs, &[4, 2, 1]);
-/// ```
-///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative and bit_idx small enough
 /// that no additional memory needs to be given to d.
 #[doc(hidden)]
@@ -169,16 +136,6 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
 ///
 /// # Panics
 /// If the slice contains only zeros a panic may occur.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_access::limbs_vec_clear_bit_neg;
-/// use std::cmp::Ordering;
-///
-/// let mut xs = vec![0, 0, u32::MAX];
-/// limbs_vec_clear_bit_neg(&mut xs, 64);
-/// assert_eq!(xs, &[0, 0, 0, 1]);
-/// ```
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative.
 #[doc(hidden)]

@@ -1,4 +1,7 @@
+use num::conversion::string::options::{FromSciStringOptions, ToSciOptions};
+use num::conversion::string::to_sci::SciWrapper;
 use rounding_modes::RoundingMode;
+use std::fmt::{Formatter, Result};
 
 /// This trait defines functions that express a value as a `Vec` of digits and read a value from an
 /// iterator of digits.
@@ -73,16 +76,51 @@ pub trait PowerOf2Digits<T>: Sized {
 
 /// Converts a string slice in a given base to a value.
 pub trait FromStringBase: Sized {
-    fn from_string_base(base: u64, s: &str) -> Option<Self>;
+    fn from_string_base(base: u8, s: &str) -> Option<Self>;
 }
 
 /// Converts a number to a string using a specified base.
 pub trait ToStringBase {
     /// Converts a signed number to a lowercase string using a specified base.
-    fn to_string_base(&self, base: u64) -> String;
+    fn to_string_base(&self, base: u8) -> String;
 
     /// Converts a signed number to an uppercase string using a specified base.
-    fn to_string_base_upper(&self, base: u64) -> String;
+    fn to_string_base_upper(&self, base: u8) -> String;
+}
+
+/// Converts a number to a string, possibly in scientific notation.
+pub trait ToSci: Sized {
+    fn fmt_sci(&self, f: &mut Formatter, options: ToSciOptions) -> Result;
+
+    fn fmt_sci_valid(&self, options: ToSciOptions) -> bool;
+
+    /// Converts a number to a string, possibly in scientific notation.
+    fn to_sci_with_options(&self, options: ToSciOptions) -> SciWrapper<Self> {
+        SciWrapper { x: self, options }
+    }
+
+    /// Converts a number to a string, possibly in scientific notation, using the default
+    /// `ToSciOptions`.
+    #[inline]
+    fn to_sci(&self) -> SciWrapper<Self> {
+        SciWrapper {
+            x: self,
+            options: ToSciOptions::default(),
+        }
+    }
+}
+
+/// Converts a `str`, possibly in scientific notation, to a number.
+pub trait FromSciString: Sized {
+    /// Converts a `str`, possibly in scientific notation, to a number.
+    fn from_sci_string_with_options(s: &str, options: FromSciStringOptions) -> Option<Self>;
+
+    /// Converts a `str`, possibly in scientific notation, to a number, using the default
+    /// `FromSciStringOptions`.
+    #[inline]
+    fn from_sci_string(s: &str) -> Option<Self> {
+        Self::from_sci_string_with_options(s, FromSciStringOptions::default())
+    }
 }
 
 /// This trait defines a conversion from another type. If the conversion fails, `None` is returned.

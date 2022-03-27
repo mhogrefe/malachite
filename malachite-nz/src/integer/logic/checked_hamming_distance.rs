@@ -24,14 +24,6 @@ use std::cmp::Ordering;
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_limb_neg;
-///
-/// assert_eq!(limbs_hamming_distance_limb_neg(&[2], 2), 0);
-/// assert_eq!(limbs_hamming_distance_limb_neg(&[1, 1, 1], 1), 2);
-/// ```
 #[doc(hidden)]
 pub fn limbs_hamming_distance_limb_neg(xs: &[Limb], y: Limb) -> u64 {
     let x_lo = xs[0].wrapping_neg();
@@ -106,14 +98,6 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
 ///
 /// # Panics
 /// May panic if `xs` or `ys` only contain zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::checked_hamming_distance::limbs_hamming_distance_neg;
-///
-/// assert_eq!(limbs_hamming_distance_neg(&[2], &[3]), 2);
-/// assert_eq!(limbs_hamming_distance_neg(&[1, 1, 1], &[1, 2, 3]), 3);
-/// ```
 ///
 /// This is mpz_hamdist from mpz/hamdist.c, GMP 6.2.1, where both arguments are negative and have
 /// the same length.

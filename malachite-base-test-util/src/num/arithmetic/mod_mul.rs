@@ -1,9 +1,9 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
+use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf};
 
 pub fn limbs_invert_limb_naive<
     T: CheckedFrom<DT> + PrimitiveUnsigned,
-    DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
+    DT: From<T> + HasHalf<Half = T> + PrimitiveUnsigned,
 >(
     x: T,
 ) -> T {

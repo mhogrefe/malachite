@@ -91,7 +91,7 @@ pub trait PrimitiveFloat:
     + Ceiling<Output = Self>
     + CeilingAssign
     + CeilingLogBase2<Output = i64>
-    + CeilingLogBasePowerOf2<Output = i64>
+    + CeilingLogBasePowerOf2<u64, Output = i64>
     + CheckedFrom<u8>
     + CheckedFrom<u16>
     + CheckedFrom<u32>
@@ -117,7 +117,7 @@ pub trait PrimitiveFloat:
     + CheckedInto<i128>
     + CheckedInto<isize>
     + CheckedLogBase2<Output = i64>
-    + CheckedLogBasePowerOf2<Output = i64>
+    + CheckedLogBasePowerOf2<u64, Output = i64>
     + ConvertibleFrom<u8>
     + ConvertibleFrom<u16>
     + ConvertibleFrom<u32>
@@ -140,7 +140,7 @@ pub trait PrimitiveFloat:
     + Floor<Output = Self>
     + FloorAssign
     + FloorLogBase2<Output = i64>
-    + FloorLogBasePowerOf2<Output = i64>
+    + FloorLogBasePowerOf2<u64, Output = i64>
     + FmtRyuString
     + From<f32>
     + FromStr

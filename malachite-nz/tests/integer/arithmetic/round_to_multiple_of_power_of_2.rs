@@ -13,6 +13,7 @@ use malachite_nz::platform::SignedLimb;
 use malachite_nz_test_util::generators::{
     integer_rounding_mode_pair_gen, integer_unsigned_pair_gen_var_2,
     integer_unsigned_pair_gen_var_5, integer_unsigned_rounding_mode_triple_gen_var_1,
+    natural_unsigned_rounding_mode_triple_gen_var_1,
 };
 use std::str::FromStr;
 
@@ -1241,7 +1242,12 @@ fn round_to_multiple_of_power_of_2_properties() {
         assert_eq!(Integer::ZERO.round_to_multiple_of_power_of_2(pow, rm), 0);
     });
 
-    // TODO test Natural equivalence here
+    natural_unsigned_rounding_mode_triple_gen_var_1().test_properties(|(n, pow, rm)| {
+        assert_eq!(
+            (&n).round_to_multiple_of_power_of_2(pow, rm),
+            Integer::from(n).round_to_multiple_of_power_of_2(pow, rm)
+        )
+    });
 
     signed_unsigned_rounding_mode_triple_gen_var_1::<SignedLimb>().test_properties(
         |(n, pow, rm)| {

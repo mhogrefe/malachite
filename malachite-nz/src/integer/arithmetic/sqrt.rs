@@ -90,7 +90,7 @@ impl FloorSqrt for Integer {
 impl<'a> FloorSqrt for &'a Integer {
     type Output = Integer;
 
-    /// Returns the floor of the square root of a `Integer`, taking the `Integer` by reference.
+    /// Returns the floor of the square root of an `Integer`, taking the `Integer` by reference.
     ///
     /// $f(x) = \lfloor\sqrt{x}\rfloor$.
     ///
@@ -252,7 +252,7 @@ impl CheckedSqrt for Integer {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
+    ///     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
     ///     \operatorname{None} & \textrm{otherwise},
     /// \\end{cases}
     /// $$
@@ -296,7 +296,7 @@ impl<'a> CheckedSqrt for &'a Integer {
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
+    ///     \operatorname{Some}(\sqrt{x}) & \sqrt{x} \in \Z \\\\
     ///     \operatorname{None} & \textrm{otherwise},
     /// \\end{cases}
     /// $$

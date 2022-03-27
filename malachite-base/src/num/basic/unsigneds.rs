@@ -15,9 +15,8 @@ use num::arithmetic::traits::{
     XXXSubYYYIsZZZ, XXXXAddYYYYIsZZZZ,
 };
 use num::basic::integers::PrimitiveInt;
-use num::basic::signeds::PrimitiveSigned;
 use num::conversion::traits::{
-    FromOtherTypeSlice, IntegerMantissaAndExponent, PowerOf2DigitIterable, PowerOf2Digits,
+    Digits, FromOtherTypeSlice, IntegerMantissaAndExponent, PowerOf2DigitIterable, PowerOf2Digits,
     SciMantissaAndExponent, VecFromOtherType, VecFromOtherTypeSlice,
 };
 use num::logic::traits::HammingDistance;
@@ -26,18 +25,24 @@ use num::logic::traits::HammingDistance;
 pub trait PrimitiveUnsigned:
     CeilingLogBase<Output = u64>
     + CeilingLogBase2<Output = u64>
-    + CeilingLogBasePowerOf2<Output = u64>
+    + CeilingLogBasePowerOf2<u64, Output = u64>
     + CeilingDivAssignNegMod<Self, ModOutput = Self>
     + CeilingDivNegMod<Self, DivOutput = Self, ModOutput = Self>
     + CheckedLcm<Self, Output = Self>
     + CheckedLogBase<Output = u64>
     + CheckedLogBase2<Output = u64>
-    + CheckedLogBasePowerOf2<Output = u64>
+    + CheckedLogBasePowerOf2<u64, Output = u64>
     + CheckedNextPowerOf2<Output = Self>
     + CoprimeWith<Self>
+    + Digits<u8>
+    + Digits<u16>
+    + Digits<u32>
+    + Digits<u64>
+    + Digits<u128>
+    + Digits<usize>
     + FloorLogBase<Output = u64>
     + FloorLogBase2<Output = u64>
-    + FloorLogBasePowerOf2<Output = u64>
+    + FloorLogBasePowerOf2<u64, Output = u64>
     + From<u8>
     + FromOtherTypeSlice<u8>
     + FromOtherTypeSlice<u16>
@@ -163,15 +168,11 @@ pub trait PrimitiveUnsigned:
     + XXXSubYYYIsZZZ
     + XXXXAddYYYYIsZZZZ
 {
-    //TODO remove
-    type SignedOfEqualWidth: PrimitiveSigned;
 }
 
 macro_rules! impl_basic_traits {
-    ($u:ident, $s: ident) => {
-        impl PrimitiveUnsigned for $u {
-            type SignedOfEqualWidth = $s;
-        }
+    ($u:ident) => {
+        impl PrimitiveUnsigned for $u {}
     };
 }
-apply_to_unsigned_signed_pairs!(impl_basic_traits);
+apply_to_unsigneds!(impl_basic_traits);

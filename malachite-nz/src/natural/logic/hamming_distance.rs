@@ -17,14 +17,6 @@ use std::cmp::Ordering;
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::hamming_distance::limbs_hamming_distance_limb;
-///
-/// assert_eq!(limbs_hamming_distance_limb(&[2], 3), 1);
-/// assert_eq!(limbs_hamming_distance_limb(&[1, 1, 1], 1), 2);
-/// ```
 #[doc(hidden)]
 pub fn limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
     xs[0].hamming_distance(y) + limbs_count_ones(&xs[1..])
@@ -44,14 +36,6 @@ pub fn limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::hamming_distance::limbs_hamming_distance_same_length;
-///
-/// assert_eq!(limbs_hamming_distance_same_length(&[2], &[3]), 1);
-/// assert_eq!(limbs_hamming_distance_same_length(&[1, 1, 1], &[1, 2, 3]), 3);
-/// ```
 #[doc(hidden)]
 pub fn limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
     assert_eq!(xs.len(), ys.len());
@@ -71,14 +55,6 @@ pub fn limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
 /// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::hamming_distance::limbs_hamming_distance;
-///
-/// assert_eq!(limbs_hamming_distance(&[1, 2, 3], &[3]), 4);
-/// assert_eq!(limbs_hamming_distance(&[1, 1, 1], &[1, 2, 3]), 3);
-/// ```
 #[doc(hidden)]
 pub fn limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_len = xs.len();

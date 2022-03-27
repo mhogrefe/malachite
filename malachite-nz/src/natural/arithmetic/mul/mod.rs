@@ -40,16 +40,6 @@ use std::ops::{Mul, MulAssign};
 /// # Panics
 /// Panics if `xs` is shorter than `ys` or `ys` is empty.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limbs_mul_greater;
-/// use malachite_nz::platform::Limb;
-///
-/// assert_eq!(limbs_mul_greater(&[1, 2, 3], &[6, 7]), &[6, 19, 32, 21, 0]);
-/// assert_eq!(limbs_mul_greater(&[100, 101, u32::MAX], &[102, 101, 2]),
-///         &[10200, 20402, 10299, 203, 99, 2]);
-/// ```
-///
 /// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where prodp is returned.
 #[doc(hidden)]
 pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
@@ -71,16 +61,6 @@ pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if either slice is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limbs_mul;
-/// use malachite_nz::platform::Limb;
-///
-/// assert_eq!(limbs_mul(&[6, 7], &[1, 2, 3]), &[6, 19, 32, 21, 0]);
-/// assert_eq!(limbs_mul(&[100, 101, u32::MAX], &[102, 101, 2]),
-///         &[10200, 20402, 10299, 203, 99, 2]);
-/// ```
 ///
 /// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn and prodp is
 /// returned.
@@ -107,20 +87,6 @@ pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `out` is too short, `xs` and `ys` have different lengths, or either slice is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limbs_mul_same_length_to_out;
-/// use malachite_nz::platform::Limb;
-///
-/// let xs: &mut [Limb] = &mut [10; 4];
-/// limbs_mul_same_length_to_out(xs, &[1, 2], &[6, 7]);
-/// assert_eq!(xs, &[6, 19, 14, 0]);
-///
-/// let xs: &mut [Limb] = &mut [10; 6];
-/// limbs_mul_same_length_to_out(xs, &[100, 101, u32::MAX], &[102, 101, 2]);
-/// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
-/// ```
 ///
 /// This is mpn_mul_n from mpn/generic/mul_n.c, GMP 6.1.2.
 #[doc(hidden)]
@@ -174,20 +140,6 @@ const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
 ///
 /// # Panics
 /// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limbs_mul_greater_to_out;
-/// use malachite_nz::platform::Limb;
-///
-/// let xs: &mut [Limb] = &mut [10; 5];
-/// assert_eq!(limbs_mul_greater_to_out(xs, &[1, 2, 3], &[6, 7]), 0);
-/// assert_eq!(xs, &[6, 19, 32, 21, 0]);
-///
-/// let xs: &mut [Limb] = &mut [10; 6];
-/// assert_eq!(limbs_mul_greater_to_out(xs, &[100, 101, u32::MAX], &[102, 101, 2]), 2);
-/// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
-/// ```
 ///
 /// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2.
 #[doc(hidden)]
@@ -339,20 +291,6 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
 ///
 /// # Panics
 /// Panics if `out` is too short or either slice is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mul::limbs_mul_to_out;
-/// use malachite_nz::platform::Limb;
-///
-/// let xs: &mut [Limb] = &mut [10; 5];
-/// assert_eq!(limbs_mul_to_out(xs, &[6, 7], &[1, 2, 3]), 0);
-/// assert_eq!(xs, &[6, 19, 32, 21, 0]);
-///
-/// let xs: &mut [Limb] = &mut [10; 6];
-/// assert_eq!(limbs_mul_to_out(xs, &[100, 101, u32::MAX], &[102, 101, 2]), 2);
-/// assert_eq!(xs, &[10200, 20402, 10299, 203, 99, 2]);
-/// ```
 ///
 /// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn.
 #[doc(hidden)]

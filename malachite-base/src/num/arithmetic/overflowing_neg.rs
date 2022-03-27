@@ -24,8 +24,8 @@ macro_rules! impl_overflowing_neg {
             /// See the documentation of the `num::arithmetic::overflowing_neg` module.
             #[inline]
             fn overflowing_neg_assign(&mut self) -> bool {
-                let (result, overflow) = self.overflowing_neg();
-                *self = result;
+                let overflow;
+                (*self, overflow) = self.overflowing_neg();
                 overflow
             }
         }

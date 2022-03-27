@@ -3,8 +3,8 @@ use generators::common::{
     reshape_3_1_to_4, It,
 };
 use generators::{
-    digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, signed_assign_bits_valid,
-    unsigned_assign_bits_valid,
+    digits_valid, exhaustive_pairs_big_small, exhaustive_pairs_big_tiny, large_exponent,
+    signed_assign_bits_valid, unsigned_assign_bits_valid,
 };
 use itertools::{repeat_n, Itertools};
 use malachite_base::bools::exhaustive::{exhaustive_bools, ExhaustiveBools};
@@ -20,6 +20,12 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::exhaustive::{
+    exhaustive_from_sci_string_options, exhaustive_sci_size_options, exhaustive_to_sci_options,
+};
+use malachite_base::num::conversion::string::options::{
+    FromSciStringOptions, SciSizeOptions, ToSciOptions,
+};
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
     SaturatingFrom, SplitInHalf, WrappingFrom,
@@ -67,6 +73,7 @@ use malachite_base::vecs::exhaustive::{
     LexFixedLengthVecsFromSingle, ShortlexVecs,
 };
 use num::arithmetic::mod_mul::limbs_invert_limb_naive;
+use num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use num::float::PRIMITIVE_FLOAT_CHARS;
 use rounding_modes::ROUNDING_MODE_CHARS;
 use std::cmp::{max, min};
@@ -110,6 +117,32 @@ pub fn exhaustive_char_gen_var_2() -> It<char> {
 
 pub fn exhaustive_char_pair_gen() -> It<(char, char)> {
     Box::new(exhaustive_pairs_from_single(exhaustive_chars()))
+}
+
+// -- FromSciStringOptions --
+
+pub fn exhaustive_from_sci_string_options_gen() -> It<FromSciStringOptions> {
+    Box::new(exhaustive_from_sci_string_options())
+}
+
+// -- (FromSciStringOptions, PrimitiveUnsigned) --
+
+pub fn exhaustive_from_sci_string_options_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(FromSciStringOptions, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_from_sci_string_options(),
+        primitive_int_increasing_inclusive_range(T::TWO, T::from(36u8)),
+    ))
+}
+
+// -- (FromSciStringOptions, RoundingMode) --
+
+pub fn exhaustive_from_sci_string_options_rounding_mode_pair_gen(
+) -> It<(FromSciStringOptions, RoundingMode)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_from_sci_string_options(),
+        exhaustive_rounding_modes(),
+    ))
 }
 
 // -- PrimitiveFloat --
@@ -688,6 +721,10 @@ pub fn exhaustive_signed_gen_var_10<T: PrimitiveFloat>() -> It<i64> {
         T::MIN_EXPONENT,
         T::MAX_EXPONENT,
     ))
+}
+
+pub fn exhaustive_signed_gen_var_11<T: PrimitiveSigned>() -> It<T> {
+    Box::new(exhaustive_signeds().filter(|&x| x != T::ZERO && x != T::MIN))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned) --
@@ -1531,6 +1568,23 @@ pub fn exhaustive_signed_rounding_mode_pair_gen_var_4<
     )
 }
 
+// -- (PrimitiveSigned, ToSciOptions) --
+
+pub fn exhaustive_signed_to_sci_options_pair_gen<T: PrimitiveSigned>() -> It<(T, ToSciOptions)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_signeds(),
+        exhaustive_to_sci_options(),
+    ))
+}
+
+type TSO = ToSciOptions;
+pub fn exhaustive_signed_to_sci_options_pair_gen_var_1<T: PrimitiveSigned>() -> It<(T, TSO)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_signeds::<T>(), exhaustive_to_sci_options())
+            .filter(|(x, options)| x.fmt_sci_valid(*options)),
+    )
+}
+
 // -- (PrimitiveSigned, Vec<bool>) --
 
 struct SignedBoolVecPairGeneratorVar1;
@@ -2167,6 +2221,16 @@ pub fn exhaustive_unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>(
                 .map(|(x, y)| (x, y, true)),
             ),
     )
+}
+
+pub fn exhaustive_unsigned_unsigned_bool_triple_gen_var_2<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>() -> It<(T, U, bool)> {
+    reshape_2_1_to_3(Box::new(lex_pairs(
+        exhaustive_pairs(exhaustive_unsigneds(), exhaustive_positive_primitive_ints()),
+        exhaustive_bools(),
+    )))
 }
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, PrimitiveUnsigned) --
@@ -2909,7 +2973,7 @@ struct DigitStringGenerator;
 
 impl
     ExhaustiveDependentPairsYsGenerator<
-        u64,
+        u8,
         String,
         StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, IntoIter<char>>>,
     > for DigitStringGenerator
@@ -2917,18 +2981,18 @@ impl
     #[inline]
     fn get_ys(
         &self,
-        &base: &u64,
+        &base: &u8,
     ) -> StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, IntoIter<char>>>
     {
         assert!((2..=36).contains(&base));
         strings_from_char_vecs(exhaustive_vecs_min_length(
             1,
-            valid_digit_chars(u8::wrapping_from(base)).into_iter(),
+            valid_digit_chars(base).into_iter(),
         ))
     }
 }
 
-pub fn exhaustive_unsigned_string_pair_gen_var_1() -> It<(u64, String)> {
+pub fn exhaustive_unsigned_string_pair_gen_var_1() -> It<(u8, String)> {
     Box::new(exhaustive_dependent_pairs(
         bit_distributor_sequence(
             BitDistributorOutputType::normal(1),
@@ -2939,7 +3003,7 @@ pub fn exhaustive_unsigned_string_pair_gen_var_1() -> It<(u64, String)> {
     ))
 }
 
-pub fn exhaustive_unsigned_string_pair_gen_var_2() -> It<(u64, String)> {
+pub fn exhaustive_unsigned_string_pair_gen_var_2() -> It<(u8, String)> {
     Box::new(exhaustive_pairs(
         primitive_int_increasing_inclusive_range(2, 36),
         exhaustive_strings(),
@@ -2948,15 +3012,15 @@ pub fn exhaustive_unsigned_string_pair_gen_var_2() -> It<(u64, String)> {
 
 struct TargetedIntegerFromStringBaseInputs {
     neg: bool,
-    u: u64,
+    u: u8,
     s: String,
-    uss: It<(u64, String)>,
+    uss: It<(u8, String)>,
 }
 
 impl Iterator for TargetedIntegerFromStringBaseInputs {
-    type Item = (u64, String);
+    type Item = (u8, String);
 
-    fn next(&mut self) -> Option<(u64, String)> {
+    fn next(&mut self) -> Option<(u8, String)> {
         Some(if self.neg {
             self.neg = false;
             let next = self.uss.next().unwrap();
@@ -2972,13 +3036,31 @@ impl Iterator for TargetedIntegerFromStringBaseInputs {
     }
 }
 
-pub fn exhaustive_unsigned_string_pair_gen_var_3() -> It<(u64, String)> {
+pub fn exhaustive_unsigned_string_pair_gen_var_3() -> It<(u8, String)> {
     Box::new(TargetedIntegerFromStringBaseInputs {
         neg: true,
         u: 0,
         s: String::new(),
         uss: exhaustive_unsigned_string_pair_gen_var_1(),
     })
+}
+
+// -- (PrimitiveUnsigned, ToSciOptions) --
+
+pub fn exhaustive_unsigned_to_sci_options_pair_gen<T: PrimitiveUnsigned>() -> It<(T, ToSciOptions)>
+{
+    Box::new(exhaustive_pairs(
+        exhaustive_unsigneds(),
+        exhaustive_to_sci_options(),
+    ))
+}
+
+pub fn exhaustive_unsigned_to_sci_options_pair_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(T, ToSciOptions)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_unsigneds::<T>(), exhaustive_to_sci_options())
+            .filter(|(x, options)| x.fmt_sci_valid(*options)),
+    )
 }
 
 // -- (PrimitiveUnsigned, Vec<bool>) --
@@ -3079,6 +3161,12 @@ pub fn exhaustive_rounding_mode_pair_gen() -> It<(RoundingMode, RoundingMode)> {
 
 pub fn exhaustive_rounding_mode_triple_gen() -> It<(RoundingMode, RoundingMode, RoundingMode)> {
     Box::new(lex_triples_from_single(exhaustive_rounding_modes()))
+}
+
+// -- SciSizeOptions --
+
+pub fn exhaustive_sci_size_options_gen() -> It<SciSizeOptions> {
+    Box::new(exhaustive_sci_size_options())
 }
 
 // -- String --
@@ -3197,6 +3285,145 @@ pub fn exhaustive_string_gen_var_10() -> It<String> {
     ))
 }
 
+// vars 11 through 12 are in malachite-q.
+
+pub fn exhaustive_string_gen_var_13() -> It<String> {
+    Box::new(exhaustive_strings_using_chars(
+        DECIMAL_SCI_STRING_CHARS.chars(),
+    ))
+}
+
+pub fn exhaustive_string_gen_var_14() -> It<String> {
+    Box::new(exhaustive_strings().filter(|s| !large_exponent(s)))
+}
+
+pub fn exhaustive_string_gen_var_15() -> It<String> {
+    Box::new(
+        exhaustive_strings_using_chars(DECIMAL_SCI_STRING_CHARS.chars())
+            .filter(|s| !large_exponent(s)),
+    )
+}
+
+// -- (String, FromSciStringOptions) --
+
+pub fn exhaustive_string_from_sci_string_options_pair_gen() -> It<(String, FromSciStringOptions)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_strings(),
+        exhaustive_from_sci_string_options(),
+    ))
+}
+
+struct SciDigitStringGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        FromSciStringOptions,
+        String,
+        StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, IntoIter<char>>>,
+    > for SciDigitStringGenerator
+{
+    #[inline]
+    fn get_ys(
+        &self,
+        &options: &FromSciStringOptions,
+    ) -> StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, IntoIter<char>>>
+    {
+        let base = options.get_base();
+        let mut cs = vec!['+', '-', '.'];
+        if base < 15 {
+            cs.push('e');
+            cs.push('E');
+        }
+        cs.extend(valid_digit_chars(base));
+        assert!((2..=36).contains(&base));
+        strings_from_char_vecs(exhaustive_vecs_min_length(1, cs.into_iter()))
+    }
+}
+
+struct SciDigitStringGenerator2;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        u8,
+        String,
+        StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, IntoIter<char>>>,
+    > for SciDigitStringGenerator2
+{
+    #[inline]
+    fn get_ys(
+        &self,
+        &base: &u8,
+    ) -> StringsFromCharVecs<ExhaustiveVecs<char, PrimitiveIntIncreasingRange<u64>, IntoIter<char>>>
+    {
+        let mut cs = vec!['+', '-', '.'];
+        if base < 15 {
+            cs.push('e');
+            cs.push('E');
+        }
+        cs.extend(valid_digit_chars(base));
+        assert!((2..=36).contains(&base));
+        strings_from_char_vecs(exhaustive_vecs_min_length(1, cs.into_iter()))
+    }
+}
+
+pub fn exhaustive_string_from_sci_string_options_pair_gen_var_1(
+) -> It<(String, FromSciStringOptions)> {
+    permute_2_1(Box::new(exhaustive_dependent_pairs(
+        bit_distributor_sequence(
+            BitDistributorOutputType::normal(1),
+            BitDistributorOutputType::normal(1),
+        ),
+        exhaustive_from_sci_string_options(),
+        SciDigitStringGenerator,
+    )))
+}
+
+pub fn exhaustive_string_from_sci_string_options_pair_gen_var_2(
+) -> It<(String, FromSciStringOptions)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_strings().filter(|s| !large_exponent(s)),
+        exhaustive_from_sci_string_options(),
+    ))
+}
+
+pub fn exhaustive_string_from_sci_string_options_pair_gen_var_3(
+) -> It<(String, FromSciStringOptions)> {
+    permute_2_1(Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            exhaustive_from_sci_string_options(),
+            SciDigitStringGenerator,
+        )
+        .filter(|(_, s)| !large_exponent(s)),
+    ))
+}
+
+// -- (String, PrimitiveUnsigned) --
+
+pub fn exhaustive_string_unsigned_pair_gen_var_1() -> It<(String, u8)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_strings().filter(|s| !large_exponent(s)),
+        primitive_int_increasing_inclusive_range(2, 36),
+    ))
+}
+
+pub fn exhaustive_string_unsigned_pair_gen_var_2() -> It<(String, u8)> {
+    permute_2_1(Box::new(
+        exhaustive_dependent_pairs(
+            bit_distributor_sequence(
+                BitDistributorOutputType::normal(1),
+                BitDistributorOutputType::normal(1),
+            ),
+            primitive_int_increasing_inclusive_range(2, 36),
+            SciDigitStringGenerator2,
+        )
+        .filter(|(_, s)| !large_exponent(s)),
+    ))
+}
+
 // -- (String, String) --
 
 pub fn exhaustive_string_pair_gen() -> It<(String, String)> {
@@ -3206,6 +3433,64 @@ pub fn exhaustive_string_pair_gen() -> It<(String, String)> {
 pub fn exhaustive_string_pair_gen_var_1() -> It<(String, String)> {
     Box::new(exhaustive_pairs_from_single(
         exhaustive_strings_using_chars(exhaustive_ascii_chars()),
+    ))
+}
+
+// -- ToSciOptions --
+
+pub fn exhaustive_to_sci_options_gen() -> It<ToSciOptions> {
+    Box::new(exhaustive_to_sci_options())
+}
+
+// -- (ToSciOptions, bool) --
+
+pub fn exhaustive_to_sci_options_bool_pair_gen() -> It<(ToSciOptions, bool)> {
+    Box::new(lex_pairs(exhaustive_to_sci_options(), exhaustive_bools()))
+}
+
+// -- (ToSciOptions, PrimitiveInt) --
+
+pub fn exhaustive_to_sci_options_primitive_int_pair_gen_var_1<T: PrimitiveInt>(
+) -> It<(ToSciOptions, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_to_sci_options(),
+        exhaustive_positive_primitive_ints(),
+    ))
+}
+
+// -- (ToSciOptions, PrimitiveSigned) --
+
+pub fn exhaustive_to_sci_options_signed_pair_gen_var_1<T: PrimitiveSigned>() -> It<(TSO, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_to_sci_options(),
+        exhaustive_negative_signeds(),
+    ))
+}
+
+// -- (ToSciOptions, PrimitiveUnsigned) --
+
+pub fn exhaustive_to_sci_options_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+) -> It<(ToSciOptions, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_to_sci_options(),
+        primitive_int_increasing_inclusive_range(T::TWO, T::from(36u8)),
+    ))
+}
+
+pub fn exhaustive_to_sci_options_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
+) -> It<(ToSciOptions, T)> {
+    Box::new(exhaustive_pairs_big_tiny(
+        exhaustive_to_sci_options(),
+        exhaustive_unsigneds(),
+    ))
+}
+
+// -- (ToSciOptions, RoundingMode) --
+
+pub fn exhaustive_to_sci_options_rounding_mode_pair_gen() -> It<(ToSciOptions, RoundingMode)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_to_sci_options(),
+        exhaustive_rounding_modes(),
     ))
 }
 

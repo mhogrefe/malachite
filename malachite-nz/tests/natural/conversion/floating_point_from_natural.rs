@@ -19,7 +19,10 @@ use std::str::FromStr;
 #[test]
 fn test_f32_rounding_from_natural() {
     let test = |n: &str, rm: RoundingMode, out| {
-        assert_eq!(f32::rounding_from(&Natural::from_str(n).unwrap(), rm), out);
+        assert_eq!(
+            NiceFloat(f32::rounding_from(&Natural::from_str(n).unwrap(), rm)),
+            NiceFloat(out)
+        );
     };
     test("3", RoundingMode::Exact, 3.0);
     test("123", RoundingMode::Exact, 123.0);
@@ -164,7 +167,10 @@ fn f32_rounding_from_natural_fail_4() {
 #[test]
 fn test_f64_rounding_from_natural() {
     let test = |n: &str, rm: RoundingMode, out| {
-        assert_eq!(f64::rounding_from(&Natural::from_str(n).unwrap(), rm), out);
+        assert_eq!(
+            NiceFloat(f64::rounding_from(&Natural::from_str(n).unwrap(), rm)),
+            NiceFloat(out)
+        );
     };
     test("3", RoundingMode::Exact, 3.0);
     test("123", RoundingMode::Exact, 123.0);
@@ -329,7 +335,10 @@ fn f64_rounding_from_natural_fail_3() {
 #[test]
 fn test_f32_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f32::from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(
+            NiceFloat(f32::from(&Natural::from_str(n).unwrap())),
+            NiceFloat(out)
+        );
     };
     test("3", 3.0);
     test("123", 123.0);
@@ -355,7 +364,10 @@ fn test_f32_from_natural() {
 #[test]
 fn test_f64_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f64::from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(
+            NiceFloat(f64::from(&Natural::from_str(n).unwrap())),
+            NiceFloat(out)
+        );
     };
     test("3", 3.0);
     test("123", 123.0);
@@ -388,8 +400,11 @@ fn test_f64_from_natural() {
 
 #[test]
 fn test_f32_checked_from_natural() {
-    let test = |n: &str, out| {
-        assert_eq!(f32::checked_from(&Natural::from_str(n).unwrap()), out);
+    let test = |n: &str, out: Option<f32>| {
+        assert_eq!(
+            f32::checked_from(&Natural::from_str(n).unwrap()).map(NiceFloat),
+            out.map(NiceFloat)
+        );
     };
     test("3", Some(3.0));
     test("123", Some(123.0));
@@ -417,8 +432,11 @@ fn test_f32_checked_from_natural() {
 
 #[test]
 fn test_f64_checked_from_natural() {
-    let test = |n: &str, out| {
-        assert_eq!(f64::checked_from(&Natural::from_str(n).unwrap()), out);
+    let test = |n: &str, out: Option<f64>| {
+        assert_eq!(
+            f64::checked_from(&Natural::from_str(n).unwrap()).map(NiceFloat),
+            out.map(NiceFloat)
+        );
     };
     test("3", Some(3.0));
     test("123", Some(123.0));
@@ -452,7 +470,10 @@ fn test_f64_checked_from_natural() {
 #[test]
 fn test_f32_exact_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f32::exact_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(
+            NiceFloat(f32::exact_from(&Natural::from_str(n).unwrap())),
+            NiceFloat(out)
+        );
     };
     test("3", 3.0);
     test("123", 123.0);
@@ -512,7 +533,10 @@ fn f32_exact_from_natural_fail_6() {
 #[test]
 fn test_f64_exact_from_natural() {
     let test = |n: &str, out| {
-        assert_eq!(f64::exact_from(&Natural::from_str(n).unwrap()), out);
+        assert_eq!(
+            NiceFloat(f64::exact_from(&Natural::from_str(n).unwrap())),
+            NiceFloat(out)
+        );
     };
     test("3", 3.0);
     test("123", 123.0);

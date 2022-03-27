@@ -1,8 +1,7 @@
 use num::arithmetic::traits::{ModNeg, ModNegAssign};
-use num::basic::traits::Zero;
-use std::ops::Sub;
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-fn mod_neg<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: T, m: T) -> T {
+fn mod_neg<T: PrimitiveUnsigned>(x: T, m: T) -> T {
     if x == T::ZERO {
         T::ZERO
     } else {
@@ -10,7 +9,7 @@ fn mod_neg<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: T, m: T) -> T {
     }
 }
 
-fn mod_neg_assign<T: Copy + Eq + Sub<T, Output = T> + Zero>(x: &mut T, m: T) {
+fn mod_neg_assign<T: PrimitiveUnsigned>(x: &mut T, m: T) {
     if *x != T::ZERO {
         *x = m - *x;
     }

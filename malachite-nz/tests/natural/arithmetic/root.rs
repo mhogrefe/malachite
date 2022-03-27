@@ -273,6 +273,19 @@ fn floor_root_fail() {
 }
 
 #[test]
+#[should_panic]
+fn floor_root_ref_fail() {
+    (&Natural::ONE).floor_root(0);
+}
+
+#[test]
+#[should_panic]
+fn floor_root_assign_fail() {
+    let mut x = Natural::ONE;
+    x.floor_root_assign(0);
+}
+
+#[test]
 fn test_ceiling_root() {
     let test = |s, exp, out| {
         let n = Natural::from_str(s).unwrap();
@@ -321,6 +334,19 @@ fn ceiling_root_fail() {
     Natural::ONE.ceiling_root(0);
 }
 
+#[test]
+#[should_panic]
+fn ceiling_root_ref_fail() {
+    (&Natural::ONE).ceiling_root(0);
+}
+
+#[test]
+#[should_panic]
+fn ceiling_root_assign_fail() {
+    let mut x = Natural::ONE;
+    x.ceiling_root_assign(0);
+}
+
 #[allow(clippy::redundant_closure_for_method_calls)]
 #[test]
 fn test_checked_root() {
@@ -367,6 +393,12 @@ fn test_checked_root() {
 #[should_panic]
 fn checked_root_fail() {
     Natural::ONE.checked_root(0);
+}
+
+#[test]
+#[should_panic]
+fn checked_root_ref_fail() {
+    (&Natural::ONE).checked_root(0);
 }
 
 #[test]
@@ -428,6 +460,19 @@ fn root_rem_fail() {
 }
 
 #[test]
+#[should_panic]
+fn root_rem_ref_fail() {
+    (&Natural::ONE).root_rem(0);
+}
+
+#[test]
+#[should_panic]
+fn root_assign_rem_fail() {
+    let mut x = Natural::ONE;
+    x.root_assign_rem(0);
+}
+
+#[test]
 fn limbs_floor_root_properties() {
     let mut config = GenConfig::new();
     config.insert("mean_length_n", 32);
@@ -464,9 +509,13 @@ fn limbs_root_rem_properties() {
 fn floor_cbrt_properties() {
     natural_gen().test_properties(|n| {
         let cbrt = n.clone().floor_root(3);
-        assert_eq!((&n).floor_root(3), cbrt);
+        assert!(cbrt.is_valid());
+        let cbrt_alt = (&n).floor_root(3);
+        assert!(cbrt_alt.is_valid());
+        assert_eq!(cbrt_alt, cbrt);
         let mut n_alt = n.clone();
         n_alt.floor_root_assign(3);
+        assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
         assert_eq!(floor_root_binary(&n, 3), cbrt);
         assert_eq!(
@@ -498,9 +547,13 @@ fn floor_cbrt_properties() {
 fn ceiling_cbrt_properties() {
     natural_gen().test_properties(|n| {
         let cbrt = n.clone().ceiling_root(3);
-        assert_eq!((&n).ceiling_root(3), cbrt);
+        assert!(cbrt.is_valid());
+        let cbrt_alt = (&n).ceiling_root(3);
+        assert!(cbrt_alt.is_valid());
+        assert_eq!(cbrt_alt, cbrt);
         let mut n_alt = n.clone();
         n_alt.ceiling_root_assign(3);
+        assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
         assert_eq!(ceiling_root_binary(&n, 3), cbrt);
         let cube = (&cbrt).pow(3);
@@ -525,7 +578,10 @@ fn ceiling_cbrt_properties() {
 fn checked_cbrt_properties() {
     natural_gen().test_properties(|n| {
         let cbrt = n.clone().checked_root(3);
-        assert_eq!((&n).checked_root(3), cbrt);
+        assert!(cbrt.as_ref().map_or(true, Natural::is_valid));
+        let cbrt_alt = (&n).checked_root(3);
+        assert!(cbrt_alt.as_ref().map_or(true, Natural::is_valid));
+        assert_eq!(cbrt_alt, cbrt);
         assert_eq!(checked_root_binary(&n, 3), cbrt);
         if let Some(cbrt) = cbrt {
             assert_eq!((&cbrt).pow(3), n);
@@ -546,10 +602,19 @@ fn checked_cbrt_properties() {
 fn cbrt_rem_properties() {
     natural_gen().test_properties(|n| {
         let (cbrt, rem) = n.clone().root_rem(3);
-        assert_eq!((&n).root_rem(3), (cbrt.clone(), rem.clone()));
+        assert!(cbrt.is_valid());
+        assert!(rem.is_valid());
+        let (cbrt_alt, rem_alt) = (&n).root_rem(3);
+        assert!(cbrt_alt.is_valid());
+        assert!(rem_alt.is_valid());
+        assert_eq!(cbrt_alt, cbrt_alt);
+        assert_eq!(rem_alt, rem);
         let mut n_alt = n.clone();
-        assert_eq!(n_alt.root_assign_rem(3), rem);
+        let rem_alt = n_alt.root_assign_rem(3);
+        assert!(n_alt.is_valid());
+        assert!(rem_alt.is_valid());
         assert_eq!(n_alt, cbrt);
+        assert_eq!(rem_alt, rem);
         assert_eq!(root_rem_binary(&n, 3), (cbrt.clone(), rem.clone()));
         let (rug_cbrt, rug_rem) = natural_to_rug_integer(&n).root_rem(rug::Integer::new(), 3);
         assert_eq!(rug_integer_to_natural(&rug_cbrt), cbrt);
@@ -572,9 +637,13 @@ fn cbrt_rem_properties() {
 fn floor_root_properties() {
     natural_unsigned_pair_gen_var_7().test_properties(|(n, exp)| {
         let root = n.clone().floor_root(exp);
-        assert_eq!((&n).floor_root(exp), root);
+        assert!(root.is_valid());
+        let root_alt = (&n).floor_root(exp);
+        assert!(root_alt.is_valid());
+        assert_eq!(root_alt, root);
         let mut n_alt = n.clone();
         n_alt.floor_root_assign(exp);
+        assert!(root_alt.is_valid());
         assert_eq!(n_alt, root);
         assert_eq!(floor_root_binary(&n, exp), root);
         assert_eq!(
@@ -611,9 +680,13 @@ fn floor_root_properties() {
 fn ceiling_root_properties() {
     natural_unsigned_pair_gen_var_7().test_properties(|(n, exp)| {
         let root = n.clone().ceiling_root(exp);
-        assert_eq!((&n).ceiling_root(exp), root);
+        assert!(root.is_valid());
+        let root_alt = (&n).ceiling_root(exp);
+        assert!(root_alt.is_valid());
+        assert_eq!(root_alt, root);
         let mut n_alt = n.clone();
         n_alt.ceiling_root_assign(exp);
+        assert!(root_alt.is_valid());
         assert_eq!(n_alt, root);
         assert_eq!(ceiling_root_binary(&n, exp), root);
         let pow = (&root).pow(exp);
@@ -643,7 +716,10 @@ fn ceiling_root_properties() {
 fn checked_root_properties() {
     natural_unsigned_pair_gen_var_7().test_properties(|(n, exp)| {
         let root = n.clone().checked_root(exp);
-        assert_eq!((&n).checked_root(exp), root);
+        assert!(root.as_ref().map_or(true, Natural::is_valid));
+        let root_alt = (&n).checked_root(exp);
+        assert!(root_alt.as_ref().map_or(true, Natural::is_valid));
+        assert_eq!(root_alt, root);
         assert_eq!(checked_root_binary(&n, exp), root);
         if let Some(root) = root {
             assert_eq!((&root).pow(exp), n);
@@ -669,10 +745,19 @@ fn checked_root_properties() {
 fn root_rem_properties() {
     natural_unsigned_pair_gen_var_7().test_properties(|(n, exp)| {
         let (root, rem) = n.clone().root_rem(exp);
-        assert_eq!((&n).root_rem(exp), (root.clone(), rem.clone()));
+        assert!(root.is_valid());
+        assert!(rem.is_valid());
+        let (root_alt, rem_alt) = (&n).root_rem(exp);
+        assert!(root_alt.is_valid());
+        assert!(rem_alt.is_valid());
+        assert_eq!(root_alt, root);
+        assert_eq!(rem_alt, rem);
         let mut n_alt = n.clone();
-        assert_eq!(n_alt.root_assign_rem(exp), rem);
+        let rem_alt = n_alt.root_assign_rem(exp);
+        assert!(root_alt.is_valid());
+        assert!(rem_alt.is_valid());
         assert_eq!(n_alt, root);
+        assert_eq!(rem_alt, rem);
         assert_eq!(root_rem_binary(&n, exp), (root.clone(), rem.clone()));
         let (rug_root, rug_rem) =
             natural_to_rug_integer(&n).root_rem(rug::Integer::new(), u32::exact_from(exp));

@@ -182,7 +182,7 @@ impl FromStringBase for Natural {
     /// assert!(Natural::from_string_base(2, "2").is_none());
     /// ```
     #[inline]
-    fn from_string_base(base: u64, s: &str) -> Option<Natural> {
+    fn from_string_base(base: u8, s: &str) -> Option<Natural> {
         assert!((2..=36).contains(&base), "base out of range");
         if s.is_empty() {
             None

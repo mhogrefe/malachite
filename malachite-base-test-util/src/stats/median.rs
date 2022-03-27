@@ -118,13 +118,12 @@ pub fn truncated_geometric_median<T: CheckedToF64 + PrimitiveInt>(
     let min_64 = min.checked_to_f64();
     let max_64 = max.checked_to_f64() - min_64;
     let unadjusted_mean = unadjusted_mean - min_64;
-    let (x, y) = binary_search_median(
+    binary_search_median(
         min,
         max,
         |n| truncated_geometric_pmf(max_64, unadjusted_mean, n.checked_to_f64() - min_64),
         |n| truncated_geometric_cdf(max_64, unadjusted_mean, n.checked_to_f64() - min_64),
-    );
-    (x, y)
+    )
 }
 
 fn double_nonzero_geometric_pmf(a: f64, b: f64, unadjusted_mean: f64, n: f64) -> f64 {
@@ -164,13 +163,12 @@ pub fn double_nonzero_geometric_median<T: CheckedToF64 + PrimitiveSigned>(
     assert!(max > T::ZERO);
     let min_64 = -min.checked_to_f64();
     let max_64 = max.checked_to_f64();
-    let (x, y) = binary_search_median(
+    binary_search_median(
         min,
         max,
         |n| double_nonzero_geometric_pmf(max_64, min_64, unadjusted_mean, n.checked_to_f64()),
         |n| double_nonzero_geometric_cdf(max_64, min_64, unadjusted_mean, n.checked_to_f64()),
-    );
-    (x, y)
+    )
 }
 
 fn double_geometric_pmf(a: f64, b: f64, unadjusted_mean: f64, n: f64) -> f64 {
@@ -213,11 +211,10 @@ pub fn double_geometric_median<T: CheckedToF64 + PrimitiveSigned>(
     assert!(max > T::ZERO);
     let min_64 = -min.checked_to_f64();
     let max_64 = max.checked_to_f64();
-    let (x, y) = binary_search_median(
+    binary_search_median(
         min,
         max,
         |n| double_geometric_pmf(max_64, min_64, unadjusted_mean, n.checked_to_f64()),
         |n| double_geometric_cdf(max_64, min_64, unadjusted_mean, n.checked_to_f64()),
-    );
-    (x, y)
+    )
 }

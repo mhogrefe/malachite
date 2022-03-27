@@ -3,9 +3,10 @@ use rounding_modes::{RoundingMode, ROUNDING_MODES};
 use slices::{random_values_from_slice, RandomValuesFromSlice};
 use std::iter::Cloned;
 
+/// Uniformly generates random `RoundingMode`s.
 pub type RandomRoundingModes = Cloned<RandomValuesFromSlice<'static, RoundingMode>>;
 
-/// Uniformly generates a random `RoundingMode`.
+/// Uniformly generates random `RoundingMode`s.
 ///
 /// The output length is infinite.
 ///

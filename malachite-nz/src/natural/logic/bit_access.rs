@@ -13,18 +13,6 @@ use platform::Limb;
 /// Additional memory: worst case O(1)
 ///
 /// This is mpz_tstbit from mpz/tstbit.c, GMP 6.1.2, where the input is non-negative.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_access::limbs_get_bit;
-///
-/// assert_eq!(limbs_get_bit(&[0, 0b1011], 0), false);
-/// assert_eq!(limbs_get_bit(&[0, 0b1011], 32), true);
-/// assert_eq!(limbs_get_bit(&[0, 0b1011], 33), true);
-/// assert_eq!(limbs_get_bit(&[0, 0b1011], 34), false);
-/// assert_eq!(limbs_get_bit(&[0, 0b1011], 35), true);
-/// assert_eq!(limbs_get_bit(&[0, 0b1011], 100), false);
-/// ```
 #[doc(hidden)]
 pub fn limbs_get_bit(xs: &[Limb], index: u64) -> bool {
     xs.get(usize::exact_from(index >> Limb::LOG_WIDTH))
@@ -46,19 +34,6 @@ fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
 /// # Panics
 /// Panics if `index` >= `xs.len()` * `Limb::WIDTH`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_access::limbs_slice_set_bit;
-///
-/// let mut xs = &mut [0, 1];
-/// limbs_slice_set_bit(xs, 0);
-/// assert_eq!(xs, &[1, 1]);
-/// limbs_slice_set_bit(xs, 1);
-/// assert_eq!(xs, &[3, 1]);
-/// limbs_slice_set_bit(xs, 33);
-/// assert_eq!(xs, &[3, 3]);
-/// ```
-///
 /// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative and bit_idx small
 /// enough that no additional memory needs to be given to d.
 #[doc(hidden)]
@@ -73,21 +48,6 @@ pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
 /// Time: worst case O(`index`)
 ///
 /// Additional memory: worst case O(`index`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_access::limbs_vec_set_bit;
-///
-/// let mut xs = vec![0, 1];
-/// limbs_vec_set_bit(&mut xs, 0);
-/// assert_eq!(xs, &[1, 1]);
-/// limbs_vec_set_bit(&mut xs, 1);
-/// assert_eq!(xs, &[3, 1]);
-/// limbs_vec_set_bit(&mut xs, 33);
-/// assert_eq!(xs, &[3, 3]);
-/// limbs_vec_set_bit(&mut xs, 128);
-/// assert_eq!(xs, &[3, 3, 0, 0, 1]);
-/// ```
 ///
 /// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative.
 #[doc(hidden)]
@@ -108,17 +68,6 @@ pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
 /// Additional memory: worst case O(1)
 ///
 /// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is non-negative.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
-///
-/// let mut xs = &mut [3, 3];
-/// limbs_clear_bit(xs, 33);
-/// assert_eq!(xs, &[3, 1]);
-/// limbs_clear_bit(xs, 1);
-/// assert_eq!(xs, &[1, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_clear_bit(xs: &mut [Limb], index: u64) {
     let small_index = usize::exact_from(index >> Limb::LOG_WIDTH);

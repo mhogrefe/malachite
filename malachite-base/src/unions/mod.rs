@@ -149,7 +149,7 @@ union!(
     [H, H, 'H', h]
 );
 
-/// This module contains iterators that generate unions without repetition.
+/// Iterators that generate unions without repetition.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -201,7 +201,7 @@ union!(
 /// );
 /// ```
 pub mod exhaustive;
-/// This module contains iterators that generate unions randomly.
+/// Iterators that generate unions randomly.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///

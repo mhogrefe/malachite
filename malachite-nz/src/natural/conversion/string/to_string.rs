@@ -117,12 +117,12 @@ impl ToStringBase for Natural {
     /// assert_eq!(Natural::from(1000u32).to_string_base(10), "1000");
     /// assert_eq!(Natural::from(1000u32).to_string_base(36), "rs");
     /// ```
-    fn to_string_base(&self, base: u64) -> String {
+    fn to_string_base(&self, base: u8) -> String {
         assert!((2..=36).contains(&base), "base out of range");
         if let Natural(Small(x)) = self {
             x.to_string_base(base)
         } else {
-            let mut digits = self.to_digits_desc(&u8::wrapping_from(base));
+            let mut digits = self.to_digits_desc(&base);
             for digit in &mut digits {
                 *digit = digit_to_display_byte_lower(*digit).unwrap();
             }
@@ -152,12 +152,12 @@ impl ToStringBase for Natural {
     /// assert_eq!(Natural::from(1000u32).to_string_base_upper(10), "1000");
     /// assert_eq!(Natural::from(1000u32).to_string_base_upper(36), "RS");
     /// ```
-    fn to_string_base_upper(&self, base: u64) -> String {
+    fn to_string_base_upper(&self, base: u8) -> String {
         assert!((2..=36).contains(&base), "base out of range");
         if let Natural(Small(x)) = self {
             x.to_string_base_upper(base)
         } else {
-            let mut digits = self.to_digits_desc(&u8::wrapping_from(base));
+            let mut digits = self.to_digits_desc(&base);
             for digit in &mut digits {
                 *digit = digit_to_display_byte_upper(*digit).unwrap();
             }

@@ -38,14 +38,6 @@ fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
 ///
 /// # Panics
 /// Panics if `pow` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_sub::*;
-///
-/// assert_eq!(limbs_mod_power_of_2_limb_sub_limbs(3, &[2], 4), &[1]);
-/// assert_eq!(limbs_mod_power_of_2_limb_sub_limbs(3, &[1, 2, 3], 70), &[2, u32::MAX - 1, 60]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> Vec<Limb> {
     let mut diff = limbs_neg_mod_power_of_2(ys, pow);
@@ -63,19 +55,6 @@ pub fn limbs_mod_power_of_2_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> Ve
 ///
 /// # Panics
 /// Panics if `pow` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_sub::*;
-///
-/// let mut ys = vec![2];
-/// limbs_mod_power_of_2_limb_sub_limbs_in_place(3, &mut ys, 4);
-/// assert_eq!(ys, &[1]);
-///
-/// let mut ys = vec![1, 2, 3];
-/// limbs_mod_power_of_2_limb_sub_limbs_in_place(3, &mut ys, 70);
-/// assert_eq!(ys, &[2, u32::MAX - 1, 60]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Limb>, pow: u64) {
     limbs_neg_mod_power_of_2_in_place(ys, pow);
@@ -89,14 +68,6 @@ pub fn limbs_mod_power_of_2_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Limb>,
 /// Time: worst case O(`pow`)
 ///
 /// Additional memory: worst case O(`pow`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_sub::limbs_mod_power_of_2_sub;
-///
-/// assert_eq!(limbs_mod_power_of_2_sub(&[1, 2, 3], &[6, 7], 100), &[4294967291, 4294967290, 2]);
-/// assert_eq!(limbs_mod_power_of_2_sub(&[6, 7], &[1, 2, 3], 100), &[5, 5, 4294967293, 15]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     let ys_len = ys.len();
@@ -119,19 +90,6 @@ pub fn limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb>
 /// Time: worst case O(`pow`)
 ///
 /// Additional memory: worst case O(`pow`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_sub::*;
-///
-/// let mut xs = vec![1, 2, 3];
-/// limbs_mod_power_of_2_sub_in_place_left(&mut xs, &[6, 7], 100);
-/// assert_eq!(xs, &[4294967291, 4294967290, 2]);
-///
-/// let mut xs = vec![6, 7];
-/// limbs_mod_power_of_2_sub_in_place_left(&mut xs, &[1, 2, 3], 100);
-/// assert_eq!(xs, &[5, 5, 4294967293, 15]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let ys_len = ys.len();
@@ -154,19 +112,6 @@ pub fn limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], p
 /// Time: worst case O(`pow`)
 ///
 /// Additional memory: worst case O(`pow`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_sub::*;
-///
-/// let mut ys = vec![6, 7];
-/// limbs_mod_power_of_2_sub_in_place_right(&[1, 2, 3], &mut ys, 100);
-/// assert_eq!(ys, &[4294967291, 4294967290, 2]);
-///
-/// let mut ys = vec![1, 2, 3];
-/// limbs_mod_power_of_2_sub_in_place_right(&[6, 7], &mut ys, 100);
-/// assert_eq!(ys, &[5, 5, 4294967293, 15]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, pow: u64) {
     let xs_len = xs.len();
@@ -198,23 +143,6 @@ pub fn limbs_mod_power_of_2_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, 
 /// Time: worst case O(`pow`)
 ///
 /// Additional memory: worst case O(`pow`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_sub::*;
-///
-/// let mut xs = vec![1, 2, 3];
-/// let mut ys = vec![6, 7];
-/// assert_eq!(limbs_mod_power_of_2_sub_in_place_either(&mut xs, &mut ys, 100), false);
-/// assert_eq!(xs, &[4294967291, 4294967290, 2]);
-/// assert_eq!(ys, &[6, 7]);
-///
-/// let mut xs = vec![6, 7];
-/// let mut ys = vec![1, 2, 3];
-/// assert_eq!(limbs_mod_power_of_2_sub_in_place_either(&mut xs, &mut ys, 100), true);
-/// assert_eq!(xs, &[6, 7]);
-/// assert_eq!(ys, &[5, 5, 4294967293, 15]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_sub_in_place_either(
     xs: &mut Vec<Limb>,

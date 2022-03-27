@@ -15,7 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_mod_square<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, m) in unsigned_pair_gen_var_16::<T>().get(gm, &config).take(limit) {
-        println!("{}.square() === {} mod {}", x, x.mod_square(m), m);
+        println!("{}.square() ≡ {} mod {}", x, x.mod_square(m), m);
     }
 }
 

@@ -1,5 +1,5 @@
 use malachite_base::num::arithmetic::traits::{
-    DivRem, WrappingAddAssign, WrappingSubAssign, XMulYIsZZ,
+    DivRem, OverflowingAddAssign, WrappingAddAssign, WrappingSubAssign, XMulYIsZZ,
 };
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
@@ -54,8 +54,8 @@ fn limbs_div_limb_normalized_in_place_mod(
 ) -> Limb {
     let len = ns.len();
     if len == 1 {
-        let (q, r) = div_mod_by_preinversion(ns_high, ns[0], d, d_inv);
-        ns[0] = q;
+        let r;
+        (ns[0], r) = div_mod_by_preinversion(ns_high, ns[0], d, d_inv);
         return r;
     }
     let power_of_2 = d.wrapping_neg().wrapping_mul(d_inv);
@@ -72,16 +72,14 @@ fn limbs_div_limb_normalized_in_place_mod(
         q_low = r;
         if big_carry {
             q.wrapping_add_assign(DoubleLimb::join_halves(1, d_inv));
-            let (sum, carry) = sum_low.overflowing_add(power_of_2);
-            sum_low = sum;
-            if carry {
+            if sum_low.overflowing_add_assign(power_of_2) {
                 sum_low.wrapping_sub_assign(d);
                 q.wrapping_add_assign(1);
             }
         }
         let (q_higher, q_high) = q.split_in_half();
         ns[j + 1] = q_high;
-        assert!(!limbs_slice_add_limb_in_place(&mut ns[j + 2..], q_higher,));
+        assert!(!limbs_slice_add_limb_in_place(&mut ns[j + 2..], q_higher));
         let (sum, carry) = DoubleLimb::join_halves(sum_low, ns[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
@@ -101,7 +99,7 @@ fn limbs_div_limb_normalized_in_place_mod(
     let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
         .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
-    assert!(!limbs_slice_add_limb_in_place(&mut ns[1..], q_high,));
+    assert!(!limbs_slice_add_limb_in_place(&mut ns[1..], q_high));
     ns[0] = q_low;
     r
 }

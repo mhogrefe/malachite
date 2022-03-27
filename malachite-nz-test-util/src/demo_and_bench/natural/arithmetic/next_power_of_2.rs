@@ -129,10 +129,9 @@ fn benchmark_limbs_vec_next_power_of_2_in_place(
         limit,
         file_name,
         &vec_len_bucketer(),
-        &mut [(
-            "Malachite",
-            &mut (|mut xs| limbs_vec_next_power_of_2_in_place(&mut xs)),
-        )],
+        &mut [("Malachite", &mut |mut xs| {
+            limbs_vec_next_power_of_2_in_place(&mut xs)
+        })],
     );
 }
 
@@ -154,6 +153,7 @@ fn benchmark_natural_next_power_of_2_assign(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_next_power_of_2_library_comparison(
     gm: GenMode,
     config: GenConfig,

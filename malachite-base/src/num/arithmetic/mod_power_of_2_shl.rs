@@ -1,13 +1,10 @@
-use num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Shl, ModPowerOf2ShlAssign, UnsignedAbs};
+use num::arithmetic::traits::{ModPowerOf2Shl, ModPowerOf2ShlAssign, UnsignedAbs};
 use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
-use num::conversion::traits::{ExactFrom, WrappingFrom};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
-fn mod_power_of_2_shl_unsigned<
-    T: ModPowerOf2<Output = T> + PrimitiveInt + Shl<U, Output = T>,
-    U: ExactFrom<u64> + Ord,
->(
+fn mod_power_of_2_shl_unsigned<T: PrimitiveUnsigned + Shl<U, Output = T>, U: PrimitiveUnsigned>(
     x: T,
     other: U,
     pow: u64,
@@ -20,7 +17,7 @@ fn mod_power_of_2_shl_unsigned<
     }
 }
 
-fn mod_power_of_2_shl_assign_unsigned<T: PrimitiveInt + ShlAssign<U>, U: ExactFrom<u64> + Ord>(
+fn mod_power_of_2_shl_assign_unsigned<T: PrimitiveUnsigned + ShlAssign<U>, U: PrimitiveUnsigned>(
     x: &mut T,
     other: U,
     pow: u64,
@@ -82,8 +79,8 @@ apply_to_unsigneds!(impl_mod_power_of_2_shl_unsigned);
 
 fn mod_power_of_2_shl_signed<
     T: ModPowerOf2Shl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
-    U: Copy + Eq + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     other: S,
@@ -105,8 +102,8 @@ fn mod_power_of_2_shl_signed<
 
 fn mod_power_of_2_shl_assign_signed<
     T: ModPowerOf2ShlAssign<U> + PrimitiveInt + ShrAssign<U>,
-    U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: &mut T,
     other: S,

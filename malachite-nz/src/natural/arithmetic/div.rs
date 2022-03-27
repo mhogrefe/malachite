@@ -139,14 +139,6 @@ pub fn div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> L
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div::limbs_div_limb;
-///
-/// assert_eq!(limbs_div_limb(&[123, 456], 789), &[2482262467, 0]);
-/// assert_eq!(limbs_div_limb(&[u32::MAX, u32::MAX], 3), &[0x55555555, 0x55555555]);
-/// ```
-///
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.2.1, where the quotient is returned, but
 /// not computing the remainder.
 #[doc(hidden)]
@@ -169,19 +161,6 @@ pub fn limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div::limbs_div_limb_to_out;
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_limb_to_out(&mut out, &[123, 456], 789);
-/// assert_eq!(out, &[2482262467, 0, 10, 10]);
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_limb_to_out(&mut out, &[u32::MAX, u32::MAX], 3);
-/// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
-/// ```
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0 and un > 1, but not
 /// computing the remainder.
@@ -206,9 +185,7 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for (out_q, &n) in out_init.iter_mut().zip(ns_init.iter()).rev() {
-            let (q, new_r) = div_mod_by_preinversion(r, n, d, d_inv);
-            *out_q = q;
-            r = new_r;
+            (*out_q, r) = div_mod_by_preinversion(r, n, d, d_inv);
         }
     } else {
         // Skip a division if high < divisor (high quotient 0). Testing here before normalizing will
@@ -230,9 +207,7 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
         let (out_first, out_tail) = out.split_first_mut().unwrap();
         for (out_q, &n) in out_tail.iter_mut().zip(ns_init.iter()).rev() {
             let shifted_n = (previous_n << bits) | (n >> cobits);
-            let (q, new_r) = div_mod_by_preinversion(r, shifted_n, d, d_inv);
-            *out_q = q;
-            r = new_r;
+            (*out_q, r) = div_mod_by_preinversion(r, shifted_n, d, d_inv);
             previous_n = n;
         }
         *out_first = div_by_preinversion(r, previous_n << bits, d, d_inv);
@@ -251,19 +226,6 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 ///
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div::limbs_div_limb_in_place;
-///
-/// let mut ns = vec![123, 456];
-/// limbs_div_limb_in_place(&mut ns, 789);
-/// assert_eq!(ns, &[2482262467, 0]);
-///
-/// let mut ns = vec![u32::MAX, u32::MAX];
-/// limbs_div_limb_in_place(&mut ns, 3);
-/// assert_eq!(ns, &[0x55555555, 0x55555555]);
-/// ```
 ///
 /// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qp == up, qxn is 0, and
 /// un > 1, but not computing the remainder.
@@ -285,9 +247,7 @@ pub fn limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
         // Multiply-by-inverse, divisor already normalized.
         let d_inv = limbs_invert_limb(d);
         for n in ns_init.iter_mut().rev() {
-            let (q, new_r) = div_mod_by_preinversion(r, *n, d, d_inv);
-            *n = q;
-            r = new_r;
+            (*n, r) = div_mod_by_preinversion(r, *n, d, d_inv);
         }
     } else {
         // Skip a division if high < divisor (high quotient 0). Testing here before normalizing will
@@ -309,9 +269,7 @@ pub fn limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
         for i in (0..last_index).rev() {
             let n = ns[i];
             let shifted_n = (previous_n << bits) | (n >> cobits);
-            let (q, new_r) = div_mod_by_preinversion(r, shifted_n, d, d_inv);
-            ns[i + 1] = q;
-            r = new_r;
+            (ns[i + 1], r) = div_mod_by_preinversion(r, shifted_n, d, d_inv);
             previous_n = n;
         }
         ns[0] = div_by_preinversion(r, previous_n << bits, d, d_inv);
@@ -375,7 +333,8 @@ pub fn limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv
             limbs_sub_mul_limb_same_length_in_place_left(ns, ds_s, q);
             n_1 = ns[d_len_s_m_1]; // update n_1; last loop's value will now be invalid
         } else {
-            let (new_q, n) = limbs_div_mod_three_limb_by_two_limb(
+            let n;
+            (q, n) = limbs_div_mod_three_limb_by_two_limb(
                 n_1,
                 ns[d_len_s_m_1],
                 ns[d_len_s - 2],
@@ -383,9 +342,8 @@ pub fn limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv
                 d_2,
                 d_inv,
             );
-            q = new_q;
-            let (new_n_1, mut n_0) = n.split_in_half();
-            n_1 = new_n_1;
+            let mut n_0;
+            (n_1, n_0) = n.split_in_half();
             let carry = limbs_sub_mul_limb_same_length_in_place_left(
                 &mut ns[..d_len_s - 2],
                 &ds_s[..d_len_s - 2],
@@ -430,11 +388,11 @@ pub fn limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv
                 }
                 n_1 = ns[i + 1];
             } else {
-                let (new_q, new_n) =
+                let n;
+                (q, n) =
                     limbs_div_mod_three_limb_by_two_limb(n_1, ns[i + 1], ns[i], d_1, d_2, d_inv);
-                q = new_q;
-                let (new_n_1, mut n_0) = new_n.split_in_half();
-                n_1 = new_n_1;
+                let mut n_0;
+                (n_1, n_0) = n.split_in_half();
                 let carry = limbs_sub_mul_limb_same_length_in_place_left(
                     &mut ns[..i],
                     &ds_suffix[..ds_suffix.len() - 2],
@@ -470,21 +428,16 @@ pub fn limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv
             if n_1 != carry {
                 if flag && n_1 < carry {
                     q.wrapping_sub_assign(1);
-                    let (new_n_1, new_n_0) = Limb::xx_add_yy_is_zz(ns[1], ns[0], d_2, ds_hi[0]);
-                    ns[1] = new_n_1;
-                    ns[0] = new_n_0;
+                    (ns[1], ns[0]) = Limb::xx_add_yy_is_zz(ns[1], ns[0], d_2, ds_hi[0]);
                 } else {
                     flag = false;
                 }
             }
             n_1 = ns[1];
         } else {
-            let (new_q, new_n) =
-                limbs_div_mod_three_limb_by_two_limb(n_1, ns[1], ns[0], d_1, d_2, d_inv);
-            q = new_q;
-            let (new_n_1, n_0) = new_n.split_in_half();
-            n_1 = new_n_1;
-            ns[0] = n_0;
+            let new_n;
+            (q, new_n) = limbs_div_mod_three_limb_by_two_limb(n_1, ns[1], ns[0], d_1, d_2, d_inv);
+            (n_1, ns[0]) = new_n.split_in_half();
             ns[1] = n_1;
         }
         qs[0] = q;
@@ -799,12 +752,9 @@ pub fn limbs_div_schoolbook_approx(
             limbs_sub_mul_limb_same_length_in_place_left(&mut ns[j - d_len_minus_1..j + 1], ds, q);
             n_1 = ns[j]; // update n_1, last loop's value will now be invalid
         } else {
-            let (new_q, new_n) =
-                limbs_div_mod_three_limb_by_two_limb(n_1, ns[j], ns[j - 1], d_1, d_0, d_inv);
-            q = new_q;
-            let (new_n1, new_n0) = new_n.split_in_half();
-            n_1 = new_n1;
-            n_0 = new_n0;
+            let n;
+            (q, n) = limbs_div_mod_three_limb_by_two_limb(n_1, ns[j], ns[j - 1], d_1, d_0, d_inv);
+            (n_1, n_0) = n.split_in_half();
             let local_carry_1 = limbs_sub_mul_limb_same_length_in_place_left(
                 &mut ns[j - d_len_minus_1..j - 1],
                 &ds[..d_len_minus_1 - 1],
@@ -847,12 +797,10 @@ pub fn limbs_div_schoolbook_approx(
                 }
                 n_1 = ns[j];
             } else {
-                let (new_q, new_n) =
+                let n;
+                (q, n) =
                     limbs_div_mod_three_limb_by_two_limb(n_1, ns[j], ns[j - 1], d_1, d_0, d_inv);
-                q = new_q;
-                let (new_n_1, new_n_0) = new_n.split_in_half();
-                n_1 = new_n_1;
-                n_0 = new_n_0;
+                (n_1, n_0) = n.split_in_half();
                 let local_carry_1 =
                     limbs_sub_mul_limb_same_length_in_place_left(&mut ns[b..j - 1], &ds[..i], q);
                 let local_carry_2 = n_0 < local_carry_1;
@@ -883,13 +831,10 @@ pub fn limbs_div_schoolbook_approx(
             }
             n_1 = ns[1];
         } else {
-            let (new_q, new_n) =
-                limbs_div_mod_three_limb_by_two_limb(n_1, ns[1], ns[0], d_1, d_0, d_inv);
-            q = new_q;
-            let (new_n_1, n_0) = new_n.split_in_half();
-            n_1 = new_n_1;
+            let n;
+            (q, n) = limbs_div_mod_three_limb_by_two_limb(n_1, ns[1], ns[0], d_1, d_0, d_inv);
+            (n_1, ns[0]) = n.split_in_half();
             ns[1] = n_1;
-            ns[0] = n_0;
         }
         qs[0] = q;
     }
@@ -1032,12 +977,9 @@ pub fn limbs_div_divide_and_conquer_approx(
                     n_2
                 );
             } else {
-                let (new_q, new_n) =
-                    limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, d_inv);
-                q = new_q;
-                let (new_n_1, new_n_0) = new_n.split_in_half();
-                n_1 = new_n_1;
-                n_0 = new_n_0;
+                let n;
+                (q, n) = limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, d_inv);
+                (n_1, n_0) = n.split_in_half();
                 // d_len > 2
                 let local_carry_1 =
                     limbs_sub_mul_limb_same_length_in_place_left(&mut ns_hi[..b], &ds[..b], q);
@@ -1282,7 +1224,7 @@ fn limbs_div_barrett_approx_preinverted(
         // Compute the next block of quotient limbs by multiplying the inverse I by the upper part
         // of the partial remainder R.
         limbs_mul_same_length_to_out(scratch, rs_hi, is);
-        // I's highest but is implicit
+        // i's highest bit is implicit
         carry = limbs_add_same_length_to_out(qs, &scratch[i_len..i_len << 1], rs_hi);
         assert!(!carry);
         q_len -= i_len;
@@ -1753,14 +1695,6 @@ pub fn limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
 /// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
 /// of `ds` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div::limbs_div;
-///
-/// assert_eq!(limbs_div(&[1, 2], &[3, 4]), vec![0]);
-/// assert_eq!(limbs_div(&[1, 2, 3], &[4, 5]), vec![2576980377, 0]);
-/// ```
-///
 /// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
 /// qp is returned.
 #[doc(hidden)]
@@ -1785,19 +1719,6 @@ pub fn limbs_div(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// # Panics
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div::limbs_div_to_out;
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_to_out(qs, &mut [1, 2], &mut [3, 4]);
-/// assert_eq!(qs, &[0, 10, 10, 10]);
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_to_out(qs, &mut [1, 2, 3], &mut [4, 5]);
-/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
-/// ```
 ///
 /// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
 /// np and dp are consumed, saving some memory allocations.
@@ -1833,19 +1754,6 @@ pub fn limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_val_ref;
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_to_out_val_ref(qs, &mut [1, 2], &[3, 4]);
-/// assert_eq!(qs, &[0, 10, 10, 10]);
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_to_out_val_ref(qs, &mut [1, 2, 3], &[4, 5]);
-/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
-/// ```
-///
 /// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
 /// np is consumed, saving some memory allocations.
 #[doc(hidden)]
@@ -1880,19 +1788,6 @@ pub fn limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_ref_val;
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_to_out_ref_val(qs, &[1, 2], &mut [3, 4]);
-/// assert_eq!(qs, &[0, 10, 10, 10]);
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_to_out_ref_val(qs, &[1, 2, 3], &mut [4, 5]);
-/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
-/// ```
-///
 /// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
 /// dp is consumed, saving some memory allocations.
 #[doc(hidden)]
@@ -1926,19 +1821,6 @@ pub fn limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
 /// # Panics
 /// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div::limbs_div_to_out_ref_ref;
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_to_out_ref_ref(qs, &[1, 2], &[3, 4]);
-/// assert_eq!(qs, &[0, 10, 10, 10]);
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_to_out_ref_ref(qs, &[1, 2, 3], &[4, 5]);
-/// assert_eq!(qs, &[2576980377, 0, 10, 10]);
-/// ```
 ///
 /// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally.
 #[doc(hidden)]
@@ -2138,6 +2020,9 @@ impl<'a> Div<Natural> for &'a Natural {
     /// );
     /// ```
     fn div(self, mut other: Natural) -> Natural {
+        if *self == other {
+            return Natural::ONE;
+        }
         match (self, &mut other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => n.clone(),
@@ -2194,10 +2079,12 @@ impl<'a, 'b> Div<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn div(self, other: &'b Natural) -> Natural {
+        if self == other {
+            return Natural::ONE;
+        }
         match (self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => n.clone(),
-            (n, d) if std::ptr::eq(n, d) => Natural::ONE,
             (n, &Natural(Small(d))) => n.div_limb_ref(d),
             (Natural(Small(_)), _) => Natural::ZERO,
             (&Natural(Large(ref ns)), &Natural(Large(ref ds))) => {
@@ -2244,6 +2131,10 @@ impl DivAssign<Natural> for Natural {
     /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign(&mut self, other: Natural) {
+        if *self == other {
+            *self = Natural::ONE;
+            return;
+        }
         match (&mut *self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (_, natural_one!()) => {}
@@ -2298,6 +2189,10 @@ impl<'a> DivAssign<&'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "810000006723");
     /// ```
     fn div_assign(&mut self, other: &'a Natural) {
+        if self == other {
+            *self = Natural::ONE;
+            return;
+        }
         match (&mut *self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (_, natural_one!()) => {}

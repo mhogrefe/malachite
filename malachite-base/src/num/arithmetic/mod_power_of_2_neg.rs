@@ -1,12 +1,12 @@
-use num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Neg, ModPowerOf2NegAssign};
-use num::basic::integers::PrimitiveInt;
+use num::arithmetic::traits::{ModPowerOf2Neg, ModPowerOf2NegAssign};
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-fn mod_power_of_2_neg<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, pow: u64) -> T {
+fn mod_power_of_2_neg<T: PrimitiveUnsigned>(x: T, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
     x.wrapping_neg().mod_power_of_2(pow)
 }
 
-fn mod_power_of_2_neg_assign<T: PrimitiveInt>(x: &mut T, pow: u64) {
+fn mod_power_of_2_neg_assign<T: PrimitiveUnsigned>(x: &mut T, pow: u64) {
     assert!(pow <= T::WIDTH);
     x.wrapping_neg_assign();
     x.mod_power_of_2_assign(pow);

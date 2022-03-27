@@ -8,9 +8,7 @@ use malachite_nz::platform::{DoubleLimb, Limb};
 pub fn limbs_square_to_out_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let (xs_head, xs_tail) = xs.split_first().unwrap();
-    let (square_hi, square_lo) = DoubleLimb::from(*xs_head).square().split_in_half();
-    out[0] = square_lo;
-    out[1] = square_hi;
+    (out[1], out[0]) = DoubleLimb::from(*xs_head).square().split_in_half();
     if n > 1 {
         let two_n = n << 1;
         let mut scratch = vec![0; two_n - 2];

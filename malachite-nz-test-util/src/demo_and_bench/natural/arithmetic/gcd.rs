@@ -492,6 +492,7 @@ fn benchmark_natural_gcd_algorithms(gm: GenMode, config: GenConfig, limit: usize
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_gcd_library_comparison(
     gm: GenMode,
     config: GenConfig,
@@ -562,6 +563,7 @@ fn benchmark_natural_gcd_algorithms_2(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_gcd_library_comparison_2(
     gm: GenMode,
     config: GenConfig,

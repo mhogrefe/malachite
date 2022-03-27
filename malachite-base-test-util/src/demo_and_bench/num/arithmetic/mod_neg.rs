@@ -14,7 +14,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_mod_neg<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in unsigned_pair_gen_var_16::<T>().get(gm, &config).take(limit) {
-        println!("-{} === {} mod {}", n, n.mod_neg(m), m);
+        println!("-{} ≡ {} mod {}", n, n.mod_neg(m), m);
     }
 }
 

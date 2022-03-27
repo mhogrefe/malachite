@@ -14,15 +14,6 @@ use std::ops::{Sub, SubAssign};
 ///
 /// where n = `xs.len()`
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb;
-///
-/// assert_eq!(limbs_sub_limb(&[123, 456], 78), (vec![45, 456], false));
-/// assert_eq!(limbs_sub_limb(&[123, 456], 789), (vec![4294966630, 455], false));
-/// assert_eq!(limbs_sub_limb(&[1], 2), (vec![u32::MAX], true));
-/// ```
-///
 /// This is mpn_sub_1 from gmp.h, GMP 6.2.1, where the result is returned.
 #[doc(hidden)]
 pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
@@ -56,31 +47,14 @@ pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[123, 456], 78), false);
-/// assert_eq!(out, &[45, 456, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[123, 456], 789), false);
-/// assert_eq!(out, &[4294966630, 455, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_limb_to_out(&mut out, &[1], 2), true);
-/// assert_eq!(out, &[u32::MAX, 0, 0]);
-/// ```
-///
 /// This is mpn_sub_1 from gmp.h, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
-        let (diff, overflow) = xs[i].overflowing_sub(y);
-        out[i] = diff;
+        let overflow;
+        (out[i], overflow) = xs[i].overflowing_sub(y);
         if overflow {
             y = 1;
         } else {
@@ -101,23 +75,6 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 ///
 /// Additional memory: worst case O(1)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_limb_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_sub_limb_in_place(&mut xs, 78), false);
-/// assert_eq!(xs, &[45, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_sub_limb_in_place(&mut xs, 789), false);
-/// assert_eq!(xs, &[4294966630, 455]);
-///
-/// let mut xs = vec![1];
-/// assert_eq!(limbs_sub_limb_in_place(&mut xs, 2), true);
-/// assert_eq!(xs, &[u32::MAX]);
-/// ```
-///
 /// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
 #[doc(hidden)]
 pub fn limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
@@ -132,9 +89,9 @@ pub fn limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
 }
 
 fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
-    let (mut diff, overflow) = x.overflowing_sub(y);
     let b = *borrow;
-    *borrow = overflow;
+    let mut diff;
+    (diff, *borrow) = x.overflowing_sub(y);
     if b {
         *borrow |= diff.overflowing_sub_assign(1);
     }
@@ -154,14 +111,6 @@ fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub;
-///
-/// assert_eq!(limbs_sub(&[123, 456], &[789]), (vec![4294966630, 455], false));
-/// assert_eq!(limbs_sub(&[123, 456], &[456, 789]), (vec![4294966963, 4294966962], true));
-/// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is returned.
 #[doc(hidden)]
@@ -198,19 +147,6 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
 /// # Panics
 /// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_same_length_to_out(&mut out, &[123, 456], &[789, 123]), false);
-/// assert_eq!(out, &[4294966630, 332, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_same_length_to_out(&mut out, &[123, 456], &[456, 789]), true);
-/// assert_eq!(out, &[4294966963, 4294966962, 0]);
-/// ```
-///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
@@ -238,19 +174,6 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// # Panics
 /// Panics if `out` is shorter than `xs` or if `xs` is shorter than `ys`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_greater_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_greater_to_out(&mut out, &[123, 456], &[789]), false);
-/// assert_eq!(out, &[4294966630, 455, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_sub_greater_to_out(&mut out, &[123, 456], &[456, 789]), true);
-/// assert_eq!(out, &[4294966963, 4294966962, 0]);
-/// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.2.1.
 #[doc(hidden)]
@@ -284,19 +207,6 @@ pub fn limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_left;
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_same_length_in_place_left(xs, &[789, 123]), false);
-/// assert_eq!(xs, &[4294966630, 332]);
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_same_length_in_place_left(xs, &[456, 789]), true);
-/// assert_eq!(xs, &[4294966963, 4294966962]);
-/// ```
-///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
 #[doc(hidden)]
 pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
@@ -322,19 +232,6 @@ pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_greater_in_place_left;
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_greater_in_place_left(xs, &[789]), false);
-/// assert_eq!(xs, &[4294966630, 455]);
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_greater_in_place_left(xs, &[456, 789]), true);
-/// assert_eq!(xs, &[4294966963, 4294966962]);
-/// ```
 ///
 /// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is written to the first input.
 #[doc(hidden)]
@@ -366,19 +263,6 @@ pub fn limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_right;
-///
-/// let ys = &mut [789, 123];
-/// assert_eq!(limbs_sub_same_length_in_place_right(&[123, 456], ys), false);
-/// assert_eq!(ys, &[4294966630, 332]);
-///
-/// let ys = &mut [456, 789];
-/// assert_eq!(limbs_sub_same_length_in_place_right(&[123, 456], ys), true);
-/// assert_eq!(ys, &[4294966963, 4294966962]);
-/// ```
-///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input.
 #[doc(hidden)]
 pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
@@ -403,19 +287,6 @@ pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> boo
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `len` is greater than `xs.len()`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_slice_sub_in_place_right;
-///
-/// let ys = &mut [789, 123];
-/// assert_eq!(limbs_slice_sub_in_place_right(&[123, 456], ys, 2), false);
-/// assert_eq!(ys, &[4294966630, 332]);
-///
-/// let ys = &mut [789, 123];
-/// assert_eq!(limbs_slice_sub_in_place_right(&[123, 456], ys, 1), false);
-/// assert_eq!(ys, &[4294966630, 455]);
-/// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input (which
 /// has `len` limbs) and the second input has enough space past `len` to accomodate the output.
@@ -450,19 +321,6 @@ pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) 
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_vec_sub_in_place_right;
-///
-/// let mut ys = vec![789];
-/// assert_eq!(limbs_vec_sub_in_place_right(&[123, 456], &mut ys), false);
-/// assert_eq!(ys, &[4294966630, 455]);
-///
-/// let mut ys = vec![456, 789];
-/// assert_eq!(limbs_vec_sub_in_place_right(&[123, 456], &mut ys), true);
-/// assert_eq!(ys, &[4294966963, 4294966962]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
@@ -497,19 +355,6 @@ pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
 /// # Panics
 /// Panics if `right_start` is greater than `xs.len()`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_in_place_with_overlap;
-///
-/// let xs: &mut [u32] = &mut [4, 3, 2, 1];
-/// assert_eq!(limbs_sub_same_length_in_place_with_overlap(xs, 1), false);
-/// assert_eq!(xs, &[1, 1, 1, 1]);
-///
-/// let xs: &mut [u32] = &mut [4, 3, 2, 1];
-/// assert_eq!(limbs_sub_same_length_in_place_with_overlap(xs, 3), false);
-/// assert_eq!(xs, &[3, 3, 2, 1]);
-/// ```
-///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input, and the
 /// two inputs are possibly-overlapping subslices of a single slice.
 #[doc(hidden)]
@@ -536,15 +381,6 @@ pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start:
 ///
 /// # Panics
 /// Panics if `xs.len()` is shorter than `ys.len()`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub::limbs_sub_same_length_to_out_with_overlap;
-///
-/// let xs = &mut [1, 2, 3, 4];
-/// assert_eq!(limbs_sub_same_length_to_out_with_overlap(xs, &[2, 2, 2]), false);
-/// assert_eq!(xs, &[0, 1, 2, 4]);
-/// ```
 ///
 /// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is a prefix of a slice and the left
 /// operand of the subtraction is a suffix of the same slice, and the prefix and suffix may overlap.

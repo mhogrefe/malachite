@@ -27,6 +27,13 @@ pub fn pair_1_rational_bit_bucketer<T>(var_name: &str) -> Bucketer<(Rational, T)
     }
 }
 
+pub fn pair_2_rational_bit_bucketer<T>(var_name: &str) -> Bucketer<(T, Rational)> {
+    Bucketer {
+        bucketing_function: &|(_, q)| usize::exact_from(q.significant_bits()),
+        bucketing_label: format!("{}.significant_bits()", var_name),
+    }
+}
+
 pub fn triple_1_rational_bit_bucketer<T, U>(var_name: &str) -> Bucketer<(Rational, T, U)> {
     Bucketer {
         bucketing_function: &|(q, _, _)| usize::exact_from(q.significant_bits()),
@@ -160,5 +167,39 @@ pub fn rational_deserialize_bucketer<'a>() -> Bucketer<'a, (String, String, Stri
             usize::exact_from(n.significant_bits())
         },
         bucketing_label: "n.significant_bits()".to_string(),
+    }
+}
+
+pub fn triple_3_pair_1_rational_bits_times_pair_2_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U, (Rational, u64))> {
+    Bucketer {
+        bucketing_function: &|&(_, _, (ref x, y))| usize::exact_from(x.significant_bits() * y),
+        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
+    }
+}
+
+pub fn triple_3_pair_1_rational_bits_times_abs_pair_2_bucketer<'a, T, U>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (T, U, (Rational, i64))> {
+    Bucketer {
+        bucketing_function: &|&(_, _, (ref x, y))| {
+            usize::exact_from(x.significant_bits() * y.unsigned_abs())
+        },
+        bucketing_label: format!("{}.significant_bits() * {}", x_name, y_name),
+    }
+}
+
+pub fn triple_1_2_rational_bit_i64_max_bucketer<'a, T>(
+    x_name: &'a str,
+    y_name: &'a str,
+) -> Bucketer<'a, (Rational, i64, T)> {
+    Bucketer {
+        bucketing_function: &|(x, y, _)| {
+            usize::exact_from(max(x.significant_bits(), y.unsigned_abs()))
+        },
+        bucketing_label: format!("max({}.significant_bits(), {})", x_name, y_name),
     }
 }

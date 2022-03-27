@@ -1,6 +1,6 @@
 // TODO
 pub mod floats;
-/// This module defines `PrimitiveInt`.
+/// The trait for primitive integers.
 ///
 /// Here are usage examples of the associated constants:
 ///
@@ -12,9 +12,9 @@ pub mod floats;
 /// assert_eq!(u32::WIDTH_MASK, 0x1f);
 /// ```
 pub mod integers;
-/// This module defines `PrimitiveSigned`.
+/// The trait for primitive signed integers.
 pub mod signeds;
-/// This module defines traits for constants and the Iverson bracket.
+/// Traits for constants and the Iverson bracket.
 ///
 /// Here are usage examples of the Iverson bracket:
 ///
@@ -25,5 +25,5 @@ pub mod signeds;
 /// assert_eq!(i8::iverson(true), 1);
 /// ```
 pub mod traits;
-/// This module defines `PrimitiveUnsigned`.
+/// The trait for primitive unsigned integers.
 pub mod unsigneds;

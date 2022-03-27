@@ -133,7 +133,7 @@ fn demo_natural_mod_power_of_2_square(gm: GenMode, config: GenConfig, limit: usi
     {
         let n_old = n.clone();
         println!(
-            "{}.square() === {} mod 2^{}",
+            "{}.square() ≡ {} mod 2^{}",
             n_old,
             n.mod_power_of_2_square(pow),
             pow
@@ -147,7 +147,7 @@ fn demo_natural_mod_power_of_2_square_ref(gm: GenMode, config: GenConfig, limit:
         .take(limit)
     {
         println!(
-            "(&{}).square() === {} mod 2^{}",
+            "(&{}).square() ≡ {} mod 2^{}",
             n,
             (&n).mod_power_of_2_square(pow),
             pow

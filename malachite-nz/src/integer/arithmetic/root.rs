@@ -5,10 +5,10 @@ use malachite_base::num::arithmetic::traits::{
 use natural::Natural;
 use std::ops::Neg;
 
-impl FloorRootAssign for Integer {
-    /// Replaces an `Integer` with the floor of its square root.
+impl FloorRootAssign<u64> for Integer {
+    /// Replaces an `Integer` with the floor of its $n$th root.
     ///
-    /// $x \gets \lfloor\root{x}\rfloor$.
+    /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -56,12 +56,12 @@ impl FloorRootAssign for Integer {
     }
 }
 
-impl FloorRoot for Integer {
+impl FloorRoot<u64> for Integer {
     type Output = Integer;
 
-    /// Returns the floor of the square root of an `Integer`, taking the `Integer` by value.
+    /// Returns the floor of the $n$th root of an `Integer`, taking the `Integer` by value.
     ///
-    /// $f(x) = \lfloor\root{x}\rfloor$.
+    /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -90,12 +90,12 @@ impl FloorRoot for Integer {
     }
 }
 
-impl<'a> FloorRoot for &'a Integer {
+impl<'a> FloorRoot<u64> for &'a Integer {
     type Output = Integer;
 
-    /// Returns the floor of the square root of a `Integer`, taking the `Integer` by reference.
+    /// Returns the floor of the $n$th root of an `Integer`, taking the `Integer` by reference.
     ///
-    /// $f(x) = \lfloor\root{x}\rfloor$.
+    /// $f(x, n) = \lfloor\root\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -129,10 +129,10 @@ impl<'a> FloorRoot for &'a Integer {
     }
 }
 
-impl CeilingRootAssign for Integer {
-    /// Replaces an `Integer` with the ceiling of its square root.
+impl CeilingRootAssign<u64> for Integer {
+    /// Replaces an `Integer` with the ceiling of its $n$th root.
     ///
-    /// $x \gets \lceil\root{x}\rceil$.
+    /// $x \gets \lceil\root\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -180,12 +180,12 @@ impl CeilingRootAssign for Integer {
     }
 }
 
-impl CeilingRoot for Integer {
+impl CeilingRoot<u64> for Integer {
     type Output = Integer;
 
-    /// Returns the ceiling of the square root of an `Integer`, taking the `Integer` by value.
+    /// Returns the ceiling of the $n$th root of an `Integer`, taking the `Integer` by value.
     ///
-    /// $f(x) = \lceil\root{x}\rceil$.
+    /// $f(x) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -214,12 +214,12 @@ impl CeilingRoot for Integer {
     }
 }
 
-impl<'a> CeilingRoot for &'a Integer {
+impl<'a> CeilingRoot<u64> for &'a Integer {
     type Output = Integer;
 
-    /// Returns the ceiling of the square root of an `Integer`, taking the `Integer` by reference.
+    /// Returns the ceiling of the $n$th root of an `Integer`, taking the `Integer` by reference.
     ///
-    /// $f(x) = \lceil\root{x}\rceil$.
+    /// $f(x) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -253,15 +253,15 @@ impl<'a> CeilingRoot for &'a Integer {
     }
 }
 
-impl CheckedRoot for Integer {
+impl CheckedRoot<u64> for Integer {
     type Output = Integer;
 
-    /// Returns the the square root of an `Integer`, or `None` if the `Integer` is not a perfect
-    /// square. The `Integer` is taken by value.
+    /// Returns the the $n$th root of an `Integer`, or `None` if the `Integer` is not a perfect
+    /// $n$th power. The `Integer` is taken by value.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(root{x}) & \root{x} \in \Z \\\\
+    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Z \\\\
     ///     \operatorname{None} & \textrm{otherwise},
     /// \\end{cases}
     /// $$
@@ -301,15 +301,15 @@ impl CheckedRoot for Integer {
     }
 }
 
-impl<'a> CheckedRoot for &'a Integer {
+impl<'a> CheckedRoot<u64> for &'a Integer {
     type Output = Integer;
 
-    /// Returns the the square root of an `Integer`, or `None` if the `Integer` is not a perfect
-    /// square. The `Integer` is taken by reference.
+    /// Returns the the $n$th root of an `Integer`, or `None` if the `Integer` is not a perfect
+    /// $n$th root. The `Integer` is taken by reference.
     ///
     /// $$
     /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(root{x}) & \root{x} \in \Z \\\\
+    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \root{x} \in \Z \\\\
     ///     \operatorname{None} & \textrm{otherwise},
     /// \\end{cases}
     /// $$

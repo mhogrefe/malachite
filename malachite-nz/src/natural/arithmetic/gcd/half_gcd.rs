@@ -775,19 +775,14 @@ pub fn limbs_gcd_div(mut n1: Limb, mut n0: Limb, mut d1: Limb, mut d0: Limb) -> 
         n0 <<= c;
         d1 = (d1 << c) | (d0 >> width_comp);
         d0 <<= c;
-        let (mut q, n1_2) = Limb::xx_div_mod_y_is_qr(n2, n1, d1);
-        n1 = n1_2;
+        (q, n1) = Limb::xx_div_mod_y_is_qr(n2, n1, d1);
         let (mut t1, mut t0) = Limb::x_mul_y_is_zz(q, d0);
         if t1 > n1 || t1 == n1 && t0 > n0 {
             assert_ne!(q, 0);
             q -= 1;
-            let (t1_2, t0_2) = Limb::xx_sub_yy_is_zz(t1, t0, d1, d0);
-            t1 = t1_2;
-            t0 = t0_2;
+            (t1, t0) = Limb::xx_sub_yy_is_zz(t1, t0, d1, d0);
         }
-        let (n1_2, n0_2) = Limb::xx_sub_yy_is_zz(n1, n0, t1, t0);
-        n1 = n1_2;
-        n0 = n0_2;
+        (n1, n0) = Limb::xx_sub_yy_is_zz(n1, n0, t1, t0);
         // Undo normalization
         (q, n1 >> c, (n0 >> c) | (n1 << width_comp))
     } else {
@@ -796,9 +791,7 @@ pub fn limbs_gcd_div(mut n1: Limb, mut n0: Limb, mut d1: Limb, mut d0: Limb) -> 
         if t1 >= n1 && (t1 > n1 || t0 > n0) {
             assert_ne!(q, 0);
             q -= 1;
-            let (t1_2, t0_2) = Limb::xx_sub_yy_is_zz(t1, t0, d1, d0);
-            t1 = t1_2;
-            t0 = t0_2;
+            (t1, t0) = Limb::xx_sub_yy_is_zz(t1, t0, d1, d0);
         }
         let (r1, r0) = Limb::xx_sub_yy_is_zz(n1, n0, t1, t0);
         (q, r1, r0)
@@ -822,21 +815,17 @@ fn limbs_half_gcd_2(
     let mut m01;
     let mut m10;
     if x_high > y_high || x_high == y_high && a_low > b_low {
-        let (x_high2, a_low2) = Limb::xx_sub_yy_is_zz(x_high, a_low, y_high, b_low);
-        if x_high2 < 2 {
+        (x_high, a_low) = Limb::xx_sub_yy_is_zz(x_high, a_low, y_high, b_low);
+        if x_high < 2 {
             return false;
         }
-        x_high = x_high2;
-        a_low = a_low2;
         m01 = 1;
         m10 = 0;
     } else {
-        let (y_high2, b_low2) = Limb::xx_sub_yy_is_zz(y_high, b_low, x_high, a_low);
-        if y_high2 < 2 {
+        (y_high, b_low) = Limb::xx_sub_yy_is_zz(y_high, b_low, x_high, a_low);
+        if y_high < 2 {
             return false;
         }
-        y_high = y_high2;
-        b_low = b_low2;
         m01 = 0;
         m10 = 1;
     }
@@ -864,9 +853,7 @@ fn limbs_half_gcd_2(
             // Subtract a -= q * b, and multiply M from the right by (1 q ; 0 1), affecting the
             // second column of M.
             assert!(x_high > y_high);
-            let (x_high2, a_low2) = Limb::xx_sub_yy_is_zz(x_high, a_low, y_high, b_low);
-            x_high = x_high2;
-            a_low = a_low2;
+            (x_high, a_low) = Limb::xx_sub_yy_is_zz(x_high, a_low, y_high, b_low);
             if x_high < 2 {
                 done = true;
                 break;
@@ -876,9 +863,8 @@ fn limbs_half_gcd_2(
                 m01 += m00;
                 m11 += m10;
             } else {
-                let (mut q, x_high_2, a_low_2) = limbs_gcd_div(x_high, a_low, y_high, b_low);
-                a_low = a_low_2;
-                x_high = x_high_2;
+                let mut q;
+                (q, x_high, a_low) = limbs_gcd_div(x_high, a_low, y_high, b_low);
                 if x_high < 2 {
                     // A is too small, but q is correct.
                     m01 += q * m00;
@@ -904,9 +890,7 @@ fn limbs_half_gcd_2(
         }
         // Subtract b -= q * a, and multiply M from the right by (1 0 ; q 1), affecting the first
         // column of M.
-        let (y_high2, b_low2) = Limb::xx_sub_yy_is_zz(y_high, b_low, x_high, a_low);
-        y_high = y_high2;
-        b_low = b_low2;
+        (y_high, b_low) = Limb::xx_sub_yy_is_zz(y_high, b_low, x_high, a_low);
         if y_high < 2 {
             done = true;
             break;
@@ -916,9 +900,8 @@ fn limbs_half_gcd_2(
             m00 += m01;
             m10 += m11;
         } else {
-            let (mut q, y_high_2, b_low_2) = limbs_gcd_div(y_high, b_low, x_high, a_low);
-            y_high = y_high_2;
-            b_low = b_low_2;
+            let mut q;
+            (q, y_high, b_low) = limbs_gcd_div(y_high, b_low, x_high, a_low);
             if y_high < 2 {
                 // B is too small, but q is correct.
                 m00 += q * m01;
@@ -949,8 +932,8 @@ fn limbs_half_gcd_2(
                     m01 += m00;
                     m11 += m10;
                 } else {
-                    let (mut q, r) = x_high.div_mod(y_high);
-                    x_high = r;
+                    let mut q;
+                    (q, x_high) = x_high.div_mod(y_high);
                     if x_high < HALF_LIMIT_2 {
                         // A is too small, but q is correct.
                         m01 += q * m00;
@@ -972,8 +955,8 @@ fn limbs_half_gcd_2(
                 m00 += m01;
                 m10 += m11;
             } else {
-                let (mut q, r) = y_high.div_mod(x_high);
-                y_high = r;
+                let mut q;
+                (q, y_high) = y_high.div_mod(x_high);
                 if y_high < HALF_LIMIT_2 {
                     // B is too small, but q is correct.
                     m00 += q * m01;
@@ -1456,12 +1439,10 @@ pub fn limbs_gcd_reduced(out: &mut [Limb], xs: &mut [Limb], ys: &mut [Limb]) -> 
     }
     let x_1 = xs[1];
     //TODO try mpn_gcd_22
-    let (out_hi, out_lo) = DoubleLimb::join_halves(x_1, x_0)
+    (out[1], out[0]) = DoubleLimb::join_halves(x_1, x_0)
         .gcd(DoubleLimb::join_halves(y_1, y_0))
         .split_in_half();
-    out[0] = out_lo;
-    out[1] = out_hi;
-    if out_hi == 0 {
+    if out[1] == 0 {
         1
     } else {
         2

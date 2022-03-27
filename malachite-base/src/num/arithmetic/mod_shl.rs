@@ -4,6 +4,8 @@ use num::basic::traits::Zero;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use std::ops::{Shr, ShrAssign};
 
+//TODO simplify generics
+
 fn mod_shl_unsigned<T: ModMul<T, Output = T> + ModPow<u64, T, Output = T> + PrimitiveInt, U>(
     x: T,
     other: U,

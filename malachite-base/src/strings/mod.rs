@@ -262,13 +262,7 @@ pub fn strings_from_char_vecs<I: Iterator<Item = Vec<char>>>(css: I) -> StringsF
     StringsFromCharVecs { css }
 }
 
-//TODO doc and test
-
-pub trait ExtraToString {
-    fn to_string(&self) -> String;
-}
-
-/// This module contains iterators that generate `String`s without repetition.
+/// Iterators that generate `String`s without repetition.
 pub mod exhaustive;
-/// This module contains iterators that generate `String`s randomly.
+/// Iterators that generate `String`s randomly.
 pub mod random;

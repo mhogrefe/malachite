@@ -24,8 +24,8 @@ macro_rules! impl_overflowing_abs {
             /// See the documentation of the `num::arithmetic::overflowing_abs` module.
             #[inline]
             fn overflowing_abs_assign(&mut self) -> bool {
-                let (result, overflow) = self.overflowing_abs();
-                *self = result;
+                let overflow;
+                (*self, overflow) = self.overflowing_abs();
                 overflow
             }
         }

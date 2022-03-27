@@ -1,4 +1,4 @@
-use num::conversion::traits::{ExactFrom, FromStringBase};
+use num::conversion::traits::FromStringBase;
 
 /// Produces a digit from a byte corresponding to a numeric or alphabetic (lower- or uppercase)
 /// `char` that represents the digit.
@@ -37,8 +37,8 @@ macro_rules! impl_from_string_base {
     ($t:ident) => {
         impl FromStringBase for $t {
             #[inline]
-            fn from_string_base(base: u64, s: &str) -> Option<Self> {
-                $t::from_str_radix(s, u32::exact_from(base)).ok()
+            fn from_string_base(base: u8, s: &str) -> Option<Self> {
+                $t::from_str_radix(s, u32::from(base)).ok()
             }
         }
     };

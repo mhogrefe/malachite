@@ -24,8 +24,8 @@ macro_rules! impl_overflowing_mul {
             /// See the documentation of the `num::arithmetic::overflowing_mul` module.
             #[inline]
             fn overflowing_mul_assign(&mut self, other: $t) -> bool {
-                let (result, overflow) = self.overflowing_mul(other);
-                *self = result;
+                let overflow;
+                (*self, overflow) = self.overflowing_mul(other);
                 overflow
             }
         }

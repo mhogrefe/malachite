@@ -19,17 +19,6 @@ use std::cmp::Ordering;
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod_power_of_2::limbs_eq_limb_mod_power_of_2;
-///
-/// assert_eq!(limbs_eq_limb_mod_power_of_2(&[0b1111011, 0b111001000], 0b101011, 4), true);
-/// assert_eq!(limbs_eq_limb_mod_power_of_2(&[0b1111011, 0b111001000], 0b101011, 5), false);
-/// assert_eq!(limbs_eq_limb_mod_power_of_2(&[0b1111011, 0b111001000], 0b1111011, 35), true);
-/// assert_eq!(limbs_eq_limb_mod_power_of_2(&[0b1111011, 0b111001000], 0b1111011, 36), false);
-/// assert_eq!(limbs_eq_limb_mod_power_of_2(&[0b1111011, 0b111001000], 0b1111011, 100), false);
-/// ```
 #[doc(hidden)]
 pub fn limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
@@ -85,20 +74,6 @@ fn limbs_eq_mod_power_of_2_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
 /// Additional memory: worst case O(1)
 ///
 /// where n = min(pow, `xs.len()`, `ys.len()`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod_power_of_2::limbs_eq_mod_power_of_2;
-///
-/// assert_eq!(limbs_eq_mod_power_of_2(&[0b1111011, 0b111001000], &[0b101011], 4), true);
-/// assert_eq!(limbs_eq_mod_power_of_2(&[0b1111011, 0b111001000], &[0b101011], 5), false);
-/// assert_eq!(limbs_eq_mod_power_of_2(&[0b1111011, 0b111001000], &[0b1111011, 0b111101000], 37),
-///         true);
-/// assert_eq!(limbs_eq_mod_power_of_2(&[0b1111011, 0b111001000], &[0b1111011, 0b111101000], 38),
-///         false);
-/// assert_eq!(limbs_eq_mod_power_of_2(&[0b1111011, 0b111001000], &[0b1111011, 0b111101000], 100),
-///         false);
-/// ```
 ///
 /// This is mpz_congruent_2exp_p from mpz/cong_2exp.c, GMP 6.2.1, where a and c are non-negative.
 #[doc(hidden)]

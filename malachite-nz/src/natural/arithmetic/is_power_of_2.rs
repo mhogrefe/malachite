@@ -17,16 +17,6 @@ use platform::Limb;
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::is_power_of_2::limbs_is_power_of_2;
-///
-/// assert_eq!(limbs_is_power_of_2(&[3]), false);
-/// assert_eq!(limbs_is_power_of_2(&[0, 0b1000]), true);
-/// assert_eq!(limbs_is_power_of_2(&[1, 0b1000]), false);
-/// assert_eq!(limbs_is_power_of_2(&[0, 0b1010]), false);
-/// ```
 #[doc(hidden)]
 pub fn limbs_is_power_of_2(xs: &[Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last().unwrap();

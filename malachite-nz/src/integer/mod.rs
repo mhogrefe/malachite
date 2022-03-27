@@ -252,7 +252,7 @@ pub mod arithmetic {
 }
 pub mod comparison;
 pub mod conversion;
-/// This module contains iterators that generate `Integer`s without repetition.
+/// Iterators that generate `Integer`s without repetition.
 pub mod exhaustive;
 pub mod logic {
     pub mod and;
@@ -271,5 +271,5 @@ pub mod logic {
     pub mod trailing_zeros;
     pub mod xor;
 }
-/// This module contains iterators that generate `Integer`s randomly.
+/// Iterators that generate `Integer`s randomly.
 pub mod random;

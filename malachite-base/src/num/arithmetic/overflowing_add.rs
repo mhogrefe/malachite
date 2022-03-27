@@ -24,8 +24,8 @@ macro_rules! impl_overflowing_add {
             /// See the documentation of the `num::arithmetic::overflowing_add` module.
             #[inline]
             fn overflowing_add_assign(&mut self, other: $t) -> bool {
-                let (result, overflow) = self.overflowing_add(other);
-                *self = result;
+                let overflow;
+                (*self, overflow) = self.overflowing_add(other);
                 overflow
             }
         }

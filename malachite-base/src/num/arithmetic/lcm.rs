@@ -1,23 +1,12 @@
-use num::arithmetic::traits::{CheckedLcm, CheckedMul, Gcd, Lcm, LcmAssign};
-use num::basic::traits::Zero;
-use std::ops::Div;
+use num::arithmetic::traits::{CheckedLcm, Lcm, LcmAssign};
+use num::basic::unsigneds::PrimitiveUnsigned;
 
 #[inline]
-fn lcm<
-    T: CheckedMul<T, Output = T> + Copy + Div<T, Output = T> + Eq + Gcd<T, Output = T> + Zero,
->(
-    x: T,
-    y: T,
-) -> T {
+fn lcm<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     checked_lcm(x, y).unwrap()
 }
 
-fn checked_lcm<
-    T: CheckedMul<T, Output = T> + Copy + Div<T, Output = T> + Eq + Gcd<T, Output = T> + Zero,
->(
-    x: T,
-    y: T,
-) -> Option<T> {
+fn checked_lcm<T: PrimitiveUnsigned>(x: T, y: T) -> Option<T> {
     if x == T::ZERO && y == T::ZERO {
         Some(T::ZERO)
     } else {

@@ -122,7 +122,7 @@ fn demo_natural_mod_pow(gm: GenMode, config: GenConfig, limit: usize) {
         let exp_old = exp.clone();
         let m_old = m.clone();
         println!(
-            "{}.pow({}) === {} mod {}",
+            "{}.pow({}) ≡ {} mod {}",
             x_old,
             exp_old,
             x.mod_pow(exp, m),
@@ -136,7 +136,7 @@ fn demo_natural_mod_pow_val_val_ref(gm: GenMode, config: GenConfig, limit: usize
         let x_old = x.clone();
         let exp_old = exp.clone();
         println!(
-            "{}.pow({}) === {} mod {}",
+            "{}.pow({}) ≡ {} mod {}",
             x_old,
             exp_old,
             x.mod_pow(exp, &m),
@@ -150,7 +150,7 @@ fn demo_natural_mod_pow_val_ref_val(gm: GenMode, config: GenConfig, limit: usize
         let x_old = x.clone();
         let m_old = m.clone();
         println!(
-            "{}.pow({}) === {} mod {}",
+            "{}.pow({}) ≡ {} mod {}",
             x_old,
             exp,
             x.mod_pow(&exp, m),
@@ -162,13 +162,7 @@ fn demo_natural_mod_pow_val_ref_val(gm: GenMode, config: GenConfig, limit: usize
 fn demo_natural_mod_pow_val_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, exp, m) in natural_triple_gen_var_5().get(gm, &config).take(limit) {
         let x_old = x.clone();
-        println!(
-            "{}.pow({}) === {} mod {}",
-            x_old,
-            exp,
-            x.mod_pow(&exp, &m),
-            m
-        );
+        println!("{}.pow({}) ≡ {} mod {}", x_old, exp, x.mod_pow(&exp, &m), m);
     }
 }
 
@@ -177,7 +171,7 @@ fn demo_natural_mod_pow_ref_val_val(gm: GenMode, config: GenConfig, limit: usize
         let exp_old = exp.clone();
         let m_old = m.clone();
         println!(
-            "{}.pow({}) === {} mod {}",
+            "{}.pow({}) ≡ {} mod {}",
             x,
             exp_old,
             (&x).mod_pow(exp, m),
@@ -190,7 +184,7 @@ fn demo_natural_mod_pow_ref_val_ref(gm: GenMode, config: GenConfig, limit: usize
     for (x, exp, m) in natural_triple_gen_var_5().get(gm, &config).take(limit) {
         let exp_old = exp.clone();
         println!(
-            "{}.pow({}) === {} mod {}",
+            "{}.pow({}) ≡ {} mod {}",
             x,
             exp_old,
             (&x).mod_pow(exp, &m),
@@ -203,7 +197,7 @@ fn demo_natural_mod_pow_ref_ref_val(gm: GenMode, config: GenConfig, limit: usize
     for (x, exp, m) in natural_triple_gen_var_5().get(gm, &config).take(limit) {
         let m_old = m.clone();
         println!(
-            "{}.pow({}) === {} mod {}",
+            "{}.pow({}) ≡ {} mod {}",
             x,
             exp,
             (&x).mod_pow(&exp, m),
@@ -214,13 +208,7 @@ fn demo_natural_mod_pow_ref_ref_val(gm: GenMode, config: GenConfig, limit: usize
 
 fn demo_natural_mod_pow_ref_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for (x, exp, m) in natural_triple_gen_var_5().get(gm, &config).take(limit) {
-        println!(
-            "{}.pow({}) === {} mod {}",
-            x,
-            exp,
-            (&x).mod_pow(&exp, &m),
-            m
-        );
+        println!("{}.pow({}) ≡ {} mod {}", x, exp, (&x).mod_pow(&exp, &m), m);
     }
 }
 

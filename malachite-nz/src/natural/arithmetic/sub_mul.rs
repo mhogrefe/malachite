@@ -23,15 +23,6 @@ use std::fmt::Display;
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_greater;
-///
-/// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[123], 4), Some(vec![4294966927, 455]));
-/// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[123], u32::MAX), Some(vec![246, 333]));
-/// assert_eq!(limbs_sub_mul_limb_greater(&[123, 456], &[0, 123], u32::MAX), None);
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, and w is returned instead of overwriting the first input.
 #[doc(hidden)]
@@ -60,23 +51,6 @@ pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], z: Limb) -> Option<V
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub_mul::*;
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(xs, &[123, 0], 4), 0);
-/// assert_eq!(xs, &[4294966927, 455]);
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(xs, &[123, 0], u32::MAX), 0);
-/// assert_eq!(xs, &[246, 333]);
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(xs, &[0, 123], u32::MAX), 123);
-/// assert_eq!(xs, &[123, 579]);
-/// ```
 ///
 /// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2.
 #[doc(hidden)]
@@ -113,23 +87,6 @@ pub fn limbs_sub_mul_limb_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_greater_in_place_left;
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_left(xs, &[123], 4), 0);
-/// assert_eq!(xs, &[4294966927, 455]);
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_left(xs, &[123], u32::MAX), 0);
-/// assert_eq!(xs, &[246, 333]);
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_left(xs, &[0, 123], u32::MAX), 123);
-/// assert_eq!(xs, &[123, 579]);
-/// ```
-///
 /// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2, but where the first input may be
 /// longer than the second.
 #[doc(hidden)]
@@ -155,23 +112,6 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub_mul::*;
-///
-/// let ys = &mut [123, 0];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_right(&[123, 456], ys, 4), 0);
-/// assert_eq!(ys, &[4294966927, 455]);
-///
-/// let ys = &mut [123, 0];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_right(&[123, 456], ys, u32::MAX), 0);
-/// assert_eq!(ys, &[246, 333]);
-///
-/// let ys = &mut [0, 123];
-/// assert_eq!(limbs_sub_mul_limb_same_length_in_place_right(&[123, 456], ys, u32::MAX), 123);
-/// assert_eq!(ys, &[123, 579]);
-/// ```
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
 /// same lengths, sub is negative, and the lowest limbs of the result are written to the second
@@ -216,23 +156,6 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_limb_greater_in_place_right;
-///
-/// let mut ys = vec![123];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_right(&[123, 456], &mut ys, 4), 0);
-/// assert_eq!(ys, &[4294966927, 455]);
-///
-/// let mut ys = vec![123];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_right(&[123, 456], &mut ys, u32::MAX), 0);
-/// assert_eq!(ys, &[246, 333]);
-///
-/// let mut ys = vec![0, 123];
-/// assert_eq!(limbs_sub_mul_limb_greater_in_place_right(&[123, 456], &mut ys, u32::MAX), 123);
-/// assert_eq!(ys, &[123, 579]);
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, and the result is written to the second input rather than the first.
 #[doc(hidden)]
@@ -270,15 +193,6 @@ pub fn limbs_sub_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 /// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
 /// `zs.len()` - 1.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul;
-///
-/// assert_eq!(limbs_sub_mul(&[123, 456, 789], &[123, 789], &[321, 654]), None);
-/// assert_eq!(limbs_sub_mul(&[123, 456, 789, 1], &[123, 789], &[321, 654]),
-///         Some(vec![4294927936, 4294634040, 4294452078, 0]));
-/// ```
-///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// negative, negative results are converted to `None`, and w is returned instead of overwriting the
 /// first input.
@@ -309,18 +223,6 @@ pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>>
 /// # Panics
 /// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
 /// `zs.len()` - 1.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::sub_mul::limbs_sub_mul_in_place_left;
-///
-/// let mut xs = vec![123, 456, 789];
-/// assert_eq!(limbs_sub_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]), true);
-///
-/// let mut xs = vec![123, 456, 789, 1];
-/// assert_eq!(limbs_sub_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]), false);
-/// assert_eq!(xs, &[4294927936, 4294634040, 4294452078, 0]);
-/// ```
 ///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// negative and negative results are discarded.

@@ -1,10 +1,37 @@
 pub mod cmp;
-/// This module provides trait implementations for comparing the absolute values of a `Natural`
-/// and a primitive integer.
+/// Trait implementations for comparing a `Natural` and the absolute value of a primitive float.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # Natural.cmp_abs(&PrimitiveInt)
+/// # Natural.partial_cmp_abs(&PrimitiveFloat)
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
+/// use malachite_nz::natural::Natural;
+///
+/// assert!(Natural::from(123u32).gt_abs(&-122.5f32));
+/// assert!(Natural::from(123u32).lt_abs(&f32::NEGATIVE_INFINITY));
+/// ```
+///
+/// # PrimitiveFloat.partial_cmp_abs(&Natural)
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_base::num::comparison::traits::PartialOrdAbs;
+/// use malachite_nz::natural::Natural;
+///
+/// assert!((-122.5f32).lt_abs(&Natural::from(123u32)));
+/// assert!(f32::NEGATIVE_INFINITY.gt_abs(&Natural::from(123u32)));
+/// ```
+pub mod partial_cmp_abs_primitive_float;
+/// Trait implementations for comparing the absolute values of a `Natural` and a primitive integer.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # Natural.partial_cmp_abs(&PrimitiveInt)
 /// ```
 /// extern crate malachite_base;
 ///
@@ -26,7 +53,7 @@ pub mod cmp;
 /// assert!(Natural::trillion().ge_abs(&123i64));
 /// ```
 ///
-/// # PrimitiveInt.cmp_abs(&Natural)
+/// # PrimitiveInt.partial_cmp_abs(&Natural)
 /// ```
 /// extern crate malachite_base;
 ///
@@ -48,11 +75,37 @@ pub mod cmp;
 /// assert!(123i64.le_abs(&Natural::trillion()));
 /// ```
 pub mod partial_cmp_abs_primitive_int;
-/// This module provides trait implementations for comparing a `Natural` to a primitive integer.
+/// Trait implementations for comparing a `Natural` and a primitive float.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
-/// # Natural.cmp(&PrimitiveInt)
+/// # Natural.partial_cmp(&PrimitiveFloat)
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_nz::natural::Natural;
+///
+/// assert!(Natural::from(123u32) > 122.5f32);
+/// assert!(Natural::from(123u32) < f32::POSITIVE_INFINITY);
+/// ```
+///
+/// # PrimitiveFloat.partial_cmp(&Natural)
+/// ```
+/// extern crate malachite_base;
+///
+/// use malachite_base::num::basic::floats::PrimitiveFloat;
+/// use malachite_nz::natural::Natural;
+///
+/// assert!(122.5f32 < Natural::from(123u32));
+/// assert!(f32::POSITIVE_INFINITY > Natural::from(123u32));
+/// ```
+pub mod partial_cmp_primitive_float;
+/// Trait implementations for comparing a `Natural` to a primitive integer.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # Natural.partial_cmp(&PrimitiveInt)
 /// ```
 /// use malachite_nz::natural::Natural;
 ///
@@ -87,7 +140,7 @@ pub mod partial_cmp_abs_primitive_int;
 /// assert!(Natural::trillion() >= 123i64);
 /// ```
 ///
-/// # PrimitiveInt.cmp(&Natural)
+/// # PrimitiveInt.partial_cmp(&Natural)
 /// ```
 /// use malachite_nz::natural::Natural;
 ///
@@ -122,8 +175,27 @@ pub mod partial_cmp_abs_primitive_int;
 /// assert!(123i64 <= Natural::trillion());
 /// ```
 pub mod partial_cmp_primitive_int;
-/// This module provides trait implementations for comparing the equality of a `Natural` and a
-/// primitive integer.
+/// Trait implementations for comparing the equality of a `Natural` and a primitive float.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # Natural == PrimitiveFloat
+/// ```
+/// use malachite_nz::natural::Natural;
+///
+/// assert!(Natural::from(123u32) == 123.0f32);
+/// assert!(Natural::from(123u32) != -5.0f32);
+/// ```
+///
+/// # PrimitiveFloat == Natural
+/// ```
+/// use malachite_nz::natural::Natural;
+///
+/// assert!(123.0f32 == Natural::from(123u32));
+/// assert!(-5.0f32 != Natural::from(123u32));
+/// ```
+pub mod partial_eq_primitive_float;
+/// Trait implementations for comparing the equality of a `Natural` and a primitive integer.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -133,9 +205,6 @@ pub mod partial_cmp_primitive_int;
 ///
 /// assert!(Natural::from(123u32) == 123u32);
 /// assert!(Natural::from(123u32) != 5u32);
-///
-/// assert!(123u32 == Natural::from(123u32));
-/// assert!(5u32 != Natural::from(123u32));
 ///
 /// assert!(Natural::from(123u32) == 123u64);
 /// assert!(Natural::from(123u32) != 5u64);
@@ -147,9 +216,6 @@ pub mod partial_cmp_primitive_int;
 /// # PrimitiveInt == Natural
 /// ```
 /// use malachite_nz::natural::Natural;
-///
-/// assert!(Natural::from(123u32) == 123u8);
-/// assert!(Natural::from(123u32) != 5u8);
 ///
 /// assert!(123u8 == Natural::from(123u32));
 /// assert!(5u8 != Natural::from(123u32));

@@ -372,26 +372,26 @@ pub trait CeilingLogBase2 {
 
 /// Provides a function to get the base-`p` logarithm of `self`. where `p` is a power of 2, or
 /// return `None` if the result is not exact.
-pub trait CheckedLogBasePowerOf2 {
+pub trait CheckedLogBasePowerOf2<POW> {
     type Output;
 
-    fn checked_log_base_power_of_2(self, pow: u64) -> Option<Self::Output>;
+    fn checked_log_base_power_of_2(self, pow: POW) -> Option<Self::Output>;
 }
 
 /// Provides a function to get the floor of the base-`p` logarithm of `self`, where `p` is a power
 /// of 2.
-pub trait FloorLogBasePowerOf2 {
+pub trait FloorLogBasePowerOf2<POW> {
     type Output;
 
-    fn floor_log_base_power_of_2(self, pow: u64) -> Self::Output;
+    fn floor_log_base_power_of_2(self, pow: POW) -> Self::Output;
 }
 
 /// Provides a function to get the ceiling of the base-`p` logarithm of `self`, where `p` is a
 /// power of 2.
-pub trait CeilingLogBasePowerOf2 {
+pub trait CeilingLogBasePowerOf2<POW> {
     type Output;
 
-    fn ceiling_log_base_power_of_2(self, pow: u64) -> Self::Output;
+    fn ceiling_log_base_power_of_2(self, pow: POW) -> Self::Output;
 }
 
 /// Computes `self + other` mod `m`. Assumes the inputs are already reduced mod `m`.
@@ -1048,35 +1048,35 @@ pub trait ReciprocalAssign {
 }
 
 /// Provides a function to get the floor of the $n$th root of `self`.
-pub trait FloorRoot {
+pub trait FloorRoot<POW> {
     type Output;
 
-    fn floor_root(self, exp: u64) -> Self::Output;
+    fn floor_root(self, pow: POW) -> Self::Output;
 }
 
 /// Replaces `self` with the floor of its $n$th root.
-pub trait FloorRootAssign {
-    fn floor_root_assign(&mut self, exp: u64);
+pub trait FloorRootAssign<POW> {
+    fn floor_root_assign(&mut self, pow: POW);
 }
 
 /// Provides a function to get the ceiling of the $n$th root of `self`.
-pub trait CeilingRoot {
+pub trait CeilingRoot<POW> {
     type Output;
 
-    fn ceiling_root(self, exp: u64) -> Self::Output;
+    fn ceiling_root(self, pow: POW) -> Self::Output;
 }
 
 /// Replaces `self` with the ceiling of its $n$th root.
-pub trait CeilingRootAssign {
-    fn ceiling_root_assign(&mut self, exp: u64);
+pub trait CeilingRootAssign<POW> {
+    fn ceiling_root_assign(&mut self, pow: POW);
 }
 
 /// Provides a function to get the $n$th root of `self`, returning `None` if `self` is not a
 /// perfect $n$th power.
-pub trait CheckedRoot {
+pub trait CheckedRoot<POW> {
     type Output;
 
-    fn checked_root(self, exp: u64) -> Option<Self::Output>;
+    fn checked_root(self, pow: POW) -> Option<Self::Output>;
 }
 
 /// Provides a function to get the floor of the $n$th root of `self` and the remainder.

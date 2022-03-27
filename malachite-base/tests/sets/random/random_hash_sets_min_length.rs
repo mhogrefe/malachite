@@ -27,7 +27,7 @@ fn random_hash_sets_min_length_helper<
         mean_length_denominator,
     );
     let values = xs.take(20).collect_vec();
-    assert_eq!(values.as_slice(), expected_values,);
+    assert_eq!(values.as_slice(), expected_values);
 }
 
 #[test]

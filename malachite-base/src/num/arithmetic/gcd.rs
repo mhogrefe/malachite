@@ -1,11 +1,8 @@
-use num::arithmetic::traits::{Gcd, GcdAssign, Parity};
-use num::basic::traits::Zero;
+use num::arithmetic::traits::{Gcd, GcdAssign};
 use num::basic::unsigneds::PrimitiveUnsigned;
-use num::logic::traits::TrailingZeros;
 use std::cmp::min;
-use std::ops::{Rem, Shl, Shr, ShrAssign, Sub, SubAssign};
 
-pub fn gcd_euclidean<T: Copy + Eq + Zero + Rem<T, Output = T>>(x: T, y: T) -> T {
+pub fn gcd_euclidean<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     if y == T::ZERO {
         x
     } else {
@@ -13,19 +10,7 @@ pub fn gcd_euclidean<T: Copy + Eq + Zero + Rem<T, Output = T>>(x: T, y: T) -> T 
     }
 }
 
-pub fn gcd_binary<
-    T: Copy
-        + Eq
-        + Ord
-        + Parity
-        + Shl<u64, Output = T>
-        + Shr<u64, Output = T>
-        + Sub<T, Output = T>
-        + Zero,
->(
-    x: T,
-    y: T,
-) -> T {
+pub fn gcd_binary<T: PrimitiveUnsigned>(x: T, y: T) -> T {
     if x == y {
         x
     } else if x == T::ZERO {
@@ -47,14 +32,8 @@ pub fn gcd_binary<
     }
 }
 
-type Q = u64;
 // This is the first version of n_gcd from ulong_extras/gcd.c, FLINT 2.7.1.
-pub fn gcd_fast_a<
-    T: Copy + Eq + Ord + Shl<u64, Output = T> + ShrAssign<Q> + SubAssign<T> + TrailingZeros + Zero,
->(
-    mut x: T,
-    mut y: T,
-) -> T {
+pub fn gcd_fast_a<T: PrimitiveUnsigned>(mut x: T, mut y: T) -> T {
     if x == T::ZERO {
         return y;
     }

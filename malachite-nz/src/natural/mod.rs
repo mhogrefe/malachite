@@ -235,7 +235,7 @@ pub mod arithmetic {
 }
 pub mod comparison;
 pub mod conversion;
-/// This module contains iterators that generate `Natural`s without repetition.
+/// Iterators that generate `Natural`s without repetition.
 pub mod exhaustive;
 pub mod logic {
     pub mod and;
@@ -253,5 +253,5 @@ pub mod logic {
     pub mod trailing_zeros;
     pub mod xor;
 }
-/// This module contains iterators that generate `Natural`s randomly.
+/// Iterators that generate `Natural`s randomly.
 pub mod random;

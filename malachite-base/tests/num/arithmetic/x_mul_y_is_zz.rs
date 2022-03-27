@@ -20,9 +20,9 @@ fn test_x_mul_y_is_zz() {
 
 fn x_mul_y_is_zz_properties_helper<T: PrimitiveUnsigned>() {
     unsigned_pair_gen_var_27::<T>().test_properties(|(x, y)| {
-        let (z_1, z_0) = T::x_mul_y_is_zz(x, y);
-        assert_eq!(explicit_x_mul_y_is_zz(x, y), (z_1, z_0));
-        assert_eq!(T::x_mul_y_is_zz(y, x), (z_1, z_0));
+        let p = T::x_mul_y_is_zz(x, y);
+        assert_eq!(explicit_x_mul_y_is_zz(x, y), p);
+        assert_eq!(T::x_mul_y_is_zz(y, x), p);
     });
 
     unsigned_gen::<T>().test_properties(|x| {
@@ -33,8 +33,8 @@ fn x_mul_y_is_zz_properties_helper<T: PrimitiveUnsigned>() {
     });
 
     unsigned_triple_gen_var_19::<T>().test_properties(|(x, y, z)| {
-        let (_, product_1) = T::x_mul_y_is_zz(x, y);
-        let (_, product_2) = T::x_mul_y_is_zz(y, z);
+        let product_1 = T::x_mul_y_is_zz(x, y).1;
+        let product_2 = T::x_mul_y_is_zz(y, z).1;
         assert_eq!(product_1.wrapping_mul(z), x.wrapping_mul(product_2));
     });
 }

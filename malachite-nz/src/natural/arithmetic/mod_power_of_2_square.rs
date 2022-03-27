@@ -70,8 +70,8 @@ pub fn limbs_square_low_basecase(out: &mut [Limb], xs: &[Limb]) {
     match n {
         1 => out[0] = xs_0.wrapping_square(),
         2 => {
-            let (p_hi, p_lo) = DoubleLimb::from(xs_0).square().split_in_half();
-            out[0] = p_lo;
+            let p_hi;
+            (p_hi, out[0]) = DoubleLimb::from(xs_0).square().split_in_half();
             out[1] = (xs_0.wrapping_mul(xs[1]) << 1).wrapping_add(p_hi);
         }
         _ => {
@@ -229,14 +229,6 @@ pub fn limbs_square_low(out: &mut [Limb], xs: &[Limb]) {
 ///
 /// # Panics
 /// Panics if the input is empty. May panic if the input has trailing zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_square::limbs_mod_power_of_2_square;
-///
-/// assert_eq!(limbs_mod_power_of_2_square(&mut vec![25], 5), &[17]);
-/// assert_eq!(limbs_mod_power_of_2_square(&mut vec![123, 456], 42), &[15129, 560]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
     let len = xs.len();
@@ -269,14 +261,6 @@ pub fn limbs_mod_power_of_2_square(xs: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if the input is empty. May panic if the input has trailing zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_square::*;
-///
-/// assert_eq!(limbs_mod_power_of_2_square_ref(&[25], 5), &[17]);
-/// assert_eq!(limbs_mod_power_of_2_square_ref(&[123, 456], 42), &[15129, 560]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_square_ref(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let len = xs.len();

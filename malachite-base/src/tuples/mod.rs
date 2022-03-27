@@ -42,7 +42,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
     Singletons { xs }
 }
 
-/// This module contains iterators that generate tuples without repetition.
+/// Iterators that generate tuples without repetition.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -474,7 +474,7 @@ pub fn singletons<I: Iterator>(xs: I) -> Singletons<I> {
 /// );
 /// ```
 pub mod exhaustive;
-/// This module contains iterators that generate tuples randomly.
+/// Iterators that generate tuples randomly.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///

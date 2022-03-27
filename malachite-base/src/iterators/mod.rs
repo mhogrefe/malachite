@@ -481,9 +481,9 @@ where
 /// The output length is $n - k + 1$, where $n$ is `xs.count()` and $k$ is `window_size`.
 ///
 /// # Worst-case complexity per iteration
-/// $T(i, k) = T^\prime(i) + O(k)$
+/// $T(i, k) = kT^\prime(ki) + O(k)$
 ///
-/// $M(i, k) = M^\prime(i) + O(k)$
+/// $M(i, k) = M^\prime(ki) + O(k)$
 ///
 /// where $T$ is time, $M$ is additional memory, $k$ is the window size, $i$ is the iteration
 /// index, $T^\prime$ and $M^\prime$ are the time and memory functions, respectively, of the inner
@@ -520,8 +520,27 @@ where
     }
 }
 
-//TODO test
-
+/// Converts a prefix of an iterator to a string.
+///
+/// Suppose the iterator is $(a, b, c, d)$. If `max_len` is 3, this function will return the string
+/// `"[a, b, c, ...]"`. If `max_len` is 4 or more, this function will return `[a, b, c, d]`.
+///
+/// This function will attempt to advance the iterator `max_len + 1` times. The extra time is used
+/// determine whether the output string should contain an ellipsis.
+///
+/// # Panics
+/// Panics if `max_len` is 0.
+///
+/// # Examples
+/// ```
+/// extern crate itertools;
+///
+/// use itertools::Itertools;
+/// use malachite_base::iterators::prefix_to_string;
+///
+/// assert_eq!(prefix_to_string(0..10, 3), "[0, 1, 2, ...]");
+/// assert_eq!(prefix_to_string(0..4, 5), "[0, 1, 2, 3]");
+/// ```
 pub fn prefix_to_string<I: Iterator>(mut xs: I, max_len: usize) -> String
 where
     I::Item: Display,
@@ -551,9 +570,9 @@ where
     s
 }
 
-/// This module contains `BitDistributor`, which helps generate tuples exhaustively.
+/// Contains `BitDistributor`, which helps generate tuples exhaustively.
 pub mod bit_distributor;
-/// This module contains functions that compare adjacent iterator elements.
+/// Functions that compare adjacent iterator elements.
 pub mod comparison;
-/// This module defines `IteratorCache`, which remembers values produced by an iterator.
+/// Contains `IteratorCache`, which remembers values produced by an iterator.
 pub mod iterator_cache;

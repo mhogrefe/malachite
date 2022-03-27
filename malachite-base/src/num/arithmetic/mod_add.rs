@@ -1,7 +1,7 @@
 use num::arithmetic::traits::{ModAdd, ModAddAssign};
-use std::ops::{Add, AddAssign, Sub};
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-fn mod_add<T: Add<T, Output = T> + Copy + Ord + Sub<T, Output = T>>(x: T, other: T, m: T) -> T {
+fn mod_add<T: PrimitiveUnsigned>(x: T, other: T, m: T) -> T {
     let neg = m - x;
     if neg > other {
         x + other
@@ -10,7 +10,7 @@ fn mod_add<T: Add<T, Output = T> + Copy + Ord + Sub<T, Output = T>>(x: T, other:
     }
 }
 
-fn mod_add_assign<T: AddAssign<T> + Copy + Ord + Sub<T, Output = T>>(x: &mut T, other: T, m: T) {
+fn mod_add_assign<T: PrimitiveUnsigned>(x: &mut T, other: T, m: T) {
     let neg = m - *x;
     if neg > other {
         *x += other;

@@ -2,14 +2,14 @@ use num::arithmetic::traits::{
     ModPowerOf2Shl, ModPowerOf2ShlAssign, ModPowerOf2Shr, ModPowerOf2ShrAssign, UnsignedAbs,
 };
 use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
-use num::conversion::traits::WrappingFrom;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use std::ops::{Shr, ShrAssign};
 
 fn mod_power_of_2_shr_signed<
     T: ModPowerOf2Shl<U, Output = T> + PrimitiveInt + Shr<U, Output = T>,
-    U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: T,
     other: S,
@@ -31,8 +31,8 @@ fn mod_power_of_2_shr_signed<
 
 fn mod_power_of_2_shr_assign_signed<
     T: ModPowerOf2ShlAssign<U> + PrimitiveInt + ShrAssign<U>,
-    U: Copy + Ord + WrappingFrom<u64> + Zero,
-    S: Copy + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: &mut T,
     other: S,

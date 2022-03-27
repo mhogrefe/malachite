@@ -1,15 +1,23 @@
 pub mod abs;
 pub mod add;
+pub mod approximate;
 pub mod ceiling;
 pub mod div;
 pub mod floor;
 pub mod is_power_of_2;
+pub mod log_base;
+pub mod log_base_2;
+pub mod log_base_power_of_2;
 pub mod mul;
 pub mod neg;
 pub mod next_power_of_2;
+pub mod pow;
 pub mod power_of_2;
 pub mod reciprocal;
-/// This module implements traits for shifting a `Rational` left (multiplying it by a power of 2).
+pub mod root;
+pub mod round_to_multiple;
+pub mod round_to_multiple_of_power_of_2;
+/// Traits for shifting a `Rational` left (multiplying it by a power of 2).
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -93,7 +101,7 @@ pub mod reciprocal;
 /// assert_eq!(x.to_string(), "11/14");
 /// ```
 pub mod shl;
-/// This module implements traits for shifting a `Rational` right (dividing it by a power of 2).
+/// Traits for shifting a `Rational` right (dividing it by a power of 2).
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -177,4 +185,8 @@ pub mod shl;
 /// ```
 pub mod shr;
 pub mod sign;
+pub mod simplest_rational_in_interval;
+pub mod sqrt;
+pub mod square;
 pub mod sub;
+pub mod traits;

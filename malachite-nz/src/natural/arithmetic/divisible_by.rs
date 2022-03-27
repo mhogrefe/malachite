@@ -25,14 +25,6 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR
 ///
 /// where n = `ns.len()`
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_limb;
-///
-/// assert_eq!(limbs_divisible_by_limb(&[333, 333], 3), true);
-/// assert_eq!(limbs_divisible_by_limb(&[332, 333], 3), false);
-/// ```
-///
 /// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.2.1, where a is non-negative and the
 /// ABOVE_THRESHOLD branch is excluded.
 #[doc(hidden)]
@@ -69,16 +61,6 @@ fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
 ///
 /// # Panics
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by;
-///
-/// assert!(!limbs_divisible_by(&mut [1, 2, 3], &mut [4, 5]));
-/// assert!(
-///     limbs_divisible_by(&mut [10200, 20402, 30605, 20402, 10200], &mut [100, 101, 102])
-/// );
-/// ```
 ///
 /// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
@@ -174,16 +156,6 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
 ///
 /// # Panics
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_val_ref;
-///
-/// assert!(!limbs_divisible_by_val_ref(&mut [1, 2, 3], &[4, 5]));
-/// assert!(
-///     limbs_divisible_by_val_ref(&mut [10200, 20402, 30605, 20402, 10200], &[100, 101, 102])
-/// );
-/// ```
 ///
 /// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
@@ -283,16 +255,6 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
 /// # Panics
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_ref_val;
-///
-/// assert!(!limbs_divisible_by_ref_val(&[1, 2, 3], &mut [4, 5]));
-/// assert!(
-///     limbs_divisible_by_ref_val(&[10200, 20402, 30605, 20402, 10200], &mut [100, 101, 102])
-/// );
-/// ```
-///
 /// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.
 #[allow(clippy::absurd_extreme_comparisons)]
@@ -386,16 +348,6 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
 ///
 /// # Panics
 /// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::divisible_by::limbs_divisible_by_ref_ref;
-///
-/// assert!(!limbs_divisible_by_ref_ref(&[1, 2, 3], &[4, 5]));
-/// assert!(
-///     limbs_divisible_by_ref_ref(&[10200, 20402, 30605, 20402, 10200], &[100, 101, 102])
-/// );
-/// ```
 ///
 /// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
 /// zero.

@@ -108,7 +108,7 @@ fn benchmark_get_bits_algorithms_signed<
                 no_out!(n.get_bits(start, end))
             }),
             ("naive", &mut |(n, start, end)| {
-                no_out!(get_bits_naive::<S, S::UnsignedOfEqualWidth>(&n, start, end))
+                no_out!(get_bits_naive::<S, U>(&n, start, end))
             }),
         ],
     );

@@ -242,29 +242,6 @@ fn select_fns(
 /// Panics if `xs`, `es`, or `ms` are empty, if `xs` is longer than `ms`, if the first element of
 /// `ms` is even, or if $E$ less than 2.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_pow::{
-///     limbs_mod_pow_odd,
-///     limbs_mod_pow_odd_scratch_len
-/// };
-///
-/// let out = &mut [10; 3];
-/// let mut scratch = vec![0; limbs_mod_pow_odd_scratch_len(1)];
-/// limbs_mod_pow_odd(out, &[3], &[2], &[9], &mut scratch);
-/// assert_eq!(out, &[0, 10, 10]);
-///
-/// let out = &mut [10; 3];
-/// let mut scratch = vec![0; limbs_mod_pow_odd_scratch_len(1)];
-/// limbs_mod_pow_odd(out, &[3], &[20], &[105], &mut scratch);
-/// assert_eq!(out, &[51, 10, 10]);
-///
-/// let out = &mut [10; 3];
-/// let mut scratch = vec![0; limbs_mod_pow_odd_scratch_len(2)];
-/// limbs_mod_pow_odd(out,  &[123, 456], &[789, 987], &[135, 797], &mut scratch);
-/// assert_eq!(out, &[2939877551, 399, 10]);
-/// ```
-///
 /// This is mpn_powm from mpn/generic/powm.c, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_mod_pow_odd(
@@ -371,19 +348,6 @@ pub fn limbs_mod_pow_odd(
 ///
 /// # Panics
 /// Panics if the exponent has trailing zeros or is 1.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_pow::limbs_mod_pow;
-///
-/// let mut out = vec![10; 3];
-/// limbs_mod_pow(&mut out, &[3], &[20], &[105]);
-/// assert_eq!(out, &[51, 10, 10]);
-///
-/// let mut out = vec![10; 3];
-/// limbs_mod_pow(&mut out, &[4], &[1, 1], &[0, 6]);
-/// assert_eq!(out, &[0, 4, 10]);
-/// ```
 ///
 /// This is mpz_powm from mpn/generic/powm.c, GMP 6.2.1, where b, e, and m are non-negative.
 /// Investigate changes from 6.1.2?

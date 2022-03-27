@@ -15,7 +15,7 @@ pub(crate) fn register(runner: &mut Runner) {
 fn demo_mod_power_of_2_square<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, pow) in unsigned_pair_gen_var_17::<T>().get(gm, &config).take(limit) {
         println!(
-            "{}.square() === {} mod 2^{}",
+            "{}.square() ≡ {} mod 2^{}",
             n,
             n.mod_power_of_2_square(pow),
             pow

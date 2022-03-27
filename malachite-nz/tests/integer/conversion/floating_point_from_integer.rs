@@ -21,7 +21,7 @@ use std::str::FromStr;
 fn test_f32_rounding_from_integer() {
     let test = |s: &str, rm: RoundingMode, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::rounding_from(&u, rm), out);
+        assert_eq!(NiceFloat(f32::rounding_from(&u, rm)), NiceFloat(out));
     };
     test("3", RoundingMode::Exact, 3.0);
     test("-3", RoundingMode::Exact, -3.0);
@@ -271,7 +271,7 @@ fn f32_rounding_from_integer_fail_4() {
 fn test_f64_rounding_from_integer() {
     let test = |s: &str, rm: RoundingMode, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::rounding_from(&u, rm), out);
+        assert_eq!(NiceFloat(f64::rounding_from(&u, rm)), NiceFloat(out));
     };
     test("3", RoundingMode::Exact, 3.0);
     test("-3", RoundingMode::Exact, -3.0);
@@ -583,7 +583,7 @@ fn f64_rounding_from_integer_fail_3() {
 fn test_f32_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::from(&u), out);
+        assert_eq!(NiceFloat(f32::from(&u)), NiceFloat(out));
     };
     test("3", 3.0);
     test("-3", -3.0);
@@ -628,7 +628,7 @@ fn test_f32_from_integer() {
 fn test_f64_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::from(&u), out);
+        assert_eq!(NiceFloat(f64::from(&u)), NiceFloat(out));
     };
     test("3", 3.0);
     test("-3", -3.0);
@@ -687,9 +687,9 @@ fn test_f64_from_integer() {
 
 #[test]
 fn test_f32_checked_from_integer() {
-    let test = |s: &str, out| {
+    let test = |s: &str, out: Option<f32>| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::checked_from(&u), out);
+        assert_eq!(f32::checked_from(&u).map(NiceFloat), out.map(NiceFloat));
     };
     test("3", Some(3.0));
     test("-3", Some(-3.0));
@@ -738,9 +738,9 @@ fn test_f32_checked_from_integer() {
 
 #[test]
 fn test_f64_checked_from_integer() {
-    let test = |s: &str, out| {
+    let test = |s: &str, out: Option<f64>| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::checked_from(&u), out);
+        assert_eq!(f64::checked_from(&u).map(NiceFloat), out.map(NiceFloat));
     };
     test("3", Some(3.0));
     test("-3", Some(-3.0));
@@ -801,7 +801,7 @@ fn test_f64_checked_from_integer() {
 fn test_f32_exact_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f32::exact_from(&u), out);
+        assert_eq!(NiceFloat(f32::exact_from(&u)), NiceFloat(out));
     };
     test("3", 3.0);
     test("-3", -3.0);
@@ -926,7 +926,7 @@ fn f32_exact_from_integer_fail_16() {
 fn test_f64_exact_from_integer() {
     let test = |s: &str, out| {
         let u = Integer::from_str(s).unwrap();
-        assert_eq!(f64::exact_from(&u), out);
+        assert_eq!(NiceFloat(f64::exact_from(&u)), NiceFloat(out));
     };
     test("3", 3.0);
     test("-3", -3.0);

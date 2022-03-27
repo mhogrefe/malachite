@@ -3,8 +3,9 @@ use generators::common::{
 };
 use generators::exhaustive::{float_rounding_mode_filter_var_1, valid_digit_chars};
 use generators::{
-    digits_valid, round_to_multiple_of_power_of_2_filter_map, round_to_multiple_signed_filter_map,
-    round_to_multiple_unsigned_filter_map, signed_assign_bits_valid, unsigned_assign_bits_valid,
+    digits_valid, large_exponent, round_to_multiple_of_power_of_2_filter_map,
+    round_to_multiple_signed_filter_map, round_to_multiple_unsigned_filter_map,
+    signed_assign_bits_valid, unsigned_assign_bits_valid,
 };
 use itertools::repeat_n;
 use itertools::Itertools;
@@ -22,6 +23,13 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::random::{
+    random_from_sci_string_options, random_sci_size_options, random_to_sci_options,
+    RandomFromSciStringOptions,
+};
+use malachite_base::num::conversion::string::options::{
+    FromSciStringOptions, SciSizeOptions, ToSciOptions,
+};
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
     SaturatingFrom, SplitInHalf, WrappingFrom, WrappingInto,
@@ -29,12 +37,12 @@ use malachite_base::num::conversion::traits::{
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::{BitBlockAccess, LeadingZeros};
 use malachite_base::num::random::geometric::{
-    geometric_random_natural_signeds, geometric_random_nonzero_signeds,
-    geometric_random_positive_unsigneds, geometric_random_signed_inclusive_range,
-    geometric_random_signed_range, geometric_random_signeds,
-    geometric_random_unsigned_inclusive_range, geometric_random_unsigned_range,
-    geometric_random_unsigneds, GeometricRandomNaturalValues, GeometricRandomSignedRange,
-    GeometricRandomSigneds,
+    geometric_random_natural_signeds, geometric_random_negative_signeds,
+    geometric_random_nonzero_signeds, geometric_random_positive_unsigneds,
+    geometric_random_signed_inclusive_range, geometric_random_signed_range,
+    geometric_random_signeds, geometric_random_unsigned_inclusive_range,
+    geometric_random_unsigned_range, geometric_random_unsigneds, GeometricRandomNaturalValues,
+    GeometricRandomSignedRange, GeometricRandomSigneds,
 };
 use malachite_base::num::random::{
     random_highest_bit_set_unsigneds, random_natural_signeds, random_negative_signeds,
@@ -72,6 +80,7 @@ use malachite_base::vecs::random::{
 };
 use malachite_base::vecs::random_values_from_vec;
 use num::arithmetic::mod_mul::limbs_invert_limb_naive;
+use num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use num::float::PRIMITIVE_FLOAT_CHARS;
 use rounding_modes::ROUNDING_MODE_CHARS;
 use std::cmp::{max, min, Ordering};
@@ -109,6 +118,36 @@ pub fn random_char_gen_var_2(_config: &GenConfig) -> It<char> {
 
 pub fn random_char_pair_gen(_config: &GenConfig) -> It<(char, char)> {
     Box::new(random_pairs_from_single(random_chars(EXAMPLE_SEED)))
+}
+
+// -- FromSciStringOptions --
+
+pub fn random_from_sci_string_options_gen(_config: &GenConfig) -> It<FromSciStringOptions> {
+    Box::new(random_from_sci_string_options(EXAMPLE_SEED))
+}
+
+// -- (FromSciStringOptions, PrimitiveUnsigned) --
+
+pub fn random_from_sci_string_options_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+    _config: &GenConfig,
+) -> It<(FromSciStringOptions, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_from_sci_string_options,
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::from(36u8)),
+    ))
+}
+
+// -- (FromSciStringOptions, RoundingMode) --
+
+pub fn random_from_sci_string_options_rounding_mode_pair_gen(
+    _config: &GenConfig,
+) -> It<(FromSciStringOptions, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_from_sci_string_options,
+        &random_rounding_modes,
+    ))
 }
 
 // -- PrimitiveFloat --
@@ -1472,6 +1511,20 @@ pub fn random_primitive_int_unsigned_bool_triple_gen_var_2<T: PrimitiveInt>(
     )
 }
 
+pub fn random_primitive_int_unsigned_bool_triple_gen_var_3<
+    T: PrimitiveUnsigned,
+    U: PrimitiveUnsigned,
+>(
+    _config: &GenConfig,
+) -> It<(T, U, bool)> {
+    Box::new(random_triples(
+        EXAMPLE_SEED,
+        &random_primitive_ints::<T>,
+        &random_positive_unsigneds::<U>,
+        &random_bools,
+    ))
+}
+
 // -- (PrimitiveInt, PrimitiveUnsigned, PrimitiveInt) --
 
 pub fn random_primitive_int_unsigned_primitive_int_triple_gen_var_1<
@@ -1749,6 +1802,39 @@ pub fn random_primitive_int_rounding_mode_pair_gen_var_1<
     )
 }
 
+// -- (PrimitiveInt, ToSciOptions) --
+
+pub fn random_primitive_int_to_sci_options_pair_gen<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(T, ToSciOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &random_primitive_ints,
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_primitive_int_to_sci_options_pair_gen_var_1<T: PrimitiveInt>(
+    config: &GenConfig,
+) -> It<(T, ToSciOptions)> {
+    Box::new(
+        random_pairs(EXAMPLE_SEED, &random_primitive_ints::<T>, &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        })
+        .filter(|(x, options)| x.fmt_sci_valid(*options)),
+    )
+}
+
 // -- PrimitiveSigned --
 
 pub fn random_signed_gen_var_1<T: PrimitiveSigned>(_config: &GenConfig) -> It<T> {
@@ -1875,6 +1961,10 @@ pub fn random_signed_gen_var_10<T: PrimitiveFloat>(_config: &GenConfig) -> It<i6
         T::MIN_EXPONENT,
         T::MAX_EXPONENT,
     ))
+}
+
+pub fn random_signed_gen_var_11<T: PrimitiveSigned>(_config: &GenConfig) -> It<T> {
+    Box::new(random_primitive_ints(EXAMPLE_SEED).filter(|&x| x != T::ZERO && x != T::MIN))
 }
 
 // -- (PrimitiveSigned, PrimitiveSigned) --
@@ -3370,7 +3460,7 @@ fn wrapping_shr<T: PrimitiveInt>(x: T, bits: u64) -> T {
 
 pub(crate) fn reduce_to_fit_add_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> (T, T, T) {
     let (p_hi, p_lo) = T::x_mul_y_is_zz(y, z);
-    let (r_hi, _) = T::xx_add_yy_is_zz(T::ZERO, x, p_hi, p_lo);
+    let r_hi = T::xx_add_yy_is_zz(T::ZERO, x, p_hi, p_lo).0;
     if r_hi == T::ZERO {
         (x, y, z)
     } else {
@@ -3715,19 +3805,19 @@ pub fn random_unsigned_rounding_mode_pair_gen_var_1<T: PrimitiveUnsigned>(
 
 struct DigitStringGenerator {
     ranges: VariableRangeGenerator,
-    digit_map: HashMap<u64, Vec<char>>,
+    digit_map: HashMap<u8, Vec<char>>,
     digit_counts: GeometricRandomNaturalValues<usize>,
 }
 
 impl Iterator for DigitStringGenerator {
-    type Item = (u64, String);
+    type Item = (u8, String);
 
-    fn next(&mut self) -> Option<(u64, String)> {
+    fn next(&mut self) -> Option<(u8, String)> {
         let base = self.ranges.next_in_inclusive_range(2, 36);
         let digits = self
             .digit_map
             .entry(base)
-            .or_insert_with(|| valid_digit_chars(u8::wrapping_from(base)));
+            .or_insert_with(|| valid_digit_chars(base));
         let digit_count = self.digit_counts.next().unwrap();
         let mut s = String::with_capacity(digit_count);
         for _ in 0..digit_count {
@@ -3738,7 +3828,7 @@ impl Iterator for DigitStringGenerator {
     }
 }
 
-pub fn random_unsigned_string_pair_gen_var_1(config: &GenConfig) -> It<(u64, String)> {
+pub fn random_unsigned_string_pair_gen_var_1(config: &GenConfig) -> It<(u8, String)> {
     Box::new(DigitStringGenerator {
         ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
         digit_map: HashMap::new(),
@@ -3752,7 +3842,7 @@ pub fn random_unsigned_string_pair_gen_var_1(config: &GenConfig) -> It<(u64, Str
     })
 }
 
-pub fn random_unsigned_string_pair_gen_var_2(config: &GenConfig) -> It<(u64, String)> {
+pub fn random_unsigned_string_pair_gen_var_2(config: &GenConfig) -> It<(u8, String)> {
     Box::new(random_pairs(
         EXAMPLE_SEED,
         &|seed| random_unsigned_inclusive_range(seed, 2, 36),
@@ -3767,14 +3857,14 @@ pub fn random_unsigned_string_pair_gen_var_2(config: &GenConfig) -> It<(u64, Str
 }
 
 struct TargetedIntegerFromStringBaseInputs {
-    uss: It<(u64, String)>,
+    uss: It<(u8, String)>,
     negs: RandomBools,
 }
 
 impl Iterator for TargetedIntegerFromStringBaseInputs {
-    type Item = (u64, String);
+    type Item = (u8, String);
 
-    fn next(&mut self) -> Option<(u64, String)> {
+    fn next(&mut self) -> Option<(u8, String)> {
         if self.negs.next().unwrap() {
             let (u, s) = self.uss.next().unwrap();
             let mut out = '-'.to_string();
@@ -3786,7 +3876,7 @@ impl Iterator for TargetedIntegerFromStringBaseInputs {
     }
 }
 
-pub fn random_unsigned_string_pair_gen_var_3(config: &GenConfig) -> It<(u64, String)> {
+pub fn random_unsigned_string_pair_gen_var_3(config: &GenConfig) -> It<(u8, String)> {
     Box::new(TargetedIntegerFromStringBaseInputs {
         uss: Box::new(DigitStringGenerator {
             ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
@@ -3956,6 +4046,16 @@ pub fn random_rounding_mode_triple_gen(
     Box::new(random_triples_from_single(random_rounding_modes(
         EXAMPLE_SEED,
     )))
+}
+
+// -- SciSizeOptions --
+
+pub fn random_sci_size_options_gen(config: &GenConfig) -> It<SciSizeOptions> {
+    Box::new(random_sci_size_options(
+        EXAMPLE_SEED,
+        config.get_or("mean_size_n", 32),
+        config.get_or("mean_size_d", 1),
+    ))
 }
 
 // -- String --
@@ -4132,6 +4232,208 @@ pub fn random_string_gen_var_10(config: &GenConfig) -> It<String> {
     ))
 }
 
+// vars 11 through 12 are in malachite-q.
+
+pub fn random_string_gen_var_13(config: &GenConfig) -> It<String> {
+    Box::new(random_strings_using_chars(
+        EXAMPLE_SEED,
+        &|seed| random_values_from_vec(seed, DECIMAL_SCI_STRING_CHARS.chars().collect()),
+        config.get_or("mean_length_n", 32),
+        config.get_or("mean_length_d", 1),
+    ))
+}
+
+pub fn random_string_gen_var_14(config: &GenConfig) -> It<String> {
+    Box::new(
+        random_strings(
+            EXAMPLE_SEED,
+            config.get_or("mean_length_n", 32),
+            config.get_or("mean_length_d", 1),
+        )
+        .filter(|s| !large_exponent(s)),
+    )
+}
+
+pub fn random_string_gen_var_15(config: &GenConfig) -> It<String> {
+    Box::new(
+        random_strings_using_chars(
+            EXAMPLE_SEED,
+            &|seed| random_values_from_vec(seed, DECIMAL_SCI_STRING_CHARS.chars().collect()),
+            config.get_or("mean_length_n", 32),
+            config.get_or("mean_length_d", 1),
+        )
+        .filter(|s| !large_exponent(s)),
+    )
+}
+
+// -- (String, FromSciStringOptions) --
+
+pub fn random_string_from_sci_string_options_pair_gen(
+    config: &GenConfig,
+) -> It<(String, FromSciStringOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_strings(
+                seed,
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+        },
+        &random_from_sci_string_options,
+    ))
+}
+
+struct SciDigitStringGenerator {
+    options: RandomFromSciStringOptions,
+    ranges: VariableRangeGenerator,
+    digit_map: HashMap<u8, Vec<char>>,
+    digit_counts: GeometricRandomNaturalValues<usize>,
+}
+
+impl Iterator for SciDigitStringGenerator {
+    type Item = (String, FromSciStringOptions);
+
+    fn next(&mut self) -> Option<(String, FromSciStringOptions)> {
+        let options = self.options.next().unwrap();
+        let base = options.get_base();
+        let digits = self.digit_map.entry(base).or_insert_with(|| {
+            let mut cs = vec!['+', '-', '.'];
+            if base < 15 {
+                cs.push('e');
+                cs.push('E');
+            }
+            cs.extend(valid_digit_chars(base));
+            cs
+        });
+        let digit_count = self.digit_counts.next().unwrap();
+        let mut s = String::with_capacity(digit_count);
+        for _ in 0..digit_count {
+            let index = self.ranges.next_less_than(digits.len());
+            s.push(digits[index]);
+        }
+        Some((s, options))
+    }
+}
+
+struct SciDigitStringGenerator2 {
+    ranges: VariableRangeGenerator,
+    digit_map: HashMap<u8, Vec<char>>,
+    digit_counts: GeometricRandomNaturalValues<usize>,
+}
+
+impl Iterator for SciDigitStringGenerator2 {
+    type Item = (String, u8);
+
+    fn next(&mut self) -> Option<(String, u8)> {
+        let base = self.ranges.next_in_inclusive_range(2, 36);
+        let digits = self.digit_map.entry(base).or_insert_with(|| {
+            let mut cs = vec!['+', '-', '.'];
+            if base < 15 {
+                cs.push('e');
+                cs.push('E');
+            }
+            cs.extend(valid_digit_chars(base));
+            cs
+        });
+        let digit_count = self.digit_counts.next().unwrap();
+        let mut s = String::with_capacity(digit_count);
+        for _ in 0..digit_count {
+            let index = self.ranges.next_less_than(digits.len());
+            s.push(digits[index]);
+        }
+        Some((s, base))
+    }
+}
+
+pub fn random_string_from_sci_string_options_pair_gen_var_1(
+    config: &GenConfig,
+) -> It<(String, FromSciStringOptions)> {
+    Box::new(SciDigitStringGenerator {
+        options: random_from_sci_string_options(EXAMPLE_SEED.fork("options")),
+        ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+        digit_map: HashMap::new(),
+        digit_counts: geometric_random_unsigned_range(
+            EXAMPLE_SEED.fork("digit_counts"),
+            1,
+            usize::MAX,
+            config.get_or("mean_length_n", 4),
+            config.get_or("mean_length_d", 1),
+        ),
+    })
+}
+
+pub fn random_string_from_sci_string_options_pair_gen_var_2(
+    config: &GenConfig,
+) -> It<(String, FromSciStringOptions)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_strings(
+                seed,
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|s| !large_exponent(s))
+        },
+        &random_from_sci_string_options,
+    ))
+}
+
+pub fn random_string_from_sci_string_options_pair_gen_var_3(
+    config: &GenConfig,
+) -> It<(String, FromSciStringOptions)> {
+    Box::new(
+        SciDigitStringGenerator {
+            options: random_from_sci_string_options(EXAMPLE_SEED.fork("options")),
+            ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+            digit_map: HashMap::new(),
+            digit_counts: geometric_random_unsigned_range(
+                EXAMPLE_SEED.fork("digit_counts"),
+                1,
+                usize::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ),
+        }
+        .filter(|(s, _)| !large_exponent(s)),
+    )
+}
+
+// -- (String, PrimitiveUnsigned) --
+
+pub fn random_string_unsigned_pair_gen_var_1(config: &GenConfig) -> It<(String, u8)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_strings(
+                seed,
+                config.get_or("mean_length_n", 32),
+                config.get_or("mean_length_d", 1),
+            )
+            .filter(|s| !large_exponent(s))
+        },
+        &|seed| random_unsigned_inclusive_range(seed, 2, 36),
+    ))
+}
+
+pub fn random_string_unsigned_pair_gen_var_2(config: &GenConfig) -> It<(String, u8)> {
+    Box::new(
+        SciDigitStringGenerator2 {
+            ranges: variable_range_generator(EXAMPLE_SEED.fork("ranges")),
+            digit_map: HashMap::new(),
+            digit_counts: geometric_random_unsigned_range(
+                EXAMPLE_SEED.fork("digit_counts"),
+                1,
+                usize::MAX,
+                config.get_or("mean_length_n", 4),
+                config.get_or("mean_length_d", 1),
+            ),
+        }
+        .filter(|(s, _)| !large_exponent(s)),
+    )
+}
+
 // -- (String, String) --
 
 pub fn random_string_pair_gen(config: &GenConfig) -> It<(String, String)> {
@@ -4149,6 +4451,136 @@ pub fn random_string_pair_gen_var_1(config: &GenConfig) -> It<(String, String)> 
         config.get_or("mean_length_n", 32),
         config.get_or("mean_length_d", 1),
     )))
+}
+
+// -- ToSciOptions --
+
+pub fn random_to_sci_options_gen(config: &GenConfig) -> It<ToSciOptions> {
+    Box::new(random_to_sci_options(
+        EXAMPLE_SEED,
+        config.get_or("mean_size_n", 32),
+        config.get_or("mean_size_d", 1),
+    ))
+}
+
+// -- (ToSciOptions, bool) --
+
+pub fn random_to_sci_options_bool_pair_gen(config: &GenConfig) -> It<(ToSciOptions, bool)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+        &random_bools,
+    ))
+}
+
+// -- (ToSciOptions, PrimitiveSigned) --
+
+pub fn random_to_sci_options_signed_pair_gen_var_1<T: PrimitiveSigned>(
+    config: &GenConfig,
+) -> It<(ToSciOptions, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_negative_signeds(
+                seed,
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (ToSciOptions, PrimitiveUnsigned) --
+
+pub fn random_to_sci_options_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(ToSciOptions, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+        &|seed| random_unsigned_inclusive_range(seed, T::TWO, T::from(36u8)),
+    ))
+}
+
+pub fn random_to_sci_options_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(ToSciOptions, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+pub fn random_to_sci_options_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>(
+    config: &GenConfig,
+) -> It<(ToSciOptions, T)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+        &|seed| {
+            geometric_random_positive_unsigneds(
+                seed,
+                config.get_or("mean_small_n", 32),
+                config.get_or("mean_small_d", 1),
+            )
+        },
+    ))
+}
+
+// -- (ToSciOptions, RoundingMode) --
+
+pub fn random_to_sci_options_rounding_mode_pair_gen(
+    config: &GenConfig,
+) -> It<(ToSciOptions, RoundingMode)> {
+    Box::new(random_pairs(
+        EXAMPLE_SEED,
+        &|seed| {
+            random_to_sci_options(
+                seed,
+                config.get_or("mean_size_n", 32),
+                config.get_or("mean_size_d", 1),
+            )
+        },
+        &random_rounding_modes,
+    ))
 }
 
 // -- Vec<bool> --

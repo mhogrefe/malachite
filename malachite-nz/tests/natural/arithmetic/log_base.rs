@@ -43,7 +43,7 @@ fn approx_log_fail() {
 }
 
 #[test]
-fn floor_log_base() {
+fn test_floor_log_base() {
     let test = |n, base, out| {
         assert_eq!(
             Natural::from_str(n)
@@ -101,7 +101,7 @@ fn floor_log_base_fail_3() {
 }
 
 #[test]
-fn ceiling_log_base() {
+fn test_ceiling_log_base() {
     let test = |n, base, out| {
         assert_eq!(
             Natural::from_str(n)
@@ -159,7 +159,7 @@ fn ceiling_log_base_fail_3() {
 }
 
 #[test]
-fn checked_log_base() {
+fn test_checked_log_base() {
     let test = |n, base, out| {
         assert_eq!(
             Natural::from_str(n)
@@ -231,7 +231,7 @@ fn floor_log_base_properties() {
     natural_pair_gen_var_3().test_properties(|(n, base)| {
         let floor_log = n.floor_log_base(&base);
         assert_eq!(floor_log_base_naive(&n, &base), floor_log);
-        assert_eq!(floor_log_base_by_squaring(&n, &base), floor_log,);
+        assert_eq!(floor_log_base_by_squaring(&n, &base), floor_log);
         assert_eq!(floor_log == 0, n < base);
 
         let power = (&base).pow(floor_log);

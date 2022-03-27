@@ -1,5 +1,8 @@
-use malachite_base::num::arithmetic::traits::{NextPowerOf2, PowerOf2, Reciprocal};
-use malachite_base::num::basic::traits::One;
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogBase2, NextPowerOf2, Pow, PowerOf2, Reciprocal,
+};
+use malachite_base::num::basic::traits::{One, Two};
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base_test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
@@ -35,8 +38,8 @@ fn power_of_2_properties() {
         assert!(x.is_valid());
 
         assert_eq!(x, Rational::ONE << pow);
-        //TODO assert_eq!(x, Natural::TWO.pow(pow));
-        //TODO checked log two
+        assert_eq!(x, Rational::TWO.pow(pow));
+        assert_eq!(x.checked_log_base_2(), Some(i64::exact_from(pow)));
         assert_eq!((&x).next_power_of_2(), x);
         assert_eq!(Natural::power_of_2(pow), x);
     });
@@ -46,8 +49,8 @@ fn power_of_2_properties() {
         assert!(x.is_valid());
 
         assert_eq!(x, Rational::ONE << pow);
-        //TODO assert_eq!(x, Natural::TWO.pow(pow));
-        //TODO checked log two
+        assert_eq!(x, Rational::TWO.pow(pow));
+        assert_eq!(x.checked_log_base_2(), Some(pow));
         assert_eq!((&x).next_power_of_2(), x);
         if pow >= 0 {
             assert_eq!(Natural::power_of_2(pow.unsigned_abs()), x);

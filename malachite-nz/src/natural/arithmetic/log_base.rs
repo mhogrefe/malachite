@@ -2,12 +2,15 @@ use malachite_base::num::arithmetic::traits::{
     CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
     CheckedLogBasePowerOf2, DivExactAssign, FloorLogBase, FloorLogBasePowerOf2, Pow,
 };
+use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::RoundingFrom;
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
+use malachite_base::rounding_modes::RoundingMode;
 use natural::Natural;
 use std::cmp::Ordering;
 
 impl Natural {
-    /// Calculates the approximate natural logarithm of a `Natural`.
+    /// Calculates the approximate natural logarithm of a nonzero `Natural`.
     ///
     /// $f(x) = \log x \pm O(\log x)$.
     ///
@@ -45,7 +48,7 @@ fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
     } else if x < base {
         return (0, false);
     }
-    let mut log = (x.approx_log() / base.approx_log()) as u64;
+    let mut log = u64::rounding_from(x.approx_log() / base.approx_log(), RoundingMode::Floor);
     let mut power = base.pow(log);
     match power.cmp(x) {
         Ordering::Equal => (log, true),
@@ -71,6 +74,53 @@ fn log_base_helper(x: &Natural, base: &Natural) -> (u64, bool) {
                 }
                 Ordering::Less => {
                     return (log - 1, false);
+                }
+                Ordering::Greater => {
+                    log -= 1;
+                }
+            }
+        },
+    }
+}
+
+// Also returns base^p and p, where b^p is close to x.
+pub(crate) fn log_base_helper_with_pow(x: &Natural, base: &Natural) -> (u64, bool, Natural, u64) {
+    assert_ne!(*x, 0);
+    assert!(*base > 1);
+    if *x == 1 {
+        return (0, true, Natural::ONE, 0);
+    } else if x < base {
+        return (0, false, Natural::ONE, 0);
+    }
+    let mut log = (x.approx_log() / base.approx_log()) as u64;
+    let mut power = base.pow(log);
+    match power.cmp(x) {
+        Ordering::Equal => (log, true, power, log),
+        Ordering::Less => loop {
+            power *= base;
+            match power.cmp(x) {
+                Ordering::Equal => {
+                    log += 1;
+                    return (log, true, power, log);
+                }
+                Ordering::Less => {
+                    log += 1;
+                }
+                Ordering::Greater => {
+                    return (log, false, power, log + 1);
+                }
+            }
+        },
+        Ordering::Greater => loop {
+            power.div_exact_assign(base);
+            match power.cmp(x) {
+                Ordering::Equal => {
+                    log -= 1;
+                    return (log, true, power, log);
+                }
+                Ordering::Less => {
+                    log -= 1;
+                    return (log, false, power, log);
                 }
                 Ordering::Greater => {
                     log -= 1;

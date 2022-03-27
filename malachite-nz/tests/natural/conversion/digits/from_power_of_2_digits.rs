@@ -138,7 +138,7 @@ fn test_from_power_of_2_digits_desc() {
     where
         Natural: PowerOf2Digits<T>,
     {
-        assert!(Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).is_none(),);
+        assert!(Natural::from_power_of_2_digits_desc(log_base, digits.iter().cloned()).is_none());
     }
     test_err::<u8>(1, &[2]);
 }

@@ -99,7 +99,7 @@ fn demo_mod_mul<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usi
         .get(gm, &config)
         .take(limit)
     {
-        println!("{} * {} === {} mod {}", x, y, x.mod_mul(y, m), m);
+        println!("{} * {} ≡ {} mod {}", x, y, x.mod_mul(y, m), m);
     }
 }
 

@@ -2,7 +2,7 @@
 #[derive(Clone, Eq, Hash, PartialEq)]
 pub struct BaseFmtWrapper<T> {
     x: T,
-    base: u64,
+    base: u8,
 }
 
 impl<T> BaseFmtWrapper<T> {
@@ -22,7 +22,7 @@ impl<T> BaseFmtWrapper<T> {
     /// assert_eq!(format!("{}", x), "gjdgxs");
     /// assert_eq!(format!("{:#}", x), "GJDGXS");
     /// ```
-    pub fn new(x: T, base: u64) -> Self {
+    pub fn new(x: T, base: u8) -> Self {
         assert!((2..=36).contains(&base), "base out of range");
         BaseFmtWrapper { x, base }
     }
@@ -44,8 +44,106 @@ impl<T> BaseFmtWrapper<T> {
     }
 }
 
+/// Trait implementations for strings, possibly using scientific notation, to numbers.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # from_sci_string
+/// ```
+/// use malachite_base::num::conversion::traits::FromSciString;
+///
+/// assert_eq!(u8::from_sci_string("123"), Some(123));
+/// assert_eq!(u8::from_sci_string("123.5"), Some(124));
+/// assert_eq!(u8::from_sci_string("256"), None);
+/// assert_eq!(u64::from_sci_string("1.23e10"), Some(12300000000));
+/// ```
+///
+/// # from_sci_string_with_options
+/// ```
+/// use malachite_base::num::conversion::string::options::FromSciStringOptions;
+/// use malachite_base::num::conversion::traits::FromSciString;
+/// use malachite_base::rounding_modes::RoundingMode;
+///
+/// let mut options = FromSciStringOptions::default();
+/// assert_eq!(u8::from_sci_string_with_options("123.5", options), Some(124));
+///
+/// options.set_rounding_mode(RoundingMode::Floor);
+/// assert_eq!(u8::from_sci_string_with_options("123.5", options), Some(123));
+///
+/// options = FromSciStringOptions::default();
+/// options.set_base(16);
+/// assert_eq!(u8::from_sci_string_with_options("ff", options), Some(255));
+/// ```
+pub mod from_sci_string;
 pub mod from_string;
-/// This module contains trait implementations for converting numbers to strings.
+pub mod options;
+/// Trait implementations for converting numbers to strings, possibly using scientific notation.
+///
+/// Here are usage examples of the macro-generated functions:
+///
+/// # to_sci()
+/// ```
+/// use malachite_base::num::conversion::traits::ToSci;
+///
+/// // If the value can fit in a `u32`, the result is the same as with `to_string`
+/// assert_eq!(123u8.to_sci().to_string(), "123");
+///
+/// assert_eq!(u128::MAX.to_sci().to_string(), "3.402823669209385e38");
+/// assert_eq!(i128::MIN.to_sci().to_string(), "-1.701411834604692e38");
+/// ```
+///
+/// # to_sci_with_options()
+/// ```
+/// use malachite_base::num::conversion::string::options::ToSciOptions;
+/// use malachite_base::num::conversion::traits::ToSci;
+/// use malachite_base::rounding_modes::RoundingMode;
+///
+/// let mut options = ToSciOptions::default();
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "123456");
+///
+/// options.set_precision(3);
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.23e5");
+///
+/// options.set_rounding_mode(RoundingMode::Ceiling);
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.24e5");
+///
+/// options.set_e_uppercase();
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.24E5");
+///
+/// options.set_force_exponent_plus_sign(true);
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.24E+5");
+///
+/// options = ToSciOptions::default();
+/// options.set_base(36);
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "2n9c");
+///
+/// options.set_uppercase();
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "2N9C");
+///
+/// options.set_base(2);
+/// options.set_precision(10);
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.1110001e16");
+///
+/// options.set_include_trailing_zeros(true);
+/// assert_eq!(123456u32.to_sci_with_options(options).to_string(), "1.111000100e16");
+/// ```
+///
+/// # fmt_sci_valid()
+/// ```
+/// use malachite_base::num::conversion::string::options::ToSciOptions;
+/// use malachite_base::num::conversion::traits::ToSci;
+/// use malachite_base::rounding_modes::RoundingMode;
+///
+/// let mut options = ToSciOptions::default();
+/// assert!(123u8.fmt_sci_valid(options));
+/// assert!(u128::MAX.fmt_sci_valid(options));
+/// options.set_rounding_mode(RoundingMode::Exact);
+/// assert!(!u128::MAX.fmt_sci_valid(options)); // u128::MAX has more than 16 significant digits
+/// options.set_precision(50);
+/// assert!(u128::MAX.fmt_sci_valid(options));
+/// ```
+pub mod to_sci;
+/// Trait implementations for converting numbers to strings.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///

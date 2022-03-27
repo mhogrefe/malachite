@@ -1,6 +1,5 @@
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
-use malachite_base::num::logic::traits::SignificantBits;
 use std::cmp::Ordering;
 use Rational;
 
@@ -66,30 +65,12 @@ impl OrdAbs for Rational {
                 return nd_cmp;
             }
         }
-        // Before cross-multiplying, compute approx significant bits of cross-products.
-        //
-        // Let a and b be the significant bits of x and y. Knowing a, we can say that x is between
-        // 2 ^ (a - 1) and 2 ^ a - 1, inclusive, and analogously for y.
-        //
-        // Thus, xy is between 2 ^ (a + b - 2) and 2 ^ (a + b) - 2 ^ a - 2 ^ b + 1, inclusive.
-        //
-        // So, the number of significant bits of xy is a + b - 1 or a + b.
-        //
-        // If we can determine that one product has more significant bits than the other, we can
-        // avoid the multiplication.
-        let first_prod_bits =
-            self.numerator.significant_bits() + other.denominator.significant_bits();
-        let second_prod_bits =
-            self.denominator.significant_bits() + other.numerator.significant_bits();
-        let bit_cmp = if first_prod_bits < second_prod_bits - 1 {
-            Some(Ordering::Less)
-        } else if first_prod_bits - 1 > second_prod_bits {
-            Some(Ordering::Greater)
-        } else {
-            None
-        };
-        if let Some(bit_cmp) = bit_cmp {
-            return bit_cmp;
+        // Then compare floor ∘ log_2 ∘ abs
+        let log_cmp = self
+            .floor_log_base_2_of_abs()
+            .cmp(&other.floor_log_base_2_of_abs());
+        if log_cmp != Ordering::Equal {
+            return log_cmp;
         }
         // Finally, cross-multiply.
         (&self.numerator * &other.denominator).cmp(&(&self.denominator * &other.numerator))

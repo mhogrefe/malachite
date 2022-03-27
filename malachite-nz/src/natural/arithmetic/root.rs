@@ -116,8 +116,8 @@ fn log_based_root(out: &mut Limb, x: Limb, mut bit_count: u64, exp: u64) -> u64 
         // In this branch, the input is unreasonably large. In the unlikely case, we use two
         // divisions and a modulo.
         fail_on_untested_path("bit_count.significant_bits() > LOGROOT_USED_BITS_COMP");
-        let (q, r) = bit_count.div_mod(exp);
-        len = q;
+        let r;
+        (len, r) = bit_count.div_mod(exp);
         bit_count = ((r << LOGROOT_USED_BITS) | b) / exp;
     } else {
         bit_count = ((bit_count << LOGROOT_USED_BITS) | b) / exp;
@@ -445,9 +445,9 @@ fn limbs_root_to_out_internal(
     rs_len
 }
 
-// Returns the size (in limbs) of the remainder.
-//
-// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where k != 2 and remp is not NULL.
+/// Returns the size (in limbs) of the remainder.
+///
+/// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where k != 2 and remp is not NULL.
 #[doc(hidden)]
 pub fn limbs_root_rem_to_out(
     out_root: &mut [Limb],
@@ -463,9 +463,9 @@ pub fn limbs_root_rem_to_out(
     limbs_root_to_out_internal(out_root, Some(out_rem), xs, exp, false)
 }
 
-// Returns a non-zero value iff the remainder is non-zero.
-//
-// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where remp is NULL.
+/// Returns a non-zero value iff the remainder is non-zero.
+///
+/// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where remp is NULL.
 #[doc(hidden)]
 pub fn limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> bool {
     let xs_len = xs.len();
@@ -520,10 +520,10 @@ pub fn limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     (root_out, rem_out)
 }
 
-impl FloorRootAssign for Natural {
+impl FloorRootAssign<u64> for Natural {
     /// Replaces a `Natural` with the floor of its $n$th root.
     ///
-    /// $x \gets \lfloor\root{x}\rfloor$.
+    /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -561,12 +561,12 @@ impl FloorRootAssign for Natural {
     }
 }
 
-impl FloorRoot for Natural {
+impl FloorRoot<u64> for Natural {
     type Output = Natural;
 
     /// Returns the floor of the $n$th root of a `Natural`, taking the `Natural` by value.
     ///
-    /// $f(x) = \lfloor\root{x}\rfloor$.
+    /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -602,12 +602,12 @@ impl FloorRoot for Natural {
     }
 }
 
-impl<'a> FloorRoot for &'a Natural {
+impl<'a> FloorRoot<u64> for &'a Natural {
     type Output = Natural;
 
     /// Returns the floor of the $n$th root of a `Natural`, taking the `Natural` by reference.
     ///
-    /// $f(x, n) = \lfloor\root\[n\]{x}\rfloor$.
+    /// $f(x, n) = \lfloor\sqrt\[n\]{x}\rfloor$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -643,10 +643,10 @@ impl<'a> FloorRoot for &'a Natural {
     }
 }
 
-impl CeilingRootAssign for Natural {
+impl CeilingRootAssign<u64> for Natural {
     /// Replaces a `Natural` with the ceiling of its $n$th root.
     ///
-    /// $x \gets \lceil\root\[n\]{x}\rceil$.
+    /// $x \gets \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -684,12 +684,12 @@ impl CeilingRootAssign for Natural {
     }
 }
 
-impl CeilingRoot for Natural {
+impl CeilingRoot<u64> for Natural {
     type Output = Natural;
 
     /// Returns the ceiling of the $n$th root of a `Natural`, taking the `Natural` by value.
     ///
-    /// $f(x, n) = \lceil\root\[n\]{x}\rceil$.
+    /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -731,12 +731,12 @@ impl CeilingRoot for Natural {
     }
 }
 
-impl<'a> CeilingRoot for &'a Natural {
+impl<'a> CeilingRoot<u64> for &'a Natural {
     type Output = Natural;
 
     /// Returns the ceiling of the $n$th root of a `Natural`, taking the `Natural` by reference.
     ///
-    /// $f(x) = \lceil\root\[n\]{x}\rceil$.
+    /// $f(x, n) = \lceil\sqrt\[n\]{x}\rceil$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -778,7 +778,7 @@ impl<'a> CeilingRoot for &'a Natural {
     }
 }
 
-impl CheckedRoot for Natural {
+impl CheckedRoot<u64> for Natural {
     type Output = Natural;
 
     /// Returns the the $n$th root of a `Natural`, or `None` if the `Natural` is not a perfect
@@ -786,7 +786,7 @@ impl CheckedRoot for Natural {
     ///
     /// $$
     /// f(x, n) = \\begin{cases}
-    ///     \operatorname{Some}(root\[n\]{x}) & \root\[n\]{x} \in \Z \\\\
+    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Z \\\\
     ///     \operatorname{None} & \textrm{otherwise},
     /// \\end{cases}
     /// $$
@@ -833,15 +833,15 @@ impl CheckedRoot for Natural {
     }
 }
 
-impl<'a> CheckedRoot for &'a Natural {
+impl<'a> CheckedRoot<u64> for &'a Natural {
     type Output = Natural;
 
     /// Returns the the $n$th root of a `Natural`, or `None` if the `Natural` is not a perfect
-    /// square. The `Natural` is taken by reference.
+    /// $n$th power. The `Natural` is taken by reference.
     ///
     /// $$
-    /// f(x) = \\begin{cases}
-    ///     \operatorname{Some}(root{x}) & \root{x} \in \Z \\\\
+    /// f(x, n) = \\begin{cases}
+    ///     \operatorname{Some}(\sqrt\[n\]{x}) & \sqrt\[n\]{x} \in \Z \\\\
     ///     \operatorname{None} & \textrm{otherwise},
     /// \\end{cases}
     /// $$
@@ -894,10 +894,10 @@ impl<'a> CheckedRoot for &'a Natural {
 impl RootAssignRem for Natural {
     type RemOutput = Natural;
 
-    /// Replaces a `Natural` with the floor of its square root, and returns the remainder (the
-    /// difference between the original `Natural` and the square of the floor).
+    /// Replaces a `Natural` with the floor of its $n$th root, and returns the remainder (the
+    /// difference between the original `Natural` and the $n$th power of the floor).
     ///
-    /// $f(x) = x - \lfloor\root{x}\rfloor^2$,
+    /// $f(x, n) = x - \lfloor\sqrt\[n\]{x}\rfloor^2$,
     ///
     /// $x \gets \lfloor\root{x}\rfloor$.
     ///
@@ -930,8 +930,8 @@ impl RootAssignRem for Natural {
     /// ```
     #[inline]
     fn root_assign_rem(&mut self, exp: u64) -> Natural {
-        let (root, rem) = (&*self).root_rem(exp);
-        *self = root;
+        let rem;
+        (*self, rem) = (&*self).root_rem(exp);
         rem
     }
 }
@@ -940,10 +940,10 @@ impl RootRem for Natural {
     type RootOutput = Natural;
     type RemOutput = Natural;
 
-    /// Returns the floor of the square root of a `Natural`, and the remainder (the difference
-    /// between the `Natural` and the square of the floor). The `Natural` is taken by value.
+    /// Returns the floor of the $n$th root of a `Natural`, and the remainder (the difference
+    /// between the `Natural` and the $n$th power of the floor). The `Natural` is taken by value.
     ///
-    /// $f(x) = (\lfloor\root{x}\rfloor, x - \lfloor\root{x}\rfloor^2)$.
+    /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^2)$.
     ///
     /// # Worst-case complexity
     /// TODO
@@ -991,10 +991,11 @@ impl<'a> RootRem for &'a Natural {
     type RootOutput = Natural;
     type RemOutput = Natural;
 
-    /// Returns the floor of the square root of a `Natural`, and the remainder (the difference
-    /// between the `Natural` and the square of the floor). The `Natural` is taken by reference.
+    /// Returns the floor of the $n$th root of a `Natural`, and the remainder (the difference
+    /// between the `Natural` and the $n$th power of the floor). The `Natural` is taken by
+    /// reference.
     ///
-    /// $f(x) = (\lfloor\root{x}\rfloor, x - \lfloor\root{x}\rfloor^2)$.
+    /// $f(x, n) = (\lfloor\sqrt\[n\]{x}\rfloor, x - \lfloor\sqrt\[n\]{x}\rfloor^2)$.
     ///
     /// # Worst-case complexity
     /// TODO

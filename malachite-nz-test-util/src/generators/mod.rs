@@ -13,7 +13,9 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{ConvertibleFrom, ExactFrom, SaturatingFrom};
+use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::vecs::exhaustive::lex_ordered_unique_vecs;
 use malachite_base_test_util::generators::common::Generator;
@@ -325,6 +327,17 @@ pub fn integer_integer_natural_triple_gen_var_2() -> Generator<(Integer, Integer
     )
 }
 
+// -- (Integer, Integer, PrimitiveFloat) --
+
+pub fn integer_integer_primitive_float_triple_gen<T: PrimitiveFloat>(
+) -> Generator<(Integer, Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_integer_primitive_float_triple_gen,
+        &random_integer_integer_primitive_float_triple_gen,
+        &special_random_integer_integer_primitive_float_triple_gen,
+    )
+}
+
 // -- (Integer, Integer, PrimitiveSigned) --
 
 pub fn integer_integer_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Integer, Integer, T)> {
@@ -447,6 +460,36 @@ pub fn integer_natural_natural_triple_gen() -> Generator<(Integer, Natural, Natu
         &exhaustive_integer_natural_natural_triple_gen,
         &random_integer_natural_natural_triple_gen,
         &special_random_integer_natural_natural_triple_gen,
+    )
+}
+
+// -- (Integer, PrimitiveFloat) --
+
+pub fn integer_primitive_float_pair_gen<T: PrimitiveFloat>() -> Generator<(Integer, T)> {
+    Generator::new(
+        &exhaustive_integer_primitive_float_pair_gen,
+        &random_integer_primitive_float_pair_gen,
+        &special_random_integer_primitive_float_pair_gen,
+    )
+}
+
+pub fn integer_primitive_float_pair_gen_rm<T: PrimitiveFloat>(
+) -> Generator<((rug::Integer, T), (Integer, T))> {
+    Generator::new(
+        &|| integer_pair_1_rm(exhaustive_integer_primitive_float_pair_gen()),
+        &|config| integer_pair_1_rm(random_integer_primitive_float_pair_gen(config)),
+        &|config| integer_pair_1_rm(special_random_integer_primitive_float_pair_gen(config)),
+    )
+}
+
+// -- (Integer, PrimitiveFloat, PrimitiveFloat) --
+
+pub fn integer_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>(
+) -> Generator<(Integer, T, T)> {
+    Generator::new(
+        &exhaustive_integer_primitive_float_primitive_float_triple_gen,
+        &random_integer_primitive_float_primitive_float_triple_gen,
+        &special_random_integer_primitive_float_primitive_float_triple_gen,
     )
 }
 
@@ -789,6 +832,25 @@ pub fn integer_rounding_mode_pair_gen_var_2() -> Generator<(Integer, RoundingMod
         &exhaustive_integer_rounding_mode_pair_gen_var_2,
         &random_integer_rounding_mode_pair_gen_var_2,
         &special_random_integer_rounding_mode_pair_gen_var_2,
+    )
+}
+
+// -- (Integer, ToSciOptions) --
+
+pub fn integer_to_sci_options_pair_gen() -> Generator<(Integer, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_integer_to_sci_options_pair_gen,
+        &random_integer_to_sci_options_pair_gen,
+        &special_random_integer_to_sci_options_pair_gen,
+    )
+}
+
+// All `(Integer, ToSciOptions)` pairs where the `Integer` can be formatted using the options.
+pub fn integer_to_sci_options_pair_gen_var_1() -> Generator<(Integer, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_integer_to_sci_options_pair_gen_var_1,
+        &random_integer_to_sci_options_pair_gen_var_1,
+        &special_random_integer_to_sci_options_pair_gen_var_1,
     )
 }
 
@@ -1315,6 +1377,17 @@ pub fn natural_natural_natural_unsigned_quadruple_gen_var_4(
     )
 }
 
+// -- (Natural, Natural, PrimitiveFloat) --
+
+pub fn natural_natural_primitive_float_triple_gen<T: PrimitiveFloat>(
+) -> Generator<(Natural, Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_natural_primitive_float_triple_gen,
+        &random_natural_natural_primitive_float_triple_gen,
+        &special_random_natural_natural_primitive_float_triple_gen,
+    )
+}
+
 // -- (Natural, Natural, PrimitiveSigned) --
 
 pub fn natural_natural_signed_triple_gen<T: PrimitiveSigned>() -> Generator<(Natural, Natural, T)> {
@@ -1449,6 +1522,36 @@ pub fn natural_natural_rounding_mode_triple_gen_var_2(
         &exhaustive_natural_natural_rounding_mode_triple_gen_var_2,
         &random_natural_natural_rounding_mode_triple_gen_var_2,
         &special_random_natural_natural_rounding_mode_triple_gen_var_2,
+    )
+}
+
+// -- (Natural, PrimitiveFloat) --
+
+pub fn natural_primitive_float_pair_gen<T: PrimitiveFloat>() -> Generator<(Natural, T)> {
+    Generator::new(
+        &exhaustive_natural_primitive_float_pair_gen,
+        &random_natural_primitive_float_pair_gen,
+        &special_random_natural_primitive_float_pair_gen,
+    )
+}
+
+pub fn natural_primitive_float_pair_gen_rm<T: PrimitiveFloat>(
+) -> Generator<((rug::Integer, T), (Natural, T))> {
+    Generator::new(
+        &|| natural_pair_1_rm(exhaustive_natural_primitive_float_pair_gen()),
+        &|config| natural_pair_1_rm(random_natural_primitive_float_pair_gen(config)),
+        &|config| natural_pair_1_rm(special_random_natural_primitive_float_pair_gen(config)),
+    )
+}
+
+// -- (Natural, PrimitiveFloat, PrimitiveFloat) --
+
+pub fn natural_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>(
+) -> Generator<(Natural, T, T)> {
+    Generator::new(
+        &exhaustive_natural_primitive_float_primitive_float_triple_gen,
+        &random_natural_primitive_float_primitive_float_triple_gen,
+        &special_random_natural_primitive_float_primitive_float_triple_gen,
     )
 }
 
@@ -1952,6 +2055,25 @@ pub fn natural_rounding_mode_pair_gen_var_2() -> Generator<(Natural, RoundingMod
     )
 }
 
+// -- (Natural, ToSciOptions) --
+
+pub fn natural_to_sci_options_pair_gen() -> Generator<(Natural, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_natural_to_sci_options_pair_gen,
+        &random_natural_to_sci_options_pair_gen,
+        &special_random_natural_to_sci_options_pair_gen,
+    )
+}
+
+// All `(Natural, ToSciOptions)` pairs where the `Natural` can be formatted using the options.
+pub fn natural_to_sci_options_pair_gen_var_1() -> Generator<(Natural, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_natural_to_sci_options_pair_gen_var_1,
+        &random_natural_to_sci_options_pair_gen_var_1,
+        &special_random_natural_to_sci_options_pair_gen_var_1,
+    )
+}
+
 // -- (Natural, Vec<bool>) --
 
 // All `(Natural, Vec<bool>)` pairs where the length of the `Vec` is the number of limbs of the
@@ -2012,6 +2134,17 @@ pub fn string_triple_gen_var_2() -> Generator<(String, String, String)> {
 }
 
 // var 3 is in malachite-q.
+
+// -- (Vec<Natural>, Integer) --
+
+// All `(Vec<Natural>, Integer)` where the `Natural`s are positive.
+pub fn natural_vec_integer_pair_gen_var_1() -> Generator<(Vec<Natural>, Integer)> {
+    Generator::new(
+        &exhaustive_natural_vec_integer_pair_gen_var_1,
+        &random_natural_vec_integer_pair_gen_var_1,
+        &special_random_natural_vec_integer_pair_gen_var_1,
+    )
+}
 
 // -- (Vec<Natural>, Natural) --
 
@@ -3215,6 +3348,46 @@ pub fn large_type_gen_var_21() -> Generator<(Limb, Limb, Limb, Limb, Limb, Limb,
         &exhaustive_large_type_gen_var_21,
         &random_large_type_gen_var_21,
         &special_random_large_type_gen_var_21,
+    )
+}
+
+// var 22 is in malachite-base.
+
+/// All `(u64, Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to
+/// `Rational::from_power_of_2_digits`.
+pub fn large_type_gen_var_23() -> Generator<(u64, Vec<Natural>, RationalSequence<Natural>)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_23,
+        &random_large_type_gen_var_23,
+        &special_random_large_type_gen_var_23,
+    )
+}
+
+/// All `(Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to
+/// `Rational::from_power_of_2_digits` with `log_base` == 1.
+pub fn large_type_gen_var_24() -> Generator<(Vec<Natural>, RationalSequence<Natural>)> {
+    Generator::new_no_special(
+        &exhaustive_large_type_gen_var_24,
+        &random_large_type_gen_var_24,
+    )
+}
+
+/// All `(u64, Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to
+/// `Rational::from_digits`.
+pub fn large_type_gen_var_25() -> Generator<(Natural, Vec<Natural>, RationalSequence<Natural>)> {
+    Generator::new(
+        &exhaustive_large_type_gen_var_25,
+        &random_large_type_gen_var_25,
+        &special_random_large_type_gen_var_24,
+    )
+}
+
+/// All `(Vec<Natural>, RationalSequence<Natural>)` that are valid inputs to
+/// `Rational::from_digits` with `base` == 10.
+pub fn large_type_gen_var_26() -> Generator<(Vec<Natural>, RationalSequence<Natural>)> {
+    Generator::new_no_special(
+        &exhaustive_large_type_gen_var_26,
+        &random_large_type_gen_var_26,
     )
 }
 

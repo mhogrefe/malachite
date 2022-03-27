@@ -1,4 +1,3 @@
-use malachite_base::strings::ExtraToString;
 use malachite_base_test_util::bench::bucketers::string_len_bucketer;
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
@@ -17,11 +16,7 @@ pub(crate) fn register(runner: &mut Runner) {
 
 fn demo_rational_from_str(gm: GenMode, config: GenConfig, limit: usize) {
     for s in string_gen().get(gm, &config).take(limit) {
-        println!(
-            "Rational::from_str({}) = {}",
-            s,
-            Rational::from_str(&s).to_string()
-        );
+        println!("Rational::from_str({}) = {:?}", s, Rational::from_str(&s));
     }
 }
 

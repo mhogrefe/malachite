@@ -23,7 +23,7 @@ fn demo_mod_pow<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usi
         .get(gm, &config)
         .take(limit)
     {
-        println!("{}.pow({}) === {} mod {}", x, exp, x.mod_pow(exp, m), m);
+        println!("{}.pow({}) ≡ {} mod {}", x, exp, x.mod_pow(exp, m), m);
     }
 }
 

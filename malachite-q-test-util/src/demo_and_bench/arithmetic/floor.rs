@@ -37,6 +37,7 @@ fn demo_rational_floor_assign(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
+#[allow(unused_must_use)]
 fn benchmark_rational_floor_library_comparison(
     gm: GenMode,
     config: GenConfig,

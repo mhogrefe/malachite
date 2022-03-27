@@ -7,7 +7,6 @@ use malachite_base_test_util::stats::median;
 use malachite_base_test_util::stats::moments::{moment_stats, MomentStats};
 use malachite_nz::integer::random::random_natural_integers;
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::integer::IntegerCheckedToF64Wrapper;
 
 fn random_natural_integers_helper(
     mean_bits_numerator: u64,
@@ -39,7 +38,7 @@ fn random_natural_integers_helper(
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
     // Note that the population moments do not exist.
-    let actual_sample_moment_stats = moment_stats(xs.take(1000000).map(IntegerCheckedToF64Wrapper));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000).map(|x| f64::from(&x)));
     assert_eq!(
         (
             actual_values.as_slice(),

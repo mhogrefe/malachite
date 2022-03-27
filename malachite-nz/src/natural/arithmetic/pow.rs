@@ -271,10 +271,8 @@ fn limb_pow_to_out_alt<'a>(
     if bits.odd() {
         swap(&mut out, &mut scratch);
     }
-    let (s_hi, s_lo) = DoubleLimb::from(x).square().split_in_half();
-    out[0] = s_lo;
-    out[1] = s_hi;
-    let mut out_len = if s_hi == 0 { 1 } else { 2 };
+    (out[1], out[0]) = DoubleLimb::from(x).square().split_in_half();
+    let mut out_len = if out[1] == 0 { 1 } else { 2 };
     for i in (0..bits - 1).rev() {
         if exp.get_bit(i) {
             let (out_last, out_init) = out[..out_len + 1].split_last_mut().unwrap();

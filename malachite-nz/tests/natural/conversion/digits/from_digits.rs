@@ -947,7 +947,7 @@ fn test_from_digits_desc_basecase() {
 
     fn test_err(xs: &[u8], base: Limb) {
         assert!(from_digits_desc_basecase(xs, base).is_none());
-        assert!(from_digits_desc_naive_primitive(xs, u8::exact_from(base)).is_none(),);
+        assert!(from_digits_desc_naive_primitive(xs, u8::exact_from(base)).is_none());
     }
     test_err(&[10, 11, 12], 10);
 }

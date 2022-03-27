@@ -20,17 +20,6 @@ use std::mem::swap;
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::comparison::cmp::limbs_cmp_same_length;
-/// use std::cmp::Ordering;
-///
-/// assert_eq!(limbs_cmp_same_length(&[3], &[5]), Ordering::Less);
-/// assert_eq!(limbs_cmp_same_length(&[3, 0], &[5, 0]), Ordering::Less);
-/// assert_eq!(limbs_cmp_same_length(&[1, 2], &[2, 1]), Ordering::Greater);
-/// assert_eq!(limbs_cmp_same_length(&[1, 2, 3], &[1, 2, 3]), Ordering::Equal);
-/// ```
 #[doc(hidden)]
 pub fn limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
     assert_eq!(xs.len(), ys.len());
@@ -49,17 +38,6 @@ pub fn limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
 ///
 /// # Panics
 /// Panics if the last element of `xs` or `ys` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::comparison::cmp::limbs_cmp;
-/// use std::cmp::Ordering;
-///
-/// assert_eq!(limbs_cmp(&[3], &[5]), Ordering::Less);
-/// assert_eq!(limbs_cmp(&[3, 1], &[5]), Ordering::Greater);
-/// assert_eq!(limbs_cmp(&[1, 2], &[2, 1, 3]), Ordering::Less);
-/// assert_eq!(limbs_cmp(&[1, 2, 3], &[1, 2, 3]), Ordering::Equal);
-/// ```
 #[doc(hidden)]
 pub fn limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
     assert_ne!(xs.last(), Some(&0));
@@ -199,8 +177,8 @@ impl Ord for Natural {
 }
 
 impl Natural {
-    /// Returns a result of a comparison between two `Natural`s as if both had been multiplied by
-    /// some power of 2 to bring them into the interval $[1, 2)$.
+    /// Returns a result of a comparison between two `Natural`s as if each had been multiplied by
+    /// some power of 2 to bring it into the interval $[1, 2)$.
     ///
     /// That is, the comparison is equivalent to a comparison between $f(x)$ and $f(y)$, where
     /// $$
@@ -216,6 +194,9 @@ impl Natural {
     ///
     /// where $T$ is time, $M$ is additional memory, and $n$ is
     /// `min(self.significant_bits(), other.significant_bits())`.
+    ///
+    /// # Panics
+    /// Panics if either argument is zero.
     ///
     /// # Examples
     /// ```

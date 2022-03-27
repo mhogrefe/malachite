@@ -133,12 +133,11 @@ fn benchmark_natural_pow_library_comparison(
         file_name,
         &triple_3_pair_1_bits_times_pair_2_bucketer("x", "exp"),
         &mut [
-            ("Malachite", &mut (|(_, _, (x, exp))| no_out!(x.pow(exp)))),
-            ("num", &mut (|((x, exp), _, _)| no_out!(x.pow(exp)))),
-            (
-                "rug",
-                &mut (|(_, (x, exp), _)| no_out!(x.pow(u32::exact_from(exp)))),
-            ),
+            ("Malachite", &mut |(_, _, (x, exp))| no_out!(x.pow(exp))),
+            ("num", &mut |((x, exp), _, _)| no_out!(x.pow(exp))),
+            ("rug", &mut |(_, (x, exp), _)| {
+                no_out!(x.pow(u32::exact_from(exp)))
+            }),
         ],
     );
 }

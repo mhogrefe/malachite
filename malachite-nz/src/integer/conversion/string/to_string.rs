@@ -2,7 +2,7 @@ use integer::Integer;
 use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
-use malachite_base::num::conversion::traits::{Digits, ToStringBase, WrappingFrom};
+use malachite_base::num::conversion::traits::{Digits, ToStringBase};
 use malachite_base::vecs::vec_pad_left;
 use natural::conversion::string::BaseFmtWrapper;
 use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
@@ -118,14 +118,12 @@ impl ToStringBase for Integer {
     /// assert_eq!(Integer::from(-1000).to_string_base(10), "-1000");
     /// assert_eq!(Integer::from(-1000).to_string_base(36), "-rs");
     /// ```
-    fn to_string_base(&self, base: u64) -> String {
+    fn to_string_base(&self, base: u8) -> String {
         assert!((2..=36).contains(&base), "base out of range");
         if *self == 0 {
             "0".to_string()
         } else {
-            let mut digits = self
-                .unsigned_abs_ref()
-                .to_digits_desc(&u8::wrapping_from(base));
+            let mut digits = self.unsigned_abs_ref().to_digits_desc(&base);
             for digit in &mut digits {
                 *digit = digit_to_display_byte_lower(*digit).unwrap();
             }
@@ -162,14 +160,12 @@ impl ToStringBase for Integer {
     /// assert_eq!(Integer::from(-1000).to_string_base_upper(10), "-1000");
     /// assert_eq!(Integer::from(-1000).to_string_base_upper(36), "-RS");
     /// ```
-    fn to_string_base_upper(&self, base: u64) -> String {
+    fn to_string_base_upper(&self, base: u8) -> String {
         assert!((2..=36).contains(&base), "base out of range");
         if *self == 0 {
             "0".to_string()
         } else {
-            let mut digits = self
-                .unsigned_abs_ref()
-                .to_digits_desc(&u8::wrapping_from(base));
+            let mut digits = self.unsigned_abs_ref().to_digits_desc(&base);
             for digit in &mut digits {
                 *digit = digit_to_display_byte_upper(*digit).unwrap();
             }

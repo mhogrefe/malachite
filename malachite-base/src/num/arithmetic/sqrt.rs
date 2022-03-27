@@ -289,7 +289,6 @@ fn floor_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64
     }
 }
 
-/// TODO clean up float conversion
 fn ceiling_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
@@ -328,7 +327,6 @@ fn ceiling_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f
     }
 }
 
-/// TODO clean up float conversion
 fn checked_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
     g: G,
@@ -369,7 +367,6 @@ fn checked_sqrt_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f
     }
 }
 
-/// TODO clean up float conversion
 /// This is n_sqrtrem from ulong_extras/sqrtrem.c, FLINT 2.7.1.
 fn sqrt_rem_approx_and_refine<T: PrimitiveUnsigned, F: Fn(T) -> f64, G: Fn(f64) -> T>(
     f: F,
@@ -1119,8 +1116,8 @@ macro_rules! impl_sqrt_assign_rem_unsigned {
             /// See the documentation of the `num::arithmetic::sqrt` module.
             #[inline]
             fn sqrt_assign_rem(&mut self) -> $t {
-                let (sqrt, rem) = self.sqrt_rem();
-                *self = sqrt;
+                let rem;
+                (*self, rem) = self.sqrt_rem();
                 rem
             }
         }

@@ -13,14 +13,6 @@ use std::ops::Not;
 /// where n = `xs.len()`
 ///
 /// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp is returned.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::not::limbs_not;
-/// use std::cmp::Ordering;
-///
-/// assert_eq!(limbs_not(&[0, 1, 2]), [0xffffffff, 0xfffffffe, 0xfffffffd]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_not(xs: &[Limb]) -> Vec<Limb> {
     xs.iter().map(|x| !x).collect()
@@ -39,15 +31,6 @@ pub fn limbs_not(xs: &[Limb]) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::not::limbs_not_to_out;
-///
-/// let mut out = [0, 1, 2];
-/// limbs_not_to_out(&mut out, &[0xffff0000, 0xf0f0f0f0]);
-/// assert_eq!(out, [0x0000ffff, 0x0f0f0f0f, 2]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
     assert!(out.len() >= xs.len());
@@ -65,16 +48,6 @@ pub fn limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
 /// where n = `xs.len()`
 ///
 /// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp == up.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::not::limbs_not_in_place;
-/// use std::cmp::Ordering;
-///
-/// let mut limbs = [0, 1, 2];
-/// limbs_not_in_place(&mut limbs);
-/// assert_eq!(limbs, [0xffffffff, 0xfffffffe, 0xfffffffd]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_not_in_place(xs: &mut [Limb]) {
     for x in xs.iter_mut() {

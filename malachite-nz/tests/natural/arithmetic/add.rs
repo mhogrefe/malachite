@@ -1160,7 +1160,7 @@ fn add_properties() {
 
     unsigned_pair_gen_var_27::<Limb>().test_properties(|(x, y)| {
         assert_eq!(
-            Natural::from(DoubleLimb::from(x) + DoubleLimb::from(y)),
+            DoubleLimb::from(x) + DoubleLimb::from(y),
             Natural::from(x) + Natural::from(y)
         );
     });

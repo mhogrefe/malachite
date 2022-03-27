@@ -12,14 +12,17 @@ impl Natural {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::natural::Natural;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert_eq!(Natural::ZERO.limb_count(), 0);
-    /// assert_eq!(Natural::from(123u32).limb_count(), 1);
-    /// assert_eq!(Natural::trillion().limb_count(), 2);
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(Natural::ZERO.limb_count(), 0);
+    ///     assert_eq!(Natural::from(123u32).limb_count(), 1);
+    ///     assert_eq!(Natural::trillion().limb_count(), 2);
+    /// }
     /// ```
     pub fn limb_count(&self) -> u64 {
         match *self {

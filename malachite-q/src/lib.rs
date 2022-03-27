@@ -19,7 +19,7 @@ use malachite_nz::natural::Natural;
 /// A rational number.
 ///
 /// On a 64-bit system, a `Rational` takes up 72 bytes of space on the stack.
-#[derive(Clone, Debug, Hash, Eq, PartialEq)]
+#[derive(Clone, Hash, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Deserialize, Serialize))]
 pub struct Rational {
     // whether the `Rational` is non-negative
@@ -71,7 +71,7 @@ impl Rational {
     ///     Rational::from_naturals(Natural::from(4u32), Natural::from(6u32)).to_string(),
     ///     "2/3"
     /// );
-    /// assert_eq!(Rational::from_naturals(Natural::ZERO, Natural::from(6u32)).to_string(), "0");
+    /// assert_eq!(Rational::from_naturals(Natural::ZERO, Natural::from(6u32)), 0);
     /// ```
     pub fn from_naturals(numerator: Natural, denominator: Natural) -> Rational {
         assert_ne!(denominator, 0);
@@ -110,10 +110,7 @@ impl Rational {
     ///     Rational::from_naturals_ref(&Natural::from(4u32), &Natural::from(6u32)).to_string(),
     ///     "2/3"
     /// );
-    /// assert_eq!(
-    ///     Rational::from_naturals_ref(&Natural::ZERO, &Natural::from(6u32)).to_string(),
-    ///     "0"
-    /// );
+    /// assert_eq!(Rational::from_naturals_ref(&Natural::ZERO, &Natural::from(6u32)), 0);
     /// ```
     pub fn from_naturals_ref(numerator: &Natural, denominator: &Natural) -> Rational {
         assert_ne!(*denominator, 0);
@@ -125,7 +122,31 @@ impl Rational {
         }
     }
 
-    //TODO
+    /// Converts two unsigned integers to a `Rational`. The integers become the `Rational`'s
+    /// numerator and denominator. Only non-negative `Rational`s can be produced with this
+    /// function.
+    ///
+    /// The denominator may not be zero.
+    ///
+    /// The input integers may have common factors; this function reduces them.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `denominator` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::from_unsigneds(4u32, 6).to_string(), "2/3");
+    /// assert_eq!(Rational::from_unsigneds(0u32, 6), 0);
+    /// ```
     #[inline]
     pub fn from_unsigneds<T: PrimitiveUnsigned>(numerator: T, denominator: T) -> Rational
     where
@@ -165,14 +186,8 @@ impl Rational {
     ///     Rational::from_integers(Integer::from(4), Integer::from(-6)).to_string(),
     ///     "-2/3"
     /// );
-    /// assert_eq!(
-    ///     Rational::from_integers(Integer::ZERO, Integer::from(6)).to_string(),
-    ///     "0"
-    /// );
-    /// assert_eq!(
-    ///     Rational::from_integers(Integer::ZERO, Integer::from(-6)).to_string(),
-    ///     "0"
-    /// );
+    /// assert_eq!(Rational::from_integers(Integer::ZERO, Integer::from(6)), 0);
+    /// assert_eq!(Rational::from_integers(Integer::ZERO, Integer::from(-6)), 0);
     /// ```
     pub fn from_integers(numerator: Integer, denominator: Integer) -> Rational {
         assert_ne!(denominator, 0);
@@ -213,14 +228,8 @@ impl Rational {
     ///     Rational::from_integers_ref(&Integer::from(4), &Integer::from(-6)).to_string(),
     ///     "-2/3"
     /// );
-    /// assert_eq!(
-    ///     Rational::from_integers_ref(&Integer::ZERO, &Integer::from(6)).to_string(),
-    ///     "0"
-    /// );
-    /// assert_eq!(
-    ///     Rational::from_integers_ref(&Integer::ZERO, &Integer::from(-6)).to_string(),
-    ///     "0"
-    /// );
+    /// assert_eq!(Rational::from_integers_ref(&Integer::ZERO, &Integer::from(6)), 0);
+    /// assert_eq!(Rational::from_integers_ref(&Integer::ZERO, &Integer::from(-6)), 0);
     /// ```
     pub fn from_integers_ref(numerator: &Integer, denominator: &Integer) -> Rational {
         assert_ne!(*denominator, 0);
@@ -232,7 +241,33 @@ impl Rational {
         q
     }
 
-    //TODO
+    /// Converts two signed integers to a `Rational`. The absolute values of the integers become
+    /// the `Rational`'s numerator and denominator. The sign of the `Rational` is the sign of the
+    /// integers' quotient.
+    ///
+    /// The denominator may not be zero.
+    ///
+    /// The input integers may have common factors; this function reduces them.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `denominator` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::from_signeds(4i8, 6).to_string(), "2/3");
+    /// assert_eq!(Rational::from_signeds(4i8, -6).to_string(), "-2/3");
+    /// assert_eq!(Rational::from_signeds(0i8, 6), 0);
+    /// assert_eq!(Rational::from_signeds(0i8, -6), 0);
+    /// ```
     #[inline]
     pub fn from_signeds<T: PrimitiveSigned>(numerator: T, denominator: T) -> Rational
     where
@@ -351,7 +386,32 @@ impl Rational {
         }
     }
 
-    //TODO
+    /// Converts a sign and two unsigned integers to a `Rational`, taking the `Natural`s by value.
+    /// The integers become the `Rational`'s numerator and denominator, and the sign indicates
+    /// whether the `Rational` should be non-negative. If the numerator is zero, then the
+    /// `Rational` will be non-negative regardless of the sign.
+    ///
+    /// The denominator may not be zero.
+    ///
+    /// The input integers may have common factors; this function reduces them.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `denominator` is zero.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::from_sign_and_unsigneds(true, 4u32, 6).to_string(), "2/3");
+    /// assert_eq!(Rational::from_sign_and_unsigneds(false, 4u32, 6).to_string(), "-2/3");
+    /// ```
     pub fn from_sign_and_unsigneds<T: PrimitiveUnsigned>(
         sign: bool,
         numerator: T,

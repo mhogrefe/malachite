@@ -33,12 +33,12 @@ pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_limbs_slice_shl_in_place);
     register_demo!(runner, demo_limbs_vec_shl_in_place);
     register_demo!(runner, demo_limbs_shl_with_complement_to_out);
-    register_unsigned_demos!(runner, demo_natural_mod_shl_assign_unsigned);
-    register_unsigned_demos!(runner, demo_natural_mod_shl_unsigned);
-    register_unsigned_demos!(runner, demo_natural_mod_shl_unsigned_ref);
-    register_signed_demos!(runner, demo_natural_mod_shl_assign_signed);
-    register_signed_demos!(runner, demo_natural_mod_shl_signed);
-    register_signed_demos!(runner, demo_natural_mod_shl_signed_ref);
+    register_unsigned_demos!(runner, demo_natural_shl_assign_unsigned);
+    register_unsigned_demos!(runner, demo_natural_shl_unsigned);
+    register_unsigned_demos!(runner, demo_natural_shl_unsigned_ref);
+    register_signed_demos!(runner, demo_natural_shl_assign_signed);
+    register_signed_demos!(runner, demo_natural_shl_signed);
+    register_signed_demos!(runner, demo_natural_shl_signed_ref);
 
     register_bench!(runner, benchmark_limbs_shl);
     register_bench!(runner, benchmark_limbs_shl_to_out);
@@ -123,7 +123,7 @@ fn demo_limbs_shl_with_complement_to_out(gm: GenMode, config: GenConfig, limit: 
     }
 }
 
-fn demo_natural_mod_shl_assign_unsigned<T: PrimitiveUnsigned>(
+fn demo_natural_shl_assign_unsigned<T: PrimitiveUnsigned>(
     gm: GenMode,
     config: GenConfig,
     limit: usize,
@@ -140,7 +140,7 @@ fn demo_natural_mod_shl_assign_unsigned<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_natural_mod_shl_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_shl_unsigned<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
 where
     Natural: Shl<T, Output = Natural>,
 {
@@ -153,11 +153,8 @@ where
     }
 }
 
-fn demo_natural_mod_shl_unsigned_ref<T: PrimitiveUnsigned>(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-) where
+fn demo_natural_shl_unsigned_ref<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+where
     for<'a> &'a Natural: Shl<T, Output = Natural>,
 {
     for (n, u) in natural_unsigned_pair_gen_var_4::<T>()
@@ -168,11 +165,8 @@ fn demo_natural_mod_shl_unsigned_ref<T: PrimitiveUnsigned>(
     }
 }
 
-fn demo_natural_mod_shl_assign_signed<T: PrimitiveSigned>(
-    gm: GenMode,
-    config: GenConfig,
-    limit: usize,
-) where
+fn demo_natural_shl_assign_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+where
     Natural: ShlAssign<T>,
 {
     for (mut n, i) in natural_signed_pair_gen_var_2::<T>()
@@ -185,7 +179,7 @@ fn demo_natural_mod_shl_assign_signed<T: PrimitiveSigned>(
     }
 }
 
-fn demo_natural_mod_shl_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_shl_signed<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
 where
     Natural: Shl<T, Output = Natural>,
 {
@@ -198,7 +192,7 @@ where
     }
 }
 
-fn demo_natural_mod_shl_signed_ref<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+fn demo_natural_shl_signed_ref<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
 where
     for<'a> &'a Natural: Shl<T, Output = Natural>,
 {

@@ -11,14 +11,6 @@ use platform::Limb;
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::count_ones::limbs_count_ones;
-///
-/// assert_eq!(limbs_count_ones(&[0, 1, 2]), 2);
-/// assert_eq!(limbs_count_ones(&[1, u32::MAX]), 33);
-/// ```
 #[doc(hidden)]
 pub fn limbs_count_ones(xs: &[Limb]) -> u64 {
     xs.iter().map(|&x| CountOnes::count_ones(x)).sum()

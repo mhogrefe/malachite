@@ -62,13 +62,6 @@ const INVERT_U32_TABLE: [u32; INVERT_U32_TABLE_SIZE] = [
 ];
 
 /// Tests that `INVERT_U32_TABLE` is correct.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::arithmetic::mod_mul::test_invert_u32_table;
-///
-/// test_invert_u32_table();
-/// ```
 #[doc(hidden)]
 pub fn test_invert_u32_table() {
     for (i, &x) in INVERT_U32_TABLE.iter().enumerate() {
@@ -139,13 +132,6 @@ const INVERT_U64_TABLE: [u64; INVERT_U64_TABLE_SIZE] = [
 ];
 
 /// Tests that `INVERT_U64_TABLE` is correct.
-///
-/// # Examples
-/// ```
-/// use malachite_base::num::arithmetic::mod_mul::test_invert_u64_table;
-///
-/// test_invert_u64_table();
-/// ```
 #[doc(hidden)]
 pub fn test_invert_u64_table() {
     for (i, &x) in INVERT_U64_TABLE.iter().enumerate() {

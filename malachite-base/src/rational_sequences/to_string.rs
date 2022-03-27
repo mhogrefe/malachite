@@ -1,5 +1,5 @@
 use rational_sequences::RationalSequence;
-use std::fmt::{Display, Formatter, Result, Write};
+use std::fmt::{Debug, Display, Formatter, Result, Write};
 
 impl<T: Display + Eq> Display for RationalSequence<T> {
     /// Converts a `RationalSequence` to a `String`.
@@ -51,5 +51,41 @@ impl<T: Display + Eq> Display for RationalSequence<T> {
             f.write_char(']')?;
         }
         f.write_char(']')
+    }
+}
+
+impl<T: Display + Eq> Debug for RationalSequence<T> {
+    /// Converts a `RationalSequence` to a `String`.
+    ///
+    /// This is the same implementation as for `Display`.
+    ///
+    /// # Worst-case complexity
+    /// $T(n) = O(n)$
+    ///
+    /// $M(n) = O(n)$
+    ///
+    /// where $T$ is time, $M$ is additional memory, and $n$ is `self.component_len()`.
+    ///
+    /// # Examples
+    /// ```
+    /// use malachite_base::rational_sequences::RationalSequence;
+    /// use malachite_base::strings::ToDebugString;
+    ///
+    /// assert_eq!(RationalSequence::<u8>::from_vecs(vec![], vec![]).to_debug_string(), "[]");
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![], vec![1, 2]).to_debug_string(),
+    ///     "[[1, 2]]"
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![1, 2], vec![]).to_debug_string(),
+    ///     "[1, 2]"
+    /// );
+    /// assert_eq!(
+    ///     RationalSequence::<u8>::from_vecs(vec![1, 2], vec![3, 4]).to_string(),
+    ///     "[1, 2, [3, 4]]"
+    /// );
+    /// ```
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self, f)
     }
 }

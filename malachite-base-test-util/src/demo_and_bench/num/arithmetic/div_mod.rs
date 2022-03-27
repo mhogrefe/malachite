@@ -369,14 +369,12 @@ fn benchmark_ceiling_div_mod_algorithms<T: PrimitiveSigned>(
         file_name,
         &pair_max_bit_bucketer("x", "y"),
         &mut [
-            (
-                "using ceiling_div_mod",
-                &mut (|(x, y)| no_out!(x.ceiling_div_mod(y))),
-            ),
-            (
-                "using div_round and ceiling_mod",
-                &mut (|(x, y)| no_out!((x.div_round(y, RoundingMode::Ceiling), x.ceiling_mod(y)))),
-            ),
+            ("using ceiling_div_mod", &mut |(x, y)| {
+                no_out!(x.ceiling_div_mod(y))
+            }),
+            ("using div_round and ceiling_mod", &mut |(x, y)| {
+                no_out!((x.div_round(y, RoundingMode::Ceiling), x.ceiling_mod(y)))
+            }),
         ],
     );
 }

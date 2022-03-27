@@ -3,9 +3,9 @@ use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 
-pub fn to_string_base_naive(x: &Natural, base: u64) -> String {
+pub fn to_string_base_naive(x: &Natural, base: u8) -> String {
     assert!((2..=36).contains(&base), "base out of range");
-    let base = Limb::wrapping_from(base);
+    let base = Limb::from(base);
     if *x == 0 {
         "0".to_string()
     } else {

@@ -52,11 +52,11 @@ impl Iterator for ExhaustivePositiveRationals {
 /// extern crate malachite_base;
 ///
 /// use itertools::Itertools;
-/// use malachite_base::strings::ExtraToString;
+/// use malachite_base::strings::ToDebugString;
 /// use malachite_q::exhaustive::exhaustive_positive_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_positive_rationals().take(20).collect_vec().to_string(),
+///     exhaustive_positive_rationals().take(20).collect_vec().to_debug_string(),
 ///     "[1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, 5/3, 3/4, 4, 1/5, 5/4, 4/7, 7/3, \
 ///     3/8]"
 /// )
@@ -84,11 +84,11 @@ pub fn exhaustive_positive_rationals() -> ExhaustivePositiveRationals {
 /// extern crate malachite_base;
 ///
 /// use itertools::Itertools;
-/// use malachite_base::strings::ExtraToString;
+/// use malachite_base::strings::ToDebugString;
 /// use malachite_q::exhaustive::exhaustive_non_negative_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_non_negative_rationals().take(20).collect_vec().to_string(),
+///     exhaustive_non_negative_rationals().take(20).collect_vec().to_debug_string(),
 ///     "[0, 1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, 5/3, 3/4, 4, 1/5, 5/4, 4/7, \
 ///     7/3]"
 /// )
@@ -133,11 +133,11 @@ impl Iterator for ExhaustiveNegativeRationals {
 /// extern crate malachite_base;
 ///
 /// use itertools::Itertools;
-/// use malachite_base::strings::ExtraToString;
+/// use malachite_base::strings::ToDebugString;
 /// use malachite_q::exhaustive::exhaustive_negative_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_negative_rationals().take(20).collect_vec().to_string(),
+///     exhaustive_negative_rationals().take(20).collect_vec().to_debug_string(),
 ///     "[-1, -1/2, -2, -1/3, -3/2, -2/3, -3, -1/4, -4/3, -3/5, -5/2, -2/5, -5/3, -3/4, -4, -1/5, \
 ///     -5/4, -4/7, -7/3, -3/8]"
 /// )
@@ -194,11 +194,11 @@ impl Iterator for ExhaustiveNonzeroRationals {
 /// extern crate malachite_base;
 ///
 /// use itertools::Itertools;
-/// use malachite_base::strings::ExtraToString;
+/// use malachite_base::strings::ToDebugString;
 /// use malachite_q::exhaustive::exhaustive_nonzero_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_nonzero_rationals().take(20).collect_vec().to_string(),
+///     exhaustive_nonzero_rationals().take(20).collect_vec().to_debug_string(),
 ///     "[1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, 3/2, -3/2, 2/3, -2/3, 3, -3, 1/4, -1/4, 4/3, -4/3, \
 ///     3/5, -3/5]"
 /// )
@@ -227,11 +227,11 @@ pub fn exhaustive_nonzero_rationals() -> ExhaustiveNonzeroRationals {
 /// extern crate malachite_base;
 ///
 /// use itertools::Itertools;
-/// use malachite_base::strings::ExtraToString;
+/// use malachite_base::strings::ToDebugString;
 /// use malachite_q::exhaustive::exhaustive_rationals;
 ///
 /// assert_eq!(
-///     exhaustive_rationals().take(20).collect_vec().to_string(),
+///     exhaustive_rationals().take(20).collect_vec().to_debug_string(),
 ///     "[0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, 3/2, -3/2, 2/3, -2/3, 3, -3, 1/4, -1/4, 4/3, \
 ///     -4/3, 3/5]"
 /// )

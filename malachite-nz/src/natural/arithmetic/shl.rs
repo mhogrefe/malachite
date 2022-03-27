@@ -17,16 +17,6 @@ use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 ///
 /// where n = `xs.len()` + `bits` / Limb::WIDTH
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shl::limbs_shl;
-///
-/// assert_eq!(limbs_shl(&[123, 456], 1), &[246, 912]);
-/// assert_eq!(limbs_shl(&[123, 456], 31), &[2147483648, 61, 228]);
-/// assert_eq!(limbs_shl(&[123, 456], 32), &[0, 123, 456]);
-/// assert_eq!(limbs_shl(&[123, 456], 100), &[0, 0, 0, 1968, 7296]);
-/// ```
-///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where the result is returned.
 #[doc(hidden)]
 pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
@@ -63,19 +53,6 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// Panics if `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or equal to
 /// `Limb::WIDTH`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shl::limbs_shl_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_shl_to_out(&mut out, &[123, 456], 1), 0);
-/// assert_eq!(out, &[246, 912, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_shl_to_out(&mut out, &[123, 456], 31), 228);
-/// assert_eq!(out, &[2147483648, 61, 0]);
-/// ```
-///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
@@ -100,19 +77,6 @@ pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shl::limbs_slice_shl_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_slice_shl_in_place(&mut xs, 1), 0);
-/// assert_eq!(xs, &[246, 912]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_slice_shl_in_place(&mut xs, 31), 228);
-/// assert_eq!(xs, &[2147483648, 61]);
-/// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up.
 #[doc(hidden)]
@@ -140,19 +104,6 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shl::limbs_vec_shl_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shl_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[246, 912]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shl_in_place(&mut xs, 31);
-/// assert_eq!(xs, &[2147483648, 61, 228]);
-/// ```
 ///
 /// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up and the carry is
 /// appended to rp.
@@ -185,19 +136,6 @@ pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
 /// # Panics
 /// Panics if `out` is shorter than `xs`, `xs` is empty, `bits` is 0, or `bits` is greater than or
 /// equal to `Limb::WIDTH`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shl::limbs_shl_with_complement_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_shl_with_complement_to_out(&mut out, &[123, 456], 1), 0);
-/// assert_eq!(out, &[4294967049, 4294966383, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_shl_with_complement_to_out(&mut out, &[123, 456], 31), 228);
-/// assert_eq!(out, &[2147483647, 4294967234, 0]);
-/// ```
 ///
 /// This is mpn_lshiftc from mpn/generic/mpn_lshiftc, GMP 6.2.1.
 #[doc(hidden)]

@@ -8,7 +8,7 @@ use num::basic::floats::PrimitiveFloat;
 use num::basic::integers::PrimitiveInt;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{RawMantissaAndExponent, RoundingFrom, SaturatingFrom, WrappingFrom};
-use num::logic::traits::SignificantBits;
+use num::logic::traits::{LowMask, SignificantBits};
 use rounding_modes::RoundingMode;
 use std::cmp::Ordering;
 
@@ -904,27 +904,15 @@ const MUL_FACTOR_64: [u64; 65] = [
 // This is n_root_estimate from ulong_extras/root_estimate.c, FLINT 2.7.1, where FLINT64 is false.
 #[doc(hidden)]
 pub fn root_estimate_32(a: f64, n: usize) -> u32 {
-    let mut s = (1 << 7) - 1;
-    s <<= 23;
-    let mut i = (a as f32).to_bits();
-    i -= s;
-    let (hi, _) = u32::x_mul_y_is_zz(i, MUL_FACTOR_32[n]);
-    i = hi;
-    i += s;
-    f32::from_bits(i) as u32
+    let s = u32::low_mask(f32::EXPONENT_WIDTH - 1) << f32::MANTISSA_WIDTH;
+    f32::from_bits(u32::x_mul_y_is_zz((a as f32).to_bits() - s, MUL_FACTOR_32[n]).0 + s) as u32
 }
 
 // This is n_root_estimate from ulong_extras/root_estimate.c, FLINT 2.7.1, where FLINT64 is true.
 #[doc(hidden)]
 pub fn root_estimate_64(a: f64, n: usize) -> u64 {
-    let mut s = (1 << 10) - 1;
-    s <<= 52;
-    let mut i = a.to_bits();
-    i -= s;
-    let (hi, _) = u64::x_mul_y_is_zz(i, MUL_FACTOR_64[n]);
-    i = hi;
-    i += s;
-    f64::from_bits(i) as u64
+    let s = u64::low_mask(f64::EXPONENT_WIDTH - 1) << f64::MANTISSA_WIDTH;
+    f64::from_bits(u64::x_mul_y_is_zz(a.to_bits() - s, MUL_FACTOR_64[n]).0 + s) as u64
 }
 
 const INV_TABLE: [f64; 65] = [
@@ -1424,7 +1412,7 @@ pub fn root_rem_binary<T: PrimitiveUnsigned>(x: T, exp: u64) -> (T, T) {
     (floor_root, x - floor_root.pow(exp))
 }
 
-impl FloorRoot for u8 {
+impl FloorRoot<u64> for u8 {
     type Output = u8;
 
     /// Returns the floor of the $n$th root of a `u8`.
@@ -1467,7 +1455,7 @@ impl FloorRoot for u8 {
     }
 }
 
-impl CeilingRoot for u8 {
+impl CeilingRoot<u64> for u8 {
     type Output = u8;
 
     /// Returns the ceiling of the $n$th root of a `u8`.
@@ -1508,7 +1496,7 @@ impl CeilingRoot for u8 {
     }
 }
 
-impl CheckedRoot for u8 {
+impl CheckedRoot<u64> for u8 {
     type Output = u8;
 
     /// Returns the the $n$th root of a `u8`, or `None` if the `u8` is not a perfect $n$th power.
@@ -1588,7 +1576,7 @@ impl RootRem for u8 {
     }
 }
 
-impl FloorRoot for u16 {
+impl FloorRoot<u64> for u16 {
     type Output = u16;
 
     /// Returns the floor of the $n$th root of a `u16`.
@@ -1612,7 +1600,7 @@ impl FloorRoot for u16 {
     }
 }
 
-impl CeilingRoot for u16 {
+impl CeilingRoot<u64> for u16 {
     type Output = u16;
 
     /// Returns the ceiling of the $n$th root of a `u16`.
@@ -1636,7 +1624,7 @@ impl CeilingRoot for u16 {
     }
 }
 
-impl CheckedRoot for u16 {
+impl CheckedRoot<u64> for u16 {
     type Output = u16;
 
     /// Returns the the $n$th root of a `u16`, or `None` if the `u16` is not a perfect $n$th power.
@@ -1692,7 +1680,7 @@ impl RootRem for u16 {
     }
 }
 
-impl FloorRoot for u32 {
+impl FloorRoot<u64> for u32 {
     type Output = u32;
 
     /// Returns the floor of the $n$th root of a `u32`.
@@ -1718,7 +1706,7 @@ impl FloorRoot for u32 {
     }
 }
 
-impl CeilingRoot for u32 {
+impl CeilingRoot<u64> for u32 {
     type Output = u32;
 
     /// Returns the ceiling of the $n$th root of a `u32`.
@@ -1744,7 +1732,7 @@ impl CeilingRoot for u32 {
     }
 }
 
-impl CheckedRoot for u32 {
+impl CheckedRoot<u64> for u32 {
     type Output = u32;
 
     /// Returns the the $n$th root of a `u32`, or `None` if the `u32` is not a perfect $n$th power.
@@ -1803,7 +1791,7 @@ impl RootRem for u32 {
     }
 }
 
-impl FloorRoot for u64 {
+impl FloorRoot<u64> for u64 {
     type Output = u64;
 
     /// Returns the floor of the $n$th root of a `u64`.
@@ -1829,7 +1817,7 @@ impl FloorRoot for u64 {
     }
 }
 
-impl CeilingRoot for u64 {
+impl CeilingRoot<u64> for u64 {
     type Output = u64;
 
     /// Returns the ceiling of the $n$th root of a `u64`.
@@ -1855,7 +1843,7 @@ impl CeilingRoot for u64 {
     }
 }
 
-impl CheckedRoot for u64 {
+impl CheckedRoot<u64> for u64 {
     type Output = u64;
 
     /// Returns the the $n$th root of a `u64`, or `None` if the `u64` is not a perfect $n$th power.
@@ -1914,7 +1902,7 @@ impl RootRem for u64 {
     }
 }
 
-impl FloorRoot for usize {
+impl FloorRoot<u64> for usize {
     type Output = usize;
 
     /// Returns the floor of the $n$th root of a `usize`.
@@ -1942,7 +1930,7 @@ impl FloorRoot for usize {
     }
 }
 
-impl CeilingRoot for usize {
+impl CeilingRoot<u64> for usize {
     type Output = usize;
 
     /// Returns the ceiling of the $n$th root of a `usize`.
@@ -1970,7 +1958,7 @@ impl CeilingRoot for usize {
     }
 }
 
-impl CheckedRoot for usize {
+impl CheckedRoot<u64> for usize {
     type Output = usize;
 
     /// Returns the the $n$th root of a `usize`, or `None` if the `usize` is not a perfect $n$th
@@ -2044,7 +2032,7 @@ impl RootRem for usize {
     }
 }
 
-impl FloorRoot for u128 {
+impl FloorRoot<u64> for u128 {
     type Output = u128;
 
     /// Returns the floor of the $n$th root of a `u128`.
@@ -2068,7 +2056,7 @@ impl FloorRoot for u128 {
     }
 }
 
-impl CeilingRoot for u128 {
+impl CeilingRoot<u64> for u128 {
     type Output = u128;
 
     /// Returns the ceiling of the $n$th root of a `u128`.
@@ -2097,7 +2085,7 @@ impl CeilingRoot for u128 {
     }
 }
 
-impl CheckedRoot for u128 {
+impl CheckedRoot<u64> for u128 {
     type Output = u128;
 
     /// Returns the the $n$th root of a `u128`, or `None` if the `u128` is not a perfect $n$th
@@ -2181,8 +2169,8 @@ macro_rules! impl_root_assign_rem {
             /// See the documentation of the `num::arithmetic::root` module.
             #[inline]
             fn root_assign_rem(&mut self, exp: u64) -> $t {
-                let (root, rem) = self.root_rem(exp);
-                *self = root;
+                let rem;
+                (*self, rem) = self.root_rem(exp);
                 rem
             }
         }
@@ -2192,7 +2180,7 @@ apply_to_unsigneds!(impl_root_assign_rem);
 
 macro_rules! impl_root_signed {
     ($t: ident) => {
-        impl FloorRoot for $t {
+        impl FloorRoot<u64> for $t {
             type Output = $t;
 
             /// Returns the floor of the $n$th root of an integer.
@@ -2219,7 +2207,7 @@ macro_rules! impl_root_signed {
             }
         }
 
-        impl CeilingRoot for $t {
+        impl CeilingRoot<u64> for $t {
             type Output = $t;
 
             /// Returns the ceiling of the $n$th root of an integer.
@@ -2246,7 +2234,7 @@ macro_rules! impl_root_signed {
             }
         }
 
-        impl CheckedRoot for $t {
+        impl CheckedRoot<u64> for $t {
             type Output = $t;
 
             /// Returns the the $n$th root of an integer, or `None` if the integer is not a perfect
@@ -2285,7 +2273,7 @@ apply_to_signeds!(impl_root_signed);
 
 macro_rules! impl_root_primitive_int {
     ($t: ident) => {
-        impl FloorRootAssign for $t {
+        impl FloorRootAssign<u64> for $t {
             /// Replaces an integer with the floor of its $n$th root.
             ///
             /// $x \gets \lfloor\sqrt\[n\]{x}\rfloor$.
@@ -2304,7 +2292,7 @@ macro_rules! impl_root_primitive_int {
             }
         }
 
-        impl CeilingRootAssign for $t {
+        impl CeilingRootAssign<u64> for $t {
             /// Replaces an integer with the ceiling of its $n$th root.
             ///
             /// $x \gets \lceil\sqrt\[n\]{x}\rceil$.

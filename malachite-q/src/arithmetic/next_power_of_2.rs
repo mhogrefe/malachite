@@ -36,8 +36,7 @@ impl NextPowerOf2 for Rational {
         assert!(self > 0);
         let mut exponent = i64::exact_from(self.numerator.significant_bits())
             - i64::exact_from(self.denominator.significant_bits());
-        let cmp = self.numerator.cmp_normalized(&self.denominator);
-        match cmp {
+        match self.numerator.cmp_normalized(&self.denominator) {
             Ordering::Equal => return self,
             Ordering::Greater => exponent += 1,
             _ => {}

@@ -1,0 +1,126 @@
+use conversion::digits::to_power_of_2_digits::to_power_of_2_digits_helper;
+use malachite_base::num::arithmetic::traits::{
+    Abs, AbsAssign, CheckedLogBase2, Floor, UnsignedAbs,
+};
+use malachite_base::num::conversion::traits::Digits;
+use malachite_base::rational_sequences::RationalSequence;
+use malachite_nz::natural::Natural;
+use std::collections::HashMap;
+use Rational;
+
+fn to_digits_helper(x: Rational, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
+    if let Some(log_base) = base.checked_log_base_2() {
+        return to_power_of_2_digits_helper(x, log_base);
+    }
+    let floor = (&x).floor();
+    let mut remainder = x - Rational::from(&floor);
+    let before_point = floor.unsigned_abs().to_digits_asc(base);
+    let mut state_map = HashMap::new();
+    let mut digits = Vec::new();
+    let base = Rational::from(base);
+    for i in 0.. {
+        if remainder == 0u32 {
+            return (before_point, RationalSequence::from_vec(digits));
+        }
+        if let Some(previous_i) = state_map.insert(remainder.clone(), i) {
+            let repeating = digits.drain(previous_i..).collect();
+            return (before_point, RationalSequence::from_vecs(digits, repeating));
+        } else {
+            remainder *= &base;
+            let floor = (&remainder).floor().unsigned_abs();
+            digits.push(floor.clone());
+            remainder -= Rational::from(floor);
+        }
+    }
+    unreachable!()
+}
+
+impl Rational {
+    /// Returns the base-$b$ digits of a `Rational`, taking the `Rational` by value.
+    ///
+    /// The output has two components. The first is a `Vec` of the digits of the integer portion of
+    /// the `Rational`, least- to most-significant. The second is a `RationalSequence` of the
+    /// digits of the fractional portion.
+    ///
+    /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
+    /// the fractional-portion digits do not end with infinitely many zeros or $(b-1)$s.
+    ///
+    /// The fractional portion may be very large; the length of the repeating part may be almost as
+    /// large as the denominator. If the `Rational` has a large denominator, consider using
+    /// `digits` instead, which returns an iterator. This function computes the fractional digits
+    /// lazily and doesn't need to compute the entire repeating part.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_q::Rational;
+    /// use std::str::FromStr;
+    ///
+    /// let (before_point, after_point) = Rational::from(3u32).into_digits(&Natural::from(10u32));
+    /// assert_eq!(before_point.to_debug_string(), "[3]");
+    /// assert_eq!(after_point.to_string(), "[]");
+    ///
+    /// let (before_point, after_point) =
+    ///     Rational::from_str("22/7").unwrap().into_digits(&Natural::from(10u32));
+    /// assert_eq!(before_point.to_debug_string(), "[3]");
+    /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
+    /// ```
+    #[inline]
+    pub fn into_digits(mut self, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
+        self.abs_assign();
+        to_digits_helper(self, base)
+    }
+
+    /// Returns the base-$b$ digits of a `Rational`, taking the `Rational` by reference.
+    ///
+    /// The output has two components. The first is a `Vec` of the digits of the integer portion of
+    /// the `Rational`, least- to most-significant. The second is a `RationalSequence` of the
+    /// digits of the fractional portion.
+    ///
+    /// The output is in its simplest form: the integer-portion digits do not end with a zero, and
+    /// the fractional-portion digits do not end with infinitely many zeros or $(b-1)$s.
+    ///
+    /// The fractional portion may be very large; the length of the repeating part may be almost as
+    /// large as the denominator. If the `Rational` has a large denominator, consider using
+    /// `digits` instead, which returns an iterator. This function computes the fractional digits
+    /// lazily and doesn't need to compute the entire repeating part.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `base` is less than 2.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_nz;
+    ///
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_nz::natural::Natural;
+    /// use malachite_q::Rational;
+    /// use std::str::FromStr;
+    ///
+    /// let (before_point, after_point) = Rational::from(3u32).to_digits(&Natural::from(10u32));
+    /// assert_eq!(before_point.to_debug_string(), "[3]");
+    /// assert_eq!(after_point.to_string(), "[]");
+    ///
+    /// let (before_point, after_point) =
+    ///     Rational::from_str("22/7").unwrap().to_digits(&Natural::from(10u32));
+    /// assert_eq!(before_point.to_debug_string(), "[3]");
+    /// assert_eq!(after_point.to_string(), "[[1, 4, 2, 8, 5, 7]]");
+    /// ```
+    pub fn to_digits(&self, base: &Natural) -> (Vec<Natural>, RationalSequence<Natural>) {
+        to_digits_helper(self.abs(), base)
+    }
+}

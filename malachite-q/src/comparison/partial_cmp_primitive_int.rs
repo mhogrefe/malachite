@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::{Sign, UnsignedAbs};
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
@@ -37,12 +38,12 @@ where
             return Some(nd_cmp);
         }
     }
-    let first_prod_bits = x.numerator.significant_bits();
-    let second_prod_bits = x.denominator.significant_bits() + other.significant_bits();
-    if first_prod_bits < second_prod_bits - 1 {
-        return Some(Ordering::Less);
-    } else if first_prod_bits > second_prod_bits {
-        return Some(Ordering::Greater);
+    // Then compare floor ∘ log_2 ∘ abs
+    let log_cmp = x
+        .floor_log_base_2_of_abs()
+        .cmp(&i64::exact_from(other.significant_bits() - 1));
+    if log_cmp != Ordering::Equal {
+        return Some(if x.sign { log_cmp } else { log_cmp.reverse() });
     }
     // Finally, cross-multiply.
     Some(x.numerator.cmp(&(&x.denominator * Natural::from(*other))))
@@ -83,7 +84,7 @@ apply_to_unsigneds!(impl_unsigned);
 
 fn partial_cmp_signed<
     U: Copy + One + Ord + SignificantBits,
-    S: Copy + Sign + UnsignedAbs<Output = U>,
+    S: Copy + Sign + SignificantBits + UnsignedAbs<Output = U>,
 >(
     x: &Rational,
     other: &S,
@@ -117,17 +118,12 @@ where
             return Some(if x.sign { nd_cmp } else { nd_cmp.reverse() });
         }
     }
-    let first_prod_bits = x.numerator.significant_bits();
-    let second_prod_bits = x.denominator.significant_bits() + other_abs.significant_bits();
-    let bit_cmp = if first_prod_bits < second_prod_bits - 1 {
-        Some(Ordering::Less)
-    } else if first_prod_bits > second_prod_bits {
-        Some(Ordering::Greater)
-    } else {
-        None
-    };
-    if let Some(bit_cmp) = bit_cmp {
-        return Some(if x.sign { bit_cmp } else { bit_cmp.reverse() });
+    // Then compare floor ∘ log_2 ∘ abs
+    let log_cmp = x
+        .floor_log_base_2_of_abs()
+        .cmp(&i64::exact_from(other.significant_bits() - 1));
+    if log_cmp != Ordering::Equal {
+        return Some(if x.sign { log_cmp } else { log_cmp.reverse() });
     }
     // Finally, cross-multiply.
     let prod_cmp = x

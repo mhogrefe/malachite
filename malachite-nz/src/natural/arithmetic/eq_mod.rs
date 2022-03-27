@@ -57,7 +57,7 @@ pub const fn limbs_limb_mod_exact_odd_limb(n: Limb, d: Limb, carry: Limb) -> Lim
 /// since the factors of 2 in B ^ k can be ignored, leaving -r == a mod d (by passing c = 0). For a
 /// GCD the factor of -1 on r can be ignored, or for the Jacobi symbol it can be accounted for. The
 /// function also suits divisibility and congruence testing, since if r = 0 (or r = d) is obtained,
-/// then a === c mod d.
+/// then a ≡ c mod d.
 ///
 /// ns must be nonempty and divisor must be odd.
 ///
@@ -117,14 +117,6 @@ pub fn limbs_mod_exact_odd_limb(ns: &[Limb], d: Limb, mut carry: Limb) -> Limb {
 /// # Panics
 /// Panics if the length of `xs` is less than 2 or `m` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_limb;
-///
-/// assert_eq!(limbs_eq_limb_mod_limb(&[6, 7], 3, 2), false);
-/// assert_eq!(limbs_eq_limb_mod_limb(&[100, 101, 102], 1238, 10), true);
-/// ```
-///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.2.1, where a is positive and the
 /// ABOVE_THRESHOLD branch is excluded.
 #[doc(hidden)]
@@ -183,7 +175,7 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
 }
 
 /// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
-/// numbers x, y, and m, determines whether x === y mod m. Both input slices are immutable.
+/// numbers x, y, and m, determines whether x ≡ y mod m. Both input slices are immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -197,14 +189,6 @@ fn limbs_eq_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
 /// # Panics
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_ref_ref;
-///
-/// assert_eq!(limbs_eq_limb_mod_ref_ref(&[1, 1], 1, &[0, 1]), true);
-/// assert_eq!(limbs_eq_limb_mod_ref_ref(&[0, 1], 1, &[0, 1]), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
@@ -221,8 +205,8 @@ pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
 }
 
 /// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
-/// numbers x, y, and m, determines whether x === y mod m. The first input slice is immutable and
-/// the second is mutable.
+/// numbers x, y, and m, determines whether x ≡ y mod m. The first input slice is immutable and the
+/// second is mutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -236,14 +220,6 @@ pub fn limbs_eq_limb_mod_ref_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
 /// # Panics
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_ref_val;
-///
-/// assert_eq!(limbs_eq_limb_mod_ref_val(&[1, 1], 1, &mut [0, 1]), true);
-/// assert_eq!(limbs_eq_limb_mod_ref_val(&[0, 1], 1, &mut [0, 1]), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
@@ -260,7 +236,7 @@ pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool 
 }
 
 /// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
-/// numbers x, y, and m, determines whether x === y mod m. The first input slice is mutable and the
+/// numbers x, y, and m, determines whether x ≡ y mod m. The first input slice is mutable and the
 /// second is immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
@@ -276,14 +252,6 @@ pub fn limbs_eq_limb_mod_ref_val(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool 
 /// Panics if the length of `xs` or `m` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod_val_ref;
-///
-/// assert_eq!(limbs_eq_limb_mod_val_ref(&mut [1, 1], 1, &[0, 1]), true);
-/// assert_eq!(limbs_eq_limb_mod_val_ref(&mut [0, 1], 1, &[0, 1]), false);
-/// ```
-///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
 #[doc(hidden)]
@@ -298,7 +266,7 @@ pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool 
 }
 
 /// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
-/// numbers x, y, and m, determines whether x === y mod m. Both input slices are mutable.
+/// numbers x, y, and m, determines whether x ≡ y mod m. Both input slices are mutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -312,14 +280,6 @@ pub fn limbs_eq_limb_mod_val_ref(xs: &mut [Limb], y: Limb, ms: &[Limb]) -> bool 
 /// # Panics
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_limb_mod;
-///
-/// assert_eq!(limbs_eq_limb_mod(&mut [1, 1], 1, &mut [0, 1]), true);
-/// assert_eq!(limbs_eq_limb_mod(&mut [0, 1], 1, &mut [0, 1]), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and d are
 /// longer than one limb, and c is one limb long.
@@ -355,7 +315,7 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], m: Limb) -> Option<bool> {
 }
 
 /// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and m,
-/// determines whether x === y mod m. Both input slices are immutable.
+/// determines whether x ≡ y mod m. Both input slices are immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `m` is nonzero.
@@ -369,14 +329,6 @@ fn limbs_eq_mod_limb_helper(xs: &[Limb], ys: &[Limb], m: Limb) -> Option<bool> {
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 /// is zero, or if `m` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_limb_ref_ref;
-///
-/// assert_eq!(limbs_eq_mod_limb_ref_ref(&[1, 1], &[3, 4], 5), true);
-/// assert_eq!(limbs_eq_mod_limb_ref_ref(&[0, 1], &[3, 4], 5), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
@@ -411,7 +363,7 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
 }
 
 /// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and m,
-/// determines whether x === y mod m. The first input slice is immutable and the second is mutable.
+/// determines whether x ≡ y mod m. The first input slice is immutable and the second is mutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `m` is nonzero.
@@ -425,14 +377,6 @@ fn limbs_eq_mod_limb_ref_ref_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool 
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 /// is zero, or if `m` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_limb_ref_val;
-///
-/// assert_eq!(limbs_eq_mod_limb_ref_val(&[1, 1], &mut [3, 4], 5), true);
-/// assert_eq!(limbs_eq_mod_limb_ref_val(&[0, 1], &mut [3, 4], 5), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
@@ -470,7 +414,7 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> b
 }
 
 /// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and m,
-/// determines whether x === y mod m. The first input slice is mutable and the second is immutable.
+/// determines whether x ≡ y mod m. The first input slice is mutable and the second is immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `m` is nonzero. Both input slices are immutable.
@@ -484,14 +428,6 @@ fn limbs_eq_mod_limb_ref_val_greater(xs: &[Limb], ys: &mut [Limb], m: Limb) -> b
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 /// is zero, or if `m` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_limb_val_ref;
-///
-/// assert_eq!(limbs_eq_mod_limb_val_ref(&mut [1, 1], &[3, 4], 5), true);
-/// assert_eq!(limbs_eq_mod_limb_val_ref(&mut [0, 1], &[3, 4], 5), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive, a and c are
 /// longer than one limb, and m is one limb long.
@@ -564,14 +500,6 @@ fn limbs_eq_mod_helper(xs: &[Limb], ys: &[Limb], m: &[Limb]) -> Option<bool> {
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 /// slices is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_ref;
-///
-/// assert_eq!(limbs_eq_mod_ref_ref_ref(&[1, 1, 1], &[1, 0, 3], &[0, 7]), true);
-/// assert_eq!(limbs_eq_mod_ref_ref_ref(&[0, 1, 1], &[1, 0, 3], &[0, 7]), false);
-/// ```
-///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive and each is
 /// longer than one limb.
 #[doc(hidden)]
@@ -616,14 +544,6 @@ fn limbs_eq_mod_greater_ref_ref_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_ref_val;
-///
-/// assert_eq!(limbs_eq_mod_ref_ref_val(&[1, 1, 1], &[1, 0, 3], &mut [0, 7]), true);
-/// assert_eq!(limbs_eq_mod_ref_ref_val(&[0, 1, 1], &[1, 0, 3], &mut [0, 7]), false);
-/// ```
-///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive and each is
 /// longer than one limb.
 #[doc(hidden)]
@@ -667,14 +587,6 @@ fn limbs_eq_mod_greater_ref_ref_val(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -
 /// # Panics
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_val_ref;
-///
-/// assert_eq!(limbs_eq_mod_ref_val_ref(&[1, 1, 1], &mut [1, 0, 3], &[0, 7]), true);
-/// assert_eq!(limbs_eq_mod_ref_val_ref(&[0, 1, 1], &mut [1, 0, 3], &[0, 7]), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive and each is
 /// longer than one limb.
@@ -737,14 +649,6 @@ fn limbs_eq_mod_greater_val_ref_ref(xs: &mut [Limb], ys: &[Limb], ms: &[Limb]) -
 /// # Panics
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any
 /// of the slices is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::eq_mod::limbs_eq_mod_ref_val_val;
-///
-/// assert_eq!(limbs_eq_mod_ref_val_val(&[1, 1, 1], &mut [1, 0, 3], &mut [0, 7]), true);
-/// assert_eq!(limbs_eq_mod_ref_val_val(&[0, 1, 1], &mut [1, 0, 3], &mut [0, 7]), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a, c, and d are positive and each is
 /// longer than one limb.

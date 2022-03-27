@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter, Result, Write};
+use std::fmt::{Debug, Display, Formatter, Result, Write};
 use Rational;
 
 impl Display for Rational {
@@ -30,5 +30,32 @@ impl Display for Rational {
         } else {
             result
         }
+    }
+}
+
+impl Debug for Rational {
+    /// Converts a `Rational` to a `String`.
+    ///
+    /// This is the same implementation as for `Display`.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    ///
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_base::strings::ToDebugString;
+    /// use malachite_q::Rational;
+    /// use std::str::FromStr;
+    ///
+    /// assert_eq!(Rational::ZERO.to_debug_string(), "0");
+    /// assert_eq!(Rational::from(123).to_debug_string(), "123");
+    /// assert_eq!(Rational::from_str("22/7").unwrap().to_debug_string(), "22/7");
+    /// ```
+    #[inline]
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        Display::fmt(self, f)
     }
 }

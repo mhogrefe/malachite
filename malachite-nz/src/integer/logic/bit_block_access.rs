@@ -31,21 +31,6 @@ use platform::Limb;
 ///
 /// # Panics
 /// Panics if `start` > `end`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_block_access::limbs_neg_limb_get_bits;
-/// use malachite_nz::platform::Limb;
-///
-/// assert_eq!(limbs_neg_limb_get_bits(0x12345678, 16, 48), vec![0xffff_edcb]);
-/// assert_eq!(limbs_neg_limb_get_bits(0x12345678, 4, 16), vec![0xa98]);
-/// assert_eq!(
-///     limbs_neg_limb_get_bits(0x12345678, 0, 100),
-///     vec![0xedcb_a988, u32::MAX, u32::MAX, 0xf]
-/// );
-/// let empty: Vec<Limb> = Vec::new();
-/// assert_eq!(limbs_neg_limb_get_bits(0x12345678, 10, 10), empty);
-/// ```
 #[doc(hidden)]
 pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -88,21 +73,6 @@ pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `start` > `end`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_block_access::limbs_slice_neg_get_bits;
-/// use malachite_nz::platform::Limb;
-///
-/// assert_eq!(limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 16, 48), vec![0x10feedcb]);
-/// assert_eq!(limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 4, 16), vec![0xa98]);
-/// assert_eq!(
-///     limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 0, 100),
-///     vec![0xedcb_a988, 0x543210fe, u32::MAX, 0xf]
-/// );
-/// let empty: Vec<Limb> = Vec::new();
-/// assert_eq!(limbs_slice_neg_get_bits(&[0x12345678, 0xabcdef01], 10, 10), empty);
-/// ```
 #[doc(hidden)]
 pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -158,21 +128,6 @@ pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> 
 ///
 /// # Panics
 /// Panics if `start` > `end`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_block_access::limbs_vec_neg_get_bits;
-/// use malachite_nz::platform::Limb;
-///
-/// assert_eq!(limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 16, 48), vec![0x10feedcb]);
-/// assert_eq!(limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 4, 16), vec![0xa98]);
-/// assert_eq!(
-///     limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 0, 100),
-///     vec![0xedcb_a988, 0x543210fe, u32::MAX, 0xf]
-/// );
-/// let empty: Vec<Limb> = Vec::new();
-/// assert_eq!(limbs_vec_neg_get_bits(vec![0x12345678, 0xabcdef01], 10, 10), empty);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -224,24 +179,6 @@ pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
 ///
 /// # Panics
 /// Panics if `start` >= `end` or `xs` only contains zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
-/// use malachite_nz::platform::Limb;
-///
-/// let mut xs = vec![123];
-/// limbs_neg_assign_bits(&mut xs, 64, 128, &[456]);
-/// assert_eq!(xs, &[123, 0, 4294966839, u32::MAX]);
-///
-/// let mut xs = vec![123];
-/// limbs_neg_assign_bits(&mut xs, 80, 100, &[456]);
-/// assert_eq!(xs, &[123, 0, 4265017344, 15]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_neg_assign_bits(&mut xs, 80, 100, &[789, 321]);
-/// assert_eq!(xs, &[123, 456, 4243193856, 15]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);

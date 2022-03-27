@@ -1,4 +1,4 @@
-/// This module provides a trait for the comparing the absolute values of numbers by equality.
+/// Trait implementations for comparing the absolute values of numbers by equality.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -12,7 +12,7 @@
 /// assert_eq!(123i32.eq_abs(&-123), true);
 /// ```
 pub mod eq_abs;
-/// This module provides traits for the comparing the absolute values of numbers by order.
+/// Trait implementations for comparing the absolute values of numbers by order.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -36,5 +36,5 @@ pub mod eq_abs;
 /// assert_eq!(123i32.cmp_abs(&-123), Ordering::Equal);
 /// ```
 pub mod ord_abs;
-/// This module defines various traits for comparing numbers.
+/// Vsarious traits for comparing numbers.
 pub mod traits;

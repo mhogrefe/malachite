@@ -6,7 +6,6 @@ use malachite_base_test_util::stats::median;
 use malachite_base_test_util::stats::moments::{moment_stats, MomentStats};
 use malachite_nz::integer::random::striped_random_nonzero_integers;
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::integer::IntegerCheckedToF64Wrapper;
 
 fn striped_random_nonzero_integers_helper(
     mean_stripe_numerator: u64,
@@ -47,9 +46,7 @@ fn striped_random_nonzero_integers_helper(
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
     // Note that the population moments do not exist.
     let actual_sample_moment_stats = if expected_sample_moment_stats.is_some() {
-        Some(moment_stats(
-            xs.take(1000000).map(IntegerCheckedToF64Wrapper),
-        ))
+        Some(moment_stats(xs.take(1000000).map(|x| f64::from(&x))))
     } else {
         None
     };

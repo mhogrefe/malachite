@@ -1,5 +1,5 @@
 use num::arithmetic::traits::CheckedPow;
-use num::conversion::traits::ExactFrom;
+use num::conversion::traits::CheckedFrom;
 
 macro_rules! impl_checked_pow {
     ($t:ident) => {
@@ -8,7 +8,7 @@ macro_rules! impl_checked_pow {
 
             #[inline]
             fn checked_pow(self, exp: u64) -> Option<$t> {
-                $t::checked_pow(self, u32::exact_from(exp))
+                $t::checked_pow(self, u32::checked_from(exp)?)
             }
         }
     };

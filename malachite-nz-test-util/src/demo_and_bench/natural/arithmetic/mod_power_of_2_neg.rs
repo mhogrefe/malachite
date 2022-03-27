@@ -41,7 +41,7 @@ fn demo_natural_mod_power_of_2_neg(gm: GenMode, config: GenConfig, limit: usize)
         .take(limit)
     {
         let n_old = n.clone();
-        println!("-{} === {} mod 2^{}", n_old, n.mod_power_of_2_neg(pow), pow);
+        println!("-{} ≡ {} mod 2^{}", n_old, n.mod_power_of_2_neg(pow), pow);
     }
 }
 
@@ -52,7 +52,7 @@ fn demo_natural_mod_power_of_2_neg_ref(gm: GenMode, config: GenConfig, limit: us
     {
         let n_old = n.clone();
         println!(
-            "-(&{}) === {} mod 2^{}",
+            "-(&{}) ≡ {} mod 2^{}",
             n_old,
             n.mod_power_of_2_neg(pow),
             pow

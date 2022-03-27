@@ -1,4 +1,4 @@
-/// This module contains functions for getting and setting individual bits.
+/// Functions for getting and setting individual bits.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -129,7 +129,7 @@
 /// assert_eq!(x, -1);
 /// ```
 pub mod bit_access;
-/// This module contains functions for getting and setting adjacent blocks of bits.
+/// Functions for getting and setting adjacent blocks of bits.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -178,8 +178,7 @@ pub mod bit_access;
 /// assert_eq!(x, -0x5433);
 /// ```
 pub mod bit_block_access;
-/// This module provides traits for extracting all bits from numbers and constructing numbers from
-/// bits.
+/// Traits for extracting all bits from numbers and constructing numbers from bits.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -269,7 +268,7 @@ pub mod bit_block_access;
 /// );
 /// ```
 pub mod bit_convertible;
-/// This module provides a double-ended iterator for iterating over a number's bits.
+/// A double-ended iterator for iterating over a number's bits.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -320,8 +319,7 @@ pub mod bit_convertible;
 /// );
 /// ```
 pub mod bit_iterable;
-/// This module contains functions for finding the next `true` or `false` bit after a provided
-/// index.
+/// Functions for finding the next `true` or `false` bit after a provided index.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -373,11 +371,11 @@ pub mod bit_iterable;
 /// assert_eq!((-0x500000000i64).index_of_next_true_bit(100), Some(100));
 /// ```
 pub mod bit_scan;
-/// This module wraps the `count_ones` function into an implementation of `CountOnes`.
+/// Wraps the `count_ones` function into an implementation of `CountOnes`.
 pub mod count_ones;
-/// This module wraps the `count_zeros` function into an implementation of `CountZeros`.
+/// Wraps the `count_zeros` function into an implementation of `CountZeros`.
 pub mod count_zeros;
-/// This module contains functions for computing the Hamming distance between two numbers.
+/// Functions for computing the Hamming distance between two numbers.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -398,9 +396,9 @@ pub mod count_zeros;
 /// assert_eq!(0i8.checked_hamming_distance(-1), None);
 /// ```
 pub mod hamming_distance;
-/// This module wraps the `leading_zeros` function into an implementation of `LeadingZeros`.
+/// Wraps the `leading_zeros` function into an implementation of `LeadingZeros`.
 pub mod leading_zeros;
-/// This module contains functions for generating bit masks.
+/// Functions for generating bit masks.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -419,7 +417,7 @@ pub mod leading_zeros;
 /// assert_eq!(i64::low_mask(40), 0xffffffffff);
 /// ```
 pub mod low_mask;
-/// This module contains implementations of `NotAssign`.
+/// Contains implementations of `NotAssign`.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -432,7 +430,7 @@ pub mod low_mask;
 /// assert_eq!(x, 65412);
 /// ```
 pub mod not;
-/// This module contains functions to get the number of significant bits of a primitive integer.
+/// Functions to get the number of significant bits of a primitive integer.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -447,7 +445,7 @@ pub mod not;
 /// assert_eq!((-100i64).significant_bits(), 7);
 /// ```
 pub mod significant_bits;
-/// This module wraps the `trailing_zeros` function into an implementation of `TrailingZeros`.
+/// Wraps the `trailing_zeros` function into an implementation of `TrailingZeros`.
 pub mod trailing_zeros;
-/// This module defines various traits for functions related to bit manipulation.
+/// Various traits for functions related to bit manipulation.
 pub mod traits;

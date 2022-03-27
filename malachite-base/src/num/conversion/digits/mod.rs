@@ -1,4 +1,4 @@
-/// This module provides traits for extracting digits from numbers and constructing numbers from
+/// Traits for extracting digits from numbers and constructing numbers from
 /// digits.
 ///
 /// Here are usage examples of the macro-generated functions:
@@ -71,8 +71,7 @@
 /// assert!(u8::from_digits_desc(&1000, [1u16, 2, 3].iter().cloned()).is_none());
 /// ```
 pub mod general_digits;
-/// This module provides a double-ended iterator for iterating over a number's digits, if the base
-/// is a power of 2.
+/// A double-ended iterator for iterating over a number's digits, if the base is a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -100,8 +99,8 @@ pub mod general_digits;
 /// assert_eq!(digits.rev().collect_vec(), &[1, 2, 2, 3]);
 /// ```
 pub mod power_of_2_digit_iterable;
-/// This module provides traits for extracting digits from numbers and constructing numbers from
-/// digits, where the base is a power of 2.
+/// Traits for extracting digits from numbers and constructing numbers from digits, where the base
+/// is a power of 2.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///

@@ -12,16 +12,6 @@ use platform::Limb;
 /// Time: worst case O(`bits`)
 ///
 /// Additional memory: worst case O(`bits`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::low_mask::limbs_low_mask;
-/// use malachite_nz::platform::Limb;
-///
-/// assert_eq!(limbs_low_mask(0), Vec::<Limb>::new());
-/// assert_eq!(limbs_low_mask(3), vec![0x7]);
-/// assert_eq!(limbs_low_mask(100), vec![u32::MAX, u32::MAX, u32::MAX, 0xf]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_low_mask(bits: u64) -> Vec<Limb> {
     let len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);

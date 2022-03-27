@@ -18,14 +18,6 @@ use platform::Limb;
 ///
 /// # Panics
 /// Panics if `xs` only contains zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
-///
-/// assert_eq!(limbs_trailing_zeros(&[4]), 2);
-/// assert_eq!(limbs_trailing_zeros(&[0, 4]), 34);
-/// ```
 #[doc(hidden)]
 pub fn limbs_trailing_zeros(xs: &[Limb]) -> u64 {
     let zeros = slice_leading_zeros(xs);

@@ -25,8 +25,8 @@ macro_rules! impl_overflowing_pow {
             /// See the documentation of the `num::arithmetic::overflowing_pow` module.
             #[inline]
             fn overflowing_pow_assign(&mut self, exp: u64) -> bool {
-                let (pow, overflow) = OverflowingPow::overflowing_pow(*self, exp);
-                *self = pow;
+                let overflow;
+                (*self, overflow) = OverflowingPow::overflowing_pow(*self, exp);
                 overflow
             }
         }

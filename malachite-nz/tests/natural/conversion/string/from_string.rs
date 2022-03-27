@@ -148,7 +148,7 @@ fn from_string_base_fail_2() {
     Natural::from_string_base(0, "0");
 }
 
-fn from_string_base_helper(base: u64, s: &str) {
+fn from_string_base_helper(base: u8, s: &str) {
     let n = Natural::from_string_base(base, s).unwrap();
     let s_lo = s.to_lowercase();
     let mut trimmed = s_lo.trim_start_matches('0');
@@ -211,7 +211,7 @@ fn from_string_base_properties() {
         );
     });
 
-    unsigned_pair_gen_var_8::<Limb, u64>().test_properties(|(u, base)| {
+    unsigned_pair_gen_var_8::<Limb, u8>().test_properties(|(u, base)| {
         let s = u.to_string_base(base);
         assert_eq!(
             Natural::from_string_base(base, &s).unwrap(),

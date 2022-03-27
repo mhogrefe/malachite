@@ -52,6 +52,7 @@ pub mod num {
     }
     pub mod conversion {
         pub mod string {
+            pub mod from_sci_string;
             pub mod to_string;
         }
     }

@@ -108,8 +108,8 @@ pub fn limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
 macro_rules! base_10_normalization_step {
     ($j: expr, $buffer: ident, $i: ident, $frac: ident) => {
         if MP_BASES_NORMALIZATION_STEPS_10 <= $j {
-            let (digit, new_frac) = Limb::x_mul_y_is_zz($frac, 10);
-            $frac = new_frac;
+            let digit;
+            (digit, $frac) = Limb::x_mul_y_is_zz($frac, 10);
             $buffer[$i] = T::wrapping_from(digit);
             $i += 1;
         }
@@ -189,8 +189,7 @@ pub fn limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
         }
         let mut r = rs[1];
         while r != 0 {
-            let (new_r, d) = r.div_mod(10);
-            r = new_r;
+            let d = r.div_assign_mod(10);
             i -= 1;
             buffer[i] = T::wrapping_from(d);
         }
@@ -217,15 +216,14 @@ pub fn limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
             let old_i = i;
             i -= digits_per_limb;
             for d in buffer[i..old_i].iter_mut() {
-                let (digit, new_frac) = Limb::x_mul_y_is_zz(frac, limb_base);
-                frac = new_frac;
+                let digit;
+                (digit, frac) = Limb::x_mul_y_is_zz(frac, limb_base);
                 *d = T::wrapping_from(digit);
             }
         }
         let mut r = rs[1];
         while r != 0 {
-            let (new_r, digit) = r.div_mod(limb_base);
-            r = new_r;
+            let digit = r.div_assign_mod(limb_base);
             i -= 1;
             buffer[i] = T::wrapping_from(digit);
         }
@@ -346,9 +344,7 @@ pub fn limbs_compute_power_table_using_mul<'a>(
     let mut digits_in_base = digits_per_limb;
     let (head, mut remainder) = power_table_memory.split_first_mut().unwrap();
     *head = big_base;
-    let (hi, lo) = Limb::x_mul_y_is_zz(big_base, big_base);
-    remainder[0] = lo;
-    remainder[1] = hi;
+    (remainder[1], remainder[0]) = Limb::x_mul_y_is_zz(big_base, big_base);
     power_indices.push(PowerTableIndicesRow {
         start: 0,
         len: 1,
@@ -356,7 +352,11 @@ pub fn limbs_compute_power_table_using_mul<'a>(
         shift: 0,
     });
     // `a` and `n` are the start index and length of a power subslice.
-    let (mut start, mut len, mut shift) = if lo == 0 { (2, 1, 1) } else { (1, 2, 0) };
+    let (mut start, mut len, mut shift) = if remainder[0] == 0 {
+        (2, 1, 1)
+    } else {
+        (1, 2, 0)
+    };
     digits_in_base <<= 1;
     power_indices.push(PowerTableIndicesRow {
         start,
@@ -366,16 +366,16 @@ pub fn limbs_compute_power_table_using_mul<'a>(
     });
     let start_index;
     start_index = if exponents[0] == digits_per_limb << power_len {
-        let (power, next_remainder) = remainder[shift..].split_at_mut(len);
-        remainder = next_remainder;
+        let power;
+        (power, remainder) = remainder[shift..].split_at_mut(len);
         limbs_square_to_out(remainder, power);
         start = 3;
         isize::exact_from(power_len) - 2
     } else {
         if (digits_in_base + digits_per_limb) << (power_len - 2) <= exponents[0] {
             // a = 3, sometimes adjusted to 4.
-            let (power, next_remainder) = remainder[shift..].split_at_mut(len);
-            remainder = next_remainder;
+            let power;
+            (power, remainder) = remainder[shift..].split_at_mut(len);
             let carry = limbs_mul_limb_to_out(remainder, power, big_base);
             remainder[len] = carry;
             if carry != 0 {
@@ -394,8 +394,8 @@ pub fn limbs_compute_power_table_using_mul<'a>(
                 shift,
                 digits_in_base,
             });
-            let (power, next_remainder) = remainder[start - 3..].split_at_mut(7 - start);
-            remainder = next_remainder;
+            let power;
+            (power, remainder) = remainder[start - 3..].split_at_mut(7 - start);
             limbs_square_to_out(remainder, &power[..len]);
             start = 7;
         } else {
@@ -408,8 +408,8 @@ pub fn limbs_compute_power_table_using_mul<'a>(
                 digits_in_base,
                 shift,
             });
-            let (power, next_remainder) = remainder.split_at_mut(3);
-            remainder = next_remainder;
+            let power;
+            (power, remainder) = remainder.split_at_mut(3);
             limbs_square_to_out(remainder, &power[..len]);
             start = 6;
         }
@@ -453,8 +453,8 @@ pub fn limbs_compute_power_table_using_mul<'a>(
                 shift,
             });
             start += increment;
-            let (power, next_remainder) = remainder.split_at_mut(increment - adjust);
-            remainder = next_remainder;
+            let power;
+            (power, remainder) = remainder.split_at_mut(increment - adjust);
             if i != 0 {
                 limbs_square_to_out(remainder, &power[..len]);
             }
@@ -488,14 +488,14 @@ pub fn limbs_compute_power_table_using_mul<'a>(
     let mut consumed_len = 0;
     for row in power_indices {
         remainder = &mut remainder[row.start - consumed_len..];
-        let (power, new_remainder) = remainder.split_at_mut(row.len);
+        let power;
+        (power, remainder) = remainder.split_at_mut(row.len);
         consumed_len = row.start + power.len();
         powers.push(PowerTableRow {
             power,
             digits_in_base: row.digits_in_base,
             shift: row.shift,
         });
-        remainder = new_remainder;
     }
     powers
 }
@@ -548,9 +548,9 @@ pub fn limbs_compute_power_table_using_div<'a>(
         len -= adjust;
         shift += adjust;
         remainder = &mut remainder[adjust..];
-        let (next_power, new_remainder) = remainder.split_at_mut(two_n);
+        let next_power;
+        (next_power, remainder) = remainder.split_at_mut(two_n);
         power = &mut next_power[..len];
-        remainder = new_remainder;
         powers.push(if power[0] == 0 {
             PowerTableRow {
                 power: &power[1..],
@@ -2127,7 +2127,7 @@ impl Digits<Natural> for Natural {
     ///         .iter()
     ///         .map(|s| Natural::from_str(s).unwrap())
     /// )
-    /// .is_none(),);
+    /// .is_none());
     /// ```
     #[inline]
     fn from_digits_asc<I: Iterator<Item = Natural>>(base: &Natural, digits: I) -> Option<Natural> {
@@ -2200,7 +2200,7 @@ impl Digits<Natural> for Natural {
     ///         .iter()
     ///         .map(|s| Natural::from_str(s).unwrap())
     /// )
-    /// .is_none(),);
+    /// .is_none());
     /// ```
     #[inline]
     fn from_digits_desc<I: Iterator<Item = Natural>>(base: &Natural, digits: I) -> Option<Natural> {

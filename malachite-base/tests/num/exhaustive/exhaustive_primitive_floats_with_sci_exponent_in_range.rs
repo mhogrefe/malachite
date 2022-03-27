@@ -254,7 +254,7 @@ fn exhaustive_primitive_floats_with_sci_exponent_in_range_fail_helper<T: Primiti
     )
     .for_each(|_| {}));
     assert_panic!(
-        exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(T::ONE, T::NAN, 0,)
+        exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(T::ONE, T::NAN, 0)
             .for_each(|_| {})
     );
     assert_panic!(exhaustive_primitive_floats_with_sci_exponent_in_range::<T>(

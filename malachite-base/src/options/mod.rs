@@ -66,7 +66,7 @@ pub fn option_from_str_custom<T>(f: &dyn Fn(&str) -> Option<T>, src: &str) -> Op
     }
 }
 
-/// This module contains iterators that generate `Option`s without repetition.
+/// Iterators that generate `Option`s without repetition.
 pub mod exhaustive;
-/// This module contains iterators that generate `Option`s randomly.
+/// Iterators that generate `Option`s randomly.
 pub mod random;

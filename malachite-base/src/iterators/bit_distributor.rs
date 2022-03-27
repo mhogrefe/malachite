@@ -322,7 +322,7 @@ impl BitDistributor {
     /// let expected_outputs: &[&[usize]] = &[
     ///     &[0, 0], &[0, 1], &[1, 0], &[1, 1], &[0, 2], &[0, 3], &[1, 2], &[1, 3], &[2, 0], &[2, 1]
     /// ];
-    /// assert_eq!(outputs, expected_outputs,);
+    /// assert_eq!(outputs, expected_outputs);
     /// ```
     pub fn get_output(&self, index: usize) -> usize {
         assert!(index < self.output_types.len());

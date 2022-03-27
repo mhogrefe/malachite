@@ -1,14 +1,14 @@
 use num::arithmetic::traits::{
-    CeilingModPowerOf2, CeilingModPowerOf2Assign, CheckedNeg, ModPowerOf2, ModPowerOf2Assign,
-    NegModPowerOf2, NegModPowerOf2Assign, RemPowerOf2, RemPowerOf2Assign, WrappingNeg,
+    CeilingModPowerOf2, CeilingModPowerOf2Assign, ModPowerOf2, ModPowerOf2Assign, NegModPowerOf2,
+    NegModPowerOf2Assign, RemPowerOf2, RemPowerOf2Assign,
 };
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::Zero;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{CheckedFrom, WrappingFrom};
 
 const ERROR_MESSAGE: &str = "Result exceeds width of output type";
 
-fn mod_power_of_2_unsigned<T: PrimitiveInt>(x: T, pow: u64) -> T {
+fn mod_power_of_2_unsigned<T: PrimitiveUnsigned>(x: T, pow: u64) -> T {
     if x == T::ZERO || pow >= T::WIDTH {
         x
     } else {
@@ -16,14 +16,14 @@ fn mod_power_of_2_unsigned<T: PrimitiveInt>(x: T, pow: u64) -> T {
     }
 }
 
-fn mod_power_of_2_assign_unsigned<T: PrimitiveInt>(x: &mut T, pow: u64) {
+fn mod_power_of_2_assign_unsigned<T: PrimitiveUnsigned>(x: &mut T, pow: u64) {
     if *x != T::ZERO && pow < T::WIDTH {
         *x &= T::low_mask(pow)
     }
 }
 
 #[inline]
-fn neg_mod_power_of_2_unsigned<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, pow: u64) -> T {
+fn neg_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(x: T, pow: u64) -> T {
     if x != T::ZERO && pow > T::WIDTH {
         panic!("{}", ERROR_MESSAGE);
     }
@@ -175,7 +175,7 @@ macro_rules! impl_mod_power_of_2_unsigned {
 }
 apply_to_unsigneds!(impl_mod_power_of_2_unsigned);
 
-fn mod_power_of_2_signed<U: ModPowerOf2<Output = U> + WrappingFrom<S>, S: PrimitiveInt>(
+fn mod_power_of_2_signed<U: PrimitiveUnsigned + WrappingFrom<S>, S: PrimitiveSigned>(
     x: S,
     pow: u64,
 ) -> U {
@@ -185,7 +185,10 @@ fn mod_power_of_2_signed<U: ModPowerOf2<Output = U> + WrappingFrom<S>, S: Primit
     U::wrapping_from(x).mod_power_of_2(pow)
 }
 
-fn mod_power_of_2_assign_signed<U, S: CheckedFrom<U> + Copy + ModPowerOf2<Output = U>>(
+fn mod_power_of_2_assign_signed<
+    U,
+    S: CheckedFrom<U> + ModPowerOf2<Output = U> + PrimitiveSigned,
+>(
     x: &mut S,
     pow: u64,
 ) {
@@ -193,8 +196,8 @@ fn mod_power_of_2_assign_signed<U, S: CheckedFrom<U> + Copy + ModPowerOf2<Output
 }
 
 fn rem_power_of_2_signed<
-    U: ModPowerOf2<Output = U> + WrappingFrom<S>,
-    S: Copy + Ord + WrappingFrom<U> + WrappingNeg<Output = S> + Zero,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: PrimitiveSigned + WrappingFrom<U>,
 >(
     x: S,
     pow: u64,
@@ -207,8 +210,8 @@ fn rem_power_of_2_signed<
 }
 
 fn ceiling_mod_power_of_2_signed<
-    U: ModPowerOf2<Output = U> + NegModPowerOf2<Output = U> + WrappingFrom<S>,
-    S: CheckedFrom<U> + CheckedNeg<Output = S> + Copy + Ord + WrappingNeg<Output = S> + Zero,
+    U: PrimitiveUnsigned + WrappingFrom<S>,
+    S: CheckedFrom<U> + PrimitiveSigned,
 >(
     x: S,
     pow: u64,

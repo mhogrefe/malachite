@@ -1,4 +1,6 @@
-use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingSubAssign, XMulYIsZZ};
+use malachite_base::num::arithmetic::traits::{
+    OverflowingAddAssign, WrappingAddAssign, WrappingSubAssign, XMulYIsZZ,
+};
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
@@ -38,21 +40,19 @@ fn limbs_div_limb_normalized_in_place(ns: &mut [Limb], ns_high: Limb, d: Limb, d
         q_low = r;
         if big_carry {
             q.wrapping_add_assign(DoubleLimb::join_halves(1, d_inv));
-            let (sum, carry) = sum_low.overflowing_add(power_of_2);
-            sum_low = sum;
-            if carry {
+            if sum_low.overflowing_add_assign(power_of_2) {
                 sum_low.wrapping_sub_assign(d);
                 q.wrapping_add_assign(1);
             }
         }
-        let (q_higher, q_high) = q.split_in_half();
-        ns[j + 1] = q_high;
-        assert!(!limbs_slice_add_limb_in_place(&mut ns[j + 2..], q_higher,));
-        let (sum, carry) = DoubleLimb::join_halves(sum_low, ns[j])
+        let q_higher;
+        (q_higher, ns[j + 1]) = q.split_in_half();
+        assert!(!limbs_slice_add_limb_in_place(&mut ns[j + 2..], q_higher));
+        let sum;
+        (sum, big_carry) = DoubleLimb::join_halves(sum_low, ns[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
-        big_carry = carry;
     }
     let mut q_high = 0;
     if big_carry {
@@ -106,21 +106,19 @@ fn limbs_div_limb_normalized_to_out(
         q_low = r;
         if big_carry {
             q.wrapping_add_assign(DoubleLimb::join_halves(1, d_inv));
-            let (sum, carry) = sum_low.overflowing_add(power_of_2);
-            sum_low = sum;
-            if carry {
+            if sum_low.overflowing_add_assign(power_of_2) {
                 sum_low.wrapping_sub_assign(d);
                 q.wrapping_add_assign(1);
             }
         }
-        let (q_higher, q_high) = q.split_in_half();
-        out[j + 1] = q_high;
-        assert!(!limbs_slice_add_limb_in_place(&mut out[j + 2..], q_higher,));
-        let (sum, carry) = DoubleLimb::join_halves(sum_low, ns[j])
+        let q_higher;
+        (q_higher, out[j + 1]) = q.split_in_half();
+        assert!(!limbs_slice_add_limb_in_place(&mut out[j + 2..], q_higher));
+        let sum;
+        (sum, big_carry) = DoubleLimb::join_halves(sum_low, ns[j])
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
-        big_carry = carry;
     }
     let mut q_high = 0;
     if big_carry {
@@ -132,11 +130,10 @@ fn limbs_div_limb_normalized_to_out(
         sum_high.wrapping_sub_assign(d);
     }
     let t = div_by_preinversion(sum_high, sum_low, d, d_inv);
-    let (q_high, q_low) = DoubleLimb::join_halves(q_high, q_low)
+    (q_high, out[0]) = DoubleLimb::join_halves(q_high, q_low)
         .wrapping_add(DoubleLimb::from(t))
         .split_in_half();
     assert!(!limbs_slice_add_limb_in_place(&mut out[1..], q_high));
-    out[0] = q_low;
 }
 
 /// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.1.2, but not computing the remainder.
@@ -161,8 +158,8 @@ pub fn limbs_div_limb_to_out_alt(out: &mut [Limb], ns: &[Limb], d: Limb) {
         let d = d << bits;
         let ns_high = limbs_shl_to_out(out, ns, bits);
         let d_inv = limbs_invert_limb(d);
-        let (q, r) = div_mod_by_preinversion(ns_high, out[len_minus_1], d, d_inv);
-        out[len_minus_1] = q;
+        let r;
+        (out[len_minus_1], r) = div_mod_by_preinversion(ns_high, out[len_minus_1], d, d_inv);
         limbs_div_limb_normalized_in_place(&mut out[..len_minus_1], r, d, d_inv)
     }
 }
@@ -188,8 +185,8 @@ pub fn limbs_div_limb_in_place_alt(ns: &mut [Limb], d: Limb) {
         let d = d << bits;
         let ns_high = limbs_slice_shl_in_place(ns, bits);
         let d_inv = limbs_invert_limb(d);
-        let (q, r) = div_mod_by_preinversion(ns_high, ns[len_minus_1], d, d_inv);
-        ns[len_minus_1] = q;
+        let r;
+        (ns[len_minus_1], r) = div_mod_by_preinversion(ns_high, ns[len_minus_1], d, d_inv);
         limbs_div_limb_normalized_in_place(&mut ns[..len_minus_1], r, d, d_inv)
     }
 }

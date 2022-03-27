@@ -30,14 +30,6 @@ use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 /// # Panics
 /// Panics if the length of `limbs` is less than 2.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::eq_mod::limbs_eq_neg_limb_mod_limb;
-///
-/// assert_eq!(limbs_eq_neg_limb_mod_limb(&[6, 7], 3, 2), false);
-/// assert_eq!(limbs_eq_neg_limb_mod_limb(&[100, 101, 102], 1232, 10), true);
-/// ```
-///
 /// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.2.1, where a is negative.
 #[doc(hidden)]
 pub fn limbs_eq_neg_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
@@ -57,7 +49,7 @@ const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
 }
 
 /// Interpreting two limbs `x` and `y` and slice of `Limb`s `m` as three numbers x, y, and m,
-/// determines whether x === -y mod m.
+/// determines whether x ≡ -y mod m.
 ///
 /// This function assumes that the input slice has at least two elements, its last element is
 /// nonzero, and `x` and `y` are nonzero.
@@ -66,19 +58,11 @@ const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
 ///
 /// Additional memory: Worst case O(1)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_limb_eq_neg_limb_mod;
-///
-/// assert_eq!(limbs_pos_limb_eq_neg_limb_mod(u32::MAX, u32::MAX, &[u32::MAX - 1, 1]), true);
-/// assert_eq!(limbs_pos_limb_eq_neg_limb_mod(1, 1, &[1, 0, 1]), false);
-/// ```
-///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
 /// and d are one limb long, and c is longer than one limb.
 #[doc(hidden)]
 pub const fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bool {
-    // We are checking whether x === -y mod m; that is, whether x + y = k * m for some k in Z. But
+    // We are checking whether x ≡ -y mod m; that is, whether x + y = k * m for some k in Z. But
     // because of the preconditions on m, the lowest possible value of m is 2<sup>Limb::WIDTH</sup>,
     // while the highest possible value of x + y is 2<sup>Limb::WIDTH + 1</sup> - 2, so we have
     // x + y < 2 * m. This means that k can only be 1, so we're actually checking whether x + y = m.
@@ -128,7 +112,7 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
 }
 
 /// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `m` as three
-/// numbers x, y, and m, determines whether x === -y mod m. The second input slice is immutable.
+/// numbers x, y, and m, determines whether x ≡ -y mod m. The second input slice is immutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -142,14 +126,6 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
 /// # Panics
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_limb_mod_ref;
-///
-/// assert_eq!(limbs_pos_eq_neg_limb_mod_ref(&[2, 2], 2, &[2, 1]), true);
-/// assert_eq!(limbs_pos_eq_neg_limb_mod_ref(&[0, 1], 1, &[1, 0, 1]), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
 /// and d are longer than one limb, and c is one limb long.
@@ -164,7 +140,7 @@ pub fn limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool 
 }
 
 /// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
-/// numbers x, y, and m, determines whether x === -y mod m. The second input slice is mutable.
+/// numbers x, y, and m, determines whether x ≡ -y mod m. The second input slice is mutable.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `y` is nonzero.
@@ -179,14 +155,6 @@ pub fn limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool 
 /// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
 /// is zero, or if `y` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_limb_mod;
-///
-/// assert_eq!(limbs_pos_eq_neg_limb_mod(&[2, 2], 2, &mut [2, 1]), true);
-/// assert_eq!(limbs_pos_eq_neg_limb_mod(&[0, 1], 1, &mut [1, 0, 1]), false);
-/// ```
-///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
 /// and d are longer than one limb, and c is one limb long.
 #[doc(hidden)]
@@ -200,7 +168,7 @@ pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool 
 }
 
 /// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and
-/// m, determines whether x === -y mod m.
+/// m, determines whether x ≡ -y mod m.
 ///
 /// This function assumes that each of the two input slices have at least two elements, their last
 /// elements are nonzero, and `m` is nonzero.
@@ -214,14 +182,6 @@ pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool 
 /// # Panics
 /// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
 /// is zero, or if `m` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod_limb;
-///
-/// assert_eq!(limbs_pos_eq_neg_mod_limb(&[0, 1], &[6, 1], 2), true);
-/// assert_eq!(limbs_pos_eq_neg_mod_limb(&[0, 1], &[7, 1], 2), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
 /// and c are longer than one limb, and m is one limb long.
@@ -287,14 +247,6 @@ fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], ms: &[Limb]) ->
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 /// slices is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod_ref;
-///
-/// assert_eq!(limbs_pos_eq_neg_mod_ref(&[0, 0, 1], &[0, 1], &[1, 1]), true);
-/// assert_eq!(limbs_pos_eq_neg_mod_ref(&[1, 2], &[3, 4], &[0, 1]), false);
-/// ```
-///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
 /// and each is longer than one limb.
 #[doc(hidden)]
@@ -332,14 +284,6 @@ fn limbs_pos_eq_neg_mod_greater_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
 /// # Panics
 /// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
 /// slices is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::eq_mod::limbs_pos_eq_neg_mod;
-///
-/// assert_eq!(limbs_pos_eq_neg_mod(&[0, 0, 1], &[0, 1], &mut [1, 1]), true);
-/// assert_eq!(limbs_pos_eq_neg_mod(&[1, 2], &[3, 4], &mut [0, 1]), false);
-/// ```
 ///
 /// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
 /// and each is longer than one limb.

@@ -80,7 +80,7 @@ pub fn test_invert_limb_table() {
 }
 
 /// Finds the inverse of a `Limb` mod 2<sup>`Limb::WIDTH`</sup>; given x, returns y such that
-/// x * y === 1 mod 2<sup>`Limb::WIDTH`</sup>. This inverse only exists for odd `Limb`s, so `x` must
+/// x * y ≡ 1 mod 2<sup>`Limb::WIDTH`</sup>. This inverse only exists for odd `Limb`s, so `x` must
 /// be odd.
 ///
 /// Time: worst case O(1)
@@ -89,14 +89,6 @@ pub fn test_invert_limb_table() {
 ///
 /// # Panics
 /// Panics if `x` is even.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_modular_invert_limb;
-///
-/// assert_eq!(limbs_modular_invert_limb(3), 2863311531);
-/// assert_eq!(limbs_modular_invert_limb(1000000001), 2211001857);
-/// ```
 ///
 /// This is binvert_limb from gmp-impl.h, GMP 6.2.1.
 #[doc(hidden)]
@@ -184,8 +176,8 @@ pub fn limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d
             if previous_carry {
                 upper_half += 1;
             }
-            let (diff, carry) = n.overflowing_sub(upper_half);
-            previous_carry = carry;
+            let diff;
+            (diff, previous_carry) = n.overflowing_sub(upper_half);
             q = diff.wrapping_mul(d_inv);
             *out_q = q;
         }
@@ -242,8 +234,8 @@ pub fn limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
             if previous_carry {
                 upper_half += 1;
             }
-            let (diff, carry) = n.overflowing_sub(upper_half);
-            previous_carry = carry;
+            let diff;
+            (diff, previous_carry) = n.overflowing_sub(upper_half);
             q = diff.wrapping_mul(d_inv);
             *n = q;
         }
@@ -265,14 +257,6 @@ pub const MAX_OVER_3: Limb = Limb::MAX / 3;
 ///
 /// # Panics
 /// Panics if `ns` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_3;
-///
-/// assert_eq!(limbs_div_exact_3(&[8, 7]), &[1431655768, 2]);
-/// assert_eq!(limbs_div_exact_3(&[u32::MAX, u32::MAX]), &[0x55555555, 0x55555555]);
-/// ```
 ///
 /// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0
 /// and no carry-in, where the result is returned.
@@ -296,19 +280,6 @@ pub fn limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `out` is shorter than `ns` or if `ns` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_3_to_out;
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_exact_3_to_out(&mut out, &[8, 7]);
-/// assert_eq!(out, &[1431655768, 2, 10, 10]);
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_exact_3_to_out(&mut out, &[u32::MAX, u32::MAX]);
-/// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
-/// ```
 ///
 /// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
 /// no carry-in, and no return value.
@@ -335,18 +306,6 @@ pub fn limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
 /// # Panics
 /// Panics if `ns` is empty.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_3_in_place;
-///
-/// let mut ns = vec![8, 7];
-/// limbs_div_exact_3_in_place(&mut ns);
-/// assert_eq!(ns, &[1431655768, 2]);
-///
-/// let mut ns = vec![u32::MAX, u32::MAX];
-/// limbs_div_exact_3_in_place(&mut ns);
-/// assert_eq!(ns, &[0x55555555, 0x55555555]);
-/// ```
 /// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
 /// no carry-in, and no return value, where rp == up.
 #[doc(hidden)]
@@ -372,19 +331,6 @@ pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
 /// # Panics
 /// Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_limb_to_out;
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_exact_limb_to_out(&mut out, &[6, 7], 2);
-/// assert_eq!(out, &[2147483651, 3, 10, 10]);
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_div_exact_limb_to_out(&mut out, &[u32::MAX, u32::MAX], 3);
-/// assert_eq!(out, &[0x55555555, 0x55555555, 10, 10]);
-/// ```
-///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
@@ -409,14 +355,6 @@ pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
 /// # Panics
 /// Panics if `ns` is empty or if `d` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_limb;
-///
-/// assert_eq!(limbs_div_exact_limb(&[6, 7], 2), &[2147483651, 3]);
-/// assert_eq!(limbs_div_exact_limb(&[u32::MAX, u32::MAX], 3), &[0x55555555, 0x55555555]);
-/// ```
-///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
 #[doc(hidden)]
 pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
@@ -440,19 +378,6 @@ pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `ns` is empty or if `d` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_limb_in_place;
-///
-/// let mut ns = vec![6, 7];
-/// limbs_div_exact_limb_in_place(&mut ns, 2);
-/// assert_eq!(ns, &[2147483651, 3]);
-///
-/// let mut ns = vec![u32::MAX, u32::MAX];
-/// limbs_div_exact_limb_in_place(&mut ns, 3);
-/// assert_eq!(ns, &[0x55555555, 0x55555555]);
-/// ```
 ///
 /// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dest == src.
 #[doc(hidden)]
@@ -498,7 +423,7 @@ pub fn limbs_modular_invert_small(
 }
 
 /// Finds the inverse of a slice `Limb` mod 2<sup>`ds.len() * Limb::WIDTH`</sup>; given x, returns y
-/// such that x * y === 1 mod 2<sup>`ds.len() * Limb::WIDTH`</sup>. This inverse only exists for odd
+/// such that x * y ≡ 1 mod 2<sup>`ds.len() * Limb::WIDTH`</sup>. This inverse only exists for odd
 /// x, so the least-significant limb of `ds` must be odd.
 ///
 /// Time: O(n * log(n) * log(log(n)))
@@ -509,17 +434,6 @@ pub fn limbs_modular_invert_small(
 ///
 /// # Panics
 /// Panics if `is` is shorter than `ds`, if `ds` is empty, or if `scratch` is too short.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::*;
-///
-/// let ds = &[1, 2, 3, 4];
-/// let mut scratch = vec![0; limbs_modular_invert_scratch_len(ds.len())];
-/// let is = &mut [10; 4];
-/// limbs_modular_invert(is, ds, &mut scratch);
-/// assert_eq!(is, &[1, u32::MAX - 1, 0, 0]);
-/// ```
 ///
 /// This is mpn_binvert from mpn/generic/binvert.c, GMP 6.2.1.
 #[doc(hidden)]
@@ -2003,6 +1917,9 @@ impl<'a> DivExact<Natural> for &'a Natural {
     /// );
     /// ```
     fn div_exact(self, mut other: Natural) -> Natural {
+        if *self == other {
+            return Natural::ONE;
+        }
         match (self, &mut other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => n.clone(),
@@ -2068,11 +1985,13 @@ impl<'a, 'b> DivExact<&'b Natural> for &'a Natural {
     /// );
     /// ```
     fn div_exact(self, other: &'b Natural) -> Natural {
+        if self == other {
+            return Natural::ONE;
+        }
         match (self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (n, natural_one!()) => n.clone(),
             (natural_zero!(), _) => Natural::ZERO,
-            (n, d) if std::ptr::eq(n, d) => Natural::ONE,
             (n, Natural(Small(d))) => n.div_exact_limb_ref(*d),
             (Natural(Small(_)), Natural(Large(_))) => panic!("division not exact"),
             (Natural(Large(ref ns)), Natural(Large(ref ds))) => {
@@ -2130,6 +2049,10 @@ impl DivExactAssign<Natural> for Natural {
     /// assert_eq!(x.to_string(), "123456789000");
     /// ```
     fn div_exact_assign(&mut self, mut other: Natural) {
+        if *self == other {
+            *self = Natural::ONE;
+            return;
+        }
         match (&mut *self, &mut other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (_, natural_one!()) | (natural_zero!(), _) => {}
@@ -2191,6 +2114,10 @@ impl<'a> DivExactAssign<&'a Natural> for Natural {
     /// assert_eq!(x.to_string(), "123456789000");
     /// ```
     fn div_exact_assign(&mut self, other: &'a Natural) {
+        if self == other {
+            *self = Natural::ONE;
+            return;
+        }
         match (&mut *self, other) {
             (_, natural_zero!()) => panic!("division by zero"),
             (_, natural_one!()) | (natural_zero!(), _) => {}

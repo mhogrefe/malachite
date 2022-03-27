@@ -384,6 +384,7 @@ fn benchmark_natural_floor_cbrt_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_floor_cbrt_library_comparison(
     gm: GenMode,
     config: GenConfig,
@@ -671,6 +672,7 @@ fn benchmark_natural_floor_root_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_floor_root_library_comparison(
     gm: GenMode,
     config: GenConfig,

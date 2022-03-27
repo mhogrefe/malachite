@@ -16,18 +16,22 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::exhaustive::exhaustive_to_sci_options;
+use malachite_base::num::conversion::string::options::ToSciOptions;
 use malachite_base::num::conversion::traits::{
-    ConvertibleFrom, ExactFrom, SaturatingFrom, WrappingFrom,
+    ConvertibleFrom, ExactFrom, SaturatingFrom, ToSci, WrappingFrom,
 };
 use malachite_base::num::exhaustive::{
-    exhaustive_natural_signeds, exhaustive_positive_primitive_ints, exhaustive_signeds,
-    exhaustive_unsigneds, primitive_int_increasing_inclusive_range, primitive_int_increasing_range,
-    PrimitiveIntIncreasingRange,
+    exhaustive_natural_signeds, exhaustive_positive_primitive_ints, exhaustive_primitive_floats,
+    exhaustive_signeds, exhaustive_unsigneds, primitive_int_increasing_inclusive_range,
+    primitive_int_increasing_range, PrimitiveIntIncreasingRange,
 };
 use malachite_base::num::iterators::{bit_distributor_sequence, ruler_sequence};
 use malachite_base::num::logic::traits::{
     BitAccess, BitConvertible, LeadingZeros, SignificantBits,
 };
+use malachite_base::rational_sequences::exhaustive::exhaustive_rational_sequences;
+use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::rounding_modes::exhaustive::exhaustive_rounding_modes;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_trailing_zeros;
@@ -47,7 +51,8 @@ use malachite_base::vecs::exhaustive::{
     LexFixedLengthVecsFromSingle,
 };
 use malachite_base_test_util::generators::common::{
-    permute_1_3_2, permute_2_1, reshape_1_3_to_4, reshape_2_1_to_3, reshape_2_2_to_4, It,
+    permute_1_3_2, permute_2_1, reshape_1_2_to_3, reshape_1_3_to_4, reshape_2_1_to_3,
+    reshape_2_2_to_4, It,
 };
 use malachite_base_test_util::generators::exhaustive::{
     exhaustive_unsigned_pair_gen_var_20, exhaustive_unsigned_pair_gen_var_24,
@@ -263,6 +268,16 @@ pub fn exhaustive_integer_integer_natural_triple_gen_var_2() -> It<(Integer, Int
     )
 }
 
+// -- (Integer, Integer, PrimitiveFloat) --
+
+pub fn exhaustive_integer_integer_primitive_float_triple_gen<T: PrimitiveFloat>(
+) -> It<(Integer, Integer, T)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_integers(),
+        exhaustive_primitive_floats(),
+    ))
+}
+
 // -- (Integer, Integer, PrimitiveSigned) --
 
 pub fn exhaustive_integer_integer_signed_triple_gen<T: PrimitiveSigned>(
@@ -403,6 +418,25 @@ pub fn exhaustive_integer_natural_natural_triple_gen() -> It<(Integer, Natural, 
     ))
 }
 
+// -- (Integer, PrimitiveFloat) --
+
+pub fn exhaustive_integer_primitive_float_pair_gen<T: PrimitiveFloat>() -> It<(Integer, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integers(),
+        exhaustive_primitive_floats(),
+    ))
+}
+
+// -- (Integer, PrimitiveFloat, PrimitiveFloat) --
+
+pub fn exhaustive_integer_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>(
+) -> It<(Integer, T, T)> {
+    Box::new(exhaustive_triples_xyy(
+        exhaustive_integers(),
+        exhaustive_primitive_floats(),
+    ))
+}
+
 // -- (Integer, PrimitiveSigned) --
 
 pub fn exhaustive_integer_signed_pair_gen<T: PrimitiveSigned>() -> It<(Integer, T)> {
@@ -487,11 +521,10 @@ pub fn exhaustive_integer_unsigned_pair_gen<T: PrimitiveUnsigned>() -> It<(Integ
     ))
 }
 
-pub fn exhaustive_integer_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
-) -> It<(Integer, T)> {
+pub fn exhaustive_integer_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> It<(Integer, T)> {
     Box::new(lex_pairs(
         exhaustive_integers(),
-        primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
+        primitive_int_increasing_inclusive_range(T::TWO, T::from(36u8)),
     ))
 }
 
@@ -510,7 +543,7 @@ pub fn exhaustive_integer_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> It<
         )
         .interleave(exhaustive_pairs_big_tiny(
             exhaustive_negative_integers(),
-            exhaustive_positive_primitive_ints::<T>()
+            exhaustive_unsigneds::<T>()
                 .flat_map(|i| i.arithmetic_checked_shl(1).map(|j| j | T::ONE)),
         )),
     )
@@ -586,12 +619,12 @@ pub fn exhaustive_integer_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -
 }
 
 pub fn exhaustive_integer_unsigned_unsigned_triple_gen_var_1<
-    T: ExactFrom<u8> + PrimitiveUnsigned,
+    T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >() -> It<(Integer, T, U)> {
     permute_1_3_2(reshape_2_1_to_3(Box::new(lex_pairs(
         exhaustive_pairs_big_tiny(exhaustive_integers(), exhaustive_unsigneds()),
-        primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
+        primitive_int_increasing_inclusive_range(T::TWO, T::from(36u8)),
     ))))
 }
 
@@ -694,6 +727,22 @@ pub fn exhaustive_integer_rounding_mode_pair_gen_var_2() -> It<(Integer, Roundin
         exhaustive_nonzero_integers(),
         exhaustive_rounding_modes(),
     ))
+}
+
+// -- (Integer, ToSciOptions) --
+
+pub fn exhaustive_integer_to_sci_options_pair_gen() -> It<(Integer, ToSciOptions)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_integers(),
+        exhaustive_to_sci_options(),
+    ))
+}
+
+pub fn exhaustive_integer_to_sci_options_pair_gen_var_1() -> It<(Integer, ToSciOptions)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_integers(), exhaustive_to_sci_options())
+            .filter(|(x, options)| x.fmt_sci_valid(*options)),
+    )
 }
 
 // -- (Integer, Vec<bool>) --
@@ -1114,6 +1163,16 @@ pub fn exhaustive_natural_natural_natural_unsigned_quadruple_gen_var_4(
     )
 }
 
+// -- (Natural, Natural, PrimitiveFloat) --
+
+pub fn exhaustive_natural_natural_primitive_float_triple_gen<T: PrimitiveFloat>(
+) -> It<(Natural, Natural, T)> {
+    Box::new(exhaustive_triples_xxy(
+        exhaustive_naturals(),
+        exhaustive_primitive_floats(),
+    ))
+}
+
 // -- (Natural, Natural, PrimitiveSigned) --
 
 pub fn exhaustive_natural_natural_signed_triple_gen<T: PrimitiveSigned>(
@@ -1264,6 +1323,25 @@ pub fn exhaustive_natural_natural_rounding_mode_triple_gen_var_2(
         )
         .filter_map(|(x, y, rm)| round_to_multiple_natural_filter_map(x, y, rm)),
     )
+}
+
+// -- (Natural, PrimitiveFloat) --
+
+pub fn exhaustive_natural_primitive_float_pair_gen<T: PrimitiveFloat>() -> It<(Natural, T)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_naturals(),
+        exhaustive_primitive_floats(),
+    ))
+}
+
+// -- (Natural, PrimitiveFloat, PrimitiveFloat) --
+
+pub fn exhaustive_natural_primitive_float_primitive_float_triple_gen<T: PrimitiveFloat>(
+) -> It<(Natural, T, T)> {
+    Box::new(exhaustive_triples_xyy(
+        exhaustive_naturals(),
+        exhaustive_primitive_floats(),
+    ))
 }
 
 // -- (Natural, PrimitiveInt) --
@@ -1433,11 +1511,10 @@ pub fn exhaustive_natural_unsigned_pair_gen<T: PrimitiveUnsigned>() -> It<(Natur
     ))
 }
 
-pub fn exhaustive_natural_unsigned_pair_gen_var_1<T: ExactFrom<u8> + PrimitiveUnsigned>(
-) -> It<(Natural, T)> {
+pub fn exhaustive_natural_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> It<(Natural, T)> {
     Box::new(lex_pairs(
         exhaustive_naturals(),
-        primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
+        primitive_int_increasing_inclusive_range(T::TWO, T::from(36u8)),
     ))
 }
 
@@ -1544,12 +1621,12 @@ pub fn exhaustive_natural_unsigned_unsigned_triple_gen<T: PrimitiveUnsigned>() -
 }
 
 pub fn exhaustive_natural_unsigned_unsigned_triple_gen_var_1<
-    T: ExactFrom<u8> + PrimitiveUnsigned,
+    T: PrimitiveUnsigned,
     U: PrimitiveUnsigned,
 >() -> It<(Natural, T, U)> {
     permute_1_3_2(reshape_2_1_to_3(Box::new(lex_pairs(
         exhaustive_pairs_big_tiny(exhaustive_naturals(), exhaustive_unsigneds()),
-        primitive_int_increasing_inclusive_range(T::TWO, T::exact_from(36u8)),
+        primitive_int_increasing_inclusive_range(T::TWO, T::from(36u8)),
     ))))
 }
 
@@ -1709,6 +1786,22 @@ pub fn exhaustive_natural_rounding_mode_pair_gen_var_2() -> It<(Natural, Roundin
     ))
 }
 
+// -- (Natural, ToSciOptions) --
+
+pub fn exhaustive_natural_to_sci_options_pair_gen() -> It<(Natural, ToSciOptions)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_naturals(),
+        exhaustive_to_sci_options(),
+    ))
+}
+
+pub fn exhaustive_natural_to_sci_options_pair_gen_var_1() -> It<(Natural, ToSciOptions)> {
+    Box::new(
+        exhaustive_pairs(exhaustive_naturals(), exhaustive_to_sci_options())
+            .filter(|(x, options)| x.fmt_sci_valid(*options)),
+    )
+}
+
 // -- (Natural, Vec<bool>) --
 
 struct NaturalBoolVecPairGenerator1;
@@ -1813,6 +1906,15 @@ pub fn exhaustive_string_triple_gen_var_2() -> It<(String, String, String)> {
 }
 
 // var 3 is in malachite-q.
+
+// -- (Vec<Natural>, Integer)
+
+pub fn exhaustive_natural_vec_integer_pair_gen_var_1() -> It<(Vec<Natural>, Integer)> {
+    Box::new(exhaustive_pairs(
+        exhaustive_vecs(exhaustive_positive_naturals()),
+        exhaustive_integers(),
+    ))
+}
 
 // -- (Vec<Natural>, Natural)
 
@@ -4165,4 +4267,73 @@ pub fn exhaustive_large_type_gen_var_21(
         exhaustive_sextuples_from_single(exhaustive_unsigneds())
             .filter_map(large_type_filter_map_1),
     )
+}
+
+// var 22 is in malachite-base.
+
+struct RationalFromPowerOf2DigitsGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        u64,
+        (Vec<Natural>, RationalSequence<Natural>),
+        It<(Vec<Natural>, RationalSequence<Natural>)>,
+    > for RationalFromPowerOf2DigitsGenerator
+{
+    #[inline]
+    fn get_ys(&self, log_base: &u64) -> It<(Vec<Natural>, RationalSequence<Natural>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_vecs(exhaustive_natural_range(
+                Natural::ZERO,
+                Natural::power_of_2(*log_base),
+            )),
+            exhaustive_rational_sequences(exhaustive_natural_range(
+                Natural::ZERO,
+                Natural::power_of_2(*log_base),
+            )),
+        ))
+    }
+}
+
+pub fn exhaustive_large_type_gen_var_23() -> It<(u64, Vec<Natural>, RationalSequence<Natural>)> {
+    reshape_1_2_to_3(Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_positive_primitive_ints(),
+        RationalFromPowerOf2DigitsGenerator,
+    )))
+}
+
+pub fn exhaustive_large_type_gen_var_24() -> It<(Vec<Natural>, RationalSequence<Natural>)> {
+    RationalFromPowerOf2DigitsGenerator.get_ys(&1)
+}
+
+struct RationalFromDigitsGenerator;
+
+impl
+    ExhaustiveDependentPairsYsGenerator<
+        Natural,
+        (Vec<Natural>, RationalSequence<Natural>),
+        It<(Vec<Natural>, RationalSequence<Natural>)>,
+    > for RationalFromDigitsGenerator
+{
+    #[inline]
+    fn get_ys(&self, base: &Natural) -> It<(Vec<Natural>, RationalSequence<Natural>)> {
+        Box::new(exhaustive_pairs(
+            exhaustive_vecs(exhaustive_natural_range(Natural::ZERO, base.clone())),
+            exhaustive_rational_sequences(exhaustive_natural_range(Natural::ZERO, base.clone())),
+        ))
+    }
+}
+
+pub fn exhaustive_large_type_gen_var_25() -> It<(Natural, Vec<Natural>, RationalSequence<Natural>)>
+{
+    reshape_1_2_to_3(Box::new(exhaustive_dependent_pairs(
+        ruler_sequence(),
+        exhaustive_natural_range_to_infinity(Natural::TWO),
+        RationalFromDigitsGenerator,
+    )))
+}
+
+pub fn exhaustive_large_type_gen_var_26() -> It<(Vec<Natural>, RationalSequence<Natural>)> {
+    RationalFromDigitsGenerator.get_ys(&Natural::from(10u32))
 }

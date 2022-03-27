@@ -105,7 +105,12 @@ fn demo_integer_floor_root(gm: GenMode, config: GenConfig, limit: usize) {
         .get(gm, &config)
         .take(limit)
     {
-        println!("{}.floor_root({}) = {}", x, exp, x.clone().floor_root(exp));
+        println!(
+            "({}).floor_root({}) = {}",
+            x,
+            exp,
+            x.clone().floor_root(exp)
+        );
     }
 }
 
@@ -135,7 +140,7 @@ fn demo_integer_ceiling_root(gm: GenMode, config: GenConfig, limit: usize) {
         .take(limit)
     {
         println!(
-            "{}.ceiling_root({}) = {}",
+            "({}).ceiling_root({}) = {}",
             x,
             exp,
             x.clone().ceiling_root(exp)
@@ -174,7 +179,7 @@ fn demo_integer_checked_root(gm: GenMode, config: GenConfig, limit: usize) {
         .take(limit)
     {
         println!(
-            "{}.checked_root({}) = {:?}",
+            "({}).checked_root({}) = {:?}",
             x,
             exp,
             x.clone().checked_root(exp)
@@ -219,6 +224,7 @@ fn benchmark_integer_floor_cbrt_evaluation_strategy(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_floor_cbrt_library_comparison(
     gm: GenMode,
     config: GenConfig,
@@ -354,6 +360,7 @@ fn benchmark_integer_floor_root_evaluation_strategy(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_floor_root_library_comparison(
     gm: GenMode,
     config: GenConfig,

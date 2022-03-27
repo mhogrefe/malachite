@@ -37,7 +37,7 @@ fn demo_mod_shl_unsigned_unsigned<
         .get(gm, &config)
         .take(limit)
     {
-        println!("{} << {} === {} mod {}", x, u, x.mod_shl(u, m), m);
+        println!("{} << {} ≡ {} mod {}", x, u, x.mod_shl(u, m), m);
     }
 }
 
@@ -54,7 +54,7 @@ fn demo_mod_shl_unsigned_signed<
         .get(gm, &config)
         .take(limit)
     {
-        println!("{} << {} === {} mod {}", x, u, x.mod_shl(u, m), m);
+        println!("{} << {} ≡ {} mod {}", x, u, x.mod_shl(u, m), m);
     }
 }
 

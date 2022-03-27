@@ -4,7 +4,7 @@ use malachite_base::num::arithmetic::traits::{Square, SquareAssign};
 impl Square for Integer {
     type Output = Integer;
 
-    /// Squares a `Integer`, taking it by value.
+    /// Squares an `Integer`, taking it by value.
     ///
     /// Time: worst case O(n * log(n) * log(log(n)))
     ///
@@ -35,7 +35,7 @@ impl Square for Integer {
 impl<'a> Square for &'a Integer {
     type Output = Integer;
 
-    /// Squares a `Integer`, taking it by reference.
+    /// Squares an `Integer`, taking it by reference.
     ///
     /// Time: worst case O(n * log(n) * log(log(n)))
     ///
@@ -66,7 +66,7 @@ impl<'a> Square for &'a Integer {
 }
 
 impl SquareAssign for Integer {
-    /// Squares a `Integer` in place.
+    /// Squares an `Integer` in place.
     ///
     /// Time: worst case O(n * log(n) * log(log(n)))
     ///

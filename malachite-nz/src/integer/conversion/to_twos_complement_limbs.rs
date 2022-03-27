@@ -16,20 +16,6 @@ use platform::Limb;
 /// Additional memory: worst case O(n)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_limbs::limbs_twos_complement;
-///
-/// assert_eq!(
-///     limbs_twos_complement(&[1, 2, 3]),
-///     &[u32::MAX, 0xfffffffd, 0xfffffffc]
-/// );
-/// assert_eq!(
-///     limbs_twos_complement(&[u32::MAX, 0xfffffffd, 0xfffffffc]),
-///     &[1, 2, 3]
-/// );
-/// ```
 #[doc(hidden)]
 pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
     let i = slice_leading_zeros(xs);
@@ -50,19 +36,6 @@ pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-///
-/// let mut xs = vec![1, 2, 3];
-/// limbs_maybe_sign_extend_non_negative_in_place(&mut xs);
-/// assert_eq!(xs, &[1, 2, 3]);
-///
-/// let mut xs = vec![1, 2, u32::MAX];
-/// limbs_maybe_sign_extend_non_negative_in_place(&mut xs);
-/// assert_eq!(xs, &[1, 2, u32::MAX, 0]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
     if let Some(last) = xs.last() {
@@ -82,19 +55,6 @@ pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_limbs::limbs_twos_complement_in_place;
-///
-/// let mut xs = &mut [1, 2, 3];
-/// assert!(!limbs_twos_complement_in_place(xs));
-/// assert_eq!(xs, &[u32::MAX, 0xfffffffd, 0xfffffffc]);
-///
-/// let mut xs = &mut [0, 0, 0];
-/// assert!(limbs_twos_complement_in_place(xs));
-/// assert_eq!(xs, &[0, 0, 0]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
     limbs_not_in_place(xs);
@@ -114,19 +74,6 @@ pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
 ///
 /// # Panics
 /// Panics if `xs` contains only zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
-///
-/// let mut xs = vec![1, 2, 3];
-/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
-/// assert_eq!(xs, &[u32::MAX, 0xfffffffd, 0xfffffffc]);
-///
-/// let mut xs = vec![0, u32::MAX];
-/// limbs_twos_complement_and_maybe_sign_extend_negative_in_place(&mut xs);
-/// assert_eq!(xs, &[0, 1, u32::MAX]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
     assert!(!limbs_twos_complement_in_place(xs));
@@ -324,21 +271,23 @@ impl<'a> TwosComplementLimbIterator<'a> {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
-    /// use std::u32;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert_eq!(Integer::ZERO.twos_complement_limbs().get(0), 0);
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(Integer::ZERO.twos_complement_limbs().get(0), 0);
     ///
-    /// // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
-    /// let negative_trillion = -Integer::trillion();
-    /// let limbs = negative_trillion.twos_complement_limbs();
-    /// assert_eq!(limbs.get(0), 727379968);
-    /// assert_eq!(limbs.get(1), 4294967063);
-    /// assert_eq!(limbs.get(2), u32::MAX);
-    /// assert_eq!(limbs.get(100), u32::MAX);
+    ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
+    ///     let negative_trillion = -Integer::trillion();
+    ///     let limbs = negative_trillion.twos_complement_limbs();
+    ///     assert_eq!(limbs.get(0), 727379968);
+    ///     assert_eq!(limbs.get(1), 4294967063);
+    ///     assert_eq!(limbs.get(2), 4294967295);
+    ///     assert_eq!(limbs.get(100), 4294967295);
+    /// }
     /// ```
     pub fn get(&self, index: u64) -> Limb {
         match *self {
@@ -362,19 +311,22 @@ impl<'a> Iterator for TwosComplementLimbIterator<'a> {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert_eq!(Integer::ZERO.twos_complement_limbs().next(), None);
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(Integer::ZERO.twos_complement_limbs().next(), None);
     ///
-    /// // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
-    /// let negative_trillion = -Integer::trillion();
-    /// let mut limbs = negative_trillion.twos_complement_limbs();
-    /// assert_eq!(limbs.next(), Some(727379968));
-    /// assert_eq!(limbs.next(), Some(4294967063));
-    /// assert_eq!(limbs.next(), None);
+    ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
+    ///     let negative_trillion = -Integer::trillion();
+    ///     let mut limbs = negative_trillion.twos_complement_limbs();
+    ///     assert_eq!(limbs.next(), Some(727379968));
+    ///     assert_eq!(limbs.next(), Some(4294967063));
+    ///     assert_eq!(limbs.next(), None);
+    /// }
     /// ```
     fn next(&mut self) -> Option<Limb> {
         match *self {
@@ -402,19 +354,22 @@ impl<'a> DoubleEndedIterator for TwosComplementLimbIterator<'a> {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert_eq!(Integer::ZERO.twos_complement_limbs().next_back(), None);
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(Integer::ZERO.twos_complement_limbs().next_back(), None);
     ///
-    /// // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
-    /// let negative_trillion = -Integer::trillion();
-    /// let mut limbs = negative_trillion.twos_complement_limbs();
-    /// assert_eq!(limbs.next_back(), Some(4294967063));
-    /// assert_eq!(limbs.next_back(), Some(727379968));
-    /// assert_eq!(limbs.next_back(), None);
+    ///     // 2^64 - 10^12 = 4294967063 * 2^32 + 727379968
+    ///     let negative_trillion = -Integer::trillion();
+    ///     let mut limbs = negative_trillion.twos_complement_limbs();
+    ///     assert_eq!(limbs.next_back(), Some(4294967063));
+    ///     assert_eq!(limbs.next_back(), Some(727379968));
+    ///     assert_eq!(limbs.next_back(), None);
+    /// }
     /// ```
     fn next_back(&mut self) -> Option<Limb> {
         match *self {
@@ -469,26 +424,29 @@ impl Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert!(Integer::ZERO.to_twos_complement_limbs_asc().is_empty());
-    /// assert_eq!(Integer::from(123).to_twos_complement_limbs_asc(), &[123]);
-    /// assert_eq!(
-    ///     Integer::from(-123).to_twos_complement_limbs_asc(),
-    ///     &[4294967173]
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::trillion().to_twos_complement_limbs_asc(),
-    ///     &[3567587328, 232]
-    /// );
-    /// assert_eq!(
-    ///     (-Integer::trillion()).to_twos_complement_limbs_asc(),
-    ///     &[727379968, 4294967063]
-    /// );
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert!(Integer::ZERO.to_twos_complement_limbs_asc().is_empty());
+    ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_asc(), &[123]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).to_twos_complement_limbs_asc(),
+    ///         &[4294967173]
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::trillion().to_twos_complement_limbs_asc(),
+    ///         &[3567587328, 232]
+    ///     );
+    ///     assert_eq!(
+    ///         (-Integer::trillion()).to_twos_complement_limbs_asc(),
+    ///         &[727379968, 4294967063]
+    ///     );
+    /// }
     /// ```
     pub fn to_twos_complement_limbs_asc(&self) -> Vec<Limb> {
         let mut limbs = self.abs.to_limbs_asc();
@@ -523,26 +481,29 @@ impl Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert!(Integer::ZERO.to_twos_complement_limbs_desc().is_empty());
-    /// assert_eq!(Integer::from(123).to_twos_complement_limbs_desc(), &[123]);
-    /// assert_eq!(
-    ///     Integer::from(-123).to_twos_complement_limbs_desc(),
-    ///     &[4294967173]
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::trillion().to_twos_complement_limbs_desc(),
-    ///     &[232, 3567587328]
-    /// );
-    /// assert_eq!(
-    ///     (-Integer::trillion()).to_twos_complement_limbs_desc(),
-    ///     &[4294967063, 727379968]
-    /// );
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert!(Integer::ZERO.to_twos_complement_limbs_desc().is_empty());
+    ///     assert_eq!(Integer::from(123).to_twos_complement_limbs_desc(), &[123]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).to_twos_complement_limbs_desc(),
+    ///         &[4294967173]
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::trillion().to_twos_complement_limbs_desc(),
+    ///         &[232, 3567587328]
+    ///     );
+    ///     assert_eq!(
+    ///         (-Integer::trillion()).to_twos_complement_limbs_desc(),
+    ///         &[4294967063, 727379968]
+    ///     );
+    /// }
     /// ```
     pub fn to_twos_complement_limbs_desc(&self) -> Vec<Limb> {
         let mut xs = self.to_twos_complement_limbs_asc();
@@ -571,26 +532,29 @@ impl Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert!(Integer::ZERO.into_twos_complement_limbs_asc().is_empty());
-    /// assert_eq!(Integer::from(123).into_twos_complement_limbs_asc(), &[123]);
-    /// assert_eq!(
-    ///     Integer::from(-123).into_twos_complement_limbs_asc(),
-    ///     &[4294967173]
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::trillion().into_twos_complement_limbs_asc(),
-    ///     &[3567587328, 232]
-    /// );
-    /// assert_eq!(
-    ///     (-Integer::trillion()).into_twos_complement_limbs_asc(),
-    ///     &[727379968, 4294967063]
-    /// );
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert!(Integer::ZERO.into_twos_complement_limbs_asc().is_empty());
+    ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_asc(), &[123]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).into_twos_complement_limbs_asc(),
+    ///         &[4294967173]
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::trillion().into_twos_complement_limbs_asc(),
+    ///         &[3567587328, 232]
+    ///     );
+    ///     assert_eq!(
+    ///         (-Integer::trillion()).into_twos_complement_limbs_asc(),
+    ///         &[727379968, 4294967063]
+    ///     );
+    /// }
     /// ```
     pub fn into_twos_complement_limbs_asc(self) -> Vec<Limb> {
         let mut xs = self.abs.into_limbs_asc();
@@ -625,26 +589,29 @@ impl Integer {
     /// # Examples
     /// ```
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert!(Integer::ZERO.into_twos_complement_limbs_desc().is_empty());
-    /// assert_eq!(Integer::from(123).into_twos_complement_limbs_desc(), &[123]);
-    /// assert_eq!(
-    ///     Integer::from(-123).into_twos_complement_limbs_desc(),
-    ///     &[4294967173]
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::trillion().into_twos_complement_limbs_desc(),
-    ///     &[232, 3567587328]
-    /// );
-    /// assert_eq!(
-    ///     (-Integer::trillion()).into_twos_complement_limbs_desc(),
-    ///     &[4294967063, 727379968]
-    /// );
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert!(Integer::ZERO.into_twos_complement_limbs_desc().is_empty());
+    ///     assert_eq!(Integer::from(123).into_twos_complement_limbs_desc(), &[123]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).into_twos_complement_limbs_desc(),
+    ///         &[4294967173]
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::trillion().into_twos_complement_limbs_desc(),
+    ///         &[232, 3567587328]
+    ///     );
+    ///     assert_eq!(
+    ///         (-Integer::trillion()).into_twos_complement_limbs_desc(),
+    ///         &[4294967063, 727379968]
+    ///     );
+    /// }
     /// ```
     pub fn into_twos_complement_limbs_desc(self) -> Vec<Limb> {
         let mut xs = self.into_twos_complement_limbs_asc();
@@ -669,91 +636,63 @@ impl Integer {
     /// ```
     /// extern crate itertools;
     /// extern crate malachite_base;
-    /// extern crate malachite_nz;
     ///
     /// use itertools::Itertools;
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
     /// use malachite_base::num::basic::traits::Zero;
     /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
     ///
-    /// assert!(Integer::ZERO.twos_complement_limbs().next().is_none());
-    /// assert_eq!(
-    ///     Integer::from(123).twos_complement_limbs().collect_vec(),
-    ///     &[123]
-    /// );
-    /// assert_eq!(
-    ///     Integer::from(-123).twos_complement_limbs().collect_vec(),
-    ///     &[4294967173]
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::trillion().twos_complement_limbs().collect_vec(),
-    ///     &[3567587328, 232]
-    /// );
-    /// // Sign-extension for a non-negative `Integer`
-    /// assert_eq!(
-    ///     Integer::from(u32::MAX)
-    ///         .twos_complement_limbs()
-    ///         .collect_vec(),
-    ///     &[u32::MAX, 0]
-    /// );
-    /// assert_eq!(
-    ///     (-Integer::trillion()).twos_complement_limbs().collect_vec(),
-    ///     &[727379968, 4294967063]
-    /// );
-    /// // Sign-extension for a negative `Integer`
-    /// assert_eq!(
-    ///     (-Integer::from(u32::MAX))
-    ///         .twos_complement_limbs()
-    ///         .collect_vec(),
-    ///     &[1, u32::MAX]
-    /// );
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert!(Integer::ZERO.twos_complement_limbs().next().is_none());
+    ///     assert_eq!(Integer::from(123).twos_complement_limbs().collect_vec(), &[123]);
+    ///     assert_eq!(Integer::from(-123).twos_complement_limbs().collect_vec(), &[4294967173]);
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::trillion().twos_complement_limbs().collect_vec(),
+    ///         &[3567587328, 232]
+    ///     );
+    ///     // Sign-extension for a non-negative `Integer`
+    ///     assert_eq!(
+    ///         Integer::from(4294967295i64).twos_complement_limbs().collect_vec(),
+    ///         &[4294967295, 0]
+    ///     );
+    ///     assert_eq!(
+    ///         (-Integer::trillion()).twos_complement_limbs().collect_vec(),
+    ///         &[727379968, 4294967063]
+    ///     );
+    ///     // Sign-extension for a negative `Integer`
+    ///     assert_eq!(
+    ///         (-Integer::from(4294967295i64)).twos_complement_limbs().collect_vec(),
+    ///         &[1, 4294967295]
+    ///     );
     ///
-    /// assert!(Integer::ZERO.twos_complement_limbs().rev().next().is_none());
-    /// assert_eq!(
-    ///     Integer::from(123)
-    ///         .twos_complement_limbs()
-    ///         .rev()
-    ///         .collect_vec(),
-    ///     &[123]
-    /// );
-    /// assert_eq!(
-    ///     Integer::from(-123)
-    ///         .twos_complement_limbs()
-    ///         .rev()
-    ///         .collect_vec(),
-    ///     &[4294967173]
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::trillion()
-    ///         .twos_complement_limbs()
-    ///         .rev()
-    ///         .collect_vec(),
-    ///     &[232, 3567587328]
-    /// );
-    /// // Sign-extension for a non-negative `Integer`
-    /// assert_eq!(
-    ///     Integer::from(u32::MAX)
-    ///         .twos_complement_limbs()
-    ///         .rev()
-    ///         .collect_vec(),
-    ///     &[0, u32::MAX]
-    /// );
-    /// assert_eq!(
-    ///     (-Integer::trillion())
-    ///         .twos_complement_limbs()
-    ///         .rev()
-    ///         .collect_vec(),
-    ///     &[4294967063, 727379968]
-    /// );
-    /// // Sign-extension for a negative `Integer`
-    /// assert_eq!(
-    ///     (-Integer::from(u32::MAX))
-    ///         .twos_complement_limbs()
-    ///         .rev()
-    ///         .collect_vec(),
-    ///     &[u32::MAX, 1]
-    /// );
+    ///     assert!(Integer::ZERO.twos_complement_limbs().rev().next().is_none());
+    ///     assert_eq!(Integer::from(123).twos_complement_limbs().rev().collect_vec(), &[123]);
+    ///     assert_eq!(
+    ///         Integer::from(-123).twos_complement_limbs().rev().collect_vec(),
+    ///         &[4294967173]
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::trillion().twos_complement_limbs().rev().collect_vec(),
+    ///         &[232, 3567587328]
+    ///     );
+    ///     // Sign-extension for a non-negative `Integer`
+    ///     assert_eq!(
+    ///         Integer::from(4294967295i64).twos_complement_limbs().rev().collect_vec(),
+    ///         &[0, 4294967295]
+    ///     );
+    ///     assert_eq!(
+    ///         (-Integer::trillion()).twos_complement_limbs().rev().collect_vec(),
+    ///         &[4294967063, 727379968]
+    ///     );
+    ///     // Sign-extension for a negative `Integer`
+    ///     assert_eq!(
+    ///         (-Integer::from(4294967295i64)).twos_complement_limbs().rev().collect_vec(),
+    ///         &[4294967295, 1]
+    ///     );
+    /// }
     /// ```
     pub fn twos_complement_limbs(&self) -> TwosComplementLimbIterator {
         if *self == 0 {

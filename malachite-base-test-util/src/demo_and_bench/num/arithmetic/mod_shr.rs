@@ -29,7 +29,7 @@ fn demo_mod_shr<
         .get(gm, &config)
         .take(limit)
     {
-        println!("{} >> {} === {} mod {}", x, u, x.mod_shr(u, m), m);
+        println!("{} >> {} ≡ {} mod {}", x, u, x.mod_shr(u, m), m);
     }
 }
 

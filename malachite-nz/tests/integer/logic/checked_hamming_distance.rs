@@ -74,8 +74,8 @@ fn test_checked_hamming_distance() {
         let v = Integer::from_str(t).unwrap();
 
         assert_eq!(u.checked_hamming_distance(&v), out);
-        assert_eq!(integer_checked_hamming_distance_alt_1(&u, &v,), out);
-        assert_eq!(integer_checked_hamming_distance_alt_2(&u, &v,), out);
+        assert_eq!(integer_checked_hamming_distance_alt_1(&u, &v), out);
+        assert_eq!(integer_checked_hamming_distance_alt_2(&u, &v), out);
         assert_eq!(
             rug_checked_hamming_distance(
                 &rug::Integer::from_str(s).unwrap(),

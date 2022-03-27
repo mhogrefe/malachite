@@ -249,7 +249,7 @@ fn benchmark_natural_from_string_base_algorithms(
     file_name: &str,
 ) {
     run_benchmark(
-        "Natural::from_string_base(u64, &str)",
+        "Natural::from_string_base(u8, &str)",
         BenchmarkType::Algorithms,
         unsigned_string_pair_gen_var_1().get(gm, &config),
         gm.name(),

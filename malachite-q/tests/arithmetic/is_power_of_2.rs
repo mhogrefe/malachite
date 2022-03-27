@@ -1,4 +1,6 @@
-use malachite_base::num::arithmetic::traits::{IsPowerOf2, NextPowerOf2, Reciprocal};
+use malachite_base::num::arithmetic::traits::{
+    CheckedLogBase2, IsPowerOf2, NextPowerOf2, Reciprocal,
+};
 use malachite_nz_test_util::generators::natural_gen;
 use malachite_q::Rational;
 use malachite_q_test_util::generators::{rational_gen, rational_gen_var_1, rational_gen_var_2};
@@ -45,7 +47,9 @@ fn is_power_of_2_properties() {
     });
 
     rational_gen_var_2().test_properties(|x| {
-        assert_eq!((&x).next_power_of_2() == x, x.is_power_of_2());
+        let is_power = x.is_power_of_2();
+        assert_eq!((&x).next_power_of_2() == x, is_power);
+        assert_eq!(x.checked_log_base_2().is_some(), is_power);
     });
 
     rational_gen_var_1().test_properties(|x| {

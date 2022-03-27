@@ -21,14 +21,6 @@ use std::ops::{BitOr, BitOrAssign};
 ///
 /// # Panics
 /// May panic if `xs` is empty or only contains zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_neg_or_limb;
-///
-/// assert_eq!(limbs_neg_or_limb(&[123, 456], 789), &[107, 456]);
-/// assert_eq!(limbs_neg_or_limb(&[0, 0, 456], 789), &[0xfffffceb, u32::MAX, 455]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_neg_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     if y == 0 {
@@ -63,19 +55,6 @@ pub fn limbs_neg_or_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 ///
 /// # Panics
 /// May panic if `xs` is empty or only contains zeros, or if `out` is shorter than `xs`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_neg_or_limb_to_out;
-///
-/// let mut xs = vec![0, 0, 0, 0];
-/// limbs_neg_or_limb_to_out(&mut xs, &[123, 456], 789);
-/// assert_eq!(xs, &[107, 456, 0, 0]);
-///
-/// let mut xs = vec![0, 0, 0, 0];
-/// limbs_neg_or_limb_to_out(&mut xs, &[0, 0, 456], 789);
-/// assert_eq!(xs, &[0xfffffceb, u32::MAX, 455, 0]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_neg_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     let len = xs.len();
@@ -110,19 +89,6 @@ pub fn limbs_neg_or_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 ///
 /// # Panics
 /// May panic if `xs` is empty or only contains zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_neg_or_limb_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// limbs_neg_or_limb_in_place(&mut xs, 789);
-/// assert_eq!(xs, &[107, 456]);
-///
-/// let mut xs = vec![0, 0, 456];
-/// limbs_neg_or_limb_in_place(&mut xs, 789);
-/// assert_eq!(xs, &[0xfffffceb, u32::MAX, 455]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_neg_or_limb_in_place(xs: &mut [Limb], y: Limb) {
     if y == 0 {
@@ -151,14 +117,6 @@ pub fn limbs_neg_or_limb_in_place(xs: &mut [Limb], y: Limb) {
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_pos_or_neg_limb;
-///
-/// assert_eq!(limbs_pos_or_neg_limb(&[6, 7], 3), 4294967289);
-/// assert_eq!(limbs_pos_or_neg_limb(&[100, 101, 102], 10), 4294967186);
-/// ```
 #[doc(hidden)]
 pub const fn limbs_pos_or_neg_limb(xs: &[Limb], y: Limb) -> Limb {
     (xs[0] | y).wrapping_neg()
@@ -175,14 +133,6 @@ pub const fn limbs_pos_or_neg_limb(xs: &[Limb], y: Limb) -> Limb {
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_neg_or_neg_limb;
-///
-/// assert_eq!(limbs_neg_or_neg_limb(&[6, 7], 3), 5);
-/// assert_eq!(limbs_neg_or_neg_limb(&[100, 101, 102], 10), 98);
-/// ```
 #[doc(hidden)]
 pub const fn limbs_neg_or_neg_limb(xs: &[Limb], y: Limb) -> Limb {
     (xs[0].wrapping_neg() | y).wrapping_neg()
@@ -200,14 +150,6 @@ pub const fn limbs_neg_or_neg_limb(xs: &[Limb], y: Limb) -> Limb {
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_or_pos_neg;
-///
-/// assert_eq!(limbs_or_pos_neg(&[1, 2], &[100, 200]), &[99, 200]);
-/// assert_eq!(limbs_or_pos_neg(&[1, 2], &[100, 200, 300]), &[99, 200, 300]);
-/// ```
 ///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res is returned, the first input is positive,
 /// and the second is negative.
@@ -273,19 +215,6 @@ pub fn limbs_or_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than `ys`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_or_pos_neg_to_out;
-///
-/// let mut out = vec![0, 0];
-/// limbs_or_pos_neg_to_out(&mut out, &[1, 2], &[100, 200]);
-/// assert_eq!(out, &[99, 200]);
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_or_pos_neg_to_out(&mut out, &[1, 2], &[100, 200, 300]);
-/// assert_eq!(out, &[99, 200, 300, 10]);
-/// ```
 ///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where the first input is positive and the second is
 /// negative.
@@ -353,19 +282,6 @@ pub fn limbs_or_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_slice_or_pos_neg_in_place_left;
-///
-/// let mut xs = vec![1, 2];
-/// assert_eq!(limbs_slice_or_pos_neg_in_place_left(&mut xs, &[100, 200]), false);
-/// assert_eq!(xs, &[99, 200]);
-///
-/// let mut xs = vec![1, 2];
-/// assert_eq!(limbs_slice_or_pos_neg_in_place_left(&mut xs, &[100, 200, 300]), true);
-/// assert_eq!(xs, &[99, 200]);
-/// ```
-///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1, the first input is positive and the
 /// second is negative, and the length of op1 is not changed; instead, a carry is returned.
 #[doc(hidden)]
@@ -428,19 +344,6 @@ pub fn limbs_slice_or_pos_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> boo
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_vec_or_pos_neg_in_place_left;
-///
-/// let mut xs = vec![1, 2];
-/// limbs_vec_or_pos_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, &[99, 200]);
-///
-/// let mut xs = vec![1, 2];
-/// limbs_vec_or_pos_neg_in_place_left(&mut xs, &[100, 200, 300]);
-/// assert_eq!(xs, &[99, 200, 300]);
-/// ```
-///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1 and the first input is positive and
 /// the second is negative.
 #[doc(hidden)]
@@ -502,23 +405,6 @@ pub fn limbs_vec_or_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_or_pos_neg_in_place_right;
-///
-/// let mut ys = vec![100, 200];
-/// limbs_or_pos_neg_in_place_right(&[1, 2], &mut ys);
-/// assert_eq!(ys, &[99, 200]);
-///
-/// let mut ys = vec![100, 200];
-/// limbs_or_pos_neg_in_place_right(&[1, 2, 5], &mut ys);
-/// assert_eq!(ys, &[99, 200]);
-///
-/// let mut ys = vec![1, 2, 5];
-/// limbs_or_pos_neg_in_place_right(&[100, 200], &mut ys);
-/// assert_eq!(ys, &[1, 2, 5]);
-/// ```
-///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op2 and the first input is positive and
 /// the second is negative.
 #[doc(hidden)]
@@ -576,14 +462,6 @@ pub fn limbs_or_pos_neg_in_place_right(xs: &[Limb], ys: &mut [Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_or_neg_neg;
-///
-/// assert_eq!(limbs_or_neg_neg(&[1, 2], &[100, 200]), &[1, 0]);
-/// assert_eq!(limbs_or_neg_neg(&[1, 2, 5], &[100, 200]), &[1, 0]);
-/// ```
-///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res is returned and both inputs are negative.
 #[doc(hidden)]
 pub fn limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
@@ -637,19 +515,6 @@ pub fn limbs_or_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
 /// shorter of `xs` and `ys`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_or_neg_neg_to_out;
-///
-/// let mut out = vec![10, 10];
-/// limbs_or_neg_neg_to_out(&mut out, &[1, 2], &[100, 200]);
-/// assert_eq!(out, &[1, 0]);
-///
-/// let mut out = vec![10, 10, 10, 10];
-/// limbs_or_neg_neg_to_out(&mut out, &[1, 2, 5], &[100, 200]);
-/// assert_eq!(out, &[1, 0, 10, 10]);
-/// ```
-///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where both inputs are negative.
 #[doc(hidden)]
 pub fn limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
@@ -702,19 +567,6 @@ pub fn limbs_or_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_slice_or_neg_neg_in_place_left;
-///
-/// let mut xs = vec![1, 2];
-/// limbs_slice_or_neg_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, &[1, 0]);
-///
-/// let mut xs = vec![1, 2, 5];
-/// limbs_slice_or_neg_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, &[1, 0, 0]);
-/// ```
-///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1, both inputs are negative, and the
 /// length of op1 is not changed.
 #[doc(hidden)]
@@ -761,23 +613,6 @@ pub fn limbs_slice_or_neg_neg_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_vec_or_neg_neg_in_place_left;
-///
-/// let mut xs = vec![1, 2];
-/// limbs_vec_or_neg_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, &[1, 0]);
-///
-/// let mut xs = vec![100, 200];
-/// limbs_vec_or_neg_neg_in_place_left(&mut xs, &[1, 2, 5]);
-/// assert_eq!(xs, &[1, 0]);
-///
-/// let mut xs = vec![1, 2, 5];
-/// limbs_vec_or_neg_neg_in_place_left(&mut xs, &[100, 200]);
-/// assert_eq!(xs, &[1, 0]);
-/// ```
-///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where res == op1 and both inputs are negative.
 #[doc(hidden)]
 pub fn limbs_vec_or_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
@@ -822,29 +657,6 @@ pub fn limbs_vec_or_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// # Panics
 /// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::or::limbs_or_neg_neg_in_place_either;
-///
-/// let mut xs = vec![1, 2];
-/// let mut ys = vec![100, 200];
-/// assert_eq!(limbs_or_neg_neg_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, &[1, 0]);
-/// assert_eq!(ys, &[100, 200]);
-///
-/// let mut xs = vec![1, 2, 5];
-/// let mut ys = vec![100, 200];
-/// assert_eq!(limbs_or_neg_neg_in_place_either(&mut xs, &mut ys), true);
-/// assert_eq!(xs, &[1, 2, 5]);
-/// assert_eq!(ys, &[1, 0]);
-///
-/// let mut xs = vec![100, 200];
-/// let mut ys = vec![1, 2, 5];
-/// assert_eq!(limbs_or_neg_neg_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, &[1, 0]);
-/// assert_eq!(ys, &[1, 2, 5]);
-/// ```
 ///
 /// This is mpz_ior from mpz/ior.c, GMP 6.2.1, where both inputs are negative and the result is
 /// written to the shorter input slice.

@@ -430,6 +430,7 @@ fn benchmark_natural_floor_sqrt_algorithms(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_natural_floor_sqrt_library_comparison(
     gm: GenMode,
     config: GenConfig,

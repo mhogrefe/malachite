@@ -26,8 +26,8 @@ macro_rules! impl_overflowing_div {
             /// See the documentation of the `num::arithmetic::overflowing_div` module.
             #[inline]
             fn overflowing_div_assign(&mut self, other: $t) -> bool {
-                let (result, overflow) = self.overflowing_div(other);
-                *self = result;
+                let overflow;
+                (*self, overflow) = self.overflowing_div(other);
                 overflow
             }
         }

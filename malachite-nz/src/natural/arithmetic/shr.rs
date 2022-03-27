@@ -17,23 +17,6 @@ use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 ///
 /// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr::limbs_shr;
-///
-/// assert_eq!(limbs_shr(&[1], 1), &[0]);
-/// assert_eq!(limbs_shr(&[3], 1), &[1]);
-/// assert_eq!(limbs_shr(&[122, 456], 1), &[61, 228]);
-/// assert_eq!(limbs_shr(&[123, 456], 1), &[61, 228]);
-/// assert_eq!(limbs_shr(&[123, 455], 1), &[2147483709, 227]);
-/// assert_eq!(limbs_shr(&[123, 456], 31), &[912, 0]);
-/// assert_eq!(limbs_shr(&[123, 456], 32), &[456]);
-/// assert_eq!(limbs_shr(&[123, 456], 100), Vec::<u32>::new());
-/// assert_eq!(limbs_shr(&[256, 456], 8), &[3355443201, 1]);
-/// assert_eq!(limbs_shr(&[u32::MAX, 1], 1), &[u32::MAX, 0]);
-/// assert_eq!(limbs_shr(&[u32::MAX, u32::MAX], 32), &[u32::MAX]);
-/// ```
-///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the result is returned.
 #[doc(hidden)]
 pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
@@ -65,19 +48,6 @@ pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
 /// # Panics
 /// Panics if `xs` is empty, `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or
 /// equal to `Limb::WIDTH`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr::limbs_shr_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_shr_to_out(&mut out, &[123, 456], 1), 2147483648);
-/// assert_eq!(out, &[61, 228, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_shr_to_out(&mut out, &[122, 455], 1), 0);
-/// assert_eq!(out, &[2147483709, 227, 0]);
-/// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1.
 #[doc(hidden)]
@@ -114,19 +84,6 @@ pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
 /// # Panics
 /// Panics if `xs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr::limbs_slice_shr_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_slice_shr_in_place(&mut xs, 1), 2147483648);
-/// assert_eq!(xs, &[61, 228]);
-///
-/// let mut xs = vec![122, 455];
-/// assert_eq!(limbs_slice_shr_in_place(&mut xs, 1), 0);
-/// assert_eq!(xs, &[2147483709, 227]);
-/// ```
-///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the rp == up.
 #[doc(hidden)]
 pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
@@ -155,55 +112,6 @@ pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::shr::limbs_vec_shr_in_place;
-///
-/// let mut xs = vec![1];
-/// limbs_vec_shr_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[0]);
-///
-/// let mut xs = vec![3];
-/// limbs_vec_shr_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[1]);
-///
-/// let mut xs = vec![122, 456];
-/// limbs_vec_shr_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[61, 228]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[61, 228]);
-///
-/// let mut xs = vec![123, 455];
-/// limbs_vec_shr_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2147483709, 227]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_in_place(&mut xs, 31);
-/// assert_eq!(xs, &[912, 0]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_shr_in_place(&mut xs, 100);
-/// assert_eq!(xs, Vec::<u32>::new());
-///
-/// let mut xs = vec![256, 456];
-/// limbs_vec_shr_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[3355443201, 1]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// limbs_vec_shr_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[u32::MAX, 0]);
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// limbs_vec_shr_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[u32::MAX]);
-/// ```
 ///
 /// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where rp == up and if cnt is
 /// sufficiently large, limbs are removed from rp.

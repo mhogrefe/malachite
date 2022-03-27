@@ -64,11 +64,11 @@ impl CharType {
     }
 }
 
-/// This module contains constants associated with `char`s.
+/// Constants associated with `char`s.
 pub mod constants;
-/// This module contains functions for incrementing and decrementing `char`s.
+/// Functions for incrementing and decrementing `char`s.
 pub mod crement;
-/// This module contains iterators that generate `char`s without repetition.
+/// Iterators that generate `char`s without repetition.
 pub mod exhaustive;
-/// This module contains iterators that generate `char`s randomly.
+/// Iterators that generate `char`s randomly.
 pub mod random;

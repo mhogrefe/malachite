@@ -22,26 +22,6 @@ use platform::Limb;
 /// Additional memory: worst case O(n)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
-///
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[1], 1), &[0]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[3], 1), &[2]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[122, 456], 1), &[122, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[123, 456], 1), &[122, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[123, 455], 1), &[122, 455]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[123, 456], 31), &[0, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[123, 456], 32), &[0, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[123, 456], 100), Vec::<u32>::new());
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[256, 456], 8), &[256, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_down(&[u32::MAX, 1], 1), &[u32::MAX - 1, 1]);
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_down(&[u32::MAX, u32::MAX], 32),
-///     &[0, u32::MAX]
-/// );
-/// ```
 #[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
@@ -68,26 +48,6 @@ pub fn limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> Vec<
 /// Additional memory: worst case O(n)
 ///
 /// where n = max(xs.len(), pow / Limb::WIDTH)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
-///
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[1], 1), &[2]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[3], 1), &[4]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[122, 456], 1), &[122, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[123, 456], 1), &[124, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[123, 455], 1), &[124, 455]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[123, 456], 31), &[2147483648, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[123, 456], 32), &[0, 457]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[123, 456], 100), &[0, 0, 0, 16]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[256, 456], 8), &[256, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_up(&[u32::MAX, 1], 1), &[0, 2]);
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_up(&[u32::MAX, u32::MAX], 32),
-///     &[0, 0, 1]
-/// );
-/// ```
 #[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
@@ -149,29 +109,6 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(xs: &[Limb], pow: 
 /// Additional memory: worst case O(n)
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
-///
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[1], 1), &[0]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[3], 1), &[4]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[122, 456], 1), &[122, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[123, 456], 1), &[124, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[123, 455], 1), &[124, 455]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[123, 456], 31), &[0, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[123, 456], 32), &[0, 456]);
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_nearest(&[123, 456], 100),
-///     Vec::<u32>::new()
-/// );
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[256, 456], 8), &[256, 456]);
-/// assert_eq!(limbs_round_to_multiple_of_power_of_2_nearest(&[u32::MAX, 1], 1), &[0, 2]);
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_nearest(&[u32::MAX, u32::MAX], 32),
-///     &[0, 0, 1]
-/// );
-/// ```
 #[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
@@ -195,60 +132,6 @@ pub fn limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> V
 /// Additional memory: worst case O(n)
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::rounding_modes::RoundingMode;
-/// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
-///
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[1], 1, RoundingMode::Nearest),
-///     Some(vec![0])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[3], 1, RoundingMode::Nearest),
-///     Some(vec![4])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[122, 456], 1, RoundingMode::Floor),
-///     Some(vec![122, 456])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[123, 456], 1, RoundingMode::Floor),
-///     Some(vec![122, 456])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[123, 455], 1, RoundingMode::Floor),
-///     Some(vec![122, 455])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[123, 456], 31, RoundingMode::Ceiling),
-///     Some(vec![2147483648, 456])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[123, 456], 32, RoundingMode::Up),
-///     Some(vec![0, 457])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[123, 456], 100, RoundingMode::Down),
-///     Some(vec![])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[256, 456], 8, RoundingMode::Exact),
-///     Some(vec![256, 456])
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[u32::MAX, 1], 1, RoundingMode::Exact),
-///     None
-/// );
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2(&[u32::MAX, u32::MAX], 32, RoundingMode::Down),
-///     Some(vec![0, u32::MAX])
-/// );
-/// ```
 #[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2(
     xs: &[Limb],
@@ -281,55 +164,6 @@ pub fn limbs_round_to_multiple_of_power_of_2(
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
-///
-/// let mut xs = vec![1];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[0]);
-///
-/// let mut xs = vec![3];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2]);
-///
-/// let mut xs = vec![122, 456];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[122, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[122, 456]);
-///
-/// let mut xs = vec![123, 455];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[122, 455]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 31);
-/// assert_eq!(xs, &[0, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 100);
-/// assert_eq!(xs, Vec::<u32>::new());
-///
-/// let mut xs = vec![256, 456];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[256, 456]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[u32::MAX - 1, 1]);
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// limbs_round_to_multiple_of_power_of_2_down_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, u32::MAX]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
@@ -354,55 +188,6 @@ pub fn limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, p
 /// Additional memory: worst case O(n)
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
-///
-/// let mut xs = vec![1];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[2]);
-///
-/// let mut xs = vec![3];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[4]);
-///
-/// let mut xs = vec![122, 456];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[122, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[124, 456]);
-///
-/// let mut xs = vec![123, 455];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[124, 455]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 31);
-/// assert_eq!(xs, &[2147483648, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, 457]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 100);
-/// assert_eq!(xs, &[0, 0, 0, 16]);
-///
-/// let mut xs = vec![256, 456];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[256, 456]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[0, 2]);
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// limbs_round_to_multiple_of_power_of_2_up_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, 0, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
@@ -463,55 +248,6 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
 /// Additional memory: worst case O(n)
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
-///
-/// let mut xs = vec![1];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[0]);
-///
-/// let mut xs = vec![3];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[4]);
-///
-/// let mut xs = vec![122, 456];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[122, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[124, 456]);
-///
-/// let mut xs = vec![123, 455];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[124, 455]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 31);
-/// assert_eq!(xs, &[0, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 100);
-/// assert_eq!(xs, Vec::<u32>::new());
-///
-/// let mut xs = vec![256, 456];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 8);
-/// assert_eq!(xs, &[256, 456]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 1);
-/// assert_eq!(xs, &[0, 2]);
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// limbs_round_to_multiple_of_power_of_2_nearest_in_place(&mut xs, 32);
-/// assert_eq!(xs, &[0, 0, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
@@ -535,91 +271,6 @@ pub fn limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<Limb>
 /// Additional memory: worst case O(n)
 ///
 /// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-///
-/// # Examples
-/// ```
-/// extern crate malachite_base;
-/// extern crate malachite_nz;
-///
-/// use malachite_base::rounding_modes::RoundingMode;
-/// use malachite_nz::natural::arithmetic::round_to_multiple_of_power_of_2::*;
-///
-/// let mut xs = vec![1];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 1, RoundingMode::Nearest),
-///     true
-/// );
-/// assert_eq!(xs, &[0]);
-///
-/// let mut xs = vec![3];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 1, RoundingMode::Nearest),
-///     true
-/// );
-/// assert_eq!(xs, &[4]);
-///
-/// let mut xs = vec![122, 456];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 1, RoundingMode::Floor),
-///     true
-/// );
-/// assert_eq!(xs, &[122, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 1, RoundingMode::Floor),
-///     true
-/// );
-/// assert_eq!(xs, &[122, 456]);
-///
-/// let mut xs = vec![123, 455];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 1, RoundingMode::Floor),
-///     true
-/// );
-/// assert_eq!(xs, &[122, 455]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 31, RoundingMode::Ceiling),
-///     true
-/// );
-/// assert_eq!(xs, &[2147483648, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 32, RoundingMode::Up),
-///     true
-/// );
-/// assert_eq!(xs, &[0, 457]);
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 100, RoundingMode::Down),
-///     true
-/// );
-/// assert_eq!(xs, Vec::<u32>::new());
-///
-/// let mut xs = vec![256, 456];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 8, RoundingMode::Exact),
-///     true
-/// );
-/// assert_eq!(xs, vec![256, 456]);
-///
-/// let mut xs = vec![u32::MAX, 1];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 1, RoundingMode::Exact),
-///     false
-/// );
-///
-/// let mut xs = vec![u32::MAX, u32::MAX];
-/// assert_eq!(
-///     limbs_round_to_multiple_of_power_of_2_in_place(&mut xs, 32, RoundingMode::Down),
-///     true
-/// );
-/// assert_eq!(xs, vec![0, u32::MAX]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_round_to_multiple_of_power_of_2_in_place(
     xs: &mut Vec<Limb>,

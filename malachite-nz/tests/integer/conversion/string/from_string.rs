@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::traits::{
-    CheckedFrom, ExactFrom, FromStringBase, ToStringBase, WrappingFrom,
+    CheckedFrom, ExactFrom, FromStringBase, ToStringBase,
 };
 use malachite_base_test_util::generators::common::GenConfig;
 use malachite_base_test_util::generators::exhaustive::valid_digit_chars;
@@ -175,7 +175,7 @@ fn from_string_base_properties() {
         let abs_s = s.strip_prefix('-').unwrap_or(&s);
         let digits = digit_map
             .entry(base)
-            .or_insert_with(|| valid_digit_chars(u8::wrapping_from(base)));
+            .or_insert_with(|| valid_digit_chars(base));
         assert_eq!(
             Integer::from_string_base(base, &s).is_some(),
             !abs_s.is_empty() && abs_s.chars().all(|c| digits.contains(&c)),
@@ -225,7 +225,7 @@ fn from_string_base_properties() {
         );
     });
 
-    signed_unsigned_pair_gen_var_5::<SignedLimb, u64>().test_properties(|(i, base)| {
+    signed_unsigned_pair_gen_var_5::<SignedLimb, u8>().test_properties(|(i, base)| {
         let s = i.to_string_base(base);
         assert_eq!(
             Integer::from_string_base(base, &s).unwrap(),

@@ -92,10 +92,13 @@ pub mod integer {
         pub mod eq;
         pub mod hash;
         pub mod partial_cmp_abs_natural;
+        pub mod partial_cmp_abs_primitive_float;
         pub mod partial_cmp_abs_primitive_int;
         pub mod partial_cmp_natural;
+        pub mod partial_cmp_primitive_float;
         pub mod partial_cmp_primitive_int;
         pub mod partial_eq_natural;
+        pub mod partial_eq_primitive_float;
         pub mod partial_eq_primitive_int;
     }
     pub mod conversion {
@@ -111,7 +114,9 @@ pub mod integer {
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
+            pub mod from_sci_string;
             pub mod from_string;
+            pub mod to_sci;
             pub mod to_string;
         }
         pub mod to_twos_complement_limbs;
@@ -250,8 +255,11 @@ pub mod natural {
         pub mod cmp;
         pub mod eq;
         pub mod hash;
+        pub mod partial_cmp_abs_primitive_float;
         pub mod partial_cmp_abs_primitive_int;
+        pub mod partial_cmp_primitive_float;
         pub mod partial_cmp_primitive_int;
+        pub mod partial_eq_primitive_float;
         pub mod partial_eq_primitive_int;
     }
     pub mod conversion {
@@ -276,7 +284,9 @@ pub mod natural {
         #[cfg(feature = "serde")]
         pub mod serde;
         pub mod string {
+            pub mod from_sci_string;
             pub mod from_string;
+            pub mod to_sci;
             pub mod to_string;
         }
         pub mod to_limbs;

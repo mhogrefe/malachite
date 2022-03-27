@@ -275,8 +275,8 @@ fn test_from_f32() {
     test(-124.5, "-124");
     test(-0.499, "0");
     test(-0.5, "0");
-    test(f32::MIN_POSITIVE, "0");
-    test(-f32::MIN_POSITIVE, "0");
+    test(f32::MIN_POSITIVE_SUBNORMAL, "0");
+    test(-f32::MIN_POSITIVE_SUBNORMAL, "0");
     test(f32::MAX_SUBNORMAL, "0");
     test(-f32::MAX_SUBNORMAL, "0");
     test(f32::MIN_POSITIVE_NORMAL, "0");
@@ -361,8 +361,8 @@ fn test_from_f64() {
     test(-124.5, "-124");
     test(-0.499, "0");
     test(-0.5, "0");
-    test(f64::MIN_POSITIVE, "0");
-    test(-f64::MIN_POSITIVE, "0");
+    test(f64::MIN_POSITIVE_SUBNORMAL, "0");
+    test(-f64::MIN_POSITIVE_SUBNORMAL, "0");
     test(f64::MAX_SUBNORMAL, "0");
     test(-f64::MAX_SUBNORMAL, "0");
     test(f64::MIN_POSITIVE_NORMAL, "0");

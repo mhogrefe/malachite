@@ -101,6 +101,7 @@ fn benchmark_integer_floor_sqrt_evaluation_strategy(
     );
 }
 
+#[allow(unused_must_use)]
 fn benchmark_integer_floor_sqrt_library_comparison(
     gm: GenMode,
     config: GenConfig,

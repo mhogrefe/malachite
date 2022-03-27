@@ -27,21 +27,6 @@ use platform::Limb;
 ///
 /// # Panics
 /// Panics if `start` > `end`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_block_access::limbs_slice_get_bits;
-/// use malachite_nz::platform::Limb;
-///
-/// assert_eq!(limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 16, 48), vec![0xef011234]);
-/// assert_eq!(limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 4, 16), vec![0x567]);
-/// assert_eq!(
-///     limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 0, 100),
-///     vec![0x12345678, 0xabcdef01]
-/// );
-/// let empty: Vec<Limb> = Vec::new();
-/// assert_eq!(limbs_slice_get_bits(&[0x12345678, 0xabcdef01], 10, 10), empty);
-/// ```
 #[doc(hidden)]
 pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -79,20 +64,6 @@ pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `start` > `end`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_block_access::limbs_vec_get_bits;
-/// use malachite_nz::platform::Limb;
-///
-/// assert_eq!(limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 16, 48), &[0xef011234, 0]);
-/// assert_eq!(limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 4, 16), &[0x567]);
-/// assert_eq!(
-///     limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 0, 100),
-///     &[0x12345678, 0xabcdef01]
-/// );
-/// assert_eq!(limbs_vec_get_bits(vec![0x12345678, 0xabcdef01], 10, 10), &[0]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
@@ -187,24 +158,6 @@ pub(crate) fn limbs_assign_bits_helper(
 ///
 /// # Panics
 /// Panics if `start` >= `end`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_block_access::limbs_assign_bits;
-/// use malachite_nz::platform::Limb;
-///
-/// let mut xs = vec![123];
-/// limbs_assign_bits(&mut xs, 64, 128, &[456]);
-/// assert_eq!(xs, &[123, 0, 456, 0]);
-///
-/// let mut xs = vec![123];
-/// limbs_assign_bits(&mut xs, 80, 100, &[456]);
-/// assert_eq!(xs, &[123, 0, 29884416, 0]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_assign_bits(&mut xs, 80, 100, &[789, 321]);
-/// assert_eq!(xs, &[123, 456, 51707904, 0]);
-/// ```
 #[doc(hidden)]
 #[inline]
 pub fn limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {

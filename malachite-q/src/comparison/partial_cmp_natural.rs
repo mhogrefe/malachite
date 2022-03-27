@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
 use std::cmp::Ordering;
@@ -48,12 +49,15 @@ impl PartialOrd<Natural> for Rational {
                 return Some(nd_cmp);
             }
         }
-        let first_prod_bits = self.numerator.significant_bits();
-        let second_prod_bits = self.denominator.significant_bits() + other.significant_bits();
-        if first_prod_bits < second_prod_bits - 1 {
-            return Some(Ordering::Less);
-        } else if first_prod_bits > second_prod_bits {
-            return Some(Ordering::Greater);
+        let log_cmp = self
+            .floor_log_base_2_of_abs()
+            .cmp(&i64::exact_from(other.significant_bits() - 1));
+        if log_cmp != Ordering::Equal {
+            return Some(if self.sign {
+                log_cmp
+            } else {
+                log_cmp.reverse()
+            });
         }
         // Finally, cross-multiply.
         Some(self.numerator.cmp(&(&self.denominator * other)))

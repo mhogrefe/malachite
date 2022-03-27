@@ -31,18 +31,6 @@ use std::cmp::Ordering;
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_limb;
-///
-/// assert_eq!(limbs_overflowing_sub_mul_limb(&[123, 456], &[123], 4),
-///         (vec![4294966927, 455, 0], true));
-/// assert_eq!(limbs_overflowing_sub_mul_limb(&[123], &[123], 4),
-///         (vec![369, 0], false));
-/// assert_eq!(limbs_overflowing_sub_mul_limb(&[123], &[123, 456], u32::MAX),
-///         (vec![4294967050, 4294966962, 455], false));
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
 #[doc(hidden)]
@@ -69,24 +57,6 @@ pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], z: Limb) -> (Vec
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `ys.len()` - `xs.len()`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_limb_in_place_left;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_left(&mut xs, &[123], 4), true);
-/// assert_eq!(xs, &[4294966927, 455, 0]);
-///
-/// let mut xs = vec![123];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_left(&mut xs, &[123], 4), false);
-/// assert_eq!(xs, &[369, 0]);
-///
-/// let mut xs = vec![123];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_left(&mut xs, &[123, 456], u32::MAX),
-///         false);
-/// assert_eq!(xs, &[4294967050, 4294966962, 455]);
-/// ```
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, and w_sign is returned.
@@ -171,23 +141,6 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `xs.len()` - `ys.len()`)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_limb_in_place_right;
-///
-/// let mut ys = vec![123];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_right(&[123, 456], &mut ys, 4), true);
-/// assert_eq!(ys, &[4294966927, 455, 0]);
-///
-/// let mut ys = vec![123];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_right(&[123], &mut ys, 4), false);
-/// assert_eq!(ys, &[369, 0]);
-///
-/// let mut ys = vec![123, 456];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_right(&[123], &mut ys, u32::MAX), false);
-/// assert_eq!(ys, &[4294967050, 4294966962, 455]);
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, the limbs of the result are written to the second input rather than the first, and
 /// w_sign is returned.
@@ -269,30 +222,6 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_limb_in_place_either;
-///
-/// let mut xs = vec![123, 456];
-/// let mut ys = vec![123];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_either(&mut xs, &mut ys, 4), (false, true));
-/// assert_eq!(xs, &[4294966927, 455, 0]);
-/// assert_eq!(ys, &[123]);
-///
-/// let mut xs = vec![123];
-/// let mut ys = vec![123];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_either(&mut xs, &mut ys, 4), (false, false));
-/// assert_eq!(xs, &[369, 0]);
-/// assert_eq!(ys, &[123]);
-///
-/// let mut xs = vec![123];
-/// let mut ys = vec![123, 456];
-/// assert_eq!(limbs_overflowing_sub_mul_limb_in_place_either(&mut xs, &mut ys, u32::MAX),
-///         (true, false));
-/// assert_eq!(xs, &[123]);
-/// assert_eq!(ys, &[4294967050, 4294966962, 455]);
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// negative, the result is written to the longer input, and w_sign is returned.
 #[doc(hidden)]
@@ -328,16 +257,6 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_either(
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul;
-///
-/// assert_eq!(limbs_overflowing_sub_mul(&[123, 456], &[123, 789], &[321, 654]),
-///         (vec![39360, 333255, 516006], false));
-/// assert_eq!(limbs_overflowing_sub_mul(&[123, 456, 789, 987, 654], &[123, 789], &[321, 654]),
-///         (vec![4294927936, 4294634040, 4294452078, 986, 654], true));
-/// ```
-///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
 #[doc(hidden)]
@@ -360,19 +279,6 @@ pub fn limbs_overflowing_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> (Vec<
 ///
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::arithmetic::sub_mul::limbs_overflowing_sub_mul_in_place_left;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_overflowing_sub_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]), false);
-/// assert_eq!(xs, &[39360, 333255, 516006]);
-///
-/// let mut xs = vec![123, 456, 789, 987, 654];
-/// assert_eq!(limbs_overflowing_sub_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]), true);
-/// assert_eq!(xs, &[4294927936, 4294634040, 4294452078, 986, 654]);
-/// ```
 ///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// negative, and w_sign is returned.

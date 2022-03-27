@@ -1,6 +1,6 @@
-/// This module provides trait implementations for working with the digits of numbers.
+/// Trait implementations for working with the digits of numbers.
 pub mod digits;
-/// This module provides trait implementations for converting between different number types.
+/// Trait implementations for converting between different number types.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -149,7 +149,7 @@ pub mod digits;
 /// assert_eq!(u32::rounding_from(100.5f32, RoundingMode::Nearest), 100);
 /// ```
 pub mod from;
-/// This module provides traits for bitwise joining two numbers or splitting them in half.
+/// Traits for bitwise joining two numbers or splitting them in half.
 ///
 /// Here are some examples of the macro-generated functions:
 ///
@@ -185,7 +185,7 @@ pub mod from;
 /// assert_eq!(0xabcd1234u32.upper_half(), 0xabcd);
 /// ```
 pub mod half;
-/// This module provides a trait for determining whether a value is an integer.
+/// A trait for determining whether a value is an integer.
 ///
 /// Here are some examples of the macro-generated functions:
 ///
@@ -207,8 +207,7 @@ pub mod half;
 /// assert_eq!(f32::NEGATIVE_INFINITY.is_integer(), false);
 /// ```
 pub mod is_integer;
-/// This module provides traits for converting numbers to and from mantissa and exponent
-/// representations.
+/// Traits for converting numbers to and from mantissa and exponent representations.
 ///
 /// Here are some examples of the macro-generated functions:
 ///
@@ -544,8 +543,7 @@ pub mod is_integer;
 /// assert_eq!(f32::from_sci_mantissa_and_exponent(1.999, -149), None);
 /// ```
 pub mod mantissa_and_exponent;
-/// This module provides traits converting numbers to `Vec`s of numbers, slices to numbers, or
-/// slices to `Vec`s.
+/// Traits for converting numbers to `Vec`s of numbers, slices to numbers, or slices to `Vec`s.
 ///
 /// Here are some examples of the macro-generated functions:
 ///
@@ -587,7 +585,7 @@ pub mod mantissa_and_exponent;
 /// assert_eq!(u16::vec_from_other_type(0xabu8), &[0xab]);
 /// ```
 pub mod slice;
-/// This module provides trait implementations for converting numbers to and from `String`s.
+/// Trait implementations for converting numbers to and from `String`s.
 pub mod string;
-/// This module defines various traits for converting numbers.
+/// Various traits for converting numbers.
 pub mod traits;

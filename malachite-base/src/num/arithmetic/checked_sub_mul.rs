@@ -1,12 +1,9 @@
-use num::arithmetic::traits::{CheckedMul, CheckedSub, CheckedSubMul, UnsignedAbs, WrappingSub};
-use num::basic::traits::Zero;
+use num::arithmetic::traits::{CheckedSubMul, UnsignedAbs};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::WrappingFrom;
 
-fn checked_sub_mul_unsigned<T: CheckedMul<T, Output = T> + CheckedSub<T, Output = T>>(
-    x: T,
-    y: T,
-    z: T,
-) -> Option<T> {
+fn checked_sub_mul_unsigned<T: PrimitiveUnsigned>(x: T, y: T, z: T) -> Option<T> {
     y.checked_mul(z).and_then(|yz| x.checked_sub(yz))
 }
 
@@ -32,15 +29,8 @@ macro_rules! impl_checked_sub_mul_unsigned {
 apply_to_unsigneds!(impl_checked_sub_mul_unsigned);
 
 fn checked_sub_mul_signed<
-    U: CheckedMul<U, Output = U> + CheckedSub<U, Output = U> + Copy + WrappingSub<U, Output = U>,
-    T: CheckedMul<T, Output = T>
-        + CheckedSub<T, Output = T>
-        + Copy
-        + Eq
-        + Ord
-        + UnsignedAbs<Output = U>
-        + WrappingFrom<U>
-        + Zero,
+    U: PrimitiveUnsigned,
+    T: PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
 >(
     x: T,
     y: T,

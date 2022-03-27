@@ -101,7 +101,7 @@ fn benchmark_wrapping_square_assign_unsigned<T: PrimitiveUnsigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.wrapping_square_assign()", T::NAME,),
+        &format!("{}.wrapping_square_assign()", T::NAME),
         BenchmarkType::Single,
         unsigned_gen::<T>().get(gm, &config),
         gm.name(),
@@ -119,7 +119,7 @@ fn benchmark_wrapping_square_assign_signed<T: PrimitiveSigned>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}.wrapping_square_assign()", T::NAME,),
+        &format!("{}.wrapping_square_assign()", T::NAME),
         BenchmarkType::Single,
         signed_gen::<T>().get(gm, &config),
         gm.name(),

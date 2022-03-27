@@ -42,27 +42,27 @@ fn demo_natural_mod_square(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
         let n_old = n.clone();
         let m_old = m.clone();
-        println!("{}.square() === {} mod {}", n_old, n.mod_square(m), m_old);
+        println!("{}.square() ≡ {} mod {}", n_old, n.mod_square(m), m_old);
     }
 }
 
 fn demo_natural_mod_square_val_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
         let n_old = n.clone();
-        println!("{}.square() === {} mod &{}", n_old, n.mod_square(&m), m);
+        println!("{}.square() ≡ {} mod &{}", n_old, n.mod_square(&m), m);
     }
 }
 
 fn demo_natural_mod_square_ref_val(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
         let m_old = m.clone();
-        println!("(&{}).square() === {} mod {}", n, (&n).mod_square(m), m_old);
+        println!("(&{}).square() ≡ {} mod {}", n, (&n).mod_square(m), m_old);
     }
 }
 
 fn demo_natural_mod_square_ref_ref(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, m) in natural_pair_gen_var_8().get(gm, &config).take(limit) {
-        println!("(&{}).square() === {} mod &{}", n, (&n).mod_square(&m), m);
+        println!("(&{}).square() ≡ {} mod &{}", n, (&n).mod_square(&m), m);
     }
 }
 

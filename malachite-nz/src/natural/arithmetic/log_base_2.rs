@@ -20,14 +20,6 @@ use platform::Limb;
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::log_base_2::limbs_floor_log_base_2;
-///
-/// assert_eq!(limbs_floor_log_base_2(&[0b11]), 1);
-/// assert_eq!(limbs_floor_log_base_2(&[0, 0b1101]), 35);
-/// ```
 #[doc(hidden)]
 #[inline]
 pub fn limbs_floor_log_base_2(xs: &[Limb]) -> u64 {
@@ -50,14 +42,6 @@ pub fn limbs_floor_log_base_2(xs: &[Limb]) -> u64 {
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::log_base_2::limbs_ceiling_log_base_2;
-///
-/// assert_eq!(limbs_ceiling_log_base_2(&[0b11]), 2);
-/// assert_eq!(limbs_ceiling_log_base_2(&[0, 0b1101]), 36);
-/// ```
 #[doc(hidden)]
 pub fn limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
     let floor_log_base_2 = limbs_floor_log_base_2(xs);
@@ -90,16 +74,6 @@ pub fn limbs_ceiling_log_base_2(xs: &[Limb]) -> u64 {
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::log_base_2::limbs_checked_log_base_2;
-///
-/// assert_eq!(limbs_checked_log_base_2(&[0b11]), None);
-/// assert_eq!(limbs_checked_log_base_2(&[0b10]), Some(1));
-/// assert_eq!(limbs_checked_log_base_2(&[0, 0b1101]), None);
-/// assert_eq!(limbs_checked_log_base_2(&[0, 0b1000]), Some(35));
-/// ```
 #[doc(hidden)]
 pub fn limbs_checked_log_base_2(xs: &[Limb]) -> Option<u64> {
     let (xs_last, xs_init) = xs.split_last().unwrap();
@@ -183,8 +157,8 @@ impl<'a> CeilingLogBase2 for &'a Natural {
 impl<'a> CheckedLogBase2 for &'a Natural {
     type Output = u64;
 
-    /// Returns the base-2 logarithm of a positive `Natural`. If the integer is not a power of 2,
-    /// `None` is returned.
+    /// Returns the base-2 logarithm of a positive `Natural`. If the `Natural` is not a power of 2,
+    /// then `None` is returned.
     ///
     /// $$
     /// f(x) = \\begin{cases}

@@ -2,7 +2,7 @@
 #[derive(Clone, Eq, Hash, PartialEq)]
 pub struct BaseFmtWrapper<T> {
     pub(crate) x: T,
-    pub(crate) base: u64,
+    pub(crate) base: u8,
 }
 
 impl<T> BaseFmtWrapper<T> {
@@ -30,7 +30,7 @@ impl<T> BaseFmtWrapper<T> {
     /// assert_eq!(format!("{}", x), "-gjdgxs");
     /// assert_eq!(format!("{:#}", x), "-GJDGXS");
     /// ```
-    pub fn new(x: T, base: u64) -> Self {
+    pub fn new(x: T, base: u8) -> Self {
         assert!((2..=36).contains(&base), "base out of range");
         BaseFmtWrapper { x, base }
     }
@@ -56,5 +56,7 @@ impl<T> BaseFmtWrapper<T> {
     }
 }
 
+pub mod from_sci_string;
 pub mod from_string;
+pub mod to_sci;
 pub mod to_string;

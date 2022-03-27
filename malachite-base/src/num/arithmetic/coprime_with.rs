@@ -1,31 +1,20 @@
-use num::arithmetic::traits::{CoprimeWith, DivisibleBy, Gcd, Parity};
-use num::basic::traits::{One, Zero};
-use std::ops::Rem;
+use num::arithmetic::traits::CoprimeWith;
+use num::basic::unsigneds::PrimitiveUnsigned;
 
 #[doc(hidden)]
-pub fn coprime_with_check_2<T: Copy + Eq + Gcd<T, Output = T> + One + Parity>(x: T, y: T) -> bool {
+pub fn coprime_with_check_2<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == T::ONE
 }
 
 #[doc(hidden)]
-pub fn coprime_with_check_2_3<
-    T: Copy + DivisibleBy<T> + Eq + From<u8> + Gcd<T, Output = T> + One + Parity,
->(
-    x: T,
-    y: T,
-) -> bool {
+pub fn coprime_with_check_2_3<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
     (x.odd() || y.odd())
         && (!x.divisible_by(T::from(3u8)) || !y.divisible_by(T::from(3u8)))
         && x.gcd(y) == T::ONE
 }
 
 #[doc(hidden)]
-pub fn coprime_with_check_2_3_5<
-    T: Copy + Eq + From<u8> + Gcd<T, Output = T> + One + Parity + Rem<T, Output = T> + Zero,
->(
-    x: T,
-    y: T,
-) -> bool {
+pub fn coprime_with_check_2_3_5<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
     if x.even() && y.even() {
         false
     } else {

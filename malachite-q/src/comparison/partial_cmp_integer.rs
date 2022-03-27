@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::traits::One;
+use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
@@ -55,20 +56,14 @@ impl PartialOrd<Integer> for Rational {
                 return Some(if self.sign { nd_cmp } else { nd_cmp.reverse() });
             }
         }
-        let first_prod_bits = self.numerator.significant_bits();
-        let second_prod_bits = self.denominator.significant_bits() + other.significant_bits();
-        let bit_cmp = if first_prod_bits < second_prod_bits - 1 {
-            Some(Ordering::Less)
-        } else if first_prod_bits > second_prod_bits {
-            Some(Ordering::Greater)
-        } else {
-            None
-        };
-        if let Some(bit_cmp) = bit_cmp {
+        let log_cmp = self
+            .floor_log_base_2_of_abs()
+            .cmp(&i64::exact_from(other.significant_bits() - 1));
+        if log_cmp != Ordering::Equal {
             return Some(if self.sign {
-                bit_cmp
+                log_cmp
             } else {
-                bit_cmp.reverse()
+                log_cmp.reverse()
             });
         }
         // Finally, cross-multiply.

@@ -23,7 +23,7 @@ use natural::Natural;
 
 /// Generates random `Integer`s, given an iterator of random signed bit lengths.
 ///
-/// The `Integer`s sign is taken from the sign of the bit length.
+/// The `Integer`'s sign is taken from the sign of the bit length.
 #[derive(Clone, Debug)]
 pub struct RandomIntegers<I: Iterator<Item = i64>> {
     bits: I,

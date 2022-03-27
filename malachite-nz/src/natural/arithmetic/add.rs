@@ -15,15 +15,6 @@ use std::ops::{Add, AddAssign};
 ///
 /// where n = `limbs.len()`
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_add_limb;
-///
-/// assert_eq!(limbs_add_limb(&[123, 456], 789), &[912, 456]);
-/// assert_eq!(limbs_add_limb(&[u32::MAX, 5], 2), &[1, 6]);
-/// assert_eq!(limbs_add_limb(&[u32::MAX], 2), &[1, 1]);
-/// ```
-///
 /// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is returned.
 #[doc(hidden)]
 pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
@@ -59,27 +50,14 @@ pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
 /// # Panics
 /// Panics if `out` is shorter than `xs`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_add_limb_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_add_limb_to_out(&mut out, &[123, 456], 789), false);
-/// assert_eq!(out, &[912, 456, 0]);
-///
-/// let mut out = vec![0, 0, 0];
-/// assert_eq!(limbs_add_limb_to_out(&mut out, &[u32::MAX], 2), true);
-/// assert_eq!(out, &[1, 0, 0]);
-/// ```
-///
 /// This is mpn_add_1 from gmp.h, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
-        let (sum, overflow) = xs[i].overflowing_add(y);
-        out[i] = sum;
+        let overflow;
+        (out[i], overflow) = xs[i].overflowing_add(y);
         if overflow {
             y = 1;
         } else {
@@ -101,19 +79,6 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_slice_add_limb_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut xs, 789), false);
-/// assert_eq!(xs, &[912, 456]);
-///
-/// let mut xs = vec![u32::MAX];
-/// assert_eq!(limbs_slice_add_limb_in_place::<u32>(&mut xs, 2), true);
-/// assert_eq!(xs, &[1]);
-/// ```
 ///
 /// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
 #[doc(hidden)]
@@ -140,19 +105,6 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: 
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_vec_add_limb_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_add_limb_in_place(&mut xs, 789);
-/// assert_eq!(xs, &[912, 456]);
-///
-/// let mut xs = vec![u32::MAX];
-/// limbs_vec_add_limb_in_place(&mut xs, 2);
-/// assert_eq!(xs, &[1, 1]);
-/// ```
-///
 /// This is mpz_add_ui from mpz/aors_ui.h, GMP 6.2.1, where the input is non-negative.
 #[doc(hidden)]
 pub fn limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
@@ -163,9 +115,9 @@ pub fn limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
 }
 
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
-    let (mut sum, overflow) = x.overflowing_add(y);
     let c = *carry;
-    *carry = overflow;
+    let mut sum;
+    (sum, *carry) = x.overflowing_add(y);
     if c {
         *carry |= sum.overflowing_add_assign(1);
     }
@@ -184,14 +136,6 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_add_greater;
-///
-/// assert_eq!(limbs_add_greater(&[1, 2, 3], &[6, 7]), &[7, 9, 3]);
-/// assert_eq!(limbs_add_greater(&[100, 101, u32::MAX], &[102, 101, 2]), &[202, 202, 1, 1]);
-/// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
 /// and the output is returned.
@@ -230,14 +174,6 @@ pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_add;
-///
-/// assert_eq!(limbs_add(&[6, 7], &[1, 2, 3]), &[7, 9, 3]);
-/// assert_eq!(limbs_add(&[100, 101, u32::MAX], &[102, 101, 2]), &[202, 202, 1, 1]);
-/// ```
-///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the output is returned.
 #[doc(hidden)]
 pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
@@ -261,19 +197,6 @@ pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_add_same_length_to_out;
-///
-/// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_same_length_to_out(out, &[6, 7], &[1, 2]), false);
-/// assert_eq!(out, &[7, 9, 10, 10]);
-///
-/// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_same_length_to_out(out, &[100, 101, u32::MAX], &[102, 101, 2]), true);
-/// assert_eq!(out, &[202, 202, 1, 10]);
-/// ```
 ///
 /// This is mpn_add_n from gmp.h, GMP 6.2.1.
 #[doc(hidden)]
@@ -301,19 +224,6 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys` or if `out` is too short.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_add_greater_to_out;
-///
-/// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_greater_to_out(out, &[1, 2, 3], &[6, 7]), false);
-/// assert_eq!(out, &[7, 9, 3, 10]);
-///
-/// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_greater_to_out(out, &[100, 101, u32::MAX], &[102, 101, 2]), true);
-/// assert_eq!(out, &[202, 202, 1, 10]);
-/// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second.
 #[doc(hidden)]
@@ -346,19 +256,6 @@ pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
 ///
 /// # Panics
 /// Panics if `out` is too short.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_add_to_out;
-///
-/// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_to_out(out, &[6, 7], &[1, 2, 3]), false);
-/// assert_eq!(out, &[7, 9, 3, 10]);
-///
-/// let out = &mut [10, 10, 10, 10];
-/// assert_eq!(limbs_add_to_out(out, &[100, 101, u32::MAX], &[102, 101, 2]), true);
-/// assert_eq!(out, &[202, 202, 1, 10]);
-/// ```
 ///
 /// This is mpn_add from gmp.h, GMP 6.2.1.
 #[doc(hidden)]
@@ -414,19 +311,6 @@ pub fn limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[Limb]) -> 
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_slice_add_same_length_in_place_left;
-///
-/// let xs = &mut [6, 7];
-/// assert_eq!(limbs_slice_add_same_length_in_place_left(xs, &[1, 2]), false);
-/// assert_eq!(xs, &[7, 9]);
-///
-/// let xs = &mut [100, 101, u32::MAX];
-/// assert_eq!(limbs_slice_add_same_length_in_place_left(xs, &[102, 101, 2]), true);
-/// assert_eq!(xs, &[202, 202, 1]);
-/// ```
-///
 /// This is mpn_add_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
 #[doc(hidden)]
 pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
@@ -453,19 +337,6 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_slice_add_greater_in_place_left;
-///
-/// let xs = &mut [6, 7, 8];
-/// assert_eq!(limbs_slice_add_greater_in_place_left(xs, &[1, 2]), false);
-/// assert_eq!(xs, &[7, 9, 8]);
-///
-/// let xs = &mut [100, 101, u32::MAX];
-/// assert_eq!(limbs_slice_add_greater_in_place_left(xs, &[102, 101, 2]), true);
-/// assert_eq!(xs, &[202, 202, 1]);
-/// ```
-///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
 /// and the output is written to the first input.
 #[doc(hidden)]
@@ -491,19 +362,6 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
 /// Additional memory: worst case O(m)
 ///
 /// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_vec_add_in_place_left;
-///
-/// let mut xs = vec![6, 7];
-/// limbs_vec_add_in_place_left(&mut xs, &[1, 2]);
-/// assert_eq!(xs, &[7, 9]);
-///
-/// let mut xs = vec![100, 101, u32::MAX];
-/// limbs_vec_add_in_place_left(&mut xs, &[102, 101, 2]);
-/// assert_eq!(xs, &[202, 202, 1, 1]);
-/// ```
 ///
 /// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
 /// written to the first input.
@@ -543,29 +401,6 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// where n = max(`xs.len`, `ys.len()`)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_slice_add_in_place_either;
-///
-/// let mut xs = vec![6, 7];
-/// let mut ys = vec![1, 2, 3];
-/// assert_eq!(limbs_slice_add_in_place_either(&mut xs, &mut ys), (true, false));
-/// assert_eq!(xs, &[6, 7]);
-/// assert_eq!(ys, &[7, 9, 3]);
-///
-/// let mut xs = vec![1, 2, 3];
-/// let mut ys = vec![6, 7];
-/// assert_eq!(limbs_slice_add_in_place_either(&mut xs, &mut ys), (false, false));
-/// assert_eq!(xs, &[7, 9, 3]);
-/// assert_eq!(ys, &[6, 7]);
-///
-/// let mut xs = vec![100, 101, u32::MAX];
-/// let mut ys = vec![102, 101, 2];
-/// assert_eq!(limbs_slice_add_in_place_either(&mut xs, &mut ys), (false, true));
-/// assert_eq!(xs, &[202, 202, 1]);
-/// assert_eq!(ys, &[102, 101, 2]);
-/// ```
-///
 /// This is mpn_add from gmp.h, GMP 6.2.1, where the output is written to the longer input.
 #[doc(hidden)]
 pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> (bool, bool) {
@@ -586,29 +421,6 @@ pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(`xs.len`, `ys.len()`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add::limbs_vec_add_in_place_either;
-///
-/// let mut xs = vec![6, 7];
-/// let mut ys = vec![1, 2, 3];
-/// assert_eq!(limbs_vec_add_in_place_either(&mut xs, &mut ys), true);
-/// assert_eq!(xs, &[6, 7]);
-/// assert_eq!(ys, &[7, 9, 3]);
-///
-/// let mut xs = vec![1, 2, 3];
-/// let mut ys = vec![6, 7];
-/// assert_eq!(limbs_vec_add_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, &[7, 9, 3]);
-/// assert_eq!(ys, &[6, 7]);
-///
-/// let mut xs = vec![100, 101, u32::MAX];
-/// let mut ys = vec![102, 101, 2];
-/// assert_eq!(limbs_vec_add_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, &[202, 202, 1, 1]);
-/// assert_eq!(ys, &[102, 101, 2]);
-/// ```
 ///
 /// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
 /// written to the longer input.

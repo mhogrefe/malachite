@@ -162,6 +162,7 @@ pub mod iterators {
     pub mod iterator_cache;
     pub mod matching_intervals_in_iterator;
     pub mod nonzero_values;
+    pub mod prefix_to_string;
     pub mod with_special_value;
     pub mod with_special_values;
 }
@@ -315,7 +316,13 @@ pub mod num {
             pub mod vec_from_other_type_slice;
         }
         pub mod string {
+            pub mod from_sci_string;
             pub mod from_string;
+            pub mod options {
+                pub mod from_sci_string_options;
+                pub mod to_sci_options;
+            }
+            pub mod to_sci;
             pub mod to_string;
         }
     }

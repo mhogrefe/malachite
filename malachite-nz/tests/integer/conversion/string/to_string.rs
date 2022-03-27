@@ -760,7 +760,7 @@ fn to_hex_string_properties() {
 
 #[test]
 pub fn test_to_string_base() {
-    fn test(u: &str, base: u64, out: &str) {
+    fn test(u: &str, base: u8, out: &str) {
         let x = Integer::from_str(u).unwrap();
         assert_eq!(x.to_string_base(base), out);
         assert_eq!(format!("{}", BaseFmtWrapper::new(&x, base)), out);
@@ -822,7 +822,7 @@ pub fn test_to_string_base() {
     test("-1000000000000000", 20, "-4hd2a0000000");
     test("-1000000000000000", 36, "-9ugxnorjls");
 
-    fn test_width(u: &str, base: u64, width: usize, out: &str) {
+    fn test_width(u: &str, base: u8, width: usize, out: &str) {
         let x = Integer::from_str(u).unwrap();
         let s = x.to_string_base(base);
         assert_eq!(
@@ -944,7 +944,7 @@ fn to_string_base_properties() {
         );
     });
 
-    unsigned_pair_gen_var_9::<usize, u64>().test_properties(|(width, base)| {
+    unsigned_pair_gen_var_9::<usize, u8>().test_properties(|(width, base)| {
         let s = format!(
             "{:0width$}",
             BaseFmtWrapper::new(&Integer::ZERO, base),
@@ -953,7 +953,7 @@ fn to_string_base_properties() {
         assert_eq!(repeat_n('0', max(1, width)).collect::<String>(), s);
     });
 
-    signed_unsigned_unsigned_triple_gen_var_3::<SignedLimb, u64, usize>().test_properties(
+    signed_unsigned_unsigned_triple_gen_var_3::<SignedLimb, u8, usize>().test_properties(
         |(x, base, width)| {
             assert_eq!(
                 format!(
@@ -973,7 +973,7 @@ fn to_string_base_properties() {
 
 #[test]
 pub fn test_to_string_base_upper() {
-    fn test(u: &str, base: u64, out: &str) {
+    fn test(u: &str, base: u8, out: &str) {
         let x = Integer::from_str(u).unwrap();
         assert_eq!(x.to_string_base_upper(base), out);
         assert_eq!(format!("{:#}", BaseFmtWrapper::new(&x, base)), out);
@@ -1035,7 +1035,7 @@ pub fn test_to_string_base_upper() {
     test("-1000000000000000", 20, "-4HD2A0000000");
     test("-1000000000000000", 36, "-9UGXNORJLS");
 
-    fn test_width(u: &str, base: u64, width: usize, out: &str) {
+    fn test_width(u: &str, base: u8, width: usize, out: &str) {
         let x = Integer::from_str(u).unwrap();
         let s = x.to_string_base_upper(base);
         assert_eq!(
@@ -1159,7 +1159,7 @@ fn to_string_base_upper_properties() {
         );
     });
 
-    unsigned_pair_gen_var_9::<usize, u64>().test_properties(|(width, base)| {
+    unsigned_pair_gen_var_9::<usize, u8>().test_properties(|(width, base)| {
         let s = format!(
             "{:#0width$}",
             BaseFmtWrapper::new(&Integer::ZERO, base),
@@ -1168,7 +1168,7 @@ fn to_string_base_upper_properties() {
         assert_eq!(repeat_n('0', max(1, width)).collect::<String>(), s);
     });
 
-    signed_unsigned_unsigned_triple_gen_var_3::<SignedLimb, u64, usize>().test_properties(
+    signed_unsigned_unsigned_triple_gen_var_3::<SignedLimb, u8, usize>().test_properties(
         |(x, base, width)| {
             assert_eq!(
                 format!(

@@ -1,0 +1,222 @@
+use malachite_base::num::arithmetic::traits::{
+    Parity, Pow, PowAssign, Reciprocal, ReciprocalAssign,
+};
+use Rational;
+
+impl Pow<u64> for Rational {
+    type Output = Rational;
+
+    /// Squares a `Rational`, taking it by value.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_q;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::from_signeds(22, 7).pow(3u64).to_string(), "10648/343");
+    /// assert_eq!(Rational::from_signeds(-22, 7).pow(3u64).to_string(), "-10648/343");
+    /// assert_eq!(Rational::from_signeds(-22, 7).pow(4u64).to_string(), "234256/2401");
+    /// ```
+    #[inline]
+    fn pow(mut self, exp: u64) -> Rational {
+        self.pow_assign(exp);
+        self
+    }
+}
+
+impl<'a> Pow<u64> for &'a Rational {
+    type Output = Rational;
+
+    /// Squares a `Rational`, taking it by reference.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_q;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!((&Rational::from_signeds(22, 7)).pow(3u64).to_string(), "10648/343");
+    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(3u64).to_string(), "-10648/343");
+    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(4u64).to_string(), "234256/2401");
+    /// ```
+    #[inline]
+    fn pow(self, exp: u64) -> Rational {
+        Rational {
+            sign: self.sign || exp.even(),
+            numerator: (&self.numerator).pow(exp),
+            denominator: (&self.denominator).pow(exp),
+        }
+    }
+}
+
+impl PowAssign<u64> for Rational {
+    /// Squares a `Rational` in place.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_q;
+    ///
+    /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Rational::from_signeds(22, 7);
+    /// x.pow_assign(3u64);
+    /// assert_eq!(x.to_string(), "10648/343");
+    ///
+    /// let mut x = Rational::from_signeds(-22, 7);
+    /// x.pow_assign(3u64);
+    /// assert_eq!(x.to_string(), "-10648/343");
+    ///
+    /// let mut x = Rational::from_signeds(22, 7);
+    /// x.pow_assign(4u64);
+    /// assert_eq!(x.to_string(), "234256/2401");
+    /// ```
+    fn pow_assign(&mut self, exp: u64) {
+        self.sign |= exp.even();
+        self.numerator.pow_assign(exp);
+        self.denominator.pow_assign(exp);
+    }
+}
+
+impl Pow<i64> for Rational {
+    type Output = Rational;
+
+    /// Squares a `Rational`, taking it by value.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `self` is zero and `exp` is negative.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_q;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!(Rational::from_signeds(22, 7).pow(3i64).to_string(), "10648/343");
+    /// assert_eq!(Rational::from_signeds(-22, 7).pow(3i64).to_string(), "-10648/343");
+    /// assert_eq!(Rational::from_signeds(-22, 7).pow(4i64).to_string(), "234256/2401");
+    /// assert_eq!(Rational::from_signeds(22, 7).pow(-3i64).to_string(), "343/10648");
+    /// assert_eq!(Rational::from_signeds(-22, 7).pow(-3i64).to_string(), "-343/10648");
+    /// assert_eq!(Rational::from_signeds(-22, 7).pow(-4i64).to_string(), "2401/234256");
+    /// ```
+    #[inline]
+    fn pow(mut self, exp: i64) -> Rational {
+        self.pow_assign(exp);
+        self
+    }
+}
+
+impl<'a> Pow<i64> for &'a Rational {
+    type Output = Rational;
+
+    /// Squares a `Rational`, taking it by reference.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `self` is zero and `exp` is negative.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_q;
+    ///
+    /// use malachite_base::num::arithmetic::traits::Pow;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// assert_eq!((&Rational::from_signeds(22, 7)).pow(3i64).to_string(), "10648/343");
+    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(3i64).to_string(), "-10648/343");
+    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(4i64).to_string(), "234256/2401");
+    /// assert_eq!((&Rational::from_signeds(22, 7)).pow(-3i64).to_string(), "343/10648");
+    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(-3i64).to_string(), "-343/10648");
+    /// assert_eq!((&Rational::from_signeds(-22, 7)).pow(-4i64).to_string(), "2401/234256");
+    /// ```
+    #[inline]
+    fn pow(self, exp: i64) -> Rational {
+        let abs_exp = exp.unsigned_abs();
+        if exp >= 0 {
+            self.pow(abs_exp)
+        } else {
+            self.pow(abs_exp).reciprocal()
+        }
+    }
+}
+
+impl PowAssign<i64> for Rational {
+    /// Squares a `Rational` in place.
+    ///
+    /// # Worst-case complexity
+    /// TODO
+    ///
+    /// # Panics
+    /// Panics if `self` is zero and `exp` is negative.
+    ///
+    /// # Examples
+    /// ```
+    /// extern crate malachite_base;
+    /// extern crate malachite_q;
+    ///
+    /// use malachite_base::num::arithmetic::traits::PowAssign;
+    /// use malachite_base::num::basic::traits::Zero;
+    /// use malachite_q::Rational;
+    ///
+    /// let mut x = Rational::from_signeds(22, 7);
+    /// x.pow_assign(3i64);
+    /// assert_eq!(x.to_string(), "10648/343");
+    ///
+    /// let mut x = Rational::from_signeds(-22, 7);
+    /// x.pow_assign(3i64);
+    /// assert_eq!(x.to_string(), "-10648/343");
+    ///
+    /// let mut x = Rational::from_signeds(22, 7);
+    /// x.pow_assign(4i64);
+    /// assert_eq!(x.to_string(), "234256/2401");
+    ///
+    /// let mut x = Rational::from_signeds(22, 7);
+    /// x.pow_assign(-3i64);
+    /// assert_eq!(x.to_string(), "343/10648");
+    ///
+    /// let mut x = Rational::from_signeds(-22, 7);
+    /// x.pow_assign(-3i64);
+    /// assert_eq!(x.to_string(), "-343/10648");
+    ///
+    /// let mut x = Rational::from_signeds(22, 7);
+    /// x.pow_assign(-4i64);
+    /// assert_eq!(x.to_string(), "2401/234256");
+    /// ```
+    fn pow_assign(&mut self, exp: i64) {
+        let abs_exp = exp.unsigned_abs();
+        if exp >= 0 {
+            self.pow_assign(abs_exp);
+        } else {
+            self.pow_assign(abs_exp);
+            self.reciprocal_assign();
+        }
+    }
+}

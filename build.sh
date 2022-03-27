@@ -27,43 +27,43 @@ python3 additional-lints.py &&
 cd malachite-base &&
 cargo update &&
 cargo +nightly fmt --all &&
-cargo clippy --tests &&
+# cargo clippy --tests &&
 cargo test --release &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps &&
 cargo build --release --target wasm32-unknown-unknown &&
 cd ../malachite-base-test-util &&
 cargo update &&
 cargo +nightly fmt --all &&
-cargo clippy &&
+# cargo clippy &&
 cd ../malachite-nz &&
 cargo update &&
 cargo +nightly fmt --all &&
-cargo clippy --tests --features 32_bit_limbs --features serde &&
+# cargo clippy --tests --features 32_bit_limbs --features serde &&
 cargo test --release --features 32_bit_limbs --features fail_on_untested_path --features serde &&
-cargo test --release --test lib --features fail_on_untested_path --features serde && # Skip doctests when in 64-bit mode
+cargo test --release --features fail_on_untested_path --features serde &&
 python3 extra-tests.py &&
-cargo clippy --tests --features serde &&
+# cargo clippy --tests --features serde &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps &&
 cargo build --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
 cargo build --release --target wasm32-unknown-unknown &&
 cd ../malachite-nz-test-util &&
 cargo update &&
 cargo +nightly fmt --all &&
-cargo clippy &&
+# cargo clippy &&
 cd ../malachite-q &&
 cargo update &&
 cargo +nightly fmt --all &&
-cargo clippy --tests --features 32_bit_limbs --features serde &&
+# cargo clippy --tests --features 32_bit_limbs --features serde &&
 cargo test --release --features 32_bit_limbs --features fail_on_untested_path --features serde &&
 cargo test --release --features fail_on_untested_path --features serde &&
-cargo clippy --tests --features serde &&
+# cargo clippy --tests --features serde &&
 RUSTDOCFLAGS="--html-in-header katex-header.html" cargo doc --no-deps &&
 cargo build --release --features 32_bit_limbs --target wasm32-unknown-unknown &&
 cargo build --release --target wasm32-unknown-unknown &&
 cd ../malachite-q-test-util &&
 cargo update &&
 cargo +nightly fmt --all &&
-cargo clippy &&
+# cargo clippy &&
 cd ../malachite-bench &&
 cargo update &&
 cargo +nightly fmt --all &&

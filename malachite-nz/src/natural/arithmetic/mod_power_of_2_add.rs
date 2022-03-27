@@ -22,15 +22,6 @@ use platform::Limb;
 /// Additional memory: worst case O(n)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_add::limbs_mod_power_of_2_add_limb;
-///
-/// assert_eq!(limbs_mod_power_of_2_add_limb(&[123, 456], 789, 41), &[912, 456]);
-/// assert_eq!(limbs_mod_power_of_2_add_limb(&[u32::MAX, 3], 2, 34), &[1, 0]);
-/// assert_eq!(limbs_mod_power_of_2_add_limb(&[u32::MAX, 3], 2, 35), &[1, 4]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
@@ -53,23 +44,6 @@ pub fn limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_add::*;
-///
-/// let mut xs = vec![123, 456];
-/// assert_eq!(limbs_slice_mod_power_of_2_add_limb_in_place(&mut xs, 789, 41), false);
-/// assert_eq!(xs, &[912, 456]);
-///
-/// let mut xs = vec![u32::MAX];
-/// assert_eq!(limbs_slice_mod_power_of_2_add_limb_in_place(&mut xs, 2, 33), true);
-/// assert_eq!(xs, &[1]);
-///
-/// let mut xs = vec![u32::MAX];
-/// assert_eq!(limbs_slice_mod_power_of_2_add_limb_in_place(&mut xs, 2, 32), false);
-/// assert_eq!(xs, &[1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_slice_mod_power_of_2_add_limb_in_place(xs: &mut [Limb], y: Limb, pow: u64) -> bool {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
@@ -94,23 +68,6 @@ pub fn limbs_slice_mod_power_of_2_add_limb_in_place(xs: &mut [Limb], y: Limb, po
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_add::*;
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, 789, 41);
-/// assert_eq!(xs, &[912, 456]);
-///
-/// let mut xs = vec![u32::MAX];
-/// limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, 2, 33);
-/// assert_eq!(xs, &[1, 1]);
-///
-/// let mut xs = vec![u32::MAX];
-/// limbs_vec_mod_power_of_2_add_limb_in_place(&mut xs, 2, 32);
-/// assert_eq!(xs, &[1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, pow: u64) {
     assert!(!xs.is_empty());
@@ -132,21 +89,6 @@ pub fn limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, p
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_add::limbs_mod_power_of_2_add_greater;
-///
-/// assert_eq!(limbs_mod_power_of_2_add_greater(&[1, 2, 3], &[6, 7], 100), &[7, 9, 3]);
-/// assert_eq!(
-///     limbs_mod_power_of_2_add_greater(&[100, 101, u32::MAX], &[102, 101, 2], 97),
-///     &[202, 202, 1, 1]
-/// );
-/// assert_eq!(
-///     limbs_mod_power_of_2_add_greater(&[100, 101, u32::MAX], &[102, 101, 2], 96),
-///     &[202, 202, 1]
-/// );
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     let mut out = xs.to_vec();
@@ -165,21 +107,6 @@ pub fn limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> V
 /// Additional memory: worst case O(n)
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_add::limbs_mod_power_of_2_add;
-///
-/// assert_eq!(limbs_mod_power_of_2_add(&[6, 7], &[1, 2, 3], 100), &[7, 9, 3]);
-/// assert_eq!(
-///     limbs_mod_power_of_2_add(&[100, 101, u32::MAX], &[102, 101, 2], 97),
-///     &[202, 202, 1, 1]
-/// );
-/// assert_eq!(
-///     limbs_mod_power_of_2_add(&[100, 101, u32::MAX], &[102, 101, 2], 96),
-///     &[202, 202, 1]
-/// );
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     if xs.len() >= ys.len() {
@@ -203,29 +130,6 @@ pub fn limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb>
 ///
 /// # Panics
 /// Panics if `xs` is shorter than `ys`.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_add::*;
-///
-/// let xs = &mut [6, 7, 8];
-/// assert_eq!(limbs_slice_mod_power_of_2_add_greater_in_place_left(xs, &[1, 2], 68), false);
-/// assert_eq!(xs, &[7, 9, 8]);
-///
-/// let xs = &mut [100, 101, u32::MAX];
-/// assert_eq!(
-///     limbs_slice_mod_power_of_2_add_greater_in_place_left(xs, &[102, 101, 2], 97),
-///     true
-/// );
-/// assert_eq!(xs, &[202, 202, 1]);
-///
-/// let xs = &mut [100, 101, u32::MAX];
-/// assert_eq!(
-///     limbs_slice_mod_power_of_2_add_greater_in_place_left(xs, &[102, 101, 2], 96),
-///     false
-/// );
-/// assert_eq!(xs, &[202, 202, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_slice_mod_power_of_2_add_greater_in_place_left(
     xs: &mut [Limb],
@@ -251,23 +155,6 @@ pub fn limbs_slice_mod_power_of_2_add_greater_in_place_left(
 /// Additional memory: worst case O(m)
 ///
 /// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_add::*;
-///
-/// let mut xs = vec![6, 7, 8];
-/// limbs_vec_mod_power_of_2_add_in_place_left(&mut xs, &[1, 2], 68);
-/// assert_eq!(xs, &[7, 9, 8]);
-///
-/// let mut xs = vec![100, 101, u32::MAX];
-/// limbs_vec_mod_power_of_2_add_in_place_left(&mut xs, &[102, 101, 2], 97);
-/// assert_eq!(xs, &[202, 202, 1, 1]);
-///
-/// let mut xs = vec![100, 101, u32::MAX];
-/// limbs_vec_mod_power_of_2_add_in_place_left(&mut xs, &[102, 101, 2], 96);
-/// assert_eq!(xs, &[202, 202, 1]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let xs_len = xs.len();
@@ -304,35 +191,6 @@ pub fn limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb
 /// Additional memory: worst case O(1)
 ///
 /// where n = max(`xs.len`, `ys.len()`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_power_of_2_add::*;
-///
-/// let mut xs = vec![6, 7];
-/// let mut ys = vec![1, 2, 3];
-/// assert_eq!(limbs_mod_power_of_2_add_in_place_either(&mut xs, &mut ys, 67), true);
-/// assert_eq!(xs, &[6, 7]);
-/// assert_eq!(ys, &[7, 9, 3]);
-///
-/// let mut xs = vec![1, 2, 3];
-/// let mut ys = vec![6, 7];
-/// assert_eq!(limbs_mod_power_of_2_add_in_place_either(&mut xs, &mut ys, 67), false);
-/// assert_eq!(xs, &[7, 9, 3]);
-/// assert_eq!(ys, &[6, 7]);
-///
-/// let mut xs = vec![100, 101, u32::MAX];
-/// let mut ys = vec![102, 101, 2];
-/// assert_eq!(limbs_mod_power_of_2_add_in_place_either(&mut xs, &mut ys, 97), false);
-/// assert_eq!(xs, &[202, 202, 1, 1]);
-/// assert_eq!(ys, &[102, 101, 2]);
-///
-/// let mut xs = vec![100, 101, u32::MAX];
-/// let mut ys = vec![102, 101, 2];
-/// assert_eq!(limbs_mod_power_of_2_add_in_place_either(&mut xs, &mut ys, 96), false);
-/// assert_eq!(xs, &[202, 202, 1]);
-/// assert_eq!(ys, &[102, 101, 2]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_mod_power_of_2_add_in_place_either(
     xs: &mut Vec<Limb>,

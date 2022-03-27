@@ -284,10 +284,7 @@ fn benchmark_natural_square_algorithms(
         limit,
         file_name,
         &natural_bit_bucketer("n"),
-        &mut [
-            ("standard", &mut (|n| no_out!(n.square()))),
-            ("using *", &mut (|n| no_out!(&n * &n))),
-        ],
+        &mut [("standard", &mut |n| no_out!(n.square())), ("using *", &mut |n| no_out!(&n * &n))],
     );
 }
 

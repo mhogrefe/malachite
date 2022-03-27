@@ -740,7 +740,7 @@ pub(crate) fn limbs_mul_toom_interpolate_8_points(
         assert!(!limbs_sub_limb_in_place(&mut r5_lo[n + 1..], 1));
     }
     // Mr5-Mr3,Hr5-Hr3
-    assert!(!limbs_sub_same_length_in_place_left(&mut r5_lo[n..], r3,));
+    assert!(!limbs_sub_same_length_in_place_left(&mut r5_lo[n..], r3));
     let r5_3n = r5[3 * n];
     let (r3_lo, r3) = r3.split_at_mut(n);
     if limbs_add_limb_to_out(&mut r5[3 * n..], r3_lo, r5_3n) {

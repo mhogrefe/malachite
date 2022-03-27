@@ -19,14 +19,6 @@ use platform::Limb;
 ///
 /// # Panics
 /// Panics if `xs` is empty or `pow` is 0.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::log_base_power_of_2::limbs_floor_log_base_power_of_2;
-///
-/// assert_eq!(limbs_floor_log_base_power_of_2(&[100], 2), 3);
-/// assert_eq!(limbs_floor_log_base_power_of_2(&[0, 1], 8), 4);
-/// ```
 #[doc(hidden)]
 pub fn limbs_floor_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
     assert_ne!(pow, 0);
@@ -49,14 +41,6 @@ pub fn limbs_floor_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
 ///
 /// # Panics
 /// Panics if `xs` is empty or `pow` is 0.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::log_base_power_of_2::limbs_ceiling_log_base_power_of_2;
-///
-/// assert_eq!(limbs_ceiling_log_base_power_of_2(&[100], 2), 4);
-/// assert_eq!(limbs_ceiling_log_base_power_of_2(&[0, 1], 8), 4);
-/// ```
 #[doc(hidden)]
 pub fn limbs_ceiling_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
     assert_ne!(pow, 0);
@@ -91,14 +75,6 @@ pub fn limbs_ceiling_log_base_power_of_2(xs: &[Limb], pow: u64) -> u64 {
 ///
 /// # Panics
 /// Panics if `xs` is empty or `pow` is 0.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::log_base_power_of_2::limbs_checked_log_base_power_of_2;
-///
-/// assert_eq!(limbs_checked_log_base_power_of_2(&[100], 2), None);
-/// assert_eq!(limbs_checked_log_base_power_of_2(&[0, 1], 8), Some(4));
-/// ```
 #[doc(hidden)]
 pub fn limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u64> {
     assert_ne!(pow, 0);
@@ -111,7 +87,7 @@ pub fn limbs_checked_log_base_power_of_2(xs: &[Limb], pow: u64) -> Option<u64> {
     }
 }
 
-impl<'a> FloorLogBasePowerOf2 for &'a Natural {
+impl<'a> FloorLogBasePowerOf2<u64> for &'a Natural {
     type Output = u64;
 
     /// Returns the floor of the base-$2^p$ logarithm of a positive `Natural`.
@@ -143,7 +119,7 @@ impl<'a> FloorLogBasePowerOf2 for &'a Natural {
     }
 }
 
-impl<'a> CeilingLogBasePowerOf2 for &'a Natural {
+impl<'a> CeilingLogBasePowerOf2<u64> for &'a Natural {
     type Output = u64;
 
     /// Returns the ceiling of the base-$2^p$ logarithm of a positive `Natural`.
@@ -179,11 +155,11 @@ impl<'a> CeilingLogBasePowerOf2 for &'a Natural {
     }
 }
 
-impl<'a> CheckedLogBasePowerOf2 for &'a Natural {
+impl<'a> CheckedLogBasePowerOf2<u64> for &'a Natural {
     type Output = u64;
 
-    /// Returns the base-$2^p$ logarithm of a positive `Natural`. If the integer is not a power of
-    /// $2^p$, `None` is returned.
+    /// Returns the base-$2^p$ logarithm of a positive `Natural`. If the `Natural` is not a power
+    /// of $2^p$, `None` is returned.
     ///
     /// $$
     /// f(x, p) = \\begin{cases}

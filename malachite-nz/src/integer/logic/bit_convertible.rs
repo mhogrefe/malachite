@@ -16,19 +16,6 @@ use platform::{Limb, SignedLimb};
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_convertible::bits_to_twos_complement_bits_non_negative;
-///
-/// let mut bits = vec![false, true, false];
-/// bits_to_twos_complement_bits_non_negative(&mut bits);
-/// assert_eq!(bits, &[false, true, false]);
-///
-/// let mut bits = vec![true, false, true];
-/// bits_to_twos_complement_bits_non_negative(&mut bits);
-/// assert_eq!(bits, &[true, false, true, false]);
-/// ```
 #[doc(hidden)]
 pub fn bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
     if !bits.is_empty() && *bits.last().unwrap() {
@@ -46,19 +33,6 @@ pub fn bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
 /// Additional memory: worst case O(1)
 ///
 /// where n = `bits.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_convertible::bits_slice_to_twos_complement_bits_negative;
-///
-/// let mut bits = &mut [true, false, true];
-/// assert!(!bits_slice_to_twos_complement_bits_negative(bits));
-/// assert_eq!(bits, &[true, true, false]);
-///
-/// let mut bits = &mut [false, false, false];
-/// assert!(bits_slice_to_twos_complement_bits_negative(bits));
-/// assert_eq!(bits, &[false, false, false]);
-/// ```
 #[doc(hidden)]
 pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
     let mut true_seen = false;
@@ -85,19 +59,6 @@ pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
 ///
 /// # Panics
 /// Panics if `bits` contains only `false`s.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_convertible::bits_vec_to_twos_complement_bits_negative;
-///
-/// let mut bits = vec![true, false, false];
-/// bits_vec_to_twos_complement_bits_negative(&mut bits);
-/// assert_eq!(bits, &[true, true, true]);
-///
-/// let mut bits = vec![true, false, true];
-/// bits_vec_to_twos_complement_bits_negative(&mut bits);
-/// assert_eq!(bits, &[true, true, false, true]);
-/// ```
 #[doc(hidden)]
 pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
     assert!(!bits_slice_to_twos_complement_bits_negative(bits));

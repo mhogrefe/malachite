@@ -1,5 +1,6 @@
 use malachite_base::num::arithmetic::traits::{
-    CeilingRoot, CeilingRootAssign, CheckedRoot, FloorRoot, FloorRootAssign, Parity, Pow,
+    CeilingRoot, CeilingRootAssign, CeilingSqrt, CheckedRoot, CheckedSqrt, FloorRoot,
+    FloorRootAssign, FloorSqrt, Parity, Pow,
 };
 use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::num::conversion::traits::ExactFrom;
@@ -10,7 +11,8 @@ use malachite_nz_test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
 use malachite_nz_test_util::generators::{
-    integer_gen, integer_unsigned_pair_gen_var_3, natural_gen, natural_unsigned_pair_gen_var_7,
+    integer_gen, integer_gen_var_4, integer_unsigned_pair_gen_var_3, natural_gen,
+    natural_unsigned_pair_gen_var_7,
 };
 use std::panic::catch_unwind;
 use std::str::FromStr;
@@ -83,6 +85,39 @@ fn floor_root_fail() {
 }
 
 #[test]
+fn floor_root_ref_fail() {
+    assert_panic!((&Integer::ONE).floor_root(0));
+    assert_panic!((&Integer::NEGATIVE_ONE).floor_root(0));
+    assert_panic!((&Integer::NEGATIVE_ONE).floor_root(2));
+    assert_panic!((&Integer::NEGATIVE_ONE).floor_root(4));
+    assert_panic!((&Integer::NEGATIVE_ONE).floor_root(100));
+}
+
+#[test]
+fn floor_root_assign_fail() {
+    assert_panic!({
+        let mut x = Integer::ONE;
+        x.floor_root_assign(0)
+    });
+    assert_panic!({
+        let mut x = Integer::NEGATIVE_ONE;
+        x.floor_root_assign(0)
+    });
+    assert_panic!({
+        let mut x = Integer::NEGATIVE_ONE;
+        x.floor_root_assign(2)
+    });
+    assert_panic!({
+        let mut x = Integer::NEGATIVE_ONE;
+        x.floor_root_assign(4)
+    });
+    assert_panic!({
+        let mut x = Integer::NEGATIVE_ONE;
+        x.floor_root_assign(100)
+    });
+}
+
+#[test]
 fn test_ceiling_root() {
     let test = |s, exp, out| {
         let n = Integer::from_str(s).unwrap();
@@ -146,6 +181,39 @@ fn ceiling_root_fail() {
     assert_panic!(Integer::NEGATIVE_ONE.ceiling_root(2));
     assert_panic!(Integer::NEGATIVE_ONE.ceiling_root(4));
     assert_panic!(Integer::NEGATIVE_ONE.ceiling_root(100));
+}
+
+#[test]
+fn ceiling_root_ref_fail() {
+    assert_panic!((&Integer::ONE).ceiling_root(0));
+    assert_panic!((&Integer::NEGATIVE_ONE).ceiling_root(0));
+    assert_panic!((&Integer::NEGATIVE_ONE).ceiling_root(2));
+    assert_panic!((&Integer::NEGATIVE_ONE).ceiling_root(4));
+    assert_panic!((&Integer::NEGATIVE_ONE).ceiling_root(100));
+}
+
+#[test]
+fn ceiling_root_assign_fail() {
+    assert_panic!({
+        let mut x = Integer::ONE;
+        x.ceiling_root_assign(0)
+    });
+    assert_panic!({
+        let mut x = Integer::NEGATIVE_ONE;
+        x.ceiling_root_assign(0)
+    });
+    assert_panic!({
+        let mut x = Integer::NEGATIVE_ONE;
+        x.ceiling_root_assign(2)
+    });
+    assert_panic!({
+        let mut x = Integer::NEGATIVE_ONE;
+        x.ceiling_root_assign(4)
+    });
+    assert_panic!({
+        let mut x = Integer::NEGATIVE_ONE;
+        x.ceiling_root_assign(100)
+    });
 }
 
 #[allow(clippy::redundant_closure_for_method_calls)]
@@ -214,12 +282,25 @@ fn checked_root_fail() {
 }
 
 #[test]
+fn checked_root_ref_fail() {
+    assert_panic!((&Integer::ONE).checked_root(0));
+    assert_panic!((&Integer::NEGATIVE_ONE).checked_root(0));
+    assert_panic!((&Integer::NEGATIVE_ONE).checked_root(2));
+    assert_panic!((&Integer::NEGATIVE_ONE).checked_root(4));
+    assert_panic!((&Integer::NEGATIVE_ONE).checked_root(100));
+}
+
+#[test]
 fn floor_cbrt_properties() {
     integer_gen().test_properties(|n| {
         let cbrt = n.clone().floor_root(3);
-        assert_eq!((&n).floor_root(3), cbrt);
+        assert!(cbrt.is_valid());
+        let cbrt_alt = (&n).floor_root(3);
+        assert!(cbrt_alt.is_valid());
+        assert_eq!(cbrt_alt, cbrt);
         let mut n_alt = n.clone();
         n_alt.floor_root_assign(3);
+        assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
         if n >= 0 {
             assert_eq!(bigint_to_integer(&integer_to_bigint(&n).nth_root(3)), cbrt);
@@ -254,9 +335,13 @@ fn floor_cbrt_properties() {
 fn ceiling_cbrt_properties() {
     integer_gen().test_properties(|n| {
         let cbrt = n.clone().ceiling_root(3);
-        assert_eq!((&n).ceiling_root(3), cbrt);
+        assert!(cbrt.is_valid());
+        let cbrt_alt = (&n).ceiling_root(3);
+        assert!(cbrt_alt.is_valid());
+        assert_eq!(cbrt_alt, cbrt);
         let mut n_alt = n.clone();
         n_alt.ceiling_root_assign(3);
+        assert!(cbrt_alt.is_valid());
         assert_eq!(n_alt, cbrt);
         if n < 0 {
             assert_eq!(bigint_to_integer(&integer_to_bigint(&n).nth_root(3)), cbrt);
@@ -292,7 +377,10 @@ fn ceiling_cbrt_properties() {
 fn checked_cbrt_properties() {
     integer_gen().test_properties(|n| {
         let cbrt = n.clone().checked_root(3);
-        assert_eq!((&n).checked_root(3), cbrt);
+        assert!(cbrt.as_ref().map_or(true, Integer::is_valid));
+        let cbrt_alt = (&n).checked_root(3);
+        assert!(cbrt_alt.as_ref().map_or(true, Integer::is_valid));
+        assert_eq!(cbrt_alt, cbrt);
         if let Some(cbrt) = cbrt {
             assert_eq!((&cbrt).pow(3), n);
             assert_eq!((&n).floor_root(3), cbrt);
@@ -319,9 +407,13 @@ fn checked_cbrt_properties() {
 fn floor_root_properties() {
     integer_unsigned_pair_gen_var_3().test_properties(|(n, exp)| {
         let root = n.clone().floor_root(exp);
-        assert_eq!((&n).floor_root(exp), root);
+        assert!(root.is_valid());
+        let root_alt = (&n).floor_root(exp);
+        assert!(root_alt.is_valid());
+        assert_eq!(root_alt, root);
         let mut n_alt = n.clone();
         n_alt.floor_root_assign(exp);
+        assert!(root_alt.is_valid());
         assert_eq!(n_alt, root);
         if n >= 0 {
             assert_eq!(
@@ -348,6 +440,14 @@ fn floor_root_properties() {
         }
     });
 
+    integer_gen().test_properties(|n| {
+        assert_eq!((&n).floor_root(1), n);
+    });
+
+    integer_gen_var_4().test_properties(|n| {
+        assert_eq!((&n).floor_root(2), (&n).floor_sqrt());
+    });
+
     natural_unsigned_pair_gen_var_7().test_properties(|(n, exp)| {
         assert_eq!((&n).floor_root(exp), Integer::from(n).floor_root(exp));
     });
@@ -361,9 +461,13 @@ fn floor_root_properties() {
 fn ceiling_root_properties() {
     integer_unsigned_pair_gen_var_3().test_properties(|(n, exp)| {
         let root = n.clone().ceiling_root(exp);
-        assert_eq!((&n).ceiling_root(exp), root);
+        assert!(root.is_valid());
+        let root_alt = (&n).ceiling_root(exp);
+        assert!(root_alt.is_valid());
+        assert_eq!(root_alt, root);
         let mut n_alt = n.clone();
         n_alt.ceiling_root_assign(exp);
+        assert!(root_alt.is_valid());
         assert_eq!(n_alt, root);
         if n < 0 {
             assert_eq!(
@@ -391,6 +495,14 @@ fn ceiling_root_properties() {
         }
     });
 
+    integer_gen().test_properties(|n| {
+        assert_eq!((&n).ceiling_root(1), n);
+    });
+
+    integer_gen_var_4().test_properties(|n| {
+        assert_eq!((&n).ceiling_root(2), (&n).ceiling_sqrt());
+    });
+
     natural_unsigned_pair_gen_var_7().test_properties(|(n, exp)| {
         assert_eq!((&n).ceiling_root(exp), Integer::from(n).ceiling_root(exp));
     });
@@ -404,12 +516,23 @@ fn ceiling_root_properties() {
 fn checked_root_properties() {
     integer_unsigned_pair_gen_var_3().test_properties(|(n, exp)| {
         let root = n.clone().checked_root(exp);
-        assert_eq!((&n).checked_root(exp), root);
+        assert!(root.as_ref().map_or(true, Integer::is_valid));
+        let root_alt = (&n).checked_root(exp);
+        assert!(root_alt.as_ref().map_or(true, Integer::is_valid));
+        assert_eq!(root_alt, root);
         if let Some(root) = root {
             assert_eq!((&root).pow(exp), n);
             assert_eq!((&n).floor_root(exp), root);
             assert_eq!(n.ceiling_root(exp), root);
         }
+    });
+
+    integer_gen().test_properties(|n| {
+        assert_eq!((&n).checked_root(1), Some(n));
+    });
+
+    integer_gen_var_4().test_properties(|n| {
+        assert_eq!((&n).checked_root(2), (&n).checked_sqrt());
     });
 
     natural_unsigned_pair_gen_var_7().test_properties(|(n, exp)| {

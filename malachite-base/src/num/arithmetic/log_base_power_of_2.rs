@@ -1,15 +1,13 @@
 use num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, DivRound, FloorLogBasePowerOf2,
-    IsPowerOf2,
 };
-use num::basic::integers::PrimitiveInt;
-use num::basic::traits::{Iverson, Zero};
+use num::basic::traits::Iverson;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
-use num::logic::traits::SignificantBits;
 use rounding_modes::RoundingMode;
 
 #[doc(hidden)]
-pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveInt>(x: T, pow: u64) -> u64 {
+pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
     assert_ne!(x, T::ZERO);
     assert_ne!(pow, 0);
     if pow >= T::WIDTH {
@@ -28,7 +26,7 @@ pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveInt>(x: T, pow: u64) -> u64
     result
 }
 
-fn floor_log_base_power_of_2<T: Copy + Eq + SignificantBits + Zero>(x: T, pow: u64) -> u64 {
+fn floor_log_base_power_of_2<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
     if x == T::ZERO {
         panic!("Cannot take the base-2 logarithm of 0.");
     }
@@ -36,10 +34,7 @@ fn floor_log_base_power_of_2<T: Copy + Eq + SignificantBits + Zero>(x: T, pow: u
     (x.significant_bits() - 1) / pow
 }
 
-fn ceiling_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(
-    x: T,
-    pow: u64,
-) -> u64 {
+fn ceiling_log_base_power_of_2<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
     if x == T::ZERO {
         panic!("Cannot take the base-2 logarithm of 0.");
     }
@@ -52,10 +47,7 @@ fn ceiling_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zer
     }
 }
 
-fn checked_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zero>(
-    x: T,
-    pow: u64,
-) -> Option<u64> {
+fn checked_log_base_power_of_2<T: PrimitiveUnsigned>(x: T, pow: u64) -> Option<u64> {
     if x == T::ZERO {
         panic!("Cannot take the base-2 logarithm of 0.");
     }
@@ -70,7 +62,7 @@ fn checked_log_base_power_of_2<T: Copy + Eq + IsPowerOf2 + SignificantBits + Zer
 
 macro_rules! impl_log_base_power_of_2_unsigned {
     ($t:ident) => {
-        impl FloorLogBasePowerOf2 for $t {
+        impl FloorLogBasePowerOf2<u64> for $t {
             type Output = u64;
 
             /// Returns the floor of the base-$b$ logarithm of a positive float, where $b$ is a
@@ -93,7 +85,7 @@ macro_rules! impl_log_base_power_of_2_unsigned {
             }
         }
 
-        impl CeilingLogBasePowerOf2 for $t {
+        impl CeilingLogBasePowerOf2<u64> for $t {
             type Output = u64;
 
             /// Returns the ceiling of the base-$b$ logarithm of a positive float, where $b$ is a
@@ -116,7 +108,7 @@ macro_rules! impl_log_base_power_of_2_unsigned {
             }
         }
 
-        impl CheckedLogBasePowerOf2 for $t {
+        impl CheckedLogBasePowerOf2<u64> for $t {
             type Output = u64;
 
             /// Returns the base-$b$ logarithm of a positive float, where $b$ is a power of 2. If
@@ -149,7 +141,7 @@ apply_to_unsigneds!(impl_log_base_power_of_2_unsigned);
 
 macro_rules! impl_log_base_power_of_2_primitive_float {
     ($t:ident) => {
-        impl FloorLogBasePowerOf2 for $t {
+        impl FloorLogBasePowerOf2<u64> for $t {
             type Output = i64;
 
             /// Returns the floor of the base-$b$ logarithm of a positive integer, where $b$ is a
@@ -173,7 +165,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
             }
         }
 
-        impl CeilingLogBasePowerOf2 for $t {
+        impl CeilingLogBasePowerOf2<u64> for $t {
             type Output = i64;
 
             /// Returns the ceiling of the base-$b$ logarithm of a positive integer, where $b$ is a
@@ -203,7 +195,7 @@ macro_rules! impl_log_base_power_of_2_primitive_float {
             }
         }
 
-        impl CheckedLogBasePowerOf2 for $t {
+        impl CheckedLogBasePowerOf2<u64> for $t {
             type Output = i64;
 
             /// Returns the base-$b$ logarithm of a positive integer, where $b$ is a power of 2. If

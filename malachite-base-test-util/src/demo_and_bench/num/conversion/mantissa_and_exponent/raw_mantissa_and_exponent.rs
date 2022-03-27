@@ -130,7 +130,7 @@ fn benchmark_from_raw_mantissa_and_exponent<T: PrimitiveFloat>(
     file_name: &str,
 ) {
     run_benchmark(
-        &format!("{}::from_raw_mantissa_and_exponent(u64, u64)", T::NAME,),
+        &format!("{}::from_raw_mantissa_and_exponent(u64, u64)", T::NAME),
         BenchmarkType::Single,
         unsigned_pair_gen_var_26::<T>().get(gm, &config),
         gm.name(),

@@ -21,15 +21,6 @@ use std::mem::swap;
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add_mul::limbs_add_mul_limb;
-///
-/// assert_eq!(limbs_add_mul_limb(&[123, 456], &[123], 4), &[615, 456]);
-/// assert_eq!(limbs_add_mul_limb(&[123], &[0, 123], 4), &[123, 492]);
-/// assert_eq!(limbs_add_mul_limb(&[123, 456], &[0, 123], u32::MAX), &[123, 333, 123]);
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// positive, and w is returned instead of overwriting the first input.
 #[doc(hidden)]
@@ -57,27 +48,6 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add_mul::*;
-///
-/// let xs = &mut [123];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[123], 4), 0);
-/// assert_eq!(xs, &[615]);
-///
-/// let xs = &mut [123];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[123], u32::MAX), 123);
-/// assert_eq!(xs, &[0]);
-///
-/// let xs = &mut [123, 0];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[0, 123], 4), 0);
-/// assert_eq!(xs, &[123, 492]);
-///
-/// let xs = &mut [123, 456];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_left(xs, &[0, 123], u32::MAX), 123);
-/// assert_eq!(xs, &[123, 333]);
-/// ```
 ///
 /// This is mpn_addmul_1 from mpn/generic/addmul_1.c, GMP 6.2.1.
 #[doc(hidden)]
@@ -111,20 +81,6 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add_mul::*;
-///
-/// let ys = &mut [0, 123];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_right(&[123, 0], ys, 4), 0);
-/// assert_eq!(ys, &[123, 492]);
-///
-/// let ys = &mut [0, 123];
-/// assert_eq!(limbs_slice_add_mul_limb_same_length_in_place_right(&[123, 456], ys, u32::MAX),
-///         123);
-/// assert_eq!(ys, &[123, 333]);
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
 /// same lengths, sub is positive, the lowest limbs of the result are written to the second input
 /// rather than the first, and the highest limb is returned.
@@ -156,27 +112,6 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `ys.len()` - `xs.len()`)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add_mul::limbs_vec_add_mul_limb_in_place_left;
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[123], 4);
-/// assert_eq!(xs, &[615, 456]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[123], u32::MAX);
-/// assert_eq!(xs, &[0, 579]);
-///
-/// let mut xs = vec![123];
-/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[0, 123], 4);
-/// assert_eq!(xs, &[123, 492]);
-///
-/// let mut xs = vec![123, 456];
-/// limbs_vec_add_mul_limb_in_place_left(&mut xs, &[0, 123], u32::MAX);
-/// assert_eq!(xs, &[123, 333, 123]);
-/// ```
 ///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and sub is
 /// positive.
@@ -224,27 +159,6 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
 /// where n = max(`xs.len()`, `ys.len()`)
 ///       m = max(1, `xs.len()` - `ys.len()`)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add_mul::limbs_vec_add_mul_limb_in_place_right;
-///
-/// let mut ys = vec![123];
-/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, 4);
-/// assert_eq!(ys, &[615, 456]);
-///
-/// let mut ys = vec![123];
-/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, u32::MAX);
-/// assert_eq!(ys, &[0, 579]);
-///
-/// let mut ys = vec![0, 123];
-/// limbs_vec_add_mul_limb_in_place_right(&[123], &mut ys, 4);
-/// assert_eq!(ys, &[123, 492]);
-///
-/// let mut ys = vec![0, 123];
-/// limbs_vec_add_mul_limb_in_place_right(&[123, 456], &mut ys, u32::MAX);
-/// assert_eq!(ys, &[123, 333, 123]);
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// positive, and the result is written to the second input rather than the first.
 #[doc(hidden)]
@@ -289,35 +203,6 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
 ///
 /// where n = max(`xs.len()`, `ys.len()`)
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add_mul::limbs_vec_add_mul_limb_in_place_either;
-///
-/// let mut xs = vec![123, 456];
-/// let mut ys = vec![123];
-/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, 4), false);
-/// assert_eq!(xs, &[615, 456]);
-/// assert_eq!(ys, &[123]);
-///
-/// let mut xs = vec![123, 456];
-/// let mut ys = vec![123];
-/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, u32::MAX), false);
-/// assert_eq!(xs, &[0, 579]);
-/// assert_eq!(ys, &[123]);
-///
-/// let mut xs = vec![123];
-/// let mut ys = vec![0, 123];
-/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, 4), true);
-/// assert_eq!(xs, &[123]);
-/// assert_eq!(ys, &[123, 492]);
-///
-/// let mut xs = vec![123, 456];
-/// let mut ys = vec![0, 123];
-/// assert_eq!(limbs_vec_add_mul_limb_in_place_either(&mut xs, &mut ys, u32::MAX), false);
-/// assert_eq!(xs, &[123, 333, 123]);
-/// assert_eq!(ys, &[0, 123]);
-/// ```
-///
 /// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
 /// positive, and the result is written to the longer input.
 #[doc(hidden)]
@@ -348,16 +233,6 @@ pub fn limbs_vec_add_mul_limb_in_place_either(
 ///
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add_mul::limbs_add_mul;
-///
-/// assert_eq!(limbs_add_mul(&[123, 456], &[123, 789], &[321, 654]),
-///         &[39606, 334167, 516006]);
-/// assert_eq!(limbs_add_mul(&[123, 456, 789, 987, 654], &[123, 789], &[321, 654]),
-///         &[39606, 334167, 516795, 987, 654]);
-/// ```
 ///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
 /// positive, and w is returned instead of overwriting the first input.
@@ -395,19 +270,6 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `ys` or `zs` are empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::add_mul::limbs_add_mul_in_place_left;
-///
-/// let mut xs = vec![123, 456];
-/// limbs_add_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]);
-/// assert_eq!(xs, &[39606, 334167, 516006]);
-///
-/// let mut xs = vec![123, 456, 789, 987, 654];
-/// limbs_add_mul_in_place_left(&mut xs, &[123, 789], &[321, 654]);
-/// assert_eq!(xs, &[39606, 334167, 516795, 987, 654]);
-/// ```
 ///
 /// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive and sub is
 /// positive.

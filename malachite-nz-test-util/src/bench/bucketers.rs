@@ -2,6 +2,7 @@ use crate::natural::arithmetic::gcd::OwnedHalfGcdMatrix;
 use malachite_base::max;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::SignificantBits;
+use malachite_base::rational_sequences::RationalSequence;
 use malachite_base_test_util::bench::bucketers::Bucketer;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
@@ -615,5 +616,37 @@ pub fn limbs_mod_limb_small_unnormalized_bucketer<'a>() -> Bucketer<'a, (Vec<Lim
             }
         },
         bucketing_label: "adjusted ns.len()".to_string(),
+    }
+}
+
+pub fn rational_from_power_of_2_digits_bucketer<'a>(
+) -> Bucketer<'a, (u64, Vec<Natural>, RationalSequence<Natural>)> {
+    Bucketer {
+        bucketing_function: &|(log_base, xs, ys)| {
+            usize::exact_from(*log_base) * max(xs.len(), ys.component_len())
+        },
+        bucketing_label: "log_base * max(before_point.len(), after_point.component_len})"
+            .to_string(),
+    }
+}
+
+pub fn rational_from_digits_bucketer<'a>(
+) -> Bucketer<'a, (Natural, Vec<Natural>, RationalSequence<Natural>)> {
+    Bucketer {
+        bucketing_function: &|(base, xs, ys)| {
+            usize::exact_from(base.significant_bits()) * max(xs.len(), ys.component_len())
+        },
+        bucketing_label:
+            "base.significant_bits() * max(before_point.len(), after_point.component_len})"
+                .to_string(),
+    }
+}
+
+pub fn pair_1_vec_natural_sum_bits_bucketer<'a, T>() -> Bucketer<'a, (Vec<Natural>, T)> {
+    Bucketer {
+        bucketing_function: &|(xs, _)| {
+            usize::exact_from(xs.iter().map(|x| x.significant_bits()).sum::<u64>())
+        },
+        bucketing_label: "xs.map(|x| x.significant_bits()).sum()".to_string(),
     }
 }

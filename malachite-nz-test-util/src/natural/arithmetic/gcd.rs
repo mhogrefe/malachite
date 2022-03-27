@@ -169,9 +169,7 @@ pub fn limbs_gcd_div_alt(
         q <<= 1;
         if n1 == d1 && n0 >= d0 || n1 != d1 && n1 > d1 {
             q |= 1;
-            let (n1_2, n0_2) = Limb::xx_sub_yy_is_zz(n1, n0, d1, d0);
-            n1 = n1_2;
-            n0 = n0_2;
+            (n1, n0) = Limb::xx_sub_yy_is_zz(n1, n0, d1, d0);
         }
         d0 = (d1 << (Limb::WIDTH - 1)) | (d0 >> 1);
         d1 >>= 1;

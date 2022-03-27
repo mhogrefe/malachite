@@ -47,7 +47,7 @@ pub fn rational_sequence_is_reduced<T: Eq>(non_repeating: &[T], repeating: &[T])
 ///
 /// In testing, the set of rational sequences may be used as a proxy for the set of all sequences,
 /// which is too large to work with.
-#[derive(Clone, Debug, Default, Eq, Hash, PartialEq)]
+#[derive(Clone, Default, Eq, Hash, PartialEq)]
 pub struct RationalSequence<T: Eq> {
     non_repeating: Vec<T>,
     repeating: Vec<T>,
@@ -185,17 +185,15 @@ impl<T: Clone + Eq> RationalSequence<T> {
     }
 }
 
-/// This module contains functions for getting and setting elements in a `RationalSequence`.
+/// Functions for getting and setting elements in a `RationalSequence`.
 pub mod access;
-/// This module contains the `Ord` and `PartialOrd` implementations for `RationalSequence`s.
+/// The `Ord` and `PartialOrd` implementations for `RationalSequence`s.
 pub mod cmp;
-/// This module contains functions for converting `RationalSequence`s to and from `Vec`s and
-/// slices.
+/// Functions for converting `RationalSequence`s to and from `Vec`s and slices.
 pub mod conversion;
-/// This module contains functions for generating all `RationalSequences` over a set of elements.
+/// Functions for generating all `RationalSequences` over a set of elements.
 pub mod exhaustive;
-/// This module contains functions for generating random `RationalSequences` from a set of
-/// elements.
+/// Functions for generating random `RationalSequences` from a set of elements.
 pub mod random;
-/// This module contains the `Display` implementation for `RationalSequence`s.
+/// The `Display` implementation for `RationalSequence`s.
 pub mod to_string;

@@ -26,29 +26,35 @@ impl Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::integer::Integer;
+    /// extern crate malachite_base;
     ///
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_asc(&[]).to_string(),
-    ///     "0"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_asc(&[123]).to_string(),
-    ///     "123"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_asc(&[4294967173]).to_string(),
-    ///     "-123"
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_asc(&[3567587328, 232]).to_string(),
-    ///     "1000000000000"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_asc(&[727379968, 4294967063]).to_string(),
-    ///     "-1000000000000"
-    /// );
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
+    ///
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_asc(&[]).to_string(),
+    ///         "0"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_asc(&[123]).to_string(),
+    ///         "123"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_asc(&[4294967173]).to_string(),
+    ///         "-123"
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_asc(&[3567587328, 232]).to_string(),
+    ///         "1000000000000"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_asc(&[727379968, 4294967063]).to_string(),
+    ///         "-1000000000000"
+    ///     );
+    /// }
     /// ```
     pub fn from_twos_complement_limbs_asc(xs: &[Limb]) -> Integer {
         match xs {
@@ -77,29 +83,35 @@ impl Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::integer::Integer;
+    /// extern crate malachite_base;
     ///
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_desc(&[]).to_string(),
-    ///     "0"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_desc(&[123]).to_string(),
-    ///     "123"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_desc(&[4294967173]).to_string(),
-    ///     "-123"
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_desc(&[232, 3567587328]).to_string(),
-    ///     "1000000000000"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_twos_complement_limbs_desc(&[4294967063, 727379968]).to_string(),
-    ///     "-1000000000000"
-    /// );
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
+    ///
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_desc(&[]).to_string(),
+    ///         "0"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_desc(&[123]).to_string(),
+    ///         "123"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_desc(&[4294967173]).to_string(),
+    ///         "-123"
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_desc(&[232, 3567587328]).to_string(),
+    ///         "1000000000000"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_twos_complement_limbs_desc(&[4294967063, 727379968]).to_string(),
+    ///         "-1000000000000"
+    ///     );
+    /// }
     /// ```
     pub fn from_twos_complement_limbs_desc(xs: &[Limb]) -> Integer {
         Integer::from_owned_twos_complement_limbs_asc(xs.iter().cloned().rev().collect())
@@ -123,29 +135,35 @@ impl Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::integer::Integer;
+    /// extern crate malachite_base;
     ///
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_asc(vec![]).to_string(),
-    ///     "0"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_asc(vec![123]).to_string(),
-    ///     "123"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_asc(vec![4294967173]).to_string(),
-    ///     "-123"
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_asc(vec![3567587328, 232]).to_string(),
-    ///     "1000000000000"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_asc(vec![727379968, 4294967063]).to_string(),
-    ///     "-1000000000000"
-    /// );
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
+    ///
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_asc(vec![]).to_string(),
+    ///         "0"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_asc(vec![123]).to_string(),
+    ///         "123"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_asc(vec![4294967173]).to_string(),
+    ///         "-123"
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_asc(vec![3567587328, 232]),
+    ///         1000000000000i64
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_asc(vec![727379968, 4294967063]),
+    ///         -1000000000000i64
+    ///     );
+    /// }
     /// ```
     pub fn from_owned_twos_complement_limbs_asc(mut xs: Vec<Limb>) -> Integer {
         match *xs.as_slice() {
@@ -178,29 +196,35 @@ impl Integer {
     ///
     /// # Examples
     /// ```
-    /// use malachite_nz::integer::Integer;
+    /// extern crate malachite_base;
     ///
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_desc(vec![]).to_string(),
-    ///     "0"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_desc(vec![123]).to_string(),
-    ///     "123"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_desc(vec![4294967173]).to_string(),
-    ///     "-123"
-    /// );
-    /// // 10^12 = 232 * 2^32 + 3567587328
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_desc(vec![232, 3567587328]).to_string(),
-    ///     "1000000000000"
-    /// );
-    /// assert_eq!(
-    ///     Integer::from_owned_twos_complement_limbs_desc(vec![4294967063, 727379968]).to_string(),
-    ///     "-1000000000000"
-    /// );
+    /// use malachite_base::num::basic::integers::PrimitiveInt;
+    /// use malachite_nz::integer::Integer;
+    /// use malachite_nz::platform::Limb;
+    ///
+    /// if Limb::WIDTH == u32::WIDTH {
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_desc(vec![]).to_string(),
+    ///         "0"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_desc(vec![123]).to_string(),
+    ///         "123"
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_desc(vec![4294967173]).to_string(),
+    ///         "-123"
+    ///     );
+    ///     // 10^12 = 232 * 2^32 + 3567587328
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_desc(vec![232, 3567587328]),
+    ///         1000000000000i64
+    ///     );
+    ///     assert_eq!(
+    ///         Integer::from_owned_twos_complement_limbs_desc(vec![4294967063, 727379968]),
+    ///         -1000000000000i64
+    ///     );
+    /// }
     /// ```
     pub fn from_owned_twos_complement_limbs_desc(mut xs: Vec<Limb>) -> Integer {
         xs.reverse();

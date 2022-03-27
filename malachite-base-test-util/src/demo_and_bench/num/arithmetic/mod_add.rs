@@ -17,7 +17,7 @@ fn demo_mod_add<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usi
         .get(gm, &config)
         .take(limit)
     {
-        println!("{} + {} === {} mod {}", x, y, x.mod_add(y, m), m);
+        println!("{} + {} ≡ {} mod {}", x, y, x.mod_add(y, m), m);
     }
 }
 

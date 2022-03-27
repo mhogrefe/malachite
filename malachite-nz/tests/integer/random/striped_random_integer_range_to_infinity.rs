@@ -6,7 +6,6 @@ use malachite_base_test_util::stats::median;
 use malachite_base_test_util::stats::moments::{moment_stats, MomentStats};
 use malachite_nz::integer::random::striped_random_integer_range_to_infinity;
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::integer::IntegerCheckedToF64Wrapper;
 use std::str::FromStr;
 
 fn striped_random_integer_range_to_infinity_helper(
@@ -49,7 +48,7 @@ fn striped_random_integer_range_to_infinity_helper(
         median_hi.map(|x| Integer::to_string(&x)),
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
-    let actual_sample_moment_stats = moment_stats(xs.take(1000000).map(IntegerCheckedToF64Wrapper));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000).map(|x| f64::from(&x)));
     assert_eq!(
         (
             actual_values.as_slice(),

@@ -7,7 +7,6 @@ use malachite_base_test_util::stats::median;
 use malachite_base_test_util::stats::moments::{moment_stats, MomentStats};
 use malachite_nz::natural::random::striped_random_naturals;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::natural::NaturalCheckedToF64Wrapper;
 
 fn striped_random_naturals_helper(
     mean_stripe_numerator: u64,
@@ -47,7 +46,7 @@ fn striped_random_naturals_helper(
     );
     let actual_sample_median = (median_lo.as_str(), median_hi.as_deref());
     // Note that the population moments do not exist.
-    let actual_sample_moment_stats = moment_stats(xs.take(1000000).map(NaturalCheckedToF64Wrapper));
+    let actual_sample_moment_stats = moment_stats(xs.take(1000000).map(|x| f64::from(&x)));
     assert_eq!(
         (
             actual_values.as_slice(),

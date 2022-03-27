@@ -8,6 +8,9 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base::num::conversion::string::options::{
+    FromSciStringOptions, SciSizeOptions, ToSciOptions,
+};
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, HasHalf, JoinHalves, RoundingFrom,
     SaturatingFrom, SplitInHalf, WrappingFrom, WrappingInto,
@@ -143,6 +146,37 @@ pub fn char_pair_gen() -> Generator<(char, char)> {
         &exhaustive_char_pair_gen,
         &random_char_pair_gen,
         &special_random_char_pair_gen,
+    )
+}
+
+// -- FromSciStringOptions --
+
+pub fn from_sci_string_options_gen() -> Generator<FromSciStringOptions> {
+    Generator::new_no_special(
+        &exhaustive_from_sci_string_options_gen,
+        &random_from_sci_string_options_gen,
+    )
+}
+
+// -- (FromSciStringOptions, PrimitiveUnsigned) --
+
+// All `(FromSciStringOptions, T)` where `T` is unsigned and the `T` is between 2 and 36, inclusive.
+pub fn from_sci_string_options_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>(
+) -> Generator<(FromSciStringOptions, T)> {
+    Generator::new(
+        &exhaustive_from_sci_string_options_unsigned_pair_gen_var_1,
+        &random_from_sci_string_options_unsigned_pair_gen_var_1,
+        &special_random_from_sci_string_options_unsigned_pair_gen_var_1,
+    )
+}
+
+// -- (FromSciStringOptions, RoundingMode) --
+
+pub fn from_sci_string_options_rounding_mode_pair_gen(
+) -> Generator<(FromSciStringOptions, RoundingMode)> {
+    Generator::new_no_special(
+        &exhaustive_from_sci_string_options_rounding_mode_pair_gen,
+        &random_from_sci_string_options_rounding_mode_pair_gen,
     )
 }
 
@@ -617,6 +651,15 @@ pub fn signed_gen_var_11<T: PrimitiveFloat>() -> Generator<i64> {
         &exhaustive_signed_gen_var_10::<T>,
         &random_signed_gen_var_10::<T>,
         &special_random_signed_gen_var_9::<T>,
+    )
+}
+
+// All signed `T`s that are neither 0 nor -1.
+pub fn signed_gen_var_12<T: PrimitiveSigned>() -> Generator<T> {
+    Generator::new(
+        &exhaustive_signed_gen_var_11,
+        &random_signed_gen_var_11,
+        &special_random_signed_gen_var_10,
     )
 }
 
@@ -1195,6 +1238,26 @@ pub fn signed_rounding_mode_pair_gen_var_4<
         &exhaustive_signed_rounding_mode_pair_gen_var_4::<T, U>,
         &random_primitive_int_rounding_mode_pair_gen_var_1::<T, U>,
         &special_random_signed_rounding_mode_pair_gen_var_4::<T, U>,
+    )
+}
+
+// -- (PrimitiveSigned, ToSciOptions) --
+
+pub fn signed_to_sci_options_pair_gen<T: PrimitiveSigned>() -> Generator<(T, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_signed_to_sci_options_pair_gen,
+        &random_primitive_int_to_sci_options_pair_gen,
+        &special_random_signed_to_sci_options_pair_gen,
+    )
+}
+
+// All `(T, ToSciOptions)` pairs where `T` is signed and the `T` can be formatted using the
+// options.
+pub fn signed_to_sci_options_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(T, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_signed_to_sci_options_pair_gen_var_1,
+        &random_primitive_int_to_sci_options_pair_gen_var_1,
+        &special_random_signed_to_sci_options_pair_gen_var_1,
     )
 }
 
@@ -1885,7 +1948,7 @@ pub fn unsigned_pair_gen_var_37<T: PrimitiveUnsigned, U: PrimitiveUnsigned>() ->
 
 // -- (PrimitiveUnsigned, PrimitiveUnsigned, bool) --
 
-// All (`T`, `u64`, `bool`) where `T` is unsigned and either the `bool` is false or the `u64` is
+// All `(T, u64, `bool) where `T` is unsigned and either the `bool` is false or the `u64` is
 // smaller than `T::WIDTH`.
 pub fn unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, u64, bool)>
 {
@@ -1893,6 +1956,16 @@ pub fn unsigned_unsigned_bool_triple_gen_var_1<T: PrimitiveUnsigned>() -> Genera
         &exhaustive_unsigned_unsigned_bool_triple_gen_var_1,
         &random_primitive_int_unsigned_bool_triple_gen_var_1,
         &special_random_unsigned_unsigned_bool_triple_gen_var_1,
+    )
+}
+
+// All `(T, U, bool)` where `T` and `U` are unsigned and the `U` is positive.
+pub fn unsigned_unsigned_bool_triple_gen_var_2<T: PrimitiveUnsigned, U: PrimitiveUnsigned>(
+) -> Generator<(T, U, bool)> {
+    Generator::new(
+        &exhaustive_unsigned_unsigned_bool_triple_gen_var_2,
+        &random_primitive_int_unsigned_bool_triple_gen_var_3,
+        &special_random_unsigned_unsigned_bool_triple_gen_var_2,
     )
 }
 
@@ -2374,17 +2447,17 @@ pub fn unsigned_rounding_mode_pair_gen_var_2<
 
 // -- (PrimitiveUnsigned, String) --
 
-// All `(u64, String)` that, when passed to `Natural::from_string_base`, return a `Some`.
-pub fn unsigned_string_pair_gen_var_1() -> Generator<(u64, String)> {
+// All `(u8, String)` that, when passed to `Natural::from_string_base`, return a `Some`.
+pub fn unsigned_string_pair_gen_var_1() -> Generator<(u8, String)> {
     Generator::new_no_special(
         &exhaustive_unsigned_string_pair_gen_var_1,
         &random_unsigned_string_pair_gen_var_1,
     )
 }
 
-// All `(u64, String)` that are valid inputs to `Natural::from_string_base` or
+// All `(u8, String)` that are valid inputs to `Natural::from_string_base` or
 // `Integer::from_string_base`, regardless of whether it returns `Some` or `None`.
-pub fn unsigned_string_pair_gen_var_2() -> Generator<(u64, String)> {
+pub fn unsigned_string_pair_gen_var_2() -> Generator<(u8, String)> {
     Generator::new(
         &exhaustive_unsigned_string_pair_gen_var_2,
         &random_unsigned_string_pair_gen_var_2,
@@ -2392,11 +2465,32 @@ pub fn unsigned_string_pair_gen_var_2() -> Generator<(u64, String)> {
     )
 }
 
-// All `(u64, String)` that, when passed to `Integer::from_string_base`, return a `Some`.
-pub fn unsigned_string_pair_gen_var_3() -> Generator<(u64, String)> {
+// All `(u8, String)` that, when passed to `Integer::from_string_base`, return a `Some`.
+pub fn unsigned_string_pair_gen_var_3() -> Generator<(u8, String)> {
     Generator::new_no_special(
         &exhaustive_unsigned_string_pair_gen_var_3,
         &random_unsigned_string_pair_gen_var_3,
+    )
+}
+
+// -- (PrimitiveUnsigned, ToSciOptions) --
+
+pub fn unsigned_to_sci_options_pair_gen<T: PrimitiveUnsigned>() -> Generator<(T, ToSciOptions)> {
+    Generator::new(
+        &exhaustive_unsigned_to_sci_options_pair_gen,
+        &random_primitive_int_to_sci_options_pair_gen,
+        &special_random_unsigned_to_sci_options_pair_gen,
+    )
+}
+
+type TSO = ToSciOptions;
+// All `(T, ToSciOptions)` pairs where `T` is unsigned and the `T` can be formatted using the
+// options.
+pub fn unsigned_to_sci_options_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(T, TSO)> {
+    Generator::new(
+        &exhaustive_unsigned_to_sci_options_pair_gen_var_1,
+        &random_primitive_int_to_sci_options_pair_gen_var_1,
+        &special_random_unsigned_to_sci_options_pair_gen_var_1,
     )
 }
 
@@ -2496,6 +2590,15 @@ pub fn rounding_mode_triple_gen() -> Generator<(RoundingMode, RoundingMode, Roun
     )
 }
 
+// -- SciSizeOptions --
+
+pub fn sci_size_options_gen() -> Generator<SciSizeOptions> {
+    Generator::new_no_special(
+        &exhaustive_sci_size_options_gen,
+        &random_sci_size_options_gen,
+    )
+}
+
 // -- String --
 
 pub fn string_gen() -> Generator<String> {
@@ -2566,7 +2669,112 @@ pub fn string_gen_var_10() -> Generator<String> {
     Generator::new_no_special(&exhaustive_string_gen_var_10, &random_string_gen_var_10)
 }
 
-// var 11 is in malachite-q.
+// vars 11 through 12 are in malachite-q.
+
+// All `String`s containing only the characters `+-.0123456789Ee`.
+pub fn string_gen_var_13() -> Generator<String> {
+    Generator::new_no_special(&exhaustive_string_gen_var_13, &random_string_gen_var_13)
+}
+
+fn large_exponent(s: &str) -> bool {
+    let mut i = 0;
+    let mut expect_e = false;
+    for c in s.chars().rev() {
+        if expect_e {
+            return c == 'e' || c == 'E';
+        } else if c.is_digit(10) {
+            i += 1;
+        } else if i <= 3 {
+            return false;
+        } else if c == 'e' || c == 'E' {
+            return true;
+        } else if c == '+' || c == '-' {
+            expect_e = true;
+        }
+    }
+    false
+}
+
+// All `Strings` that do not end in an 'e' or 'E' followed by an optional plus or minus sign and
+// more than three digits.
+pub fn string_gen_var_14() -> Generator<String> {
+    Generator::new(
+        &exhaustive_string_gen_var_14,
+        &random_string_gen_var_14,
+        &special_random_string_gen_var_4,
+    )
+}
+
+// All `String`s containing only the characters `+-.0123456789Ee`, and that do not end in an 'e' or
+// 'E' followed by an optional plus or minus sign and more than three digits.
+pub fn string_gen_var_15() -> Generator<String> {
+    Generator::new_no_special(&exhaustive_string_gen_var_15, &random_string_gen_var_15)
+}
+
+// -- (String, FromSciStringOptions) --
+
+pub fn string_from_sci_string_options_pair_gen() -> Generator<(String, FromSciStringOptions)> {
+    Generator::new(
+        &exhaustive_string_from_sci_string_options_pair_gen,
+        &random_string_from_sci_string_options_pair_gen,
+        &special_random_string_from_sci_string_options_pair_gen,
+    )
+}
+
+// All `(String, FromSciStringOptions)`, where the `String` only contains characters that occur in
+// valid inputs to `T::from_sci_string_options`, using the specified options.
+pub fn string_from_sci_string_options_pair_gen_var_1() -> Generator<(String, FromSciStringOptions)>
+{
+    Generator::new_no_special(
+        &exhaustive_string_from_sci_string_options_pair_gen_var_1,
+        &random_string_from_sci_string_options_pair_gen_var_1,
+    )
+}
+
+// All `(String, FromSciStringOptions)`, where the string does not end in an 'e' or 'E' followed by
+// an optional plus or minus sign and more than three digits.
+pub fn string_from_sci_string_options_pair_gen_var_2() -> Generator<(String, FromSciStringOptions)>
+{
+    Generator::new(
+        &exhaustive_string_from_sci_string_options_pair_gen_var_2,
+        &random_string_from_sci_string_options_pair_gen_var_2,
+        &special_random_string_from_sci_string_options_pair_gen_var_1,
+    )
+}
+
+// All `(String, FromSciStringOptions)`, where the `String` only contains characters that occur in
+// valid inputs to `T::from_sci_string_options`, using the specified options, and the string does
+// not end in an 'e' or 'E' followed by an optional plus or minus sign and more than three digits.
+pub fn string_from_sci_string_options_pair_gen_var_3() -> Generator<(String, FromSciStringOptions)>
+{
+    Generator::new_no_special(
+        &exhaustive_string_from_sci_string_options_pair_gen_var_3,
+        &random_string_from_sci_string_options_pair_gen_var_3,
+    )
+}
+
+// -- (String, PrimitiveUnsigned) --
+
+// All `(String, u8)`s where the `u8` is between 2 and 36, inclusive, and the string does not end
+// in an 'e' or 'E' followed by an optional plus or minus sign and more than three digits.
+pub fn string_unsigned_pair_gen_var_1() -> Generator<(String, u8)> {
+    Generator::new(
+        &exhaustive_string_unsigned_pair_gen_var_1,
+        &random_string_unsigned_pair_gen_var_1,
+        &special_random_string_unsigned_pair_gen_var_1,
+    )
+}
+
+// All `(String, u8)`s where the `u8` is between 2 and 36, inclusive, the `String` only contains
+// characters that occur in valid inputs to `T::from_sci_string_options` with the specified base,
+// and the string does not end in an 'e' or 'E' followed by an optional plus or minus sign and
+// more than three digits.
+pub fn string_unsigned_pair_gen_var_2() -> Generator<(String, u8)> {
+    Generator::new_no_special(
+        &exhaustive_string_unsigned_pair_gen_var_2,
+        &random_string_unsigned_pair_gen_var_2,
+    )
+}
 
 // -- (String, String) --
 
@@ -2584,6 +2792,67 @@ pub fn string_pair_gen_var_1() -> Generator<(String, String)> {
         &exhaustive_string_pair_gen_var_1,
         &random_string_pair_gen_var_1,
         &special_random_string_pair_gen_var_1,
+    )
+}
+
+// -- ToSciOptions --
+
+pub fn to_sci_options_gen() -> Generator<ToSciOptions> {
+    Generator::new_no_special(&exhaustive_to_sci_options_gen, &random_to_sci_options_gen)
+}
+
+// -- (ToSciOptions, bool) --
+
+pub fn to_sci_options_bool_pair_gen() -> Generator<(ToSciOptions, bool)> {
+    Generator::new_no_special(
+        &exhaustive_to_sci_options_bool_pair_gen,
+        &random_to_sci_options_bool_pair_gen,
+    )
+}
+
+// -- (ToSciOptions, PrimitiveSigned) --
+
+// All `(ToSciOptions, T)` where `T` is signed and the `T` is small and negative.
+pub fn to_sci_options_signed_pair_gen_var_1<T: PrimitiveSigned>() -> Generator<(ToSciOptions, T)> {
+    Generator::new_no_special(
+        &exhaustive_to_sci_options_signed_pair_gen_var_1,
+        &random_to_sci_options_signed_pair_gen_var_1,
+    )
+}
+
+// -- (ToSciOptions, PrimitiveUnsigned) --
+
+// All `(ToSciOptions, T)` where `T` is unsigned and the `T` is between 2 and 36, inclusive.
+pub fn to_sci_options_unsigned_pair_gen_var_1<T: PrimitiveUnsigned>() -> Generator<(TSO, T)> {
+    Generator::new(
+        &exhaustive_to_sci_options_unsigned_pair_gen_var_1,
+        &random_to_sci_options_unsigned_pair_gen_var_1,
+        &special_random_to_sci_options_unsigned_pair_gen_var_1,
+    )
+}
+
+// All `(ToSciOptions, T)` where `T` is unsigned and the `T` is small.
+pub fn to_sci_options_unsigned_pair_gen_var_2<T: PrimitiveUnsigned>() -> Generator<(TSO, T)> {
+    Generator::new_no_special(
+        &exhaustive_to_sci_options_unsigned_pair_gen_var_2,
+        &random_to_sci_options_unsigned_pair_gen_var_2,
+    )
+}
+
+// All `(ToSciOptions, T)` where `T` is unsigned and the `T` is small and positive.
+pub fn to_sci_options_unsigned_pair_gen_var_3<T: PrimitiveUnsigned>() -> Generator<(TSO, T)> {
+    Generator::new_no_special(
+        &exhaustive_to_sci_options_primitive_int_pair_gen_var_1,
+        &random_to_sci_options_unsigned_pair_gen_var_3,
+    )
+}
+
+// -- (ToSciOptions, RoundingMode) --
+
+pub fn to_sci_options_rounding_mode_pair_gen() -> Generator<(ToSciOptions, RoundingMode)> {
+    Generator::new_no_special(
+        &exhaustive_to_sci_options_rounding_mode_pair_gen,
+        &random_to_sci_options_rounding_mode_pair_gen,
     )
 }
 
@@ -3880,6 +4149,8 @@ pub fn large_type_gen_var_22<T: PrimitiveUnsigned>() -> T2<T> {
         &special_random_large_type_gen_var_22,
     )
 }
+
+// var 23 is in malachite-nz.
 
 pub mod common;
 pub mod exhaustive;

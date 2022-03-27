@@ -1,28 +1,10 @@
-use num::arithmetic::traits::{DivRound, DivRoundAssign, Parity, UnsignedAbs, WrappingNeg};
-use num::basic::traits::{One, Zero};
+use num::arithmetic::traits::{DivRound, DivRoundAssign, UnsignedAbs};
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, WrappingFrom};
 use rounding_modes::RoundingMode;
-use std::fmt::Display;
-use std::ops::{Add, Div, Mul, Shr, Sub};
 
-fn div_round_unsigned<
-    T: Add<T, Output = T>
-        + Copy
-        + Display
-        + Div<T, Output = T>
-        + Eq
-        + Mul<T, Output = T>
-        + One
-        + Ord
-        + Parity
-        + Shr<u64, Output = T>
-        + Sub<T, Output = T>
-        + Zero,
->(
-    x: T,
-    other: T,
-    rm: RoundingMode,
-) -> T {
+fn div_round_unsigned<T: PrimitiveUnsigned>(x: T, other: T, rm: RoundingMode) -> T {
     let quotient = x / other;
     if rm == RoundingMode::Down || rm == RoundingMode::Floor {
         quotient
@@ -117,14 +99,8 @@ macro_rules! impl_div_round_unsigned {
 apply_to_unsigneds!(impl_div_round_unsigned);
 
 fn div_round_signed<
-    U: DivRound<U, Output = U>,
-    S: Copy
-        + ExactFrom<U>
-        + Ord
-        + UnsignedAbs<Output = U>
-        + WrappingFrom<U>
-        + WrappingNeg<Output = S>
-        + Zero,
+    U: PrimitiveUnsigned,
+    S: ExactFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U> + WrappingFrom<U>,
 >(
     x: S,
     other: S,

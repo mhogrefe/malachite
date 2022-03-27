@@ -1,13 +1,13 @@
-use num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Mul, ModPowerOf2MulAssign};
-use num::basic::integers::PrimitiveInt;
+use num::arithmetic::traits::{ModPowerOf2Mul, ModPowerOf2MulAssign};
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-fn mod_power_of_2_mul<T: ModPowerOf2<Output = T> + PrimitiveInt>(x: T, other: T, pow: u64) -> T {
+fn mod_power_of_2_mul<T: PrimitiveUnsigned>(x: T, other: T, pow: u64) -> T {
     assert!(pow <= T::WIDTH);
     x.wrapping_mul(other).mod_power_of_2(pow)
 }
 
 #[inline]
-fn mod_power_of_2_mul_assign<T: PrimitiveInt>(x: &mut T, other: T, pow: u64) {
+fn mod_power_of_2_mul_assign<T: PrimitiveUnsigned>(x: &mut T, other: T, pow: u64) {
     assert!(pow <= T::WIDTH);
     x.wrapping_mul_assign(other);
     x.mod_power_of_2_assign(pow);

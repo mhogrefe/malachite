@@ -25,9 +25,9 @@ use num::arithmetic::traits::{
 use num::basic::traits::{Iverson, One, Two, Zero};
 use num::comparison::traits::{EqAbs, OrdAbs, PartialOrdAbs};
 use num::conversion::traits::{
-    CheckedFrom, CheckedInto, ConvertibleFrom, ExactFrom, ExactInto, FromStringBase, IsInteger,
-    OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom, SaturatingInto,
-    ToStringBase, WrappingFrom, WrappingInto,
+    CheckedFrom, CheckedInto, ConvertibleFrom, ExactFrom, ExactInto, FromSciString, FromStringBase,
+    IsInteger, OverflowingFrom, OverflowingInto, RoundingFrom, RoundingInto, SaturatingFrom,
+    SaturatingInto, ToSci, ToStringBase, WrappingFrom, WrappingInto,
 };
 use num::logic::traits::{
     BitAccess, BitBlockAccess, BitConvertible, BitIterable, BitScan, CountOnes, CountZeros,
@@ -87,8 +87,8 @@ pub trait PrimitiveInt:
     + BitScan
     + BitXor<Self, Output = Self>
     + BitXorAssign<Self>
-    + CeilingRoot<Output = Self>
-    + CeilingRootAssign
+    + CeilingRoot<u64, Output = Self>
+    + CeilingRootAssign<u64>
     + CeilingSqrt<Output = Self>
     + CeilingSqrtAssign
     + CheckedAdd<Self, Output = Self>
@@ -123,7 +123,7 @@ pub trait PrimitiveInt:
     + CheckedMul<Self, Output = Self>
     + CheckedNeg<Output = Self>
     + CheckedPow<u64, Output = Self>
-    + CheckedRoot<Output = Self>
+    + CheckedRoot<u64, Output = Self>
     + CheckedSqrt<Output = Self>
     + CheckedSquare<Output = Self>
     + CheckedSub<Self, Output = Self>
@@ -189,10 +189,11 @@ pub trait PrimitiveInt:
     + ExactInto<i64>
     + ExactInto<i128>
     + ExactInto<isize>
-    + FloorRoot<Output = Self>
-    + FloorRootAssign
+    + FloorRoot<u64, Output = Self>
+    + FloorRootAssign<u64>
     + FloorSqrt<Output = Self>
     + FloorSqrtAssign
+    + FromSciString
     + FromStr
     + FromStringBase
     + Hash
@@ -409,6 +410,7 @@ pub trait PrimitiveInt:
     + SubMul<Self, Self, Output = Self>
     + SubMulAssign<Self, Self>
     + Sum<Self>
+    + ToSci
     + ToStringBase
     + TrailingZeros
     + Two

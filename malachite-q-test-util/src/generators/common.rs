@@ -6,6 +6,10 @@ use malachite_nz_test_util::common::{integer_to_rug_integer, natural_to_rug_inte
 use malachite_q::Rational;
 use num::BigRational;
 
+pub fn rational_rm(xs: It<Rational>) -> It<(rug::Rational, Rational)> {
+    Box::new(xs.map(|x| (rational_to_rug_rational(&x), x)))
+}
+
 pub fn rational_nrm(xs: It<Rational>) -> It<(BigRational, rug::Rational, Rational)> {
     Box::new(xs.map(|x| (rational_to_bigrational(&x), rational_to_rug_rational(&x), x)))
 }
@@ -64,4 +68,16 @@ pub fn rational_pair_1_rm<T: 'static + Clone>(
     ps: It<(Rational, T)>,
 ) -> It<((rug::Rational, T), (Rational, T))> {
     Box::new(ps.map(|(x, y)| ((rational_to_rug_rational(&x), y.clone()), (x, y))))
+}
+
+pub fn rational_pair_1_nrm<T: 'static + Clone>(
+    ps: It<(Rational, T)>,
+) -> It<((BigRational, T), (rug::Rational, T), (Rational, T))> {
+    Box::new(ps.map(|(x, y)| {
+        (
+            (rational_to_bigrational(&x), y.clone()),
+            (rational_to_rug_rational(&x), y.clone()),
+            (x, y),
+        )
+    }))
 }

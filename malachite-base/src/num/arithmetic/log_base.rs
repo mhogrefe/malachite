@@ -1,15 +1,8 @@
-use num::arithmetic::traits::{
-    CeilingLogBase, CeilingLogBasePowerOf2, CheckedLogBase, CheckedLogBase2,
-    CheckedLogBasePowerOf2, CheckedMul, FloorLogBase, FloorLogBasePowerOf2,
-};
-use num::basic::traits::{One, Zero};
-use std::fmt::Debug;
+use num::arithmetic::traits::{CeilingLogBase, CheckedLogBase, FloorLogBase};
+use num::basic::unsigneds::PrimitiveUnsigned;
 
 #[doc(hidden)]
-pub fn floor_log_base_naive<T: CheckedMul<T, Output = T> + Copy + Debug + Ord + One + Zero>(
-    x: T,
-    base: T,
-) -> u64 {
+pub fn floor_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
     let mut result = 0;
@@ -27,10 +20,7 @@ pub fn floor_log_base_naive<T: CheckedMul<T, Output = T> + Copy + Debug + Ord + 
 }
 
 #[doc(hidden)]
-pub fn ceiling_log_base_naive<T: CheckedMul<T, Output = T> + Copy + Debug + Ord + One + Zero>(
-    x: T,
-    base: T,
-) -> u64 {
+pub fn ceiling_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
     let mut result = 0;
@@ -47,10 +37,7 @@ pub fn ceiling_log_base_naive<T: CheckedMul<T, Output = T> + Copy + Debug + Ord 
 }
 
 #[doc(hidden)]
-pub fn checked_log_base_naive<T: CheckedMul<T, Output = T> + Copy + Debug + Ord + One + Zero>(
-    x: T,
-    base: T,
-) -> Option<u64> {
+pub fn checked_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> Option<u64> {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
     let mut result = 0;
@@ -70,19 +57,7 @@ pub fn checked_log_base_naive<T: CheckedMul<T, Output = T> + Copy + Debug + Ord 
     }
 }
 
-fn floor_log_base<
-    T: CheckedLogBase2<Output = u64>
-        + CheckedMul<T, Output = T>
-        + Copy
-        + Debug
-        + FloorLogBasePowerOf2<Output = u64>
-        + Ord
-        + One
-        + Zero,
->(
-    x: T,
-    base: T,
-) -> u64 {
+fn floor_log_base<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     if let Some(log_base) = base.checked_log_base_2() {
         x.floor_log_base_power_of_2(log_base)
     } else {
@@ -90,19 +65,7 @@ fn floor_log_base<
     }
 }
 
-fn ceiling_log_base<
-    T: CheckedLogBase2<Output = u64>
-        + CheckedMul<T, Output = T>
-        + Copy
-        + Debug
-        + CeilingLogBasePowerOf2<Output = u64>
-        + Ord
-        + One
-        + Zero,
->(
-    x: T,
-    base: T,
-) -> u64 {
+fn ceiling_log_base<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     if let Some(log_base) = base.checked_log_base_2() {
         x.ceiling_log_base_power_of_2(log_base)
     } else {
@@ -110,19 +73,7 @@ fn ceiling_log_base<
     }
 }
 
-fn checked_log_base<
-    T: CheckedLogBase2<Output = u64>
-        + CheckedMul<T, Output = T>
-        + Copy
-        + Debug
-        + CheckedLogBasePowerOf2<Output = u64>
-        + Ord
-        + One
-        + Zero,
->(
-    x: T,
-    base: T,
-) -> Option<u64> {
+fn checked_log_base<T: PrimitiveUnsigned>(x: T, base: T) -> Option<u64> {
     if let Some(log_base) = base.checked_log_base_2() {
         x.checked_log_base_power_of_2(log_base)
     } else {

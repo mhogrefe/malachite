@@ -52,7 +52,7 @@ fn demo_integer_round_to_multiple_of_power_of_2(gm: GenMode, config: GenConfig, 
     {
         let n_old = n.clone();
         println!(
-            "{}.round_to_multiple_of_power_of_2({}, {}) = {}",
+            "({}).round_to_multiple_of_power_of_2({}, {}) = {}",
             n_old,
             pow,
             rm,

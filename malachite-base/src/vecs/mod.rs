@@ -4,9 +4,7 @@ use rand::prelude::SliceRandom;
 use rand_chacha::ChaCha20Rng;
 use random::Seed;
 use slices::advance_indices;
-use std::fmt::Display;
 use std::str::FromStr;
-use strings::ExtraToString;
 
 /// Inserts several copies of a value at the left (beginning) of a `Vec`.
 ///
@@ -357,27 +355,7 @@ pub fn random_vec_permutations<T: Clone>(seed: Seed, xs: Vec<T>) -> RandomVecPer
     }
 }
 
-//TODO doc and test
-
-impl<T: Display> ExtraToString for Vec<T> {
-    fn to_string(&self) -> String {
-        let mut s = String::new();
-        s.push('[');
-        let mut first = true;
-        for x in self {
-            if first {
-                first = false;
-            } else {
-                s.push_str(", ");
-            }
-            s.push_str(&x.to_string());
-        }
-        s.push(']');
-        s
-    }
-}
-
-/// This module contains iterators that generate `Vec`s without repetition.
+/// Iterators that generate `Vec`s without repetition.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///
@@ -549,7 +527,7 @@ impl<T: Display> ExtraToString for Vec<T> {
 /// );
 /// ```
 pub mod exhaustive;
-/// This module contains iterators that generate `Vec`s randomly.
+/// Iterators that generate `Vec`s randomly.
 ///
 /// Here are usage examples of the macro-generated functions:
 ///

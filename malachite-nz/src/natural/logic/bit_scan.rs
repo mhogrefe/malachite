@@ -16,20 +16,6 @@ use platform::Limb;
 /// where n = `xs.len()`
 ///
 /// This is mpn_scan0 from mpn/generic/scan0.c, GMP 6.1.2.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_false_bit;
-///
-/// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 0), 0);
-/// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 20), 20);
-/// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 31), 31);
-/// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 32), 34);
-/// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 33), 34);
-/// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 34), 34);
-/// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 35), 36);
-/// assert_eq!(limbs_index_of_next_false_bit(&[0, 0b1011], 100), 100);
-/// ```
 #[doc(hidden)]
 pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
     let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
@@ -68,21 +54,6 @@ pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
 /// where n = `xs.len()`
 ///
 /// This is mpn_scan1 from mpn/generic/scan1.c, GMP 6.1.2.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::bit_scan::limbs_index_of_next_true_bit;
-///
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 0), Some(32));
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 20), Some(32));
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 31), Some(32));
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 32), Some(32));
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 33), Some(33));
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 34), Some(35));
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 35), Some(35));
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 36), None);
-/// assert_eq!(limbs_index_of_next_true_bit(&[0, 0b1011], 100), None);
-/// ```
 #[doc(hidden)]
 pub fn limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
     let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);

@@ -88,7 +88,7 @@ impl FromStringBase for Integer {
     /// assert!(Integer::from_string_base(2, "-2").is_none());
     /// ```
     #[inline]
-    fn from_string_base(base: u64, s: &str) -> Option<Integer> {
+    fn from_string_base(base: u8, s: &str) -> Option<Integer> {
         if let Some(abs_string) = s.strip_prefix('-') {
             Natural::from_string_base(base, abs_string).map(Neg::neg)
         } else {

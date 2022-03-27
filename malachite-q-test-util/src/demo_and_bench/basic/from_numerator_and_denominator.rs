@@ -1,6 +1,16 @@
+use malachite_base::num::basic::signeds::PrimitiveSigned;
+use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
+use malachite_base_test_util::bench::bucketers::{
+    pair_max_bit_bucketer, triple_1_2_max_bit_bucketer,
+};
 use malachite_base_test_util::bench::{run_benchmark, BenchmarkType};
 use malachite_base_test_util::generators::common::{GenConfig, GenMode};
+use malachite_base_test_util::generators::{
+    signed_pair_gen_var_6, unsigned_pair_gen_var_12, unsigned_unsigned_bool_triple_gen_var_2,
+};
 use malachite_base_test_util::runner::Runner;
+use malachite_nz::integer::Integer;
+use malachite_nz::natural::Natural;
 use malachite_nz_test_util::bench::bucketers::{
     pair_integer_max_bit_bucketer, pair_natural_max_bit_bucketer,
     triple_1_2_natural_max_bit_bucketer, triple_3_pair_integer_max_bit_bucketer,
@@ -15,15 +25,21 @@ use num::BigRational;
 pub(crate) fn register(runner: &mut Runner) {
     register_demo!(runner, demo_from_naturals);
     register_demo!(runner, demo_from_naturals_ref);
+    register_unsigned_demos!(runner, demo_from_unsigneds);
     register_demo!(runner, demo_from_integers);
     register_demo!(runner, demo_from_integers_ref);
+    register_signed_demos!(runner, demo_from_signeds);
     register_demo!(runner, demo_from_sign_and_naturals);
     register_demo!(runner, demo_from_sign_and_naturals_ref);
+    register_unsigned_demos!(runner, demo_from_sign_and_unsigneds);
 
     register_bench!(runner, benchmark_from_naturals_evaluation_strategy);
+    register_unsigned_benches!(runner, benchmark_from_unsigneds);
     register_bench!(runner, benchmark_from_integers_evaluation_strategy);
     register_bench!(runner, benchmark_from_integers_library_comparison);
+    register_signed_benches!(runner, benchmark_from_signeds);
     register_bench!(runner, benchmark_from_sign_and_naturals_evaluation_strategy);
+    register_unsigned_benches!(runner, benchmark_from_sign_and_unsigneds);
 }
 
 fn demo_from_naturals(gm: GenMode, config: GenConfig, limit: usize) {
@@ -50,6 +66,23 @@ fn demo_from_naturals_ref(gm: GenMode, config: GenConfig, limit: usize) {
     }
 }
 
+fn demo_from_unsigneds<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+where
+    Natural: From<T>,
+{
+    for (n, d) in unsigned_pair_gen_var_12::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "Rational::from_unsigneds({}, {}) = {}",
+            n,
+            d,
+            Rational::from_unsigneds(n, d)
+        );
+    }
+}
+
 fn demo_from_integers(gm: GenMode, config: GenConfig, limit: usize) {
     for (n, d) in integer_pair_gen_var_1().get(gm, &config).take(limit) {
         let n_old = n.clone();
@@ -70,6 +103,20 @@ fn demo_from_integers_ref(gm: GenMode, config: GenConfig, limit: usize) {
             n,
             d,
             Rational::from_integers_ref(&n, &d)
+        );
+    }
+}
+
+fn demo_from_signeds<T: PrimitiveSigned>(gm: GenMode, config: GenConfig, limit: usize)
+where
+    Integer: From<T>,
+{
+    for (n, d) in signed_pair_gen_var_6::<T>().get(gm, &config).take(limit) {
+        println!(
+            "Rational::from_signeds({}, {}) = {}",
+            n,
+            d,
+            Rational::from_signeds(n, d)
         );
     }
 }
@@ -106,6 +153,24 @@ fn demo_from_sign_and_naturals_ref(gm: GenMode, config: GenConfig, limit: usize)
     }
 }
 
+fn demo_from_sign_and_unsigneds<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig, limit: usize)
+where
+    Natural: From<T>,
+{
+    for (n, d, sign) in unsigned_unsigned_bool_triple_gen_var_2::<T, T>()
+        .get(gm, &config)
+        .take(limit)
+    {
+        println!(
+            "Rational::from_sign_and_unsigneds({}, {}, {}) = {}",
+            sign,
+            n,
+            d,
+            Rational::from_sign_and_unsigneds(sign, n, d)
+        );
+    }
+}
+
 fn benchmark_from_naturals_evaluation_strategy(
     gm: GenMode,
     config: GenConfig,
@@ -128,6 +193,28 @@ fn benchmark_from_naturals_evaluation_strategy(
                 no_out!(Rational::from_naturals_ref(&n, &d))
             }),
         ],
+    );
+}
+
+fn benchmark_from_unsigneds<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Natural: From<T>,
+{
+    run_benchmark(
+        &format!("Rational::from_unsigneds({}, {})", T::NAME, T::NAME),
+        BenchmarkType::Single,
+        unsigned_pair_gen_var_12::<T, T>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_max_bit_bucketer("n", "d"),
+        &mut [("from_unsigneds", &mut |(n, d)| {
+            no_out!(Rational::from_unsigneds(n, d))
+        })],
     );
 }
 
@@ -183,6 +270,28 @@ fn benchmark_from_integers_library_comparison(
     );
 }
 
+fn benchmark_from_signeds<T: PrimitiveSigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Integer: From<T>,
+{
+    run_benchmark(
+        &format!("Rational::from_signeds({}, {})", T::NAME, T::NAME),
+        BenchmarkType::Single,
+        signed_pair_gen_var_6::<T>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &pair_max_bit_bucketer("n", "d"),
+        &mut [("from_unsigneds", &mut |(n, d)| {
+            no_out!(Rational::from_signeds(n, d))
+        })],
+    );
+}
+
 fn benchmark_from_sign_and_naturals_evaluation_strategy(
     gm: GenMode,
     config: GenConfig,
@@ -205,5 +314,31 @@ fn benchmark_from_sign_and_naturals_evaluation_strategy(
                 no_out!(Rational::from_sign_and_naturals_ref(sign, &n, &d))
             }),
         ],
+    );
+}
+
+fn benchmark_from_sign_and_unsigneds<T: PrimitiveUnsigned>(
+    gm: GenMode,
+    config: GenConfig,
+    limit: usize,
+    file_name: &str,
+) where
+    Natural: From<T>,
+{
+    run_benchmark(
+        &format!(
+            "Rational::from_sign_and_unsigneds({}, {})",
+            T::NAME,
+            T::NAME
+        ),
+        BenchmarkType::Single,
+        unsigned_unsigned_bool_triple_gen_var_2::<T, T>().get(gm, &config),
+        gm.name(),
+        limit,
+        file_name,
+        &triple_1_2_max_bit_bucketer("n", "d"),
+        &mut [("from_sign_and_unsigneds", &mut |(n, d, sign)| {
+            no_out!(Rational::from_sign_and_unsigneds(sign, n, d))
+        })],
     );
 }

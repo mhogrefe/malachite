@@ -18,7 +18,7 @@ fn demo_mod_power_of_2_add<T: PrimitiveUnsigned>(gm: GenMode, config: GenConfig,
         .take(limit)
     {
         println!(
-            "{} + {} === {} mod 2^{}",
+            "{} + {} ≡ {} mod 2^{}",
             x,
             y,
             x.mod_power_of_2_add(y, pow),

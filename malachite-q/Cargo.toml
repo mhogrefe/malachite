@@ -15,9 +15,10 @@ serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
 [profile.release]
 lto = true
+strip = "debuginfo"
 
 [dev-dependencies]
-num = "0.3.1"
+num = "0.4.0"
 malachite-base-test-util = { path = "../malachite-base-test-util" }
 malachite-nz-test-util = { path = "../malachite-nz-test-util" }
 malachite-q-test-util = { path = "../malachite-q-test-util" }
@@ -25,6 +26,6 @@ serde = "^1.0.0"
 serde_json = "^1.0.32"
 
 [dev-dependencies.rug]
-version = "1.11.0"
+version = "1.14.1"
 default-features = false
 features = ["rational"]

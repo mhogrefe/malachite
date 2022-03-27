@@ -13,8 +13,8 @@ pub fn limbs_square_low_basecase_unrestricted(out: &mut [Limb], xs: &[Limb]) {
     match n {
         1 => out[0] = xs_0.wrapping_square(),
         2 => {
-            let (p_hi, p_lo) = DoubleLimb::from(xs_0).square().split_in_half();
-            out[0] = p_lo;
+            let p_hi;
+            (p_hi, out[0]) = DoubleLimb::from(xs_0).square().split_in_half();
             out[1] = (xs_0.wrapping_mul(xs[1]) << 1).wrapping_add(p_hi);
         }
         _ => {

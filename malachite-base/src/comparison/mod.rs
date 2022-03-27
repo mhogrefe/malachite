@@ -1,4 +1,4 @@
-/// This module contains macros related to comparing values.
+/// Macros related to comparing values.
 pub mod macros;
-/// This module contains traits related to comparing values.
+/// Traits related to comparing values.
 pub mod traits;

@@ -15,13 +15,6 @@ use std::ops::{BitXor, BitXorAssign};
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_limb;
-///
-/// assert_eq!(limbs_xor_limb(&[123, 456], 789), &[878, 456]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut result = xs.to_vec();
@@ -41,15 +34,6 @@ pub fn limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
 ///
 /// # Panics
 /// Panics if `out` is shorter than `xs` or if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_limb_to_out;
-///
-/// let mut out = vec![0, 0, 0];
-/// limbs_xor_limb_to_out(&mut out, &[123, 456], 789);
-/// assert_eq!(out, &[878, 456, 0]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     out[..xs.len()].copy_from_slice(xs);
@@ -65,15 +49,6 @@ pub fn limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
 ///
 /// # Panics
 /// Panics if `xs` is empty.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_limb_in_place;
-///
-/// let mut xs = vec![123, 456];
-/// limbs_xor_limb_in_place(&mut xs, 789);
-/// assert_eq!(xs, &[878, 456]);
-/// ```
 #[doc(hidden)]
 #[inline]
 pub fn limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
@@ -94,14 +69,6 @@ pub fn limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_same_length;
-///
-/// assert_eq!(limbs_xor_same_length(&[6, 7], &[1, 2]), &[7, 5]);
-/// assert_eq!(limbs_xor_same_length(&[100, 101, 102], &[102, 101, 100]), &[2, 0, 2]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     assert_eq!(xs.len(), ys.len());
@@ -120,14 +87,6 @@ pub fn limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 ///
 /// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res is returned and both inputs are non-
 /// negative.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor;
-///
-/// assert_eq!(limbs_xor(&[6, 7], &[1, 2, 3]), &[7, 5, 3]);
-/// assert_eq!(limbs_xor(&[100, 101, 102], &[102, 101, 100]), &[2, 0, 2]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
@@ -157,19 +116,6 @@ pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
 /// Panics if `xs` and `ys` have different lengths or if `out` is too short.
 ///
 /// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_same_length_to_out;
-///
-/// let xs = &mut [10, 10, 10, 10];
-/// limbs_xor_same_length_to_out(xs, &[6, 7], &[1, 2]);
-/// assert_eq!(xs, &[7, 5, 10, 10]);
-///
-/// let xs = &mut [10, 10, 10, 10];
-/// limbs_xor_same_length_to_out(xs, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(xs, &[2, 0, 2, 10]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
@@ -194,19 +140,6 @@ pub fn limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
 /// Panics if `out` is too short.
 ///
 /// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are non-negative.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_to_out;
-///
-/// let xs = &mut [10, 10, 10, 10];
-/// limbs_xor_to_out(xs, &[6, 7], &[1, 2, 3]);
-/// assert_eq!(xs, &[7, 5, 3, 10]);
-///
-/// let xs = &mut [10, 10, 10, 10];
-/// limbs_xor_to_out(xs, &[100, 101, 102], &[102, 101, 100]);
-/// assert_eq!(xs, &[2, 0, 2, 10]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
@@ -235,19 +168,6 @@ pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
 ///
 /// # Panics
 /// Panics if `xs` and `ys` have different lengths.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_same_length_in_place_left;
-///
-/// let xs = &mut [6, 7];
-/// limbs_xor_same_length_in_place_left(xs, &[1, 2]);
-/// assert_eq!(xs, &[7, 5]);
-///
-/// let xs = &mut [100, 101, 102];
-/// limbs_xor_same_length_in_place_left(xs, &[102, 101, 100]);
-/// assert_eq!(xs, &[2, 0, 2]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
@@ -267,23 +187,6 @@ pub fn limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
 /// where n = `ys.len()`
 ///
 /// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_in_place_left;
-///
-/// let mut xs = vec![6, 7];
-/// limbs_xor_in_place_left(&mut xs, &[1, 2, 3]);
-/// assert_eq!(xs, &[7, 5, 3]);
-///
-/// let mut xs = vec![1, 2, 3];
-/// limbs_xor_in_place_left(&mut xs, &[6, 7]);
-/// assert_eq!(xs, &[7, 5, 3]);
-///
-/// let mut xs = vec![100, 101, 102];
-/// limbs_xor_in_place_left(&mut xs, &[102, 101, 100]);
-/// assert_eq!(xs, &[2, 0, 2]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
@@ -309,29 +212,6 @@ pub fn limbs_xor_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
 ///
 /// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are non-negative and the result is
 /// written to the longer input slice.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::xor::limbs_xor_in_place_either;
-///
-/// let mut xs = vec![6, 7];
-/// let mut ys = vec![1, 2, 3];
-/// assert_eq!(limbs_xor_in_place_either(&mut xs, &mut ys), true);
-/// assert_eq!(xs, &[6, 7]);
-/// assert_eq!(ys, &[7, 5, 3]);
-///
-/// let mut xs = vec![1, 2, 3];
-/// let mut ys = vec![6, 7];
-/// assert_eq!(limbs_xor_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, &[7, 5, 3]);
-/// assert_eq!(ys, &[6, 7]);
-///
-/// let mut xs = vec![100, 101, 102];
-/// let mut ys = vec![102, 101, 100];
-/// assert_eq!(limbs_xor_in_place_either(&mut xs, &mut ys), false);
-/// assert_eq!(xs, &[2, 0, 2]);
-/// assert_eq!(ys, &[102, 101, 100]);
-/// ```
 #[doc(hidden)]
 pub fn limbs_xor_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();

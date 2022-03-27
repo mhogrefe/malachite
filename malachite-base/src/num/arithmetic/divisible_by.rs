@@ -1,9 +1,8 @@
-use comparison::traits::Min;
 use num::arithmetic::traits::DivisibleBy;
-use num::basic::traits::{NegativeOne, Zero};
-use std::ops::Rem;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 
-fn divisible_by_unsigned<T: Copy + Eq + Rem<T, Output = T> + Zero>(x: T, other: T) -> bool {
+fn divisible_by_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> bool {
     x == T::ZERO || other != T::ZERO && x % other == T::ZERO
 }
 
@@ -34,10 +33,7 @@ macro_rules! impl_divisible_by_unsigned {
 }
 apply_to_unsigneds!(impl_divisible_by_unsigned);
 
-fn divisible_by_signed<T: Copy + Eq + Min + NegativeOne + Rem<T, Output = T> + Zero>(
-    x: T,
-    other: T,
-) -> bool {
+fn divisible_by_signed<T: PrimitiveSigned>(x: T, other: T) -> bool {
     x == T::ZERO
         || x == T::MIN && other == T::NEGATIVE_ONE
         || other != T::ZERO && x % other == T::ZERO

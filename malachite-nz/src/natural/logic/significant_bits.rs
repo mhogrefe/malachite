@@ -17,14 +17,6 @@ use natural::Natural;
 /// # Panics
 /// Panics if `xs` is empty.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
-///
-/// assert_eq!(limbs_significant_bits::<u32>(&[0b11]), 2);
-/// assert_eq!(limbs_significant_bits::<u32>(&[0, 0b1101]), 36);
-/// ```
-///
 /// This is mpz_sizeinbase from mpz/sizeinbase.c, GMP 6.1.2, where x is non-negative and base is 2.
 #[doc(hidden)]
 pub fn limbs_significant_bits<T: PrimitiveUnsigned>(xs: &[T]) -> u64 {

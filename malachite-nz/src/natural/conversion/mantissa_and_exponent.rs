@@ -487,7 +487,7 @@ macro_rules! impl_mantissa_and_exponent {
             /// $m_s$ is a rational number with $1 \leq m_s < 2$. We represent the rational
             /// mantissa as a float. The conversion might not be exact, so we round to the nearest
             /// float using the `Nearest` rounding mode. To use other rounding modes, use
-            /// `sci_mantissa_and_exponent`.
+            /// `sci_mantissa_and_exponent_with_rounding`.
             /// $$
             /// f(x) \approx (\frac{x}{2^{\lfloor \log_2 x \rfloor}}, \lfloor \log_2 x \rfloor).
             /// $$

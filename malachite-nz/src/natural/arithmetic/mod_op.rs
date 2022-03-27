@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::{
-    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, Parity, PowerOf2, WrappingAddAssign,
-    WrappingMulAssign, WrappingSubAssign,
+    Mod, ModAssign, ModPowerOf2, NegMod, NegModAssign, OverflowingAddAssign, Parity, PowerOf2,
+    WrappingAddAssign, WrappingMulAssign, WrappingSubAssign,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, Zero};
@@ -78,14 +78,6 @@ pub fn mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> L
 ///
 /// # Panics
 /// Panics if the length of `ns` is less than 2 or if `d` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_limb;
-///
-/// assert_eq!(limbs_mod_limb(&[123, 456], 789), 636);
-/// assert_eq!(limbs_mod_limb(&[u32::MAX, u32::MAX], 3), 0);
-/// ```
 #[cfg(feature = "32_bit_limbs")]
 #[doc(hidden)]
 #[inline]
@@ -106,30 +98,6 @@ pub fn limbs_mod_limb(ns: &[Limb], d: Limb) -> Limb {
 /// Time: worst case O(1)
 ///
 /// Additional memory: worst case O(1)
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_mod::limbs_two_limb_inverse_helper;
-/// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_three_limb_by_two_limb;
-///
-/// let d_1 = 0x80000004;
-/// let d_0 = 5;
-/// assert_eq!(
-///     limbs_mod_three_limb_by_two_limb(
-///         1, 2, 3, d_1, d_0,
-///         limbs_two_limb_inverse_helper(d_1, d_0)),
-///     0x7ffffffdfffffffe
-/// );
-///
-/// let d_1 = 0x80000000;
-/// let d_0 = 0;
-/// assert_eq!(
-///     limbs_mod_three_limb_by_two_limb(
-///         2, 0x40000000, 4, d_1, d_0,
-///         limbs_two_limb_inverse_helper(d_1, d_0)),
-///     0x4000000000000004
-/// );
-/// ```
 ///
 /// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.2.1, returning only the remainder.
 #[doc(hidden)]
@@ -174,16 +142,6 @@ pub fn limbs_mod_three_limb_by_two_limb(
 /// Panics if `ds` does not have length 2, `ns` has length less than 2, `qs` has length less than
 /// `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_by_two_limb_normalized;
-///
-/// assert_eq!(
-///     limbs_mod_by_two_limb_normalized(&[1, 2, 3, 4, 5], &[3, 0x80000000]),
-///     (166, 2147483626)
-/// );
-/// ```
-///
 /// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.2.1, returning the two limbs of the
 /// remainder.
 #[doc(hidden)]
@@ -203,10 +161,7 @@ pub fn limbs_mod_by_two_limb_normalized(ns: &[Limb], ds: &[Limb]) -> (Limb, Limb
     let (mut r_1, mut r_0) = r.split_in_half();
     let d_inv = limbs_two_limb_inverse_helper(d_1, d_0);
     for &n in ns[..n_limit].iter().rev() {
-        let (new_r_1, new_r_0) =
-            limbs_mod_three_limb_by_two_limb(r_1, r_0, n, d_1, d_0, d_inv).split_in_half();
-        r_1 = new_r_1;
-        r_0 = new_r_0;
+        (r_1, r_0) = limbs_mod_three_limb_by_two_limb(r_1, r_0, n, d_1, d_0, d_inv).split_in_half();
     }
     (r_0, r_1)
 }
@@ -252,10 +207,10 @@ pub fn limbs_mod_schoolbook(ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
             n_1 = ns[i - 1]; // update n_1, last loop's value will now be invalid
         } else {
             let (ns_lo, ns_hi) = ns.split_at_mut(i - 2);
-            let (q, new_n) =
+            let (q, n) =
                 limbs_div_mod_three_limb_by_two_limb(n_1, ns_hi[1], ns_hi[0], d_1, d_0, d_inv);
-            let (new_n_1, mut n_0) = new_n.split_in_half();
-            n_1 = new_n_1;
+            let mut n_0;
+            (n_1, n_0) = n.split_in_half();
             let local_carry_1 =
                 limbs_sub_mul_limb_same_length_in_place_left(&mut ns_lo[j..], ds_init_init, q);
             let local_carry_2 = n_0 < local_carry_1;
@@ -397,12 +352,9 @@ pub fn limbs_mod_divide_and_conquer(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb
                 q = Limb::MAX;
                 assert_eq!(limbs_sub_mul_limb_same_length_in_place_left(ns, ds, q), n_2);
             } else {
-                let (new_q, new_n) =
-                    limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, d_inv);
-                q = new_q;
-                let (new_n_1, new_n_0) = new_n.split_in_half();
-                n_1 = new_n_1;
-                n_0 = new_n_0;
+                let n;
+                (q, n) = limbs_div_mod_three_limb_by_two_limb(n_2, n_1, n_0, d_1, d_0, d_inv);
+                (n_1, n_0) = n.split_in_half();
                 // d_len > 2 because of precondition. No need to check
                 let local_carry_1 =
                     limbs_sub_mul_limb_same_length_in_place_left(&mut ns[..b], &ds[..b], q);
@@ -833,14 +785,6 @@ fn limbs_mod_unbalanced(rs: &mut [Limb], ns: &[Limb], ds: &[Limb], adjusted_n_le
 /// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
 /// of `ds` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_op::limbs_mod;
-///
-/// assert_eq!(limbs_mod(&[1, 2], &[3, 4]), &[1, 2]);
-/// assert_eq!(limbs_mod(&[1, 2, 3], &[4, 5]), &[2576980381, 2]);
-/// ```
-///
 /// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where qp is not calculated and rp is
 /// returned.
 #[doc(hidden)]
@@ -866,19 +810,6 @@ pub fn limbs_mod(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
 /// Panics if `rs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
 /// most-significant limb of `ds` is zero.
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::mod_op::limbs_mod_to_out;
-///
-/// let rs = &mut [10; 4];
-/// limbs_mod_to_out(rs, &[1, 2], &[3, 4]);
-/// assert_eq!(rs, &[1, 2, 10, 10]);
-///
-/// let rs = &mut [10; 4];
-/// limbs_mod_to_out(rs, &[1, 2, 3], &[4, 5]);
-/// assert_eq!(rs, &[2576980381, 2, 10, 10]);
-/// ```
-///
 /// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where qp is not calculated.
 #[doc(hidden)]
 pub fn limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
@@ -889,9 +820,7 @@ pub fn limbs_mod_to_out(rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let ds_last = *ds.last().unwrap();
     assert!(d_len > 1 && ds_last != 0);
     if d_len == 2 {
-        let (r_0, r_1) = limbs_mod_by_two_limb(ns, ds);
-        rs[0] = r_0;
-        rs[1] = r_1;
+        (rs[0], rs[1]) = limbs_mod_by_two_limb(ns, ds);
     } else {
         // conservative tests for quotient size
         let adjust = ns[n_len - 1] >= ds_last;
@@ -934,18 +863,14 @@ fn limbs_mod_limb_normalized(ns: &[Limb], ns_high: Limb, d: Limb, d_inv: Limb) -
         .overflowing_add(DoubleLimb::from(power_of_2) * DoubleLimb::from(ns_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for &n in ns[..len - 2].iter().rev() {
-        if big_carry {
-            let (sum, carry) = sum_low.overflowing_add(power_of_2);
-            sum_low = sum;
-            if carry {
-                sum_low.wrapping_sub_assign(d);
-            }
+        if big_carry && sum_low.overflowing_add_assign(power_of_2) {
+            sum_low.wrapping_sub_assign(d);
         }
-        let (sum, carry) = DoubleLimb::join_halves(sum_low, n)
+        let sum;
+        (sum, big_carry) = DoubleLimb::join_halves(sum_low, n)
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
-        big_carry = carry;
     }
     if big_carry {
         sum_high.wrapping_sub_assign(d);
@@ -990,22 +915,18 @@ fn limbs_mod_limb_normalized_shl(
         .overflowing_add(DoubleLimb::from(power_of_2) * DoubleLimb::from(ns_high));
     let (mut sum_high, mut sum_low) = sum.split_in_half();
     for j in (0..len - 2).rev() {
-        if big_carry {
-            let (sum, carry) = sum_low.overflowing_add(power_of_2);
-            sum_low = sum;
-            if carry {
-                sum_low.wrapping_sub_assign(d);
-            }
+        if big_carry && sum_low.overflowing_add_assign(power_of_2) {
+            sum_low.wrapping_sub_assign(d);
         }
         let mut n = ns[j] << bits;
         if j != 0 {
             n |= ns[j - 1] >> cobits;
         }
-        let (sum, carry) = DoubleLimb::join_halves(sum_low, n)
+        let sum;
+        (sum, big_carry) = DoubleLimb::join_halves(sum_low, n)
             .overflowing_add(DoubleLimb::from(sum_high) * DoubleLimb::from(power_of_2));
         sum_high = sum.upper_half();
         sum_low = sum.lower_half();
-        big_carry = carry;
     }
     if big_carry {
         sum_high.wrapping_sub_assign(d);
@@ -1206,12 +1127,10 @@ pub fn limbs_mod_limb_any_leading_zeros_1(ns: &[Limb], d: Limb) -> Limb {
         .wrapping_add(DoubleLimb::from(ns[len - 2]))
         .split_in_half();
     for &n in ns[..len - 2].iter().rev() {
-        let (new_r_hi, new_r_lo) = (DoubleLimb::from(r_hi) * base_pow_2_mod_d)
+        (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_pow_2_mod_d)
             .wrapping_add(DoubleLimb::from(r_lo) * base_mod_d)
             .wrapping_add(DoubleLimb::from(n))
             .split_in_half();
-        r_hi = new_r_hi;
-        r_lo = new_r_lo;
     }
     if shift != 0 {
         r_hi = (r_hi << shift) | (r_lo >> (Limb::WIDTH - shift));
@@ -1254,23 +1173,15 @@ pub fn limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
     if len > 2 {
         let (r, mut carry) = DoubleLimb::join_halves(r_lo, ns[len - 3])
             .overflowing_add(DoubleLimb::from(r_hi) * base_pow_2_mod_d);
-        let (new_r_hi, new_r_lo) = r.split_in_half();
-        r_hi = new_r_hi;
-        r_lo = new_r_lo;
+        (r_hi, r_lo) = r.split_in_half();
         for &n in ns[..len - 3].iter().rev() {
-            if carry {
-                let (new_r_lo, carry) = r_lo.overflowing_add(small_base_pow_2_mod_d);
-                r_lo = new_r_lo;
-                if carry {
-                    r_lo.wrapping_sub_assign(d);
-                }
+            if carry && r_lo.overflowing_add_assign(small_base_pow_2_mod_d) {
+                r_lo.wrapping_sub_assign(d);
             }
-            let (r, new_carry) = DoubleLimb::join_halves(r_lo, n)
+            let r;
+            (r, carry) = DoubleLimb::join_halves(r_lo, n)
                 .overflowing_add(DoubleLimb::from(r_hi) * base_pow_2_mod_d);
-            carry = new_carry;
-            let (new_r_hi, new_r_lo) = r.split_in_half();
-            r_hi = new_r_hi;
-            r_lo = new_r_lo;
+            (r_hi, r_lo) = r.split_in_half();
         }
         if carry {
             r_hi.wrapping_sub_assign(d);
@@ -1278,11 +1189,9 @@ pub fn limbs_mod_limb_any_leading_zeros_2(ns: &[Limb], d: Limb) -> Limb {
     }
     if shift != 0 {
         let (new_r_hi, t) = (DoubleLimb::from(r_hi) * base_mod_d).split_in_half();
-        let (new_r_hi, new_r_lo) =
-            (DoubleLimb::join_halves(new_r_hi, r_lo).wrapping_add(DoubleLimb::from(t)) << shift)
-                .split_in_half();
-        r_hi = new_r_hi;
-        r_lo = new_r_lo;
+        (r_hi, r_lo) = (DoubleLimb::join_halves(new_r_hi, r_lo).wrapping_add(DoubleLimb::from(t))
+            << shift)
+            .split_in_half();
     } else if r_hi >= d {
         // might get r_hi == divisor here, but `mod_by_preinversion_special` allows that.
         r_hi.wrapping_sub_assign(d);
@@ -1329,13 +1238,11 @@ pub fn limbs_mod_limb_at_least_1_leading_zero(ns: &[Limb], d: Limb) -> Limb {
         (ns[len - 1], ns[len - 2])
     };
     for chunk in ns[..len - 2].rchunks_exact(2) {
-        let (new_r_hi, new_r_lo) = (DoubleLimb::from(r_hi) * base_pow_3_mod_d)
+        (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_pow_3_mod_d)
             .wrapping_add(DoubleLimb::from(r_lo) * base_pow_2_mod_d)
             .wrapping_add(DoubleLimb::from(chunk[1]) * base_mod_d)
             .wrapping_add(DoubleLimb::from(chunk[0]))
             .split_in_half();
-        r_hi = new_r_hi;
-        r_lo = new_r_lo;
     }
     let (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_mod_d)
         .wrapping_add(DoubleLimb::from(r_lo))
@@ -1404,15 +1311,13 @@ pub fn limbs_mod_limb_at_least_2_leading_zeros(ns: &[Limb], d: Limb) -> Limb {
         _ => unreachable!(),
     };
     for chunk in ns[..len].rchunks_exact(4) {
-        let (new_r_hi, new_r_lo) = (DoubleLimb::from(r_hi) * base_pow_5_mod_d)
+        (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_pow_5_mod_d)
             .wrapping_add(DoubleLimb::from(r_lo) * base_pow_4_mod_d)
             .wrapping_add(DoubleLimb::from(chunk[3]) * base_pow_3_mod_d)
             .wrapping_add(DoubleLimb::from(chunk[2]) * base_pow_2_mod_d)
             .wrapping_add(DoubleLimb::from(chunk[1]) * base_mod_d)
             .wrapping_add(DoubleLimb::from(chunk[0]))
             .split_in_half();
-        r_hi = new_r_hi;
-        r_lo = new_r_lo;
     }
     let (r_hi, r_lo) = (DoubleLimb::from(r_hi) * base_mod_d)
         .wrapping_add(DoubleLimb::from(r_lo))

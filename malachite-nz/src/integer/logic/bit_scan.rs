@@ -20,20 +20,6 @@ use std::cmp::Ordering;
 ///
 /// where n = `xs.len()`
 ///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_false_bit_neg;
-///
-/// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 0), Some(0));
-/// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 20), Some(20));
-/// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 31), Some(31));
-/// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 32), Some(34));
-/// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 33), Some(34));
-/// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 34), Some(34));
-/// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 35), None);
-/// assert_eq!(limbs_index_of_next_false_bit_neg(&[0, 0b101], 100), None);
-/// ```
-///
 /// This is mpz_scan0 from mpz/scan0.c, GMP 6.2.1.
 #[doc(hidden)]
 pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -> Option<u64> {
@@ -79,21 +65,6 @@ pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -
 /// Additional memory: worst case O(1)
 ///
 /// where n = `xs.len()`
-///
-/// # Examples
-/// ```
-/// use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_true_bit_neg;
-///
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 0), 32);
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 20), 32);
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 31), 32);
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 32), 32);
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 33), 33);
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 34), 35);
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 35), 35);
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 36), 36);
-/// assert_eq!(limbs_index_of_next_true_bit_neg(&[0, 0b101], 100), 100);
-/// ```
 ///
 /// This is mpz_scan1 from mpz/scan1.c, GMP 6.2.1.
 #[doc(hidden)]

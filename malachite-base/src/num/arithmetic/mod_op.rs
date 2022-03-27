@@ -1,14 +1,11 @@
 use num::arithmetic::traits::{
     CeilingMod, CeilingModAssign, Mod, ModAssign, NegMod, NegModAssign, UnsignedAbs,
 };
-use num::basic::traits::Zero;
+use num::basic::signeds::PrimitiveSigned;
+use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::ExactFrom;
-use std::ops::{Neg, Rem, RemAssign, Sub};
 
-fn neg_mod_unsigned<T: Copy + Eq + Rem<T, Output = T> + Sub<T, Output = T> + Zero>(
-    x: T,
-    other: T,
-) -> T {
+fn neg_mod_unsigned<T: PrimitiveUnsigned>(x: T, other: T) -> T {
     let remainder = x % other;
     if remainder == T::ZERO {
         T::ZERO
@@ -17,10 +14,7 @@ fn neg_mod_unsigned<T: Copy + Eq + Rem<T, Output = T> + Sub<T, Output = T> + Zer
     }
 }
 
-fn neg_mod_assign_unsigned<T: Copy + Eq + RemAssign<T> + Sub<T, Output = T> + Zero>(
-    x: &mut T,
-    other: T,
-) {
+fn neg_mod_assign_unsigned<T: PrimitiveUnsigned>(x: &mut T, other: T) {
     *x %= other;
     if *x != T::ZERO {
         *x = other - *x;
@@ -133,8 +127,8 @@ macro_rules! impl_mod_unsigned {
 apply_to_unsigneds!(impl_mod_unsigned);
 
 fn mod_op_signed<
-    U: NegMod<U, Output = U> + Rem<U, Output = U>,
-    S: Copy + ExactFrom<U> + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: ExactFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: S,
     other: S,
@@ -152,8 +146,8 @@ fn mod_op_signed<
 }
 
 fn ceiling_mod_signed<
-    U: NegMod<U, Output = U> + Rem<U, Output = U>,
-    S: Copy + ExactFrom<U> + Neg<Output = S> + Ord + UnsignedAbs<Output = U> + Zero,
+    U: PrimitiveUnsigned,
+    S: ExactFrom<U> + PrimitiveSigned + UnsignedAbs<Output = U>,
 >(
     x: S,
     other: S,

@@ -139,8 +139,8 @@ macro_rules! impl_overflowing_add_mul_signed {
             /// See the documentation of the `num::arithmetic::overflowing_add_mul` module.
             #[inline]
             fn overflowing_add_mul_assign(&mut self, y: $t, z: $t) -> bool {
-                let (result, overflow) = self.overflowing_add_mul(y, z);
-                *self = result;
+                let overflow;
+                (*self, overflow) = self.overflowing_add_mul(y, z);
                 overflow
             }
         }

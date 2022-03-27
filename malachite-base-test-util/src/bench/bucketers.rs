@@ -26,7 +26,7 @@ fn float_size<T: PrimitiveFloat>(f: T) -> usize {
         0
     } else {
         let (m, e) = f.integer_mantissa_and_exponent();
-        usize::exact_from(m) + usize::wrapping_from(e.abs())
+        usize::exact_from(m.significant_bits()) + usize::wrapping_from(e.abs())
     }
 }
 
@@ -171,6 +171,13 @@ pub fn pair_string_max_len_bucketer<'a>() -> Bucketer<'a, (String, String)> {
     Bucketer {
         bucketing_function: &|(s, t)| max(s.len(), t.len()),
         bucketing_label: "max(s.len(), t.len())".to_string(),
+    }
+}
+
+pub fn pair_1_string_len_bucketer<T>(s_name: &str) -> Bucketer<(String, T)> {
+    Bucketer {
+        bucketing_function: &|&(ref s, _)| s.len(),
+        bucketing_label: format!("{}.len()", s_name),
     }
 }
 

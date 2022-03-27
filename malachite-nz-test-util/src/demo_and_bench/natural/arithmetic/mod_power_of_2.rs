@@ -277,10 +277,9 @@ fn benchmark_limbs_vec_mod_power_of_2_in_place(
         limit,
         file_name,
         &pair_2_bucketer("pow"),
-        &mut [(
-            "Malachite",
-            &mut (|(mut xs, pow)| limbs_vec_mod_power_of_2_in_place(&mut xs, pow)),
-        )],
+        &mut [("Malachite", &mut |(mut xs, pow)| {
+            limbs_vec_mod_power_of_2_in_place(&mut xs, pow)
+        })],
     );
 }
 
@@ -298,10 +297,9 @@ fn benchmark_limbs_neg_mod_power_of_2(
         limit,
         file_name,
         &pair_2_bucketer("pow"),
-        &mut [(
-            "Malachite",
-            &mut (|(xs, pow)| no_out!(limbs_neg_mod_power_of_2(&xs, pow))),
-        )],
+        &mut [("Malachite", &mut |(xs, pow)| {
+            no_out!(limbs_neg_mod_power_of_2(&xs, pow))
+        })],
     );
 }
 
@@ -319,10 +317,9 @@ fn benchmark_limbs_neg_mod_power_of_2_in_place(
         limit,
         file_name,
         &pair_2_bucketer("pow"),
-        &mut [(
-            "Malachite",
-            &mut (|(mut xs, pow)| limbs_neg_mod_power_of_2_in_place(&mut xs, pow)),
-        )],
+        &mut [("Malachite", &mut |(mut xs, pow)| {
+            limbs_neg_mod_power_of_2_in_place(&mut xs, pow)
+        })],
     );
 }
 

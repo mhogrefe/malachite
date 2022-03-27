@@ -49,7 +49,7 @@ fn demo_mod_power_of_2_unsigned<T: PrimitiveUnsigned>(
         .get(gm, &config)
         .take(limit)
     {
-        println!("{} === {} mod 2^{}", n, n.mod_power_of_2(pow), pow);
+        println!("{} ≡ {} mod 2^{}", n, n.mod_power_of_2(pow), pow);
     }
 }
 
@@ -61,7 +61,7 @@ where
         .get(gm, &config)
         .take(limit)
     {
-        println!("{} === {} mod 2^{}", n, n.mod_power_of_2(pow), pow);
+        println!("{} ≡ {} mod 2^{}", n, n.mod_power_of_2(pow), pow);
     }
 }
 
@@ -263,10 +263,7 @@ fn benchmark_mod_power_of_2_signed<T: PrimitiveSigned>(
         limit,
         file_name,
         &pair_1_bit_bucketer("n"),
-        &mut [(
-            "Malachite",
-            &mut (|(n, pow)| no_out!(n.mod_power_of_2(pow))),
-        )],
+        &mut [("Malachite", &mut |(n, pow)| no_out!(n.mod_power_of_2(pow)))],
     );
 }
 
@@ -344,10 +341,7 @@ fn benchmark_rem_power_of_2_signed<T: PrimitiveSigned>(
         limit,
         file_name,
         &pair_1_bit_bucketer("n"),
-        &mut [(
-            "Malachite",
-            &mut (|(n, pow)| no_out!(n.rem_power_of_2(pow))),
-        )],
+        &mut [("Malachite", &mut |(n, pow)| no_out!(n.rem_power_of_2(pow)))],
     );
 }
 

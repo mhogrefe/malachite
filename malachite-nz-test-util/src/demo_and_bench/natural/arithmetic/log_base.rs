@@ -11,7 +11,7 @@ use malachite_nz_test_util::natural::arithmetic::log_base::{
 };
 
 pub(crate) fn register(runner: &mut Runner) {
-    register_demo!(runner, demo_natural_log_approx);
+    register_demo!(runner, demo_natural_approx_log);
     register_demo!(runner, demo_natural_floor_log_base);
     register_demo!(runner, demo_natural_ceiling_log_base);
     register_demo!(runner, demo_natural_checked_log_base);
@@ -21,7 +21,7 @@ pub(crate) fn register(runner: &mut Runner) {
     register_bench!(runner, benchmark_natural_checked_log_base_algorithms);
 }
 
-fn demo_natural_log_approx(gm: GenMode, config: GenConfig, limit: usize) {
+fn demo_natural_approx_log(gm: GenMode, config: GenConfig, limit: usize) {
     for n in natural_gen_var_2().get(gm, &config).take(limit) {
         println!("log({}) ≈ {}", n, NiceFloat(n.approx_log()));
     }

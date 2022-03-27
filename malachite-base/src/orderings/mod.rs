@@ -29,7 +29,7 @@ pub fn ordering_from_str(src: &str) -> Option<Ordering> {
     }
 }
 
-/// This module contains iterators that generate `Ordering`s without repetition.
+/// Iterators that generate `Ordering`s without repetition.
 pub mod exhaustive;
-/// This module contains iterators that generate `Ordering`s randomly.
+/// Iterators that generate `Ordering`s randomly.
 pub mod random;
