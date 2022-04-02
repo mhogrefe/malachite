@@ -4,6 +4,7 @@ use malachite_base::num::conversion::traits::FromStringBase;
 use natural::InnerNatural::Small;
 use natural::Natural;
 use std::convert::TryFrom;
+#[cfg(feature = "test_build")]
 use std::str::FromStr;
 
 /// An integer.
@@ -72,12 +73,13 @@ impl Integer {
     ///
     /// To be valid, its absolute value must be valid, and if the absolute value is zero, the sign
     /// must be true. All `Integer`s must be valid.
-    #[doc(hidden)]
+
+    #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         self.abs.is_valid() && (self.sign || self.abs != 0)
     }
 
-    #[doc(hidden)]
+    #[cfg(feature = "test_build")]
     pub fn trillion() -> Integer {
         Integer::from_str("1000000000000").unwrap()
     }

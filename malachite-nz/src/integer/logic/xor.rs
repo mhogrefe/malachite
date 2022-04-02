@@ -16,17 +16,16 @@ use platform::Limb;
 use std::cmp::{max, Ordering};
 use std::ops::{BitXor, BitXorAssign};
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, returns the limbs of the bitwise xor of the `Integer` and a `Limb`. `xs` cannot be
-/// empty or only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, returns the limbs of the bitwise xor of the `Integer` and a `Limb`. `xs` cannot be
+// empty or only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+pub_test! {limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     if y == 0 {
         return xs.to_vec();
     }
@@ -47,20 +46,19 @@ pub fn limbs_neg_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
         out.extend_from_slice(&limbs_sub_limb(tail, 1).0);
     }
     out
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, writes the limbs of the bitwise and of the `Integer`, writes the limbs of the bitwise
-/// xor of the `Integer` and a `Limb` to an output slice. The output slice must be at least as long
-/// as the input slice. `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, writes the limbs of the bitwise and of the `Integer`, writes the limbs of the bitwise
+// xor of the `Integer` and a `Limb` to an output slice. The output slice must be at least as long
+// as the input slice. `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
     if y == 0 {
@@ -84,19 +82,18 @@ pub fn limbs_neg_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool
         limbs_sub_limb_to_out(&mut out[1..len], tail, 1);
         false
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to the input slice.
-/// `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to the input slice.
+// `xs` cannot be empty or only contain zeros. Returns whether a carry occurs.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
     if y == 0 {
         return false;
     }
@@ -115,38 +112,36 @@ pub fn limbs_slice_neg_xor_limb_in_place(xs: &mut [Limb], y: Limb) -> bool {
         limbs_sub_limb_in_place(tail, 1);
         false
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to the input slice.
-/// `xs` cannot be empty or only contain zeros. If a carry occurs, extends the `Vec`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a `Limb` to the input slice.
+// `xs` cannot be empty or only contain zeros. If a carry occurs, extends the `Vec`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_vec_neg_xor_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_neg_xor_limb_in_place(xs, y) {
         xs.push(1);
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
-/// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
-/// `y` and whose other limbs are full of `true` bits. `xs` may not be empty.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, returns the
+// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
+// `y` and whose other limbs are full of `true` bits. `xs` may not be empty.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let (head, tail) = xs.split_first().unwrap();
     let lo = head ^ y;
     let mut out;
@@ -158,24 +153,23 @@ pub fn limbs_pos_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
         out[0] = lo.wrapping_neg();
     }
     out
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
-/// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
-/// `y` and whose other limbs are full of `true` bits to an output slice. `xs` may not be empty or
-/// only contain zeros. The output slice must be at least as long as the input slice. Returns
-/// whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty or if `out` is shorter than `xs`.
-#[doc(hidden)]
-pub fn limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, writes the
+// limbs of the bitwise xor of the `Integer` and a negative number whose lowest limb is given by
+// `y` and whose other limbs are full of `true` bits to an output slice. `xs` may not be empty or
+// only contain zeros. The output slice must be at least as long as the input slice. Returns
+// whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty or if `out` is shorter than `xs`.
+pub_test! {limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> bool {
     let (head, tail) = xs.split_first().unwrap();
     let (out_head, out_tail) = out[..xs.len()].split_first_mut().unwrap();
     let lo = head ^ y;
@@ -187,23 +181,22 @@ pub fn limbs_pos_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) -> 
         out_tail.copy_from_slice(tail);
         false
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, takes the
-/// bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y` and whose
-/// other limbs are full of `true` bits, in place. `xs` may not be empty. Returns whether there is a
-/// carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of an `Integer`, takes the
+// bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y` and whose
+// other limbs are full of `true` bits, in place. `xs` may not be empty. Returns whether there is a
+// carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
     let (head, tail) = xs.split_at_mut(1);
     let head = &mut head[0];
     *head ^= y;
@@ -213,42 +206,40 @@ pub fn limbs_slice_pos_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) -> bool {
         *head = head.wrapping_neg();
         false
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of an `Integer`, takes the
-/// bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y` and whose
-/// other limbs are full of `true` bits, in place. `xs` may not be empty.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of an `Integer`, takes the
+// bitwise xor of the `Integer` and a negative number whose lowest limb is given by `y` and whose
+// other limbs are full of `true` bits, in place. `xs` may not be empty.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_vec_pos_xor_limb_neg_in_place(xs: &mut Vec<Limb>, y: Limb) {
     if limbs_slice_pos_xor_limb_neg_in_place(xs, y) {
         xs.push(1);
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, returns the limbs of the bitwise xor of the `Integer` and a negative number whose
-/// lowest limb is given by `y` and whose other limbs are full of `true` bits. `xs` may not be empty
-/// or only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty or only contains zeros.
-#[doc(hidden)]
-pub fn limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, returns the limbs of the bitwise xor of the `Integer` and a negative number whose
+// lowest limb is given by `y` and whose other limbs are full of `true` bits. `xs` may not be empty
+// or only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty or only contains zeros.
+pub_test! {limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut out;
     if xs[0] == 0 {
         let carry;
@@ -260,24 +251,23 @@ pub fn limbs_neg_xor_limb_neg(xs: &[Limb], y: Limb) -> Vec<Limb> {
         out[0] = xs[0].wrapping_neg() ^ y;
     }
     out
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a negative number whose
-/// lowest limb is given by `y` and whose other limbs are full of `true` bits to an output slice.
-/// `xs` may not be empty or only contain zeros. The output slice must be at least as long as the
-/// input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty or only contains zeros, or if `out` is shorter than `xs`.
-#[doc(hidden)]
-pub fn limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, writes the limbs of the bitwise xor of the `Integer` and a negative number whose
+// lowest limb is given by `y` and whose other limbs are full of `true` bits to an output slice.
+// `xs` may not be empty or only contain zeros. The output slice must be at least as long as the
+// input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty or only contains zeros, or if `out` is shorter than `xs`.
+pub_test! {limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     let (head, tail) = xs.split_first().unwrap();
     let (out_head, out_tail) = out[..xs.len()].split_first_mut().unwrap();
     if *head == 0 {
@@ -287,23 +277,22 @@ pub fn limbs_neg_xor_limb_neg_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
         *out_head = xs[0].wrapping_neg() ^ y;
         out_tail.copy_from_slice(tail);
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, takes the bitwise xor of the `Integer` and a negative number whose lowest limb is
-/// given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
-/// only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty or only contains zeros.
-#[doc(hidden)]
-pub fn limbs_neg_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, takes the bitwise xor of the `Integer` and a negative number whose lowest limb is
+// given by `y` and whose other limbs are full of `true` bits, in place. `xs` may not be empty or
+// only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty or only contains zeros.
+pub_test! {limbs_neg_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) {
     let (head, tail) = xs.split_first_mut().unwrap();
     if *head == 0 {
         assert!(!limbs_sub_limb_in_place(tail, 1));
@@ -312,7 +301,7 @@ pub fn limbs_neg_xor_limb_neg_in_place(xs: &mut [Limb], y: Limb) {
         head.wrapping_neg_assign();
         *head ^= y;
     }
-}
+}}
 
 fn limbs_xor_pos_neg_helper(x: Limb, boundary_seen: &mut bool) -> Limb {
     if *boundary_seen {
@@ -325,24 +314,23 @@ fn limbs_xor_pos_neg_helper(x: Limb, boundary_seen: &mut bool) -> Limb {
     }
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
-/// negative of another, returns the limbs of the bitwise xor of the `Integer`s. `xs` and `ys` may
-/// not be empty or only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res is returned, the first input is positive,
-/// and the second is negative.
-/// [0, 1], &[0, Limb::MAX, Limb::MAX]
-#[doc(hidden)]
-pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
+// negative of another, returns the limbs of the bitwise xor of the `Integer`s. `xs` and `ys` may
+// not be empty or only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res is returned, the first input is positive,
+// and the second is negative.
+// [0, 1], &[0, Limb::MAX, Limb::MAX]
+pub_test! {limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -408,30 +396,29 @@ pub fn limbs_xor_pos_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         out.push(1);
     }
     out
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
-/// negative of another, writes the limbs of the bitwise xor of the `Integer`s to an output slice.
-/// `xs` and `ys` may not be empty or only contain zeros. The output slice must be at least as long
-/// as the longer of the two input slices. max(`xs.len()`, `ys.len()`) limbs will be written; if the
-/// number of significant limbs of the result is lower, some of the written limbs will be zero.
-///
-/// Returns whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len() + ys.len()`
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
-/// longer of `xs` and `ys`.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where the first input is positive and the second is
-/// negative.
-#[doc(hidden)]
-pub fn limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of one `Integer` and the
+// negative of another, writes the limbs of the bitwise xor of the `Integer`s to an output slice.
+// `xs` and `ys` may not be empty or only contain zeros. The output slice must be at least as long
+// as the longer of the two input slices. max(`xs.len()`, `ys.len()`) limbs will be written; if the
+// number of significant limbs of the result is lower, some of the written limbs will be zero.
+//
+// Returns whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len() + ys.len()`
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
+// longer of `xs` and `ys`.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where the first input is positive and the second is
+// negative.
+pub_test! {limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
@@ -507,7 +494,7 @@ pub fn limbs_xor_pos_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
         }
     }
     slice_test_zero(&out[..max_len])
-}
+}}
 
 fn limbs_xor_pos_neg_in_place_left_helper(
     xs: &mut [Limb],
@@ -547,23 +534,22 @@ fn limbs_xor_pos_neg_in_place_left_helper(
     boundary_seen
 }
 
-/// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of one
-/// `Integer` and the negative of another, writes the limbs of the bitwise xor of the `Integer`s to
-/// the `Vec`. `xs` and `ys` may not be empty or only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len() + ys.len()`, m = `max(1, ys.len() - xs.len())`
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op1 and the first input is positive and
-/// the second is negative.
-#[doc(hidden)]
-pub fn limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of one
+// `Integer` and the negative of another, writes the limbs of the bitwise xor of the `Integer`s to
+// the `Vec`. `xs` and `ys` may not be empty or only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len() + ys.len()`, m = `max(1, ys.len() - xs.len())`
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op1 and the first input is positive and
+// the second is negative.
+pub_test! {limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -604,7 +590,7 @@ pub fn limbs_xor_pos_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if slice_test_zero(xs) {
         xs.push(1);
     }
-}
+}}
 
 fn limbs_xor_pos_neg_in_place_right_helper(
     xs: &[Limb],
@@ -646,23 +632,22 @@ fn limbs_xor_pos_neg_in_place_right_helper(
     boundary_seen
 }
 
-/// Interpreting a slice of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of one
-/// `Integer` and the negative of another, writes the limbs of the bitwise xor of the `Integer`s to
-/// the second (right) slice. `xs` and `ys` may not be empty or only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len() + ys.len()`, m = `max(1, xs.len() - ys.len())`
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op2 and the first input is positive and
-/// the second is negative.
-#[doc(hidden)]
-pub fn limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
+// Interpreting a slice of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of one
+// `Integer` and the negative of another, writes the limbs of the bitwise xor of the `Integer`s to
+// the second (right) slice. `xs` and `ys` may not be empty or only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len() + ys.len()`, m = `max(1, xs.len() - ys.len())`
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op2 and the first input is positive and
+// the second is negative.
+pub_test! {limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -700,27 +685,26 @@ pub fn limbs_xor_pos_neg_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) {
     if slice_test_zero(ys) {
         ys.push(1);
     }
-}
+}}
 
-/// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of one `Integer` and the
-/// negative of another, writes the limbs of the bitwise xor of the `Integer`s to the longer `Vec`
-/// (or the first one, if they are equally long). `xs` and `ys` may not be empty or only contain
-/// zeros. Returns a `bool` which is `false` when the output is to the first `Vec` and `true` when
-/// it's to the second `Vec`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len() + ys.len()`
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where the first input is positive, the second is
-/// negative, and the result is written to the longer input slice.
-#[doc(hidden)]
-pub fn limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
+// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of one `Integer` and the
+// negative of another, writes the limbs of the bitwise xor of the `Integer`s to the longer `Vec`
+// (or the first one, if they are equally long). `xs` and `ys` may not be empty or only contain
+// zeros. Returns a `bool` which is `false` when the output is to the first `Vec` and `true` when
+// it's to the second `Vec`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len() + ys.len()`
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where the first input is positive, the second is
+// negative, and the result is written to the longer input slice.
+pub_test! {limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -764,24 +748,23 @@ pub fn limbs_xor_pos_neg_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>)
         }
         true
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
-/// `Integer`s, returns the limbs of the bitwise xor of the `Integer`s. `xs` and `ys` may not be
-/// empty or only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res is returned and both inputs are negative.
-#[doc(hidden)]
-pub fn limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
+// `Integer`s, returns the limbs of the bitwise xor of the `Integer`s. `xs` and `ys` may not be
+// empty or only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len() + ys.len()`, m = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res is returned and both inputs are negative.
+pub_test! {limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -819,26 +802,25 @@ pub fn limbs_xor_neg_neg(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         _ => {}
     }
     out
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
-/// `Integer`s, writes the max(`xs.len()`, `ys.len()`) limbs of the bitwise xor of the `Integer`s to
-/// an output slice. `xs` and `ys` may not be empty or only contain zeros. The output slice must be
-/// at least as long as the longer input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len() + ys.len()`
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
-/// longer of `xs` and `ys`.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where both inputs are negative.
-#[doc(hidden)]
-pub fn limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
+// `Integer`s, writes the max(`xs.len()`, `ys.len()`) limbs of the bitwise xor of the `Integer`s to
+// an output slice. `xs` and `ys` may not be empty or only contain zeros. The output slice must be
+// at least as long as the longer input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len() + ys.len()`
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros, or if `out` is shorter than the
+// longer of `xs` and `ys`.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where both inputs are negative.
+pub_test! {limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
@@ -880,7 +862,7 @@ pub fn limbs_xor_neg_neg_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
         Ordering::Greater => out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]),
         _ => {}
     }
-}
+}}
 
 fn limbs_xor_neg_neg_in_place_helper(xs: &mut [Limb], ys: &[Limb], x_i: usize, y_i: usize) {
     let (min_i, max_i) = if x_i <= y_i { (x_i, y_i) } else { (y_i, x_i) };
@@ -903,22 +885,21 @@ fn limbs_xor_neg_neg_in_place_helper(xs: &mut [Limb], ys: &[Limb], x_i: usize, y
     }
 }
 
-/// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of the
-/// negatives of two `Integer`s, writes the limbs of the bitwise xor of the `Integer`s to the `Vec`.
-/// `xs` and `ys` may not be empty or only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len() + ys.len()`, m = `max(1, ys.len() - xs.len())`
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op1 and both inputs are negative.
-#[doc(hidden)]
-pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of the
+// negatives of two `Integer`s, writes the limbs of the bitwise xor of the `Integer`s to the `Vec`.
+// `xs` and `ys` may not be empty or only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len() + ys.len()`, m = `max(1, ys.len() - xs.len())`
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where res == op1 and both inputs are negative.
+pub_test! {limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -935,26 +916,25 @@ pub fn limbs_xor_neg_neg_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
             xs.extend_from_slice(&ys[xs_len..]);
         }
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
-/// `Integer`s, writes the limbs of the bitwise xor of the `Integer`s to the longer slice (or the
-/// first one, if they are equally long). `xs` and `ys` may not be empty or only contain zeros.
-/// Returns `false` when the output is to the first slice and `true` when it's to the second slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len() + ys.len()`
-///
-/// # Panics
-/// Panics if `xs` or `ys` are empty or contain only zeros.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where both inputs are negative and the result is
-/// written to the longer input slice.
-#[doc(hidden)]
-pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of the negatives of two
+// `Integer`s, writes the limbs of the bitwise xor of the `Integer`s to the longer slice (or the
+// first one, if they are equally long). `xs` and `ys` may not be empty or only contain zeros.
+// Returns `false` when the output is to the first slice and `true` when it's to the second slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len() + ys.len()`
+//
+// # Panics
+// Panics if `xs` or `ys` are empty or contain only zeros.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.2.1, where both inputs are negative and the result is
+// written to the longer input slice.
+pub_test! {limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let x_i = slice_leading_zeros(xs);
@@ -974,7 +954,7 @@ pub fn limbs_xor_neg_neg_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bo
         limbs_xor_neg_neg_in_place_helper(ys, xs, y_i, x_i);
         true
     }
-}
+}}
 
 impl Natural {
     fn xor_assign_neg_limb_pos(&mut self, other: Limb) {

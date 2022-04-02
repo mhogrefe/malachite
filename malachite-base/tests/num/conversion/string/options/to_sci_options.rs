@@ -1,5 +1,5 @@
 use malachite_base::num::conversion::string::options::SciSizeOptions;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     to_sci_options_bool_pair_gen, to_sci_options_gen, to_sci_options_rounding_mode_pair_gen,
     to_sci_options_signed_pair_gen_var_1, to_sci_options_unsigned_pair_gen_var_1,
     to_sci_options_unsigned_pair_gen_var_2, to_sci_options_unsigned_pair_gen_var_3,

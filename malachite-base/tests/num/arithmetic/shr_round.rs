@@ -6,7 +6,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_rounding_mode_pair_gen, signed_signed_rounding_mode_triple_gen_var_3,
     signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_16,
     signed_unsigned_pair_gen_var_17, signed_unsigned_pair_gen_var_8,

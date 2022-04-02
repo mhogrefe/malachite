@@ -7,20 +7,19 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
-/// whether the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether
-/// the `pow` least-significant bits of the `Natural` and the limb are equal.
-///
-/// This function assumes that `xs` has length at least 2 and the last (most significant) limb is
-/// nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
+// whether the `Natural` is equivalent to a limb mod two to the power of `pow`; that is, whether
+// the `pow` least-significant bits of the `Natural` and the limb are equal.
+//
+// This function assumes that `xs` has length at least 2 and the last (most significant) limb is
+// nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
     let i = usize::exact_from(pow >> Limb::LOG_WIDTH);
     if i >= xs.len() {
         false
@@ -30,7 +29,7 @@ pub fn limbs_eq_limb_mod_power_of_2(xs: &[Limb], y: Limb, pow: u64) -> bool {
         let (xs_head, xs_tail) = xs.split_first().unwrap();
         *xs_head == y && limbs_divisible_by_power_of_2(xs_tail, pow - Limb::WIDTH)
     }
-}
+}}
 
 // xs.len() == ys.len()
 fn limbs_eq_mod_power_of_2_same_length(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {

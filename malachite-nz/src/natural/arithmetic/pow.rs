@@ -1,12 +1,19 @@
 use malachite_base::num::arithmetic::traits::{
-    EqModPowerOf2, IsPowerOf2, Parity, Pow, PowAssign, PowerOf2, ShrRound, Square, SquareAssign,
+    EqModPowerOf2, Parity, Pow, PowAssign, Square, SquareAssign,
 };
+#[cfg(feature = "test_build")]
+use malachite_base::num::arithmetic::traits::{IsPowerOf2, PowerOf2, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base::num::conversion::traits::{ExactFrom, SplitInHalf, WrappingFrom};
+#[cfg(feature = "test_build")]
+use malachite_base::num::conversion::traits::SplitInHalf;
+use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
+#[cfg(feature = "test_build")]
+use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::num::logic::traits::{
-    BitAccess, BitIterable, CountOnes, LeadingZeros, SignificantBits, TrailingZeros,
+    BitIterable, CountOnes, LeadingZeros, SignificantBits, TrailingZeros,
 };
+#[cfg(feature = "test_build")]
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::slices::slice_leading_zeros;
 use natural::arithmetic::mul::limb::limbs_slice_mul_limb_in_place;
@@ -14,22 +21,24 @@ use natural::arithmetic::mul::limbs_mul_greater_to_out;
 use natural::arithmetic::shl::limbs_slice_shl_in_place;
 use natural::arithmetic::shr::limbs_shr_to_out;
 use natural::arithmetic::square::limbs_square_to_out;
+#[cfg(feature = "test_build")]
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
-use platform::{DoubleLimb, Limb};
+#[cfg(feature = "test_build")]
+use platform::DoubleLimb;
+use platform::Limb;
 use std::mem::swap;
 
 /// This is GMP_NUMB_HALFMAX from mpz/n_pow_ui.c, GMP 6.1.2.
 const HALF_MAX: Limb = (1 << (Limb::WIDTH >> 1)) - 1;
 
-#[doc(hidden)]
-pub fn limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
+pub_crate_test! {limbs_pow(xs: &[Limb], exp: u64) -> Vec<Limb> {
     let mut out = Vec::new();
     let out_len = limbs_pow_to_out(&mut out, xs, exp);
     out.truncate(out_len);
     out
-}
+}}
 
 fn len_1_helper(x_0: &mut Limb, out_0: &mut Limb, trailing_zero_bits_out: &mut u64, exp: &mut u64) {
     // Power up as far as possible within `x_0`. We start here with `exp` != 0, but if `exp` is
@@ -225,6 +234,7 @@ fn limbs_pow_to_out(out: &mut Vec<Limb>, xs: &[Limb], mut exp: u64) -> usize {
     out_len + leading_zeros_out
 }
 
+#[cfg(feature = "test_build")]
 fn exp_predecessor(exp: u64) -> u64 {
     if exp.even() {
         exp >> 1
@@ -233,6 +243,7 @@ fn exp_predecessor(exp: u64) -> u64 {
     }
 }
 
+#[cfg(feature = "test_build")]
 fn estimated_limb_len_helper(x: Limb, exp: u64) -> usize {
     usize::exact_from(
         (x.significant_bits() * exp).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling),
@@ -240,6 +251,7 @@ fn estimated_limb_len_helper(x: Limb, exp: u64) -> usize {
 }
 
 // Never an underestimate.
+#[cfg(feature = "test_build")]
 fn limb_pow_alt_estimated_out_len(x: Limb, exp: u64) -> usize {
     if exp.even() {
         estimated_limb_len_helper(x, exp >> 1) << 1
@@ -249,14 +261,16 @@ fn limb_pow_alt_estimated_out_len(x: Limb, exp: u64) -> usize {
 }
 
 // Never an underestimate.
+#[cfg(feature = "test_build")]
 #[inline]
 fn limb_pow_alt_estimated_scratch_len(x: Limb, exp: u64) -> usize {
     limb_pow_alt_estimated_out_len(x, exp_predecessor(exp))
 }
 
-/// TODO figure out how to find scratch len using mp_bases. x > 1.
-///
-/// This is mpn_pow_1 from mpn/generic/pow_1.c, GMP 6.1.2, where exp > 1 and bn == 1.
+// TODO figure out how to find scratch len using mp_bases. x > 1.
+//
+// This is mpn_pow_1 from mpn/generic/pow_1.c, GMP 6.1.2, where exp > 1 and bn == 1.
+#[cfg(feature = "test_build")]
 fn limb_pow_to_out_alt<'a>(
     mut out: &'a mut [Limb],
     x: Limb,
@@ -294,6 +308,7 @@ fn limb_pow_to_out_alt<'a>(
     out_len
 }
 
+#[cfg(feature = "test_build")]
 fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
     let mut out = vec![0; limb_pow_alt_estimated_out_len(x, exp)];
     let mut scratch = vec![0; limb_pow_alt_estimated_scratch_len(x, exp)];
@@ -303,6 +318,7 @@ fn limb_pow_alt(x: Limb, exp: u64) -> Vec<Limb> {
     out
 }
 
+#[cfg(feature = "test_build")]
 fn estimated_limbs_len_helper(xs: &[Limb], exp: u64) -> usize {
     usize::exact_from(
         (limbs_significant_bits(xs) * exp).shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling),
@@ -310,6 +326,7 @@ fn estimated_limbs_len_helper(xs: &[Limb], exp: u64) -> usize {
 }
 
 // Never an underestimate.
+#[cfg(feature = "test_build")]
 fn limbs_pow_alt_estimated_out_len(xs: &[Limb], exp: u64) -> usize {
     if exp.even() {
         estimated_limbs_len_helper(xs, exp >> 1) << 1
@@ -319,15 +336,17 @@ fn limbs_pow_alt_estimated_out_len(xs: &[Limb], exp: u64) -> usize {
 }
 
 // Never an underestimate.
+#[cfg(feature = "test_build")]
 #[inline]
 fn limbs_pow_alt_estimated_scratch_len(xs: &[Limb], exp: u64) -> usize {
     limbs_pow_alt_estimated_out_len(xs, exp_predecessor(exp))
 }
 
-/// TODO figure out how to find scratch len using mp_bases.
-///
-/// This is mpn_pow_1 from mpn/generic/pow_1.c, GMP 6.1.2, where exp > 1, bn > 1, and the last
-/// element of xs is nonzero.
+// TODO figure out how to find scratch len using mp_bases.
+//
+// This is mpn_pow_1 from mpn/generic/pow_1.c, GMP 6.1.2, where exp > 1, bn > 1, and the last
+// element of xs is nonzero.
+#[cfg(feature = "test_build")]
 fn limbs_pow_to_out_alt<'a>(
     mut out: &'a mut [Limb],
     xs: &[Limb],
@@ -369,6 +388,7 @@ fn limbs_pow_to_out_alt<'a>(
     out_len
 }
 
+#[cfg(feature = "test_build")]
 fn limbs_pow_alt(xs: &[Limb], exp: u64) -> Vec<Limb> {
     let mut out = vec![0; limbs_pow_alt_estimated_out_len(xs, exp)];
     let mut scratch = vec![0; limbs_pow_alt_estimated_scratch_len(xs, exp)];
@@ -378,8 +398,8 @@ fn limbs_pow_alt(xs: &[Limb], exp: u64) -> Vec<Limb> {
     out
 }
 
+#[cfg(feature = "test_build")]
 impl Natural {
-    #[doc(hidden)]
     pub fn pow_ref_alt(&self, exp: u64) -> Natural {
         match (self, exp) {
             (_, 0) | (natural_one!(), _) => Natural::ONE,
@@ -400,7 +420,6 @@ impl Natural {
         }
     }
 
-    #[doc(hidden)]
     pub fn pow_assign_alt(&mut self, exp: u64) {
         match (&mut *self, exp) {
             (x, 0) => *x = Natural::ONE,

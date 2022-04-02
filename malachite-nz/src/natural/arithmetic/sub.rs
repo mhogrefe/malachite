@@ -4,19 +4,18 @@ use platform::Limb;
 use std::fmt::Display;
 use std::ops::{Sub, SubAssign};
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-/// `Limb` from the `Natural`. Returns a pair consisting of the limbs of the result, and whether
-/// there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_sub_1 from gmp.h, GMP 6.2.1, where the result is returned.
-#[doc(hidden)]
-pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
+// `Limb` from the `Natural`. Returns a pair consisting of the limbs of the result, and whether
+// there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// This is mpn_sub_1 from gmp.h, GMP 6.2.1, where the result is returned.
+pub_crate_test! {limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
     let len = xs.len();
     let mut out = Vec::with_capacity(len);
     for i in 0..len {
@@ -31,25 +30,24 @@ pub fn limbs_sub_limb(xs: &[Limb], mut y: Limb) -> (Vec<Limb>, bool) {
         }
     }
     (out, y != 0)
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-/// `Limb` from the `Natural`, writing the `xs.len()` limbs of the result to an output slice.
-/// Returns whether there was a borrow left over; that is, whether the `Limb` was greater than the
-/// `Natural`. The output slice must be at least as long as the input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs`.
-///
-/// This is mpn_sub_1 from gmp.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
+// `Limb` from the `Natural`, writing the `xs.len()` limbs of the result to an output slice.
+// Returns whether there was a borrow left over; that is, whether the `Limb` was greater than the
+// `Natural`. The output slice must be at least as long as the input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `xs`.
+//
+// This is mpn_sub_1 from gmp.h, GMP 6.2.1.
+pub_crate_test! {limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
@@ -65,19 +63,18 @@ pub fn limbs_sub_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
         }
     }
     y != 0
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-/// `Limb` from the `Natural` and writes the limbs of the result to the input slice. Returns whether
-/// there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
-#[doc(hidden)]
-pub fn limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
+// `Limb` from the `Natural` and writes the limbs of the result to the input slice. Returns whether
+// there was a borrow left over; that is, whether the `Limb` was greater than the `Natural`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
+pub_crate_test! {limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
     for x in xs.iter_mut() {
         if x.overflowing_sub_assign(y) {
             y = 1;
@@ -86,7 +83,7 @@ pub fn limbs_sub_limb_in_place(xs: &mut [Limb], mut y: Limb) -> bool {
         }
     }
     y != 0
-}
+}}
 
 fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
     let b = *borrow;
@@ -98,23 +95,22 @@ fn sub_and_borrow(x: Limb, y: Limb, borrow: &mut bool) -> Limb {
     diff
 }
 
-/// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// subtracts the second from the first. Returns a pair consisting of the limbs of the result, and
-/// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
-/// first `Natural`. The first slice must be at least as long as the second.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-///
-/// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is returned.
-#[doc(hidden)]
-pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
+// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// subtracts the second from the first. Returns a pair consisting of the limbs of the result, and
+// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
+// first `Natural`. The first slice must be at least as long as the second.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+//
+// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is returned.
+pub_crate_test! {limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -130,26 +126,25 @@ pub fn limbs_sub(xs: &[Limb], ys: &[Limb]) -> (Vec<Limb>, bool) {
         }
     }
     (out, borrow)
-}
+}}
 
-/// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
-/// an output slice. Returns whether there was a borrow left over; that is, whether the second
-/// `Natural` was greater than the first `Natural`. The output slice must be at least as long as
-/// either input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
-///
-/// This is mpn_sub_n from gmp.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
+// an output slice. Returns whether there was a borrow left over; that is, whether the second
+// `Natural` was greater than the first `Natural`. The output slice must be at least as long as
+// either input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
+//
+// This is mpn_sub_n from gmp.h, GMP 6.2.1.
+pub_crate_test! {limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
@@ -158,26 +153,25 @@ pub fn limbs_sub_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
         *out = sub_and_borrow(x, y, &mut borrow);
     }
     borrow
-}
+}}
 
-/// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// subtracts the second from the first, writing the `xs.len()` limbs of the result to an output
-/// slice. Returns whether there was a borrow left over; that is, whether the second `Natural` was
-/// greater than the first `Natural`. The output slice must be at least as long as the first input
-/// slice and the first input slice must be at least as long as the second.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs` or if `xs` is shorter than `ys`.
-///
-/// This is mpn_sub from gmp.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+// Interpreting a two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// subtracts the second from the first, writing the `xs.len()` limbs of the result to an output
+// slice. Returns whether there was a borrow left over; that is, whether the second `Natural` was
+// greater than the first `Natural`. The output slice must be at least as long as the first input
+// slice and the first input slice must be at least as long as the second.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `xs` or if `xs` is shorter than `ys`.
+//
+// This is mpn_sub from gmp.h, GMP 6.2.1.
+pub_crate_test! {limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(out.len() >= xs_len);
@@ -191,51 +185,49 @@ pub fn limbs_sub_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
         out[ys_len..xs_len].copy_from_slice(xs_hi);
         false
     }
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
-/// the first (left) slice. Returns whether there was a borrow left over; that is, whether the
-/// second `Natural` was greater than the first `Natural`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
-#[doc(hidden)]
-pub fn limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
+// the first (left) slice. Returns whether there was a borrow left over; that is, whether the
+// second `Natural` was greater than the first `Natural`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
+pub_crate_test! {limbs_sub_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = false;
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         *x = sub_and_borrow(*x, y, &mut borrow);
     }
     borrow
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// subtracts the second from the first, writing the `xs.len()` limbs of the result to the first
-/// (left) slice. Returns whether there was a borrow left over; that is, whether the second
-/// `Natural` was greater than the first `Natural`. The first slice must be at least as long as the
-/// second.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-///
-/// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is written to the first input.
-#[doc(hidden)]
-pub fn limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// subtracts the second from the first, writing the `xs.len()` limbs of the result to the first
+// (left) slice. Returns whether there was a borrow left over; that is, whether the second
+// `Natural` was greater than the first `Natural`. The first slice must be at least as long as the
+// second.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+//
+// This is mpn_sub from gmp.h, GMP 6.2.1, where the output is written to the first input.
+pub_crate_test! {limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let (xs_lo, xs_hi) = xs.split_at_mut(ys_len);
@@ -247,51 +239,49 @@ pub fn limbs_sub_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     } else {
         false
     }
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
-/// the second (right) slice. Returns whether there was a borrow left over; that is, whether the
-/// second `Natural` was greater than the first `Natural`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input.
-#[doc(hidden)]
-pub fn limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
+// the second (right) slice. Returns whether there was a borrow left over; that is, whether the
+// second `Natural` was greater than the first `Natural`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input.
+pub_crate_test! {limbs_sub_same_length_in_place_right(xs: &[Limb], ys: &mut [Limb]) -> bool {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = false;
     for (&x, y) in xs.iter().zip(ys.iter_mut()) {
         *y = sub_and_borrow(x, *y, &mut borrow);
     }
     borrow
-}
+}}
 
-/// Given two equal-length slices `xs` and `ys`, computes the difference between the `Natural`s
-/// whose limbs are `xs` and `&ys[..len]`, and writes the limbs of the result to `ys`. Returns
-/// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
-/// first `Natural`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `len` is greater than `xs.len()`.
-///
-/// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input (which
-/// has `len` limbs) and the second input has enough space past `len` to accomodate the output.
-#[doc(hidden)]
-pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
+// Given two equal-length slices `xs` and `ys`, computes the difference between the `Natural`s
+// whose limbs are `xs` and `&ys[..len]`, and writes the limbs of the result to `ys`. Returns
+// whether there was a borrow left over; that is, whether the second `Natural` was greater than the
+// first `Natural`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths or if `len` is greater than `xs.len()`.
+//
+// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the second input (which
+// has `len` limbs) and the second input has enough space past `len` to accomodate the output.
+pub_crate_test! {limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
     let (xs_lo, xs_hi) = xs.split_at(len);
@@ -305,24 +295,23 @@ pub fn limbs_slice_sub_in_place_right(xs: &[Limb], ys: &mut [Limb], len: usize) 
         ys_hi.copy_from_slice(xs_hi);
         false
     }
-}
+}}
 
-/// Interpreting a of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
-/// the `Vec`, possibly extending the `Vec`'s length. Returns whether there was a borrow left over;
-/// that is, whether the second `Natural` was greater than the first `Natural`. The first slice must
-/// be at least as long as the second.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len()`, m = `xs.len()` - `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-#[doc(hidden)]
-pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
+// Interpreting a of `Limb`s and a `Vec` of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, subtracts the second from the first, writing the `xs.len()` limbs of the result to
+// the `Vec`, possibly extending the `Vec`'s length. Returns whether there was a borrow left over;
+// that is, whether the second `Natural` was greater than the first `Natural`. The first slice must
+// be at least as long as the second.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len()`, m = `xs.len()` - `ys.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+pub_crate_test! {limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -338,54 +327,55 @@ pub fn limbs_vec_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>) -> bool {
             false
         }
     }
-}
+}}
 
-/// Given a slice `xs`, computes the difference between the `Natural`s whose limbs are
-/// `&xs[..xs.len() - right_start]` and `&xs[right_start..]`, and writes the limbs of the result to
-/// `&xs[..xs.len() - right_start]`. Returns whether there was a borrow left over; that is, whether
-/// the second `Natural` was greater than the first `Natural`. As implied by the name, the input
-/// slices may overlap.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` - `right_start`
-///
-/// # Panics
-/// Panics if `right_start` is greater than `xs.len()`.
-///
-/// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input, and the
-/// two inputs are possibly-overlapping subslices of a single slice.
-#[doc(hidden)]
-pub fn limbs_sub_same_length_in_place_with_overlap(xs: &mut [Limb], right_start: usize) -> bool {
+// Given a slice `xs`, computes the difference between the `Natural`s whose limbs are
+// `&xs[..xs.len() - right_start]` and `&xs[right_start..]`, and writes the limbs of the result to
+// `&xs[..xs.len() - right_start]`. Returns whether there was a borrow left over; that is, whether
+// the second `Natural` was greater than the first `Natural`. As implied by the name, the input
+// slices may overlap.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` - `right_start`
+//
+// # Panics
+// Panics if `right_start` is greater than `xs.len()`.
+//
+// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is written to the first input, and the
+// two inputs are possibly-overlapping subslices of a single slice.
+pub_crate_test! {limbs_sub_same_length_in_place_with_overlap(
+    xs: &mut [Limb],
+    right_start: usize
+) -> bool {
     let len = xs.len() - right_start;
     let mut borrow = false;
     for i in 0..len {
         xs[i] = sub_and_borrow(xs[i], xs[i + right_start], &mut borrow);
     }
     borrow
-}
+}}
 
-/// Given two slices `xs` and `ys`, computes the difference between the `Natural`s whose limbs are
-/// `&xs[xs.len() - ys.len()..]` and `&ys`, and writes the limbs of the result to `&xs[..ys.len()]`.
-/// Returns whether there was a borrow left over; that is, whether the second `Natural` was greater
-/// than the first `Natural`. As implied by the name, the input and output ranges may overlap. `xs`
-/// must be at least as long as `ys`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs.len()` is shorter than `ys.len()`.
-///
-/// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is a prefix of a slice and the left
-/// operand of the subtraction is a suffix of the same slice, and the prefix and suffix may overlap.
-#[doc(hidden)]
-pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -> bool {
+// Given two slices `xs` and `ys`, computes the difference between the `Natural`s whose limbs are
+// `&xs[xs.len() - ys.len()..]` and `&ys`, and writes the limbs of the result to `&xs[..ys.len()]`.
+// Returns whether there was a borrow left over; that is, whether the second `Natural` was greater
+// than the first `Natural`. As implied by the name, the input and output ranges may overlap. `xs`
+// must be at least as long as `ys`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ys.len()`
+//
+// # Panics
+// Panics if `xs.len()` is shorter than `ys.len()`.
+//
+// This is mpn_sub_n from gmp.h, GMP 6.2.1, where the output is a prefix of a slice and the left
+// operand of the subtraction is a suffix of the same slice, and the prefix and suffix may overlap.
+pub_crate_test! {limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -395,25 +385,24 @@ pub fn limbs_sub_same_length_to_out_with_overlap(xs: &mut [Limb], ys: &[Limb]) -
         xs[i] = sub_and_borrow(xs[i + right_start], ys[i], &mut borrow);
     }
     borrow
-}
+}}
 
-/// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
-/// `true` is 1), writing the `xs.len()` limbs of the result to an output slice. Returns whether
-/// there was a borrow left over. The output slice must be at least as long as either input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
-///
-/// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp, up, and vp are disjoint.
-#[doc(hidden)]
-pub fn limbs_sub_same_length_with_borrow_in_to_out(
+// Interpreting a two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
+// `true` is 1), writing the `xs.len()` limbs of the result to an output slice. Returns whether
+// there was a borrow left over. The output slice must be at least as long as either input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `xs` or if `xs` and `ys` have different lengths.
+//
+// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp, up, and vp are disjoint.
+pub_crate_test! {limbs_sub_same_length_with_borrow_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -424,25 +413,24 @@ pub fn limbs_sub_same_length_with_borrow_in_to_out(
         borrow |= limbs_sub_limb_in_place(&mut out[..xs.len()], 1);
     }
     borrow
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
-/// `true` is 1), writing the `xs.len()` limbs of the result to the first (left) slice. Return
-/// whether there was a borrow left over.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
-#[doc(hidden)]
-pub fn limbs_sub_same_length_with_borrow_in_in_place_left(
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
+// `true` is 1), writing the `xs.len()` limbs of the result to the first (left) slice. Return
+// whether there was a borrow left over.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
+pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     borrow_in: bool,
@@ -452,25 +440,24 @@ pub fn limbs_sub_same_length_with_borrow_in_in_place_left(
         borrow |= limbs_sub_limb_in_place(xs, 1);
     }
     borrow
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
-/// `true` is 1), writing the `xs.len()` limbs of the result to the second (right) slice. Returns
-/// whether there was a borrow left over.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as vp.
-#[doc(hidden)]
-pub fn limbs_sub_same_length_with_borrow_in_in_place_right(
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, subtracts the second from the first, and then subtracts a borrow (`false` is 0,
+// `true` is 1), writing the `xs.len()` limbs of the result to the second (right) slice. Returns
+// whether there was a borrow left over.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpn_sub_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as vp.
+pub_crate_test! {limbs_sub_same_length_with_borrow_in_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     borrow_in: bool,
@@ -480,7 +467,7 @@ pub fn limbs_sub_same_length_with_borrow_in_in_place_right(
         borrow |= limbs_sub_limb_in_place(ys, 1);
     }
     borrow
-}
+}}
 
 fn sub_panic<S: Display, T: Display>(x: S, y: T) -> ! {
     panic!(

@@ -1,12 +1,12 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::One;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{unsigned_vec_gen, unsigned_vec_pair_gen_var_1};
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{unsigned_vec_gen, unsigned_vec_pair_gen_var_1};
 use malachite_nz::natural::logic::not::{limbs_not, limbs_not_in_place, limbs_not_to_out};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_rug_integer, rug_integer_to_integer};
-use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz::test_util::common::{natural_to_rug_integer, rug_integer_to_integer};
+use malachite_nz::test_util::generators::natural_gen;
 use rug;
 use std::str::FromStr;
 

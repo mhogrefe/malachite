@@ -1,10 +1,10 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
-use malachite_base_test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
+use malachite_base::test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
 use malachite_nz::natural::Natural;
+use malachite_q::test_util::common::rug_rational_to_rational;
 use malachite_q::Rational;
-use malachite_q_test_util::common::rug_rational_to_rational;
 use rug;
 
 #[test]

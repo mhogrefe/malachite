@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::{DivisibleBy, DivisibleByPowerOf2, Parity};
 use malachite_base::num::basic::traits::{One, Two};
-use malachite_base_test_util::generators::unsigned_gen;
+use malachite_base::test_util::generators::unsigned_gen;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz::test_util::generators::natural_gen;
 use std::str::FromStr;
 
 #[test]

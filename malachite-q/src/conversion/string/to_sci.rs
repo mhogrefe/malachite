@@ -106,8 +106,7 @@ impl Rational {
     }
 }
 
-#[doc(hidden)]
-pub fn floor_log_base_of_abs(x: &Rational, base: &Rational) -> i64 {
+pub_test! {floor_log_base_of_abs(x: &Rational, base: &Rational) -> i64 {
     if let Some(log_base) = base.checked_log_base_2() {
         match log_base.sign() {
             Ordering::Equal => panic!("Cannot take base-1 logarithm"),
@@ -122,7 +121,7 @@ pub fn floor_log_base_of_abs(x: &Rational, base: &Rational) -> i64 {
     } else {
         log_base_helper(x, base).0
     }
-}
+}}
 
 fn fmt_zero(f: &mut Formatter, options: ToSciOptions) -> std::fmt::Result {
     f.write_char('0')?;

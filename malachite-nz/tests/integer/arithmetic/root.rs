@@ -4,13 +4,13 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{NegativeOne, One};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::{signed_gen, signed_unsigned_pair_gen_var_18};
+use malachite_base::test_util::generators::{signed_gen, signed_unsigned_pair_gen_var_18};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_4, integer_unsigned_pair_gen_var_3, natural_gen,
     natural_unsigned_pair_gen_var_7,
 };

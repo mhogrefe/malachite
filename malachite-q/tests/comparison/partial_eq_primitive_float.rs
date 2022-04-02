@@ -1,8 +1,8 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
+use malachite_q::test_util::common::rational_to_rug_rational;
+use malachite_q::test_util::generators::rational_primitive_float_pair_gen;
 use malachite_q::Rational;
-use malachite_q_test_util::common::rational_to_rug_rational;
-use malachite_q_test_util::generators::rational_primitive_float_pair_gen;
 use rug;
 use std::cmp::Ordering;
 use std::str::FromStr;

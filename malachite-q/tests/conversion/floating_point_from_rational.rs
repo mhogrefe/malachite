@@ -8,15 +8,15 @@ use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_1, integer_rounding_mode_pair_gen_var_1,
 };
-use malachite_q::Rational;
-use malachite_q_test_util::common::rational_to_rug_rational;
-use malachite_q_test_util::generators::{
+use malachite_q::test_util::common::rational_to_rug_rational;
+use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_4, rational_gen_var_5, rational_gen_var_6,
     rational_rounding_mode_pair_gen_var_5,
 };
+use malachite_q::Rational;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 
@@ -432,31 +432,31 @@ fn test_f32_rounding_from_rational() {
     // just over half of smallest positive; Nearest rounds up
     test(
         "88819109620612751463292030150471001/126765060022822940149670320537600000000000000000000000\
-        000000000000000000000000000", 
+        000000000000000000000000000",
         RoundingMode::Floor,
         0.0
     );
     test(
         "88819109620612751463292030150471001/126765060022822940149670320537600000000000000000000000\
-        000000000000000000000000000", 
+        000000000000000000000000000",
         RoundingMode::Down,
         0.0
     );
     test(
         "88819109620612751463292030150471001/126765060022822940149670320537600000000000000000000000\
-        000000000000000000000000000", 
+        000000000000000000000000000",
         RoundingMode::Ceiling,
         1.0e-45
     );
     test(
         "88819109620612751463292030150471001/126765060022822940149670320537600000000000000000000000\
-        000000000000000000000000000", 
+        000000000000000000000000000",
         RoundingMode::Up,
         1.0e-45
     );
     test(
         "88819109620612751463292030150471001/126765060022822940149670320537600000000000000000000000\
-        000000000000000000000000000", 
+        000000000000000000000000000",
         RoundingMode::Nearest,
         1.0e-45
     );
@@ -875,7 +875,7 @@ fn test_f32_from_rational() {
     // just over half of smallest positive; Nearest rounds up
     test(
         "88819109620612751463292030150471001/126765060022822940149670320537600000000000000000000000\
-        000000000000000000000000000", 
+        000000000000000000000000000",
         1.0e-45
     );
     test(

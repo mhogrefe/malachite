@@ -1,13 +1,13 @@
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base_test_util::common::test_custom_cmp_helper;
+use malachite_base::test_util::common::test_custom_cmp_helper;
 use malachite_q::arithmetic::traits::SimplestRationalInInterval;
-use malachite_q::Rational;
-use malachite_q_test_util::arithmetic::simplest_rational_in_interval::*;
-use malachite_q_test_util::generators::{
+use malachite_q::test_util::arithmetic::simplest_rational_in_interval::*;
+use malachite_q::test_util::generators::{
     rational_gen, rational_pair_gen, rational_pair_gen_var_3, rational_pair_gen_var_4,
     rational_pair_gen_var_5, rational_pair_gen_var_6, rational_triple_gen,
     rational_triple_gen_var_2, rational_triple_gen_var_3,
 };
+use malachite_q::Rational;
 use std::cmp::Ordering;
 use std::str::FromStr;
 

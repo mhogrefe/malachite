@@ -8,18 +8,17 @@ use natural::Natural;
 use platform::Limb;
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `Limb`, rounding down.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the result is returned.
-#[doc(hidden)]
-pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` right-shifted by a `Limb`, rounding down.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+//
+// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the result is returned.
+pub_crate_test! {limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
         Vec::new()
@@ -31,27 +30,26 @@ pub fn limbs_shr(xs: &[Limb], bits: u64) -> Vec<Limb> {
         }
         out
     }
-}
+}}
 
-/// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`,
-/// writes the limbs of the `Natural` right-shifted by a `Limb` to an output slice. The output slice
-/// must be at least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH` - 1,
-/// inclusive. The carry, or the bits that are shifted past the width of the input slice, is
-/// returned. The input slice should not only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty, `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or
-/// equal to `Limb::WIDTH`.
-///
-/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
+// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`,
+// writes the limbs of the `Natural` right-shifted by a `Limb` to an output slice. The output slice
+// must be at least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH` - 1,
+// inclusive. The carry, or the bits that are shifted past the width of the input slice, is
+// returned. The input slice should not only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty, `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or
+// equal to `Limb::WIDTH`.
+//
+// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1.
+pub_crate_test! {limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     let len = xs.len();
     assert_ne!(len, 0);
     assert_ne!(bits, 0);
@@ -68,25 +66,24 @@ pub fn limbs_shr_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     }
     *out_last = previous_x;
     remaining_bits
-}
+}}
 
-/// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`,
-/// writes the limbs of the `Natural` right-shifted by a `Limb` to the input slice. The `Limb` must
-/// be between 1 and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the
-/// width of the input slice, is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
-///
-/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the rp == up.
-#[doc(hidden)]
-pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
+// Interpreting a nonempty slice of `Limb`s as the limbs (in ascending order) of a `Natural`,
+// writes the limbs of the `Natural` right-shifted by a `Limb` to the input slice. The `Limb` must
+// be between 1 and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the
+// width of the input slice, is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty, `bits` is 0, or `bits` is greater than or equal to `Limb::WIDTH`.
+//
+// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where the rp == up.
+pub_crate_test! {limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let len = xs.len();
@@ -102,21 +99,20 @@ pub fn limbs_slice_shr_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     }
     *xs.last_mut().unwrap() = previous_x;
     remaining_bits
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where rp == up and if cnt is
-/// sufficiently large, limbs are removed from rp.
-#[doc(hidden)]
-pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+//
+// This is mpn_rshift from mpn/generic/rshift.c, GMP 6.2.1, where rp == up and if cnt is
+// sufficiently large, limbs are removed from rp.
+pub_crate_test! {limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
         xs.clear();
@@ -127,7 +123,7 @@ pub fn limbs_vec_shr_in_place(xs: &mut Vec<Limb>, bits: u64) {
             limbs_slice_shr_in_place(xs, small_shift);
         }
     }
-}
+}}
 
 fn shr_unsigned_ref<T: Copy + Eq + Ord + WrappingFrom<u64> + Zero>(x: &Natural, bits: T) -> Natural
 where

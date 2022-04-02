@@ -4,24 +4,23 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
-/// whether that `Natural` is an integer power of 2.
-///
-/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_is_power_of_2(xs: &[Limb]) -> bool {
+// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
+// whether that `Natural` is an integer power of 2.
+//
+// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_crate_test! {limbs_is_power_of_2(xs: &[Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last().unwrap();
     slice_test_zero(xs_init) && xs_last.is_power_of_2()
-}
+}}
 
 impl IsPowerOf2 for Natural {
     /// Determines whether a `Natural` is an integer power of 2.

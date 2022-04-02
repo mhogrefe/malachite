@@ -1,6 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     primitive_float_gen_var_11, primitive_float_pair_gen_var_1,
 };
 use std::panic::catch_unwind;

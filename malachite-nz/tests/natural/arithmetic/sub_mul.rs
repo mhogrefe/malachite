@@ -1,8 +1,8 @@
 use malachite_base::num::arithmetic::traits::{CheckedSub, CheckedSubMul, SubMul, SubMulAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_triple_gen_var_2, unsigned_vec_triple_gen_var_59,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_1,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12,
@@ -14,7 +14,7 @@ use malachite_nz::natural::arithmetic::sub_mul::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen, natural_pair_gen, natural_pair_gen_var_10, natural_triple_gen_var_7,
 };
 use std::str::FromStr;

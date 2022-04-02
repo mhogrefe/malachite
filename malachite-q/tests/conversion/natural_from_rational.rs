@@ -1,3 +1,4 @@
+use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{Ceiling, Floor, Parity};
 use malachite_base::num::basic::traits::{One, OneHalf, Two};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
@@ -6,14 +7,13 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
-use malachite_base_test_util::assert_panic;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::natural_gen;
-use malachite_q::Rational;
-use malachite_q_test_util::generators::{
+use malachite_nz::test_util::generators::natural_gen;
+use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_3, rational_rounding_mode_pair_gen_var_1,
 };
+use malachite_q::Rational;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 

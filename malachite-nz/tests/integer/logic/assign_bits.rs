@@ -2,14 +2,14 @@ use malachite_base::num::arithmetic::traits::{ModPowerOf2, ModPowerOf2Sub, NegMo
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::large_type_gen_var_4;
-use malachite_base_test_util::num::logic::bit_block_access::assign_bits_naive;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::large_type_gen_var_4;
+use malachite_base::test_util::num::logic::bit_block_access::assign_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::limbs_neg_assign_bits;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_4, integer_gen_var_7, integer_unsigned_natural_triple_gen,
     integer_unsigned_unsigned_natural_quadruple_gen_var_1, natural_gen,
     natural_unsigned_pair_gen_var_4, natural_unsigned_unsigned_natural_quadruple_gen_var_1,

@@ -1,16 +1,16 @@
 use malachite_base::num::conversion::traits::{
     CheckedFrom, ExactFrom, FromStringBase, ToStringBase, WrappingFrom,
 };
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::exhaustive::valid_digit_chars;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::exhaustive::valid_digit_chars;
+use malachite_base::test_util::generators::{
     string_gen, string_gen_var_3, string_gen_var_5, string_gen_var_6, string_gen_var_7,
     unsigned_gen, unsigned_gen_var_11, unsigned_pair_gen_var_19, unsigned_pair_gen_var_8,
     unsigned_string_pair_gen_var_1, unsigned_string_pair_gen_var_2,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
 use num::{BigUint, Num};
 use rug;
 use std::collections::HashMap;

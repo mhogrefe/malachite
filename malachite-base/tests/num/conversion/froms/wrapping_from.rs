@@ -2,7 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{OverflowingFrom, WrappingFrom};
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use std::fmt::Debug;
 
 #[test]

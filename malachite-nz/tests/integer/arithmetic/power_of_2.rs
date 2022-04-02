@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, LowMask};
-use malachite_base_test_util::generators::{unsigned_gen_var_16, unsigned_gen_var_5};
+use malachite_base::test_util::generators::{unsigned_gen_var_16, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;

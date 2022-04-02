@@ -1,6 +1,6 @@
 use malachite_base::strings::{string_is_subset, string_sort, string_unique};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::string_pair_gen;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::string_pair_gen;
 
 #[test]
 fn test_string_is_subset() {

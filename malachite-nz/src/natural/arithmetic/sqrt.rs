@@ -33,11 +33,10 @@ use natural::Natural;
 use platform::{Limb, SignedLimb, DC_DIVAPPR_Q_THRESHOLD, MU_DIVAPPR_Q_THRESHOLD};
 use std::cmp::Ordering;
 
-/// Returns (sqrt, r_hi, r_lo) such that [n_lo, n_hi] = sqrt ^ 2 + [r_lo, r_hi].
-///
-/// This is mpn_sqrtrem2 from mpn/generic/sqrtrem.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
+// Returns (sqrt, r_hi, r_lo) such that [n_lo, n_hi] = sqrt ^ 2 + [r_lo, r_hi].
+//
+// This is mpn_sqrtrem2 from mpn/generic/sqrtrem.c, GMP 6.2.1.
+pub_test! {sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
     assert!(n_hi.leading_zeros() < 2);
     let (mut sqrt, mut r_lo) = sqrt_rem_newton::<Limb, SignedLimb>(n_hi);
     const PREC: u64 = Limb::WIDTH >> 1;
@@ -74,25 +73,23 @@ pub fn sqrt_rem_2_newton(n_hi: Limb, n_lo: Limb) -> (Limb, bool, Limb) {
     r_hi -= 1;
     assert!(r_hi < 2);
     (sqrt, r_hi == 1, r_lo)
-}
+}}
 
-#[doc(hidden)]
-pub const fn limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
+pub_const_test! {limbs_sqrt_rem_helper_scratch_len(n: usize) -> usize {
     (n >> 1) + 1
-}
+}}
 
-/// Let n be out.len().
-/// Let x be xs[..2 * n] before execution.
-/// Let s be out after execution.
-/// Let r be xs[..n] after execution.
-///
-/// xs[2 * n - 1].leading_zeros() must be less than 2.
-///
-/// If approx = 0, then s = floor(sqrt(x)) and r = x - s ^ 2.
-///
-/// This is mpn_dc_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_sqrt_rem_helper(
+// Let n be out.len().
+// Let x be xs[..2 * n] before execution.
+// Let s be out after execution.
+// Let r be xs[..n] after execution.
+//
+// xs[2 * n - 1].leading_zeros() must be less than 2.
+//
+// If approx = 0, then s = floor(sqrt(x)) and r = x - s ^ 2.
+//
+// This is mpn_dc_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1.
+pub_test! {limbs_sqrt_rem_helper(
     out: &mut [Limb],
     xs: &mut [Limb],
     approx: Limb,
@@ -165,7 +162,7 @@ pub fn limbs_sqrt_rem_helper(
     assert!(r_hi >= 0);
     assert!(r_hi < 2);
     r_hi == 1
-}
+}}
 
 /// This is mpn_divappr_q from mpn/generic/sqrtrem.c, GMP 6.2.1.
 fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
@@ -187,19 +184,18 @@ fn limbs_sqrt_div_approx_helper(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scrat
     });
 }
 
-/// Let n be out.len().
-/// Let m be xs.len().
-/// n must be ceiling(m / 2).
-/// odd must be m.odd().
-/// shift must be floor(xs[m - 1].leading_zeros() / 2).
-/// Let x be xs before execution.
-/// Let s be out after execution.
-/// Then s = floor(sqrt(x)).
-/// The return value is true iff there is a remainder (that is, x is not a perfect square).
-///
-/// This is mpn_dc_sqrt from mpn/generic/sqrtrem.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
+// Let n be out.len().
+// Let m be xs.len().
+// n must be ceiling(m / 2).
+// odd must be m.odd().
+// shift must be floor(xs[m - 1].leading_zeros() / 2).
+// Let x be xs before execution.
+// Let s be out after execution.
+// Then s = floor(sqrt(x)).
+// The return value is true iff there is a remainder (that is, x is not a perfect square).
+//
+// This is mpn_dc_sqrt from mpn/generic/sqrtrem.c, GMP 6.2.1.
+pub_test! {limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -> bool {
     let n = out.len();
     let odd = usize::iverson(odd);
     assert_eq!(xs.len(), (n << 1) - odd);
@@ -309,22 +305,21 @@ pub fn limbs_sqrt_helper(out: &mut [Limb], xs: &[Limb], shift: u64, odd: bool) -
         limbs_slice_shr_in_place(out, shift);
     }
     nonzero_remainder
-}
+}}
 
-/// Computes the floor of the square root of a `Natural`.
-///
-/// Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural`
-/// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out`. Then
-/// $s = \lfloor \sqrt x \rfloor$.
-///
-/// All limbs are in ascending order (least-significant first).
-///
-/// # Worst-case complexity
-/// TODO
-///
-/// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is NULL.
-#[doc(hidden)]
-pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
+// Computes the floor of the square root of a `Natural`.
+//
+// Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural`
+// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out`. Then
+// $s = \lfloor \sqrt x \rfloor$.
+//
+// All limbs are in ascending order (least-significant first).
+//
+// # Worst-case complexity
+// TODO
+//
+// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is NULL.
+pub_test! {limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
     let xs_len = xs.len();
     let high = xs[xs_len - 1];
     assert_ne!(high, 0);
@@ -381,23 +376,26 @@ pub fn limbs_sqrt_to_out(out: &mut [Limb], xs: &[Limb]) {
             }
         }
     }
-}
+}}
 
-/// Computes the square root and remainder of a `Natural`.
-///
-/// Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural`
-/// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out_sqrt`, $m$ the return value, and
-/// $r$ be the `Natural` whose limbs are the first $m$ limbs of `out_rem`. Then
-/// $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that $r \leq 2x$.
-///
-/// All limbs are in ascending order (least-significant first).
-///
-/// # Worst-case complexity
-/// TODO
-///
-/// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is not NULL.
-#[doc(hidden)]
-pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[Limb]) -> usize {
+// Computes the square root and remainder of a `Natural`.
+//
+// Let $n$ be `xs.len()` and $x$ be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural`
+// whose limbs are the first $\lceil n/2 \rceil$ limbs of `out_sqrt`, $m$ the return value, and
+// $r$ be the `Natural` whose limbs are the first $m$ limbs of `out_rem`. Then
+// $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that $r \leq 2x$.
+//
+// All limbs are in ascending order (least-significant first).
+//
+// # Worst-case complexity
+// TODO
+//
+// This is mpn_sqrtrem from mpn/generic/sqrtrem.c, GMP 6.2.1, where rp is not NULL.
+pub_test! {limbs_sqrt_rem_to_out(
+    out_sqrt: &mut [Limb],
+    out_rem: &mut [Limb],
+    xs: &[Limb]
+) -> usize {
     let xs_len = xs.len();
     let high = xs[xs_len - 1];
     assert_ne!(high, 0);
@@ -500,35 +498,33 @@ pub fn limbs_sqrt_rem_to_out(out_sqrt: &mut [Limb], out_rem: &mut [Limb], xs: &[
             out_len
         }
     }
-}
+}}
 
-/// Computes the floor of the square root of a `Natural`.
-///
-/// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
-/// returned. Then $s = \lfloor \sqrt x \rfloor$.
-///
-/// All limbs are in ascending order (least-significant first).
-///
-/// # Worst-case complexity
-/// TODO
-#[doc(hidden)]
-pub fn limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
+// Computes the floor of the square root of a `Natural`.
+//
+// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
+// returned. Then $s = \lfloor \sqrt x \rfloor$.
+//
+// All limbs are in ascending order (least-significant first).
+//
+// # Worst-case complexity
+// TODO
+pub_test! {limbs_floor_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len().shr_round(1, RoundingMode::Ceiling)];
     limbs_sqrt_to_out(&mut out, xs);
     out
-}
+}}
 
-/// Computes the ceiling of the square root of a `Natural`.
-///
-/// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
-/// returned. Then $s = \lceil \sqrt x \rceil$.
-///
-/// All limbs are in ascending order (least-significant first).
-///
-/// # Worst-case complexity
-/// TODO
-#[doc(hidden)]
-pub fn limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
+// Computes the ceiling of the square root of a `Natural`.
+//
+// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
+// returned. Then $s = \lceil \sqrt x \rceil$.
+//
+// All limbs are in ascending order (least-significant first).
+//
+// # Worst-case complexity
+// TODO
+pub_test! {limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
     let mut out_rem = vec![0; xs_len];
@@ -537,27 +533,26 @@ pub fn limbs_ceiling_sqrt(xs: &[Limb]) -> Vec<Limb> {
         limbs_vec_add_limb_in_place(&mut out_sqrt, 1);
     }
     out_sqrt
-}
+}}
 
-/// Computes the square root of a `Natural`, returning `None` if the `Natural` is not a perfect
-/// square.
-///
-/// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
-/// returned.
-///
-/// $$
-/// s = \\begin{cases}
-///     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
-///     \operatorname{None} & \textrm{otherwise}.
-/// \\end{cases}
-/// $$
-///
-/// All limbs are in ascending order (least-significant first).
-///
-/// # Worst-case complexity
-/// TODO
-#[doc(hidden)]
-pub fn limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
+// Computes the square root of a `Natural`, returning `None` if the `Natural` is not a perfect
+// square.
+//
+// Let $x$ be the `Natural` whose limbs are `xs` and $s$ be the `Natural` whose limbs are
+// returned.
+//
+// $$
+// s = \\begin{cases}
+//     \operatorname{Some}(sqrt{x}) & \sqrt{x} \in \Z \\\\
+//     \operatorname{None} & \textrm{otherwise}.
+// \\end{cases}
+// $$
+//
+// All limbs are in ascending order (least-significant first).
+//
+// # Worst-case complexity
+// TODO
+pub_test! {limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
     let mut out_rem = vec![0; xs_len];
@@ -567,29 +562,28 @@ pub fn limbs_checked_sqrt(xs: &[Limb]) -> Option<Vec<Limb>> {
     } else {
         None
     }
-}
+}}
 
-/// Computes the square root and remainder of a `Natural`.
-///
-/// Let `out_sqrt` and `out_rem` be the two returned `Limb` `Vec`s. Let $n$ be `xs.len()` and $x$
-/// be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural` whose limbs are the first
-/// $\lceil n/2 \rceil$ limbs of `out_sqrt` and $r$ be the `Natural` whose limbs are the first $n$
-/// limbs of `out_rem`.  Then $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that
-/// $r \leq 2x$.
-///
-/// All limbs are in ascending order (least-significant first).
-///
-/// # Worst-case complexity
-/// TODO
-#[doc(hidden)]
-pub fn limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
+// Computes the square root and remainder of a `Natural`.
+//
+// Let `out_sqrt` and `out_rem` be the two returned `Limb` `Vec`s. Let $n$ be `xs.len()` and $x$
+// be the `Natural` whose limbs are `xs`. Let $s$ be the `Natural` whose limbs are the first
+// $\lceil n/2 \rceil$ limbs of `out_sqrt` and $r$ be the `Natural` whose limbs are the first $n$
+// limbs of `out_rem`.  Then $s = \lfloor \sqrt x \rfloor$ and $s^2 + r = x$. This implies that
+// $r \leq 2x$.
+//
+// All limbs are in ascending order (least-significant first).
+//
+// # Worst-case complexity
+// TODO
+pub_test! {limbs_sqrt_rem(xs: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let xs_len = xs.len();
     let mut out_sqrt = vec![0; xs_len.shr_round(1, RoundingMode::Ceiling)];
     let mut out_rem = vec![0; xs_len];
     let rem_len = limbs_sqrt_rem_to_out(&mut out_sqrt, &mut out_rem, xs);
     out_rem.truncate(rem_len);
     (out_sqrt, out_rem)
-}
+}}
 
 impl FloorSqrtAssign for Natural {
     /// Replaces a `Natural` with the floor of its square root.

@@ -1,5 +1,5 @@
+use malachite_base::test_util::common::test_eq_helper;
 use malachite_base::unions::Union3;
-use malachite_base_test_util::common::test_eq_helper;
 
 #[test]
 fn test_eq() {

@@ -6,11 +6,11 @@ use malachite_base::num::arithmetic::traits::ModMulPrecomputed;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, HasHalf, JoinHalves, SplitInHalf};
 use malachite_base::num::logic::traits::LeadingZeros;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen_var_12, unsigned_pair_gen_var_16, unsigned_quadruple_gen_var_4,
     unsigned_quadruple_gen_var_5, unsigned_triple_gen_var_12,
 };
-use malachite_base_test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
+use malachite_base::test_util::num::arithmetic::mod_mul::limbs_invert_limb_naive;
 
 #[test]
 fn test_test_invert_u32_table() {

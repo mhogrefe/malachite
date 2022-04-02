@@ -1,16 +1,16 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
-use malachite_base_test_util::generators::{signed_pair_gen_var_7, unsigned_pair_gen_var_27};
+use malachite_base::test_util::generators::{signed_pair_gen_var_7, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_nz::test_util::generators::{
     natural_gen, natural_natural_signed_triple_gen, natural_natural_unsigned_triple_gen,
     natural_signed_pair_gen, natural_signed_pair_gen_var_1, natural_signed_signed_triple_gen,
     natural_unsigned_pair_gen, natural_unsigned_unsigned_triple_gen,
 };
-use malachite_nz_test_util::natural::comparison::partial_cmp_primitive_int::*;
+use malachite_nz::test_util::natural::comparison::partial_cmp_primitive_int::*;
 use num::BigUint;
 use rug;
 use std::cmp::Ordering;

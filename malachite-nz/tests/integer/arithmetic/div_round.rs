@@ -3,14 +3,14 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::signed_signed_rounding_mode_triple_gen_var_1;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::signed_signed_rounding_mode_triple_gen_var_1;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_integer_rounding_mode_triple_gen_var_1, integer_pair_gen_var_1, integer_pair_gen_var_3,
     integer_rounding_mode_pair_gen, integer_rounding_mode_pair_gen_var_2,
     natural_natural_rounding_mode_triple_gen_var_1,

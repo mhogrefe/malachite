@@ -21,20 +21,23 @@ use natural::logic::not::limbs_not_in_place;
 use platform::Limb;
 use std::cmp::Ordering;
 
-/// Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, returning the
-/// limbs of the absolute value and the sign (true means non-negative). `xs` and `ys` should be
-/// nonempty and have no trailing zeros, and `z` should be nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
-#[doc(hidden)]
-pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], z: Limb) -> (Vec<Limb>, bool) {
+// Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, returning the
+// limbs of the absolute value and the sign (true means non-negative). `xs` and `ys` should be
+// nonempty and have no trailing zeros, and `z` should be nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
+pub_crate_test! {limbs_overflowing_sub_mul_limb(
+    xs: &[Limb],
+    ys: &[Limb],
+    z: Limb
+) -> (Vec<Limb>, bool) {
     let mut result;
     let sign = if xs.len() >= ys.len() {
         result = xs.to_vec();
@@ -44,24 +47,23 @@ pub fn limbs_overflowing_sub_mul_limb(xs: &[Limb], ys: &[Limb], z: Limb) -> (Vec
         limbs_overflowing_sub_mul_limb_smaller_in_place_right(xs, &mut result, z)
     };
     (result, sign)
-}
+}}
 
-/// Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, writing the
-/// limbs of the absolute value to the first (left) slice and returning the sign (true means non-
-/// negative). `xs` and `ys` should be nonempty and have no trailing zeros, and `z` should be
-/// nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///       m = max(1, `ys.len()` - `xs.len()`)
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// negative, and w_sign is returned.
-#[doc(hidden)]
-pub fn limbs_overflowing_sub_mul_limb_in_place_left(
+// Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, writing the
+// limbs of the absolute value to the first (left) slice and returning the sign (true means non-
+// negative). `xs` and `ys` should be nonempty and have no trailing zeros, and `z` should be
+// nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//       m = max(1, `ys.len()` - `xs.len()`)
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// negative, and w_sign is returned.
+pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
     z: Limb,
@@ -99,7 +101,7 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_left(
         }
         false
     }
-}
+}}
 
 // xs.len() >= ys.len()
 fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
@@ -129,23 +131,22 @@ fn limbs_overflowing_sub_mul_limb_greater_in_place_left(
     }
 }
 
-/// Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, writing the
-/// limbs of the absolute value to the second (right) slice and returning the sign (true means non-
-/// negative). `xs` and `ys` should be nonempty and have no trailing zeros, and `z` should be
-/// nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///       m = max(1, `xs.len()` - `ys.len()`)
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// negative, the limbs of the result are written to the second input rather than the first, and
-/// w_sign is returned.
-#[doc(hidden)]
-pub fn limbs_overflowing_sub_mul_limb_in_place_right(
+// Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, writing the
+// limbs of the absolute value to the second (right) slice and returning the sign (true means non-
+// negative). `xs` and `ys` should be nonempty and have no trailing zeros, and `z` should be
+// nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//       m = max(1, `xs.len()` - `ys.len()`)
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// negative, the limbs of the result are written to the second input rather than the first, and
+// w_sign is returned.
+pub_test! {limbs_overflowing_sub_mul_limb_in_place_right(
     xs: &[Limb],
     ys: &mut Vec<Limb>,
     z: Limb,
@@ -176,7 +177,7 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_right(
     } else {
         limbs_overflowing_sub_mul_limb_smaller_in_place_right(xs, ys, z)
     }
-}
+}}
 
 // xs.len() < ys.len()
 fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
@@ -210,22 +211,21 @@ fn limbs_overflowing_sub_mul_limb_smaller_in_place_right(
     false
 }
 
-/// Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, writing the
-/// limbs of the absolute value to whichever input is longer. The first `bool` returned is `false`
-/// if the result is written to the first input, and `true` if it is written to the second. The
-/// second `bool` is the sign of the result (true means non-negative). `xs` and `ys` should be
-/// nonempty and have no trailing zeros, and `z` should be nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// negative, the result is written to the longer input, and w_sign is returned.
-#[doc(hidden)]
-pub fn limbs_overflowing_sub_mul_limb_in_place_either(
+// Given the limbs of two `Natural`s x and y, and a limb `z`, calculates x - y * z, writing the
+// limbs of the absolute value to whichever input is longer. The first `bool` returned is `false`
+// if the result is written to the first input, and `true` if it is written to the second. The
+// second `bool` is the sign of the result (true means non-negative). `xs` and `ys` should be
+// nonempty and have no trailing zeros, and `z` should be nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// negative, the result is written to the longer input, and w_sign is returned.
+pub_crate_test! {limbs_overflowing_sub_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
     z: Limb,
@@ -241,49 +241,51 @@ pub fn limbs_overflowing_sub_mul_limb_in_place_either(
             limbs_overflowing_sub_mul_limb_smaller_in_place_right(xs, ys, z),
         )
     }
-}
+}}
 
-/// Given the limbs of three `Natural`s x, y, and z, calculates x - y * z, returning the limbs of
-/// the absolute value and the sign (true means non-negative). All of the input slices should be
-/// non-empty and have no trailing zeros.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(m + n * log(n))
-///
-/// where n = max(`ys.len()`, `zs.len()`)
-///       m = `xs.len()`
-///
-/// # Panics
-/// Panics if `ys` or `zs` are empty.
-///
-/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-/// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
-#[doc(hidden)]
-pub fn limbs_overflowing_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> (Vec<Limb>, bool) {
+// Given the limbs of three `Natural`s x, y, and z, calculates x - y * z, returning the limbs of
+// the absolute value and the sign (true means non-negative). All of the input slices should be
+// non-empty and have no trailing zeros.
+//
+// Time: O(m + n * log(n) * log(log(n)))
+//
+// Additional memory: O(m + n * log(n))
+//
+// where n = max(`ys.len()`, `zs.len()`)
+//       m = `xs.len()`
+//
+// # Panics
+// Panics if `ys` or `zs` are empty.
+//
+// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
+// negative, and w is returned instead of overwriting the first input. w_sign is also returned.
+pub_crate_test! {limbs_overflowing_sub_mul(
+    xs: &[Limb],
+    ys: &[Limb],
+    zs: &[Limb]
+) -> (Vec<Limb>, bool) {
     let mut xs = xs.to_vec();
     let sign = limbs_overflowing_sub_mul_in_place_left(&mut xs, ys, zs);
     (xs, sign)
-}
+}}
 
-/// Given the limbs of three `Natural`s x, y, and z, calculates x - y * z, writing the limbs of the
-/// absolute value to the first (left) slice and returning the sign (true means non-negative). All
-/// of the input slices should be non-empty and have no trailing zeros.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`ys.len()`, `zs.len()`)
-///       m = `xs.len()`
-///
-/// # Panics
-/// Panics if `ys` or `zs` are empty.
-///
-/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-/// negative, and w_sign is returned.
-#[doc(hidden)]
-pub fn limbs_overflowing_sub_mul_in_place_left(
+// Given the limbs of three `Natural`s x, y, and z, calculates x - y * z, writing the limbs of the
+// absolute value to the first (left) slice and returning the sign (true means non-negative). All
+// of the input slices should be non-empty and have no trailing zeros.
+//
+// Time: O(m + n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = max(`ys.len()`, `zs.len()`)
+//       m = `xs.len()`
+//
+// # Panics
+// Panics if `ys` or `zs` are empty.
+//
+// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
+// negative, and w_sign is returned.
+pub_crate_test! {limbs_overflowing_sub_mul_in_place_left(
     xs: &mut Vec<Limb>,
     ys: &[Limb],
     zs: &[Limb],
@@ -293,7 +295,7 @@ pub fn limbs_overflowing_sub_mul_in_place_left(
     } else {
         limbs_overflowing_sub_mul_greater_in_place_left(xs, zs, ys)
     }
-}
+}}
 
 // zs.len() >= ys.len()
 fn limbs_overflowing_sub_mul_greater_in_place_left(

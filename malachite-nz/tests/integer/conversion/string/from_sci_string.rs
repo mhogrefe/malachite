@@ -2,12 +2,12 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::num::conversion::traits::{FromSciString, ToStringBase};
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     string_from_sci_string_options_pair_gen_var_2, string_from_sci_string_options_pair_gen_var_3,
     string_gen_var_14, string_gen_var_15,
 };
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz::test_util::generators::integer_gen;
 use std::str::FromStr;
 
 #[test]

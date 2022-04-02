@@ -1,10 +1,10 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
-use malachite_base_test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
+use malachite_base::test_util::generators::{signed_gen, signed_gen_var_2, unsigned_gen};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::common::{bigint_to_integer, rug_integer_to_integer};
+use malachite_nz::test_util::common::{bigint_to_integer, rug_integer_to_integer};
 use num::BigInt;
 use rug;
 

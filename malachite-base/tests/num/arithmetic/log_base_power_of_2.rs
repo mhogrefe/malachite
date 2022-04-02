@@ -4,7 +4,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     primitive_float_gen_var_18, primitive_float_unsigned_pair_gen_var_3, unsigned_gen_var_1,
     unsigned_gen_var_11, unsigned_pair_gen_var_21,
 };

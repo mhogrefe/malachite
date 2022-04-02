@@ -3,7 +3,7 @@ use malachite_base::num::basic::traits::One;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitScan;
 use malachite_base::num::logic::traits::LowMask;
-use malachite_base_test_util::generators::{unsigned_gen_var_15, unsigned_gen_var_5};
+use malachite_base::test_util::generators::{unsigned_gen_var_15, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;

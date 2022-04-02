@@ -1,6 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::{unsigned_gen_var_13, unsigned_pair_gen_var_22};
+use malachite_base::test_util::generators::{unsigned_gen_var_13, unsigned_pair_gen_var_22};
 use std::panic::catch_unwind;
 
 #[allow(clippy::approx_constant)]

@@ -4,7 +4,7 @@ use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     large_type_gen_var_23, natural_vec_unsigned_pair_gen_var_1,
 };
 use malachite_q::Rational;

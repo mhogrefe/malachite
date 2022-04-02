@@ -5,8 +5,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_gen_var_5, unsigned_pair_gen_var_17, unsigned_vec_pair_gen_var_1,
     unsigned_vec_pair_gen_var_20,
 };
@@ -16,11 +16,11 @@ use malachite_nz::natural::arithmetic::mod_power_of_2_square::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_natural_unsigned_triple_gen_var_4, natural_unsigned_pair_gen_var_11,
     unsigned_vec_pair_gen_var_21, unsigned_vec_unsigned_pair_gen_var_30,
 };
-use malachite_nz_test_util::natural::arithmetic::mod_power_of_2_square::*;
+use malachite_nz::test_util::natural::arithmetic::mod_power_of_2_square::*;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]

@@ -1,9 +1,9 @@
-use malachite_base_test_util::common::test_cmp_helper;
-use malachite_base_test_util::generators::signed_pair_gen;
+use malachite_base::test_util::common::test_cmp_helper;
+use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::common::{integer_to_bigint, integer_to_rug_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
+use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen, natural_pair_gen,
 };
 use num::BigInt;

@@ -7,13 +7,12 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Returns the limbs of a `Natural`, where the lowest `bits` bits are set.
-///
-/// Time: worst case O(`bits`)
-///
-/// Additional memory: worst case O(`bits`)
-#[doc(hidden)]
-pub fn limbs_low_mask(bits: u64) -> Vec<Limb> {
+// Returns the limbs of a `Natural`, where the lowest `bits` bits are set.
+//
+// Time: worst case O(`bits`)
+//
+// Additional memory: worst case O(`bits`)
+pub_crate_test! {limbs_low_mask(bits: u64) -> Vec<Limb> {
     let len = bits.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling);
     let remaining_bits = bits & Limb::WIDTH_MASK;
     let mut xs = vec![Limb::MAX; usize::exact_from(len)];
@@ -21,7 +20,7 @@ pub fn limbs_low_mask(bits: u64) -> Vec<Limb> {
         xs.last_mut().unwrap().mod_power_of_2_assign(remaining_bits);
     }
     xs
-}
+}}
 
 impl LowMask for Natural {
     /// Returns a `Natural` with the least significant `bits` bits on and the remaining bits off.

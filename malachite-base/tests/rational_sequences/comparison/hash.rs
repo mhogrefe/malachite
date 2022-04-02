@@ -1,5 +1,5 @@
-use malachite_base_test_util::generators::unsigned_rational_sequence_gen;
-use malachite_base_test_util::hash::hash;
+use malachite_base::test_util::generators::unsigned_rational_sequence_gen;
+use malachite_base::test_util::hash::hash;
 
 #[test]
 fn hash_properties() {

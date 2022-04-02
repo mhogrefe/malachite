@@ -5,17 +5,16 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
-/// number of zeros in the binary expansion of the negative (two's complement) of the `Natural`.
-/// `limbs` cannot be empty.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
+// Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
+// number of zeros in the binary expansion of the negative (two's complement) of the `Natural`.
+// `limbs` cannot be empty.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_crate_test! {limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
     let mut sum = 0;
     let mut nonzero_seen = false;
     for &x in xs.iter() {
@@ -29,7 +28,7 @@ pub fn limbs_count_zeros_neg(xs: &[Limb]) -> u64 {
         };
     }
     sum
-}
+}}
 
 impl Natural {
     fn count_zeros_neg(&self) -> u64 {

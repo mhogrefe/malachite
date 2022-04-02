@@ -47,8 +47,7 @@ pub fn char_is_graphic(c: char) -> bool {
 }
 
 impl CharType {
-    #[doc(hidden)]
-    pub fn contains(self, c: char) -> bool {
+    pub_crate_test! {contains(self, c: char) -> bool {
         match self {
             CharType::AsciiLower => c.is_ascii_lowercase(),
             CharType::AsciiUpper => c.is_ascii_uppercase(),
@@ -61,7 +60,7 @@ impl CharType {
                 c.is_ascii_control() || !c.is_ascii() && debug_starts_with_slash(c)
             }
         }
-    }
+    }}
 }
 
 /// Constants associated with `char`s.

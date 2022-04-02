@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::x_mul_y_is_zz::explicit_x_mul_y_is_zz;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_27, unsigned_triple_gen_var_19,
 };
 

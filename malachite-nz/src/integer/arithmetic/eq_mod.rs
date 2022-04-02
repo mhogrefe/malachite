@@ -15,26 +15,25 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD};
 
-/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
-/// whether that `Natural` is equal to the negative of a limb mod a given `Limb` m.
-///
-/// This function assumes that `m` is nonzero, `limbs` has at least two elements, and the last
-/// element of `limbs` is nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `limbs.len()`
-///
-/// # Panics
-/// Panics if the length of `limbs` is less than 2.
-///
-/// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.2.1, where a is negative.
-#[doc(hidden)]
-pub fn limbs_eq_neg_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
+// whether that `Natural` is equal to the negative of a limb mod a given `Limb` m.
+//
+// This function assumes that `m` is nonzero, `limbs` has at least two elements, and the last
+// element of `limbs` is nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `limbs.len()`
+//
+// # Panics
+// Panics if the length of `limbs` is less than 2.
+//
+// This is mpz_congruent_ui_p from mpz/cong_ui.c, GMP 6.2.1, where a is negative.
+pub_test! {limbs_eq_neg_limb_mod_limb(xs: &[Limb], y: Limb, m: Limb) -> bool {
     limbs_eq_limb_mod_limb(xs, y.neg_mod(m), m)
-}
+}}
 
 /// Set r to -n mod d. n >= d is allowed. Can give r > d. d cannot equal 0.
 ///
@@ -48,20 +47,19 @@ const fn quick_neg_mod(n: Limb, d: Limb) -> Limb {
     }
 }
 
-/// Interpreting two limbs `x` and `y` and slice of `Limb`s `m` as three numbers x, y, and m,
-/// determines whether x ≡ -y mod m.
-///
-/// This function assumes that the input slice has at least two elements, its last element is
-/// nonzero, and `x` and `y` are nonzero.
-///
-/// Time: Worst case O(1)
-///
-/// Additional memory: Worst case O(1)
-///
-/// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
-/// and d are one limb long, and c is longer than one limb.
-#[doc(hidden)]
-pub const fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bool {
+// Interpreting two limbs `x` and `y` and slice of `Limb`s `m` as three numbers x, y, and m,
+// determines whether x ≡ -y mod m.
+//
+// This function assumes that the input slice has at least two elements, its last element is
+// nonzero, and `x` and `y` are nonzero.
+//
+// Time: Worst case O(1)
+//
+// Additional memory: Worst case O(1)
+//
+// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
+// and d are one limb long, and c is longer than one limb.
+pub_const_test! {limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bool {
     // We are checking whether x ≡ -y mod m; that is, whether x + y = k * m for some k in Z. But
     // because of the preconditions on m, the lowest possible value of m is 2<sup>Limb::WIDTH</sup>,
     // while the highest possible value of x + y is 2<sup>Limb::WIDTH + 1</sup> - 2, so we have
@@ -70,7 +68,7 @@ pub const fn limbs_pos_limb_eq_neg_limb_mod(x: Limb, y: Limb, ms: &[Limb]) -> bo
         let (sum, overflow) = x.overflowing_add(y);
         overflow && sum == ms[0]
     }
-}
+}}
 
 #[allow(clippy::absurd_extreme_comparisons)]
 fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option<bool> {
@@ -111,88 +109,85 @@ fn limbs_pos_eq_neg_limb_mod_helper(xs: &[Limb], y: Limb, ms: &[Limb]) -> Option
     None
 }
 
-/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `m` as three
-/// numbers x, y, and m, determines whether x ≡ -y mod m. The second input slice is immutable.
-///
-/// This function assumes that each of the two input slices have at least two elements, their last
-/// elements are nonzero, and `y` is nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
-/// is zero, or if `y` is zero.
-///
-/// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
-/// and d are longer than one limb, and c is one limb long.
-#[doc(hidden)]
-pub fn limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
+// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `m` as three
+// numbers x, y, and m, determines whether x ≡ -y mod m. The second input slice is immutable.
+//
+// This function assumes that each of the two input slices have at least two elements, their last
+// elements are nonzero, and `y` is nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
+// is zero, or if `y` is zero.
+//
+// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
+// and d are longer than one limb, and c is one limb long.
+pub_test! {limbs_pos_eq_neg_limb_mod_ref(xs: &[Limb], y: Limb, ms: &[Limb]) -> bool {
     if let Some(equal) = limbs_pos_eq_neg_limb_mod_helper(xs, y, ms) {
         return equal;
     }
     // calculate |x - y|. Different signs, add
     let mut scratch = limbs_add_limb(xs, y);
     scratch.len() >= ms.len() && limbs_divisible_by_val_ref(&mut scratch, ms)
-}
+}}
 
-/// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
-/// numbers x, y, and m, determines whether x ≡ -y mod m. The second input slice is mutable.
-///
-/// This function assumes that each of the two input slices have at least two elements, their last
-/// elements are nonzero, and `y` is nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
-/// is zero, or if `y` is zero.
-///
-/// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
-/// and d are longer than one limb, and c is one limb long.
-#[doc(hidden)]
-pub fn limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
+// Interpreting a slice of `Limb`s `xs`, a Limb `y`, and another slice of `Limb`s `ms` as three
+// numbers x, y, and m, determines whether x ≡ -y mod m. The second input slice is mutable.
+//
+// This function assumes that each of the two input slices have at least two elements, their last
+// elements are nonzero, and `y` is nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if the length of `xs` or `ms` is less than 2, if the last element of either of the slices
+// is zero, or if `y` is zero.
+//
+// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
+// and d are longer than one limb, and c is one limb long.
+pub_test! {limbs_pos_eq_neg_limb_mod(xs: &[Limb], y: Limb, ms: &mut [Limb]) -> bool {
     if let Some(equal) = limbs_pos_eq_neg_limb_mod_helper(xs, y, ms) {
         return equal;
     }
     // calculate |x - y|. Different signs, add
     let mut scratch = limbs_add_limb(xs, y);
     scratch.len() >= ms.len() && limbs_divisible_by(&mut scratch, ms)
-}
+}}
 
-/// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and
-/// m, determines whether x ≡ -y mod m.
-///
-/// This function assumes that each of the two input slices have at least two elements, their last
-/// elements are nonzero, and `m` is nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs.len()`, `ys.len`)
-///
-/// # Panics
-/// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
-/// is zero, or if `m` is zero.
-///
-/// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
-/// and c are longer than one limb, and m is one limb long.
-#[doc(hidden)]
-pub fn limbs_pos_eq_neg_mod_limb(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
+// Interpreting two slices of `Limb`s `xs` and `ys` and a Limb `m` as three numbers x, y, and
+// m, determines whether x ≡ -y mod m.
+//
+// This function assumes that each of the two input slices have at least two elements, their last
+// elements are nonzero, and `m` is nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs.len()`, `ys.len`)
+//
+// # Panics
+// Panics if the length of `xs` or `ys` is less than 2, if the last element of either of the slices
+// is zero, or if `m` is zero.
+//
+// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative, a
+// and c are longer than one limb, and m is one limb long.
+pub_test! {limbs_pos_eq_neg_mod_limb(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_mod_neg_limb_greater(xs, ys, m)
     } else {
         limbs_pos_eq_mod_neg_limb_greater(ys, xs, m)
     }
-}
+}}
 
 // xs.len() >= ys.len()
 fn limbs_pos_eq_mod_neg_limb_greater(xs: &[Limb], ys: &[Limb], m: Limb) -> bool {
@@ -230,33 +225,32 @@ fn limbs_pos_eq_neg_mod_greater_helper(xs: &[Limb], ys: &[Limb], ms: &[Limb]) ->
     }
 }
 
-/// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
-/// first `Natural` is equal to the negative of the second `Natural` mod the third `Natural`. The
-/// second input slice is immutable.
-///
-/// This function assumes that each of the three input slices have at least two elements, and their
-/// last elements are nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
-/// slices is zero.
-///
-/// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
-/// and each is longer than one limb.
-#[doc(hidden)]
-pub fn limbs_pos_eq_neg_mod_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
+// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
+// first `Natural` is equal to the negative of the second `Natural` mod the third `Natural`. The
+// second input slice is immutable.
+//
+// This function assumes that each of the three input slices have at least two elements, and their
+// last elements are nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
+// slices is zero.
+//
+// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
+// and each is longer than one limb.
+pub_test! {limbs_pos_eq_neg_mod_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_neg_mod_greater_ref(xs, ys, ms)
     } else {
         limbs_pos_eq_neg_mod_greater_ref(ys, xs, ms)
     }
-}
+}}
 
 // xs.len() >= ys.len()
 fn limbs_pos_eq_neg_mod_greater_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bool {
@@ -268,33 +262,32 @@ fn limbs_pos_eq_neg_mod_greater_ref(xs: &[Limb], ys: &[Limb], ms: &[Limb]) -> bo
     scratch.len() >= ms.len() && limbs_divisible_by_val_ref(&mut scratch, ms)
 }
 
-/// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
-/// first `Natural` is equal to the negative of the second `Natural` mod the third `Natural`. The
-/// second input slice is mutable.
-///
-/// This function assumes that each of the three input slices have at least two elements, and their
-/// last elements are nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
-/// slices is zero.
-///
-/// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
-/// and each is longer than one limb.
-#[doc(hidden)]
-pub fn limbs_pos_eq_neg_mod(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
+// Interpreting three slice of `Limb`s as the limbs of three `Natural`s, determines whether the
+// first `Natural` is equal to the negative of the second `Natural` mod the third `Natural`. The
+// second input slice is mutable.
+//
+// This function assumes that each of the three input slices have at least two elements, and their
+// last elements are nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if the length of `xs`, `ys`, or `ms` is less than 2, or if the last element of any of the
+// slices is zero.
+//
+// This is mpz_congruent_p from mpz/cong.c, GMP 6.2.1, where a and d are positive, c is negative,
+// and each is longer than one limb.
+pub_test! {limbs_pos_eq_neg_mod(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_pos_eq_neg_mod_greater(xs, ys, ms)
     } else {
         limbs_pos_eq_neg_mod_greater(ys, xs, ms)
     }
-}
+}}
 
 // xs.len() >= ys.len()
 fn limbs_pos_eq_neg_mod_greater(xs: &[Limb], ys: &[Limb], ms: &mut [Limb]) -> bool {

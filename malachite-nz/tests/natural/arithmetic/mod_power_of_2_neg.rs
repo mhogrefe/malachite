@@ -3,10 +3,10 @@ use malachite_base::num::arithmetic::traits::{
     ModPowerOf2NegAssign, PowerOf2,
 };
 use malachite_base::num::basic::traits::Zero;
-use malachite_base_test_util::generators::unsigned_pair_gen_var_17;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_17;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_11;
+use malachite_nz::test_util::generators::natural_unsigned_pair_gen_var_11;
 use std::str::FromStr;
 
 #[test]

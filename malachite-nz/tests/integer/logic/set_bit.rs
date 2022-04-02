@@ -1,13 +1,13 @@
 use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::{BitAccess, NotAssign};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_vec_unsigned_pair_gen_var_20;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_vec_unsigned_pair_gen_var_20;
 use malachite_nz::integer::logic::bit_access::limbs_set_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::integer_unsigned_pair_gen_var_2;
+use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]

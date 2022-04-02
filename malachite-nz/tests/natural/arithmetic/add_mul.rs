@@ -2,8 +2,8 @@ use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, CheckedAddMu
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ConvertibleFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_triple_gen_var_1, unsigned_triple_gen_var_19, unsigned_vec_triple_gen_var_41,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_10,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_12,
@@ -16,7 +16,7 @@ use malachite_nz::natural::arithmetic::add_mul::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{natural_pair_gen, natural_triple_gen};
+use malachite_nz::test_util::generators::{natural_pair_gen, natural_triple_gen};
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]

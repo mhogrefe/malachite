@@ -12,18 +12,17 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` mod two raised to `pow`. Equivalently, retains only the least-significant
-/// `pow` bits.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative and the
-/// result is returned.
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` mod two raised to `pow`. Equivalently, retains only the least-significant
+// `pow` bits.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+//
+// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative and the
+// result is returned.
+pub_test! {limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         return Vec::new();
     }
@@ -37,21 +36,20 @@ pub fn limbs_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
         result.push(xs[result_size].mod_power_of_2(leftover_bits));
     }
     result
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` mod two raised to `pow` to the input slice. Equivalently, retains only
-/// the least-significant `pow` bits. If the upper limbs of the input slice are no longer needed,
-/// they are set to zero.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative, res == in,
-/// and instead of possibly being truncated, the high limbs of res are possibly filled with zeros.
-#[doc(hidden)]
-pub fn limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` mod two raised to `pow` to the input slice. Equivalently, retains only
+// the least-significant `pow` bits. If the upper limbs of the input slice are no longer needed,
+// they are set to zero.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative, res == in,
+// and instead of possibly being truncated, the high limbs of res are possibly filled with zeros.
+pub_crate_test! {limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) {
     if pow == 0 {
         slice_set_zero(xs);
         return;
@@ -65,20 +63,19 @@ pub fn limbs_slice_mod_power_of_2_in_place(xs: &mut [Limb], pow: u64) {
     if leftover_bits != 0 {
         xs[new_size - 1].mod_power_of_2_assign(leftover_bits);
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently, retains only
-/// the least-significant `pow` bits.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative and
-/// res == in.
-#[doc(hidden)]
-pub fn limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently, retains only
+// the least-significant `pow` bits.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is non-negative and
+// res == in.
+pub_crate_test! {limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
         xs.clear();
         return;
@@ -92,37 +89,35 @@ pub fn limbs_vec_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if leftover_bits != 0 {
         xs[new_size - 1].mod_power_of_2_assign(leftover_bits);
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the negative of the `Natural` mod two raised to `pow`. Equivalently, takes the two's
-/// complement and retains only the least-significant `pow` bits.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is negative and the result
-/// is returned. `xs` is the limbs of -in.
-#[doc(hidden)]
-pub fn limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the negative of the `Natural` mod two raised to `pow`. Equivalently, takes the two's
+// complement and retains only the least-significant `pow` bits.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+//
+// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is negative and the result
+// is returned. `xs` is the limbs of -in.
+pub_crate_test! {limbs_neg_mod_power_of_2(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let mut result = xs.to_vec();
     limbs_neg_mod_power_of_2_in_place(&mut result, pow);
     result
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the negative of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently,
-/// takes the two's complement and retains only the least-significant `pow` bits.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-///
-/// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is negative and res == in.
-/// `xs` is the limbs of -in.
-#[doc(hidden)]
-pub fn limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the negative of the `Natural` mod two raised to `pow` to the input `Vec`. Equivalently,
+// takes the two's complement and retains only the least-significant `pow` bits.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+//
+// This is mpz_tdiv_r_2exp from mpz/tdiv_r_2exp.c, GMP 6.2.1, where in is negative and res == in.
+// `xs` is the limbs of -in.
+pub_crate_test! {limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let new_size = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
     xs.resize(new_size, 0);
     limbs_twos_complement_in_place(xs);
@@ -130,7 +125,7 @@ pub fn limbs_neg_mod_power_of_2_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if leftover_bits != 0 {
         xs[new_size - 1].mod_power_of_2_assign(leftover_bits);
     }
-}
+}}
 
 impl ModPowerOf2 for Natural {
     type Output = Natural;

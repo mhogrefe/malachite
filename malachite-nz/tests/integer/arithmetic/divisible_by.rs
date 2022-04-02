@@ -1,16 +1,16 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::signed_pair_gen;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::signed_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::common::{integer_to_bigint, integer_to_rug_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
+use malachite_nz::test_util::generators::{
     integer_gen, integer_gen_var_8, integer_pair_gen, integer_pair_gen_var_2,
     integer_pair_gen_var_3, natural_pair_gen,
 };
-use malachite_nz_test_util::integer::arithmetic::divisible_by::num_divisible_by;
+use malachite_nz::test_util::integer::arithmetic::divisible_by::num_divisible_by;
 use num::BigInt;
 use std::str::FromStr;
 

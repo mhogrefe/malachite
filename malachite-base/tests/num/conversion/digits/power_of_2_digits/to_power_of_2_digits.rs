@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::DivRound;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, PowerOf2Digits};
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_3, unsigned_pair_gen_var_4,
 };
 use std::panic::catch_unwind;

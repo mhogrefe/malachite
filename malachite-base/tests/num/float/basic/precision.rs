@@ -1,5 +1,5 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
-use malachite_base_test_util::generators::primitive_float_gen_var_12;
+use malachite_base::test_util::generators::primitive_float_gen_var_12;
 use std::panic::catch_unwind;
 
 fn precision_helper<T: PrimitiveFloat>() {

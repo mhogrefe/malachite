@@ -11,22 +11,25 @@ use platform::{DoubleLimb, Limb};
 use std::cmp::Ordering;
 use std::fmt::Display;
 
-/// Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If
-/// y * z > x, `None` is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// negative, and w is returned instead of overwriting the first input.
-#[doc(hidden)]
-pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], z: Limb) -> Option<Vec<Limb>> {
+// Given the limbs of two `Natural`s x and y, and a limb z, returns the limbs of x - y * z. If
+// y * z > x, `None` is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// negative, and w is returned instead of overwriting the first input.
+pub_crate_test! {limbs_sub_mul_limb_greater(
+    xs: &[Limb],
+    ys: &[Limb],
+    z: Limb
+) -> Option<Vec<Limb>> {
     let ys_len = ys.len();
     let mut result = xs.to_vec();
     let borrow = limbs_sub_mul_limb_same_length_in_place_left(&mut result[..ys_len], ys, z);
@@ -37,24 +40,27 @@ pub fn limbs_sub_mul_limb_greater(xs: &[Limb], ys: &[Limb], z: Limb) -> Option<V
     } else {
         Some(result)
     }
-}
+}}
 
-/// Given the equal-length limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and
-/// writes the limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow
-/// is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_sub_mul_limb_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb], z: Limb) -> Limb {
+// Given the equal-length limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and
+// writes the limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow
+// is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2.
+pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    z: Limb
+) -> Limb {
     assert_eq!(xs.len(), ys.len());
     let mut borrow = 0;
     let z = DoubleLimb::from(z);
@@ -73,24 +79,27 @@ pub fn limbs_sub_mul_limb_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]
         *x = lower;
     }
     borrow
-}
+}}
 
-/// Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
-/// limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-///
-/// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2, but where the first input may be
-/// longer than the second.
-#[doc(hidden)]
-pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], limb: Limb) -> Limb {
+// Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
+// limbs of the result to the first (left) input slice. If y * z > x, a nonzero borrow is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+//
+// This is mpn_submul_1 from mpn/generic/submul_1.c, GMP 6.1.2, but where the first input may be
+// longer than the second.
+pub_crate_test! {limbs_sub_mul_limb_greater_in_place_left(
+    xs: &mut [Limb],
+    ys: &[Limb],
+    limb: Limb
+) -> Limb {
     let (xs_lo, xs_hi) = xs.split_at_mut(ys.len());
     let borrow = limbs_sub_mul_limb_same_length_in_place_left(xs_lo, ys, limb);
     if borrow == 0 || xs_hi.is_empty() {
@@ -98,26 +107,25 @@ pub fn limbs_sub_mul_limb_greater_in_place_left(xs: &mut [Limb], ys: &[Limb], li
     } else {
         Limb::iverson(limbs_sub_limb_in_place(xs_hi, borrow))
     }
-}
+}}
 
-/// Given the equal-length limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and
-/// writes the limbs of the result to the second (right) input slice. If y * z > x, a nonzero borrow
-/// is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
-/// same lengths, sub is negative, and the lowest limbs of the result are written to the second
-/// input rather than the first.
-#[doc(hidden)]
-pub fn limbs_sub_mul_limb_same_length_in_place_right(
+// Given the equal-length limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and
+// writes the limbs of the result to the second (right) input slice. If y * z > x, a nonzero borrow
+// is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
+// same lengths, sub is negative, and the lowest limbs of the result are written to the second
+// input rather than the first.
+pub_crate_test! {limbs_sub_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     z: Limb,
@@ -140,26 +148,29 @@ pub fn limbs_sub_mul_limb_same_length_in_place_right(
         *y = lower;
     }
     borrow
-}
+}}
 
-/// Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
-/// limbs of the result to the second (right) input `Vec`. If y * z > x, a nonzero borrow is
-/// returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len()`
-///       m = `xs.len() - ys.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// negative, and the result is written to the second input rather than the first.
-#[doc(hidden)]
-pub fn limbs_sub_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) -> Limb {
+// Given the limbs of two `Natural`s x and y, and a limb z, calculates x - y * z and writes the
+// limbs of the result to the second (right) input `Vec`. If y * z > x, a nonzero borrow is
+// returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len()`
+//       m = `xs.len() - ys.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// negative, and the result is written to the second input rather than the first.
+pub_test! {limbs_sub_mul_limb_greater_in_place_right(
+    xs: &[Limb],
+    ys: &mut Vec<Limb>,
+    z: Limb
+) -> Limb {
     let ys_len = ys.len();
     let (xs_lo, xs_hi) = xs.split_at(ys_len);
     let borrow = limbs_sub_mul_limb_same_length_in_place_right(xs_lo, ys, z);
@@ -175,59 +186,57 @@ pub fn limbs_sub_mul_limb_greater_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
             0
         }
     }
-}
+}}
 
-/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of
-/// x - y * z. If x < y * z, `None` is returned. `ys` and `zs` should have length at least 2, and
-/// the length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the latter condition is
-/// false, the result would be `None` and there's no point in calling this function). None of the
-/// slices should have any trailing zeros. The result, if it exists, will have no trailing zeros.
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`ys.len()`, `zs.len()`)
-///
-/// # Panics
-/// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
-/// `zs.len()` - 1.
-///
-/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-/// negative, negative results are converted to `None`, and w is returned instead of overwriting the
-/// first input.
-#[doc(hidden)]
-pub fn limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>> {
+// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of
+// x - y * z. If x < y * z, `None` is returned. `ys` and `zs` should have length at least 2, and
+// the length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the latter condition is
+// false, the result would be `None` and there's no point in calling this function). None of the
+// slices should have any trailing zeros. The result, if it exists, will have no trailing zeros.
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = max(`ys.len()`, `zs.len()`)
+//
+// # Panics
+// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
+// `zs.len()` - 1.
+//
+// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
+// negative, negative results are converted to `None`, and w is returned instead of overwriting the
+// first input.
+pub_crate_test! {limbs_sub_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Option<Vec<Limb>> {
     let mut xs = xs.to_vec();
     if limbs_sub_mul_in_place_left(&mut xs, ys, zs) {
         None
     } else {
         Some(xs)
     }
-}
+}}
 
-/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, computes x - y * z. The
-/// limbs of the result are written to `xs`. Returns whether a borrow (overflow) occurred: if
-/// x < y * z, `true` is returned and the value of `xs` should be ignored. `ys` and `zs` should have
-/// length at least 2, and the length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the
-/// latter condition is false, the result would be negative and there would be no point in calling
-/// this function). None of the slices should have any trailing zeros. The result, if it exists,
-/// will have no trailing zeros.
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`ys.len()`, `zs.len()`)
-///
-/// # Panics
-/// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
-/// `zs.len()` - 1.
-///
-/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-/// negative and negative results are discarded.
-#[doc(hidden)]
-pub fn limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
+// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, computes x - y * z. The
+// limbs of the result are written to `xs`. Returns whether a borrow (overflow) occurred: if
+// x < y * z, `true` is returned and the value of `xs` should be ignored. `ys` and `zs` should have
+// length at least 2, and the length of `xs` should be at least `ys.len()` + `zs.len()` - 1 (if the
+// latter condition is false, the result would be negative and there would be no point in calling
+// this function). None of the slices should have any trailing zeros. The result, if it exists,
+// will have no trailing zeros.
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = max(`ys.len()`, `zs.len()`)
+//
+// # Panics
+// Panics if `ys` or `zs` have fewer than two elements each, or if `xs.len()` < `ys.len()` +
+// `zs.len()` - 1.
+//
+// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
+// negative and negative results are discarded.
+pub_crate_test! {limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) -> bool {
     assert!(ys.len() > 1);
     assert!(zs.len() > 1);
     let mut scratch = limbs_mul(ys, zs);
@@ -240,7 +249,7 @@ pub fn limbs_sub_mul_in_place_left(xs: &mut [Limb], ys: &[Limb], zs: &[Limb]) ->
         assert!(!limbs_sub_greater_in_place_left(xs, &scratch));
     }
     borrow
-}
+}}
 
 fn sub_mul_panic<S: Display, T: Display, U: Display>(a: S, b: T, c: U) -> ! {
     panic!("Cannot perform sub_mul. a: {}, b: {}, c: {}", a, b, c);

@@ -8,22 +8,21 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// quotient limbs of a `Limb` divided by the `Natural` and rounded according to a specified
-/// `RoundingMode`. The limb slice must have at least two elements and cannot have any trailing
-/// zeros.
-///
-/// This function returns a `None` iff the rounding mode is `Exact` but the remainder of the
-/// division would be nonzero.
-///
-/// Note that this function may only return `None`, `Some(0)`, or `Some(1)` because of the
-/// restrictions placed on the input slice.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-#[doc(hidden)]
-pub fn limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) -> Option<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// quotient limbs of a `Limb` divided by the `Natural` and rounded according to a specified
+// `RoundingMode`. The limb slice must have at least two elements and cannot have any trailing
+// zeros.
+//
+// This function returns a `None` iff the rounding mode is `Exact` but the remainder of the
+// division would be nonzero.
+//
+// Note that this function may only return `None`, `Some(0)`, or `Some(1)` because of the
+// restrictions placed on the input slice.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+pub_test! {limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) -> Option<Limb> {
     if n == 0 {
         Some(0)
     } else {
@@ -37,7 +36,7 @@ pub fn limbs_limb_div_round_limbs(n: Limb, ds: &[Limb], rm: RoundingMode) -> Opt
             )),
         }
     }
-}
+}}
 
 fn div_round_nearest(q: Natural, r: Natural, d: &Natural) -> Natural {
     let compare = (r << 1u64).cmp(d);

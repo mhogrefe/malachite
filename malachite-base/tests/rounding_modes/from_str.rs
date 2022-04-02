@@ -1,6 +1,6 @@
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{string_gen, string_gen_var_2};
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{string_gen, string_gen_var_2};
 use std::str::FromStr;
 
 #[test]

@@ -34,13 +34,15 @@ use std::cmp::{max, Ordering};
 //TODO double check this
 pub(crate) const SQR_FFT_MODF_THRESHOLD: usize = SQR_TOOM3_THRESHOLD * 3;
 
-#[doc(hidden)]
-pub fn limbs_mul_greater_to_out_fft_input_sizes_threshold(xs_len: usize, ys_len: usize) -> bool {
+pub_test! {limbs_mul_greater_to_out_fft_input_sizes_threshold(
+    xs_len: usize,
+    ys_len: usize
+) -> bool {
     xs_len != 0 && xs_len >= ys_len && {
         let n = limbs_mul_mod_base_pow_n_minus_1_next_size(xs_len + ys_len);
         n.even() && n >= MULMOD_BNM1_THRESHOLD
     }
-}
+}}
 
 const fn get_k_by_index(table: &[(usize, usize)], index: usize) -> usize {
     table[index].1
@@ -505,17 +507,15 @@ pub(crate) fn limbs_mul_fft_best_k(n: usize, square: bool) -> usize {
     last_k
 }
 
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_fft_mul from gmp-impl.h, GMP 6.2.1, and mpn_nussbaumer_mul from
-/// mpn/generic/mpn_nussbaumer_mul.c, GMP 6.2.1.
-#[doc(hidden)]
-#[inline]
-pub fn limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = `xs.len()`
+//
+// This is mpn_fft_mul from gmp-impl.h, GMP 6.2.1, and mpn_nussbaumer_mul from
+// mpn/generic/mpn_nussbaumer_mul.c, GMP 6.2.1.
+pub_crate_test! {limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -529,7 +529,7 @@ pub fn limbs_mul_greater_to_out_fft(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
         let mut scratch = vec![0; limbs_mul_mod_base_pow_n_minus_1_scratch_len(n, xs_len, ys_len)];
         limbs_mul_mod_base_pow_n_minus_1(out, n, xs, ys, &mut scratch);
     }
-}
+}}
 
 /// Initialize table[i][j] with bitrev(j).
 ///
@@ -825,20 +825,19 @@ fn limbs_mul_fft_decompose<'a>(
     a_table
 }
 
-/// input: xss\[0\] ... xss[increment * (k - 1)] are residues mod 2 ^ N + 1 where
-/// N = n * Limb::WIDTH, and 2 ^ omega is a primitive root mod 2 ^ N + 1.
-/// output: xss[increment * bit_reverse_table[k]\[i\]] <-
-///      sum (2 ^ omega) ^ (i * j) xss[increment * j] mod 2 ^ N + 1
-///
-/// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xss[0].len()`
-///
-/// This is mpn_fft_fft from mpn/generic/mul_fft.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_mul_fft_fft(
+// input: xss\[0\] ... xss[increment * (k - 1)] are residues mod 2 ^ N + 1 where
+// N = n * Limb::WIDTH, and 2 ^ omega is a primitive root mod 2 ^ N + 1.
+// output: xss[increment * bit_reverse_table[k]\[i\]] <-
+//      sum (2 ^ omega) ^ (i * j) xss[increment * j] mod 2 ^ N + 1
+//
+// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xss[0].len()`
+//
+// This is mpn_fft_fft from mpn/generic/mul_fft.c, GMP 6.2.1.
+pub_test! {limbs_mul_fft_fft(
     xss: &mut [&mut [Limb]],
     k: usize,
     bit_reverse_table: &[&[usize]],
@@ -908,23 +907,22 @@ pub fn limbs_mul_fft_fft(
             xss_offset += increment << 1;
         }
     }
-}
+}}
 
-/// input: xs ^ bit_reverse_table\[k\]\[0\], xs ^ bit_reverse_table\[k\]\[1\], ...,
-///      xs ^ bit_reverse_table[k][K-1]
-/// output: k * xss\[0\], k * xss[k - 1], ..., k * xss\[1\].
-/// Assumes the xss are pseudo-normalized, i.e. 0 <= xss[]\[n\] <= 1. This condition is also
-/// fulfilled at exit.
-///
-/// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xss[0].len()`
-///
-/// This is mpn_fft_fftinv from mpn/generic/mul_fft.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_mul_fft_inverse(
+// input: xs ^ bit_reverse_table\[k\]\[0\], xs ^ bit_reverse_table\[k\]\[1\], ...,
+//      xs ^ bit_reverse_table[k][K-1]
+// output: k * xss\[0\], k * xss[k - 1], ..., k * xss\[1\].
+// Assumes the xss are pseudo-normalized, i.e. 0 <= xss[]\[n\] <= 1. This condition is also
+// fulfilled at exit.
+//
+// Time: O(n * log(n) * log(log(n))), assuming k = O(log(n))
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xss[0].len()`
+//
+// This is mpn_fft_fftinv from mpn/generic/mul_fft.c, GMP 6.2.1.
+pub_test! {limbs_mul_fft_inverse(
     xss: &mut [&mut [Limb]],
     k: usize,
     omega: usize,
@@ -963,20 +961,19 @@ pub fn limbs_mul_fft_inverse(
             limbs_mul_fft_add_mod_f_in_place_left(xss_lo[i], scratch);
         }
     }
-}
+}}
 
-/// out[..n] <- xs[..an] mod 2 ^ (n * Limb::WIDTH) + 1, n <= an <= 3 * n.
-/// Returns carry out, i.e. 1 iff xs[..an] == -1 mod 2 ^ (n * Limb::WIDTH) + 1, then out[..n] = 0.
-///
-/// Time: O(n)
-///
-/// Additional memory: O(1)
-///
-/// where n = `n`
-///
-/// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
+// out[..n] <- xs[..an] mod 2 ^ (n * Limb::WIDTH) + 1, n <= an <= 3 * n.
+// Returns carry out, i.e. 1 iff xs[..an] == -1 mod 2 ^ (n * Limb::WIDTH) + 1, then out[..n] = 0.
+//
+// Time: O(n)
+//
+// Additional memory: O(1)
+//
+// where n = `n`
+//
+// This is mpn_fft_norm_modF from mpn/generic/mul_fft.c, GMP 6.2.1.
+pub_test! {limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert!(n <= xs_len && xs_len <= 3 * n);
     let out = &mut out[..n];
@@ -995,7 +992,7 @@ pub fn limbs_mul_fft_normalize_mod_f(out: &mut [Limb], n: usize, xs: &[Limb]) ->
         out.copy_from_slice(xs_lo);
         limbs_sub_greater_in_place_left(out, xs_hi) && limbs_slice_add_limb_in_place(out, 1)
     }
-}
+}}
 
 /// Time: TODO
 ///
@@ -1169,16 +1166,15 @@ fn limbs_mul_fft_mul_mod_f_k_square(xss: &mut [&mut [Limb]]) {
     }
 }
 
-/// Time: TODO
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xss[i].len()` (each slice in `xss` should have the same length)
-///
-/// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c, GMP 6.2.1. A is excluded as it is
-/// unused. nprime is `xss[0].len()` - 1.
-#[doc(hidden)]
-pub fn limbs_mul_fft_internal(
+// Time: TODO
+//
+// Additional memory: O(n * log(n))
+//
+// where n = `xss[i].len()` (each slice in `xss` should have the same length)
+//
+// This is mpn_mul_fft_internal from mpn/generic/mul_fft.c, GMP 6.2.1. A is excluded as it is
+// unused. nprime is `xss[0].len()` - 1.
+pub_test! {limbs_mul_fft_internal(
     out: &mut [Limb],
     p: usize,
     k: usize,
@@ -1302,7 +1298,7 @@ pub fn limbs_mul_fft_internal(
     // < k * 2 ^ (2 * m) * [2 ^ (m * (k - 1)) + 2 ^ (m * (k - 2)) + ...]
     // < k * 2 ^ (2 * m) * 2 ^ (m * (k - 1)) * 2 = 2 ^ (m * k + m + k + 1)
     limbs_mul_fft_normalize_mod_f(out, p, ys)
-}
+}}
 
 /// Time: TODO
 ///

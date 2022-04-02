@@ -6,8 +6,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_gen_var_22, unsigned_pair_gen_var_11, unsigned_vec_pair_gen_var_12,
 };
 use malachite_nz::integer::Integer;
@@ -26,15 +26,15 @@ use malachite_nz::natural::arithmetic::div_exact::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
+use malachite_nz::test_util::generators::{
     large_type_gen_var_13, large_type_gen_var_14, large_type_gen_var_15, large_type_gen_var_16,
     natural_gen, natural_gen_var_2, natural_pair_gen_var_6, unsigned_vec_gen_var_5,
     unsigned_vec_pair_gen_var_13, unsigned_vec_quadruple_gen_var_2, unsigned_vec_triple_gen_var_46,
     unsigned_vec_triple_gen_var_47, unsigned_vec_triple_gen_var_48,
     unsigned_vec_unsigned_pair_gen_var_29, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_14,
 };
-use malachite_nz_test_util::natural::arithmetic::div_exact::{
+use malachite_nz::test_util::natural::arithmetic::div_exact::{
     limbs_div_exact_3_in_place_alt, limbs_div_exact_3_to_out_alt,
 };
 use std::str::FromStr;

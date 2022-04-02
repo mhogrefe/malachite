@@ -2,10 +2,10 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
-use malachite_base_test_util::generators::{signed_pair_gen_var_7, unsigned_pair_gen_var_27};
+use malachite_base::test_util::generators::{signed_pair_gen_var_7, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_natural_signed_triple_gen, natural_natural_unsigned_triple_gen,
     natural_signed_pair_gen, natural_signed_pair_gen_var_1, natural_signed_signed_triple_gen,
     natural_unsigned_pair_gen, natural_unsigned_unsigned_triple_gen,

@@ -25,19 +25,19 @@ path = 'src/natural/arithmetic/mul/mul_mod.rs'
 assert subprocess.call('cp ' + path + ' backup.rs', shell = True) == 0
 substitute_mul_fft_modf_threshold('backup.rs', 'temp.rs', '40')
 assert subprocess.call('mv temp.rs ' + path, shell = True) == 0
-assert subprocess.call('cargo test --test lib --features 32_bit_limbs --features serde --features fail_on_untested_path -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
+assert subprocess.call('cargo test --test lib --features 32_bit_limbs --features serde --features test_build -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
 substitute_mul_fft_modf_threshold('backup.rs', 'temp.rs', '4')
 assert subprocess.call('mv temp.rs ' + path, shell = True) == 0
-assert subprocess.call('cargo test --test lib --features 32_bit_limbs --features serde --features fail_on_untested_path -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
+assert subprocess.call('cargo test --test lib --features 32_bit_limbs --features serde --features test_build -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
 substitute_mul_fft_modf_threshold('backup.rs', 'temp.rs', '396')
 assert subprocess.call('mv temp.rs ' + path, shell = True) == 0
-assert subprocess.call('cargo test --test lib --features 32_bit_limbs --features serde --features fail_on_untested_path -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
+assert subprocess.call('cargo test --test lib --features 32_bit_limbs --features serde --features test_build -- test_limbs_mul_greater_to_out_fft', shell = True) == 0
 assert subprocess.call('mv backup.rs ' + path, shell = True) == 0
 
 path = 'src/natural/arithmetic/gcd/half_gcd.rs'
 assert subprocess.call('cp ' + path + ' backup.rs', shell = True) == 0
 substitute_hgcd_reduce_threshold('backup.rs', 'temp.rs', '200')
 assert subprocess.call('mv temp.rs ' + path, shell = True) == 0
-assert subprocess.call('cargo test --test lib --features 32_bit_limbs --features serde --features fail_on_untested_path -- test_limbs_gcd_reduced', shell = True) == 0
-assert subprocess.call('cargo test --test lib --features serde --features fail_on_untested_path -- test_limbs_gcd_reduced', shell = True) == 0
+assert subprocess.call('cargo test --test lib --features 32_bit_limbs --features serde --features test_build -- test_limbs_gcd_reduced', shell = True) == 0
+assert subprocess.call('cargo test --test lib --features serde --features test_build -- test_limbs_gcd_reduced', shell = True) == 0
 assert subprocess.call('mv backup.rs ' + path, shell = True) == 0

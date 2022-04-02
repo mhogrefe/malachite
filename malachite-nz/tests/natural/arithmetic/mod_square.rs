@@ -2,10 +2,10 @@ use malachite_base::num::arithmetic::traits::{
     ModIsReduced, ModMul, ModNeg, ModSquare, ModSquareAssign, Square,
 };
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base_test_util::generators::unsigned_pair_gen_var_16;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_16;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen_var_2, natural_pair_gen_var_8, natural_triple_gen_var_3,
 };
 use std::str::FromStr;

@@ -1,19 +1,20 @@
-use malachite_base::num::arithmetic::traits::{CoprimeWith, DivisibleBy, Gcd, Parity};
+#[cfg(feature = "test_build")]
+use malachite_base::num::arithmetic::traits::DivisibleBy;
+use malachite_base::num::arithmetic::traits::{CoprimeWith, Gcd, Parity};
 use natural::Natural;
 
-#[doc(hidden)]
-pub fn coprime_with_check_2(x: Natural, y: Natural) -> bool {
+pub_test! {coprime_with_check_2(x: Natural, y: Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1
-}
+}}
 
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub fn coprime_with_check_2_3(x: Natural, y: Natural) -> bool {
     (x.odd() || y.odd())
         && (!(&x).divisible_by(Natural::from(3u32)) || !(&y).divisible_by(Natural::from(3u32)))
         && x.gcd(y) == 1
 }
 
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub fn coprime_with_check_2_3_5(x: Natural, y: Natural) -> bool {
     if x.even() && y.even() {
         false
@@ -32,20 +33,17 @@ pub fn coprime_with_check_2_3_5(x: Natural, y: Natural) -> bool {
     }
 }
 
-#[doc(hidden)]
-pub fn coprime_with_check_2_val_ref(x: Natural, y: &Natural) -> bool {
+pub_test! {coprime_with_check_2_val_ref(x: Natural, y: &Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1
-}
+}}
 
-#[doc(hidden)]
-pub fn coprime_with_check_2_ref_val(x: &Natural, y: Natural) -> bool {
+pub_test! {coprime_with_check_2_ref_val(x: &Natural, y: Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1
-}
+}}
 
-#[doc(hidden)]
-pub fn coprime_with_check_2_ref_ref(x: &Natural, y: &Natural) -> bool {
+pub_test! {coprime_with_check_2_ref_ref(x: &Natural, y: &Natural) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == 1
-}
+}}
 
 impl CoprimeWith<Natural> for Natural {
     /// Returns whether two `Natural`s are coprime; that is, whether they have no common factor

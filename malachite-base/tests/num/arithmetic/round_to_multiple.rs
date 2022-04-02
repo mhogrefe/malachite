@@ -4,7 +4,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom};
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_pair_gen, signed_pair_gen_var_5, signed_rounding_mode_pair_gen,
     signed_signed_rounding_mode_triple_gen_var_2, unsigned_pair_gen_var_13,
     unsigned_pair_gen_var_27, unsigned_rounding_mode_pair_gen,

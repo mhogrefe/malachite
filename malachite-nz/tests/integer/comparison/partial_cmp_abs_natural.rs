@@ -2,8 +2,8 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
+use malachite_nz::test_util::generators::{
     integer_gen, integer_integer_natural_triple_gen, integer_natural_natural_triple_gen,
     integer_natural_pair_gen, natural_pair_gen,
 };

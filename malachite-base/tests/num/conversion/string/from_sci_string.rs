@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::string::options::FromSciStringOptions;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_gen, string_from_sci_string_options_pair_gen,
     string_from_sci_string_options_pair_gen_var_1, string_gen, string_gen_var_13, unsigned_gen,
 };

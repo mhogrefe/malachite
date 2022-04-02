@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base_test_util::generators::unsigned_gen;
+use malachite_base::test_util::generators::unsigned_gen;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::natural_to_rug_integer;
-use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz::test_util::common::natural_to_rug_integer;
+use malachite_nz::test_util::generators::natural_gen;
 use rug;
 use std::cmp::Ordering;
 use std::str::FromStr;

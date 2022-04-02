@@ -2,11 +2,11 @@ use malachite_base::num::arithmetic::traits::{Abs, UnsignedAbs};
 use malachite_base::num::basic::traits::One;
 use malachite_base::strings::ToDebugString;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::common::{bigint_to_integer, rug_integer_to_integer};
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz::test_util::common::{bigint_to_integer, rug_integer_to_integer};
+use malachite_nz::test_util::generators::integer_gen;
+use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
-use malachite_q_test_util::common::{rational_to_bigrational, rational_to_rug_rational};
-use malachite_q_test_util::generators::rational_gen;
 use num::{BigRational, Signed};
 use std::str::FromStr;
 

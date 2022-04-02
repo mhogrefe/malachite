@@ -6,18 +6,17 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
-/// lowest index greater than or equal to `start` at which the `Natural` has a `false` bit.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_scan0 from mpn/generic/scan0.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
+// lowest index greater than or equal to `start` at which the `Natural` has a `false` bit.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpn_scan0 from mpn/generic/scan0.c, GMP 6.1.2.
+pub_crate_test! {limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
     let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
     if starting_index >= xs.len() {
         return start;
@@ -41,21 +40,20 @@ pub fn limbs_index_of_next_false_bit(xs: &[Limb], start: u64) -> u64 {
         result_offset += TrailingZeros::trailing_zeros(!xs[false_index]);
     }
     result_offset
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
-/// lowest index greater than or equal to `start` at which the `Natural` has a `true` bit. If the
-/// starting index is too large and there are no more `true` bits above it, `None` is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_scan1 from mpn/generic/scan1.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, finds the
+// lowest index greater than or equal to `start` at which the `Natural` has a `true` bit. If the
+// starting index is too large and there are no more `true` bits above it, `None` is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpn_scan1 from mpn/generic/scan1.c, GMP 6.1.2.
+pub_crate_test! {limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
     let starting_index = usize::exact_from(start >> Limb::LOG_WIDTH);
     if starting_index >= xs.len() {
         None
@@ -77,7 +75,7 @@ pub fn limbs_index_of_next_true_bit(xs: &[Limb], start: u64) -> Option<u64> {
             )
         }
     }
-}
+}}
 
 impl<'a> BitScan for &'a Natural {
     /// Finds the lowest index greater than or equal to `start` at which the `Natural` has a `false`

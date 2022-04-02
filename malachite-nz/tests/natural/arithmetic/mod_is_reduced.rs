@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::ModIsReduced;
 use malachite_base::num::basic::traits::Zero;
-use malachite_base_test_util::generators::unsigned_pair_gen_var_12;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_12;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::natural_pair_gen_var_5;
+use malachite_nz::test_util::generators::natural_pair_gen_var_5;
 use std::str::FromStr;
 
 #[test]

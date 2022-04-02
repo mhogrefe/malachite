@@ -1,7 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::slices::slice_set_zero;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_vec_unsigned_unsigned_triple_gen_var_2;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_vec_unsigned_unsigned_triple_gen_var_2;
 
 #[test]
 fn test_split_into_chunks() {

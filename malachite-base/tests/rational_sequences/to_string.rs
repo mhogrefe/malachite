@@ -1,7 +1,7 @@
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::strings::string_is_subset;
 use malachite_base::strings::ToDebugString;
-use malachite_base_test_util::generators::{unsigned_rational_sequence_gen, unsigned_vec_gen};
+use malachite_base::test_util::generators::{unsigned_rational_sequence_gen, unsigned_vec_gen};
 
 #[test]
 pub fn test_to_string() {

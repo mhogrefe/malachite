@@ -1,8 +1,8 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     signed_pair_gen, unsigned_vec_pair_gen_var_8, unsigned_vec_triple_gen_var_33,
     unsigned_vec_triple_gen_var_35, unsigned_vec_unsigned_pair_gen_var_18,
     unsigned_vec_unsigned_pair_gen_var_22, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_5,
@@ -17,11 +17,11 @@ use malachite_nz::integer::logic::or::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
+use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen, natural_pair_gen,
 };
-use malachite_nz_test_util::integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
+use malachite_nz::test_util::integer::logic::or::{integer_or_alt_1, integer_or_alt_2};
 use rug;
 use std::cmp::min;
 use std::str::FromStr;

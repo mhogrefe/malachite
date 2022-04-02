@@ -1,7 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::{primitive_float_gen_var_19, unsigned_gen_var_14};
+use malachite_base::test_util::generators::{primitive_float_gen_var_19, unsigned_gen_var_14};
 use std::panic::catch_unwind;
 
 fn next_power_of_2_helper_unsigned<T: PrimitiveUnsigned>() {

@@ -6,18 +6,17 @@ use natural::Natural;
 use platform::Limb;
 use std::ops::{Add, AddAssign};
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the sum of the `Natural` and a `Limb`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `limbs.len()`
-///
-/// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is returned.
-#[doc(hidden)]
-pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the sum of the `Natural` and a `Limb`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `limbs.len()`
+//
+// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is returned.
+pub_crate_test! {limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
     let len = xs.len();
     let mut out = Vec::with_capacity(len);
     for i in 0..len {
@@ -35,24 +34,23 @@ pub fn limbs_add_limb(xs: &[Limb], mut y: Limb) -> Vec<Limb> {
         out.push(y);
     }
     out
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the sum of the `Natural` and a `Limb` to an output slice. The output slice must be at
-/// least as long as the input slice. Returns whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs`.
-///
-/// This is mpn_add_1 from gmp.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the sum of the `Natural` and a `Limb` to an output slice. The output slice must be at
+// least as long as the input slice. Returns whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `xs`.
+//
+// This is mpn_add_1 from gmp.h, GMP 6.2.1.
+pub_crate_test! {limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool {
     let len = xs.len();
     assert!(out.len() >= len);
     for i in 0..len {
@@ -68,21 +66,23 @@ pub fn limbs_add_limb_to_out(out: &mut [Limb], xs: &[Limb], mut y: Limb) -> bool
         }
     }
     y != 0
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the sum of the `Natural` and a `Limb` to the input slice. Returns whether there is a
-/// carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
-#[doc(hidden)]
-pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: T) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the sum of the `Natural` and a `Limb` to the input slice. Returns whether there is a
+// carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpn_add_1 from gmp.h, GMP 6.2.1, where the result is written to the input slice.
+pub_crate_test! {limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(
+    xs: &mut [T],
+    mut y: T
+) -> bool {
     for x in xs.iter_mut() {
         if x.overflowing_add_assign(y) {
             y = T::ONE;
@@ -91,28 +91,27 @@ pub fn limbs_slice_add_limb_in_place<T: PrimitiveUnsigned>(xs: &mut [T], mut y: 
         }
     }
     y != T::ZERO
-}
+}}
 
-/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
-/// writes the limbs of the sum of the `Natural` and a `Limb` to the input `Vec`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-///
-/// This is mpz_add_ui from mpz/aors_ui.h, GMP 6.2.1, where the input is non-negative.
-#[doc(hidden)]
-pub fn limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
+// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
+// writes the limbs of the sum of the `Natural` and a `Limb` to the input `Vec`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+//
+// This is mpz_add_ui from mpz/aors_ui.h, GMP 6.2.1, where the input is non-negative.
+pub_crate_test! {limbs_vec_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb) {
     assert!(!xs.is_empty());
     if limbs_slice_add_limb_in_place(xs, y) {
         xs.push(1);
     }
-}
+}}
 
 fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     let c = *carry;
@@ -124,23 +123,22 @@ fn add_and_carry(x: Limb, y: Limb, carry: &mut bool) -> Limb {
     sum
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-/// the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
-/// the `Natural`s.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-///
-/// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
-/// and the output is returned.
-#[doc(hidden)]
-pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
+// the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
+// the `Natural`s.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+//
+// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
+// and the output is returned.
+pub_crate_test! {limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if std::ptr::eq(xs, ys) {
         return limbs_shl(xs, 1);
     }
@@ -163,44 +161,42 @@ pub fn limbs_add_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         }
     }
     out
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// a `Vec` of the limbs of the sum of the `Natural`s.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is mpn_add from gmp.h, GMP 6.2.1, where the output is returned.
-#[doc(hidden)]
-pub fn limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+// a `Vec` of the limbs of the sum of the `Natural`s.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// This is mpn_add from gmp.h, GMP 6.2.1, where the output is returned.
+pub_crate_test! {limbs_add(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_add_greater(xs, ys)
     } else {
         limbs_add_greater(ys, xs)
     }
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s to an
-/// output slice. The output must be at least as long as one of the input slices. Returns whether
-/// there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `out` is too short.
-///
-/// This is mpn_add_n from gmp.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s to an
+// output slice. The output must be at least as long as one of the input slices. Returns whether
+// there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths or if `out` is too short.
+//
+// This is mpn_add_n from gmp.h, GMP 6.2.1.
+pub_crate_test! {limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
@@ -209,25 +205,24 @@ pub fn limbs_add_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
         out[i] = add_and_carry(xs[i], ys[i], &mut carry);
     }
     carry
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-/// the first slice is at least as long as the second, writes the `xs.len()` least-significant limbs
-/// of the sum of the `Natural`s to an output slice. The output must be at least as long as `xs`.
-/// Returns whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys` or if `out` is too short.
-///
-/// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second.
-#[doc(hidden)]
-pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
+// the first slice is at least as long as the second, writes the `xs.len()` least-significant limbs
+// of the sum of the `Natural`s to an output slice. The output must be at least as long as `xs`.
+// Returns whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys` or if `out` is too short.
+//
+// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second.
+pub_crate_test! {limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -241,79 +236,76 @@ pub fn limbs_add_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> b
         out[ys_len..xs_len].copy_from_slice(&xs[ys_len..]);
         false
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to an output
-/// slice. The output must be at least as long as the longer input slice. Returns whether there is a
-/// carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if `out` is too short.
-///
-/// This is mpn_add from gmp.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to an output
+// slice. The output must be at least as long as the longer input slice. Returns whether there is a
+// carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if `out` is too short.
+//
+// This is mpn_add from gmp.h, GMP 6.2.1.
+pub_crate_test! {limbs_add_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> bool {
     if xs.len() >= ys.len() {
         limbs_add_greater_to_out(out, xs, ys)
     } else {
         limbs_add_greater_to_out(out, ys, xs)
     }
-}
+}}
 
-/// Given two slices of `Limb`s as the limbs `xs` and `ys`, where `xs` is at least as long as `ys`
-/// and `xs_len` is no greater than `ys.len()`, writes the `ys.len()` lowest limbs of the sum of
-/// `xs[..xs_len]` and `ys` to `xs`. Returns whether there is a carry.
-///
-/// For example,
-/// `limbs_add_to_out_aliased(&mut xs[..12], 7, &ys[0..10])`
-/// would be equivalent to
-/// `limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])`
-/// although the latter expression is not allowed because `xs` cannot be borrowed in that way.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys` or `xs_len` is greater than `ys.len()`.
-///
-/// This is mpn_add from gmp.h, GMP 6.2.1, where the second argument is at least as long as the
-/// first and the output pointer is the same as the first input pointer.
-#[doc(hidden)]
-pub fn limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[Limb]) -> bool {
+// Given two slices of `Limb`s as the limbs `xs` and `ys`, where `xs` is at least as long as `ys`
+// and `xs_len` is no greater than `ys.len()`, writes the `ys.len()` lowest limbs of the sum of
+// `xs[..xs_len]` and `ys` to `xs`. Returns whether there is a carry.
+//
+// For example,
+// `limbs_add_to_out_aliased(&mut xs[..12], 7, &ys[0..10])`
+// would be equivalent to
+// `limbs_add_to_out(&mut xs[..12], &xs[..7], &ys[0..10])`
+// although the latter expression is not allowed because `xs` cannot be borrowed in that way.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if `xs` is shorter than `ys` or `xs_len` is greater than `ys.len()`.
+//
+// This is mpn_add from gmp.h, GMP 6.2.1, where the second argument is at least as long as the
+// first and the output pointer is the same as the first input pointer.
+pub_crate_test! {limbs_add_to_out_aliased(xs: &mut [Limb], xs_len: usize, ys: &[Limb]) -> bool {
     let ys_len = ys.len();
     assert!(xs.len() >= ys_len);
     assert!(xs_len <= ys_len);
     let (ys_lo, ys_hi) = ys.split_at(xs_len);
     xs[xs_len..ys_len].copy_from_slice(ys_hi);
     limbs_slice_add_greater_in_place_left(&mut xs[..ys_len], ys_lo)
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s to the
-/// first (left) slice. Returns whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpn_add_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
-#[doc(hidden)]
-pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s to the
+// first (left) slice. Returns whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpn_add_n from gmp.h, GMP 6.2.1, where the output is written to the first input.
+pub_crate_test! {limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     assert_eq!(xs_len, ys.len());
     let mut carry = false;
@@ -321,26 +313,25 @@ pub fn limbs_slice_add_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) -
         xs[i] = add_and_carry(xs[i], ys[i], &mut carry);
     }
     carry
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-/// the length of the first slice is greater than or equal to the length of the second, writes the
-/// `xs.len()` least-significant limbs of the sum of the `Natural`s to the first (left) slice.
-/// Returns whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-///
-/// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
-/// and the output is written to the first input.
-#[doc(hidden)]
-pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
+// the length of the first slice is greater than or equal to the length of the second, writes the
+// `xs.len()` least-significant limbs of the sum of the `Natural`s to the first (left) slice.
+// Returns whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+//
+// This is mpn_add from gmp.h, GMP 6.2.1, where the first input is at least as long as the second,
+// and the output is written to the first input.
+pub_crate_test! {limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let (xs_lo, xs_hi) = xs.split_at_mut(ys_len);
@@ -352,21 +343,20 @@ pub fn limbs_slice_add_greater_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> bo
     } else {
         false
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the limbs of the sum of the `Natural`s to the first (left) slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
-///
-/// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
-/// written to the first input.
-#[doc(hidden)]
-pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the limbs of the sum of the `Natural`s to the first (left) slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
+//
+// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
+// written to the first input.
+pub_crate_test! {limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if std::ptr::eq(xs.as_slice(), ys) {
         limbs_vec_shl_in_place(xs, 1);
         return;
@@ -387,45 +377,43 @@ pub fn limbs_vec_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if carry {
         xs.push(1);
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to the longer
-/// slice (or the first one, if they are equally long). Returns a pair of `bool`s. The first is
-/// `false` when the output is to the first slice and `true` when it's to the second slice, and the
-/// second is whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len`, `ys.len()`)
-///
-/// This is mpn_add from gmp.h, GMP 6.2.1, where the output is written to the longer input.
-#[doc(hidden)]
-pub fn limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> (bool, bool) {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the `max(xs.len(), ys.len())` least-significant limbs of the sum of the `Natural`s to the longer
+// slice (or the first one, if they are equally long). Returns a pair of `bool`s. The first is
+// `false` when the output is to the first slice and `true` when it's to the second slice, and the
+// second is whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len`, `ys.len()`)
+//
+// This is mpn_add from gmp.h, GMP 6.2.1, where the output is written to the longer input.
+pub_test! {limbs_slice_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> (bool, bool) {
     if xs.len() >= ys.len() {
         (false, limbs_slice_add_greater_in_place_left(xs, ys))
     } else {
         (true, limbs_slice_add_greater_in_place_left(ys, xs))
     }
-}
+}}
 
-/// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the limbs of the sum of the `Natural`s to the longer slice (or the first one, if they are
-/// equally long). Returns a `bool` which is `false` when the output is to the first `Vec` and
-/// `true` when it's to the second `Vec`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len`, `ys.len()`)
-///
-/// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
-/// written to the longer input.
-#[doc(hidden)]
-pub fn limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
+// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the limbs of the sum of the `Natural`s to the longer slice (or the first one, if they are
+// equally long). Returns a `bool` which is `false` when the output is to the first `Vec` and
+// `true` when it's to the second `Vec`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len`, `ys.len()`)
+//
+// This is mpz_add from mpz/aors.h, GMP 6.2.1, where both inputs are non-negative and the output is
+// written to the longer input.
+pub_test! {limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> bool {
     if xs.len() >= ys.len() {
         if limbs_slice_add_greater_in_place_left(xs, ys) {
             xs.push(1);
@@ -437,25 +425,24 @@ pub fn limbs_vec_add_in_place_either(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>) -> 
         }
         true
     }
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
-/// carry (`false` is 0, `true` is 1) to an output slice. The output must be at least as long as one
-/// of the input slices. Returns whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `out` is too short.
-///
-/// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp and up are disjoint.
-#[doc(hidden)]
-pub fn limbs_add_same_length_with_carry_in_to_out(
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
+// carry (`false` is 0, `true` is 1) to an output slice. The output must be at least as long as one
+// of the input slices. Returns whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths or if `out` is too short.
+//
+// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp and up are disjoint.
+pub_crate_test! {limbs_add_same_length_with_carry_in_to_out(
     out: &mut [Limb],
     xs: &[Limb],
     ys: &[Limb],
@@ -466,24 +453,23 @@ pub fn limbs_add_same_length_with_carry_in_to_out(
         carry |= limbs_slice_add_limb_in_place(&mut out[..xs.len()], 1);
     }
     carry
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
-/// carry (`false` is 0, `true` is 1) to the first (left) slice. Returns whether there is a carry.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
-#[doc(hidden)]
-pub fn limbs_add_same_length_with_carry_in_in_place_left(
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the `xs.len()` least-significant limbs of the sum of the `Natural`s and a
+// carry (`false` is 0, `true` is 1) to the first (left) slice. Returns whether there is a carry.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpn_add_nc from gmp-impl.h, GMP 6.2.1, where rp is the same as up.
+pub_crate_test! {limbs_add_same_length_with_carry_in_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     carry_in: bool,
@@ -493,7 +479,7 @@ pub fn limbs_add_same_length_with_carry_in_in_place_left(
         carry |= limbs_slice_add_limb_in_place(xs, 1);
     }
     carry
-}
+}}
 
 impl Natural {
     #[inline]

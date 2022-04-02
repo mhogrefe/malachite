@@ -3,19 +3,19 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{Iverson, NegativeOne, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
-use malachite_nz_test_util::generators::integer_unsigned_pair_gen_var_2;
-use malachite_q::Rational;
-use malachite_q_test_util::common::{
+use malachite_base::test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
+use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
+use malachite_q::test_util::common::{
     bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
     rug_rational_to_rational,
 };
-use malachite_q_test_util::generators::{
+use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_rational_signed_triple_gen_var_1,
     rational_rational_unsigned_triple_gen_var_1, rational_signed_pair_gen_var_2,
     rational_signed_signed_triple_gen_var_1, rational_unsigned_pair_gen_var_1,
     rational_unsigned_unsigned_triple_gen_var_1,
 };
+use malachite_q::Rational;
 use num::traits::Pow as NumPow;
 use num::BigRational;
 use rug::ops::Pow as RugPow;

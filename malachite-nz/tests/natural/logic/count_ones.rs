@@ -1,13 +1,13 @@
 use malachite_base::num::arithmetic::traits::IsPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::logic::traits::CountOnes;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_vec_gen};
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{unsigned_gen, unsigned_vec_gen};
 use malachite_nz::natural::logic::count_ones::limbs_count_ones;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::natural_gen;
-use malachite_nz_test_util::natural::logic::count_ones::{
+use malachite_nz::test_util::generators::natural_gen;
+use malachite_nz::test_util::natural::logic::count_ones::{
     natural_count_ones_alt_1, natural_count_ones_alt_2,
 };
 use std::str::FromStr;

@@ -572,15 +572,14 @@ pub(crate) fn limbs_mul_toom_interpolate_7_points(
     }
 }
 
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ys.len()`
-///
-/// This is DO_mpn_sublsh_n from mpn/generic/toom_interpolate_8pts.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_shl_and_sub_same_length(
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ys.len()`
+//
+// This is DO_mpn_sublsh_n from mpn/generic/toom_interpolate_8pts.c, GMP 6.1.2.
+pub_test! {limbs_shl_and_sub_same_length(
     xs: &mut [Limb],
     ys: &[Limb],
     shift: u64,
@@ -592,7 +591,7 @@ pub fn limbs_shl_and_sub_same_length(
         carry.wrapping_add_assign(1);
     }
     carry
-}
+}}
 
 /// Time: worst case O(n)
 ///
@@ -869,42 +868,41 @@ fn limbs_aors_mul_or_aors_and_sh_aors_helper(
     }
 }
 
-/// Interpolation for Toom-6.5 (or Toom-6), using the evaluation points:
-/// Infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0.
-///
-/// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 11
-/// (or 10), given the 12 (resp. 11) values:
-///
-/// r0 = limit at infinity of f(x) / x ^ 7,
-/// r1 = f(4),f(-4),
-/// r2 = f(2),f(-2),
-/// r3 = f(1),f(-1),
-/// r4 = f(1 / 4), f(-1 / 4),
-/// r5 = f(1 / 2), f(-1 / 2),
-/// r6 = f(0).
-///
-/// All couples of the form f(n),f(-n) must be already mixed with
-/// `limbs_toom_couple_handling`(f(n), ..., f(-n),...)
-///
-/// The result is stored in {out, s_plus_t + 7 * n (or 6 * n)}.
-/// At entry, r6 is stored at {out, 2 * n},
-/// r4 is stored at {out +  3 * n, 3 * n + 1}.
-/// r2 is stored at {out +  7 * n, 3 * n + 1}.
-/// r0 is stored at {out + 11 * n, s_plus_t}.
-///
-/// The other values are 3 * n + 1 limbs each (with most significant limbs small).
-///
-/// Negative intermediate results are stored two-complemented. Inputs are destroyed.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `n`
-///
-/// This is mpn_toom_interpolate_12pts from mpn/generic/toom_interpolate_12pts.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_mul_toom_interpolate_12_points<'a>(
+// Interpolation for Toom-6.5 (or Toom-6), using the evaluation points:
+// Infinity(6.5 only), +-4, +-2, +-1, +-1/4, +-1/2, 0.
+//
+// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 11
+// (or 10), given the 12 (resp. 11) values:
+//
+// r0 = limit at infinity of f(x) / x ^ 7,
+// r1 = f(4),f(-4),
+// r2 = f(2),f(-2),
+// r3 = f(1),f(-1),
+// r4 = f(1 / 4), f(-1 / 4),
+// r5 = f(1 / 2), f(-1 / 2),
+// r6 = f(0).
+//
+// All couples of the form f(n),f(-n) must be already mixed with
+// `limbs_toom_couple_handling`(f(n), ..., f(-n),...)
+//
+// The result is stored in {out, s_plus_t + 7 * n (or 6 * n)}.
+// At entry, r6 is stored at {out, 2 * n},
+// r4 is stored at {out +  3 * n, 3 * n + 1}.
+// r2 is stored at {out +  7 * n, 3 * n + 1}.
+// r0 is stored at {out + 11 * n, s_plus_t}.
+//
+// The other values are 3 * n + 1 limbs each (with most significant limbs small).
+//
+// Negative intermediate results are stored two-complemented. Inputs are destroyed.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `n`
+//
+// This is mpn_toom_interpolate_12pts from mpn/generic/toom_interpolate_12pts.c, GMP 6.1.2.
+pub_crate_test! {limbs_mul_toom_interpolate_12_points<'a>(
     out: &mut [Limb],
     mut r1: &'a mut [Limb],
     r3: &mut [Limb],
@@ -1064,52 +1062,51 @@ pub fn limbs_mul_toom_interpolate_12_points<'a>(
             out_10_first,
         ));
     }
-}
+}}
 
 #[cfg(feature = "32_bit_limbs")]
 const CORRECTED_WIDTH: u64 = 42 - Limb::WIDTH;
 #[cfg(not(feature = "32_bit_limbs"))]
 const CORRECTED_WIDTH: u64 = 42;
 
-/// Interpolation for Toom-8.5 (or Toom-8), using the evaluation points:
-/// Infinity(8.5 only), +-8, +-4, +-2, +-1, +-1/4, +-1/2, +-1/8, 0.
-///
-/// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 15
-/// (or 14), given the 16 (rsp. 15) values:
-///
-/// r0 = limit at infinity of f(x) / x ^ 7,
-/// r1 = f(8), f(-8),
-/// r2 = f(4), f(-4),
-/// r3 = f(2), f(-2),
-/// r4 = f(1), f(-1),
-/// r5 = f(1/4), f(-1/4),
-/// r6 = f(1/2), f(-1/2),
-/// r7 = f(1/8), f(-1/8),
-/// r8 = f(0).
-///
-/// All couples of the form f(n),f(-n) must be already mixed with
-/// toom_couple_handling(f(n),...,f(-n),...)
-///
-/// The result is stored in {out, s_plus_t + 7 * n (or 8 * n)}.
-/// At entry, r8 is stored at {out, 2 * n},
-/// r6 is stored at {out + 3 * n, 3 * n + 1}.
-/// r4 is stored at {out + 7 * n, 3 * n + 1}.
-/// r2 is stored at {out + 11 * n, 3 * n + 1}.
-/// r0 is stored at {out + 15 * n, s_plus_t}.
-///
-/// The other values are 3 * n + 1 limbs each (with most significant limbs small).
-///
-/// Negative intermediate results are stored two-complemented. Inputs are destroyed.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `n`
-///
-/// This is mpn_toom_interpolate_16pts from mpn/generic/toom_interpolate_16pts.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_mul_toom_interpolate_16_points<'a>(
+// Interpolation for Toom-8.5 (or Toom-8), using the evaluation points:
+// Infinity(8.5 only), +-8, +-4, +-2, +-1, +-1/4, +-1/2, +-1/8, 0.
+//
+// More precisely, we want to compute f(2 ^ (`Limb::WIDTH` * n)) for a polynomial f of degree 15
+// (or 14), given the 16 (rsp. 15) values:
+//
+// r0 = limit at infinity of f(x) / x ^ 7,
+// r1 = f(8), f(-8),
+// r2 = f(4), f(-4),
+// r3 = f(2), f(-2),
+// r4 = f(1), f(-1),
+// r5 = f(1/4), f(-1/4),
+// r6 = f(1/2), f(-1/2),
+// r7 = f(1/8), f(-1/8),
+// r8 = f(0).
+//
+// All couples of the form f(n),f(-n) must be already mixed with
+// toom_couple_handling(f(n),...,f(-n),...)
+//
+// The result is stored in {out, s_plus_t + 7 * n (or 8 * n)}.
+// At entry, r8 is stored at {out, 2 * n},
+// r6 is stored at {out + 3 * n, 3 * n + 1}.
+// r4 is stored at {out + 7 * n, 3 * n + 1}.
+// r2 is stored at {out + 11 * n, 3 * n + 1}.
+// r0 is stored at {out + 15 * n, s_plus_t}.
+//
+// The other values are 3 * n + 1 limbs each (with most significant limbs small).
+//
+// Negative intermediate results are stored two-complemented. Inputs are destroyed.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `n`
+//
+// This is mpn_toom_interpolate_16pts from mpn/generic/toom_interpolate_16pts.c, GMP 6.1.2.
+pub_crate_test! {limbs_mul_toom_interpolate_16_points<'a>(
     out: &mut [Limb],
     r1: &mut [Limb],
     mut r3: &'a mut [Limb],
@@ -1340,4 +1337,4 @@ pub fn limbs_mul_toom_interpolate_16_points<'a>(
             out_14_first,
         ));
     }
-}
+}}

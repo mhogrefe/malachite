@@ -5,7 +5,7 @@ use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::random_signed_bit_chunks;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base_test_util::stats::moments::{
+use malachite_base::test_util::stats::moments::{
     uniform_primitive_int_assertions, CheckedToF64, MomentStats,
 };
 use std::panic::catch_unwind;

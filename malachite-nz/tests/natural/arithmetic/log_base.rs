@@ -4,13 +4,13 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Two, Zero};
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::unsigned_pair_gen_var_24;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_24;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen_var_1, natural_gen_var_2, natural_pair_gen_var_3,
 };
-use malachite_nz_test_util::natural::arithmetic::log_base::{
+use malachite_nz::test_util::natural::arithmetic::log_base::{
     ceiling_log_base_by_squaring, ceiling_log_base_naive, checked_log_base_by_squaring,
     checked_log_base_naive, floor_log_base_by_squaring, floor_log_base_naive,
 };

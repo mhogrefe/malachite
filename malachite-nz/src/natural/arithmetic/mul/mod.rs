@@ -27,70 +27,67 @@ use platform::{
 };
 use std::ops::{Mul, MulAssign};
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys`
-/// cannot be empty.
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys` or `ys` is empty.
-///
-/// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where prodp is returned.
-#[doc(hidden)]
-pub fn limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+// the limbs of the product of the `Natural`s. `xs` must be as least as long as `ys` and `ys`
+// cannot be empty.
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys` or `ys` is empty.
+//
+// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where prodp is returned.
+pub_test! {limbs_mul_greater(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len() + ys.len()];
     limbs_mul_greater_to_out(&mut out, xs, ys);
     out
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// the limbs of the product of the `Natural`s. Neither slice can be empty. The length of the
-/// resulting slice is always the sum of the lengths of the input slices, so it may have trailing
-/// zeros.
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if either slice is empty.
-///
-/// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn and prodp is
-/// returned.
-#[doc(hidden)]
-pub fn limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+// the limbs of the product of the `Natural`s. Neither slice can be empty. The length of the
+// resulting slice is always the sum of the lengths of the input slices, so it may have trailing
+// zeros.
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if either slice is empty.
+//
+// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn and prodp is
+// returned.
+pub_crate_test! {limbs_mul(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_mul_greater(xs, ys)
     } else {
         limbs_mul_greater(ys, xs)
     }
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s
-/// to an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long
-/// as `ys`, and neither slice can be empty. Returns the result limb at index `2 * xs.len() - 1`
-/// (which may be zero).
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is too short, `xs` and `ys` have different lengths, or either slice is empty.
-///
-/// This is mpn_mul_n from mpn/generic/mul_n.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the `2 * xs.len()` least-significant limbs of the product of the `Natural`s
+// to an output slice. The output must be at least as long as `2 * xs.len()`, `xs` must be as long
+// as `ys`, and neither slice can be empty. Returns the result limb at index `2 * xs.len() - 1`
+// (which may be zero).
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is too short, `xs` and `ys` have different lengths, or either slice is empty.
+//
+// This is mpn_mul_n from mpn/generic/mul_n.c, GMP 6.1.2.
+pub_crate_test! {limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(ys.len(), len);
     assert_ne!(len, 0);
@@ -119,31 +116,30 @@ pub fn limbs_mul_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) 
     } else {
         limbs_mul_greater_to_out_fft(out, xs, ys);
     }
-}
+}}
 
 // This is TOOM44_OK from mpn/generic/mul.c, GMP 6.1.2.
 const fn toom44_ok(xs_len: usize, ys_len: usize) -> bool {
     12 + 3 * xs_len < ys_len << 2
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
-/// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
-/// `xs.len() + ys.len() - 1` (which may be zero).
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
-///
-/// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
+// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
+// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
+// `xs.len() + ys.len() - 1` (which may be zero).
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
+//
+// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2.
+pub_crate_test! {limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert!(xs_len >= ys_len);
@@ -276,55 +272,53 @@ pub fn limbs_mul_greater_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> L
         limbs_mul_greater_to_out_fft(out, xs, ys);
     }
     out[xs_len + ys_len - 1]
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. The output must be at least as long as `xs.len() + ys.len()`, and neither slice can be
-/// empty. Returns the result limb at index `xs.len() + ys.len() - 1` (which may be zero).
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if `out` is too short or either slice is empty.
-///
-/// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn.
-#[doc(hidden)]
-pub fn limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
+// slice. The output must be at least as long as `xs.len() + ys.len()`, and neither slice can be
+// empty. Returns the result limb at index `xs.len() + ys.len() - 1` (which may be zero).
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if `out` is too short or either slice is empty.
+//
+// This is mpn_mul from mpn/generic/mul.c, GMP 6.1.2, where un may be less than vn.
+pub_crate_test! {limbs_mul_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) -> Limb {
     if xs.len() >= ys.len() {
         limbs_mul_greater_to_out(out, xs, ys)
     } else {
         limbs_mul_greater_to_out(out, ys, xs)
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
-/// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
-/// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
-/// `xs.len() + ys.len() - 1` (which may be zero).
-///
-/// This uses the basecase, quadratic, schoolbook algorithm, and it is most critical code for
-/// multiplication. All multiplies rely on this, both small and huge. Small ones arrive here
-/// immediately, and huge ones arrive here as this is the base case for Karatsuba's recursive
-/// algorithm.
-///
-/// Time: worst case O(n<sup>2</sup>)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` + `ys.len()`
-///
-/// # Panics
-/// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
-///
-/// This is mpn_mul_basecase from mpn/generic/mul_basecase.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the `xs.len() + ys.len()` least-significant limbs of the product of the `Natural`s to an output
+// slice. The output must be at least as long as `xs.len() + ys.len()`, `xs` must be as least as
+// long as `ys`, and `ys` cannot be empty. Returns the result limb at index
+// `xs.len() + ys.len() - 1` (which may be zero).
+//
+// This uses the basecase, quadratic, schoolbook algorithm, and it is most critical code for
+// multiplication. All multiplies rely on this, both small and huge. Small ones arrive here
+// immediately, and huge ones arrive here as this is the base case for Karatsuba's recursive
+// algorithm.
+//
+// Time: worst case O(n<sup>2</sup>)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` + `ys.len()`
+//
+// # Panics
+// Panics if `out` is too short, `xs` is shorter than `ys`, or `ys` is empty.
+//
+// This is mpn_mul_basecase from mpn/generic/mul_basecase.c, GMP 6.1.2.
+pub_crate_test! {limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     assert_ne!(ys_len, 0);
@@ -338,7 +332,7 @@ pub fn limbs_mul_greater_to_out_basecase(out: &mut [Limb], xs: &[Limb], ys: &[Li
         let (out_last, out_init) = out[i..i + window_size].split_last_mut().unwrap();
         *out_last = limbs_slice_add_mul_limb_same_length_in_place_left(out_init, xs, ys[i]);
     }
-}
+}}
 
 impl Mul<Natural> for Natural {
     type Output = Natural;

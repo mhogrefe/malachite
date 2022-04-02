@@ -1,3 +1,4 @@
+#[cfg(feature = "test_build")]
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::{DivRound, Parity, ShrRound};
 use malachite_base::num::basic::integers::PrimitiveInt;
@@ -5,18 +6,23 @@ use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
 use malachite_base::num::conversion::string::BaseFmtWrapper as BaseBaseFmtWrapper;
-use malachite_base::num::conversion::traits::{
-    Digits, ExactFrom, PowerOf2DigitIterable, ToStringBase, WrappingFrom,
-};
+#[cfg(feature = "test_build")]
+use malachite_base::num::conversion::traits::PowerOf2DigitIterable;
+use malachite_base::num::conversion::traits::{Digits, ExactFrom, ToStringBase, WrappingFrom};
+#[cfg(feature = "test_build")]
 use malachite_base::num::logic::traits::{BitIterable, SignificantBits};
 use malachite_base::rounding_modes::RoundingMode;
-use natural::conversion::digits::general_digits::{limbs_digit_count, limbs_to_digits_small_base};
+use natural::conversion::digits::general_digits::{
+    limbs_digit_count, limbs_to_digits_small_base_no_alg_specified,
+};
 use natural::conversion::string::BaseFmtWrapper;
 use natural::logic::significant_bits::limbs_significant_bits;
 use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
-use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex, Write};
+#[cfg(feature = "test_build")]
+use std::fmt::Write;
+use std::fmt::{Binary, Debug, Display, Formatter, LowerHex, Octal, Result, UpperHex};
 
 impl<'a> Display for BaseFmtWrapper<&'a Natural> {
     /// Writes a wrapped `Natural` to a string using a specified base.
@@ -194,7 +200,7 @@ impl Display for Natural {
             Natural(Large(xs)) => {
                 let mut digits = vec![0; usize::exact_from(limbs_digit_count(xs, 10))];
                 let mut xs = xs.clone();
-                let len = limbs_to_digits_small_base(&mut digits, 10, &mut xs, None);
+                let len = limbs_to_digits_small_base_no_alg_specified(&mut digits, 10, &mut xs);
                 digits.truncate(len);
                 for digit in &mut digits {
                     *digit = digit_to_display_byte_lower(*digit).unwrap();
@@ -238,14 +244,14 @@ impl Debug for Natural {
     }
 }
 
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub struct NaturalAlt(pub Natural);
 
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub struct NaturalAlt2(pub Natural);
 
+#[cfg(feature = "test_build")]
 impl Binary for NaturalAlt {
-    #[doc(hidden)]
     fn fmt(&self, f: &mut Formatter) -> Result {
         if let Natural(Small(x)) = self.0 {
             Binary::fmt(&x, f)
@@ -270,8 +276,8 @@ impl Binary for NaturalAlt {
     }
 }
 
+#[cfg(feature = "test_build")]
 impl Binary for NaturalAlt2 {
-    #[doc(hidden)]
     fn fmt(&self, f: &mut Formatter) -> Result {
         match &self.0 {
             Natural(Small(x)) => Binary::fmt(x, f),
@@ -365,8 +371,8 @@ impl Binary for Natural {
     }
 }
 
+#[cfg(feature = "test_build")]
 impl Octal for NaturalAlt {
-    #[doc(hidden)]
     fn fmt(&self, f: &mut Formatter) -> Result {
         if let Natural(Small(x)) = self.0 {
             Octal::fmt(&x, f)
@@ -395,17 +401,19 @@ impl Octal for NaturalAlt {
     }
 }
 
+#[cfg(feature = "test_build")]
 #[cfg(feature = "32_bit_limbs")]
 fn oz_fmt(f: &mut Formatter, x: Limb) -> Result {
     write!(f, "{:08o}", x)
 }
+#[cfg(feature = "test_build")]
 #[cfg(not(feature = "32_bit_limbs"))]
 fn oz_fmt(f: &mut Formatter, x: Limb) -> Result {
     write!(f, "{:016o}", x)
 }
 
+#[cfg(feature = "test_build")]
 impl Octal for NaturalAlt2 {
-    #[doc(hidden)]
     fn fmt(&self, f: &mut Formatter) -> Result {
         match &self.0 {
             Natural(Small(x)) => Octal::fmt(x, f),
@@ -582,8 +590,8 @@ impl Octal for Natural {
     }
 }
 
+#[cfg(feature = "test_build")]
 impl LowerHex for NaturalAlt {
-    #[doc(hidden)]
     fn fmt(&self, f: &mut Formatter) -> Result {
         if let Natural(Small(x)) = self.0 {
             LowerHex::fmt(&x, f)
@@ -612,8 +620,8 @@ impl LowerHex for NaturalAlt {
     }
 }
 
+#[cfg(feature = "test_build")]
 impl LowerHex for NaturalAlt2 {
-    #[doc(hidden)]
     fn fmt(&self, f: &mut Formatter) -> Result {
         match &self.0 {
             Natural(Small(x)) => LowerHex::fmt(x, f),

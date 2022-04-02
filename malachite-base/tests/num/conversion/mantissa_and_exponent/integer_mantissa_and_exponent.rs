@@ -3,7 +3,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     primitive_float_gen_var_12, unsigned_gen_var_1, unsigned_pair_gen_var_2,
     unsigned_pair_gen_var_30, unsigned_signed_pair_gen_var_1, unsigned_signed_pair_gen_var_2,
 };

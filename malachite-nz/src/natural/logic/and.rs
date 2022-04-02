@@ -7,77 +7,73 @@ use std::cmp::Ordering;
 use std::mem::swap;
 use std::ops::{BitAnd, BitAndAssign};
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// bitwise and of the `Natural` and a `Limb`. The slice cannot be empty.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub const fn limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// bitwise and of the `Natural` and a `Limb`. The slice cannot be empty.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_const_test! {limbs_and_limb(xs: &[Limb], y: Limb) -> Limb {
     xs[0] & y
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// a `Vec` of the limbs of the bitwise and of the `Natural`s. The length of the result is the
-/// length of the shorter input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = min(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res is returned and both inputs are non-
-/// negative.
-#[doc(hidden)]
-pub fn limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+// a `Vec` of the limbs of the bitwise and of the `Natural`s. The length of the result is the
+// length of the shorter input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = min(`xs.len()`, `ys.len()`)
+//
+// This is mpz_and from mpz/and.c, GMP 6.1.2, where res is returned and both inputs are non-
+// negative.
+pub_test! {limbs_and(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     xs.iter().zip(ys.iter()).map(|(x, y)| x & y).collect()
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to a specified slice. The
-/// output slice must be at least as long as the length of one of the input slices.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// This is mpn_and_n from gmp-impl.h, GMP 6.2.1.
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `out` is too short.
-#[doc(hidden)]
-pub fn limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to a specified slice. The
+// output slice must be at least as long as the length of one of the input slices.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// This is mpn_and_n from gmp-impl.h, GMP 6.2.1.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths or if `out` is too short.
+pub_test! {limbs_and_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
     for (out, (&x, &y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
         *out = x & y;
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the limbs of the bitwise and of the `Natural`s to a specified slice. The output slice must be at
-/// least as long as the longer input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative.
-///
-/// # Panics
-/// Panics if `out` is too short.
-#[doc(hidden)]
-pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the limbs of the bitwise and of the `Natural`s to a specified slice. The output slice must be at
+// least as long as the longer input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative.
+//
+// # Panics
+// Panics if `out` is too short.
+pub_test! {limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -89,45 +85,43 @@ pub fn limbs_and_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
         limbs_and_same_length_to_out(out, xs, &ys[..xs_len]);
         slice_set_zero(&mut out[xs_len..ys_len]);
     }
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to the first (left) slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// This is mpn_and_n from gmp-impl.h, GMP 6.2.1, where rp == up.
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-#[doc(hidden)]
-pub fn limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to the first (left) slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// This is mpn_and_n from gmp-impl.h, GMP 6.2.1, where rp == up.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+pub_test! {limbs_slice_and_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, &y) in xs.iter_mut().zip(ys.iter()) {
         *x &= y;
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the limbs of the bitwise and of the `Natural`s to the first (left) slice. If the second slice is
-/// shorter than the first, then some of the most-significant bits of the first slice should become
-/// zero. Rather than setting them to zero, this function optionally returns the length of the
-/// significant part of the slice. The caller can decide whether to zero the rest. If `None` is
-/// returned, the entire slice remains significant.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = min(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
-#[doc(hidden)]
-pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usize> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the limbs of the bitwise and of the `Natural`s to the first (left) slice. If the second slice is
+// shorter than the first, then some of the most-significant bits of the first slice should become
+// zero. Rather than setting them to zero, this function optionally returns the length of the
+// significant part of the slice. The caller can decide whether to zero the rest. If `None` is
+// returned, the entire slice remains significant.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = min(`xs.len()`, `ys.len()`)
+//
+// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative.
+pub_test! {limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usize> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys.len()) {
@@ -144,44 +138,42 @@ pub fn limbs_slice_and_in_place_left(xs: &mut [Limb], ys: &[Limb]) -> Option<usi
             None
         }
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to the `Vec`. If the slice is
-/// shorter than the `Vec`, then some of the most-significant bits of the `Vec` should become zero.
-/// Rather than setting them to zero, this function truncates the `Vec`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = min(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative and
-/// have the same length, and res is truncated afterwards to remove the max(0, xs.len() - ys.len())
-/// trailing zero limbs.
-#[doc(hidden)]
-pub fn limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
+// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the limbs of the bitwise and of the `Natural`s to the `Vec`. If the slice is
+// shorter than the `Vec`, then some of the most-significant bits of the `Vec` should become zero.
+// Rather than setting them to zero, this function truncates the `Vec`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = min(`xs.len()`, `ys.len()`)
+//
+// This is mpz_and from mpz/and.c, GMP 6.1.2, where res == op1 and both inputs are non-negative and
+// have the same length, and res is truncated afterwards to remove the max(0, xs.len() - ys.len())
+// trailing zero limbs.
+pub_test! {limbs_vec_and_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb]) {
     if let Some(truncate_size) = limbs_slice_and_in_place_left(xs, ys) {
         xs.truncate(truncate_size);
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, takes
-/// the limbs of the bitwise and of the `Natural`s and writes them to the shorter slice (or the
-/// first one, if they are equally long). If the function writes to the first slice, it returns
-/// `false`; otherwise, it returns `true`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = min(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative and the result is
-/// written to the shorter input slice.
-#[doc(hidden)]
-pub fn limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, takes
+// the limbs of the bitwise and of the `Natural`s and writes them to the shorter slice (or the
+// first one, if they are equally long). If the function writes to the first slice, it returns
+// `false`; otherwise, it returns `true`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = min(`xs.len()`, `ys.len()`)
+//
+// This is mpz_and from mpz/and.c, GMP 6.1.2, where both inputs are non-negative and the result is
+// written to the shorter input slice.
+pub_test! {limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
@@ -198,7 +190,7 @@ pub fn limbs_and_in_place_either(xs: &mut [Limb], ys: &mut [Limb]) -> bool {
             true
         }
     }
-}
+}}
 
 impl Natural {
     fn and_limb(self, other: Limb) -> Limb {

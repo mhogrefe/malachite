@@ -6,11 +6,11 @@ use malachite_base::num::conversion::string::options::{
 use malachite_base::num::conversion::traits::{ExactFrom, FromSciString, ToSci};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::string_is_subset;
-use malachite_base_test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
-use malachite_nz_test_util::generators::{integer_gen, integer_to_sci_options_pair_gen_var_1};
+use malachite_base::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
+use malachite_nz::test_util::generators::{integer_gen, integer_to_sci_options_pair_gen_var_1};
 use malachite_q::conversion::string::to_sci::floor_log_base_of_abs;
+use malachite_q::test_util::generators::{rational_gen, rational_to_sci_options_pair_gen_var_1};
 use malachite_q::Rational;
-use malachite_q_test_util::generators::{rational_gen, rational_to_sci_options_pair_gen_var_1};
 use std::collections::HashMap;
 use std::str::FromStr;
 

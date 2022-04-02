@@ -4,21 +4,21 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_gen_var_5, unsigned_pair_gen_var_29, unsigned_vec_unsigned_pair_gen_var_31,
 };
 use malachite_nz::natural::arithmetic::pow::limbs_pow;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen, natural_natural_unsigned_triple_gen_var_1, natural_unsigned_pair_gen_var_4,
     natural_unsigned_unsigned_triple_gen_var_5,
 };
-use malachite_nz_test_util::natural::arithmetic::pow::{
+use malachite_nz::test_util::natural::arithmetic::pow::{
     natural_pow_naive, natural_pow_simple_binary,
 };
 use num::traits::Pow as NumPow;

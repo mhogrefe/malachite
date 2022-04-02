@@ -2325,12 +2325,11 @@ pub fn exhaustive_primitive_floats<T: PrimitiveFloat>(
         .chain(exhaustive_nonzero_finite_primitive_floats())
 }
 
-#[doc(hidden)]
-pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<T: PrimitiveFloat>(
+pub_test! {exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<T: PrimitiveFloat>(
     a: T,
     b: T,
     sci_exponent: i64,
-    precision: u64,
+    precision: u64
 ) -> ConstantPrecisionPrimitiveFloats<T> {
     assert!(a.is_finite());
     assert!(b.is_finite());
@@ -2392,7 +2391,7 @@ pub fn exhaustive_primitive_floats_with_sci_exponent_and_precision_in_range<T: P
         i: 0,
         count,
     }
-}
+}}
 
 #[doc(hidden)]
 #[derive(Clone, Debug)]

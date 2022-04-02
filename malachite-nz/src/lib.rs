@@ -40,18 +40,23 @@ extern crate malachite_base;
 #[macro_use]
 extern crate serde;
 
+#[cfg(feature = "test_build")]
+extern crate num;
+#[cfg(feature = "test_build")]
+extern crate rug;
+
 #[cfg(feature = "32_bit_limbs")]
 pub use platform_32 as platform;
 #[cfg(not(feature = "32_bit_limbs"))]
 pub use platform_64 as platform;
 
-#[cfg(feature = "fail_on_untested_path")]
+#[cfg(feature = "test_build")]
 #[inline]
 pub fn fail_on_untested_path(message: &str) {
     panic!("Untested path. {}", message);
 }
 
-#[cfg(not(feature = "fail_on_untested_path"))]
+#[cfg(not(feature = "test_build"))]
 #[inline]
 pub const fn fail_on_untested_path(_message: &str) {}
 
@@ -64,3 +69,6 @@ pub mod platform_64;
 pub mod natural;
 /// `Integer`s (which are arbitrarily large).
 pub mod integer;
+
+#[cfg(feature = "test_build")]
+pub mod test_util;

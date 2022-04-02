@@ -2,8 +2,8 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_nz_test_util::generators::integer_unsigned_pair_gen_var_2;
+use malachite_nz::test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
+use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_2;
 use rug;
 use std::str::FromStr;
 

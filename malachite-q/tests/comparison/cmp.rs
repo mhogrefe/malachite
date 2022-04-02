@@ -1,8 +1,8 @@
-use malachite_base_test_util::common::test_cmp_helper;
-use malachite_nz_test_util::generators::integer_pair_gen;
+use malachite_base::test_util::common::test_cmp_helper;
+use malachite_nz::test_util::generators::integer_pair_gen;
+use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use malachite_q::test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use malachite_q::Rational;
-use malachite_q_test_util::common::{rational_to_bigrational, rational_to_rug_rational};
-use malachite_q_test_util::generators::{rational_gen, rational_pair_gen, rational_triple_gen};
 use num::BigRational;
 use std::cmp::Ordering;
 

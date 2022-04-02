@@ -1,9 +1,9 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
-use malachite_base_test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
+use malachite_base::test_util::generators::{signed_pair_gen, unsigned_pair_gen_var_27};
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_gen, integer_integer_signed_triple_gen, integer_integer_unsigned_triple_gen,
     integer_signed_pair_gen, integer_signed_signed_triple_gen, integer_unsigned_pair_gen,
     integer_unsigned_unsigned_triple_gen,

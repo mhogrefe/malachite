@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::{SaturatingSub, SaturatingSubAssign};
 use malachite_base::num::basic::traits::Zero;
-use malachite_base_test_util::generators::unsigned_pair_gen_var_27;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_27;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{natural_gen, natural_pair_gen};
+use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen};
 use std::str::FromStr;
 
 #[test]

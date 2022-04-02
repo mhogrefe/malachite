@@ -23,7 +23,7 @@ use std::cmp::min;
 //TODO tune
 pub(crate) const MULMOD_BNM1_THRESHOLD: usize = 13;
 //TODO tune
-pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 396;
+pub(crate) const MUL_FFT_MODF_THRESHOLD: usize = 40;
 
 pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     n: usize,
@@ -50,23 +50,21 @@ pub(crate) fn limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
     }
 }
 
-/// Time: O(1)
-///
-/// Additional memory: O(1)
-///
-/// Result is O(`n`)
-///
-/// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
-#[doc(hidden)]
-#[inline]
-pub fn limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
+// Time: O(1)
+//
+// Additional memory: O(1)
+//
+// Result is O(`n`)
+//
+// This is mpn_mulmod_bnm1_next_size from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
+pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1_next_size(n: usize) -> usize {
     limbs_mul_mod_base_pow_n_minus_1_next_size_helper(
         n,
         MULMOD_BNM1_THRESHOLD,
         MUL_FFT_MODF_THRESHOLD,
         false,
     )
-}
+}}
 
 /// Time: O(1)
 ///
@@ -164,37 +162,36 @@ fn limbs_mul_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], ys: &
 // Toom3 at 1.485.
 pub(crate) const FFT_FIRST_K: usize = 4;
 
-/// Interpreting two nonempty slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1. The limbs of the result are
-/// written to `out`.
-///
-/// The result is expected to be 0 if and only if one of the operands already is. Otherwise the
-/// class 0 mod (`Limb::WIDTH`<sup>n</sup> - 1) is represented by 2<sup>n * `Limb::WIDTH`</sup> - 1.
-/// This should not be a problem if `limbs_mul_mod_base_pow_n_minus_1` is used to combine results
-/// and obtain a natural number when one knows in advance that the final value is less than
-/// 2<sup>n * `Limb::WIDTH`</sup> - 1. Moreover it should not be a problem if
-/// `limbs_mul_mod_base_pow_n_minus_1` is used to compute the full product with `xs.len()` +
-/// `ys.len()` <= n, because this condition implies
-/// (2<sup>`Limb::WIDTH` * `xs.len()`</sup> - 1)(2<sup>`Limb::WIDTH` * `ys.len()`</sup> - 1) <
-/// 2<sup>`Limb::WIDTH` * n</sup> - 1.
-///
-/// Requires 0 < `ys.len()` <= `xs.len()` <= n and an + `ys.len()` > n / 2.
-/// Scratch need: n + (need for recursive call OR n + 4). This gives
-/// S(n) <= n + MAX (n + 4, S(n / 2)) <= 2 * n + 4
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`, if `ys` is empty, is `xs` is longer than n, or if `out` or
-/// `scratch` are too short.
-///
-/// This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_mul_mod_base_pow_n_minus_1(
+// Interpreting two nonempty slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// multiplies the `Natural`s mod 2<sup>`Limb::WIDTH` * n</sup> - 1. The limbs of the result are
+// written to `out`.
+//
+// The result is expected to be 0 if and only if one of the operands already is. Otherwise the
+// class 0 mod (`Limb::WIDTH`<sup>n</sup> - 1) is represented by 2<sup>n * `Limb::WIDTH`</sup> - 1.
+// This should not be a problem if `limbs_mul_mod_base_pow_n_minus_1` is used to combine results
+// and obtain a natural number when one knows in advance that the final value is less than
+// 2<sup>n * `Limb::WIDTH`</sup> - 1. Moreover it should not be a problem if
+// `limbs_mul_mod_base_pow_n_minus_1` is used to compute the full product with `xs.len()` +
+// `ys.len()` <= n, because this condition implies
+// (2<sup>`Limb::WIDTH` * `xs.len()`</sup> - 1)(2<sup>`Limb::WIDTH` * `ys.len()`</sup> - 1) <
+// 2<sup>`Limb::WIDTH` * n</sup> - 1.
+//
+// Requires 0 < `ys.len()` <= `xs.len()` <= n and an + `ys.len()` > n / 2.
+// Scratch need: n + (need for recursive call OR n + 4). This gives
+// S(n) <= n + MAX (n + 4, S(n / 2)) <= 2 * n + 4
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`, if `ys` is empty, is `xs` is longer than n, or if `out` or
+// `scratch` are too short.
+//
+// This is mpn_mulmod_bnm1 from mpn/generic/mulmod_bnm1.c, GMP 6.1.2.
+pub_crate_test! {limbs_mul_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,
     xs: &[Limb],
@@ -411,4 +408,4 @@ pub fn limbs_mul_mod_base_pow_n_minus_1(
             assert!(!limbs_sub_limb_in_place(&mut out[..half_n << 1], carry));
         }
     }
-}
+}}

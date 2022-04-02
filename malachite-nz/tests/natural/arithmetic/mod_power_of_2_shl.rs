@@ -5,13 +5,13 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_14, unsigned_pair_gen_var_28,
     unsigned_signed_unsigned_triple_gen_var_1, unsigned_triple_gen_var_17,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_signed_unsigned_triple_gen_var_1, natural_unsigned_pair_gen_var_11,
     natural_unsigned_unsigned_triple_gen_var_6,
 };

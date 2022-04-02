@@ -1,8 +1,8 @@
 use itertools::Itertools;
 use malachite_base::random::EXAMPLE_SEED;
+use malachite_base::test_util::stats::common_values_map::common_values_map;
+use malachite_base::test_util::stats::median;
 use malachite_base::vecs::random_vec_permutations;
-use malachite_base_test_util::stats::common_values_map::common_values_map;
-use malachite_base_test_util::stats::median;
 
 fn random_vec_permutations_helper(
     cs: &str,

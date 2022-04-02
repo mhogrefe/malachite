@@ -2,8 +2,8 @@ use itertools::Itertools;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
-use malachite_base_test_util::num::logic::bit_convertible::{
+use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
+use malachite_base::test_util::num::logic::bit_convertible::{
     to_bits_asc_alt, to_bits_asc_signed_naive, to_bits_asc_unsigned_naive, to_bits_desc_alt,
     to_bits_desc_signed_naive, to_bits_desc_unsigned_naive,
 };

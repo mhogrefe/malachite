@@ -1,9 +1,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::vecs::vec_delete_left;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_vec_gen, unsigned_vec_unsigned_pair_gen_var_1,
 };
+use malachite_base::vecs::vec_delete_left;
 
 #[test]
 fn test_vec_delete_left() {

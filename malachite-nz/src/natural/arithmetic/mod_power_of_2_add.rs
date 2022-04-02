@@ -13,17 +13,16 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>. Assumes the input is
-/// already reduced mod 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>. Assumes the input is
+// already reduced mod 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+pub_test! {limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb> {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
         limbs_add_limb(xs, y)
     } else {
@@ -33,19 +32,22 @@ pub fn limbs_mod_power_of_2_add_limb(xs: &[Limb], y: Limb, pow: u64) -> Vec<Limb
         }
         out
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input slice.
-/// Returns whether there is a carry. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_slice_mod_power_of_2_add_limb_in_place(xs: &mut [Limb], y: Limb, pow: u64) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input slice.
+// Returns whether there is a carry. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_slice_mod_power_of_2_add_limb_in_place(
+    xs: &mut [Limb],
+    y: Limb,
+    pow: u64
+) -> bool {
     if xs.len() < usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling)) {
         limbs_slice_add_limb_in_place(xs, y)
     } else {
@@ -54,84 +56,80 @@ pub fn limbs_slice_mod_power_of_2_add_limb_in_place(xs: &mut [Limb], y: Limb, po
         }
         false
     }
-}
+}}
 
-/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
-/// writes the limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input
-/// `Vec`. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, pow: u64) {
+// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
+// writes the limbs of the sum of the `Natural` and a `Limb`, mod 2<sup>`pow`</sup>, to the input
+// `Vec`. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_crate_test! {limbs_vec_mod_power_of_2_add_limb_in_place(xs: &mut Vec<Limb>, y: Limb, pow: u64) {
     assert!(!xs.is_empty());
     if limbs_slice_mod_power_of_2_add_limb_in_place(xs, y, pow) {
         xs.push(1);
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-/// the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
-/// the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
-/// 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
+// the first slice is at least as long as the second, returns a `Vec` of the limbs of the sum of
+// the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are already reduced mod
+// 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+pub_test! {limbs_mod_power_of_2_add_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     let mut out = xs.to_vec();
     if limbs_slice_mod_power_of_2_add_greater_in_place_left(&mut out, ys, pow) {
         out.push(1);
     }
     out
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// a `Vec` of the limbs of the sum of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are
-/// already reduced mod 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+// a `Vec` of the limbs of the sum of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs are
+// already reduced mod 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+pub_test! {limbs_mod_power_of_2_add(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     if xs.len() >= ys.len() {
         limbs_mod_power_of_2_add_greater(xs, ys, pow)
     } else {
         limbs_mod_power_of_2_add_greater(ys, xs, pow)
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
-/// the length of the first slice is greater than or equal to the length of the second, writes the
-/// `xs.len()` least-significant limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the
-/// first (left) slice. Returns whether there is a carry. Assumes the inputs are already reduced mod
-/// 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is shorter than `ys`.
-#[doc(hidden)]
-pub fn limbs_slice_mod_power_of_2_add_greater_in_place_left(
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, where
+// the length of the first slice is greater than or equal to the length of the second, writes the
+// `xs.len()` least-significant limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the
+// first (left) slice. Returns whether there is a carry. Assumes the inputs are already reduced mod
+// 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is shorter than `ys`.
+pub_test! {limbs_slice_mod_power_of_2_add_greater_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     pow: u64,
@@ -144,19 +142,18 @@ pub fn limbs_slice_mod_power_of_2_add_greater_in_place_left(
         }
         false
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the first
-/// (left) slice. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
-#[doc(hidden)]
-pub fn limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
+// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the first
+// (left) slice. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = max(`xs.len()`, `ys.len()`), m = max(1, ys.len() - xs.len())
+pub_test! {limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let max_len = usize::exact_from(pow.shr_round(Limb::LOG_WIDTH, RoundingMode::Ceiling));
@@ -178,21 +175,20 @@ pub fn limbs_vec_mod_power_of_2_add_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb
             limbs_clear_bit(xs, pow);
         }
     }
-}
+}}
 
-/// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the longer slice (or the first
-/// one, if they are equally long). Returns a `bool` which is `false` when the output is to the
-/// first `Vec` and `true` when it's to the second `Vec`. Assumes the inputs are already reduced mod
-/// 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len`, `ys.len()`)
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_add_in_place_either(
+// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the limbs of the sum of the `Natural`s, mod 2<sup>`pow`</sup>, to the longer slice (or the first
+// one, if they are equally long). Returns a `bool` which is `false` when the output is to the
+// first `Vec` and `true` when it's to the second `Vec`. Assumes the inputs are already reduced mod
+// 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len`, `ys.len()`)
+pub_test! {limbs_mod_power_of_2_add_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
     pow: u64,
@@ -208,7 +204,7 @@ pub fn limbs_mod_power_of_2_add_in_place_either(
         }
         true
     }
-}
+}}
 
 impl Natural {
     fn mod_power_of_2_add_limb_ref(&self, y: Limb, pow: u64) -> Natural {

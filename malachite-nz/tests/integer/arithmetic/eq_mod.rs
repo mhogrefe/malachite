@@ -1,8 +1,8 @@
 use malachite_base::num::arithmetic::traits::{DivisibleBy, EqMod, Mod, UnsignedAbs};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     signed_triple_gen, unsigned_vec_triple_gen_var_36,
     unsigned_vec_unsigned_unsigned_triple_gen_var_5,
     unsigned_vec_unsigned_unsigned_triple_gen_var_7,
@@ -16,8 +16,8 @@ use malachite_nz::integer::arithmetic::eq_mod::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
+use malachite_nz::test_util::generators::{
     integer_integer_natural_triple_gen, integer_integer_natural_triple_gen_var_1,
     integer_integer_natural_triple_gen_var_2, integer_natural_pair_gen, integer_pair_gen,
     natural_triple_gen, unsigned_vec_triple_gen_var_37, unsigned_vec_triple_gen_var_38,

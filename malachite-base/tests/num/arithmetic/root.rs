@@ -12,7 +12,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_gen, signed_gen_var_2, signed_unsigned_pair_gen_var_18, unsigned_gen,
     unsigned_gen_var_1, unsigned_pair_gen_var_32,
 };

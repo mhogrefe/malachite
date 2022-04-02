@@ -3,12 +3,12 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_rounding_mode_pair_gen, unsigned_signed_rounding_mode_triple_gen_var_2,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_rounding_mode_pair_gen, natural_signed_rounding_mode_triple_gen_var_1,
 };
 use std::ops::Shr;

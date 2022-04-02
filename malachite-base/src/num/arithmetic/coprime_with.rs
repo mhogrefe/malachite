@@ -1,19 +1,18 @@
 use num::arithmetic::traits::CoprimeWith;
 use num::basic::unsigneds::PrimitiveUnsigned;
 
-#[doc(hidden)]
-pub fn coprime_with_check_2<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
+pub_test! {coprime_with_check_2<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
     (x.odd() || y.odd()) && x.gcd(y) == T::ONE
-}
+}}
 
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub fn coprime_with_check_2_3<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
     (x.odd() || y.odd())
         && (!x.divisible_by(T::from(3u8)) || !y.divisible_by(T::from(3u8)))
         && x.gcd(y) == T::ONE
 }
 
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub fn coprime_with_check_2_3_5<T: PrimitiveUnsigned>(x: T, y: T) -> bool {
     if x.even() && y.even() {
         false

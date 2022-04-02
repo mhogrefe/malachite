@@ -3,11 +3,11 @@ use malachite_base::iterators::comparison::{is_strictly_ascending, is_strictly_d
 use malachite_base::num::arithmetic::traits::{Abs, Floor, Parity};
 use malachite_base::num::conversion::traits::IsInteger;
 use malachite_base::strings::ToDebugString;
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::conversion::traits::Convergents;
+use malachite_q::test_util::conversion::continued_fraction::convergents::convergents_alt;
+use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
-use malachite_q_test_util::conversion::continued_fraction::convergents::convergents_alt;
-use malachite_q_test_util::generators::rational_gen;
 use std::str::FromStr;
 
 #[test]

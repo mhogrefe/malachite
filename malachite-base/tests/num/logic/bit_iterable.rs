@@ -2,7 +2,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitIterable;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_bool_vec_pair_gen_var_1, signed_gen, signed_unsigned_pair_gen_var_1,
     unsigned_bool_vec_pair_gen_var_1, unsigned_gen, unsigned_gen_var_5, unsigned_pair_gen_var_2,
 };

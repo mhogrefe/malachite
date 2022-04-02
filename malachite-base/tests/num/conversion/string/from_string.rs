@@ -2,7 +2,7 @@ use malachite_base::num::conversion::string::from_string::digit_from_display_byt
 use malachite_base::num::conversion::string::to_string::{
     digit_to_display_byte_lower, digit_to_display_byte_upper,
 };
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_gen_var_10};
+use malachite_base::test_util::generators::{unsigned_gen, unsigned_gen_var_10};
 
 #[test]
 fn test_digit_from_display_byte() {

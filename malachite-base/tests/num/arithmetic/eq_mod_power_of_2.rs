@@ -2,7 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_pair_gen, signed_signed_signed_unsigned_quadruple_gen_var_1,
     signed_signed_unsigned_triple_gen_var_1, signed_signed_unsigned_triple_gen_var_2,
     signed_signed_unsigned_triple_gen_var_3, signed_unsigned_pair_gen_var_1,

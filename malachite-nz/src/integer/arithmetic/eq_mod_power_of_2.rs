@@ -8,21 +8,20 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
-/// whether the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`;
-/// that is, whether the `pow` least-significant bits of the negative of the `Natural` and the limb
-/// are equal.
-///
-/// This function assumes that `limbs` has length at least 2 and the last (most significant) limb is
-/// nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `limbs.len()`
-#[doc(hidden)]
-pub fn limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns
+// whether the negative of the `Natural` is equivalent to a limb mod two to the power of `pow`;
+// that is, whether the `pow` least-significant bits of the negative of the `Natural` and the limb
+// are equal.
+//
+// This function assumes that `limbs` has length at least 2 and the last (most significant) limb is
+// nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `limbs.len()`
+pub_test! {limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> bool {
     if y == 0 {
         return limbs_divisible_by_power_of_2(xs, pow);
     }
@@ -55,7 +54,7 @@ pub fn limbs_eq_mod_power_of_2_neg_limb(xs: &[Limb], y: Limb, pow: u64) -> bool 
             }
         }
     }
-}
+}}
 
 fn limbs_eq_mod_power_of_2_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     let xs_len = xs.len();
@@ -97,29 +96,28 @@ fn limbs_eq_mod_power_of_2_neg_pos_greater(xs: &[Limb], ys: &[Limb], pow: u64) -
     }
 }
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// whether the first `Natural` and the negative of the second natural (equivalently, the negative
-/// of the first `Natural` and the second `Natural`) are equivalent mod two to the power of `pow`;
-/// that is, whether their `pow` least-significant bits are equal.
-///
-/// This function assumes that neither slice is empty and their last elements are nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = min(pow, max(`xs.len()`, `ys.len()`))
-///
-/// This is mpz_congruent_2exp_p from mpz/cong_2exp.c, GMP 6.2.1, where a is negative and c is
-/// positive.
-#[doc(hidden)]
-pub fn limbs_eq_mod_power_of_2_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+// whether the first `Natural` and the negative of the second natural (equivalently, the negative
+// of the first `Natural` and the second `Natural`) are equivalent mod two to the power of `pow`;
+// that is, whether their `pow` least-significant bits are equal.
+//
+// This function assumes that neither slice is empty and their last elements are nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = min(pow, max(`xs.len()`, `ys.len()`))
+//
+// This is mpz_congruent_2exp_p from mpz/cong_2exp.c, GMP 6.2.1, where a is negative and c is
+// positive.
+pub_test! {limbs_eq_mod_power_of_2_neg_pos(xs: &[Limb], ys: &[Limb], pow: u64) -> bool {
     if xs.len() >= ys.len() {
         limbs_eq_mod_power_of_2_neg_pos_greater(xs, ys, pow)
     } else {
         limbs_eq_mod_power_of_2_neg_pos_greater(ys, xs, pow)
     }
-}
+}}
 
 impl Natural {
     fn eq_mod_power_of_2_neg_limb(&self, other: Limb, pow: u64) -> bool {

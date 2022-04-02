@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::traits::Abs;
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::{OrdAbs, PartialOrdAbs};
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_gen, integer_integer_primitive_float_triple_gen, integer_primitive_float_pair_gen,
     integer_primitive_float_primitive_float_triple_gen,
 };

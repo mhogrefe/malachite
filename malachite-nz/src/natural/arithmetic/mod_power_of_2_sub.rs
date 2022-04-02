@@ -28,48 +28,45 @@ fn extend_with_ones(xs: &mut Vec<Limb>, pow: u64) {
     );
 }
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-/// `Natural` from a `Limb`, mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
-/// 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-///
-/// # Panics
-/// Panics if `pow` is zero.
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
+// `Natural` from a `Limb`, mod 2<sup>`pow`</sup>. Assumes the input is already reduced mod
+// 2<sup>`pow`</sup>.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+//
+// # Panics
+// Panics if `pow` is zero.
+pub_test! {limbs_mod_power_of_2_limb_sub_limbs(x: Limb, ys: &[Limb], pow: u64) -> Vec<Limb> {
     let mut diff = limbs_neg_mod_power_of_2(ys, pow);
     limbs_vec_mod_power_of_2_add_limb_in_place(&mut diff, x, pow);
     diff
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
-/// `Natural` from a `Limb`, mod 2<sup>`pow`</sup>, and writes the limbs of the difference to the
-/// input slice. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-///
-/// # Panics
-/// Panics if `pow` is zero.
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Limb>, pow: u64) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, subtracts the
+// `Natural` from a `Limb`, mod 2<sup>`pow`</sup>, and writes the limbs of the difference to the
+// input slice. Assumes the input is already reduced mod 2<sup>`pow`</sup>.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+//
+// # Panics
+// Panics if `pow` is zero.
+pub_test! {limbs_mod_power_of_2_limb_sub_limbs_in_place(x: Limb, ys: &mut Vec<Limb>, pow: u64) {
     limbs_neg_mod_power_of_2_in_place(ys, pow);
     limbs_vec_mod_power_of_2_add_limb_in_place(ys, x, pow);
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and returns a `Vec` of the
-/// limbs of the difference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and returns a `Vec` of the
+// limbs of the difference. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+pub_test! {limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     let ys_len = ys.len();
     let mut out_limbs = xs.to_vec();
     if ys_len > xs.len() {
@@ -80,18 +77,17 @@ pub fn limbs_mod_power_of_2_sub(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb>
         limbs_slice_mod_power_of_2_in_place(&mut out_limbs, pow);
     }
     out_limbs
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
-/// the difference to the first (left) slice. Assumes the inputs are already reduced mod
-/// 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
+// the difference to the first (left) slice. Assumes the inputs are already reduced mod
+// 2<sup>`pow`</sup>.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+pub_test! {limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) {
     let ys_len = ys.len();
     if ys_len > xs.len() {
         xs.resize(ys_len, 0);
@@ -100,20 +96,19 @@ pub fn limbs_mod_power_of_2_sub_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], p
         extend_with_ones(xs, pow);
         limbs_slice_mod_power_of_2_in_place(xs, pow);
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
-/// the difference to the second (right) slice. Assumes the inputs are already reduced mod
-/// 2<sup>`pow`</sup>.
-///
-/// Neither input slice may have trailing zeros.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, pow: u64) {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
+// the difference to the second (right) slice. Assumes the inputs are already reduced mod
+// 2<sup>`pow`</sup>.
+//
+// Neither input slice may have trailing zeros.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+pub_test! {limbs_mod_power_of_2_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, pow: u64) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
         if limbs_vec_sub_in_place_right(xs, ys) {
@@ -130,21 +125,20 @@ pub fn limbs_mod_power_of_2_sub_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, 
         extend_with_ones(ys, pow);
         limbs_slice_mod_power_of_2_in_place(ys, pow);
     }
-}
+}}
 
-/// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s,
-/// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
-/// the difference to to the longer slice (or the first one, if they are equally long). Returns a
-/// `bool` which is `false` when the output is to the first `Vec` and `true` when it's to the second
-/// `Vec`. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
-///
-/// Neither input slice may have trailing zeros.
-///
-/// Time: worst case O(`pow`)
-///
-/// Additional memory: worst case O(`pow`)
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_sub_in_place_either(
+// Interpreting two `Vec`s of `Limb`s as the limbs (in ascending order) of two `Natural`s,
+// subtracts the second `Natural` from the first, mod 2<sup>`pow`</sup>, and writes the limbs of
+// the difference to to the longer slice (or the first one, if they are equally long). Returns a
+// `bool` which is `false` when the output is to the first `Vec` and `true` when it's to the second
+// `Vec`. Assumes the inputs are already reduced mod 2<sup>`pow`</sup>.
+//
+// Neither input slice may have trailing zeros.
+//
+// Time: worst case O(`pow`)
+//
+// Additional memory: worst case O(`pow`)
+pub_test! {limbs_mod_power_of_2_sub_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
     pow: u64,
@@ -156,7 +150,7 @@ pub fn limbs_mod_power_of_2_sub_in_place_either(
         limbs_mod_power_of_2_sub_in_place_right(xs, ys, pow);
         true
     }
-}
+}}
 
 impl Natural {
     fn mod_power_of_2_sub_limb_ref(&self, y: Limb, pow: u64) -> Natural {

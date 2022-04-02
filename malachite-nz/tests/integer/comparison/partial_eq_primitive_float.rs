@@ -1,8 +1,8 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::common::integer_to_rug_integer;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::integer_to_rug_integer;
+use malachite_nz::test_util::generators::{
     integer_primitive_float_pair_gen, natural_primitive_float_pair_gen,
 };
 use rug;

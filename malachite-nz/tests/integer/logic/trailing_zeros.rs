@@ -1,10 +1,10 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base_test_util::generators::signed_gen_var_6;
+use malachite_base::test_util::generators::signed_gen_var_6;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::generators::integer_gen;
-use malachite_nz_test_util::integer::logic::trailing_zeros::integer_trailing_zeros_alt;
+use malachite_nz::test_util::generators::integer_gen;
+use malachite_nz::test_util::integer::logic::trailing_zeros::integer_trailing_zeros_alt;
 use std::str::FromStr;
 
 #[test]

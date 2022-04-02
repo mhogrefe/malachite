@@ -3,8 +3,8 @@ use malachite_base::num::random::random_primitive_ints;
 use malachite_base::random::EXAMPLE_SEED;
 use malachite_base::rational_sequences::random::random_rational_sequences;
 use malachite_base::rational_sequences::RationalSequence;
-use malachite_base_test_util::stats::common_values_map::common_values_map;
-use malachite_base_test_util::stats::median;
+use malachite_base::test_util::stats::common_values_map::common_values_map;
+use malachite_base::test_util::stats::median;
 
 #[test]
 fn test_random_rational_sequences() {

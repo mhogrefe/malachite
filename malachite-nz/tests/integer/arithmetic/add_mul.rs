@@ -1,10 +1,10 @@
 use malachite_base::num::arithmetic::traits::{AddMul, AddMulAssign, CheckedAddMul};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::ConvertibleFrom;
-use malachite_base_test_util::generators::{signed_triple_gen, signed_triple_gen_var_1};
+use malachite_base::test_util::generators::{signed_triple_gen, signed_triple_gen_var_1};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen, natural_triple_gen,
 };
 use std::str::FromStr;

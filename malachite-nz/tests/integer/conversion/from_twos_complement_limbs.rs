@@ -1,9 +1,9 @@
 use itertools::Itertools;
 use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::integers::PrimitiveInt;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_vec_gen;
 use malachite_base::vecs::vec_delete_left;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_vec_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::Limb;
 use std::cmp::Ordering;

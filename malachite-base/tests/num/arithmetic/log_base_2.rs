@@ -1,6 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{primitive_float_gen_var_18, unsigned_gen_var_1};
+use malachite_base::test_util::generators::{primitive_float_gen_var_18, unsigned_gen_var_1};
 use std::panic::catch_unwind;
 
 fn floor_log_base_2_helper_unsigned<T: PrimitiveUnsigned>() {

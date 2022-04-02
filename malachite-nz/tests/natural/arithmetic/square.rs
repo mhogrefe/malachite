@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::{CheckedLogBase, CheckedSqrt, Square, SquareAssign};
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_gen_var_21;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_gen_var_21;
 use malachite_nz::natural::arithmetic::mul::fft::limbs_mul_greater_to_out_fft;
 use malachite_nz::natural::arithmetic::square::{
     limbs_square_to_out_basecase, limbs_square_to_out_toom_4,
@@ -17,12 +17,12 @@ use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_nz::platform::SQR_TOOM2_THRESHOLD;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen, natural_pair_gen, unsigned_vec_pair_gen_var_22, unsigned_vec_pair_gen_var_23,
     unsigned_vec_pair_gen_var_24, unsigned_vec_pair_gen_var_25, unsigned_vec_pair_gen_var_27,
     unsigned_vec_pair_gen_var_28, unsigned_vec_pair_gen_var_29, unsigned_vec_pair_gen_var_30,
 };
-use malachite_nz_test_util::natural::arithmetic::square::limbs_square_to_out_basecase_unrestricted;
+use malachite_nz::test_util::natural::arithmetic::square::limbs_square_to_out_basecase_unrestricted;
 use std::str::FromStr;
 
 fn limbs_square_basecase_helper_1(

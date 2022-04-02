@@ -2,8 +2,8 @@ use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::slices::slice_test_zero;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_15, unsigned_vec_pair_gen_var_16,
     unsigned_vec_unsigned_pair_gen_var_22,
 };
@@ -14,12 +14,12 @@ use malachite_nz::natural::arithmetic::divisible_by::{
 use malachite_nz::natural::arithmetic::mod_op::{limbs_mod, limbs_mod_limb};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_2, natural_pair_gen, natural_pair_gen_var_6,
     natural_pair_gen_var_7, unsigned_vec_pair_gen_var_17,
 };
-use malachite_nz_test_util::natural::arithmetic::divisible_by::{
+use malachite_nz::test_util::natural::arithmetic::divisible_by::{
     combined_limbs_divisible_by_limb, num_divisible_by,
 };
 use num::BigUint;

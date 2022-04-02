@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::xx_div_mod_y_is_qr::explicit_xx_div_mod_y_is_qr;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{unsigned_gen_var_1, unsigned_triple_gen_var_15};
+use malachite_base::test_util::generators::{unsigned_gen_var_1, unsigned_triple_gen_var_15};
 use std::panic::catch_unwind;
 
 #[test]

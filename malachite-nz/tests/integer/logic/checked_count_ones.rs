@@ -1,9 +1,9 @@
 use malachite_base::num::logic::traits::CountOnes;
-use malachite_base_test_util::generators::signed_gen_var_2;
+use malachite_base::test_util::generators::signed_gen_var_2;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::generators::integer_gen;
-use malachite_nz_test_util::integer::logic::checked_count_ones::{
+use malachite_nz::test_util::generators::integer_gen;
+use malachite_nz::test_util::integer::logic::checked_count_ones::{
     integer_checked_count_ones_alt_1, integer_checked_count_ones_alt_2,
 };
 use std::str::FromStr;

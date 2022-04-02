@@ -1,10 +1,10 @@
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_base_test_util::generators::signed_gen;
+use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::common::{integer_to_bigint, integer_to_rug_integer};
-use malachite_nz_test_util::generators::integer_gen;
-use malachite_nz_test_util::integer::arithmetic::sign::num_sign;
+use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
+use malachite_nz::test_util::generators::integer_gen;
+use malachite_nz::test_util::integer::arithmetic::sign::num_sign;
 use num::BigInt;
 use rug;
 use std::cmp::Ordering;

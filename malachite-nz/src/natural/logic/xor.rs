@@ -4,91 +4,85 @@ use platform::Limb;
 use std::mem::swap;
 use std::ops::{BitXor, BitXorAssign};
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the bitwise xor of the `Natural` and a `Limb`. `xs` cannot be empty.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the bitwise xor of the `Natural` and a `Limb`. `xs` cannot be empty.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_xor_limb(xs: &[Limb], y: Limb) -> Vec<Limb> {
     let mut result = xs.to_vec();
     limbs_xor_limb_in_place(&mut result, y);
     result
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the bitwise xor of the `Natural` and a `Limb` to an output slice. The output slice must
-/// be at least as long as the input slice. `xs` cannot be empty.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs` or if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the bitwise xor of the `Natural` and a `Limb` to an output slice. The output slice must
+// be at least as long as the input slice. `xs` cannot be empty.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `xs` or if `xs` is empty.
+pub_test! {limbs_xor_limb_to_out(out: &mut [Limb], xs: &[Limb], y: Limb) {
     out[..xs.len()].copy_from_slice(xs);
     limbs_xor_limb_in_place(out, y);
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the bitwise xor of the `Natural` and a `Limb` to the input slice. `xs` cannot be empty.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-#[inline]
-pub fn limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the bitwise xor of the `Natural` and a `Limb` to the input slice. `xs` cannot be empty.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_xor_limb_in_place(xs: &mut [Limb], y: Limb) {
     xs[0] ^= y;
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, returns a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the
-/// result is the length of one of the input slices.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1, where rp is returned.
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-#[doc(hidden)]
-pub fn limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, returns a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the
+// result is the length of one of the input slices.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1, where rp is returned.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+pub_test! {limbs_xor_same_length(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     assert_eq!(xs.len(), ys.len());
     xs.iter().zip(ys.iter()).map(|(x, y)| x ^ y).collect()
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the result is the
-/// length of the longer input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res is returned and both inputs are non-
-/// negative.
-#[doc(hidden)]
-pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+// a `Vec` of the limbs of the bitwise xor of the `Natural`s. The length of the result is the
+// length of the longer input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where res is returned and both inputs are non-
+// negative.
+pub_test! {limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let ys_len = ys.len();
     let mut result;
@@ -100,48 +94,46 @@ pub fn limbs_xor(xs: &[Limb], ys: &[Limb]) -> Vec<Limb> {
         result.extend_from_slice(&ys[xs_len..]);
     }
     result
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to an output slice. The output
-/// must be at least as long as one of the input slices.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths or if `out` is too short.
-///
-/// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to an output slice. The output
+// must be at least as long as one of the input slices.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths or if `out` is too short.
+//
+// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1.
+pub_test! {limbs_xor_same_length_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let len = xs.len();
     assert_eq!(len, ys.len());
     assert!(out.len() >= len);
     for (z, (x, y)) in out.iter_mut().zip(xs.iter().zip(ys.iter())) {
         *z = x ^ y;
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
-/// the limbs of the bitwise xor of the `Natural`s to an output slice. The output must be at least
-/// as long as the longer input slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// # Panics
-/// Panics if `out` is too short.
-///
-/// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are non-negative.
-#[doc(hidden)]
-pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, writes
+// the limbs of the bitwise xor of the `Natural`s to an output slice. The output must be at least
+// as long as the longer input slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// # Panics
+// Panics if `out` is too short.
+//
+// This is mpz_xor from mpz/xor.c, GMP 6.1.2, where both inputs are non-negative.
+pub_test! {limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
     let xs_len = xs.len();
     let ys_len = ys.len();
     if xs_len >= ys_len {
@@ -153,28 +145,27 @@ pub fn limbs_xor_to_out(out: &mut [Limb], xs: &[Limb], ys: &[Limb]) {
         limbs_xor_same_length_to_out(out, xs, &ys[..xs_len]);
         out[xs_len..ys_len].copy_from_slice(&ys[xs_len..]);
     }
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to the first (left) slice.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1, where rp == up.
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-#[doc(hidden)]
-pub fn limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to the first (left) slice.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// This is mpn_xor_n from gmp-impl.h, GMP 6.2.1, where rp == up.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+pub_test! {limbs_xor_same_length_in_place_left(xs: &mut [Limb], ys: &[Limb]) {
     assert_eq!(xs.len(), ys.len());
     for (x, y) in xs.iter_mut().zip(ys.iter()) {
         *x ^= y;
     }
-}
+}}
 
 /// Interpreting a `Vec` of `Limb`s and a slice of `Limb`s as the limbs (in ascending order) of two
 /// `Natural`s, writes the limbs of the bitwise xor of the `Natural`s to the `Vec`. If `ys` is

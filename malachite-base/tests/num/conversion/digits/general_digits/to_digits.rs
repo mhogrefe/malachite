@@ -2,7 +2,7 @@ use itertools::Itertools;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::digits::general_digits::unsigned_to_digits_asc_naive;
 use malachite_base::num::conversion::traits::{Digits, ExactFrom, SaturatingFrom, WrappingFrom};
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_4, unsigned_pair_gen_var_6,
 };
 use std::panic::catch_unwind;

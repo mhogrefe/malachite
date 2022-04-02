@@ -1,8 +1,7 @@
 use num::arithmetic::traits::{CeilingLogBase, CheckedLogBase, FloorLogBase};
 use num::basic::unsigneds::PrimitiveUnsigned;
 
-#[doc(hidden)]
-pub fn floor_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
+pub_test! {floor_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
     let mut result = 0;
@@ -17,10 +16,9 @@ pub fn floor_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
         }
     }
     result - 1
-}
+}}
 
-#[doc(hidden)]
-pub fn ceiling_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
+pub_test! {ceiling_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
     let mut result = 0;
@@ -34,10 +32,9 @@ pub fn ceiling_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
         }
     }
     result
-}
+}}
 
-#[doc(hidden)]
-pub fn checked_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> Option<u64> {
+pub_test! {checked_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> Option<u64> {
     assert_ne!(x, T::ZERO);
     assert!(base > T::ONE);
     let mut result = 0;
@@ -55,7 +52,7 @@ pub fn checked_log_base_naive<T: PrimitiveUnsigned>(x: T, base: T) -> Option<u64
     } else {
         None
     }
-}
+}}
 
 fn floor_log_base<T: PrimitiveUnsigned>(x: T, base: T) -> u64 {
     if let Some(log_base) = base.checked_log_base_2() {

@@ -6,7 +6,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::ToDebugString;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_gen_var_1, primitive_float_gen_var_13,
     primitive_float_gen_var_2, primitive_float_gen_var_3, primitive_float_gen_var_4,
     primitive_float_rounding_mode_pair_gen_var_1, primitive_float_rounding_mode_pair_gen_var_3,

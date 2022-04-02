@@ -1,6 +1,6 @@
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::strings::ToDebugString;
-use malachite_base_test_util::generators::unsigned_vec_gen;
+use malachite_base::test_util::generators::unsigned_vec_gen;
 
 #[test]
 pub fn test_from_vec_and_from_slice() {

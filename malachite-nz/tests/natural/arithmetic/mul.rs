@@ -4,8 +4,8 @@ use malachite_base::num::arithmetic::traits::{DivMod, Square};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     large_type_gen_var_1, unsigned_pair_gen_var_27, unsigned_vec_pair_gen_var_1,
     unsigned_vec_pair_gen_var_2, unsigned_vec_triple_gen_var_1, unsigned_vec_triple_gen_var_2,
     unsigned_vec_triple_gen_var_24, unsigned_vec_triple_gen_var_25, unsigned_vec_triple_gen_var_3,
@@ -50,10 +50,10 @@ use malachite_nz::natural::arithmetic::mul::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen, natural_pair_gen, natural_triple_gen, unsigned_vec_triple_gen_var_10,
     unsigned_vec_triple_gen_var_11, unsigned_vec_triple_gen_var_12, unsigned_vec_triple_gen_var_13,
     unsigned_vec_triple_gen_var_14, unsigned_vec_triple_gen_var_15, unsigned_vec_triple_gen_var_16,
@@ -61,7 +61,7 @@ use malachite_nz_test_util::generators::{
     unsigned_vec_triple_gen_var_6, unsigned_vec_triple_gen_var_7, unsigned_vec_triple_gen_var_8,
     unsigned_vec_triple_gen_var_9,
 };
-use malachite_nz_test_util::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase_mem_opt;
+use malachite_nz::test_util::natural::arithmetic::mul::limbs_mul_greater_to_out_basecase_mem_opt;
 use num::BigUint;
 use rug;
 use std::str::FromStr;

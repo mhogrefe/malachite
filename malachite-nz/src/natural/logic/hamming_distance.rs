@@ -5,58 +5,55 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
-/// Hamming distance between that `Natural` and a `Limb`. Both have infinitely many implicit leading
-/// zeros. `xs` cannot be empty.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
+// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
+// Hamming distance between that `Natural` and a `Limb`. Both have infinitely many implicit leading
+// zeros. `xs` cannot be empty.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_hamming_distance_limb(xs: &[Limb], y: Limb) -> u64 {
     xs[0].hamming_distance(y) + limbs_count_ones(&xs[1..])
-}
+}}
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
-/// returns the Hamming distance between them. Both have infinitely many implicit leading zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative and
-/// have the same length.
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-#[doc(hidden)]
-pub fn limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
+// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
+// returns the Hamming distance between them. Both have infinitely many implicit leading zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative and
+// have the same length.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+pub_crate_test! {limbs_hamming_distance_same_length(xs: &[Limb], ys: &[Limb]) -> u64 {
     assert_eq!(xs.len(), ys.len());
     xs.iter()
         .zip(ys.iter())
         .map(|(x, &y)| x.hamming_distance(y))
         .sum()
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs of `Natural`s in ascending order, returns the
-/// Hamming distance between them. Both have infinitely many implicit leading zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative.
-#[doc(hidden)]
-pub fn limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
+// Interpreting two slices of `Limb`s as the limbs of `Natural`s in ascending order, returns the
+// Hamming distance between them. Both have infinitely many implicit leading zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// This is mpz_hamdist from mpz/hamdist.c, GMP 6.1.2, where both arguments are non-negative.
+pub_test! {limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_len = xs.len();
     let ys_len = ys.len();
     match xs_len.cmp(&ys_len) {
@@ -68,7 +65,7 @@ pub fn limbs_hamming_distance(xs: &[Limb], ys: &[Limb]) -> u64 {
             limbs_hamming_distance_same_length(&xs[..ys_len], ys) + limbs_count_ones(&xs[ys_len..])
         }
     }
-}
+}}
 
 impl Natural {
     fn hamming_distance_limb(&self, other: Limb) -> u64 {

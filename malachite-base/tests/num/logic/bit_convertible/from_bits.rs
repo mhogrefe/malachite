@@ -1,11 +1,11 @@
 use itertools::repeat_n;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     bool_vec_gen_var_1, bool_vec_gen_var_2, bool_vec_gen_var_3, bool_vec_gen_var_4,
     unsigned_gen_var_5,
 };
-use malachite_base_test_util::num::logic::bit_convertible::{
+use malachite_base::test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_asc_signed_naive, from_bits_asc_unsigned_naive, from_bits_desc_alt,
 };
 use std::iter::once;

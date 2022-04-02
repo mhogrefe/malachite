@@ -1,7 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::common::test_cmp_helper;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::common::test_cmp_helper;
+use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_pair_gen, primitive_float_triple_gen,
 };
 use std::cmp::Ordering;

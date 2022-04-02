@@ -1,10 +1,10 @@
 use malachite_base::num::arithmetic::traits::{
     ModIsReduced, ModPowerOf2, ModPowerOf2IsReduced, PowerOf2,
 };
-use malachite_base_test_util::generators::unsigned_pair_gen_var_2;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_4;
+use malachite_nz::test_util::generators::natural_unsigned_pair_gen_var_4;
 use std::str::FromStr;
 
 #[test]

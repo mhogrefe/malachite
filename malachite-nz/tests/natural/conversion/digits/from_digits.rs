@@ -6,15 +6,15 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, Digits, ExactFrom, PowerOf2Digits, SaturatingFrom, WrappingFrom,
 };
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_10, unsigned_vec_unsigned_pair_gen_var_12,
     unsigned_vec_unsigned_pair_gen_var_5,
 };
 use malachite_nz::natural::conversion::digits::general_digits::*;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_unsigned_pair_gen_var_5, natural_vec_natural_pair_gen_var_1,
     natural_vec_natural_pair_gen_var_2, natural_vec_natural_pair_gen_var_3,
     natural_vec_natural_pair_gen_var_4, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_2,

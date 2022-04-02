@@ -6,6 +6,7 @@ use malachite_base::slices::slice_trailing_zeros;
 use natural::InnerNatural::{Large, Small};
 use platform::Limb;
 use std::convert::TryFrom;
+#[cfg(feature = "test_build")]
 use std::str::FromStr;
 
 /// A natural (non-negative) integer.
@@ -108,11 +109,11 @@ impl Natural {
         self.demote_if_small();
     }
 
-    /// Returns true iff `self` is valid. To be valid,
-    ///
-    /// `self` can only be `Large` when it is at least 2<sup>`Limb::WIDTH`</sup>, and cannot have
-    /// leading zero limbs. All `Natural`s must be valid.
-    #[doc(hidden)]
+    // Returns true iff `self` is valid. To be valid,
+    //
+    // `self` can only be `Large` when it is at least 2<sup>`Limb::WIDTH`</sup>, and cannot have
+    // leading zero limbs. All `Natural`s must be valid.
+    #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         match *self {
             Natural(Small(_)) => true,
@@ -120,7 +121,8 @@ impl Natural {
         }
     }
 
-    /// A `Large` value (when using 32-bit limbs) used for testing.
+    // A `Large` value (when using 32-bit limbs) used for testing.
+    #[cfg(feature = "test_build")]
     #[doc(hidden)]
     pub fn trillion() -> Natural {
         Natural::from_str("1000000000000").unwrap()

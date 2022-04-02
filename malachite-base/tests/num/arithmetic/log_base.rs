@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::log_base::{
     ceiling_log_base_naive, checked_log_base_naive, floor_log_base_naive,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen_var_1, unsigned_gen_var_6, unsigned_pair_gen_var_24,
 };
 use std::panic::catch_unwind;

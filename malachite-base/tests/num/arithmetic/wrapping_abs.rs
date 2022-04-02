@@ -1,5 +1,5 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
-use malachite_base_test_util::generators::signed_gen;
+use malachite_base::test_util::generators::signed_gen;
 
 fn wrapping_abs_helper<T: PrimitiveSigned>() {
     let test = |n: T, out| {

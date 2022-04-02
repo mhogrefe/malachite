@@ -1,7 +1,7 @@
 use malachite_base::chars::random::random_char_inclusive_range;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
+use malachite_base::test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base::test_util::stats::median;
 
 fn random_char_inclusive_range_helper(
     a: char,

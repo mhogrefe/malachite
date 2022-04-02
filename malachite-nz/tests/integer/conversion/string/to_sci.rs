@@ -5,12 +5,12 @@ use malachite_base::num::conversion::string::options::{
 use malachite_base::num::conversion::traits::{FromSciString, ToSci};
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::string_is_subset;
-use malachite_base_test_util::generators::{signed_gen, signed_to_sci_options_pair_gen_var_1};
-use malachite_base_test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
+use malachite_base::test_util::generators::{signed_gen, signed_to_sci_options_pair_gen_var_1};
+use malachite_base::test_util::num::conversion::string::from_sci_string::DECIMAL_SCI_STRING_CHARS;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::generators::{integer_gen, integer_to_sci_options_pair_gen_var_1};
+use malachite_nz::test_util::generators::{integer_gen, integer_to_sci_options_pair_gen_var_1};
 use std::collections::HashMap;
 use std::str::FromStr;
 

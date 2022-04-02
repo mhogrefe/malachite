@@ -58,15 +58,8 @@ const INVERT_LIMB_TABLE: [u8; INVERT_LIMB_TABLE_SIZE] = [
     0x21, 0xcb, 0xed, 0xd7, 0x59, 0xc3, 0xe5, 0x0f, 0x11, 0x3b, 0x5d, 0xc7, 0x49, 0x33, 0x55, 0xff,
 ];
 
-/// Tests that `INVERT_LIMB_TABLE` is correct.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::test_invert_limb_table;
-///
-/// test_invert_limb_table();
-/// ```
-#[doc(hidden)]
+// Tests that `INVERT_LIMB_TABLE` is correct.
+#[cfg(feature = "test_build")]
 pub fn test_invert_limb_table() {
     for (i, &inv) in INVERT_LIMB_TABLE.iter().enumerate() {
         let value = (u8::exact_from(i) << 1) + 1;
@@ -79,20 +72,19 @@ pub fn test_invert_limb_table() {
     }
 }
 
-/// Finds the inverse of a `Limb` mod 2<sup>`Limb::WIDTH`</sup>; given x, returns y such that
-/// x * y ≡ 1 mod 2<sup>`Limb::WIDTH`</sup>. This inverse only exists for odd `Limb`s, so `x` must
-/// be odd.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Panics
-/// Panics if `x` is even.
-///
-/// This is binvert_limb from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_invert_limb(x: Limb) -> Limb {
+// Finds the inverse of a `Limb` mod 2<sup>`Limb::WIDTH`</sup>; given x, returns y such that
+// x * y ≡ 1 mod 2<sup>`Limb::WIDTH`</sup>. This inverse only exists for odd `Limb`s, so `x` must
+// be odd.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// # Panics
+// Panics if `x` is even.
+//
+// This is binvert_limb from gmp-impl.h, GMP 6.2.1.
+pub_crate_test! {limbs_modular_invert_limb(x: Limb) -> Limb {
     assert!(x.odd());
     let index = (x >> 1).mod_power_of_2(INVERT_LIMB_TABLE_LOG_SIZE);
     let mut inv = Limb::from(INVERT_LIMB_TABLE[usize::exact_from(index)]);
@@ -102,42 +94,40 @@ pub fn limbs_modular_invert_limb(x: Limb) -> Limb {
         inv = (inv << 1).wrapping_sub(inv.wrapping_mul(inv).wrapping_mul(x));
     }
     inv
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
-/// limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
-/// the behavior of this function is undefined.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is empty or if `d` is zero.
-///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
-#[doc(hidden)]
-pub fn limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
+// limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
+// the behavior of this function is undefined.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is empty or if `d` is zero.
+//
+// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
+pub_test! {limbs_div_exact_limb_no_special_3(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_limb_to_out(&mut q, ns, d);
     q
-}
+}}
 
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
-///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d: Limb) {
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
+//
+// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
+pub_test! {limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert_ne!(len, 0);
@@ -182,20 +172,19 @@ pub fn limbs_div_exact_limb_to_out_no_special_3(out: &mut [Limb], ns: &[Limb], d
             *out_q = q;
         }
     }
-}
+}}
 
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is empty or if `d` is zero.
-///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dst == src.
-#[doc(hidden)]
-pub fn limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is empty or if `d` is zero.
+//
+// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dst == src.
+pub_test! {limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert_ne!(len, 0);
@@ -240,164 +229,160 @@ pub fn limbs_div_exact_limb_in_place_no_special_3(ns: &mut [Limb], d: Limb) {
             *n = q;
         }
     }
-}
+}}
 
-#[doc(hidden)]
-pub const MAX_OVER_3: Limb = Limb::MAX / 3;
+#[cfg(feature = "test_build")]
+pub(crate) const MAX_OVER_3: Limb = Limb::MAX / 3;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// quotient limbs of the `Natural` divided by 3. The limb slice must be nonempty. The `Natural`
-/// must be exactly divisible by 3. If it isn't, the behavior of this function is undefined.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is empty.
-///
-/// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0
-/// and no carry-in, where the result is returned.
-#[doc(hidden)]
-pub fn limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
+#[cfg(not(feature = "test_build"))]
+const MAX_OVER_3: Limb = Limb::MAX / 3;
+
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// quotient limbs of the `Natural` divided by 3. The limb slice must be nonempty. The `Natural`
+// must be exactly divisible by 3. If it isn't, the behavior of this function is undefined.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is empty.
+//
+// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0
+// and no carry-in, where the result is returned.
+pub_test! {limbs_div_exact_3(ns: &[Limb]) -> Vec<Limb> {
     let mut q = vec![0; ns.len()];
     limbs_div_exact_3_to_out(&mut q, ns);
     q
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and 3 to an output slice. The output slice must be at
-/// least as long as the input slice. The input limb slice must be nonempty. The `Natural` must be
-/// exactly divisible by 3. If it isn't, the behavior of this function is undefined.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `ns` or if `ns` is empty.
-///
-/// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
-/// no carry-in, and no return value.
-#[doc(hidden)]
-pub fn limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the quotient of the `Natural` and 3 to an output slice. The output slice must be at
+// least as long as the input slice. The input limb slice must be nonempty. The `Natural` must be
+// exactly divisible by 3. If it isn't, the behavior of this function is undefined.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `ns` or if `ns` is empty.
+//
+// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
+// no carry-in, and no return value.
+pub_test! {limbs_div_exact_3_to_out(out: &mut [Limb], ns: &[Limb]) {
     let (out_last, out_init) = out[..ns.len()].split_last_mut().unwrap();
     let (ns_last, ns_init) = ns.split_last().unwrap();
     let q = limbs_div_divisor_of_limb_max_with_carry_to_out(out_init, ns_init, MAX_OVER_3, 0);
     let lower = (DoubleLimb::from(*ns_last) * DoubleLimb::from(MAX_OVER_3)).lower_half();
     *out_last = q.wrapping_sub(lower);
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and 3 to the input slice. The input limb slice must be
-/// nonempty. The `Natural` must be exactly divisible by 3. If it isn't, the behavior of this
-/// function is undefined.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is empty.
-///
-/// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
-/// no carry-in, and no return value, where rp == up.
-#[doc(hidden)]
-pub fn limbs_div_exact_3_in_place(ns: &mut [Limb]) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the quotient of the `Natural` and 3 to the input slice. The input limb slice must be
+// nonempty. The `Natural` must be exactly divisible by 3. If it isn't, the behavior of this
+// function is undefined.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is empty.
+//
+// This is mpn_divexact_by3c from mpn/generic/diveby3.c, GMP 6.2.1, with DIVEXACT_BY3_METHOD == 0,
+// no carry-in, and no return value, where rp == up.
+pub_crate_test! {limbs_div_exact_3_in_place(ns: &mut [Limb]) {
     let (ns_last, ns_init) = ns.split_last_mut().unwrap();
     let q = limbs_div_divisor_of_limb_max_with_carry_in_place(ns_init, MAX_OVER_3, 0);
     let lower = (DoubleLimb::from(*ns_last) * DoubleLimb::from(MAX_OVER_3)).lower_half();
     *ns_last = q.wrapping_sub(lower);
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and a `Limb` to an output slice. The output slice must be
-/// at least as long as the input slice. The divisor limb cannot be zero and the input limb slice
-/// must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't, the
-/// behavior of this function is undefined.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
-///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the quotient of the `Natural` and a `Limb` to an output slice. The output slice must be
+// at least as long as the input slice. The divisor limb cannot be zero and the input limb slice
+// must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't, the
+// behavior of this function is undefined.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `ns`, `ns` is empty, or if `d` is zero.
+//
+// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1.
+pub_test! {limbs_div_exact_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_to_out(out, ns)
     } else {
         limbs_div_exact_limb_to_out_no_special_3(out, ns, d);
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
-/// limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
-/// the behavior of this function is undefined.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is empty or if `d` is zero.
-///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
-#[doc(hidden)]
-pub fn limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
+// limb slice must be nonempty. The `Natural` must be exactly divisible by the `Limb`. If it isn't,
+// the behavior of this function is undefined.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is empty or if `d` is zero.
+//
+// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where the result is returned.
+pub_test! {limbs_div_exact_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
     if d == 3 {
         limbs_div_exact_3(ns)
     } else {
         limbs_div_exact_limb_no_special_3(ns, d)
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and a `Limb` to the input slice. The divisor limb cannot
-/// be zero and the input limb slice must be nonempty. The `Natural` must be exactly divisible by
-/// the `Limb`. If it isn't, the behavior of this function is undefined.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is empty or if `d` is zero.
-///
-/// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dest == src.
-#[doc(hidden)]
-pub fn limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the quotient of the `Natural` and a `Limb` to the input slice. The divisor limb cannot
+// be zero and the input limb slice must be nonempty. The `Natural` must be exactly divisible by
+// the `Limb`. If it isn't, the behavior of this function is undefined.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is empty or if `d` is zero.
+//
+// This is mpn_divexact_1 from mpn/generic/dive_1.c, GMP 6.2.1, where dest == src.
+pub_crate_test! {limbs_div_exact_limb_in_place(ns: &mut [Limb], d: Limb) {
     if d == 3 {
         limbs_div_exact_3_in_place(ns)
     } else {
         limbs_div_exact_limb_in_place_no_special_3(ns, d)
     }
-}
+}}
 
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// Result is O(`n`)
-///
-/// This is mpn_binvert_itch from mpn/generic/binvert.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// Result is O(`n`)
+//
+// This is mpn_binvert_itch from mpn/generic/binvert.c, GMP 6.2.1.
+pub_crate_test! {limbs_modular_invert_scratch_len(n: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(n);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(
         itch_local,
@@ -405,10 +390,9 @@ pub fn limbs_modular_invert_scratch_len(n: usize) -> usize {
         n.shr_round(1, RoundingMode::Ceiling),
     );
     itch_local + itch_out
-}
+}}
 
-#[doc(hidden)]
-pub fn limbs_modular_invert_small(
+pub_test! {limbs_modular_invert_small(
     size: usize,
     is: &mut [Limb],
     scratch: &mut [Limb],
@@ -420,24 +404,23 @@ pub fn limbs_modular_invert_small(
     } else {
         limbs_modular_div_divide_and_conquer(is, scratch, ds, d_inv);
     }
-}
+}}
 
-/// Finds the inverse of a slice `Limb` mod 2<sup>`ds.len() * Limb::WIDTH`</sup>; given x, returns y
-/// such that x * y ≡ 1 mod 2<sup>`ds.len() * Limb::WIDTH`</sup>. This inverse only exists for odd
-/// x, so the least-significant limb of `ds` must be odd.
-///
-/// Time: O(n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = `ds.len()`
-///
-/// # Panics
-/// Panics if `is` is shorter than `ds`, if `ds` is empty, or if `scratch` is too short.
-///
-/// This is mpn_binvert from mpn/generic/binvert.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
+// Finds the inverse of a slice `Limb` mod 2<sup>`ds.len() * Limb::WIDTH`</sup>; given x, returns y
+// such that x * y ≡ 1 mod 2<sup>`ds.len() * Limb::WIDTH`</sup>. This inverse only exists for odd
+// x, so the least-significant limb of `ds` must be odd.
+//
+// Time: O(n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = `ds.len()`
+//
+// # Panics
+// Panics if `is` is shorter than `ds`, if `ds` is empty, or if `scratch` is too short.
+//
+// This is mpn_binvert from mpn/generic/binvert.c, GMP 6.2.1.
+pub_crate_test! {limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     // Compute the computation precisions from highest to lowest, leaving the basecase size in
     // `size`.
@@ -471,28 +454,27 @@ pub fn limbs_modular_invert(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) 
         limbs_twos_complement_in_place(&mut is_hi[..diff]);
         previous_size = size;
     }
-}
+}}
 
-/// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()`. D must be odd. `d_inv` is
-/// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
-///
-/// Output:
-///    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
-///    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
-///
-/// Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
-/// the subtraction N - Q * D.
-///
-/// Time: worst case O(n ^ 2)
-///
-/// where n = `ns.len()`
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_sbpi1_bdiv_qr from mpn/generic/sbpi1_bdiv_qr.c, GMP 6.2.1. Note: need to investigate
-/// changes from 6.1.2.
-#[doc(hidden)]
-pub fn limbs_modular_div_mod_schoolbook(
+// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()`. D must be odd. `d_inv` is
+// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+//
+// Output:
+//    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
+//    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
+//
+// Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
+// the subtraction N - Q * D.
+//
+// Time: worst case O(n ^ 2)
+//
+// where n = `ns.len()`
+//
+// Additional memory: worst case O(1)
+//
+// This is mpn_sbpi1_bdiv_qr from mpn/generic/sbpi1_bdiv_qr.c, GMP 6.2.1. Note: need to investigate
+// changes from 6.1.2.
+pub_crate_test! {limbs_modular_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -548,7 +530,7 @@ pub fn limbs_modular_div_mod_schoolbook(
         assert!(carry || !highest_r);
         carry != highest_r
     }
-}
+}}
 
 fn limbs_modular_div_mod_helper(
     qs: &mut [Limb],
@@ -607,26 +589,25 @@ fn limbs_modular_div_mod_divide_and_conquer_helper(
     }
 }
 
-/// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()` and a remainder of size
-/// `rs.len()`. D must be odd. `d_inv` is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or
-/// `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
-///
-/// Output:
-///    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
-///    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
-///
-/// Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
-/// the subtraction N - Q * D.
-///
-/// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `ns.len()`, d = `ds.len()`
-///
-/// This is mpn_dcpi1_bdiv_qr from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_div_mod_divide_and_conquer(
+// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()` and a remainder of size
+// `rs.len()`. D must be odd. `d_inv` is (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or
+// `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+//
+// Output:
+//    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
+//    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
+//
+// Stores the `ds.len()` least-significant limbs of R at `&np[q_len..]` and returns the borrow from
+// the subtraction N - Q * D.
+//
+// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = `ns.len()`, d = `ds.len()`
+//
+// This is mpn_dcpi1_bdiv_qr from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
+pub_crate_test! {limbs_modular_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -698,21 +679,19 @@ pub fn limbs_modular_div_mod_divide_and_conquer(
         borrow = true;
     }
     borrow
-}
+}}
 
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_dcpi1_bdiv_qr_n_itch from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
-#[doc(hidden)]
-pub const fn limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// This is mpn_dcpi1_bdiv_qr_n_itch from mpn/generic/dcpi1_bdiv_qr.c, GMP 6.2.1.
+pub_const_test! {limbs_modular_div_mod_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
-}
+}}
 
-/// This is mpn_mu_bdiv_qr_itch from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+// This is mpn_mu_bdiv_qr_itch from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
+pub_crate_test! {limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let q_len = n_len - d_len;
     let i_len = if q_len > d_len {
@@ -733,7 +712,7 @@ pub fn limbs_modular_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> 
     let modular_invert_scratch_len = limbs_modular_invert_scratch_len(i_len);
     let scratch_len = mul_len_1 + mul_len_2;
     i_len + max(scratch_len, modular_invert_scratch_len)
-}
+}}
 
 fn limbs_modular_div_mod_barrett_unbalanced(
     qs: &mut [Limb],
@@ -922,27 +901,26 @@ fn limbs_modular_div_mod_barrett_balanced(
     )
 }
 
-/// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()` and a remainder of size
-/// `ds.len()`. D must be odd.
-///
-/// Output:
-///    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
-///    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()` + 2, `qs` has
-/// length less than `ns.len()` - `ds.len()`, `rs` is shorter than `ds`, `scratch` is to short, or
-/// the last limb of `ds` is even.
-///
-/// This is mpn_mu_bdiv_qr from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_div_mod_barrett(
+// Computes a binary quotient of size `q_len` = `ns.len()` - `ds.len()` and a remainder of size
+// `ds.len()`. D must be odd.
+//
+// Output:
+//    Q = N / D mod 2 ^ (`Limb::WIDTH` * `q_len`)
+//    R = (N - Q * D) / 2 ^ (`Limb::WIDTH` * `q_len`)
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()` + 2, `qs` has
+// length less than `ns.len()` - `ds.len()`, `rs` is shorter than `ds`, `scratch` is to short, or
+// the last limb of `ds` is even.
+//
+// This is mpn_mu_bdiv_qr from mpn/generic/mu_bdiv_qr.c, GMP 6.2.1.
+pub_crate_test! {limbs_modular_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -958,33 +936,37 @@ pub fn limbs_modular_div_mod_barrett(
     } else {
         limbs_modular_div_mod_barrett_balanced(qs, rs, ns, ds, scratch)
     }
-}
+}}
 
-/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
-/// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
-///
-/// The straightforward way to compute Q is to cancel one limb at a time, using
-///     qs\[i\] = D ^ (-1) * ns\[i\] mod 2 ^ `Limb::WIDTH`
-///     N -= 2 ^ (Limb::WIDTH * i) * qs\[i\] * D
-///
-/// But we prefer addition to subtraction, since
-/// `limbs_slice_add_mul_limb_same_length_in_place_left` is often faster than
-/// `limbs_sub_mul_limb_same_length_in_place_left`. Q = -N / D can be computed by iterating
-///     qs\[i\] = (-D) ^ (-1) * ns\[i\] mod 2 ^ `Limb::WIDTH`
-///     N += 2 ^ (Limb::WIDTH * i) * qs\[i\] * D
-///
-/// And then we flip the sign: -Q = ~Q + 1.
-///
-/// Time: worst case O(n ^ 2)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_sbpi1_bdiv_q from mpn/generic/sbpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
-/// changes from 6.1.2.
-#[doc(hidden)]
-pub fn limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
+// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
+// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+//
+// The straightforward way to compute Q is to cancel one limb at a time, using
+//     qs\[i\] = D ^ (-1) * ns\[i\] mod 2 ^ `Limb::WIDTH`
+//     N -= 2 ^ (Limb::WIDTH * i) * qs\[i\] * D
+//
+// But we prefer addition to subtraction, since
+// `limbs_slice_add_mul_limb_same_length_in_place_left` is often faster than
+// `limbs_sub_mul_limb_same_length_in_place_left`. Q = -N / D can be computed by iterating
+//     qs\[i\] = (-D) ^ (-1) * ns\[i\] mod 2 ^ `Limb::WIDTH`
+//     N += 2 ^ (Limb::WIDTH * i) * qs\[i\] * D
+//
+// And then we flip the sign: -Q = ~Q + 1.
+//
+// Time: worst case O(n ^ 2)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// This is mpn_sbpi1_bdiv_q from mpn/generic/sbpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
+// changes from 6.1.2.
+pub_test! {limbs_modular_div_schoolbook(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    d_inv: Limb
+) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1010,17 +992,16 @@ pub fn limbs_modular_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb
     }
     qs[last_index] = !d_inv.wrapping_mul(ns[last_index]);
     limbs_slice_add_limb_in_place(qs, 1);
-}
+}}
 
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub const fn limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// This is mpn_dcpi1_bdiv_q_n_itch from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1.
+pub_const_test! {limbs_modular_div_divide_and_conquer_helper_scratch_len(n: usize) -> usize {
     n
-}
+}}
 
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
@@ -1065,19 +1046,18 @@ fn limbs_modular_div_divide_and_conquer_helper(
     limbs_modular_div_schoolbook(&mut qs[m..], &mut ns[m..n], &ds[..n_rem], d_inv);
 }
 
-/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
-/// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
-///
-/// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `ns.len()`, d = `ds.len()`
-///
-/// This is mpn_dcpi1_bdiv_q from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
-/// changes from 6.1.2.
-#[doc(hidden)]
-pub fn limbs_modular_div_divide_and_conquer(
+// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), destroying N. D must be odd. `d_inv` is
+// (-D) ^ -1 mod 2 ^ `Limb::WIDTH`, or `limbs_modular_invert_limb(ds[0]).wrapping_neg()`.
+//
+// Time: worst case O(n * log(d) ^ 2 * log(log(d)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = `ns.len()`, d = `ds.len()`
+//
+// This is mpn_dcpi1_bdiv_q from mpn/generic/dcpi1_bdiv_q.c, GMP 6.2.1. Note: need to investigate
+// changes from 6.1.2.
+pub_test! {limbs_modular_div_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -1143,11 +1123,10 @@ pub fn limbs_modular_div_divide_and_conquer(
         let mut scratch = vec![0; n_len];
         limbs_modular_div_divide_and_conquer_helper(qs, ns, ds, d_inv, &mut scratch);
     }
-}
+}}
 
-/// This is mpn_mu_bdiv_q_itch from mpn/generic/mu_bdiv_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+// This is mpn_mu_bdiv_q_itch from mpn/generic/mu_bdiv_q.c, GMP 6.2.1.
+pub_test! {limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     assert!(DC_BDIV_Q_THRESHOLD < MU_BDIV_Q_THRESHOLD);
     let i_len;
     let mul_len = if n_len > d_len {
@@ -1178,7 +1157,7 @@ pub fn limbs_modular_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usiz
     };
     let invert_len = limbs_modular_invert_scratch_len(i_len);
     i_len + max(mul_len, invert_len)
-}
+}}
 
 fn limbs_modular_div_barrett_greater(
     qs: &mut [Limb],
@@ -1330,17 +1309,21 @@ fn limbs_modular_div_barrett_same_length(
     limbs_mul_low_same_length(qs_hi, &scratch[..diff], &is[..diff]);
 }
 
-/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`). D must be odd.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_mu_bdiv_q from mpn/generic/mu_bdiv_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`). D must be odd.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// This is mpn_mu_bdiv_q from mpn/generic/mu_bdiv_q.c, GMP 6.2.1.
+pub_test! {limbs_modular_div_barrett(
+    qs: &mut [Limb],
+    ns: &[Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb]
+) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(d_len >= 2);
@@ -1350,31 +1333,29 @@ pub fn limbs_modular_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scra
     } else {
         limbs_modular_div_barrett_same_length(qs, ns, ds, scratch);
     }
-}
+}}
 
-/// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, GMP 6.2.1, where nothing is allocated for
-/// inputs that are too small for Barrett division. Note: need to investigate changes from 6.1.2.
-#[doc(hidden)]
-pub fn limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
+// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, GMP 6.2.1, where nothing is allocated for
+// inputs that are too small for Barrett division. Note: need to investigate changes from 6.1.2.
+pub_test! {limbs_modular_div_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         0
     } else {
         limbs_modular_div_barrett_scratch_len(n_len, d_len)
     }
-}
+}}
 
-/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), taking N by value. D must be odd.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_bdiv_q from mpn/generic/bdiv_q.c, GMP 6.2.1. Note: need to investigate changes from
-/// 6.1.2.
-#[doc(hidden)]
-pub fn limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
+// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), taking N by value. D must be odd.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// This is mpn_bdiv_q from mpn/generic/bdiv_q.c, GMP 6.2.1. Note: need to investigate changes from
+// 6.1.2.
+pub_test! {limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
         let d_inv = limbs_modular_invert_limb(ds[0]).wrapping_neg();
@@ -1385,29 +1366,27 @@ pub fn limbs_modular_div(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], scratch:
     } else {
         limbs_modular_div_barrett(qs, ns, ds, scratch);
     }
-}
+}}
 
-/// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
+// This is mpn_bdiv_q_itch from mpn/generic/bdiv_q.c, GMP 6.2.1.
+pub_test! {limbs_modular_div_ref_scratch_len(n_len: usize, d_len: usize) -> usize {
     if d_len < MU_BDIV_Q_THRESHOLD {
         n_len
     } else {
         limbs_modular_div_barrett_scratch_len(n_len, d_len)
     }
-}
+}}
 
-/// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), taking N by reference. D must be odd.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_bdiv_q from mpn/generic/bdiv_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
+// Computes Q = N / D mod 2 ^ (`Limb::WIDTH` * `ns.len()`), taking N by reference. D must be odd.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// This is mpn_bdiv_q from mpn/generic/bdiv_q.c, GMP 6.2.1.
+pub_test! {limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     if d_len < DC_BDIV_Q_THRESHOLD {
@@ -1423,84 +1402,58 @@ pub fn limbs_modular_div_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch:
     } else {
         limbs_modular_div_barrett(qs, ns, ds, scratch);
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, returning the quotient. The quotient has `ns.len() - ds.len() + 1`
-/// limbs.
-///
-/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
-/// meaningless result.
-///
-/// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
-/// significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is shorter than `ds`, `ds` is empty, or the most-significant limb of `ds` is
-/// zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact;
-///
-/// assert_eq!(limbs_div_exact(&[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]), vec![0, 6, 7]);
-/// assert_eq!(
-///     limbs_div_exact(&[10200, 20402, 30605, 20402, 10200], &[100, 101, 102]),
-///     vec![102, 101, 100]
-/// );
-/// ```
-///
-/// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1, where scratch is allocated
-/// internally and qp is returned.
-#[doc(hidden)]
-pub fn limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, returning the quotient. The quotient has `ns.len() - ds.len() + 1`
+// limbs.
+//
+// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+// meaningless result.
+//
+// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
+// significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is shorter than `ds`, `ds` is empty, or the most-significant limb of `ds` is
+// zero.
+//
+// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1, where scratch is allocated
+// internally and qp is returned.
+pub_test! {limbs_div_exact(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut qs = vec![0; ns.len() - ds.len() + 1];
     limbs_div_exact_to_out_ref_ref(&mut qs, ns, ds);
     qs
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
-/// `ns` and `ds` are taken by value.
-///
-/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
-/// meaningless result.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must be nonempty and its most significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
-/// limb of `ds` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out;
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out(qs, &mut [0, 0, 0, 6, 19, 32, 21], &mut [0, 0, 1, 2, 3]);
-/// assert_eq!(qs, &[0, 6, 7, 10]);
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out(qs, &mut [10200, 20402, 30605, 20402, 10200], &mut [100, 101, 102]);
-/// assert_eq!(qs, &[102, 101, 100, 10]);
-/// ```
-///
-/// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+// `ns` and `ds` are taken by value.
+//
+// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+// meaningless result.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// and `ds` must be nonempty and its most significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
+// limb of `ds` is zero.
+//
+// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+pub_test! {limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1529,48 +1482,30 @@ pub fn limbs_div_exact_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb])
     let d_len = min(d_len, q_len);
     let mut scratch = vec![0; limbs_modular_div_scratch_len(q_len, d_len)];
     limbs_modular_div(qs, &mut ns[..q_len], &ds[..d_len], &mut scratch);
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
-/// `ns` is taken by value and `ds` by reference.
-///
-/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
-/// meaningless result.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must be nonempty and its most significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
-/// limb of `ds` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_val_ref;
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out_val_ref(qs, &mut [0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]);
-/// assert_eq!(qs, &[0, 6, 7, 10]);
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out_val_ref(
-///     qs,
-///     &mut [10200, 20402, 30605, 20402, 10200],
-///     &[100, 101, 102]
-/// );
-/// assert_eq!(qs, &[102, 101, 100, 10]);
-/// ```
-///
-/// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+// `ns` is taken by value and `ds` by reference.
+//
+// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+// meaningless result.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// and `ds` must be nonempty and its most significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
+// limb of `ds` is zero.
+//
+// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+pub_test! {limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1602,48 +1537,30 @@ pub fn limbs_div_exact_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Li
     let d_len = min(d_len, q_len);
     let mut scratch = vec![0; limbs_modular_div_scratch_len(q_len, d_len)];
     limbs_modular_div(qs, &mut ns[..q_len], &ds[..d_len], &mut scratch);
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
-/// `ns` is taken by reference and `ds` by value.
-///
-/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
-/// meaningless result.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must be nonempty and its most significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
-/// limb of `ds` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_ref_val;
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out_ref_val(qs, &[0, 0, 0, 6, 19, 32, 21], &mut [0, 0, 1, 2, 3]);
-/// assert_eq!(qs, &[0, 6, 7, 10]);
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out_ref_val(
-///     qs,
-///     &[10200, 20402, 30605, 20402, 10200],
-///     &mut [100, 101, 102]
-/// );
-/// assert_eq!(qs, &[102, 101, 100, 10]);
-/// ```
-///
-/// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+// `ns` is taken by reference and `ds` by value.
+//
+// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+// meaningless result.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// and `ds` must be nonempty and its most significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
+// limb of `ds` is zero.
+//
+// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+pub_test! {limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1676,44 +1593,30 @@ pub fn limbs_div_exact_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Li
     let d_len = min(d_len, q_len);
     let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(q_len, d_len)];
     limbs_modular_div_ref(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
-/// `ns` and `ds` are taken by reference.
-///
-/// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
-/// meaningless result.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must be nonempty and its most significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
-/// limb of `ds` is zero.
-///
-/// # Examples
-/// ```
-/// use malachite_nz::natural::arithmetic::div_exact::limbs_div_exact_to_out_ref_ref;
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out_ref_ref(qs, &[0, 0, 0, 6, 19, 32, 21], &[0, 0, 1, 2, 3]);
-/// assert_eq!(qs, &[0, 6, 7, 10]);
-///
-/// let qs = &mut [10; 4];
-/// limbs_div_exact_to_out_ref_ref(qs, &[10200, 20402, 30605, 20402, 10200], &[100, 101, 102]);
-/// assert_eq!(qs, &[102, 101, 100, 10]);
-/// ```
-///
-/// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+// `ns` and `ds` are taken by reference.
+//
+// `ns` must be exactly divisible by `ds`! If it isn't, the function will panic or return a
+// meaningless result.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// and `ds` must be nonempty and its most significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` is empty, or the most-significant
+// limb of `ds` is zero.
+//
+// This is mpn_divexact from mpn/generic/divexact.c, GMP 6.2.1.
+pub_test! {limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -1749,7 +1652,7 @@ pub fn limbs_div_exact_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb])
     let d_len = min(d_len, q_len);
     let mut scratch = vec![0; limbs_modular_div_ref_scratch_len(q_len, d_len)];
     limbs_modular_div_ref(qs, &ns[..q_len], &ds[..d_len], &mut scratch);
-}
+}}
 
 impl Natural {
     fn div_exact_limb_ref(&self, other: Limb) -> Natural {

@@ -1,4 +1,4 @@
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     from_sci_string_options_gen, from_sci_string_options_rounding_mode_pair_gen,
     from_sci_string_options_unsigned_pair_gen_var_1,
 };

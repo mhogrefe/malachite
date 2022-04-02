@@ -1,7 +1,7 @@
 use malachite_base::num::conversion::traits::IsInteger;
-use malachite_base_test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::common::GenConfig;
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz::test_util::generators::integer_gen;
 use std::str::FromStr;
 
 #[test]

@@ -23,7 +23,7 @@ impl Default for SciSizeOptions {
 }
 
 impl SciSizeOptions {
-    #[doc(hidden)]
+    #[cfg(feature = "test_build")]
     pub const fn is_valid(&self) -> bool {
         if let SciSizeOptions::Precision(p) = *self {
             p != 0
@@ -229,7 +229,7 @@ impl ToSciOptions {
         self.include_trailing_zeros = include_trailing_zeros;
     }
 
-    #[doc(hidden)]
+    #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         (2..=36).contains(&self.base) && self.neg_exp_threshold < 0 && self.size_options.is_valid()
     }
@@ -288,7 +288,7 @@ impl FromSciStringOptions {
         self.rounding_mode = rm;
     }
 
-    #[doc(hidden)]
+    #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         (2..=36).contains(&self.base)
     }

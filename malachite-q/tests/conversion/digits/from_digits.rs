@@ -3,7 +3,7 @@ use malachite_base::num::conversion::traits::Digits;
 use malachite_base::rational_sequences::RationalSequence;
 use malachite_base::vecs::vec_from_str;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     large_type_gen_var_25, natural_vec_natural_pair_gen_var_2,
 };
 use malachite_q::Rational;

@@ -1,9 +1,9 @@
 use malachite_base::num::arithmetic::traits::Sign;
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz::test_util::generators::integer_gen;
+use malachite_q::test_util::arithmetic::sign::num_sign;
+use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
-use malachite_q_test_util::arithmetic::sign::num_sign;
-use malachite_q_test_util::common::{rational_to_bigrational, rational_to_rug_rational};
-use malachite_q_test_util::generators::rational_gen;
 use num::BigRational;
 use rug;
 use std::cmp::Ordering;

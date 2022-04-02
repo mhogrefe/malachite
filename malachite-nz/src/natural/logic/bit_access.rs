@@ -5,76 +5,72 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, gets a bit of
-/// the `Natural` at a specified index. Sufficiently high indices will return `false`.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpz_tstbit from mpz/tstbit.c, GMP 6.1.2, where the input is non-negative.
-#[doc(hidden)]
-pub fn limbs_get_bit(xs: &[Limb], index: u64) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, gets a bit of
+// the `Natural` at a specified index. Sufficiently high indices will return `false`.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// This is mpz_tstbit from mpz/tstbit.c, GMP 6.1.2, where the input is non-negative.
+pub_crate_test! {limbs_get_bit(xs: &[Limb], index: u64) -> bool {
     xs.get(usize::exact_from(index >> Limb::LOG_WIDTH))
         .map_or(false, |x| x.get_bit(index & Limb::WIDTH_MASK))
-}
+}}
 
 fn limbs_set_bit_helper(xs: &mut [Limb], index: u64, limb_index: usize) {
     xs[limb_index].set_bit(index & Limb::WIDTH_MASK);
 }
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
-/// the `Natural` at a specified index to `true`. Indices that are outside the bounds of the slice
-/// will cause a panic.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Panics
-/// Panics if `index` >= `xs.len()` * `Limb::WIDTH`.
-///
-/// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative and bit_idx small
-/// enough that no additional memory needs to be given to d.
-#[doc(hidden)]
-pub fn limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+// the `Natural` at a specified index to `true`. Indices that are outside the bounds of the slice
+// will cause a panic.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// # Panics
+// Panics if `index` >= `xs.len()` * `Limb::WIDTH`.
+//
+// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative and bit_idx small
+// enough that no additional memory needs to be given to d.
+pub_crate_test! {limbs_slice_set_bit(xs: &mut [Limb], index: u64) {
     limbs_set_bit_helper(xs, index, usize::exact_from(index >> Limb::LOG_WIDTH));
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
-/// the `Natural` at a specified index to `true`. Sufficiently high indices will increase the length
-/// of the limbs vector.
-///
-/// Time: worst case O(`index`)
-///
-/// Additional memory: worst case O(`index`)
-///
-/// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative.
-#[doc(hidden)]
-pub fn limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+// the `Natural` at a specified index to `true`. Sufficiently high indices will increase the length
+// of the limbs vector.
+//
+// Time: worst case O(`index`)
+//
+// Additional memory: worst case O(`index`)
+//
+// This is mpz_setbit from mpz/setbit.c, GMP 6.1.2, where d is non-negative.
+pub_test! {limbs_vec_set_bit(xs: &mut Vec<Limb>, index: u64) {
     let small_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if small_index >= xs.len() {
         xs.resize(small_index + 1, 0);
     }
     limbs_set_bit_helper(xs, index, small_index);
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
-/// the `Natural` at a specified index to `false`. Indices that are outside the bounds of the slice
-/// will result in no action being taken, since there are infinitely many leading zeros.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is non-negative.
-#[doc(hidden)]
-pub fn limbs_clear_bit(xs: &mut [Limb], index: u64) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, sets a bit of
+// the `Natural` at a specified index to `false`. Indices that are outside the bounds of the slice
+// will result in no action being taken, since there are infinitely many leading zeros.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// This is mpz_clrbit from mpz/clrbit.c, GMP 6.1.2, where d is non-negative.
+pub_crate_test! {limbs_clear_bit(xs: &mut [Limb], index: u64) {
     let small_index = usize::exact_from(index >> Limb::LOG_WIDTH);
     if small_index < xs.len() {
         xs[small_index].clear_bit(index & Limb::WIDTH_MASK);
     }
-}
+}}
 
 /// Provides functions for accessing and modifying the `index`th bit of a `Natural`, or the
 /// coefficient of 2<sup>`index`</sup> in its binary expansion.

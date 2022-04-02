@@ -15,21 +15,20 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
-/// Interpreting two `Vec<Limb>`s as the limbs (in ascending order) of two `Natural`s, returns a
-/// `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
-/// are already reduced mod 2<sup>`pow`</sup>. The input `Vec`s may be mutated. Neither input may be
-/// empty or have trailing zeros.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `pow`
-///
-/// # Panics
-/// Panics if either input is empty. May panic if either input has trailing zeros.
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
+// Interpreting two `Vec<Limb>`s as the limbs (in ascending order) of two `Natural`s, returns a
+// `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
+// are already reduced mod 2<sup>`pow`</sup>. The input `Vec`s may be mutated. Neither input may be
+// empty or have trailing zeros.
+//
+// Time: worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = `pow`
+//
+// # Panics
+// Panics if either input is empty. May panic if either input has trailing zeros.
+pub_test! {limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64) -> Vec<Limb> {
     if std::ptr::eq(xs.as_slice(), ys.as_slice()) {
         return limbs_mod_power_of_2_square(xs, pow);
     }
@@ -58,23 +57,26 @@ pub fn limbs_mod_power_of_2_mul(xs: &mut Vec<Limb>, ys: &mut Vec<Limb>, pow: u64
     };
     limbs_vec_mod_power_of_2_in_place(&mut product, pow);
     product
-}
+}}
 
-/// Interpreting a slice of `Limb` and a `Vec<Limb>` as the limbs (in ascending order) of two
-/// `Natural`s, returns a `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>.
-/// Assumes the inputs are already reduced mod 2<sup>`pow`</sup>. The input `Vec` may be mutated.
-/// Neither input may be empty or have trailing zeros.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `pow`
-///
-/// # Panics
-/// Panics if either input is empty. May panic if either input has trailing zeros.
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb` and a `Vec<Limb>` as the limbs (in ascending order) of two
+// `Natural`s, returns a `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>.
+// Assumes the inputs are already reduced mod 2<sup>`pow`</sup>. The input `Vec` may be mutated.
+// Neither input may be empty or have trailing zeros.
+//
+// Time: worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = `pow`
+//
+// # Panics
+// Panics if either input is empty. May panic if either input has trailing zeros.
+pub_test! {limbs_mod_power_of_2_mul_val_ref(
+    xs: &mut Vec<Limb>,
+    ys: &[Limb],
+    pow: u64
+) -> Vec<Limb> {
     if std::ptr::eq(xs.as_slice(), ys) {
         return limbs_mod_power_of_2_square(xs, pow);
     }
@@ -108,22 +110,21 @@ pub fn limbs_mod_power_of_2_mul_val_ref(xs: &mut Vec<Limb>, ys: &[Limb], pow: u6
     };
     limbs_vec_mod_power_of_2_in_place(&mut product, pow);
     product
-}
+}}
 
-/// Interpreting two slices of `Limb` as the limbs (in ascending order) of two `Natural`s, returns a
-/// `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
-/// are already reduced mod 2<sup>`pow`</sup>. Neither input may be empty or have trailing zeros.
-///
-/// Time: worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `pow`
-///
-/// # Panics
-/// Panics if either input is empty. May panic if either input has trailing zeros.
-#[doc(hidden)]
-pub fn limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting two slices of `Limb` as the limbs (in ascending order) of two `Natural`s, returns a
+// `Vec` of the limbs of the product of the `Natural`s mod 2<sup>`pow`</sup>. Assumes the inputs
+// are already reduced mod 2<sup>`pow`</sup>. Neither input may be empty or have trailing zeros.
+//
+// Time: worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = `pow`
+//
+// # Panics
+// Panics if either input is empty. May panic if either input has trailing zeros.
+pub_test! {limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> Vec<Limb> {
     if std::ptr::eq(xs, ys) {
         return limbs_mod_power_of_2_square_ref(xs, pow);
     }
@@ -162,7 +163,7 @@ pub fn limbs_mod_power_of_2_mul_ref_ref(xs: &[Limb], ys: &[Limb], pow: u64) -> V
     };
     limbs_vec_mod_power_of_2_in_place(&mut product, pow);
     product
-}
+}}
 
 impl Natural {
     fn mod_power_of_2_mul_limb_ref(&self, y: Limb, pow: u64) -> Natural {

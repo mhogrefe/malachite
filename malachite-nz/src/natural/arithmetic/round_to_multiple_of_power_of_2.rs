@@ -14,16 +14,15 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` rounded down to a multiple of 2<sup>`pow`</sup>.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` rounded down to a multiple of 2<sup>`pow`</sup>.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+pub_test! {limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
     if clear_count >= xs_len {
@@ -37,19 +36,18 @@ pub fn limbs_round_to_multiple_of_power_of_2_down(xs: &[Limb], pow: u64) -> Vec<
         }
         out
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` rounded up to a multiple of 2<sup>`pow`</sup>. The limbs should not all
-/// be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(xs.len(), pow / Limb::WIDTH)
-#[doc(hidden)]
-pub fn limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` rounded up to a multiple of 2<sup>`pow`</sup>. The limbs should not all
+// be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(xs.len(), pow / Limb::WIDTH)
+pub_test! {limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
     let mut out;
@@ -75,7 +73,7 @@ pub fn limbs_round_to_multiple_of_power_of_2_up(xs: &[Limb], pow: u64) -> Vec<Li
         }
     }
     out
-}
+}}
 
 fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(xs: &[Limb], pow: u64) -> Vec<Limb> {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
@@ -100,17 +98,16 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even(xs: &[Limb], pow: 
     }
 }
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` rounded to the nearest multiple of 2<sup>`pow`</sup>. If the original
-/// value is exactly between two multiples, it is rounded to the one whose `pow`th bit is zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-#[doc(hidden)]
-pub fn limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` rounded to the nearest multiple of 2<sup>`pow`</sup>. If the original
+// value is exactly between two multiples, it is rounded to the one whose `pow`th bit is zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+pub_test! {limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> Vec<Limb> {
     if pow == 0 {
         xs.to_vec()
     } else if !limbs_get_bit(xs, pow - 1) {
@@ -120,20 +117,19 @@ pub fn limbs_round_to_multiple_of_power_of_2_nearest(xs: &[Limb], pow: u64) -> V
     } else {
         limbs_round_to_multiple_of_power_of_2_half_integer_to_even(xs, pow)
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` rounded to a multiple of 2<sup>`pow`</sup>, using a specified rounding
-/// format. If the original value is not already a multiple of the power of 2, and the
-/// `RoundingMode` is `Exact`, `None` is returned. The limbs should not all be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-#[doc(hidden)]
-pub fn limbs_round_to_multiple_of_power_of_2(
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` rounded to a multiple of 2<sup>`pow`</sup>, using a specified rounding
+// format. If the original value is not already a multiple of the power of 2, and the
+// `RoundingMode` is `Exact`, `None` is returned. The limbs should not all be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+pub_test! {limbs_round_to_multiple_of_power_of_2(
     xs: &[Limb],
     pow: u64,
     rm: RoundingMode,
@@ -154,18 +150,17 @@ pub fn limbs_round_to_multiple_of_power_of_2(
             }
         }
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural`, rounded down to a multiple of 2<sup>`pow`</sup>, to the input `Vec`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, pow: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural`, rounded down to a multiple of 2<sup>`pow`</sup>, to the input `Vec`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
     if clear_count >= xs_len {
@@ -177,19 +172,18 @@ pub fn limbs_round_to_multiple_of_power_of_2_down_in_place(xs: &mut Vec<Limb>, p
             xs[clear_count] &= !Limb::low_mask(small_pow);
         }
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural`, rounded up to a multiple of 2<sup>`pow`</sup>, to the input `Vec`. The
-/// limbs should not all be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-#[doc(hidden)]
-pub fn limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>, pow: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural`, rounded up to a multiple of 2<sup>`pow`</sup>, to the input `Vec`. The
+// limbs should not all be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+pub_test! {limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>, pow: u64) {
     let clear_count = usize::exact_from(pow >> Limb::LOG_WIDTH);
     let xs_len = xs.len();
     let small_pow = pow & Limb::WIDTH_MASK;
@@ -211,7 +205,7 @@ pub fn limbs_round_to_multiple_of_power_of_2_up_in_place(xs: &mut Vec<Limb>, pow
             xs.push(1);
         }
     }
-}
+}}
 
 fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
     xs: &mut Vec<Limb>,
@@ -238,18 +232,17 @@ fn limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(
     }
 }
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural`, rounded to the nearest multiple of 2<sup>`pow`</sup>, to the input
-/// `Vec`. If the original value is exactly between two multiples, it is rounded to the one whose
-/// `pow`th bit is zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-#[doc(hidden)]
-pub fn limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<Limb>, pow: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural`, rounded to the nearest multiple of 2<sup>`pow`</sup>, to the input
+// `Vec`. If the original value is exactly between two multiples, it is rounded to the one whose
+// `pow`th bit is zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+pub_test! {limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<Limb>, pow: u64) {
     if pow == 0 {
     } else if !limbs_get_bit(xs, pow - 1) {
         limbs_round_to_multiple_of_power_of_2_down_in_place(xs, pow);
@@ -258,21 +251,20 @@ pub fn limbs_round_to_multiple_of_power_of_2_nearest_in_place(xs: &mut Vec<Limb>
     } else {
         limbs_round_to_multiple_of_power_of_2_half_integer_to_even_in_place(xs, pow);
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` rounded to the nearest multiple of 2<sup>`pow`</sup> to the input `Vec`,
-/// using a specified rounding format. If the original value is not already a multiple of the power
-/// of two, and the `RoundingMode` is `Exact`, the value of `xs` becomes unspecified and `false` is
-/// returned. Otherwise, `true` is returned. The limbs should not all be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
-#[doc(hidden)]
-pub fn limbs_round_to_multiple_of_power_of_2_in_place(
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` rounded to the nearest multiple of 2<sup>`pow`</sup> to the input `Vec`,
+// using a specified rounding format. If the original value is not already a multiple of the power
+// of two, and the `RoundingMode` is `Exact`, the value of `xs` becomes unspecified and `false` is
+// returned. Otherwise, `true` is returned. The limbs should not all be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs`.len(), `pow` / `Limb::WIDTH`)
+pub_test! {limbs_round_to_multiple_of_power_of_2_in_place(
     xs: &mut Vec<Limb>,
     pow: u64,
     rm: RoundingMode,
@@ -292,7 +284,7 @@ pub fn limbs_round_to_multiple_of_power_of_2_in_place(
         }
         RoundingMode::Exact => limbs_divisible_by_power_of_2(xs, pow),
     }
-}
+}}
 
 impl RoundToMultipleOfPowerOf2<u64> for Natural {
     type Output = Natural;

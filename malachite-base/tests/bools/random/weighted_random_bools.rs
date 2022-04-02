@@ -1,8 +1,8 @@
 use itertools::Itertools;
 use malachite_base::bools::random::weighted_random_bools;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base_test_util::stats::common_values_map::common_values_map;
-use malachite_base_test_util::stats::median;
+use malachite_base::test_util::stats::common_values_map::common_values_map;
+use malachite_base::test_util::stats::median;
 
 fn weighted_random_bools_helper(
     p_numerator: u64,

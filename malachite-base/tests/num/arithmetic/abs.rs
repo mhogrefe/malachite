@@ -3,7 +3,7 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::{primitive_float_gen, signed_gen_var_1};
+use malachite_base::test_util::generators::{primitive_float_gen, signed_gen_var_1};
 use std::cmp::Ordering;
 
 fn abs_signed_helper<T: PrimitiveSigned>() {

@@ -1,8 +1,8 @@
 use malachite_base::num::arithmetic::traits::{CheckedSqrt, Reciprocal, Square};
 use malachite_base::num::basic::traits::NegativeOne;
-use malachite_nz_test_util::generators::integer_gen_var_4;
+use malachite_nz::test_util::generators::integer_gen_var_4;
+use malachite_q::test_util::generators::rational_gen_var_3;
 use malachite_q::Rational;
-use malachite_q_test_util::generators::rational_gen_var_3;
 use std::str::FromStr;
 
 #[test]

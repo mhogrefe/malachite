@@ -1,11 +1,11 @@
 use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::{signed_unsigned_pair_gen_var_1, unsigned_gen};
+use malachite_base::test_util::generators::{signed_unsigned_pair_gen_var_1, unsigned_gen};
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::common::integer_to_rug_integer;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::integer_to_rug_integer;
+use malachite_nz::test_util::generators::{
     integer_gen, integer_unsigned_pair_gen_var_2, integer_unsigned_pair_gen_var_4,
     integer_unsigned_pair_gen_var_5, natural_unsigned_pair_gen_var_4,
 };

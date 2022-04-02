@@ -3,7 +3,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::CheckedFrom;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_gen_var_11, unsigned_gen_var_15, unsigned_gen_var_16,
 };
 use std::panic::catch_unwind;

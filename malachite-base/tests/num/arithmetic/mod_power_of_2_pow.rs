@@ -1,6 +1,6 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_17, unsigned_pair_gen_var_23, unsigned_quadruple_gen_var_8,
     unsigned_quadruple_gen_var_9, unsigned_triple_gen_var_16,
 };

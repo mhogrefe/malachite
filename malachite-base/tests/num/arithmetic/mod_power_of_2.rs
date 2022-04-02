@@ -3,7 +3,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{ExactFrom, WrappingFrom};
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_gen, signed_unsigned_pair_gen_var_1, signed_unsigned_pair_gen_var_10,
     signed_unsigned_pair_gen_var_11, signed_unsigned_pair_gen_var_4, unsigned_gen,
     unsigned_pair_gen_var_2, unsigned_pair_gen_var_20, unsigned_triple_gen_var_13,

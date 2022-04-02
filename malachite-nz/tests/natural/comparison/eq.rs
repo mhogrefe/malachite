@@ -1,9 +1,9 @@
-use malachite_base_test_util::common::test_eq_helper;
-use malachite_base_test_util::generators::unsigned_pair_gen_var_27;
+use malachite_base::test_util::common::test_eq_helper;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_27;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
+use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
 use num::BigUint;
 use rug;
 

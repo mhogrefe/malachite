@@ -81,18 +81,16 @@ fn limbs_add_signed_same_length_in_place_left(
     }
 }
 
-/// This is mpn_matrix22_mul_itch from mpn/generic/matrix22_mul.c, GMP 6.2.1.
-#[doc(hidden)]
-pub const fn limbs_matrix_mul_2_2_scratch_len(xs_len: usize, ys_len: usize) -> usize {
+// This is mpn_matrix22_mul_itch from mpn/generic/matrix22_mul.c, GMP 6.2.1.
+pub_const_test! {limbs_matrix_mul_2_2_scratch_len(xs_len: usize, ys_len: usize) -> usize {
     if xs_len < MATRIX22_STRASSEN_THRESHOLD || ys_len < MATRIX22_STRASSEN_THRESHOLD {
         3 * xs_len + 2 * ys_len
     } else {
         3 * (xs_len + ys_len) + 5
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn limbs_matrix_2_2_mul_small(
+pub_test! {limbs_matrix_2_2_mul_small(
     xs00: &mut [Limb],
     xs01: &mut [Limb],
     xs10: &mut [Limb],
@@ -134,7 +132,7 @@ pub fn limbs_matrix_2_2_mul_small(
         t0 = &mut *xs10;
         t1 = &mut *xs11;
     }
-}
+}}
 
 // Algorithm:
 //
@@ -176,8 +174,7 @@ pub fn limbs_matrix_2_2_mul_small(
 // Temporary storage: 3 * xs_len + 3 * ys_len + 5.
 //
 // This is mpn_matrix22_mul_strassen from mpn/generic/matrix22_mul.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_matrix_2_2_mul_strassen(
+pub_test! {limbs_matrix_2_2_mul_strassen(
     xs00: &mut [Limb],
     xs01: &mut [Limb],
     xs10: &mut [Limb],
@@ -323,11 +320,10 @@ pub fn limbs_matrix_2_2_mul_strassen(
         assert!(!limbs_sub_same_length_in_place_right(u1_init, xs10));
     }
     assert!(xs10[sum_len] < 2);
-}
+}}
 
-/// This is mpn_matrix22_mul from mpn/generic/matrix22_mul.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_matrix_2_2_mul(
+// This is mpn_matrix22_mul from mpn/generic/matrix22_mul.c, GMP 6.2.1.
+pub_crate_test! {limbs_matrix_2_2_mul(
     xs00: &mut [Limb],
     xs01: &mut [Limb],
     xs10: &mut [Limb],
@@ -352,4 +348,4 @@ pub fn limbs_matrix_2_2_mul(
             xs00, xs01, xs10, xs11, xs_len, ys00, ys01, ys10, ys11, scratch,
         );
     }
-}
+}}

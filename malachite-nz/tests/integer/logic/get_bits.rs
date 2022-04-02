@@ -1,19 +1,19 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     signed_unsigned_unsigned_triple_gen_var_2, unsigned_pair_gen_var_7, unsigned_triple_gen_var_20,
     unsigned_vec_unsigned_unsigned_triple_gen_var_4,
 };
-use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
+use malachite_base::test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::integer::logic::bit_block_access::{
     limbs_neg_limb_get_bits, limbs_slice_neg_get_bits, limbs_vec_neg_get_bits,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_unsigned_pair_gen_var_2, integer_unsigned_unsigned_triple_gen_var_2,
     natural_unsigned_unsigned_triple_gen_var_4,
 };

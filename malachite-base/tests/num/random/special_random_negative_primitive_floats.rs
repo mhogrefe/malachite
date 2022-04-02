@@ -3,9 +3,9 @@ use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::num::random::special_random_negative_primitive_floats;
 use malachite_base::random::EXAMPLE_SEED;
-use malachite_base_test_util::stats::common_values_map::common_values_map;
-use malachite_base_test_util::stats::median;
-use malachite_base_test_util::stats::moments::CheckedToF64;
+use malachite_base::test_util::stats::common_values_map::common_values_map;
+use malachite_base::test_util::stats::median;
+use malachite_base::test_util::stats::moments::CheckedToF64;
 use std::panic::catch_unwind;
 
 fn special_random_negative_primitive_floats_helper<T: CheckedToF64 + PrimitiveFloat>(

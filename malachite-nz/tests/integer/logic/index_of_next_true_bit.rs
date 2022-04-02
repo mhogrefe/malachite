@@ -2,19 +2,19 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, BitScan};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_1, unsigned_gen, unsigned_vec_unsigned_pair_gen_var_20,
 };
 use malachite_nz::integer::logic::bit_scan::limbs_index_of_next_true_bit_neg;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::common::integer_to_rug_integer;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::integer_to_rug_integer;
+use malachite_nz::test_util::generators::{
     integer_gen, integer_unsigned_pair_gen_var_2, natural_unsigned_pair_gen_var_4,
 };
-use malachite_nz_test_util::integer::logic::index_of_next_true_bit::*;
+use malachite_nz::test_util::integer::logic::index_of_next_true_bit::*;
 use rug;
 use std::str::FromStr;
 

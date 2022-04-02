@@ -1,9 +1,9 @@
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::common::integer_to_rug_integer;
-use malachite_nz_test_util::generators::integer_pair_gen;
+use malachite_nz::test_util::common::integer_to_rug_integer;
+use malachite_nz::test_util::generators::integer_pair_gen;
+use malachite_q::test_util::common::rational_to_rug_rational;
+use malachite_q::test_util::generators::rational_integer_pair_gen;
 use malachite_q::Rational;
-use malachite_q_test_util::common::rational_to_rug_rational;
-use malachite_q_test_util::generators::rational_integer_pair_gen;
 use rug;
 use std::str::FromStr;
 

@@ -1,6 +1,6 @@
 use malachite_base::num::basic::traits::Iverson;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base_test_util::generators::bool_gen;
+use malachite_base::test_util::generators::bool_gen;
 use std::fmt::Debug;
 use std::ops::Sub;
 

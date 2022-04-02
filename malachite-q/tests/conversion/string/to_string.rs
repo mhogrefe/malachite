@@ -1,9 +1,9 @@
 use malachite_base::strings::string_is_subset;
 use malachite_base::strings::ToDebugString;
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz::test_util::generators::integer_gen;
+use malachite_q::test_util::common::{rational_to_bigrational, rational_to_rug_rational};
+use malachite_q::test_util::generators::rational_gen;
 use malachite_q::Rational;
-use malachite_q_test_util::common::{rational_to_bigrational, rational_to_rug_rational};
-use malachite_q_test_util::generators::rational_gen;
 use std::str::FromStr;
 
 #[test]

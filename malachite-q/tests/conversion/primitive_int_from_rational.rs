@@ -1,3 +1,4 @@
+use malachite_base::assert_panic;
 use malachite_base::num::arithmetic::traits::{Ceiling, Floor};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
@@ -8,13 +9,12 @@ use malachite_base::num::conversion::traits::{
     CheckedFrom, ConvertibleFrom, IsInteger, RoundingFrom,
 };
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::assert_panic;
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 use malachite_nz::integer::Integer;
-use malachite_q::Rational;
-use malachite_q_test_util::generators::{
+use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_3, rational_rounding_mode_pair_gen_var_3,
 };
+use malachite_q::Rational;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 

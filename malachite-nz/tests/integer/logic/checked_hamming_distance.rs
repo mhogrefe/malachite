@@ -1,8 +1,8 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{NegativeOne, Zero};
 use malachite_base::num::logic::traits::{CheckedHammingDistance, HammingDistance};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     signed_pair_gen, unsigned_vec_pair_gen_var_8, unsigned_vec_unsigned_pair_gen_var_19,
 };
 use malachite_nz::integer::logic::checked_hamming_distance::{
@@ -11,11 +11,11 @@ use malachite_nz::integer::logic::checked_hamming_distance::{
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::common::integer_to_rug_integer;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::integer_to_rug_integer;
+use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen, integer_triple_gen_var_1, natural_pair_gen,
 };
-use malachite_nz_test_util::integer::logic::checked_hamming_distance::{
+use malachite_nz::test_util::integer::logic::checked_hamming_distance::{
     integer_checked_hamming_distance_alt_1, integer_checked_hamming_distance_alt_2,
     rug_checked_hamming_distance,
 };

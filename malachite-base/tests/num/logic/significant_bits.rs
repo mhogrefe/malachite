@@ -1,7 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 
 fn significant_bits_helper<T: PrimitiveInt>() {
     let test = |n, out| {

@@ -3,18 +3,18 @@ use malachite_base::num::arithmetic::traits::Sign;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_gen_var_5, unsigned_vec_gen, unsigned_vec_gen_var_2,
 };
 use malachite_nz::integer::conversion::to_twos_complement_limbs::*;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_bool_vec_pair_gen_var_1, integer_gen, integer_unsigned_pair_gen_var_2,
 };
-use malachite_nz_test_util::integer::conversion::to_twos_complement_limbs::{
+use malachite_nz::test_util::integer::conversion::to_twos_complement_limbs::{
     limbs_twos_complement_in_place_alt_1, limbs_twos_complement_in_place_alt_2,
 };
 use std::cmp::Ordering;

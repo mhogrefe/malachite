@@ -6,12 +6,12 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::{BitConvertible, SignificantBits};
 use malachite_base::strings::ToDebugString;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_gen_var_3, unsigned_pair_gen_var_4,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen, natural_unsigned_pair_gen_var_6, natural_unsigned_pair_gen_var_7,
 };
 use std::panic::catch_unwind;

@@ -2,16 +2,16 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::BitAccess;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_16,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::logic::bit_access::limbs_clear_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
-use malachite_nz_test_util::generators::natural_unsigned_pair_gen_var_4;
+use malachite_nz::test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
+use malachite_nz::test_util::generators::natural_unsigned_pair_gen_var_4;
 #[cfg(feature = "32_bit_limbs")]
 use rug;
 #[cfg(feature = "32_bit_limbs")]

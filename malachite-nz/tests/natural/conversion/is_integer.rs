@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::IsInteger;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz::test_util::generators::natural_gen;
 use std::str::FromStr;
 
 #[test]

@@ -1,12 +1,12 @@
 use malachite_base::num::arithmetic::traits::{CheckedRoot, CheckedSqrt, Pow, Reciprocal};
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_nz_test_util::generators::integer_unsigned_pair_gen_var_3;
-use malachite_q::Rational;
-use malachite_q_test_util::generators::{
+use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_3;
+use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_gen_var_3, rational_signed_pair_gen_var_4,
     rational_unsigned_pair_gen_var_4,
 };
+use malachite_q::Rational;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 

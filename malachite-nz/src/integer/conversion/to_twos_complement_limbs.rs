@@ -8,16 +8,15 @@ use natural::logic::not::limbs_not_in_place;
 use natural::Natural;
 use platform::Limb;
 
-/// Given the limbs of the absolute value of an `Integer`, in ascending order, returns the two's
-/// complement limbs. The input limbs should not be all zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
+// Given the limbs of the absolute value of an `Integer`, in ascending order, returns the two's
+// complement limbs. The input limbs should not be all zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+pub_crate_test! {limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
     let i = slice_leading_zeros(xs);
     let mut result = vec![0; i];
     if i != xs.len() {
@@ -27,55 +26,52 @@ pub fn limbs_twos_complement(xs: &[Limb]) -> Vec<Limb> {
         }
     }
     result
-}
+}}
 
-/// Given the limbs of a non-negative `Integer`, in ascending order, checks whether the most
-/// significant bit is `false`; if it isn't, appends an extra zero bit. This way the `Integer`'s
-/// non-negativity is preserved in its limbs.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-#[doc(hidden)]
-pub fn limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
+// Given the limbs of a non-negative `Integer`, in ascending order, checks whether the most
+// significant bit is `false`; if it isn't, appends an extra zero bit. This way the `Integer`'s
+// non-negativity is preserved in its limbs.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+pub_test! {limbs_maybe_sign_extend_non_negative_in_place(xs: &mut Vec<Limb>) {
     if let Some(last) = xs.last() {
         if last.get_highest_bit() {
             // Sign-extend with an extra 0 limb to indicate a positive Integer
             xs.push(0);
         }
     }
-}
+}}
 
-/// Given the limbs of the absolute value of an `Integer`, in ascending order, converts the limbs to
-/// two's complement. Returns whether there is a carry left over from the two's complement
-/// conversion process.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
+// Given the limbs of the absolute value of an `Integer`, in ascending order, converts the limbs to
+// two's complement. Returns whether there is a carry left over from the two's complement
+// conversion process.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_crate_test! {limbs_twos_complement_in_place(xs: &mut [Limb]) -> bool {
     limbs_not_in_place(xs);
     limbs_slice_add_limb_in_place(xs, 1)
-}
+}}
 
-/// Given the limbs of the absolute value of a negative `Integer`, in ascending order, converts the
-/// limbs to two's complement and checks whether the most significant bit is `true`; if it isn't,
-/// appends an extra `Limb::MAX` bit. This way the `Integer`'s negativity is preserved in its limbs.
-/// The limbs cannot be empty or contain only zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` contains only zeros.
-#[doc(hidden)]
-pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
+// Given the limbs of the absolute value of a negative `Integer`, in ascending order, converts the
+// limbs to two's complement and checks whether the most significant bit is `true`; if it isn't,
+// appends an extra `Limb::MAX` bit. This way the `Integer`'s negativity is preserved in its limbs.
+// The limbs cannot be empty or contain only zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` contains only zeros.
+pub_test! {limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Vec<Limb>) {
     assert!(!limbs_twos_complement_in_place(xs));
     if let Some(last) = xs.last() {
         if !last.get_highest_bit() {
@@ -83,7 +79,7 @@ pub fn limbs_twos_complement_and_maybe_sign_extend_negative_in_place(xs: &mut Ve
             xs.push(Limb::MAX);
         }
     }
-}
+}}
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct NegativeLimbIterator<'a>(NLIterator<'a>);

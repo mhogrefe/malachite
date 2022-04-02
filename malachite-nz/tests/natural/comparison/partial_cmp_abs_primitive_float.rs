@@ -1,7 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen, natural_natural_primitive_float_triple_gen, natural_primitive_float_pair_gen,
     natural_primitive_float_primitive_float_triple_gen,
 };

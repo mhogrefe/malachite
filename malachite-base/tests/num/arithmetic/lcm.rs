@@ -1,5 +1,5 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_33, unsigned_pair_gen_var_34, unsigned_triple_gen_var_19,
 };
 use std::panic::catch_unwind;

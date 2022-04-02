@@ -6,21 +6,20 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the smallest integer power of 2 greater than or equal to the `Natural`.
-///
-/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the smallest integer power of 2 greater than or equal to the `Natural`.
+//
+// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
     let (xs_last, xs_init) = xs.split_last().unwrap();
     let mut out;
     if let Some(x) = xs_last.checked_next_power_of_two() {
@@ -40,26 +39,24 @@ pub fn limbs_next_power_of_2(xs: &[Limb]) -> Vec<Limb> {
         out.push(1);
     }
     out
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the smallest integer power of 2 greater than or equal to the `Natural` to the input
-/// slice. If the input slice is too small to hold the result, the limbs are all set to zero and the
-/// carry bit, `true`, is returned. Otherwise, `false` is returned.
-///
-/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-#[allow(clippy::branches_sharing_code)]
-pub fn limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the smallest integer power of 2 greater than or equal to the `Natural` to the input
+// slice. If the input slice is too small to hold the result, the limbs are all set to zero and the
+// carry bit, `true`, is returned. Otherwise, `false` is returned.
+//
+// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
     let (xs_last, xs_init) = xs.split_last_mut().unwrap();
     if let Some(x) = xs_last.checked_next_power_of_two() {
         if x == *xs_last && !slice_test_zero(xs_init) {
@@ -81,28 +78,27 @@ pub fn limbs_slice_next_power_of_2_in_place(xs: &mut [Limb]) -> bool {
         *xs_last = 0;
         true
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the smallest integer power of 2 greater than or equal to the `Natural` to the input
-/// `Vec`.
-///
-/// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_vec_next_power_of_2_in_place(xs: &mut Vec<Limb>) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the smallest integer power of 2 greater than or equal to the `Natural` to the input
+// `Vec`.
+//
+// This function assumes that `xs` is nonempty and the last (most significant) limb is nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_vec_next_power_of_2_in_place(xs: &mut Vec<Limb>) {
     if limbs_slice_next_power_of_2_in_place(xs) {
         xs.push(1);
     }
-}
+}}
 
 impl NextPowerOf2 for Natural {
     type Output = Natural;

@@ -7,10 +7,10 @@ use malachite_base::num::random::random_unsigned_inclusive_range;
 use malachite_base::orderings::random::random_orderings;
 use malachite_base::random::{Seed, EXAMPLE_SEED};
 use malachite_base::strings::random::random_strings_using_chars;
+use malachite_base::test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base::test_util::stats::median;
 use malachite_base::unions::random::{random_union2s, random_union3s};
 use malachite_base::unions::{Union2, Union3};
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
 use std::cmp::Ordering;
 use std::fmt::Debug;
 

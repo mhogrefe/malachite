@@ -10,8 +10,8 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::BitConvertible;
 use malachite_base::slices::slice_leading_zeros;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{unsigned_gen_var_6, unsigned_pair_gen_var_6};
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{unsigned_gen_var_6, unsigned_pair_gen_var_6};
 use malachite_nz::natural::conversion::digits::general_digits::{
     limbs_to_digits_basecase, limbs_to_digits_small_base, limbs_to_digits_small_base_basecase,
     to_digits_asc_large, to_digits_asc_limb, to_digits_asc_naive, to_digits_asc_naive_primitive,
@@ -19,7 +19,7 @@ use malachite_nz::natural::conversion::digits::general_digits::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::*;
+use malachite_nz::test_util::generators::*;
 use std::panic::catch_unwind;
 use std::str::FromStr;
 

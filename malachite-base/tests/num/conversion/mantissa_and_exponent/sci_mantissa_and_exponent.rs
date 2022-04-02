@@ -6,7 +6,7 @@ use malachite_base::num::conversion::mantissa_and_exponent::{
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     primitive_float_gen_var_12, primitive_float_signed_pair_gen_var_1,
     primitive_float_signed_pair_gen_var_2, primitive_float_unsigned_pair_gen_var_1,
     primitive_float_unsigned_pair_gen_var_2,

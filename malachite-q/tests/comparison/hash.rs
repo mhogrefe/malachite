@@ -1,5 +1,5 @@
-use malachite_base_test_util::hash::hash;
-use malachite_q_test_util::generators::rational_gen;
+use malachite_base::test_util::hash::hash;
+use malachite_q::test_util::generators::rational_gen;
 
 #[test]
 fn hash_properties() {

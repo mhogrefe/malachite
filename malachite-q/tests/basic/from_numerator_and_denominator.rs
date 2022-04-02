@@ -2,19 +2,19 @@ use malachite_base::num::arithmetic::traits::{CoprimeWith, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::One;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_gen, signed_pair_gen_var_6, unsigned_gen, unsigned_pair_gen_var_12,
     unsigned_unsigned_bool_triple_gen_var_2,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::common::{integer_to_bigint, integer_to_rug_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{integer_to_bigint, integer_to_rug_integer};
+use malachite_nz::test_util::generators::{
     integer_gen, integer_pair_gen_var_1, natural_gen, natural_natural_bool_triple_gen_var_1,
     natural_pair_gen_var_5,
 };
+use malachite_q::test_util::common::{bigrational_to_rational, rug_rational_to_rational};
 use malachite_q::Rational;
-use malachite_q_test_util::common::{bigrational_to_rational, rug_rational_to_rational};
 use num::{BigInt, BigRational};
 use std::str::FromStr;
 

@@ -3,18 +3,17 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
-/// number of ones in the binary expansion of the `Natural`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_count_ones(xs: &[Limb]) -> u64 {
+// Interpreting a slice of `Limb`s, as the limbs (in ascending order) of a `Natural`, counts the
+// number of ones in the binary expansion of the `Natural`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_crate_test! {limbs_count_ones(xs: &[Limb]) -> u64 {
     xs.iter().map(|&x| CountOnes::count_ones(x)).sum()
-}
+}}
 
 impl CountOnes for &Natural {
     /// Counts the number of ones in the binary expansion of a `Natural`.

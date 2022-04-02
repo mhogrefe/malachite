@@ -6,7 +6,7 @@ use malachite_base::strings::{
     string_is_subset, ToBinaryString, ToDebugString, ToLowerHexString, ToOctalString,
     ToUpperHexString,
 };
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_8, unsigned_pair_gen_var_2, unsigned_pair_gen_var_9,
     unsigned_triple_gen_var_6,
 };
@@ -14,12 +14,12 @@ use malachite_nz::natural::conversion::string::to_string::{NaturalAlt, NaturalAl
 use malachite_nz::natural::conversion::string::BaseFmtWrapper;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_nz::test_util::generators::{
     natural_gen, natural_unsigned_pair_gen_var_3, natural_unsigned_pair_gen_var_4,
     natural_unsigned_unsigned_triple_gen_var_1,
 };
-use malachite_nz_test_util::natural::conversion::string::to_string::to_string_base_naive;
+use malachite_nz::test_util::natural::conversion::string::to_string::to_string_base_naive;
 use std::cmp::max;
 use std::panic::catch_unwind;
 use std::str::FromStr;

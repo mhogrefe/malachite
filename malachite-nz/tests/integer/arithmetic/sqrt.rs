@@ -3,13 +3,13 @@ use malachite_base::num::arithmetic::traits::{
     FloorSqrtAssign, Square,
 };
 use malachite_base::num::basic::traits::{NegativeOne, One};
-use malachite_base_test_util::generators::signed_gen_var_2;
+use malachite_base::test_util::generators::signed_gen_var_2;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_nz_test_util::generators::{integer_gen_var_4, natural_gen};
+use malachite_nz::test_util::generators::{integer_gen_var_4, natural_gen};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 

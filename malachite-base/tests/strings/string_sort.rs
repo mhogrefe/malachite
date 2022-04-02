@@ -1,7 +1,7 @@
 use malachite_base::iterators::comparison::is_weakly_ascending;
 use malachite_base::strings::{string_is_subset, string_sort, string_unique};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::string_gen;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::string_gen;
 
 #[test]
 fn test_string_sort() {

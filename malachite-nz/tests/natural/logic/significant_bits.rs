@@ -1,8 +1,8 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::SignificantBits;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_vec_gen_var_1;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_vec_gen_var_1;
 use malachite_nz::natural::arithmetic::log_base_2::limbs_floor_log_base_2;
 use malachite_nz::natural::logic::significant_bits::limbs_significant_bits;
 use malachite_nz::natural::Natural;

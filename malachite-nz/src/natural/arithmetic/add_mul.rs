@@ -11,20 +11,19 @@ use natural::Natural;
 use platform::{DoubleLimb, Limb};
 use std::mem::swap;
 
-/// Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`
-/// and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result
-/// will have no trailing zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// positive, and w is returned instead of overwriting the first input.
-#[doc(hidden)]
-pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
+// Given the limbs of two `Natural`s x and y, and a limb `z`, returns the limbs of x + y * z. `xs`
+// and `ys` should be nonempty and have no trailing zeros, and `z` should be nonzero. The result
+// will have no trailing zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// positive, and w is returned instead of overwriting the first input.
+pub_test! {limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
     let mut out;
     if xs.len() >= ys.len() {
         out = xs.to_vec();
@@ -34,24 +33,23 @@ pub fn limbs_add_mul_limb(xs: &[Limb], ys: &[Limb], limb: Limb) -> Vec<Limb> {
         limbs_vec_add_mul_limb_smaller_in_place_right(xs, &mut out, limb);
     }
     out
-}
+}}
 
-/// Given the equal-length limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The
-/// lowest `xs.len()` limbs of the result are written to `xs`, and the highest limb of y * z, plus
-/// the carry-out from the addition, is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpn_addmul_1 from mpn/generic/addmul_1.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
+// Given the equal-length limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The
+// lowest `xs.len()` limbs of the result are written to `xs`, and the highest limb of y * z, plus
+// the carry-out from the addition, is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpn_addmul_1 from mpn/generic/addmul_1.c, GMP 6.2.1.
+pub_crate_test! {limbs_slice_add_mul_limb_same_length_in_place_left(
     xs: &mut [Limb],
     ys: &[Limb],
     z: Limb,
@@ -66,26 +64,25 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_left(
         carry = out >> Limb::WIDTH;
     }
     Limb::exact_from(carry)
-}
+}}
 
-/// Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs
-/// of the result are written to `ys` and the highest limb is returned. `xs` must have the same
-/// length as `ys`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
-/// same lengths, sub is positive, the lowest limbs of the result are written to the second input
-/// rather than the first, and the highest limb is returned.
-#[doc(hidden)]
-pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
+// Given the limbs of two `Natural`s x and y, and a limb `z`, computes x + y * z. The lowest limbs
+// of the result are written to `ys` and the highest limb is returned. `xs` must have the same
+// length as `ys`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and have the
+// same lengths, sub is positive, the lowest limbs of the result are written to the second input
+// rather than the first, and the highest limb is returned.
+pub_test! {limbs_slice_add_mul_limb_same_length_in_place_right(
     xs: &[Limb],
     ys: &mut [Limb],
     z: Limb,
@@ -100,23 +97,22 @@ pub fn limbs_slice_add_mul_limb_same_length_in_place_right(
         carry = out >> Limb::WIDTH;
     }
     Limb::exact_from(carry)
-}
+}}
 
-/// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
-/// first (left) input, corresponding to the limbs of a. `xs` and `ys` should be nonempty and have
-/// no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///       m = max(1, `ys.len()` - `xs.len()`)
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and sub is
-/// positive.
-#[doc(hidden)]
-pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
+// Given the limbs of two `Natural`s a and b, and a limb c, writes the limbs of a + b * c to the
+// first (left) input, corresponding to the limbs of a. `xs` and `ys` should be nonempty and have
+// no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//       m = max(1, `ys.len()` - `xs.len()`)
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive and sub is
+// positive.
+pub_test! {limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
     let xs_len = xs.len();
     if xs_len >= ys.len() {
         limbs_vec_add_mul_limb_greater_in_place_left(xs, ys, z);
@@ -133,7 +129,7 @@ pub fn limbs_vec_add_mul_limb_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: 
             xs.push(carry);
         }
     }
-}
+}}
 
 // ys.len() > 0, xs.len() >= ys.len(), z != 0
 fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], z: Limb) {
@@ -148,21 +144,20 @@ fn limbs_vec_add_mul_limb_greater_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb],
     }
 }
 
-/// Given the limbs of two `Natural`s x and y, and a limb `z`, writes the limbs of x + y * z to the
-/// second (right) input, corresponding to the limbs of y. `xs` and `ys` should be nonempty and have
-/// no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///       m = max(1, `xs.len()` - `ys.len()`)
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// positive, and the result is written to the second input rather than the first.
-#[doc(hidden)]
-pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
+// Given the limbs of two `Natural`s x and y, and a limb `z`, writes the limbs of x + y * z to the
+// second (right) input, corresponding to the limbs of y. `xs` and `ys` should be nonempty and have
+// no trailing zeros, and `z` should be nonzero. The result will have no trailing zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//       m = max(1, `xs.len()` - `ys.len()`)
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// positive, and the result is written to the second input rather than the first.
+pub_test! {limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
     let ys_len = ys.len();
     if xs.len() >= ys_len {
         let carry = limbs_slice_add_mul_limb_same_length_in_place_right(&xs[..ys_len], ys, z);
@@ -177,7 +172,7 @@ pub fn limbs_vec_add_mul_limb_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z:
     } else {
         limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, z);
     }
-}
+}}
 
 // xs.len() > 0, xs.len() < ys.len(), z != 0
 fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>, z: Limb) {
@@ -192,21 +187,20 @@ fn limbs_vec_add_mul_limb_smaller_in_place_right(xs: &[Limb], ys: &mut Vec<Limb>
     }
 }
 
-/// Given the limbs of two `Natural`s x and y, and a limb `z`, writes the limbs of x + y * z to
-/// whichever input is longer. If the result is written to the first input, `false` is returned; if
-/// to the second, `true` is returned. `xs` and `ys` should be nonempty and have no trailing zeros,
-/// and `z` should be nonzero. The result will have no trailing zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(`xs.len()`, `ys.len()`)
-///
-/// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
-/// positive, and the result is written to the longer input.
-#[doc(hidden)]
-pub fn limbs_vec_add_mul_limb_in_place_either(
+// Given the limbs of two `Natural`s x and y, and a limb `z`, writes the limbs of x + y * z to
+// whichever input is longer. If the result is written to the first input, `false` is returned; if
+// to the second, `true` is returned. `xs` and `ys` should be nonempty and have no trailing zeros,
+// and `z` should be nonzero. The result will have no trailing zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(`xs.len()`, `ys.len()`)
+//
+// This is mpz_aorsmul_1 from mpz/aorsmul_i.c, GMP 6.2.1, where w and x are positive, sub is
+// positive, and the result is written to the longer input.
+pub_test! {limbs_vec_add_mul_limb_in_place_either(
     xs: &mut Vec<Limb>,
     ys: &mut Vec<Limb>,
     z: Limb,
@@ -218,26 +212,25 @@ pub fn limbs_vec_add_mul_limb_in_place_either(
         limbs_vec_add_mul_limb_smaller_in_place_right(xs, ys, z);
         true
     }
-}
+}}
 
-/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of
-/// x + y * z. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the
-/// slices should have any trailing zeros. The result will have no trailing zeros.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(m + n * log(n))
-///
-/// where n = max(`ys.len()`, `zs.len()`)
-///       m = `xs.len()`
-///
-/// # Panics
-/// Panics if `ys` or `zs` are empty.
-///
-/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
-/// positive, and w is returned instead of overwriting the first input.
-#[doc(hidden)]
-pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
+// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, returns the limbs of
+// x + y * z. `xs` should be nonempty and `ys` and `zs` should have length at least 2. None of the
+// slices should have any trailing zeros. The result will have no trailing zeros.
+//
+// Time: O(m + n * log(n) * log(log(n)))
+//
+// Additional memory: O(m + n * log(n))
+//
+// where n = max(`ys.len()`, `zs.len()`)
+//       m = `xs.len()`
+//
+// # Panics
+// Panics if `ys` or `zs` are empty.
+//
+// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive, sub is
+// positive, and w is returned instead of overwriting the first input.
+pub_test! {limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
     let mut out = vec![0; out_len];
@@ -254,27 +247,26 @@ pub fn limbs_add_mul(xs: &[Limb], ys: &[Limb], zs: &[Limb]) -> Vec<Limb> {
         }
         out
     }
-}
+}}
 
-/// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, computes x + y * z. The
-/// limbs of the result are written to `xs`. `xs` should be nonempty and `ys` and `zs` should have
-/// length at least 2. None of the slices should have any trailing zeros. The result will have no
-/// trailing zeros.
-///
-/// Time: O(m + n * log(n) * log(log(n)))
-///
-/// Additional memory: O(n * log(n))
-///
-/// where n = max(`ys.len()`, `zs.len()`)
-///       m = `xs.len()`
-///
-/// # Panics
-/// Panics if `ys` or `zs` are empty.
-///
-/// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive and sub is
-/// positive.
-#[doc(hidden)]
-pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
+// Given the limbs `xs`, `ys` and `zs` of three `Natural`s x, y, and z, computes x + y * z. The
+// limbs of the result are written to `xs`. `xs` should be nonempty and `ys` and `zs` should have
+// length at least 2. None of the slices should have any trailing zeros. The result will have no
+// trailing zeros.
+//
+// Time: O(m + n * log(n) * log(log(n)))
+//
+// Additional memory: O(n * log(n))
+//
+// where n = max(`ys.len()`, `zs.len()`)
+//       m = `xs.len()`
+//
+// # Panics
+// Panics if `ys` or `zs` are empty.
+//
+// This is mpz_aorsmul from mpz/aorsmul.c, GMP 6.2.1, where w, x, and y are positive and sub is
+// positive.
+pub_test! {limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb]) {
     let xs_len = xs.len();
     let mut out_len = ys.len() + zs.len();
     let mut out = vec![0; out_len];
@@ -289,7 +281,7 @@ pub fn limbs_add_mul_in_place_left(xs: &mut Vec<Limb>, ys: &[Limb], zs: &[Limb])
     if limbs_slice_add_greater_in_place_left(xs, &out) {
         xs.push(1);
     }
-}
+}}
 
 impl Natural {
     fn add_mul_limb_ref_ref(&self, y: &Natural, z: Limb) -> Natural {

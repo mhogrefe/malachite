@@ -1,5 +1,5 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_duodecuple_gen_var_1, unsigned_octuple_gen_var_1, unsigned_quadruple_gen_var_10,
 };
 

@@ -1,12 +1,12 @@
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_vec_gen_var_2;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_vec_gen_var_2;
 use malachite_nz::natural::logic::trailing_zeros::limbs_trailing_zeros;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::natural_gen;
-use malachite_nz_test_util::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
+use malachite_nz::test_util::generators::natural_gen;
+use malachite_nz::test_util::natural::logic::trailing_zeros::natural_trailing_zeros_alt;
 use std::str::FromStr;
 
 #[cfg(feature = "32_bit_limbs")]

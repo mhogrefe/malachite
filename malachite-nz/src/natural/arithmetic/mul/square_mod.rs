@@ -81,23 +81,22 @@ fn limbs_square_mod_base_pow_n_plus_1_basecase(out: &mut [Limb], xs: &[Limb], n:
     limbs_mul_mod_base_pow_n_plus_1_basecase_helper(out, n);
 }
 
-/// Computes {out, min(n, 2 * xs.len())} <- xs ^ 2 mod (B ^ n - 1)
-///
-/// The result is expected to be zero if and only if the operand already is. Otherwise the class
-/// \[0\] mod (B ^ n - 1) is represented by B ^ n - 1.
-///
-/// It should not be a problem if `limbs_square_mod_base_pow_n_minus_1` is used to compute the full
-/// square with xs.len() <= 2 * n, because this condition implies (B ^ xs.len() - 1) ^ 2 <
-/// (B ^ n - 1) .
-///
-/// Requires n / 4 < xs.len() <= n
-/// Scratch need: n / 2 + (need for recursive call OR n + 3). This gives
-///
-/// S(n) <= n / 2 + MAX (n + 4, S(half_n / 2)) <= 3 / 2 * n + 4
-///
-/// This is mpn_sqrmod_bnm1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_square_mod_base_pow_n_minus_1(
+// Computes {out, min(n, 2 * xs.len())} <- xs ^ 2 mod (B ^ n - 1)
+//
+// The result is expected to be zero if and only if the operand already is. Otherwise the class
+// \[0\] mod (B ^ n - 1) is represented by B ^ n - 1.
+//
+// It should not be a problem if `limbs_square_mod_base_pow_n_minus_1` is used to compute the full
+// square with xs.len() <= 2 * n, because this condition implies (B ^ xs.len() - 1) ^ 2 <
+// (B ^ n - 1) .
+//
+// Requires n / 4 < xs.len() <= n
+// Scratch need: n / 2 + (need for recursive call OR n + 3). This gives
+//
+// S(n) <= n / 2 + MAX (n + 4, S(half_n / 2)) <= 3 / 2 * n + 4
+//
+// This is mpn_sqrmod_bnm1 from mpn/generic/sqrmod_bnm1.c, GMP 6.1.2.
+pub_crate_test! {limbs_square_mod_base_pow_n_minus_1(
     out: &mut [Limb],
     n: usize,
     xs: &[Limb],
@@ -233,4 +232,4 @@ pub fn limbs_square_mod_base_pow_n_minus_1(
             assert!(!limbs_sub_limb_in_place(&mut out[..half_n << 1], carry));
         }
     }
-}
+}}

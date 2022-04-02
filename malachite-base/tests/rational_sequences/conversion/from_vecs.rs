@@ -1,5 +1,5 @@
 use malachite_base::rational_sequences::{rational_sequence_is_reduced, RationalSequence};
-use malachite_base_test_util::generators::unsigned_vec_pair_gen;
+use malachite_base::test_util::generators::unsigned_vec_pair_gen;
 
 #[test]
 pub fn test_from_vecs_and_from_slices() {

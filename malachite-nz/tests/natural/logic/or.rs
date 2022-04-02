@@ -1,8 +1,8 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::CountOnes;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_27, unsigned_vec_pair_gen, unsigned_vec_pair_gen_var_6,
     unsigned_vec_triple_gen_var_31, unsigned_vec_triple_gen_var_32,
     unsigned_vec_unsigned_pair_gen_var_15, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_4,
@@ -14,11 +14,11 @@ use malachite_nz::natural::logic::or::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_nz_test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
-use malachite_nz_test_util::natural::logic::or::{natural_or_alt_1, natural_or_alt_2};
+use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
+use malachite_nz::test_util::natural::logic::or::{natural_or_alt_1, natural_or_alt_2};
 use num::BigUint;
 use rug;
 use std::cmp::max;

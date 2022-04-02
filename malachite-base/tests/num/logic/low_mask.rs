@@ -1,7 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::unsigned_gen_var_9;
+use malachite_base::test_util::generators::unsigned_gen_var_9;
 use std::panic::catch_unwind;
 
 fn low_mask_primitive_helper<T: PrimitiveInt>() {

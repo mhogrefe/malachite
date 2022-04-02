@@ -1,6 +1,6 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen};
+use malachite_base::test_util::generators::{signed_gen, unsigned_gen};
 
 fn unsigned_overflowing_neg_helper<T: PrimitiveUnsigned>() {
     let test = |n: T, out, overflow| {

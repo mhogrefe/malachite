@@ -1,7 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::primitive_float_gen;
-use malachite_base_test_util::hash::hash;
+use malachite_base::test_util::generators::primitive_float_gen;
+use malachite_base::test_util::hash::hash;
 
 fn hash_properties_helper<T: PrimitiveFloat>() {
     primitive_float_gen::<T>().test_properties(|x| {

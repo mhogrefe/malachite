@@ -2,7 +2,7 @@ use malachite_base::num::arithmetic::coprime_with::{
     coprime_with_check_2, coprime_with_check_2_3, coprime_with_check_2_3_5,
 };
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_pair_gen_var_27};
+use malachite_base::test_util::generators::{unsigned_gen, unsigned_pair_gen_var_27};
 
 #[test]
 fn test_coprime_with() {

@@ -1,14 +1,14 @@
 use malachite_base::num::arithmetic::traits::Reciprocal;
 use malachite_base::num::basic::traits::{NegativeOne, One, Zero};
-use malachite_q::Rational;
-use malachite_q_test_util::arithmetic::div::div_naive;
-use malachite_q_test_util::common::{
+use malachite_q::test_util::arithmetic::div::div_naive;
+use malachite_q::test_util::common::{
     bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
     rug_rational_to_rational,
 };
-use malachite_q_test_util::generators::{
+use malachite_q::test_util::generators::{
     rational_gen, rational_gen_var_1, rational_pair_gen_var_1, rational_triple_gen_var_1,
 };
+use malachite_q::Rational;
 use num::BigRational;
 use std::str::FromStr;
 

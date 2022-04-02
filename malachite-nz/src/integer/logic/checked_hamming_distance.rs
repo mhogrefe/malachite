@@ -11,25 +11,24 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
-/// Hamming distance between the negative of that `Natural` (two's complement) and the negative of a
-/// `Limb`. Both have infinitely many implicit leading ones. `xs` cannot be empty or only contain
-/// zeros; `y` cannot be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-#[doc(hidden)]
-pub fn limbs_hamming_distance_limb_neg(xs: &[Limb], y: Limb) -> u64 {
+// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
+// Hamming distance between the negative of that `Natural` (two's complement) and the negative of a
+// `Limb`. Both have infinitely many implicit leading ones. `xs` cannot be empty or only contain
+// zeros; `y` cannot be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` is empty.
+pub_test! {limbs_hamming_distance_limb_neg(xs: &[Limb], y: Limb) -> u64 {
     let x_lo = xs[0].wrapping_neg();
     limbs_count_zeros_neg(xs) - CountZeros::count_zeros(x_lo)
         + x_lo.hamming_distance(y.wrapping_neg())
-}
+}}
 
 fn limbs_count_zeros(xs: &[Limb]) -> u64 {
     xs.iter().map(|&limb| CountZeros::count_zeros(limb)).sum()
@@ -86,23 +85,22 @@ fn limbs_hamming_distance_neg_helper(xs: &[Limb], ys: &[Limb], xs_i: usize, ys_i
     distance + limbs_hamming_distance_neg_leading_limbs_helper(xs, ys, ys_i)
 }
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
-/// returns the Hamming distance between their negatives (two's complement). Both have infinitely
-/// many implicit leading ones. Neither slice may be empty or only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// May panic if `xs` or `ys` only contain zeros.
-///
-/// This is mpz_hamdist from mpz/hamdist.c, GMP 6.2.1, where both arguments are negative and have
-/// the same length.
-#[doc(hidden)]
-pub fn limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
+// Interpreting two equal-length slices of `Limb`s as the limbs of `Natural`s in ascending order,
+// returns the Hamming distance between their negatives (two's complement). Both have infinitely
+// many implicit leading ones. Neither slice may be empty or only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// May panic if `xs` or `ys` only contain zeros.
+//
+// This is mpz_hamdist from mpz/hamdist.c, GMP 6.2.1, where both arguments are negative and have
+// the same length.
+pub_test! {limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
     let xs_i = slice_leading_zeros(xs);
     let ys_i = slice_leading_zeros(ys);
     match xs_i.cmp(&ys_i) {
@@ -115,7 +113,7 @@ pub fn limbs_hamming_distance_neg(xs: &[Limb], ys: &[Limb]) -> u64 {
         Ordering::Less => limbs_hamming_distance_neg_helper(xs, ys, xs_i, ys_i),
         Ordering::Greater => limbs_hamming_distance_neg_helper(ys, xs, ys_i, xs_i),
     }
-}
+}}
 
 impl Natural {
     fn hamming_distance_neg_limb(&self, other: Limb) -> u64 {

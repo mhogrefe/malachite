@@ -7,7 +7,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz::test_util::generators::natural_gen;
 use rug;
 use std::str::FromStr;
 

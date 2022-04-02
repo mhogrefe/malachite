@@ -15,19 +15,18 @@ use platform::Limb;
 use std::fmt::Display;
 use std::ops::{Shl, ShlAssign};
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `Limb`, rounding up. The limbs should not all be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
-/// the result is returned.
-#[doc(hidden)]
-pub fn limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` right-shifted by a `Limb`, rounding up. The limbs should not all be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+//
+// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
+// the result is returned.
+pub_test! {limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
         vec![1]
@@ -44,7 +43,7 @@ pub fn limbs_shr_round_up(xs: &[Limb], bits: u64) -> Vec<Limb> {
         }
         out
     }
-}
+}}
 
 fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
@@ -63,18 +62,17 @@ fn limbs_shr_round_half_integer_to_even(xs: &[Limb], bits: u64) -> Vec<Limb> {
     }
 }
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `Limb`, rounding to the `Natural` nearest to the
-/// actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is exactly between
-/// two integers, it is rounded to the even one.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-#[doc(hidden)]
-pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` right-shifted by a `Limb`, rounding to the `Natural` nearest to the
+// actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is exactly between
+// two integers, it is rounded to the even one.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+pub_test! {limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
     if bits == 0 {
         xs.to_vec()
     } else if !limbs_get_bit(xs, bits - 1) {
@@ -84,59 +82,56 @@ pub fn limbs_shr_round_nearest(xs: &[Limb], bits: u64) -> Vec<Limb> {
     } else {
         limbs_shr_round_half_integer_to_even(xs, bits)
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `Limb`, if the shift is exact (doesn't remove any
-/// `true` bits). If the shift is inexact, `None` is returned. The limbs should not all be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-#[doc(hidden)]
-pub fn limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` right-shifted by a `Limb`, if the shift is exact (doesn't remove any
+// `true` bits). If the shift is inexact, `None` is returned. The limbs should not all be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+pub_test! {limbs_shr_exact(xs: &[Limb], bits: u64) -> Option<Vec<Limb>> {
     if limbs_divisible_by_power_of_2(xs, bits) {
         Some(limbs_shr(xs, bits))
     } else {
         None
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` right-shifted by a `Limb`, rounded using a specified rounding format. The
-/// limbs should not all be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-#[doc(hidden)]
-pub fn limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` right-shifted by a `Limb`, rounded using a specified rounding format. The
+// limbs should not all be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len()`, m = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+pub_test! {limbs_shr_round(xs: &[Limb], bits: u64, rm: RoundingMode) -> Option<Vec<Limb>> {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => Some(limbs_shr(xs, bits)),
         RoundingMode::Up | RoundingMode::Ceiling => Some(limbs_shr_round_up(xs, bits)),
         RoundingMode::Nearest => Some(limbs_shr_round_nearest(xs, bits)),
         RoundingMode::Exact => limbs_shr_exact(xs, bits),
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `Limb`, rounding up, to the input `Vec`. The limbs
-/// should not all be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
-///
-/// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
-/// w == u.
-#[doc(hidden)]
-pub fn limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` right-shifted by a `Limb`, rounding up, to the input `Vec`. The limbs
+// should not all be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = max(1, `xs.len()` - `bits` / Limb::WIDTH)
+//
+// This is cfdiv_q_2exp from mpz/cfdiv_q_2exp.c, GMP 6.2.1, where u is non-negative, dir == 1, and
+// w == u.
+pub_test! {limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
     if delete_count >= xs.len() {
         xs.truncate(1);
@@ -152,7 +147,7 @@ pub fn limbs_vec_shr_round_up_in_place(xs: &mut Vec<Limb>, bits: u64) {
             limbs_vec_add_limb_in_place(xs, 1);
         }
     }
-}
+}}
 
 fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let delete_count = usize::exact_from(bits >> Limb::LOG_WIDTH);
@@ -170,18 +165,17 @@ fn limbs_vec_shr_round_half_integer_to_even_in_place(xs: &mut Vec<Limb>, bits: u
     }
 }
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, rounding to the `Natural`
-/// nearest to the actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is
-/// exactly between two integers, it is rounded to the even one.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, rounding to the `Natural`
+// nearest to the actual value of `self` divided by 2<sup>`bits`</sup>. If the actual value is
+// exactly between two integers, it is rounded to the even one.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
     if bits == 0 {
     } else if !limbs_get_bit(xs, bits - 1) {
         limbs_vec_shr_in_place(xs, bits)
@@ -190,41 +184,39 @@ pub fn limbs_vec_shr_round_nearest_in_place(xs: &mut Vec<Limb>, bits: u64) {
     } else {
         limbs_vec_shr_round_half_integer_to_even_in_place(xs, bits)
     }
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, if the shift is exact
-/// (doesn't remove any `true` bits). Returns whether the shift was exact. The limbs should not all
-/// be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, if the shift is exact
+// (doesn't remove any `true` bits). Returns whether the shift was exact. The limbs should not all
+// be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_vec_shr_exact_in_place(xs: &mut Vec<Limb>, bits: u64) -> bool {
     if limbs_divisible_by_power_of_2(xs, bits) {
         limbs_vec_shr_in_place(xs, bits);
         true
     } else {
         false
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, rounded using a specified
-/// rounding format. If the shift is inexact (removes some `true` bits) and the `RoundingMode` is
-/// `Exact`, the value of `xs` becomes unspecified and `false` is returned. Otherwise, `true` is
-/// returned. The limbs should not all be zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-#[doc(hidden)]
-pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` right-shifted by a `Limb` to the input `Vec`, rounded using a specified
+// rounding format. If the shift is inexact (removes some `true` bits) and the `RoundingMode` is
+// `Exact`, the value of `xs` becomes unspecified and `false` is returned. Otherwise, `true` is
+// returned. The limbs should not all be zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+pub_test! {limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingMode) -> bool {
     match rm {
         RoundingMode::Down | RoundingMode::Floor => {
             limbs_vec_shr_in_place(xs, bits);
@@ -240,7 +232,7 @@ pub fn limbs_vec_shr_round_in_place(xs: &mut Vec<Limb>, bits: u64, rm: RoundingM
         }
         RoundingMode::Exact => limbs_vec_shr_exact_in_place(xs, bits),
     }
-}
+}}
 
 fn shr_round_unsigned_ref_n<T: Copy + Display + Eq + Zero>(
     x: &Natural,

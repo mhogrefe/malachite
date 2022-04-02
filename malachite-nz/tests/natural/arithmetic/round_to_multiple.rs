@@ -3,11 +3,11 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::unsigned_unsigned_rounding_mode_triple_gen_var_2;
+use malachite_base::test_util::generators::unsigned_unsigned_rounding_mode_triple_gen_var_2;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_natural_rounding_mode_triple_gen_var_2, natural_pair_gen_var_5, natural_pair_gen_var_7,
     natural_rounding_mode_pair_gen,
 };

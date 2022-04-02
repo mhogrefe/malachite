@@ -2,7 +2,7 @@ use itertools::repeat_n;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::PowerOf2Digits;
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_5, unsigned_vec_unsigned_pair_gen_var_2,
     unsigned_vec_unsigned_pair_gen_var_3, unsigned_vec_unsigned_pair_gen_var_6,
 };

@@ -11,20 +11,19 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
-/// action equivalent to taking the two's complement of the limbs and getting the bit at the
-/// specified index. Sufficiently high indices will return `true`. The slice cannot be empty or
-/// contain only zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpz_tstbit from mpz/tstbit.c, GMP 6.2.1, where d is negative.
-#[doc(hidden)]
-pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
+// action equivalent to taking the two's complement of the limbs and getting the bit at the
+// specified index. Sufficiently high indices will return `true`. The slice cannot be empty or
+// contain only zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpz_tstbit from mpz/tstbit.c, GMP 6.2.1, where d is negative.
+pub_test! {limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     if x_i >= xs.len() {
         // We're indexing into the infinite suffix of 1s
@@ -37,24 +36,23 @@ pub fn limbs_get_bit_neg(xs: &[Limb], index: u64) -> bool {
         };
         x.get_bit(index & Limb::WIDTH_MASK)
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
-/// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
-/// index to `true`, and taking the two's complement again. Indices that are outside the bounds of
-/// the slice will result in no action being taken, since negative numbers in two's complement have
-/// infinitely many leading 1s. The slice cannot be empty or contain only zeros.
-///
-/// Time: worst case O(`index`)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Panics
-/// If the slice contains only zeros a panic may occur.
-///
-/// This is mpz_setbit from mpz/setbit.c, GMP 6.2.1, where d is negative.
-#[doc(hidden)]
-pub fn limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
+// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
+// index to `true`, and taking the two's complement again. Indices that are outside the bounds of
+// the slice will result in no action being taken, since negative numbers in two's complement have
+// infinitely many leading 1s. The slice cannot be empty or contain only zeros.
+//
+// Time: worst case O(`index`)
+//
+// Additional memory: worst case O(1)
+//
+// # Panics
+// If the slice contains only zeros a panic may occur.
+//
+// This is mpz_setbit from mpz/setbit.c, GMP 6.2.1, where d is negative.
+pub_test! {limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     if x_i >= xs.len() {
         return;
@@ -80,7 +78,7 @@ pub fn limbs_set_bit_neg(xs: &mut [Limb], index: u64) {
             xs[x_i].clear_bit(reduced_index);
         }
     }
-}
+}}
 
 fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -> bool {
     let zero_bound = slice_leading_zeros(xs);
@@ -101,22 +99,21 @@ fn limbs_clear_bit_neg_helper(xs: &mut [Limb], x_i: usize, reduced_index: u64) -
     }
 }
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
-/// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
-/// index to `false`, and taking the two's complement again. Inputs that would result in new `true`
-/// bits outside of the slice will cause a panic. The slice cannot be empty or contain only zeros.
-///
-/// Time: worst case O(`index`)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Panics
-/// Panics if evaluation would require new `true` bits outside of the slice. If the slice contains
-/// only zeros a panic may occur.
-///
-/// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative and bit_idx small enough
-/// that no additional memory needs to be given to d.
-#[doc(hidden)]
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
+// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
+// index to `false`, and taking the two's complement again. Inputs that would result in new `true`
+// bits outside of the slice will cause a panic. The slice cannot be empty or contain only zeros.
+//
+// Time: worst case O(`index`)
+//
+// Additional memory: worst case O(1)
+//
+// # Panics
+// Panics if evaluation would require new `true` bits outside of the slice. If the slice contains
+// only zeros a panic may occur.
+//
+// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative and bit_idx small enough
+// that no additional memory needs to be given to d.
 pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
@@ -125,21 +122,20 @@ pub fn limbs_slice_clear_bit_neg(xs: &mut [Limb], index: u64) {
     }
 }
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
-/// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
-/// index to `false`, and taking the two's complement again. Sufficiently high indices will increase
-/// the length of the limbs vector. The slice cannot be empty or contain only zeros.
-///
-/// Time: worst case O(`index`)
-///
-/// Additional memory: worst case O(`index`)
-///
-/// # Panics
-/// If the slice contains only zeros a panic may occur.
-///
-/// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative.
-#[doc(hidden)]
-pub fn limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, performs an
+// action equivalent to taking the two's complement of the limbs, setting a bit at the specified
+// index to `false`, and taking the two's complement again. Sufficiently high indices will increase
+// the length of the limbs vector. The slice cannot be empty or contain only zeros.
+//
+// Time: worst case O(`index`)
+//
+// Additional memory: worst case O(`index`)
+//
+// # Panics
+// If the slice contains only zeros a panic may occur.
+//
+// This is mpz_clrbit from mpz/clrbit.c, GMP 6.2.1, where d is negative.
+pub_test! {limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
     let x_i = usize::exact_from(index >> Limb::LOG_WIDTH);
     let reduced_index = index & Limb::WIDTH_MASK;
     if x_i < xs.len() {
@@ -150,7 +146,7 @@ pub fn limbs_vec_clear_bit_neg(xs: &mut Vec<Limb>, index: u64) {
         xs.resize(x_i, 0);
         xs.push(Limb::power_of_2(reduced_index));
     }
-}
+}}
 
 impl Natural {
     // self cannot be zero

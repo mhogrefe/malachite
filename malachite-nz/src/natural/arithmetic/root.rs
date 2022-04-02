@@ -445,11 +445,10 @@ fn limbs_root_to_out_internal(
     rs_len
 }
 
-/// Returns the size (in limbs) of the remainder.
-///
-/// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where k != 2 and remp is not NULL.
-#[doc(hidden)]
-pub fn limbs_root_rem_to_out(
+// Returns the size (in limbs) of the remainder.
+//
+// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where k != 2 and remp is not NULL.
+pub_test! {limbs_root_rem_to_out(
     out_root: &mut [Limb],
     out_rem: &mut [Limb],
     xs: &[Limb],
@@ -461,13 +460,12 @@ pub fn limbs_root_rem_to_out(
     assert!(exp > 2);
     // (xs_len - 1) / exp > 2 <=> xs_len > 3 * exp <=> (xs_len + 2) / 3 > exp
     limbs_root_to_out_internal(out_root, Some(out_rem), xs, exp, false)
-}
+}}
 
-/// Returns a non-zero value iff the remainder is non-zero.
-///
-/// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where remp is NULL.
-#[doc(hidden)]
-pub fn limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> bool {
+// Returns a non-zero value iff the remainder is non-zero.
+//
+// This is mpn_rootrem from mpn/generic/rootrem.c, GMP 6.2.1, where remp is NULL.
+pub_test! {limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> bool {
     let xs_len = xs.len();
     assert_ne!(xs_len, 0);
     assert_ne!(xs[xs_len - 1], 0);
@@ -494,10 +492,9 @@ pub fn limbs_floor_root_to_out(out_root: &mut [Limb], xs: &[Limb], exp: u64) -> 
     } else {
         limbs_root_to_out_internal(out_root, None, xs, exp, false) != 0
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
+pub_test! {limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
     let mut out = vec![
         0;
         xs.len()
@@ -505,10 +502,9 @@ pub fn limbs_floor_root(xs: &[Limb], exp: u64) -> (Vec<Limb>, bool) {
     ];
     let inexact = limbs_floor_root_to_out(&mut out, xs, exp);
     (out, inexact)
-}
+}}
 
-#[doc(hidden)]
-pub fn limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
+pub_test! {limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     let mut root_out = vec![
         0;
         xs.len()
@@ -518,7 +514,7 @@ pub fn limbs_root_rem(xs: &[Limb], exp: u64) -> (Vec<Limb>, Vec<Limb>) {
     let rem_len = limbs_root_rem_to_out(&mut root_out, &mut rem_out, xs, exp);
     rem_out.truncate(rem_len);
     (root_out, rem_out)
-}
+}}
 
 impl FloorRootAssign<u64> for Natural {
     /// Replaces a `Natural` with the floor of its $n$th root.

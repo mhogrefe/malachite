@@ -1,7 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::slices::{slice_leading_zeros, slice_test_zero, slice_trailing_zeros};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_vec_gen;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_vec_gen;
 
 #[test]
 fn test_slice_trailing_zeros() {

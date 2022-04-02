@@ -23,9 +23,8 @@ fn limbs_mod_or_modexact(ns: &[Limb], d: Limb) -> Limb {
     }
 }
 
-/// This is mpn_gcd_1 from mpn/generic/gcd_1.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_gcd_limb(xs: &[Limb], mut y: Limb) -> Limb {
+// This is mpn_gcd_1 from mpn/generic/gcd_1.c, GMP 6.2.1.
+pub_test! {limbs_gcd_limb(xs: &[Limb], mut y: Limb) -> Limb {
     assert!(xs.len() > 1);
     assert_ne!(y, 0);
     let mut x = xs[0];
@@ -39,7 +38,7 @@ pub fn limbs_gcd_limb(xs: &[Limb], mut y: Limb) -> Limb {
         y.gcd_assign(x >> x.trailing_zeros());
     }
     y << zeros
-}
+}}
 
 fn gcd_greater_helper(mut xs: &mut [Limb], mut ys: &mut [Limb]) -> Natural {
     let xs_zero_limbs = slice_leading_zeros(xs);

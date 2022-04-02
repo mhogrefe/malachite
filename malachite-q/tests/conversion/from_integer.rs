@@ -1,6 +1,6 @@
 use malachite_base::num::conversion::traits::CheckedFrom;
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz::test_util::generators::integer_gen;
 use malachite_q::Rational;
 use std::str::FromStr;
 

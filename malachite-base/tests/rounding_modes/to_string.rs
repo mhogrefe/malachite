@@ -1,7 +1,7 @@
 use malachite_base::rounding_modes::RoundingMode;
 use malachite_base::strings::string_is_subset;
-use malachite_base_test_util::generators::rounding_mode_gen;
-use malachite_base_test_util::rounding_modes::ROUNDING_MODE_CHARS;
+use malachite_base::test_util::generators::rounding_mode_gen;
+use malachite_base::test_util::rounding_modes::ROUNDING_MODE_CHARS;
 use std::str::FromStr;
 
 #[test]

@@ -1,7 +1,7 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{signed_pair_gen_var_6, unsigned_pair_gen_var_12};
+use malachite_base::test_util::generators::{signed_pair_gen_var_6, unsigned_pair_gen_var_12};
 use std::panic::catch_unwind;
 
 #[test]

@@ -9,32 +9,30 @@ use natural::arithmetic::shr::limbs_slice_shr_in_place;
 use natural::Natural;
 use platform::{Limb, SignedLimb};
 
-/// Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
-/// significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s
-/// non-negativity is preserved in its bits.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-#[doc(hidden)]
-pub fn bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
+// Given the bits of a non-negative `Integer`, in ascending order, checks whether the most
+// significant bit is `false`; if it isn't, appends an extra `false` bit. This way the `Integer`'s
+// non-negativity is preserved in its bits.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+pub_test! {bits_to_twos_complement_bits_non_negative(bits: &mut Vec<bool>) {
     if !bits.is_empty() && *bits.last().unwrap() {
         // Sign-extend with an extra false bit to indicate a positive Integer
         bits.push(false);
     }
-}
+}}
 
-/// Given the bits of the absolute value of a negative `Integer`, in ascending order, converts the
-/// bits to two's complement. Returns whether there is a carry left over from the two's complement
-/// conversion process.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `bits.len()`
-#[doc(hidden)]
-pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
+// Given the bits of the absolute value of a negative `Integer`, in ascending order, converts the
+// bits to two's complement. Returns whether there is a carry left over from the two's complement
+// conversion process.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `bits.len()`
+pub_test! {bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
     let mut true_seen = false;
     for bit in bits.iter_mut() {
         if true_seen {
@@ -44,29 +42,28 @@ pub fn bits_slice_to_twos_complement_bits_negative(bits: &mut [bool]) -> bool {
         }
     }
     !true_seen
-}
+}}
 
-/// Given the bits of the absolute value of a negative `Integer`, in ascending order, converts the
-/// bits to two's complement and checks whether the most significant bit is `true`; if it isn't,
-/// appends an extra `true` bit. This way the `Integer`'s negativity is preserved in its bits. The
-/// bits cannot be empty or contain only `false`s.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `bits.len()`
-///
-/// # Panics
-/// Panics if `bits` contains only `false`s.
-#[doc(hidden)]
-pub fn bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
+// Given the bits of the absolute value of a negative `Integer`, in ascending order, converts the
+// bits to two's complement and checks whether the most significant bit is `true`; if it isn't,
+// appends an extra `true` bit. This way the `Integer`'s negativity is preserved in its bits. The
+// bits cannot be empty or contain only `false`s.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `bits.len()`
+//
+// # Panics
+// Panics if `bits` contains only `false`s.
+pub_test! {bits_vec_to_twos_complement_bits_negative(bits: &mut Vec<bool>) {
     assert!(!bits_slice_to_twos_complement_bits_negative(bits));
     if bits.last() == Some(&false) {
         // Sign-extend with an extra true bit to indicate a negative Integer
         bits.push(true);
     }
-}
+}}
 
 fn from_bits_helper(mut limbs: Vec<Limb>, sign_bit: bool, last_width: u64) -> Integer {
     if sign_bit {

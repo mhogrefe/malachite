@@ -22,8 +22,7 @@ fn rational_sequence_reduce<T: Eq>(non_repeating: &mut Vec<T>, repeating: &mut V
     }
 }
 
-#[doc(hidden)]
-pub fn rational_sequence_is_reduced<T: Eq>(non_repeating: &[T], repeating: &[T]) -> bool {
+pub_test! {rational_sequence_is_reduced<T: Eq>(non_repeating: &[T], repeating: &[T]) -> bool {
     if repeating.is_empty() {
         return true;
     }
@@ -40,7 +39,7 @@ pub fn rational_sequence_is_reduced<T: Eq>(non_repeating: &[T], repeating: &[T])
         .take_while(|(x, y)| x == y)
         .count()
         == 0
-}
+}}
 
 /// A `RationalSequence` is a sequence that is either finite or eventually repeating, just like
 /// the digits of a rational number.
@@ -179,7 +178,7 @@ impl<T: Clone + Eq> RationalSequence<T> {
     /// and `[3, 4]` are a reduced pair. On the other hand, `[1, 2]` and `[3, 4, 3, 4]` are a
     /// non-reduced pair representing the same sequence, as are `[1, 2, 3]` and `[4, 3]`. All
     /// `RationalSequence`s must be valid.
-    #[doc(hidden)]
+    #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         rational_sequence_is_reduced(&self.non_repeating, &self.repeating)
     }

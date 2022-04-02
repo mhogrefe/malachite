@@ -5,10 +5,17 @@ extern crate malachite_nz;
 #[macro_use]
 extern crate serde;
 
+#[cfg(feature = "test_build")]
+extern crate itertools;
+#[cfg(feature = "test_build")]
+extern crate num;
+#[cfg(feature = "test_build")]
+extern crate rug;
+
 use malachite_base::named::Named;
-use malachite_base::num::arithmetic::traits::{
-    CoprimeWith, DivExact, DivExactAssign, Gcd, UnsignedAbs,
-};
+#[cfg(feature = "test_build")]
+use malachite_base::num::arithmetic::traits::CoprimeWith;
+use malachite_base::num::arithmetic::traits::{DivExact, DivExactAssign, Gcd, UnsignedAbs};
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::traits::{NegativeOne, One, OneHalf, Two, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
@@ -32,12 +39,12 @@ pub struct Rational {
 }
 
 impl Rational {
-    /// Returns true iff `self` is valid.
-    ///
-    /// To be valid, its denominator must be nonzero, its numerator and denominator must be
-    /// relatively prime, and if its numerator is zero, then `sign` must be `true`. All `Rational`s
-    /// must be valid.
-    #[doc(hidden)]
+    // Returns true iff `self` is valid.
+    //
+    // To be valid, its denominator must be nonzero, its numerator and denominator must be
+    // relatively prime, and if its numerator is zero, then `sign` must be `true`. All `Rational`s
+    // must be valid.
+    #[cfg(feature = "test_build")]
     pub fn is_valid(&self) -> bool {
         self.denominator != 0
             && (self.sign || self.numerator != 0)
@@ -852,3 +859,6 @@ pub mod comparison;
 pub mod conversion;
 pub mod exhaustive;
 pub mod random;
+
+#[cfg(feature = "test_build")]
+pub mod test_util;

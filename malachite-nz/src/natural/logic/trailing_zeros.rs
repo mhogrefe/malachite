@@ -6,24 +6,23 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
-/// number of trailing zeros in the binary expansion of a `Natural` (equivalently, the multiplicity
-/// of 2 in its prime factorization). The limbs cannot be empty or all zero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `xs` only contains zeros.
-#[doc(hidden)]
-pub fn limbs_trailing_zeros(xs: &[Limb]) -> u64 {
+// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, returns the
+// number of trailing zeros in the binary expansion of a `Natural` (equivalently, the multiplicity
+// of 2 in its prime factorization). The limbs cannot be empty or all zero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `xs` only contains zeros.
+pub_crate_test! {limbs_trailing_zeros(xs: &[Limb]) -> u64 {
     let zeros = slice_leading_zeros(xs);
     let remaining_zeros = TrailingZeros::trailing_zeros(xs[zeros]);
     (u64::wrapping_from(zeros) << Limb::LOG_WIDTH) + remaining_zeros
-}
+}}
 
 impl Natural {
     /// Returns the number of trailing zeros in the binary expansion of a `Natural` (equivalently,

@@ -1,5 +1,5 @@
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::num::random::geometric::{
+use malachite_base::test_util::num::random::geometric::{
     adjusted_mean_to_unadjusted_mean, unadjusted_mean_to_adjusted_mean,
 };
 

@@ -15,11 +15,9 @@ pub struct RationalContinuedFraction {
 }
 
 impl RationalContinuedFraction {
-    #[doc(hidden)]
-    #[inline]
-    pub fn is_done(&self) -> bool {
+    pub_crate_test! {is_done(&self) -> bool {
         self.denominator == 0u32 || self.numerator == 0u32
-    }
+    }}
 }
 
 impl Iterator for RationalContinuedFraction {

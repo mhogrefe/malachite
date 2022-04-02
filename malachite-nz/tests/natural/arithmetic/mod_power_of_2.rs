@@ -6,8 +6,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_2, unsigned_pair_gen_var_20,
     unsigned_vec_unsigned_pair_gen_var_16,
 };
@@ -17,7 +17,7 @@ use malachite_nz::natural::arithmetic::mod_power_of_2::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen, natural_natural_unsigned_triple_gen_var_1, natural_unsigned_pair_gen_var_10,
     natural_unsigned_pair_gen_var_4, natural_unsigned_pair_gen_var_9,
     natural_unsigned_unsigned_triple_gen_var_5,

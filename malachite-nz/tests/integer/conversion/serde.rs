@@ -1,7 +1,7 @@
 use malachite_base::strings::string_is_subset;
-use malachite_base_test_util::generators::{string_gen, string_gen_var_9};
+use malachite_base::test_util::generators::{string_gen, string_gen_var_9};
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::generators::integer_gen;
+use malachite_nz::test_util::generators::integer_gen;
 use std::str::FromStr;
 
 #[test]

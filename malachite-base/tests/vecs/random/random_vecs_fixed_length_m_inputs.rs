@@ -2,11 +2,11 @@ use core::hash::Hash;
 use itertools::Itertools;
 use malachite_base::num::random::{random_primitive_ints, random_unsigned_range};
 use malachite_base::random::{Seed, EXAMPLE_SEED};
+use malachite_base::test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base::test_util::stats::median;
 use malachite_base::vecs::random::{
     random_vecs_fixed_length_2_inputs, random_vecs_fixed_length_from_single,
 };
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
 use std::fmt::Debug;
 
 fn random_vecs_fixed_length_2_inputs_helper<

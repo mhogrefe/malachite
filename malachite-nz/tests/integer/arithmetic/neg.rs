@@ -1,11 +1,11 @@
 use malachite_base::num::arithmetic::traits::NegAssign;
-use malachite_base_test_util::generators::signed_gen;
+use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{SignedDoubleLimb, SignedLimb};
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     bigint_to_integer, integer_to_bigint, integer_to_rug_integer, rug_integer_to_integer,
 };
-use malachite_nz_test_util::generators::{integer_gen, natural_gen};
+use malachite_nz::test_util::generators::{integer_gen, natural_gen};
 use num::BigInt;
 use std::str::FromStr;
 

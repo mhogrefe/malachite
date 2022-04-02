@@ -13,22 +13,21 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs obtained by taking a slice of bits beginning at index `start` of the input slice and
-/// ending at index `end - 1`. `start` must be less than or equal to `end`, but apart from that
-/// there are no restrictions on the index values. If they index beyond the physical size of the
-/// input limbs, the function interprets them as pointing to `false` bits.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `start` > `end`.
-#[doc(hidden)]
-pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs obtained by taking a slice of bits beginning at index `start` of the input slice and
+// ending at index `end - 1`. `start` must be less than or equal to `end`, but apart from that
+// there are no restrictions on the index values. If they index beyond the physical size of the
+// input limbs, the function interprets them as pointing to `false` bits.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `start` > `end`.
+pub_crate_test! {limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
     let len = xs.len();
@@ -48,24 +47,23 @@ pub fn limbs_slice_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     }
     limbs_vec_mod_power_of_2_in_place(&mut out, end - start);
     out
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs obtained by taking a slice of bits beginning at index `start` of the input slice and
-/// ending at index `end - 1`. `start` must be less than or equal to `end`, but apart from that
-/// there are no restrictions on the index values. If they index beyond the physical size of the
-/// input limbs, the function interprets them as pointing to `false` bits.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `start` > `end`.
-#[doc(hidden)]
-pub fn limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs obtained by taking a slice of bits beginning at index `start` of the input slice and
+// ending at index `end - 1`. `start` must be less than or equal to `end`, but apart from that
+// there are no restrictions on the index values. If they index beyond the physical size of the
+// input limbs, the function interprets them as pointing to `false` bits.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `start` > `end`.
+pub_test! {limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let small_start = usize::exact_from(start >> Limb::LOG_WIDTH);
     if small_start >= xs.len() {
@@ -78,7 +76,7 @@ pub fn limbs_vec_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> 
         limbs_slice_shr_in_place(&mut xs, offset);
     }
     xs
-}
+}}
 
 /// Copy values from `ys` into `xs`.
 ///
@@ -144,26 +142,24 @@ pub(crate) fn limbs_assign_bits_helper(
     }
 }
 
-/// Writes the limbs of `bits` into the limbs of `xs`, starting at bit `start` of `xs` (inclusive)
-/// and ending at bit `end` of `xs` (exclusive). The bit indices do not need to be aligned with any
-/// limb boundaries. If `bits` has more than `end` - `start` bits, only the first `end` - `start`
-/// bits are written. If `bits` has fewer than `end` - `start` bits, the remaining written bits are
-/// zero. `xs` may be extended to accommodate the new bits. `start` must be smaller than `end`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `end`.
-///
-/// # Panics
-/// Panics if `start` >= `end`.
-#[doc(hidden)]
-#[inline]
-pub fn limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
+// Writes the limbs of `bits` into the limbs of `xs`, starting at bit `start` of `xs` (inclusive)
+// and ending at bit `end` of `xs` (exclusive). The bit indices do not need to be aligned with any
+// limb boundaries. If `bits` has more than `end` - `start` bits, only the first `end` - `start`
+// bits are written. If `bits` has fewer than `end` - `start` bits, the remaining written bits are
+// zero. `xs` may be extended to accommodate the new bits. `start` must be smaller than `end`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `end`.
+//
+// # Panics
+// Panics if `start` >= `end`.
+pub_test! {limbs_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
     limbs_assign_bits_helper(xs, start, end, bits, false);
-}
+}}
 
 impl BitBlockAccess for Natural {
     type Bits = Natural;

@@ -9,8 +9,8 @@ use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves};
 use malachite_base::num::logic::traits::LeadingZeros;
 use malachite_base::num::logic::traits::LowMask;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_gen_var_12, unsigned_pair_gen_var_12, unsigned_pair_gen_var_35,
     unsigned_vec_pair_gen_var_11, unsigned_vec_triple_gen_var_50, unsigned_vec_triple_gen_var_51,
     unsigned_vec_triple_gen_var_53, unsigned_vec_unsigned_pair_gen_var_22,
@@ -26,16 +26,16 @@ use malachite_nz::natural::arithmetic::div_mod::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{DoubleLimb, Limb};
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     large_type_gen_var_11, large_type_gen_var_12, large_type_gen_var_18, large_type_gen_var_19,
     natural_gen, natural_gen_var_2, natural_pair_gen_var_5, natural_pair_gen_var_6,
     unsigned_sextuple_gen_var_2, unsigned_vec_quadruple_gen_var_1,
     unsigned_vec_quadruple_gen_var_5,
 };
-use malachite_nz_test_util::natural::arithmetic::div_mod::{
+use malachite_nz::test_util::natural::arithmetic::div_mod::{
     limbs_div_limb_in_place_mod_alt, limbs_div_limb_in_place_mod_naive,
     limbs_div_limb_to_out_mod_alt, limbs_div_limb_to_out_mod_naive, rug_ceiling_div_neg_mod,
 };

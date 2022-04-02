@@ -4,7 +4,7 @@ use malachite_base::num::conversion::mantissa_and_exponent::sci_mantissa_and_exp
 use malachite_base::num::conversion::traits::SciMantissaAndExponent;
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     primitive_float_unsigned_pair_gen_var_1, primitive_float_unsigned_pair_gen_var_2,
     primitive_float_unsigned_rounding_mode_triple_gen_var_1,
     primitive_float_unsigned_rounding_mode_triple_gen_var_2, unsigned_gen_var_1,
@@ -12,7 +12,9 @@ use malachite_base_test_util::generators::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{natural_gen_var_2, natural_rounding_mode_pair_gen_var_2};
+use malachite_nz::test_util::generators::{
+    natural_gen_var_2, natural_rounding_mode_pair_gen_var_2,
+};
 use std::panic::catch_unwind;
 use std::str::FromStr;
 

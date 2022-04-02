@@ -6,11 +6,11 @@ use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::logic::traits::BitAccess;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::signed_unsigned_rounding_mode_triple_gen_var_1;
-use malachite_base_test_util::generators::unsigned_rounding_mode_pair_gen;
+use malachite_base::test_util::generators::signed_unsigned_rounding_mode_triple_gen_var_1;
+use malachite_base::test_util::generators::unsigned_rounding_mode_pair_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     integer_rounding_mode_pair_gen, integer_unsigned_pair_gen_var_2,
     integer_unsigned_pair_gen_var_5, integer_unsigned_rounding_mode_triple_gen_var_1,
     natural_unsigned_rounding_mode_triple_gen_var_1,

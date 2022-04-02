@@ -2,7 +2,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_pair_gen_var_3, signed_pair_gen_var_5, signed_rounding_mode_pair_gen,
     signed_rounding_mode_pair_gen_var_1, signed_rounding_mode_pair_gen_var_2,
     signed_rounding_mode_pair_gen_var_3, signed_signed_rounding_mode_triple_gen_var_1,

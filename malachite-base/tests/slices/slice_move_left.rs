@@ -1,10 +1,10 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::slices::slice_move_left;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_vec_gen, unsigned_vec_unsigned_pair_gen_var_1,
 };
-use malachite_base_test_util::slices::slice_move_left_naive;
+use malachite_base::test_util::slices::slice_move_left_naive;
 
 #[test]
 fn test_slice_move_left() {

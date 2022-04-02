@@ -1,7 +1,7 @@
 use malachite_base::num::arithmetic::traits::UnsignedAbs;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::generators::{natural_bool_pair_gen, natural_gen};
+use malachite_nz::test_util::generators::{natural_bool_pair_gen, natural_gen};
 use std::str::FromStr;
 
 #[test]

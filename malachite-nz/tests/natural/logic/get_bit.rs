@@ -2,16 +2,16 @@ use malachite_base::num::arithmetic::traits::PowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitAccess, SignificantBits};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_16,
 };
 use malachite_nz::natural::logic::bit_access::limbs_get_bit;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_biguint, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_4};
-use malachite_nz_test_util::natural::logic::get_bit::num_get_bit;
+use malachite_nz::test_util::common::{natural_to_biguint, natural_to_rug_integer};
+use malachite_nz::test_util::generators::{natural_gen, natural_unsigned_pair_gen_var_4};
+use malachite_nz::test_util::natural::logic::get_bit::num_get_bit;
 use num::BigUint;
 use rug;
 use std::str::FromStr;

@@ -52,37 +52,35 @@ pub(crate) fn limbs_square_diagonal(out: &mut [Limb], xs: &[Limb]) {
     }
 }
 
-/// scratch must have length 2 * xs.len() - 2 and out must have length 2 * xs.len().
-///
-/// This is MPN_SQR_DIAG_ADDLSH1 from mpn/generic/sqr_basecase.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
+// scratch must have length 2 * xs.len() - 2 and out must have length 2 * xs.len().
+//
+// This is MPN_SQR_DIAG_ADDLSH1 from mpn/generic/sqr_basecase.c, GMP 6.1.2.
+pub_test! {limbs_square_diagonal_add_shl_1(out: &mut [Limb], scratch: &mut [Limb], xs: &[Limb]) {
     limbs_square_diagonal(out, xs);
     let (out_last, out_init) = out.split_last_mut().unwrap();
     *out_last += limbs_slice_shl_in_place(scratch, 1);
     if limbs_slice_add_same_length_in_place_left(&mut out_init[1..], scratch) {
         *out_last += 1;
     }
-}
+}}
 
-/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`s, writes the
-/// `2 * xs.len()` least-significant limbs of the square of the `Natural`s to an output slice. The
-/// output must be at least twice as long as `xs.len()`, `xs.len()` must be less than
-/// `SQR_TOOM2_THRESHOLD`, and `xs` cannot be empty.
-///
-/// Time: worst case O(n<sup>2</sup>)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is less than twice the length of `xs`, `xs.len()` > SQR_TOOM2_THRESHOLD, or if
-/// `xs` is empty.
-///
-/// This is mpn_sqr_basecase from mpn/generic/sqr_basecase.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`s, writes the
+// `2 * xs.len()` least-significant limbs of the square of the `Natural`s to an output slice. The
+// output must be at least twice as long as `xs.len()`, `xs.len()` must be less than
+// `SQR_TOOM2_THRESHOLD`, and `xs` cannot be empty.
+//
+// Time: worst case O(n<sup>2</sup>)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is less than twice the length of `xs`, `xs.len()` > SQR_TOOM2_THRESHOLD, or if
+// `xs` is empty.
+//
+// This is mpn_sqr_basecase from mpn/generic/sqr_basecase.c, GMP 6.1.2.
+pub_crate_test! {limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     let (xs_head, xs_tail) = xs.split_first().unwrap();
     (out[1], out[0]) = DoubleLimb::from(*xs_head).square().split_in_half();
@@ -101,13 +99,12 @@ pub fn limbs_square_to_out_basecase(out: &mut [Limb], xs: &[Limb]) {
         }
         limbs_square_diagonal_add_shl_1(&mut out[..two_n], scratch, xs);
     }
-}
+}}
 
-/// This is mpn_toom2_sqr_itch from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub const fn limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
+// This is mpn_toom2_sqr_itch from gmp-impl.h, GMP 6.2.1.
+pub_const_test! {limbs_square_to_out_toom_2_scratch_len(xs_len: usize) -> usize {
     (xs_len + Limb::WIDTH as usize) << 1
-}
+}}
 
 //TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom2_sqr.c, GMP 6.1.2.
@@ -123,38 +120,37 @@ fn limbs_square_to_out_toom_2_recursive(p: &mut [Limb], a: &[Limb], ws: &mut [Li
     }
 }
 
-/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-/// limbs needed is provided by `limbs_square_to_out_toom_2_scratch_len`. The following
-/// restrictions on the input slices must be met:
-/// 1. `out`.len() >= 2 * `xs`.len()
-/// 2. `xs`.len() > 1
-///
-/// The smallest allowable `xs` length is 2.
-///
-/// Evaluate in: -1, 0, infinity.
-///
-/// <-s--><--n-->
-///  ____ ______
-/// |xs1_|__xs0_|
-///
-/// v_0     = xs_0 ^ 2          # X(0) ^ 2
-/// v_neg_1 = (xs_0 - xs_1) ^ 2 # X(-1) ^ 2
-/// v_inf   = xs_1 ^ 2          # X(inf) ^ 2
-///
-/// Time: O(n<sup>log<sub>2</sub>3</sup>)
-///
-/// Additional memory: O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// May panic if the input slice conditions are not met.
-///
-/// This is mpn_toom2_sqr from mpn/generic/toom2_sqr.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
+// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
+// limbs needed is provided by `limbs_square_to_out_toom_2_scratch_len`. The following
+// restrictions on the input slices must be met:
+// 1. `out`.len() >= 2 * `xs`.len()
+// 2. `xs`.len() > 1
+//
+// The smallest allowable `xs` length is 2.
+//
+// Evaluate in: -1, 0, infinity.
+//
+// <-s--><--n-->
+//  ____ ______
+// |xs1_|__xs0_|
+//
+// v_0     = xs_0 ^ 2          # X(0) ^ 2
+// v_neg_1 = (xs_0 - xs_1) ^ 2 # X(-1) ^ 2
+// v_inf   = xs_1 ^ 2          # X(inf) ^ 2
+//
+// Time: O(n<sup>log<sub>2</sub>3</sup>)
+//
+// Additional memory: O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// May panic if the input slice conditions are not met.
+//
+// This is mpn_toom2_sqr from mpn/generic/toom2_sqr.c, GMP 6.1.2.
+pub_test! {limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len > 1);
     let out = &mut out[..xs_len << 1];
@@ -208,39 +204,42 @@ pub fn limbs_square_to_out_toom_2(out: &mut [Limb], xs: &[Limb], scratch: &mut [
     } else if limbs_sub_limb_in_place(out_hi, 1) {
         assert!(carry3);
     }
-}
+}}
 
-/// This function can be used to determine whether the size of the input slice to
-/// `limbs_square_to_out_toom_3` is valid.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-#[doc(hidden)]
-#[inline]
-pub const fn limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
+// This function can be used to determine whether the size of the input slice to
+// `limbs_square_to_out_toom_3` is valid.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+pub_const_test! {limbs_square_to_out_toom_3_input_size_valid(xs_len: usize) -> bool {
     xs_len == 3 || xs_len > 4
-}
+}}
 
-/// This is mpn_toom3_sqr_itch from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub const fn limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
+// This is mpn_toom3_sqr_itch from gmp-impl.h, GMP 6.2.1.
+pub_const_test! {limbs_square_to_out_toom_3_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
-}
+}}
 
 //TODO tune
 const SMALLER_RECURSION_TOOM_3: bool = true;
 
 //TODO tune
-/// This is MAYBE_sqr_toom3 from mpn/generic/toom3_sqr.c, GMP 6.1.2.
-#[doc(hidden)]
+// This is MAYBE_sqr_toom3 from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+#[cfg(feature = "test_build")]
 pub const TOOM3_MAYBE_SQR_TOOM3: bool =
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM4_THRESHOLD >= 3 * SQR_TOOM3_THRESHOLD;
+#[cfg(not(feature = "test_build"))]
+const TOOM3_MAYBE_SQR_TOOM3: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM4_THRESHOLD >= 3 * SQR_TOOM3_THRESHOLD;
 
 //TODO tune
 /// This is MAYBE_sqr_basecase from mpn/generic/toom3_sqr.c, GMP 6.1.2.
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub const TOOM3_MAYBE_SQR_BASECASE: bool =
+    TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD < 3 * SQR_TOOM2_THRESHOLD;
+#[cfg(not(feature = "test_build"))]
+const TOOM3_MAYBE_SQR_BASECASE: bool =
     TUNE_PROGRAM_BUILD || WANT_FAT_BINARY || SQR_TOOM3_THRESHOLD < 3 * SQR_TOOM2_THRESHOLD;
 
 /// This is TOOM3_SQR_REC from mpn/generic/toom3_sqr.c, GMP 6.1.2.
@@ -255,40 +254,39 @@ fn limbs_square_to_out_toom_3_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-/// limbs needed is provided by `limbs_square_to_out_toom_3_scratch_len`. The following
-/// restrictions on the input slices must be met:
-/// 1. `out`.len() >= 2 * `xs`.len()
-/// 2. `xs`.len() == 3 or `xs`.len() > 4
-///
-/// The smallest allowable `xs` length is 3.
-///
-/// Evaluate in: -1, 0, +1, +2, +inf
-///
-/// <-s--><--n--><--n-->
-///  ____ ______ ______
-/// |xs_2|_xs_1_|_xs_0_|
-///
-/// v_0     = xs_0 ^ 2                         # X(0)^2
-/// v_1     = (xs_0 + xs_1 + xs_2) ^ 2         # X(1)^2    xh  <= 2
-/// v_neg_1 = (xs_0 - xs_1 + xs_2) ^ 2         # X(-1)^2  |xh| <= 1
-/// v_2     = (xs_0 + 2 * xs_1 + 4 * xs_2) ^ 2 # X(2)^2    xh  <= 6
-/// v_inf   = xs_2 ^ 2                         # X(inf)^2
-///
-/// Time: O(n<sup>log<sub>3</sub>5</sup>)
-///
-/// Additional memory: O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// May panic if the input slice conditions are not met.
-///
-/// This is mpn_toom3_sqr from mpn/generic/toom3_sqr.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
+// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
+// limbs needed is provided by `limbs_square_to_out_toom_3_scratch_len`. The following
+// restrictions on the input slices must be met:
+// 1. `out`.len() >= 2 * `xs`.len()
+// 2. `xs`.len() == 3 or `xs`.len() > 4
+//
+// The smallest allowable `xs` length is 3.
+//
+// Evaluate in: -1, 0, +1, +2, +inf
+//
+// <-s--><--n--><--n-->
+//  ____ ______ ______
+// |xs_2|_xs_1_|_xs_0_|
+//
+// v_0     = xs_0 ^ 2                         # X(0)^2
+// v_1     = (xs_0 + xs_1 + xs_2) ^ 2         # X(1)^2    xh  <= 2
+// v_neg_1 = (xs_0 - xs_1 + xs_2) ^ 2         # X(-1)^2  |xh| <= 1
+// v_2     = (xs_0 + 2 * xs_1 + 4 * xs_2) ^ 2 # X(2)^2    xh  <= 6
+// v_inf   = xs_2 ^ 2                         # X(inf)^2
+//
+// Time: O(n<sup>log<sub>3</sub>5</sup>)
+//
+// Additional memory: O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// May panic if the input slice conditions are not met.
+//
+// This is mpn_toom3_sqr from mpn/generic/toom3_sqr.c, GMP 6.1.2.
+pub_test! {limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     let n = xs_len.div_round(3, RoundingMode::Ceiling);
     let m = n + 1;
@@ -378,25 +376,22 @@ pub fn limbs_square_to_out_toom_3(out: &mut [Limb], xs: &[Limb], scratch: &mut [
     let (v_2, scratch_out) = remainder.split_at_mut(3 * n + 4);
     limbs_square_to_out_toom_3_recursive(out, xs_0, scratch_out);
     limbs_mul_toom_interpolate_5_points(out, v_2, v_neg_1, n, s << 1, false, v_inf_0);
-}
+}}
 
-/// This function can be used to determine whether the size of the input slice to
-/// `limbs_square_to_out_toom_4` is valid.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-#[doc(hidden)]
-#[inline]
-pub const fn limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool {
+// This function can be used to determine whether the size of the input slice to
+// `limbs_square_to_out_toom_4` is valid.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+pub_const_test! {limbs_square_to_out_toom_4_input_size_valid(xs_len: usize) -> bool {
     xs_len == 4 || xs_len == 7 || xs_len == 8 || xs_len > 9
-}
+}}
 
-/// This is mpn_toom4_sqr_itch from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub const fn limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
+// This is mpn_toom4_sqr_itch from gmp-impl.h, GMP 6.2.1.
+pub_const_test! {limbs_square_to_out_toom_4_scratch_len(xs_len: usize) -> usize {
     3 * xs_len + Limb::WIDTH as usize
-}
+}}
 
 //TODO tune
 /// This is MAYBE_sqr_toom2 from mpn/generic/toom4_sqr.c, GMP 6.1.2.
@@ -424,42 +419,41 @@ fn limbs_square_to_out_toom_4_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-/// limbs needed is provided by `limbs_square_to_out_toom_4_scratch_len`. The following
-/// restrictions on the input slices must be met:
-/// 1. `out`.len() >= 2 * `xs`.len()
-/// 2. `xs`.len() is 4, 7, or 8, or `xs`.len() > 9.
-///
-/// The smallest allowable `xs` length is 4.
-///
-///  Evaluate in: -1, -1/2, 0, +1/2, +1, +2, +inf
-///
-/// <-s--><--n--><--n--><--n-->
-///  ____ ______ ______ ______
-/// |xs_3|_xs_2_|_xs_1_|_xs_0_|
-///
-/// v_0     = xs_0 ^ 2                                    # X(0) ^ 2
-/// v_1     = (xs_0 + xs_1 + xs_2 + xs_3) ^ 2             # X(1) ^ 2     xh <= 3
-/// v_neg_1 = (xs_0 - xs_1 + xs_2 - xs_3) ^ 2             # X(-1) ^ 2    |xh| <= 1
-/// v_2     = (xs_0 + 2 * xs_1 + 4 * xs_2 + 8 * xs_3) ^ 2 # X(2) ^ 2     xh <= 14
-/// vh      = (8 * xs_0 + 4 * xs_1 + 2 * xs_2 + xs_3) ^ 2 # X(1/2) ^ 2   xh <= 14
-/// vmh     = (8 * xs_0 - 4 * xs_1 + 2 * xs_2 - xs_3) ^ 2 # X(-1/2) ^ 2  -4 <= xh <= 9
-/// v_inf   = xs_3 ^ 2                                    # X(inf) ^ 2
-///
-/// Time: O(n<sup>log<sub>4</sub>7</sup>)
-///
-/// Additional memory: O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// May panic if the input slice conditions are not met.
-///
-/// This is mpn_toom4_sqr from mpn/generic/toom4_sqr.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
+// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
+// limbs needed is provided by `limbs_square_to_out_toom_4_scratch_len`. The following
+// restrictions on the input slices must be met:
+// 1. `out`.len() >= 2 * `xs`.len()
+// 2. `xs`.len() is 4, 7, or 8, or `xs`.len() > 9.
+//
+// The smallest allowable `xs` length is 4.
+//
+//  Evaluate in: -1, -1/2, 0, +1/2, +1, +2, +inf
+//
+// <-s--><--n--><--n--><--n-->
+//  ____ ______ ______ ______
+// |xs_3|_xs_2_|_xs_1_|_xs_0_|
+//
+// v_0     = xs_0 ^ 2                                    # X(0) ^ 2
+// v_1     = (xs_0 + xs_1 + xs_2 + xs_3) ^ 2             # X(1) ^ 2     xh <= 3
+// v_neg_1 = (xs_0 - xs_1 + xs_2 - xs_3) ^ 2             # X(-1) ^ 2    |xh| <= 1
+// v_2     = (xs_0 + 2 * xs_1 + 4 * xs_2 + 8 * xs_3) ^ 2 # X(2) ^ 2     xh <= 14
+// vh      = (8 * xs_0 + 4 * xs_1 + 2 * xs_2 + xs_3) ^ 2 # X(1/2) ^ 2   xh <= 14
+// vmh     = (8 * xs_0 - 4 * xs_1 + 2 * xs_2 - xs_3) ^ 2 # X(-1/2) ^ 2  -4 <= xh <= 9
+// v_inf   = xs_3 ^ 2                                    # X(inf) ^ 2
+//
+// Time: O(n<sup>log<sub>4</sub>7</sup>)
+//
+// Additional memory: O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// May panic if the input slice conditions are not met.
+//
+// This is mpn_toom4_sqr from mpn/generic/toom4_sqr.c, GMP 6.1.2.
+pub_test! {limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     let n = (xs_len + 3) >> 2;
     let s = xs_len - 3 * n;
@@ -512,30 +506,27 @@ pub fn limbs_square_to_out_toom_4(out: &mut [Limb], xs: &[Limb], scratch: &mut [
     limbs_square_to_out_toom_4_recursive(vinf, xs_3, tp);
     split_into_chunks_mut!(scratch, k, [v2, vm2, vh, vm1], tp);
     limbs_mul_toom_interpolate_7_points(out, n, s << 1, false, vm2, false, vm1, v2, vh, tp);
-}
+}}
 
-/// This function can be used to determine whether the size of the input slice to
-/// `limbs_square_to_out_toom_6` is valid.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-#[doc(hidden)]
-#[inline]
-pub const fn limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
+// This function can be used to determine whether the size of the input slice to
+// `limbs_square_to_out_toom_6` is valid.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+pub_const_test! {limbs_square_to_out_toom_6_input_size_valid(xs_len: usize) -> bool {
     xs_len == 18 || xs_len > 21 && xs_len != 25 && xs_len != 26 && xs_len != 31
-}
+}}
 
 // This is mpn_toom6_sqr_itch from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
+pub_crate_test! {limbs_square_to_out_toom_6_scratch_len(n: usize) -> usize {
     (n << 1)
         + max(
             (SQR_TOOM6_THRESHOLD << 1) + usize::wrapping_from(Limb::WIDTH) * 6,
             limbs_square_to_out_toom_4_scratch_len(SQR_TOOM6_THRESHOLD),
         )
         - (SQR_TOOM6_THRESHOLD << 1)
-}
+}}
 
 //TODO tune
 /// This is SQR_TOOM6_MAX from mpn/generic/toom6_sqr.c, GMP 6.1.2.
@@ -587,28 +578,27 @@ fn limbs_square_to_out_toom_6_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-/// limbs needed is provided by `limbs_square_to_out_toom_6_scratch_len`. The following
-/// restrictions on the input slices must be met:
-/// 1. `out`.len() >= 2 * `xs`.len()
-/// 2. `xs`.len() is 18, or `xs.len()` > 21 but `xs`.len() is not 25, 26, or 31.
-///
-/// The smallest allowable `xs` length is 18.
-///
-/// Time: O(n<sup>log<sub>6</sub>11</sup>)
-///
-/// Additional memory: O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// May panic if the input slice conditions are not met.
-///
-/// This is mpn_toom6_sqr from mpn/generic/toom6_sqr.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
+// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
+// limbs needed is provided by `limbs_square_to_out_toom_6_scratch_len`. The following
+// restrictions on the input slices must be met:
+// 1. `out`.len() >= 2 * `xs`.len()
+// 2. `xs`.len() is 18, or `xs.len()` > 21 but `xs`.len() is not 25, 26, or 31.
+//
+// The smallest allowable `xs` length is 18.
+//
+// Time: O(n<sup>log<sub>6</sub>11</sup>)
+//
+// Additional memory: O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// May panic if the input slice conditions are not met.
+//
+// This is mpn_toom6_sqr from mpn/generic/toom6_sqr.c, GMP 6.1.2.
+pub_test! {limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 18);
     let n = 1 + (xs_len - 1) / 6;
@@ -668,33 +658,30 @@ pub fn limbs_square_to_out_toom_6(out: &mut [Limb], xs: &[Limb], scratch: &mut [
     limbs_toom_couple_handling(r2, &mut out_lo[..k], false, n, 1, 2);
     limbs_square_to_out_toom_6_recursive(out_lo, &xs[..n], wse); // X(0) ^ 2
     limbs_mul_toom_interpolate_12_points(out, r1, r3, r5, n, s << 1, false, wse);
-}
+}}
 
 //TODO tune
 pub(crate) const SQR_FFT_THRESHOLD: usize = SQR_FFT_MODF_THRESHOLD * 10;
 
-/// This function can be used to determine whether the size of the input slice to
-/// `limbs_square_to_out_toom_8` is valid.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-#[doc(hidden)]
-#[inline]
-pub const fn limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
+// This function can be used to determine whether the size of the input slice to
+// `limbs_square_to_out_toom_8` is valid.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+pub_const_test! {limbs_square_to_out_toom_8_input_size_valid(xs_len: usize) -> bool {
     xs_len == 40 || xs_len > 43 && xs_len != 49 && xs_len != 50 && xs_len != 57
-}
+}}
 
 // This is mpn_toom8_sqr_itch from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
+pub_crate_test! {limbs_square_to_out_toom_8_scratch_len(n: usize) -> usize {
     ((n * 15) >> 3)
         + max(
             ((SQR_TOOM8_THRESHOLD * 15) >> 3) + usize::wrapping_from(Limb::WIDTH) * 6,
             limbs_square_to_out_toom_6_scratch_len(SQR_TOOM8_THRESHOLD),
         )
         - ((SQR_TOOM8_THRESHOLD * 15) >> 3)
-}
+}}
 
 //TODO tune
 /// This is SQR_TOOM8_MAX from mpn/generic/toom8_sqr.c, GMP 6.1.2.
@@ -767,28 +754,27 @@ fn limbs_square_to_out_toom_8_recursive(out: &mut [Limb], xs: &[Limb], scratch: 
     }
 }
 
-/// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
-/// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
-/// limbs needed is provided by `limbs_square_to_out_toom_8_scratch_len`. The following
-/// restrictions on the input slices must be met:
-/// 1. `out`.len() >= 2 * `xs`.len()
-/// 2. `xs`.len() is 40, or `xs.len()` > 43 but `xs`.len() is not 49, 50, or 57.
-///
-/// The smallest allowable `xs` length is 40.
-///
-/// Time: O(n<sup>log<sub>8</sub>15</sup>)
-///
-/// Additional memory: O(n)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// May panic if the input slice conditions are not met.
-///
-/// This is mpn_toom8_sqr from mpn/generic/toom8_sqr.c, GMP 6.1.2.
-#[doc(hidden)]
-pub fn limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
+// Interpreting a slices of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// `2 * xs.len()` least-significant limbs of the square of the `Natural` to an output slice. A
+// scratch slice is provided for the algorithm to use. An upper bound for the number of scratch
+// limbs needed is provided by `limbs_square_to_out_toom_8_scratch_len`. The following
+// restrictions on the input slices must be met:
+// 1. `out`.len() >= 2 * `xs`.len()
+// 2. `xs`.len() is 40, or `xs.len()` > 43 but `xs`.len() is not 49, 50, or 57.
+//
+// The smallest allowable `xs` length is 40.
+//
+// Time: O(n<sup>log<sub>8</sub>15</sup>)
+//
+// Additional memory: O(n)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// May panic if the input slice conditions are not met.
+//
+// This is mpn_toom8_sqr from mpn/generic/toom8_sqr.c, GMP 6.1.2.
+pub_test! {limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [Limb]) {
     let xs_len = xs.len();
     assert!(xs_len >= 40);
     let n: usize = xs_len.shr_round(3, RoundingMode::Ceiling);
@@ -878,15 +864,13 @@ pub fn limbs_square_to_out_toom_8(out: &mut [Limb], xs: &[Limb], scratch: &mut [
     // A(0) * B(0)
     limbs_square_to_out_toom_8_recursive(pp_lo, &xs[..n], wse);
     limbs_mul_toom_interpolate_16_points(out, r1, r3, r5, r7, n, s << 1, false, &mut wse[..p]);
-}
+}}
 
 //TODO tune
 const SQR_TOOM3_THRESHOLD_LIMIT: usize = SQR_TOOM3_THRESHOLD;
 
-/// This is mpn_sqr from mpn/generic/sqr.c, GMP 6.1.2.
-#[doc(hidden)]
-#[allow(clippy::absurd_extreme_comparisons)]
-pub fn limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
+// This is mpn_sqr from mpn/generic/sqr.c, GMP 6.1.2.
+pub_crate_test! {limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
     let n = xs.len();
     assert!(n >= 1);
     if n < SQR_BASECASE_THRESHOLD {
@@ -917,14 +901,13 @@ pub fn limbs_square_to_out(out: &mut [Limb], xs: &[Limb]) {
         // The current FFT code allocates its own space. That should probably change.
         limbs_mul_greater_to_out_fft(out, xs, xs);
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn limbs_square(xs: &[Limb]) -> Vec<Limb> {
+pub_crate_test! {limbs_square(xs: &[Limb]) -> Vec<Limb> {
     let mut out = vec![0; xs.len() << 1];
     limbs_square_to_out(&mut out, xs);
     out
-}
+}}
 
 impl Square for Natural {
     type Output = Natural;

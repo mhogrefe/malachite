@@ -1,11 +1,11 @@
 use itertools::Itertools;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable};
-use malachite_base_test_util::generators::unsigned_gen;
-use malachite_base_test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
+use malachite_base::test_util::generators::unsigned_gen;
+use malachite_base::test_util::num::logic::bit_convertible::{to_bits_asc_alt, to_bits_desc_alt};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::natural_gen;
-use malachite_nz_test_util::natural::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
+use malachite_nz::test_util::generators::natural_gen;
+use malachite_nz::test_util::natural::logic::to_bits::{to_bits_asc_naive, to_bits_desc_naive};
 use std::str::FromStr;
 
 #[test]

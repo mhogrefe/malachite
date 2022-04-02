@@ -38,14 +38,15 @@ use std::cmp::Ordering;
 const GET_STR_THRESHOLD_LIMIT: usize = 150;
 
 //TODO tune
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub const GET_STR_PRECOMPUTE_THRESHOLD: usize = 29;
 
-#[doc(hidden)]
-#[inline]
-pub const fn get_chars_per_limb(base: u64) -> usize {
+#[cfg(not(feature = "test_build"))]
+const GET_STR_PRECOMPUTE_THRESHOLD: usize = 29;
+
+pub_const_test! {get_chars_per_limb(base: u64) -> usize {
     BASES[base as usize].0
-}
+}}
 
 const fn get_log_base_of_2(base: u64) -> Limb {
     BASES[base as usize].1
@@ -84,12 +85,11 @@ fn limbs_digit_count_helper(bit_count: u64, base: u64) -> u64 {
         .unwrap()
 }
 
-/// The result is either exact or one too big.
-///
-/// This is MPN_SIZEINBASE from gmp-impl.h, GMP 6.2.1, where result is returned and base is not a
-/// power of 2.
-#[doc(hidden)]
-pub fn limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
+// The result is either exact or one too big.
+//
+// This is MPN_SIZEINBASE from gmp-impl.h, GMP 6.2.1, where result is returned and base is not a
+// power of 2.
+pub_crate_test! {limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
     assert!(base > 2);
     assert!(base < u64::wrapping_from(BASES.len()));
     assert!(!base.is_power_of_two());
@@ -103,7 +103,7 @@ pub fn limbs_digit_count(xs: &[Limb], base: u64) -> u64 {
             base,
         )
     }
-}
+}}
 
 macro_rules! base_10_normalization_step {
     ($j: expr, $buffer: ident, $i: ident, $frac: ident) => {
@@ -123,18 +123,17 @@ const RP_LEN: usize = if TUNE_PROGRAM_BUILD {
     GET_STR_PRECOMPUTE_THRESHOLD
 };
 
-/// Convert `xs` to digits in base `base`, and put the result in `out`. Generate `len` digits,
-/// possibly padding with zeros to the left. If `len` is zero, generate as many characters as
-/// required. Return the number of significant digits. Complexity is quadratic; intended for small
-/// conversions.
-///
-/// `base` must not be a power of 2, and 2 < `base` < 256.
-/// `xs.len()` < `GET_STR_PRECOMPUTE_THRESHOLD`.
-/// `len` must be at least as large as the actual number of digits.
-///
-/// This is mpn_bc_get_str from mpn/generic/get_str.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
+// Convert `xs` to digits in base `base`, and put the result in `out`. Generate `len` digits,
+// possibly padding with zeros to the left. If `len` is zero, generate as many characters as
+// required. Return the number of significant digits. Complexity is quadratic; intended for small
+// conversions.
+//
+// `base` must not be a power of 2, and 2 < `base` < 256.
+// `xs.len()` < `GET_STR_PRECOMPUTE_THRESHOLD`.
+// `len` must be at least as large as the actual number of digits.
+//
+// This is mpn_bc_get_str from mpn/generic/get_str.c, GMP 6.2.1.
+pub_crate_test! {limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
     out: &mut [T],
     len: usize,
     xs: &[Limb],
@@ -234,10 +233,9 @@ pub fn limbs_to_digits_small_base_basecase<T: PrimitiveUnsigned>(
     slice_set_zero(out_zero);
     out_nonzero[..nonzero_len].copy_from_slice(&buffer[i..]);
     zero_len + nonzero_len
-}
+}}
 
 /// This is powers from from gmp-impl.c, GMP 6.2.1.
-#[derive(Clone, Copy, Default)]
 struct PowerTableIndicesRow {
     start: usize, // actual power value
     len: usize,
@@ -245,9 +243,15 @@ struct PowerTableIndicesRow {
     digits_in_base: usize, // number of corresponding digits
 }
 
-#[doc(hidden)]
-#[derive(Clone, Debug)]
+#[cfg(feature = "test_build")]
 pub struct PowerTableRow<'a> {
+    power: &'a [Limb],
+    shift: usize,          // weight of lowest limb, in limb base B
+    digits_in_base: usize, // number of corresponding digits
+}
+
+#[cfg(not(feature = "test_build"))]
+struct PowerTableRow<'a> {
     power: &'a [Limb],
     shift: usize,          // weight of lowest limb, in limb base B
     digits_in_base: usize, // number of corresponding digits
@@ -262,16 +266,20 @@ const HAVE_MPN_COMPUTE_POWTAB_MUL: bool = DIV_1_VS_MUL_1_PERCENT > 120;
 //TODO tune
 const HAVE_MPN_COMPUTE_POWTAB_DIV: bool = DIV_1_VS_MUL_1_PERCENT < 275;
 
-#[doc(hidden)]
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[cfg(feature = "test_build")]
 pub enum PowerTableAlgorithm {
     Mul,
     Div,
 }
 
-/// This is powtab_decide from mpn/compute_powtab.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_choose_power_table_algorithm(
+#[cfg(not(feature = "test_build"))]
+enum PowerTableAlgorithm {
+    Mul,
+    Div,
+}
+
+// This is powtab_decide from mpn/compute_powtab.c, GMP 6.2.1.
+pub_test! {limbs_choose_power_table_algorithm(
     exptab: &mut [usize],
     xs_len: usize,
     base: u64,
@@ -318,7 +326,7 @@ pub fn limbs_choose_power_table_algorithm(
     } else {
         panic!("no powtab function available");
     }
-}
+}}
 
 /// This is mpn_str_powtab_alloc from gmp-impl.h, GMP 6.2.1.
 const fn limbs_digits_power_table_scratch_len(xs_len: usize) -> usize {
@@ -330,9 +338,8 @@ const fn limbs_to_digits_small_base_divide_and_conquer_scratch_len(xs_len: usize
     xs_len + (Limb::WIDTH as usize)
 }
 
-/// This is mpn_compute_powtab_mul from mpn/compute_powtab.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_compute_power_table_using_mul<'a>(
+// This is mpn_compute_powtab_mul from mpn/compute_powtab.c, GMP 6.2.1.
+pub_test! {limbs_compute_power_table_using_mul<'a>(
     power_table_memory: &'a mut [Limb],
     base: u64,
     exponents: &[usize],
@@ -498,11 +505,10 @@ pub fn limbs_compute_power_table_using_mul<'a>(
         });
     }
     powers
-}
+}}
 
-/// This is mpn_compute_powtab_div from mpn/compute_powtab.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_compute_power_table_using_div<'a>(
+// This is mpn_compute_powtab_div from mpn/compute_powtab.c, GMP 6.2.1.
+pub_test! {limbs_compute_power_table_using_div<'a>(
     power_table_memory: &'a mut [Limb],
     base: u64,
     exponents: &[usize],
@@ -566,11 +572,10 @@ pub fn limbs_compute_power_table_using_div<'a>(
         });
     }
     powers
-}
+}}
 
-/// This is mpn_compute_powtab from mpn/compute_powtab.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_compute_power_table(
+// This is mpn_compute_powtab from mpn/compute_powtab.c, GMP 6.2.1.
+pub_test! {limbs_compute_power_table(
     power_table_memory: &mut [Limb],
     xs_len: usize,
     base: u64,
@@ -589,7 +594,7 @@ pub fn limbs_compute_power_table(
         }
     };
     (power_len, powers)
-}
+}}
 
 //TODO tune
 const GET_STR_DC_THRESHOLD: usize = 15;
@@ -681,10 +686,17 @@ fn limbs_to_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
     }
 }
 
-/// This is mpn_get_str from mpn/generic/get_str.c, GMP 6.2.1, where un != 0 and base is not a power
-/// of two.
-#[doc(hidden)]
-pub fn limbs_to_digits_small_base<T: PrimitiveUnsigned>(
+pub_crate_test! {limbs_to_digits_small_base_no_alg_specified<T: PrimitiveUnsigned>(
+    out: &mut [T],
+    base: u64,
+    xs: &mut [Limb],
+) -> usize {
+    limbs_to_digits_small_base(out, base, xs, None)
+}}
+
+// This is mpn_get_str from mpn/generic/get_str.c, GMP 6.2.1, where un != 0 and base is not a power
+// of two.
+pub_test! {limbs_to_digits_small_base<T: PrimitiveUnsigned>(
     out: &mut [T],
     base: u64,
     xs: &mut [Limb],
@@ -716,11 +728,10 @@ pub fn limbs_to_digits_small_base<T: PrimitiveUnsigned>(
             &mut scratch,
         )
     }
-}
+}}
 
-/// Returns digits in ascending order.
-#[doc(hidden)]
-pub fn limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
+// Returns digits in ascending order.
+pub_test! {limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     digits: &mut Vec<T>,
     xs: &mut [Limb],
     base: Limb,
@@ -743,10 +754,9 @@ pub fn limbs_to_digits_basecase<T: ConvertibleFrom<Limb> + PrimitiveUnsigned>(
     }
     let trailing_zeros = slice_trailing_zeros(digits);
     digits.truncate(digits.len() - trailing_zeros);
-}
+}}
 
-#[doc(hidden)]
-pub fn to_digits_asc_naive_primitive<T: for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned>(
+pub_test! {to_digits_asc_naive_primitive<T: for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned>(
     digits: &mut Vec<T>,
     x: &Natural,
     base: T,
@@ -759,16 +769,15 @@ pub fn to_digits_asc_naive_primitive<T: for<'a> ExactFrom<&'a Natural> + Primiti
     while remainder != 0 {
         digits.push(T::exact_from(&remainder.div_assign_mod(&nat_base)));
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natural) {
+pub_test! {to_digits_asc_naive(digits: &mut Vec<Natural>, x: &Natural, base: &Natural) {
     assert!(*base > 1);
     let mut remainder = x.clone();
     while remainder != 0 {
         digits.push(remainder.div_assign_mod(base));
     }
-}
+}}
 
 //TODO tune
 const TO_DIGITS_DIVIDE_AND_CONQUER_THRESHOLD: u64 = 50;
@@ -853,8 +862,7 @@ fn to_digits_asc_divide_and_conquer(
     }
 }
 
-#[doc(hidden)]
-pub fn to_digits_asc_limb<
+pub_test! {to_digits_asc_limb<
     T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     x: &Natural,
@@ -906,10 +914,9 @@ where
             }
         }
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn to_digits_desc_limb<
+pub_test! {to_digits_desc_limb<
     T: ConvertibleFrom<Limb> + for<'a> ExactFrom<&'a Natural> + PrimitiveUnsigned,
 >(
     x: &Natural,
@@ -961,11 +968,10 @@ where
             }
         }
     }
-}
+}}
 
-/// optimized for large base
-#[doc(hidden)]
-pub fn to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
+// optimized for large base
+pub_test! {to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     if *x == 0 {
         Vec::new()
     } else if x < base {
@@ -989,11 +995,10 @@ pub fn to_digits_asc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
             _ => panic!("x must be large"),
         }
     }
-}
+}}
 
-/// optimized for large base
-#[doc(hidden)]
-pub fn to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
+// optimized for large base
+pub_test! {to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
     if *x == 0 {
         Vec::new()
     } else if x < base {
@@ -1018,10 +1023,12 @@ pub fn to_digits_desc_large(x: &Natural, base: &Natural) -> Vec<Natural> {
             _ => panic!("x must be large"),
         }
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn from_digits_desc_naive_primitive<T: PrimitiveUnsigned>(xs: &[T], base: T) -> Option<Natural>
+pub_test! {from_digits_desc_naive_primitive<T: PrimitiveUnsigned>(
+    xs: &[T],
+    base: T
+) -> Option<Natural>
 where
     Natural: From<T>,
 {
@@ -1036,10 +1043,9 @@ where
         n += Natural::from(x);
     }
     Some(n)
-}
+}}
 
-#[doc(hidden)]
-pub fn from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natural> {
+pub_test! {from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natural> {
     assert!(*base > 1);
     let mut n = Natural::ZERO;
     for x in xs {
@@ -1050,24 +1056,22 @@ pub fn from_digits_desc_naive(xs: &[Natural], base: &Natural) -> Option<Natural>
         n += x;
     }
     Some(n)
-}
+}}
 
-/// Compute the number of limbs corresponding to `digit_count` base-`base` digits, rounding up.
-///
-/// This is LIMBS_PER_DIGIT_IN_BASE from gmp-impl.h, where res is returned and base is not a power
-/// of 2.
-#[doc(hidden)]
-pub fn limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
+// Compute the number of limbs corresponding to `digit_count` base-`base` digits, rounding up.
+//
+// This is LIMBS_PER_DIGIT_IN_BASE from gmp-impl.h, where res is returned and base is not a power
+// of 2.
+pub_test! {limbs_per_digit_in_base(digit_count: usize, base: u64) -> u64 {
     (u64::exact_from(Limb::x_mul_y_is_zz(get_log_2_of_base(base), Limb::exact_from(digit_count)).0)
         >> (Limb::LOG_WIDTH - 3))
         + 2
-}
+}}
 
-/// The input digits are in descending order.
-///
-/// This is mpn_bc_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
-#[doc(hidden)]
-pub fn limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
+// The input digits are in descending order.
+//
+// This is mpn_bc_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+pub_test! {limbs_from_digits_small_base_basecase<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
     base: u64,
@@ -1174,17 +1178,16 @@ where
         }
     }
     Some(size)
-}
+}}
 
 //TODO tune
 // must be greater than get_chars_per_limb(3), which is 40 for 64-bit build
 const SET_STR_DC_THRESHOLD: usize = 7100;
 
-/// The input digits are in descending order.
-///
-/// This is mpn_dc_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
-#[doc(hidden)]
-pub fn limbs_from_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
+// The input digits are in descending order.
+//
+// This is mpn_dc_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+pub_test! {limbs_from_digits_small_base_divide_and_conquer<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
     base: u64,
@@ -1254,9 +1257,9 @@ where
         n -= 1;
     }
     Some(n)
-}
+}}
 
-/// This is mpn_dc_set_str_itch from gmp-impl.h, GMP 6.2.1.
+// This is mpn_dc_set_str_itch from gmp-impl.h, GMP 6.2.1.
 const fn limbs_from_digits_small_base_divide_and_conquer_scratch_len(xs_len: usize) -> usize {
     xs_len + (Limb::WIDTH as usize)
 }
@@ -1264,11 +1267,10 @@ const fn limbs_from_digits_small_base_divide_and_conquer_scratch_len(xs_len: usi
 // must be greater than get_chars_per_limb(3), which is 40 for 64-bit build
 const SET_STR_PRECOMPUTE_THRESHOLD: usize = 7100;
 
-/// The input digits are in descending order.
-///
-/// This is mpn_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
-#[doc(hidden)]
-pub fn limbs_from_digits_small_base<T: PrimitiveUnsigned>(
+// The input digits are in descending order.
+//
+// This is mpn_set_str from mpn/generic/set_str.c, GMP 6.2.1, where base is not a power of 2.
+pub_test! {limbs_from_digits_small_base<T: PrimitiveUnsigned>(
     out: &mut [Limb],
     xs: &[T],
     base: u64,
@@ -1296,10 +1298,9 @@ where
             &mut scratch,
         )
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn from_digits_desc_basecase<T: PrimitiveUnsigned>(xs: &[T], base: Limb) -> Option<Natural>
+pub_test! {from_digits_desc_basecase<T: PrimitiveUnsigned>(xs: &[T], base: Limb) -> Option<Natural>
 where
     Limb: WrappingFrom<T>,
 {
@@ -1325,7 +1326,7 @@ where
         x += Natural::from(big_digit);
     }
     Some(x)
-}
+}}
 
 fn compute_powers_for_from_digits(base: &Natural, digits: usize) -> Vec<Natural> {
     if u64::checked_from(digits).unwrap() * base.significant_bits()
@@ -1381,8 +1382,7 @@ where
     }
 }
 
-#[doc(hidden)]
-pub fn from_digits_desc_divide_and_conquer(
+pub_test! {from_digits_desc_divide_and_conquer(
     xs: &[Natural],
     base: &Natural,
     powers: &[Natural],
@@ -1405,10 +1405,9 @@ pub fn from_digits_desc_divide_and_conquer(
             Some(out_hi * &powers[power_index] + out_lo)
         }
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn from_digits_asc_limb<I: Iterator<Item = T>, T: CheckedFrom<Limb> + PrimitiveUnsigned>(
+pub_test! {from_digits_asc_limb<I: Iterator<Item = T>, T: CheckedFrom<Limb> + PrimitiveUnsigned>(
     xs: I,
     base: Limb,
 ) -> Option<Natural>
@@ -1443,7 +1442,7 @@ where
             )
         }
     }
-}
+}}
 
 fn from_digits_asc_limb_from_natural<
     I: Iterator<Item = Natural>,
@@ -1489,8 +1488,7 @@ where
     }
 }
 
-#[doc(hidden)]
-pub fn from_digits_desc_limb<I: Iterator<Item = T>, T: PrimitiveUnsigned>(
+pub_test! {from_digits_desc_limb<I: Iterator<Item = T>, T: PrimitiveUnsigned>(
     xs: I,
     base: Limb,
 ) -> Option<Natural>
@@ -1524,7 +1522,7 @@ where
             )
         }
     }
-}
+}}
 
 fn from_digits_desc_limb_from_natural<
     I: Iterator<Item = Natural>,
@@ -1569,9 +1567,8 @@ where
     }
 }
 
-/// optimized for large base
-#[doc(hidden)]
-pub fn from_digits_asc_large<I: Iterator<Item = Natural>>(
+// optimized for large base
+pub_test! {from_digits_asc_large<I: Iterator<Item = Natural>>(
     xs: I,
     base: &Natural,
 ) -> Option<Natural> {
@@ -1583,11 +1580,10 @@ pub fn from_digits_asc_large<I: Iterator<Item = Natural>>(
         let powers = compute_powers_for_from_digits(base, xs.len());
         from_digits_desc_divide_and_conquer(&xs, base, &powers, powers.len().saturating_sub(1))
     }
-}
+}}
 
-/// optimized for large base
-#[doc(hidden)]
-pub fn from_digits_desc_large<I: Iterator<Item = Natural>>(
+// optimized for large base
+pub_test! {from_digits_desc_large<I: Iterator<Item = Natural>>(
     xs: I,
     base: &Natural,
 ) -> Option<Natural> {
@@ -1598,7 +1594,7 @@ pub fn from_digits_desc_large<I: Iterator<Item = Natural>>(
         let powers = compute_powers_for_from_digits(base, xs.len());
         from_digits_desc_divide_and_conquer(&xs, base, &powers, powers.len().saturating_sub(1))
     }
-}
+}}
 
 impl Digits<u8> for Natural {
     /// Returns a `Vec` containing the digits of `self` in ascending order (least- to most-

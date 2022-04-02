@@ -5,12 +5,12 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_gen_var_18, unsigned_rounding_mode_pair_gen_var_2,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_gen, natural_gen_var_3, natural_gen_var_4, natural_gen_var_5,
     natural_rounding_mode_pair_gen_var_1,
 };

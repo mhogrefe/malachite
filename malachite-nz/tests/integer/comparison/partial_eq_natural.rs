@@ -1,7 +1,7 @@
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
-use malachite_nz_test_util::generators::{integer_natural_pair_gen, natural_pair_gen};
+use malachite_nz::test_util::common::{integer_to_rug_integer, natural_to_rug_integer};
+use malachite_nz::test_util::generators::{integer_natural_pair_gen, natural_pair_gen};
 use rug;
 use std::str::FromStr;
 

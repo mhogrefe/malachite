@@ -36,11 +36,24 @@ extern crate rand;
 extern crate rand_chacha;
 extern crate sha3;
 
+#[cfg(feature = "test_build")]
+extern crate clap;
+#[cfg(feature = "test_build")]
+extern crate gnuplot;
+#[cfg(feature = "test_build")]
+extern crate time;
+#[cfg(feature = "test_build")]
+extern crate walkdir;
+
 /// Contains the `Named` trait, for getting a type's name.
 #[macro_use]
 pub mod named;
 
-/// Functions for working with `bool`s.
+#[doc(hidden)]
+#[macro_use]
+pub mod macros;
+
+/// Functions for working with `bool`s.z
 #[macro_use]
 pub mod bools;
 /// Functions for working with `char`s.
@@ -134,3 +147,6 @@ pub mod tuples;
 pub mod unions;
 /// Functions for working with `Vec`s.
 pub mod vecs;
+
+#[cfg(feature = "test_build")]
+pub mod test_util;

@@ -4,14 +4,14 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_triple_gen_var_11;
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_triple_gen_var_11;
 use malachite_nz::natural::arithmetic::mod_power_of_2_mul::{
     limbs_mod_power_of_2_mul, limbs_mod_power_of_2_mul_ref_ref, limbs_mod_power_of_2_mul_val_ref,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_natural_natural_unsigned_quadruple_gen_var_2,
     natural_natural_unsigned_triple_gen_var_4, natural_unsigned_pair_gen_var_11,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_20,

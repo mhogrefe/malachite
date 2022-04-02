@@ -7,28 +7,23 @@ authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 name = "malachite_nz"
 path = "src/lib.rs"
 
-[features]
-32_bit_limbs = []
-fail_on_untested_path = []
+[[bin]]
+name = "malachite_nz_main"
+path = "src/bin.rs"
 
 [dependencies]
 itertools = "0.9.0"
 malachite-base = { path = "../malachite-base" }
 serde = { version = "^1.0.0", optional = true, features = ["derive"] }
 
+serde_json = { version = "^1.0.32", optional = true }
+num = { version = "0.4.0", optional = true, features = ["serde"] }
+rug = { version = "1.14.1", default-features = false, optional = true, features = ["integer", "serde"] }
+
+[features]
+32_bit_limbs = []
+test_build = ["malachite-base/test_build", "serde", "serde_json", "num", "rug"]
+
 [profile.release]
 lto = true
-strip = "debuginfo"
-
-[dev-dependencies]
-num = "0.4.0"
-malachite-base-test-util = { path = "../malachite-base-test-util" }
-malachite-nz-test-util = { path = "../malachite-nz-test-util" }
-serde = "^1.0.0"
-serde_json = "^1.0.32"
-
-[dev-dependencies.rug]
-version = "1.14.1"
-default-features = false
-features = ["integer"]
-
+strip = true

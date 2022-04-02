@@ -1,6 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::primitive_float_gen;
+use malachite_base::test_util::generators::primitive_float_gen;
 
 fn is_negative_zero_helper<T: PrimitiveFloat>() {
     let test = |n: T, out| {

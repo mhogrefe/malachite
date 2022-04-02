@@ -7,7 +7,7 @@ use malachite_base::num::conversion::traits::{
 };
 use malachite_base::num::float::NiceFloat;
 use malachite_base::rounding_modes::RoundingMode;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     primitive_float_gen, primitive_float_gen_var_13, primitive_float_gen_var_14, signed_gen,
     signed_gen_var_7, unsigned_gen, unsigned_gen_var_18,
 };

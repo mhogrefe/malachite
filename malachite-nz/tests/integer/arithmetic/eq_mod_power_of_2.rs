@@ -3,8 +3,8 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 #[cfg(feature = "32_bit_limbs")]
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     signed_signed_unsigned_triple_gen_var_2, unsigned_vec_unsigned_unsigned_triple_gen_var_8,
     unsigned_vec_unsigned_vec_unsigned_triple_gen_var_9,
 };
@@ -15,8 +15,8 @@ use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::{Limb, SignedLimb};
 #[cfg(feature = "32_bit_limbs")]
-use malachite_nz_test_util::common::integer_to_rug_integer;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::integer_to_rug_integer;
+use malachite_nz::test_util::generators::{
     integer_integer_integer_unsigned_quadruple_gen_var_1,
     integer_integer_unsigned_triple_gen_var_1, integer_integer_unsigned_triple_gen_var_2,
     integer_integer_unsigned_triple_gen_var_3, integer_pair_gen, integer_unsigned_pair_gen_var_2,

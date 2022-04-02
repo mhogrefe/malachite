@@ -1,9 +1,9 @@
 use malachite_base::num::logic::traits::NotAssign;
-use malachite_base_test_util::generators::signed_gen;
+use malachite_base::test_util::generators::signed_gen;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
-use malachite_nz_test_util::generators::{integer_gen, natural_gen};
+use malachite_nz::test_util::common::{integer_to_rug_integer, rug_integer_to_integer};
+use malachite_nz::test_util::generators::{integer_gen, natural_gen};
 use rug;
 use std::str::FromStr;
 

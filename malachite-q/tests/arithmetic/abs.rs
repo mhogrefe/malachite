@@ -1,11 +1,11 @@
 use malachite_base::num::arithmetic::traits::{Abs, AbsAssign};
-use malachite_nz_test_util::generators::integer_gen;
-use malachite_q::Rational;
-use malachite_q_test_util::common::{
+use malachite_nz::test_util::generators::integer_gen;
+use malachite_q::test_util::common::{
     bigrational_to_rational, rational_to_bigrational, rational_to_rug_rational,
     rug_rational_to_rational,
 };
-use malachite_q_test_util::generators::rational_gen;
+use malachite_q::test_util::generators::rational_gen;
+use malachite_q::Rational;
 use num::{BigRational, Signed};
 use std::str::FromStr;
 

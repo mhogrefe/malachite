@@ -7,60 +7,57 @@ use platform::Limb;
 use std::cmp::Ordering;
 use std::mem::swap;
 
-/// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
-/// `Natural`s, compares the two `Natural`s.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()` = `ys.len()`
-///
-/// This is mpn_cmp from gmp.h, GMP 6.2.1.
-///
-/// # Panics
-/// Panics if `xs` and `ys` have different lengths.
-#[doc(hidden)]
-pub fn limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
+// Interpreting two equal-length slices of `Limb`s as the limbs (in ascending order) of two
+// `Natural`s, compares the two `Natural`s.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()` = `ys.len()`
+//
+// This is mpn_cmp from gmp.h, GMP 6.2.1.
+//
+// # Panics
+// Panics if `xs` and `ys` have different lengths.
+pub_crate_test! {limbs_cmp_same_length(xs: &[Limb], ys: &[Limb]) -> Ordering {
     assert_eq!(xs.len(), ys.len());
     xs.iter().rev().cmp(ys.iter().rev())
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, compares
-/// the two `Natural`s. Neither limb slice can contain trailing zeros.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
-///
-/// # Panics
-/// Panics if the last element of `xs` or `ys` is zero.
-#[doc(hidden)]
-pub fn limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, compares
+// the two `Natural`s. Neither limb slice can contain trailing zeros.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
+//
+// # Panics
+// Panics if the last element of `xs` or `ys` is zero.
+pub_crate_test! {limbs_cmp(xs: &[Limb], ys: &[Limb]) -> Ordering {
     assert_ne!(xs.last(), Some(&0));
     assert_ne!(ys.last(), Some(&0));
     xs.len()
         .cmp(&ys.len())
         .then_with(|| limbs_cmp_same_length(xs, ys))
-}
+}}
 
-/// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
-/// their normalized comparison. See `Natural::cmp_normalized` for details.
-///
-/// # Worst-case complexity
-/// $T(n) = O(n)$
-///
-/// $M(n) = O(1)$
-///
-/// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
-///
-/// # Panics
-/// Panics if either `xs` or `ys` is empty, or if the last element of `xs` or `ys` is zero.
-#[doc(hidden)]
-pub fn limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
+// Interpreting two slices of `Limb`s as the limbs (in ascending order) of two `Natural`s, returns
+// their normalized comparison. See `Natural::cmp_normalized` for details.
+//
+// # Worst-case complexity
+// $T(n) = O(n)$
+//
+// $M(n) = O(1)$
+//
+// where $T$ is time, $M$ is additional memory, and $n$ is `min(xs.len(), ys.len())`.
+//
+// # Panics
+// Panics if either `xs` or `ys` is empty, or if the last element of `xs` or `ys` is zero.
+pub_test! {limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
     let mut xs = &xs[slice_leading_zeros(xs)..];
     let mut ys = &ys[slice_leading_zeros(ys)..];
     let mut xs_leading = LeadingZeros::leading_zeros(*xs.last().unwrap());
@@ -131,7 +128,7 @@ pub fn limbs_cmp_normalized(xs: &[Limb], ys: &[Limb]) -> Ordering {
         xs_i -= 1;
         ys_i -= 1;
     }
-}
+}}
 
 impl PartialOrd for Natural {
     /// Compares a `Natural` to another `Natural`.

@@ -1,16 +1,16 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{BitBlockAccess, LowMask, SignificantBits};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_16, unsigned_triple_gen_var_5,
     unsigned_vec_unsigned_unsigned_triple_gen_var_3,
 };
-use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
+use malachite_base::test_util::num::logic::bit_block_access::get_bits_naive;
 use malachite_nz::natural::logic::bit_block_access::{limbs_slice_get_bits, limbs_vec_get_bits};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_unsigned_pair_gen, natural_unsigned_unsigned_triple_gen_var_4,
 };
 use std::str::FromStr;

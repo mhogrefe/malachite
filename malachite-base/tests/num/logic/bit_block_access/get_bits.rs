@@ -3,11 +3,11 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::logic::traits::BitBlockAccess;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_unsigned_pair_gen_var_1, signed_unsigned_unsigned_triple_gen_var_2, unsigned_gen_var_5,
     unsigned_pair_gen_var_2, unsigned_pair_gen_var_7, unsigned_triple_gen_var_5,
 };
-use malachite_base_test_util::num::logic::bit_block_access::get_bits_naive;
+use malachite_base::test_util::num::logic::bit_block_access::get_bits_naive;
 use std::panic::catch_unwind;
 
 #[test]

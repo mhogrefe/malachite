@@ -4,14 +4,14 @@ use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::comparison::traits::PartialOrdAbs;
 use malachite_base::num::conversion::traits::{CheckedFrom, ExactFrom};
-use malachite_base_test_util::generators::{signed_gen, unsigned_gen_var_5};
+use malachite_base::test_util::generators::{signed_gen, unsigned_gen_var_5};
 use malachite_nz::integer::Integer;
-use malachite_nz_test_util::generators::integer_unsigned_pair_gen_var_1;
-use malachite_q::Rational;
-use malachite_q_test_util::common::{rational_to_rug_rational, rug_rational_to_rational};
-use malachite_q_test_util::generators::{
+use malachite_nz::test_util::generators::integer_unsigned_pair_gen_var_1;
+use malachite_q::test_util::common::{rational_to_rug_rational, rug_rational_to_rational};
+use malachite_q::test_util::generators::{
     rational_gen, rational_signed_pair_gen_var_1, rational_unsigned_pair_gen_var_1,
 };
+use malachite_q::Rational;
 use std::ops::{Shl, ShlAssign, Shr};
 use std::str::FromStr;
 

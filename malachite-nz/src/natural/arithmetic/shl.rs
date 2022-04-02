@@ -8,18 +8,17 @@ use natural::Natural;
 use platform::Limb;
 use std::ops::{Shl, ShlAssign, Shr, ShrAssign};
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs of the `Natural` left-shifted by a `Limb`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()` + `bits` / Limb::WIDTH
-///
-/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where the result is returned.
-#[doc(hidden)]
-pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs of the `Natural` left-shifted by a `Limb`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()` + `bits` / Limb::WIDTH
+//
+// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where the result is returned.
+pub_crate_test! {limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
     let small_bits = bits & Limb::WIDTH_MASK;
     let mut out = vec![0; usize::exact_from(bits >> Limb::LOG_WIDTH)];
     if small_bits == 0 {
@@ -36,26 +35,25 @@ pub fn limbs_shl(xs: &[Limb], bits: u64) -> Vec<Limb> {
         }
     }
     out
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` left-shifted by a `Limb` to an output slice. The output slice must be at
-/// least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH` - 1, inclusive.
-/// The carry, or the bits that are shifted past the width of the input slice, is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or equal to
-/// `Limb::WIDTH`.
-///
-/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` left-shifted by a `Limb` to an output slice. The output slice must be at
+// least as long as the input slice. The `Limb` must be between 1 and `Limb::WIDTH` - 1, inclusive.
+// The carry, or the bits that are shifted past the width of the input slice, is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `xs`, `bits` is 0, or `bits` is greater than or equal to
+// `Limb::WIDTH`.
+//
+// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1.
+pub_crate_test! {limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
@@ -65,22 +63,21 @@ pub fn limbs_shl_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
         remaining_bits = x >> cobits;
     }
     remaining_bits
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` left-shifted by a `Limb` to the input slice. The `Limb` must be between 1
-/// and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
-/// input slice, is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up.
-#[doc(hidden)]
-pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` left-shifted by a `Limb` to the input slice. The `Limb` must be between 1
+// and `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
+// input slice, is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up.
+pub_crate_test! {limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
     assert_ne!(bits, 0);
     assert!(bits < Limb::WIDTH);
     let cobits = Limb::WIDTH - bits;
@@ -91,24 +88,23 @@ pub fn limbs_slice_shl_in_place(xs: &mut [Limb], bits: u64) -> Limb {
         remaining_bits = previous_x >> cobits;
     }
     remaining_bits
-}
+}}
 
-/// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
-/// writes the limbs of the `Natural` left-shifted by a `Limb` to the input `Vec`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(m)
-///
-/// where n = `xs.len()` + `bits` / Limb::WIDTH, m = `bits`
-///
-/// # Panics
-/// Panics if `xs` is empty.
-///
-/// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up and the carry is
-/// appended to rp.
-#[doc(hidden)]
-pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
+// Interpreting a nonempty `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`,
+// writes the limbs of the `Natural` left-shifted by a `Limb` to the input `Vec`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(m)
+//
+// where n = `xs.len()` + `bits` / Limb::WIDTH, m = `bits`
+//
+// # Panics
+// Panics if `xs` is empty.
+//
+// This is mpn_lshift from mpn/generic/lshift.c, GMP 6.2.1, where rp == up and the carry is
+// appended to rp.
+pub_crate_test! {limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
     let small_bits = bits & Limb::WIDTH_MASK;
     let remaining_bits = if small_bits == 0 {
         0
@@ -119,27 +115,30 @@ pub fn limbs_vec_shl_in_place(xs: &mut Vec<Limb>, bits: u64) {
     if remaining_bits != 0 {
         xs.push(remaining_bits);
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the `Natural` left-shifted by a `Limb`, and complemented, to an output slice. The
-/// output slice must be at least as long as the input slice. The `Limb` must be between 1 and
-/// `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
-/// input slice, is returned. The carry is not complemented.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs`, `xs` is empty, `bits` is 0, or `bits` is greater than or
-/// equal to `Limb::WIDTH`.
-///
-/// This is mpn_lshiftc from mpn/generic/mpn_lshiftc, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64) -> Limb {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the `Natural` left-shifted by a `Limb`, and complemented, to an output slice. The
+// output slice must be at least as long as the input slice. The `Limb` must be between 1 and
+// `Limb::WIDTH` - 1, inclusive. The carry, or the bits that are shifted past the width of the
+// input slice, is returned. The carry is not complemented.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `xs`, `xs` is empty, `bits` is 0, or `bits` is greater than or
+// equal to `Limb::WIDTH`.
+//
+// This is mpn_lshiftc from mpn/generic/mpn_lshiftc, GMP 6.2.1.
+pub_crate_test! {limbs_shl_with_complement_to_out(
+    out: &mut [Limb],
+    xs: &[Limb],
+    bits: u64
+) -> Limb {
     let n = xs.len();
     assert_ne!(n, 0);
     assert_ne!(bits, 0);
@@ -155,7 +154,7 @@ pub fn limbs_shl_with_complement_to_out(out: &mut [Limb], xs: &[Limb], bits: u64
     }
     *out_head = !previous_x;
     remaining_bits
-}
+}}
 
 fn shl_ref_unsigned<T: Copy + Eq + Zero>(x: &Natural, bits: T) -> Natural
 where

@@ -1,9 +1,9 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::logic::traits::{CheckedHammingDistance, CountOnes, HammingDistance};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::unsigned_pair_gen_var_27;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::unsigned_pair_gen_var_27;
+use malachite_base::test_util::generators::{
     unsigned_vec_pair_gen_var_6, unsigned_vec_pair_gen_var_7, unsigned_vec_unsigned_pair_gen_var_15,
 };
 use malachite_nz::natural::logic::hamming_distance::{
@@ -11,9 +11,9 @@ use malachite_nz::natural::logic::hamming_distance::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::natural_to_rug_integer;
-use malachite_nz_test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
-use malachite_nz_test_util::natural::logic::hamming_distance::{
+use malachite_nz::test_util::common::natural_to_rug_integer;
+use malachite_nz::test_util::generators::{natural_gen, natural_pair_gen, natural_triple_gen};
+use malachite_nz::test_util::natural::logic::hamming_distance::{
     natural_hamming_distance_alt_1, natural_hamming_distance_alt_2, rug_hamming_distance,
 };
 use rug;

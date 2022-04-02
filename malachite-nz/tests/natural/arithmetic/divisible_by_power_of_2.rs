@@ -2,15 +2,15 @@ use malachite_base::num::arithmetic::traits::DivisibleByPowerOf2;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_gen, unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_20,
 };
 use malachite_nz::natural::arithmetic::divisible_by_power_of_2::limbs_divisible_by_power_of_2;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::natural_to_rug_integer;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::common::natural_to_rug_integer;
+use malachite_nz::test_util::generators::{
     natural_gen, natural_unsigned_pair_gen_var_10, natural_unsigned_pair_gen_var_4,
     natural_unsigned_pair_gen_var_9,
 };

@@ -1,5 +1,5 @@
 use malachite_base::rational_sequences::RationalSequence;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_rational_sequence_unsigned_pair_gen_var_1,
     unsigned_rational_sequence_unsigned_pair_gen_var_2,
 };

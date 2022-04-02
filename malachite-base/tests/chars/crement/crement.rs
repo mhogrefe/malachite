@@ -1,6 +1,6 @@
 use malachite_base::chars::constants::{CHAR_JUST_ABOVE_SURROGATES, CHAR_JUST_BELOW_SURROGATES};
 use malachite_base::chars::crement::{decrement_char, increment_char};
-use malachite_base_test_util::generators::{char_gen_var_1, char_gen_var_2};
+use malachite_base::test_util::generators::{char_gen_var_1, char_gen_var_2};
 
 #[test]
 fn test_increment_char() {

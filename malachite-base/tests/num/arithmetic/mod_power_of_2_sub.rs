@@ -1,5 +1,5 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{unsigned_pair_gen_var_17, unsigned_triple_gen_var_11};
+use malachite_base::test_util::generators::{unsigned_pair_gen_var_17, unsigned_triple_gen_var_11};
 
 fn mod_power_of_2_sub_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, y: T, pow, out| {

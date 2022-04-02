@@ -41,29 +41,31 @@ use platform::{
 use std::cmp::{min, Ordering};
 use std::mem::swap;
 
-/// The highest bit of the input must be set.
-///
-/// Time: O(1)
-///
-/// Additional memory: O(1)
-///
-/// # Panics
-/// Panics if `d` is zero.
-///
-/// This is mpn_invert_limb, or invert_limb, from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-#[inline]
-pub fn limbs_invert_limb(d: Limb) -> Limb {
+// The highest bit of the input must be set.
+//
+// Time: O(1)
+//
+// Additional memory: O(1)
+//
+// # Panics
+// Panics if `d` is zero.
+//
+// This is mpn_invert_limb, or invert_limb, from gmp-impl.h, GMP 6.2.1.
+pub_crate_test! {limbs_invert_limb(d: Limb) -> Limb {
     (DoubleLimb::join_halves(!d, Limb::MAX) / DoubleLimb::from(d)).lower_half()
-}
+}}
 
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> (Limb, Limb) {
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1.
+pub_crate_test! {div_mod_by_preinversion(
+    n_high: Limb,
+    n_low: Limb,
+    d: Limb,
+    d_inv: Limb
+) -> (Limb, Limb) {
     let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
         .split_in_half();
@@ -79,51 +81,48 @@ pub fn div_mod_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) 
         r -= d;
     }
     (q_high, r)
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// quotient limbs and remainder of the `Natural` divided by a `Limb`. The divisor limb cannot be
-/// zero and the limb slice must have at least two elements.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if the length of `ns` is less than 2 or if `d` is zero.
-///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0, un > 1, and both
-/// results are returned. Experiments show that DIVREM_1_NORM_THRESHOLD and
-/// DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be 0).
-#[doc(hidden)]
-pub fn limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// quotient limbs and remainder of the `Natural` divided by a `Limb`. The divisor limb cannot be
+// zero and the limb slice must have at least two elements.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if the length of `ns` is less than 2 or if `d` is zero.
+//
+// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0, un > 1, and both
+// results are returned. Experiments show that DIVREM_1_NORM_THRESHOLD and
+// DIVREM_1_UNNORM_THRESHOLD are unnecessary (they would always be 0).
+pub_test! {limbs_div_limb_mod(ns: &[Limb], d: Limb) -> (Vec<Limb>, Limb) {
     let mut qs = vec![0; ns.len()];
     let r = limbs_div_limb_to_out_mod(&mut qs, ns, d);
     (qs, r)
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and a `Limb` to an output slice, and returns the
-/// remainder. The output slice must be at least as long as the input slice. The divisor limb cannot
-/// be zero and the input limb slice must have at least two elements.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
-///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0 and un > 1.
-/// Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary
-/// (they would always be 0).
-#[doc(hidden)]
-#[allow(clippy::branches_sharing_code)]
-pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the quotient of the `Natural` and a `Limb` to an output slice, and returns the
+// remainder. The output slice must be at least as long as the input slice. The divisor limb cannot
+// be zero and the input limb slice must have at least two elements.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
+//
+// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0 and un > 1.
+// Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are unnecessary
+// (they would always be 0).
+pub_crate_test! {limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -172,27 +171,26 @@ pub fn limbs_div_limb_to_out_mod(out: &mut [Limb], ns: &[Limb], d: Limb) -> Limb
         (*out_head, out_r) = div_mod_by_preinversion(r, previous_n << bits, d, d_inv);
         out_r >> bits
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and a `Limb` to the input slice and returns the
-/// remainder. The divisor limb cannot be zero and the input limb slice must have at least two
-/// elements.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if the length of `ns` is less than 2 or if `d` is zero.
-///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qp == up, qxn is 0, and
-/// un > 1. Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are
-/// unnecessary (they would always be 0).
-#[doc(hidden)]
-pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the quotient of the `Natural` and a `Limb` to the input slice and returns the
+// remainder. The divisor limb cannot be zero and the input limb slice must have at least two
+// elements.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if the length of `ns` is less than 2 or if `d` is zero.
+//
+// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qp == up, qxn is 0, and
+// un > 1. Experiments show that DIVREM_1_NORM_THRESHOLD and DIVREM_1_UNNORM_THRESHOLD are
+// unnecessary (they would always be 0).
+pub_crate_test! {limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -239,28 +237,27 @@ pub fn limbs_div_limb_in_place_mod(ns: &mut [Limb], d: Limb) -> Limb {
         (ns[0], out_r) = div_mod_by_preinversion(r, previous_n << bits, d, d_inv);
         out_r >> bits
     }
-}
+}}
 
-/// Let `ns` be the limbs of a `Natural` $n$, and let $f$ be `fraction_len`. This function performs
-/// the integer division $B^fn / d$, writing the `ns.len() + fraction_len` limbs of the quotient to
-/// `out` and returning the remainder.
-///
-/// `shift` must be the number of leading zeros of `d`, and `d_inv` must be
-/// `limbs_invert_limb(d << shift)`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()` + `fraction_len`
-///
-/// # Panics
-/// Panics if `out` is shorter than `ns.len()` + `fraction_len`, if `ns` is empty, or if `d` is
-/// zero.
-///
-/// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp != ap.
-#[doc(hidden)]
-pub fn limbs_div_mod_extra(
+// Let `ns` be the limbs of a `Natural` $n$, and let $f$ be `fraction_len`. This function performs
+// the integer division $B^fn / d$, writing the `ns.len() + fraction_len` limbs of the quotient to
+// `out` and returning the remainder.
+//
+// `shift` must be the number of leading zeros of `d`, and `d_inv` must be
+// `limbs_invert_limb(d << shift)`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()` + `fraction_len`
+//
+// # Panics
+// Panics if `out` is shorter than `ns.len()` + `fraction_len`, if `ns` is empty, or if `d` is
+// zero.
+//
+// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp != ap.
+pub_test! {limbs_div_mod_extra(
     out: &mut [Limb],
     fraction_len: usize,
     mut ns: &[Limb],
@@ -319,27 +316,26 @@ pub fn limbs_div_mod_extra(
         (*q, r) = div_mod_by_preinversion(r, 0, d_norm, d_inv);
     }
     r >> shift
-}
+}}
 
-/// Let `&ns[fraction_len..]` be the limbs of a `Natural` $n$, and let $f$ be `fraction_len`. This
-/// function performs the integer division $B^fn / d$, writing the `ns.len() + fraction_len` limbs
-/// of the quotient to `ns` and returning the remainder.
-///
-/// `shift` must be the number of leading zeros of `d`, and `d_inv` must be
-/// `limbs_invert_limb(d << shift)`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()` + `fraction_len`
-///
-/// # Panics
-/// Panics if `ns` is empty, if `ns.len()` is less than `fraction_len`, or if `d` is zero.
-///
-/// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp == ap.
-#[doc(hidden)]
-pub fn limbs_div_mod_extra_in_place(
+// Let `&ns[fraction_len..]` be the limbs of a `Natural` $n$, and let $f$ be `fraction_len`. This
+// function performs the integer division $B^fn / d$, writing the `ns.len() + fraction_len` limbs
+// of the quotient to `ns` and returning the remainder.
+//
+// `shift` must be the number of leading zeros of `d`, and `d_inv` must be
+// `limbs_invert_limb(d << shift)`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()` + `fraction_len`
+//
+// # Panics
+// Panics if `ns` is empty, if `ns.len()` is less than `fraction_len`, or if `d` is zero.
+//
+// This is mpn_preinv_divrem_1 from mpn/generic/pre_divrem_1.c, GMP 6.2.1, where qp == ap.
+pub_crate_test! {limbs_div_mod_extra_in_place(
     ns: &mut [Limb],
     fraction_len: usize,
     d: Limb,
@@ -392,22 +388,21 @@ pub fn limbs_div_mod_extra_in_place(
         (*q, r) = div_mod_by_preinversion(r, 0, d_norm, d_inv);
     }
     r >> shift
-}
+}}
 
-/// Computes floor((B ^ 3 - 1) / (`hi` * B + `lo`)) - B, where B = 2 ^ `Limb::WIDTH`, assuming the
-/// highest bit of `hi` is set.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// # Panics
-/// Panics if `hi` is zero.
-///
-/// This is invert_pi1 from gmp-impl.h, GMP 6.2.1, where the result is returned instead of being
-/// written to dinv.
-#[doc(hidden)]
-pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
+// Computes floor((B ^ 3 - 1) / (`hi` * B + `lo`)) - B, where B = 2 ^ `Limb::WIDTH`, assuming the
+// highest bit of `hi` is set.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// # Panics
+// Panics if `hi` is zero.
+//
+// This is invert_pi1 from gmp-impl.h, GMP 6.2.1, where the result is returned instead of being
+// written to dinv.
+pub_crate_test! {limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
     let mut d_inv = limbs_invert_limb(hi);
     let mut hi_product = hi.wrapping_mul(d_inv);
     hi_product.wrapping_add_assign(lo);
@@ -428,19 +423,18 @@ pub fn limbs_two_limb_inverse_helper(hi: Limb, lo: Limb) -> Limb {
         }
     }
     d_inv
-}
+}}
 
-/// Computes the quotient and remainder of `[n_2, n_1, n_0]` / `[d_1, d_0]`. Requires the highest
-/// bit of `d_1` to be set, and `[n_2, n_1]` < `[d_1, d_0]`. `d_inv` is the inverse of `[d_1, d_0]`
-/// computed by `limbs_two_limb_inverse_helper`.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
-///
-/// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_mod_three_limb_by_two_limb(
+// Computes the quotient and remainder of `[n_2, n_1, n_0]` / `[d_1, d_0]`. Requires the highest
+// bit of `d_1` to be set, and `[n_2, n_1]` < `[d_1, d_0]`. `d_inv` is the inverse of `[d_1, d_0]`
+// computed by `limbs_two_limb_inverse_helper`.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+//
+// This is udiv_qr_3by2 from gmp-impl.h, GMP 6.2.1.
+pub_crate_test! {limbs_div_mod_three_limb_by_two_limb(
     n_2: Limb,
     n_1: Limb,
     n_0: Limb,
@@ -469,26 +463,29 @@ pub fn limbs_div_mod_three_limb_by_two_limb(
         r.wrapping_sub_assign(d);
     }
     (q, r)
-}
+}}
 
-/// Divides `ns` by `ds` and writes the `ns.len()` - 2 least-significant quotient limbs to `qs` and
-/// the 2-long remainder to `ns`. Returns the most significant limb of the quotient; `true` means 1
-/// and `false` means 0. `ds` must have length 2, `ns` must have length at least 2, and the most
-/// significant bit of `ds[1]` must be set.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ds` does not have length 2, `ns` has length less than 2, `qs` has length less than
-/// `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
-///
-/// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_mod_by_two_limb_normalized(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
+// Divides `ns` by `ds` and writes the `ns.len()` - 2 least-significant quotient limbs to `qs` and
+// the 2-long remainder to `ns`. Returns the most significant limb of the quotient; `true` means 1
+// and `false` means 0. `ds` must have length 2, `ns` must have length at least 2, and the most
+// significant bit of `ds[1]` must be set.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ds` does not have length 2, `ns` has length less than 2, `qs` has length less than
+// `ns.len() - 2`, or `ds[1]` does not have its highest bit set.
+//
+// This is mpn_divrem_2 from mpn/generic/divrem_2.c, GMP 6.2.1.
+pub_crate_test! {limbs_div_mod_by_two_limb_normalized(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb]
+) -> bool {
     assert_eq!(ds.len(), 2);
     let n_len = ns.len();
     assert!(n_len >= 2);
@@ -512,31 +509,30 @@ pub fn limbs_div_mod_by_two_limb_normalized(qs: &mut [Limb], ns: &mut [Limb], ds
     ns[1] = r_1;
     ns[0] = r_0;
     highest_q
-}
+}}
 
-/// Schoolbook division using the Möller-Granlund 3/2 division algorithm.
-///
-/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-/// `qs` and the `ds.len()` limbs of the remainder to `ns`. Returns the most significant limb of the
-/// quotient; `true` means 1 and `false` means 0. `ds` must have length greater than 2, `ns` must be
-/// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be
-/// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
-/// denominator.
-///
-/// Time: worst case O(d * (n - d + 1)); also, O(n ^ 2)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///       d = `ds.len()`
-///
-/// # Panics
-/// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
-/// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
-///
-/// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_mod_schoolbook(
+// Schoolbook division using the Möller-Granlund 3/2 division algorithm.
+//
+// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+// `qs` and the `ds.len()` limbs of the remainder to `ns`. Returns the most significant limb of the
+// quotient; `true` means 1 and `false` means 0. `ds` must have length greater than 2, `ns` must be
+// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be
+// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
+// denominator.
+//
+// Time: worst case O(d * (n - d + 1)); also, O(n ^ 2)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//       d = `ds.len()`
+//
+// # Panics
+// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
+// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
+//
+// This is mpn_sbpi1_div_qr from mpn/generic/sbpi1_div_qr.c, GMP 6.2.1.
+pub_crate_test! {limbs_div_mod_schoolbook(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -595,15 +591,15 @@ pub fn limbs_div_mod_schoolbook(
     }
     ns[d_len - 1] = n_1;
     highest_q
-}
+}}
 
-/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `ds.len()`
-///
-/// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1.
+// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = `ds.len()`
+//
+// This is mpn_dcpi1_div_qr_n from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1.
 pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
@@ -663,8 +659,7 @@ pub(crate) fn limbs_div_mod_divide_and_conquer_helper(
     highest_q
 }
 
-#[doc(hidden)]
-pub fn limbs_div_dc_helper(
+pub_test! {limbs_div_dc_helper(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -676,24 +671,23 @@ pub fn limbs_div_dc_helper(
     } else {
         limbs_div_mod_divide_and_conquer_helper(qs, ns, ds, d_inv, scratch)
     }
-}
+}}
 
-/// Recursive divide-and-conquer division.
-///
-/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `ds.len()`
-///
-/// # Panics
-/// Panics if `ds` has length smaller than 6, `ns.len()` is less than `ds.len()` + 3, `qs` has
-/// length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit
-/// set.
-///
-/// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_mod_divide_and_conquer(
+// Recursive divide-and-conquer division.
+//
+// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = `ds.len()`
+//
+// # Panics
+// Panics if `ds` has length smaller than 6, `ns.len()` is less than `ds.len()` + 3, `qs` has
+// length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit
+// set.
+//
+// This is mpn_dcpi1_div_qr from mpn/generic/dcpi1_div_qr.c, GMP 6.2.1.
+pub_test! {limbs_div_mod_divide_and_conquer(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -841,35 +835,37 @@ pub fn limbs_div_mod_divide_and_conquer(
         }
     }
     highest_q
-}
+}}
 
-#[doc(hidden)]
-pub fn limbs_div_approx_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
+pub_test! {limbs_div_approx_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) {
     if ds.len() < DC_DIVAPPR_Q_THRESHOLD {
         limbs_div_schoolbook_approx(qs, ns, ds, d_inv);
     } else {
         limbs_div_divide_and_conquer_approx(qs, ns, ds, d_inv);
     }
-}
+}}
 
-/// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
-/// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
-/// `limbs_invert_approx` for an explanation of the return value.
-///
-/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = `ds.len()`
-///
-/// # Panics
-/// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
-/// of `ds`, or the last limb of `ds` does not have its highest bit set.
-///
-/// This is mpn_bc_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
-/// `true` iff the return value of mpn_bc_invertappr would be 0.
-#[doc(hidden)]
-pub fn limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
+// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
+// `limbs_invert_approx` for an explanation of the return value.
+//
+// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = `ds.len()`
+//
+// # Panics
+// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
+// of `ds`, or the last limb of `ds` does not have its highest bit set.
+//
+// This is mpn_bc_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
+// `true` iff the return value of mpn_bc_invertappr would be 0.
+pub_test! {limbs_invert_basecase_approx(
+    is: &mut [Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb]
+) -> bool {
     let d_len = ds.len();
     assert_ne!(d_len, 0);
     let highest_d = ds[d_len - 1];
@@ -899,40 +895,39 @@ pub fn limbs_invert_basecase_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut 
         }
     }
     true
-}
+}}
 
-/// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
-/// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
-/// `limbs_invert_approx` for an explanation of the return value.
-///
-/// Uses Newton's iterations (at least one). Inspired by Algorithm "ApproximateReciprocal",
-/// published in "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann, algorithm
-/// 3.5, page 121 in version 0.4 of the book.
-///
-/// Some adaptations were introduced, to allow product mod B ^ m - 1 and return the value e.
-///
-/// We introduced a correction in such a way that "the value of B ^ {n + h} - T computed at step 8
-/// cannot exceed B ^ n - 1" (the book reads "2 * B ^ n - 1").
-///
-/// Maximum scratch needed by this branch <= 2 * n, but have to fit 3 * rn in the scratch, i.e.
-/// 3 * rn <= 2 * n: we require n > 4.
-///
-/// We use a wrapped product modulo B ^ m - 1.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `is.len()`
-///
-/// # Panics
-/// Panics if `ds` has length less than 5, `is` is shorter than `ds`, `scratch` is shorter than
-/// twice the length of `ds`, or the last limb of `ds` does not have its highest bit set.
-///
-/// This is mpn_ni_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
-/// `true` iff the return value of mpn_ni_invertappr would be 0.
-#[doc(hidden)]
-pub fn limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
+// computes the approximate reciprocal of `ds`, with the same length as `ds`. See documentation for
+// `limbs_invert_approx` for an explanation of the return value.
+//
+// Uses Newton's iterations (at least one). Inspired by Algorithm "ApproximateReciprocal",
+// published in "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann, algorithm
+// 3.5, page 121 in version 0.4 of the book.
+//
+// Some adaptations were introduced, to allow product mod B ^ m - 1 and return the value e.
+//
+// We introduced a correction in such a way that "the value of B ^ {n + h} - T computed at step 8
+// cannot exceed B ^ n - 1" (the book reads "2 * B ^ n - 1").
+//
+// Maximum scratch needed by this branch <= 2 * n, but have to fit 3 * rn in the scratch, i.e.
+// 3 * rn <= 2 * n: we require n > 4.
+//
+// We use a wrapped product modulo B ^ m - 1.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `is.len()`
+//
+// # Panics
+// Panics if `ds` has length less than 5, `is` is shorter than `ds`, `scratch` is shorter than
+// twice the length of `ds`, or the last limb of `ds` does not have its highest bit set.
+//
+// This is mpn_ni_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
+// `true` iff the return value of mpn_ni_invertappr would be 0.
+pub_test! {limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     let d_len = ds.len();
     assert!(d_len > 4);
     assert!(ds[d_len - 1].get_highest_bit());
@@ -1070,42 +1065,41 @@ pub fn limbs_invert_newton_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [L
     }
     // Check for possible carry propagation from below. Be conservative.
     scratch[a - 1] <= Limb::MAX - 7
-}
+}}
 
-/// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
-/// computes the approximate reciprocal of `ds`, with the same length as `ds`.
-///
-/// Let result_definitely_exact = limbs_invert_basecase_approx(is, ds, scratch) be the returned
-/// value. If result_definitely_exact is `true`, the error e is 0; otherwise, it may be 0 or 1. The
-/// following condition is satisfied by the output:
-///
-/// ds * (2 ^ (n * Limb::WIDTH) + is) < 2 ^ (2 * n * Limb::WIDTH) <=
-/// ds * (2 ^ (n * Limb::WIDTH) + is + 1 + e),
-/// where n = `ds.len()`.
-///
-/// When the strict result is needed, i.e., e = 0 in the relation above, the function `mpn_invert`
-/// (TODO!) should be used instead.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `is.len()`
-///
-/// # Panics
-/// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
-/// of `ds`, or the last limb of `ds` does not have its highest bit set.
-///
-/// This is mpn_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
-/// `true` iff the return value of mpn_invertappr would be 0.
-#[doc(hidden)]
-pub fn limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+// Takes the strictly normalized value ds (i.e., most significant bit must be set) as an input, and
+// computes the approximate reciprocal of `ds`, with the same length as `ds`.
+//
+// Let result_definitely_exact = limbs_invert_basecase_approx(is, ds, scratch) be the returned
+// value. If result_definitely_exact is `true`, the error e is 0; otherwise, it may be 0 or 1. The
+// following condition is satisfied by the output:
+//
+// ds * (2 ^ (n * Limb::WIDTH) + is) < 2 ^ (2 * n * Limb::WIDTH) <=
+// ds * (2 ^ (n * Limb::WIDTH) + is + 1 + e),
+// where n = `ds.len()`.
+//
+// When the strict result is needed, i.e., e = 0 in the relation above, the function `mpn_invert`
+// (TODO!) should be used instead.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `is.len()`
+//
+// # Panics
+// Panics if `ds` is empty, `is` is shorter than `ds`, `scratch` is shorter than twice the length
+// of `ds`, or the last limb of `ds` does not have its highest bit set.
+//
+// This is mpn_invertappr from mpn/generic/invertappr.c, GMP 6.2.1, where the return value is
+// `true` iff the return value of mpn_invertappr would be 0.
+pub_crate_test! {limbs_invert_approx(is: &mut [Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
     if ds.len() < INV_NEWTON_THRESHOLD {
         limbs_invert_basecase_approx(is, ds, scratch)
     } else {
         limbs_invert_newton_approx(is, ds, scratch)
     }
-}
+}}
 
 //TODO tune
 pub(crate) const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_THRESHOLD >> 1;
@@ -1118,8 +1112,7 @@ pub(crate) const MUL_TO_MULMOD_BNM1_FOR_2NXN_THRESHOLD: usize = INV_MULMOD_BNM1_
 // scratch_len ==  limbs_mul_mod_base_pow_n_minus_1_next_size(ds.len() + 1)
 // scratch.len() == limbs_div_mod_barrett_scratch_len(n_len, d_len) - i_len
 // rs_hi.len() == i_len
-#[doc(hidden)]
-pub fn limbs_div_barrett_large_product(
+pub_crate_test! {limbs_div_barrett_large_product(
     scratch: &mut [Limb],
     ds: &[Limb],
     qs: &[Limb],
@@ -1140,15 +1133,15 @@ pub fn limbs_div_barrett_large_product(
             assert_eq!(carry_1, carry_2);
         }
     }
-}
+}}
 
-/// Time: Worst case O(n * log(d) * log(log(d)))
-///
-/// Additional memory: Worst case O(d * log(d))
-///
-/// where n = `ns.len()`, d = `ds.len()`
-///
-/// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
+// Time: Worst case O(n * log(d) * log(log(d)))
+//
+// Additional memory: Worst case O(d * log(d))
+//
+// where n = `ns.len()`, d = `ds.len()`
+//
+// This is mpn_preinv_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
 fn limbs_div_mod_barrett_preinverted(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1241,23 +1234,22 @@ fn limbs_div_mod_barrett_preinverted(
     highest_q
 }
 
-/// We distinguish 3 cases:
-///
-/// (a) d_len < q_len:              i_len = ceil(q_len / ceil(q_len / d_len))
-/// (b) d_len / 3 < q_len <= d_len: i_len = ceil(q_len / 2)
-/// (c) q_len < d_len / 3:          i_len = q_len
-///
-/// In all cases we have i_len <= d_len.
-///
-/// Time: Worst case O(1)
-///
-/// Additional memory: Worst case O(1)
-///
-/// Result is O(`q_len`)
-///
-/// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, GMP 6.2.1, where k == 0.
-#[doc(hidden)]
-pub const fn limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
+// We distinguish 3 cases:
+//
+// (a) d_len < q_len:              i_len = ceil(q_len / ceil(q_len / d_len))
+// (b) d_len / 3 < q_len <= d_len: i_len = ceil(q_len / 2)
+// (c) q_len < d_len / 3:          i_len = q_len
+//
+// In all cases we have i_len <= d_len.
+//
+// Time: Worst case O(1)
+//
+// Additional memory: Worst case O(1)
+//
+// Result is O(`q_len`)
+//
+// This is mpn_mu_div_qr_choose_in from mpn/generic/mu_div_qr.c, GMP 6.2.1, where k == 0.
+pub_const_crate_test! {limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
     let q_len_minus_1 = q_len - 1;
     if q_len > d_len {
         // Compute an inverse size that is a nice partition of the quotient.
@@ -1268,17 +1260,16 @@ pub const fn limbs_div_mod_barrett_is_len(q_len: usize, d_len: usize) -> usize {
     } else {
         q_len_minus_1 + 1 // b = 1
     }
-}
+}}
 
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_mod_barrett_helper(
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// This is mpn_mu_div_qr2 from mpn/generic/mu_div_qr.c, GMP 6.2.1.
+pub_crate_test! {limbs_div_mod_barrett_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1313,51 +1304,48 @@ pub fn limbs_div_mod_barrett_helper(
     }
     let (scratch_lo, scratch_hi) = scratch.split_at_mut(i_len);
     limbs_div_mod_barrett_preinverted(qs, rs, ns, ds, scratch_lo, scratch_hi)
-}
+}}
 
-/// Time: Worst case O(1)
-///
-/// Additional memory: Worst case O(1)
-///
-/// Result is O(`d_len`)
-///
-/// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, but nn is omitted
-/// from the arguments as it is unused.
+// Time: Worst case O(1)
+//
+// Additional memory: Worst case O(1)
+//
+// Result is O(`d_len`)
+//
+// This is mpn_preinv_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, but nn is omitted
+// from the arguments as it is unused.
 fn limbs_div_mod_barrett_preinverse_scratch_len(d_len: usize, is_len: usize) -> usize {
     let itch_local = limbs_mul_mod_base_pow_n_minus_1_next_size(d_len + 1);
     let itch_out = limbs_mul_mod_base_pow_n_minus_1_scratch_len(itch_local, d_len, is_len);
     itch_local + itch_out
 }
 
-/// Time: Worst case O(1)
-///
-/// Additional memory: Worst case O(1)
-///
-/// This is mpn_invertappr_itch from gmp-impl.h, GMP 6.2.1.
-#[doc(hidden)]
+// Time: Worst case O(1)
+//
+// Additional memory: Worst case O(1)
+//
+// This is mpn_invertappr_itch from gmp-impl.h, GMP 6.2.1.
 pub(crate) const fn limbs_invert_approx_scratch_len(is_len: usize) -> usize {
     is_len << 1
 }
 
-/// Time: Worst case O(1)
-///
-/// Additional memory: Worst case O(1)
-///
-/// Result is O(`n_len`)
-///
-/// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, where mua_k == 0.
-#[doc(hidden)]
-pub fn limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+// Time: Worst case O(1)
+//
+// Additional memory: Worst case O(1)
+//
+// Result is O(`n_len`)
+//
+// This is mpn_mu_div_qr_itch from mpn/generic/mu_div_qr.c, GMP 6.2.1, where mua_k == 0.
+pub_crate_test! {limbs_div_mod_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let is_len = limbs_div_mod_barrett_is_len(n_len - d_len, d_len);
     let preinverse_len = limbs_div_mod_barrett_preinverse_scratch_len(d_len, is_len);
     // 3 * is_len + 4
     let inv_approx_len = limbs_invert_approx_scratch_len(is_len + 1) + is_len + 2;
     assert!(preinverse_len >= inv_approx_len);
     is_len + preinverse_len
-}
+}}
 
-#[doc(hidden)]
-pub fn limbs_div_mod_barrett_large_helper(
+pub_test! {limbs_div_mod_barrett_large_helper(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1395,30 +1383,29 @@ pub fn limbs_div_mod_barrett_large_helper(
         limbs_slice_add_same_length_in_place_left(&mut rs[..d_len], ds);
     }
     highest_q
-}
+}}
 
-/// Block-wise Barrett division. The idea of the algorithm used herein is to compute a smaller
-/// inverted value than used in the standard Barrett algorithm, and thus save time in the Newton
-/// iterations, and pay just a small price when using the inverted value for developing quotient
-/// bits. This algorithm was presented at ICMS 2006.
-///
-/// `ns` must have length at least 3, `ds` must have length at least 2 and be no longer than `ns`,
-/// and the most significant bit of `ds` must be set.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()`, `qs` has length
-/// less than `ns.len()` - `ds.len()`, `scratch` is too short, or the last limb of `ds` does not
-/// have its highest bit set.
-///
-/// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_mod_barrett(
+// Block-wise Barrett division. The idea of the algorithm used herein is to compute a smaller
+// inverted value than used in the standard Barrett algorithm, and thus save time in the Newton
+// iterations, and pay just a small price when using the inverted value for developing quotient
+// bits. This algorithm was presented at ICMS 2006.
+//
+// `ns` must have length at least 3, `ds` must have length at least 2 and be no longer than `ns`,
+// and the most significant bit of `ds` must be set.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ds` has length smaller than 2, `ns.len()` is less than `ds.len()`, `qs` has length
+// less than `ns.len()` - `ds.len()`, `scratch` is too short, or the last limb of `ds` does not
+// have its highest bit set.
+//
+// This is mpn_mu_div_qr from mpn/generic/mu_div_qr.c, GMP 6.2.1.
+pub_test! {limbs_div_mod_barrett(
     qs: &mut [Limb],
     rs: &mut [Limb],
     ns: &[Limb],
@@ -1435,17 +1422,17 @@ pub fn limbs_div_mod_barrett(
     } else {
         limbs_div_mod_barrett_large_helper(qs, rs, ns, ds, scratch)
     }
-}
+}}
 
-/// `ds` must have length 2, `ns` must have length at least 2, `qs` must have length at least
-/// `ns.len() - 2`, `rs` must have length at least 2, and the most-significant limb of `ds` must be
-/// nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `ns.len()`
+// `ds` must have length 2, `ns` must have length at least 2, `qs` must have length at least
+// `ns.len() - 2`, `rs` must have length at least 2, and the most-significant limb of `ds` must be
+// nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `ns.len()`
 fn limbs_div_mod_by_two_limb(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let ds_1 = ds[1];
@@ -1493,18 +1480,18 @@ fn limbs_div_mod_dc_condition(n_len: usize, d_len: usize) -> bool {
             > d_64 * n_64
 }
 
-/// This function is optimized for the case when the numerator has at least twice the length of the
-/// denominator.
-///
-/// `ds` must have length at least 3, `ns` must be at least as long as `ds`, `qs` must have length
-/// at least `ns.len() - ds.len() + 1`, `rs` must have the same length as `ds`, and the most-
-/// significant limb of `ds` must be nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
+// This function is optimized for the case when the numerator has at least twice the length of the
+// denominator.
+//
+// `ds` must have length at least 3, `ns` must be at least as long as `ds`, `qs` must have length
+// at least `ns.len() - ds.len() + 1`, `rs` must have the same length as `ds`, and the most-
+// significant limb of `ds` must be nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
 fn limbs_div_mod_unbalanced(
     qs: &mut [Limb],
     rs: &mut [Limb],
@@ -1736,55 +1723,53 @@ pub(crate) fn limbs_div_mod_balanced(
     }
 }
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, returning the quotient and remainder. The quotient has
-/// `ns.len() - ds.len() + 1` limbs and the remainder `ds.len()` limbs.
-///
-/// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
-/// significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
-/// of `ds` is zero.
-///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1 and qp and rp are
-/// returned.
-#[doc(hidden)]
-pub fn limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, returning the quotient and remainder. The quotient has
+// `ns.len() - ds.len() + 1` limbs and the remainder `ds.len()` limbs.
+//
+// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
+// significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
+// of `ds` is zero.
+//
+// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1 and qp and rp are
+// returned.
+pub_test! {limbs_div_mod(ns: &[Limb], ds: &[Limb]) -> (Vec<Limb>, Vec<Limb>) {
     let d_len = ds.len();
     let mut qs = vec![0; ns.len() - d_len + 1];
     let mut rs = vec![0; d_len];
     limbs_div_mod_to_out(&mut qs, &mut rs, ns, ds);
     (qs, rs)
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`
-/// and the `ds.len()` limbs of the remainder to `rs`.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// `rs` must be at least as long as `ds`, and `ds` must have length at least 2 and its most
-/// significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` or `rs` are too short, `ns` is shorter than `ds`, `ds` has length less than 2, or
-/// the most-significant limb of `ds` is zero.
-///
-/// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1.
-#[doc(hidden)]
-pub fn limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`
+// and the `ds.len()` limbs of the remainder to `rs`.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// `rs` must be at least as long as `ds`, and `ds` must have length at least 2 and its most
+// significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` or `rs` are too short, `ns` is shorter than `ds`, `ds` has length less than 2, or
+// the most-significant limb of `ds` is zero.
+//
+// This is mpn_tdiv_qr from mpn/generic/tdiv_qr.c, GMP 6.2.1, where dn > 1.
+pub_test! {limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(d_len > 1);
@@ -1805,14 +1790,13 @@ pub fn limbs_div_mod_to_out(qs: &mut [Limb], rs: &mut [Limb], ns: &[Limb], ds: &
             limbs_div_mod_unbalanced(qs, rs, ns, ds, adjusted_n_len);
         }
     }
-}
+}}
 
 //TODO improve!
-#[doc(hidden)]
-pub fn limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+pub_crate_test! {limbs_div_mod_qs_to_out_rs_to_ns(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let ns_copy = ns.to_vec();
     limbs_div_mod_to_out(qs, ns, &ns_copy, ds);
-}
+}}
 
 impl Natural {
     fn div_mod_limb_ref(&self, other: Limb) -> (Natural, Limb) {
@@ -1830,8 +1814,7 @@ impl Natural {
         }
     }
 
-    #[doc(hidden)]
-    pub fn div_assign_mod_limb(&mut self, other: Limb) -> Limb {
+    pub_test! {div_assign_mod_limb(&mut self, other: Limb) -> Limb {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),
             (_, 1) => 0,
@@ -1842,7 +1825,7 @@ impl Natural {
                 r
             }
         }
-    }
+    }}
 }
 
 impl DivMod<Natural> for Natural {

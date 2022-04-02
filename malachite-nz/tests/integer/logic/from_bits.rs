@@ -1,12 +1,12 @@
 use malachite_base::num::conversion::traits::ConvertibleFrom;
 use malachite_base::num::logic::traits::BitConvertible;
-use malachite_base_test_util::generators::bool_vec_gen;
-use malachite_base_test_util::num::logic::bit_convertible::{
+use malachite_base::test_util::generators::bool_vec_gen;
+use malachite_base::test_util::num::logic::bit_convertible::{
     from_bits_asc_alt, from_bits_desc_alt,
 };
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::SignedLimb;
-use malachite_nz_test_util::integer::logic::from_bits::{
+use malachite_nz::test_util::integer::logic::from_bits::{
     from_bits_asc_naive, from_bits_desc_naive,
 };
 

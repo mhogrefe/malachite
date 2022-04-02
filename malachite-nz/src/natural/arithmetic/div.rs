@@ -1,7 +1,7 @@
 use fail_on_untested_path;
-use malachite_base::num::arithmetic::traits::{
-    DivRem, WrappingAddAssign, WrappingSubAssign, XXAddYYIsZZ,
-};
+#[cfg(feature = "test_build")]
+use malachite_base::num::arithmetic::traits::DivRem;
+use malachite_base::num::arithmetic::traits::{WrappingAddAssign, WrappingSubAssign, XXAddYYIsZZ};
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One, Zero};
 use malachite_base::num::conversion::traits::{ExactFrom, JoinHalves, SplitInHalf};
@@ -42,20 +42,19 @@ use std::iter::once;
 use std::mem::swap;
 use std::ops::{Div, DivAssign};
 
-/// Divide an number by a divisor of B - 1, where B is the limb base.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `ns`.
-///
-/// This is mpn_bdiv_dbm1c from mpn/generic/bdiv_dbm1c.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_divisor_of_limb_max_with_carry_to_out(
+// Divide an number by a divisor of B - 1, where B is the limb base.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `ns`.
+//
+// This is mpn_bdiv_dbm1c from mpn/generic/bdiv_dbm1c.c, GMP 6.2.1.
+pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_to_out(
     out: &mut [Limb],
     ns: &[Limb],
     d: Limb,
@@ -74,19 +73,18 @@ pub fn limbs_div_divisor_of_limb_max_with_carry_to_out(
         }
     }
     carry
-}
+}}
 
-/// Divide an number by a divisor of B - 1, where B is the limb base.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_bdiv_dbm1c from mpn/generic/bdiv_dbm1c.c, GMP 6.2.1, where qp == ap.
-#[doc(hidden)]
-pub fn limbs_div_divisor_of_limb_max_with_carry_in_place(
+// Divide an number by a divisor of B - 1, where B is the limb base.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// This is mpn_bdiv_dbm1c from mpn/generic/bdiv_dbm1c.c, GMP 6.2.1, where qp == ap.
+pub_crate_test! {limbs_div_divisor_of_limb_max_with_carry_in_place(
     ns: &mut [Limb],
     d: Limb,
     mut carry: Limb,
@@ -103,15 +101,14 @@ pub fn limbs_div_divisor_of_limb_max_with_carry_in_place(
         }
     }
     carry
-}
+}}
 
-/// Time: O(1)
-///
-/// Additional memory: O(1)
-///
-/// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1, but not computing the remainder.
-#[doc(hidden)]
-pub fn div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
+// Time: O(1)
+//
+// Additional memory: O(1)
+//
+// This is udiv_qrnnd_preinv from gmp-impl.h, GMP 6.2.1, but not computing the remainder.
+pub_test! {div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> Limb {
     let (mut q_high, q_low) = (DoubleLimb::from(n_high) * DoubleLimb::from(d_inv))
         .wrapping_add(DoubleLimb::join_halves(n_high.wrapping_add(1), n_low))
         .split_in_half();
@@ -124,49 +121,46 @@ pub fn div_by_preinversion(n_high: Limb, n_low: Limb, d: Limb, d_inv: Limb) -> L
         q_high.wrapping_add_assign(1);
     }
     q_high
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
-/// limb slice must have at least two elements.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if the length of `ns` is less than 2 or if `d` is zero.
-///
-/// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.2.1, where the quotient is returned, but
-/// not computing the remainder.
-#[doc(hidden)]
-pub fn limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// quotient limbs of the `Natural` divided by a `Limb`. The divisor limb cannot be zero and the
+// limb slice must have at least two elements.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if the length of `ns` is less than 2 or if `d` is zero.
+//
+// This is mpn_div_qr_1 from mpn/generic/div_qr_1.c, GMP 6.2.1, where the quotient is returned, but
+// not computing the remainder.
+pub_test! {limbs_div_limb(ns: &[Limb], d: Limb) -> Vec<Limb> {
     let mut qs = vec![0; ns.len()];
     limbs_div_limb_to_out(&mut qs, ns, d);
     qs
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and a `Limb` to an output slice. The output slice must be
-/// at least as long as the input slice. The divisor limb cannot be zero and the input limb slice
-/// must have at least two elements.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
-///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0 and un > 1, but not
-/// computing the remainder.
-#[doc(hidden)]
-#[allow(clippy::branches_sharing_code)]
-pub fn limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the quotient of the `Natural` and a `Limb` to an output slice. The output slice must be
+// at least as long as the input slice. The divisor limb cannot be zero and the input limb slice
+// must have at least two elements.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `out` is shorter than `ns`, the length of `ns` is less than 2, or if `d` is zero.
+//
+// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qxn is 0 and un > 1, but not
+// computing the remainder.
+pub_crate_test! {limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -212,25 +206,24 @@ pub fn limbs_div_limb_to_out(out: &mut [Limb], ns: &[Limb], d: Limb) {
         }
         *out_first = div_by_preinversion(r, previous_n << bits, d, d_inv);
     }
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
-/// limbs of the quotient of the `Natural` and a `Limb` to the input slice. The divisor limb cannot
-/// be zero and the input limb slice must have at least two elements.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if the length of `ns` is less than 2 or if `d` is zero.
-///
-/// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qp == up, qxn is 0, and
-/// un > 1, but not computing the remainder.
-#[doc(hidden)]
-pub fn limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, writes the
+// limbs of the quotient of the `Natural` and a `Limb` to the input slice. The divisor limb cannot
+// be zero and the input limb slice must have at least two elements.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if the length of `ns` is less than 2 or if `d` is zero.
+//
+// This is mpn_divrem_1 from mpn/generic/divrem_1.c, GMP 6.2.1, where qp == up, qxn is 0, and
+// un > 1, but not computing the remainder.
+pub_test! {limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
     assert_ne!(d, 0);
     let len = ns.len();
     assert!(len > 1);
@@ -274,29 +267,33 @@ pub fn limbs_div_limb_in_place(ns: &mut [Limb], d: Limb) {
         }
         ns[0] = div_by_preinversion(r, previous_n << bits, d, d_inv);
     }
-}
+}}
 
-/// Schoolbook division using the Möller-Granlund 3/2 division algorithm.
-///
-/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-/// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
-/// `ds` must have length greater than 2, `ns` must be at least as long as `ds`, and the most
-/// significant bit of `ds` must be set. `d_inv` should be the result of
-/// `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
-///
-/// Time: worst case O(n ^ 2)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
-/// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
-///
-/// This is mpn_sbpi1_div_q from mpn/generic/sbpi1_div_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv: Limb) -> bool {
+// Schoolbook division using the Möller-Granlund 3/2 division algorithm.
+//
+// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
+// `ds` must have length greater than 2, `ns` must be at least as long as `ds`, and the most
+// significant bit of `ds` must be set. `d_inv` should be the result of
+// `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
+//
+// Time: worst case O(n ^ 2)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
+// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
+//
+// This is mpn_sbpi1_div_q from mpn/generic/sbpi1_div_q.c, GMP 6.2.1.
+pub_test! {limbs_div_schoolbook(
+    qs: &mut [Limb],
+    ns: &mut [Limb],
+    ds: &[Limb],
+    d_inv: Limb
+) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(d_len > 2);
@@ -508,30 +505,29 @@ pub fn limbs_div_schoolbook(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb], d_inv
         }
     }
     highest_q
-}
+}}
 
-/// Recursive divide-and-conquer division.
-///
-/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-/// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
-/// `ds` must have length greater than 2, `ns` must be at least as long as `ds`, and the most
-/// significant bit of `ds` must be set. `d_inv` should be the result of
-/// `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
-///
-/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = max(`ns.len`, `ds.len()`)
-///
-/// # Panics
-/// Panics if `ds` has length smaller than 6, `ns` is shorter than or the same length as `ds`, `qs`
-/// has length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest
-/// bit set.
-///
-/// This is mpn_dcpi1_div_q from mpn/generic/dcpi1_div_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_divide_and_conquer(
+// Recursive divide-and-conquer division.
+//
+// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
+// `ds` must have length greater than 2, `ns` must be at least as long as `ds`, and the most
+// significant bit of `ds` must be set. `d_inv` should be the result of
+// `limbs_two_limb_inverse_helper` applied to the two highest limbs of the denominator.
+//
+// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = max(`ns.len`, `ds.len()`)
+//
+// # Panics
+// Panics if `ds` has length smaller than 6, `ns` is shorter than or the same length as `ds`, `qs`
+// has length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest
+// bit set.
+//
+// This is mpn_dcpi1_div_q from mpn/generic/dcpi1_div_q.c, GMP 6.2.1.
+pub_test! {limbs_div_divide_and_conquer(
     qs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
@@ -567,27 +563,31 @@ pub fn limbs_div_divide_and_conquer(
     }
     qs.copy_from_slice(scratch_2_tail);
     highest_q
-}
+}}
 
-/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-/// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
-/// `ds` must have length greater than 2, `ns` must be longer than `ds`, and the most significant
-/// bit of `ds` must be set.
-///
-/// The idea of the algorithm used herein is to compute a smaller inverted value than used in the
-/// standard Barrett algorithm, and thus save time in the Newton iterations, and pay just a small
-/// price when using the inverted value for developing quotient bits. This algorithm was presented
-/// at ICMS 2006.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_mu_div_q from mpn/generic/mu_div_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mut [Limb]) -> bool {
+// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0.
+// `ds` must have length greater than 2, `ns` must be longer than `ds`, and the most significant
+// bit of `ds` must be set.
+//
+// The idea of the algorithm used herein is to compute a smaller inverted value than used in the
+// standard Barrett algorithm, and thus save time in the Newton iterations, and pay just a small
+// price when using the inverted value for developing quotient bits. This algorithm was presented
+// at ICMS 2006.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// This is mpn_mu_div_q from mpn/generic/mu_div_q.c, GMP 6.2.1.
+pub_test! {limbs_div_barrett(
+    qs: &mut [Limb],
+    ns: &[Limb],
+    ds: &[Limb],
+    scratch: &mut [Limb]
+) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len > d_len);
@@ -673,17 +673,16 @@ pub fn limbs_div_barrett(qs: &mut [Limb], ns: &[Limb], ds: &[Limb], scratch: &mu
         }
     }
     highest_q
-}
+}}
 
-/// Time: Worst case O(1)
-///
-/// Additional memory: Worst case O(1)
-///
-/// Result is O(`n_len`)
-///
-/// This is mpn_mu_div_q_itch from mpn/generic/mu_div_q.c, GMP 6.2.1, where mua_k == 0.
-#[doc(hidden)]
-pub fn limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
+// Time: Worst case O(1)
+//
+// Additional memory: Worst case O(1)
+//
+// Result is O(`n_len`)
+//
+// This is mpn_mu_div_q_itch from mpn/generic/mu_div_q.c, GMP 6.2.1, where mua_k == 0.
+pub_test! {limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
     let q_len = n_len - d_len;
     if q_len >= d_len {
         limbs_div_barrett_approx_scratch_len(n_len + 1, d_len)
@@ -691,31 +690,30 @@ pub fn limbs_div_barrett_scratch_len(n_len: usize, d_len: usize) -> usize {
         let q_len_plus_1 = q_len + 1;
         limbs_div_barrett_approx_scratch_len(q_len_plus_1 << 1, q_len_plus_1)
     }
-}
+}}
 
-/// Schoolbook division using the Möller-Granlund 3/2 division algorithm, returning approximate
-/// quotient.
-///
-/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-/// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. The
-/// quotient is either correct, or one too large. `ds` must have length greater than 2, `ns` must be
-/// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be
-/// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
-/// denominator.
-///
-/// Time: worst case O(n ^ 2)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
-/// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
-///
-/// This is mpn_sbpi1_divappr_q from mpn/generic/sbpi1_divappr_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_schoolbook_approx(
+// Schoolbook division using the Möller-Granlund 3/2 division algorithm, returning approximate
+// quotient.
+//
+// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. The
+// quotient is either correct, or one too large. `ds` must have length greater than 2, `ns` must be
+// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be
+// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
+// denominator.
+//
+// Time: worst case O(n ^ 2)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ds` has length smaller than 3, `ns` is shorter than `ds`, `qs` has length less than
+// `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest bit set.
+//
+// This is mpn_sbpi1_divappr_q from mpn/generic/sbpi1_divappr_q.c, GMP 6.2.1.
+pub_crate_test! {limbs_div_schoolbook_approx(
     qs: &mut [Limb],
     ns: &mut [Limb],
     mut ds: &[Limb],
@@ -840,7 +838,7 @@ pub fn limbs_div_schoolbook_approx(
     }
     assert_eq!(ns[a], n_1);
     highest_q
-}
+}}
 
 /// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
 ///
@@ -902,29 +900,28 @@ fn limbs_div_divide_and_conquer_approx_helper(
     highest_q
 }
 
-/// Recursive divide-and-conquer division, returning approximate quotient.
-///
-/// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
-/// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. The
-/// quotient is either correct, or one too large. `ds` must have length greater than 2, `ns` must be
-/// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be
-/// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
-/// denominator.
-///
-/// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
-///
-/// Additional memory: worst case O(n * log(n))
-///
-/// where n = max(`ns.len`, `ds.len()`)
-///
-/// # Panics
-/// Panics if `ds` has length smaller than 6, `ns` is shorter than or the same length as `ds`, `qs`
-/// has length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest
-/// bit set.
-///
-/// This is mpn_dcpi1_divappr_q from mpn/generic/dcpi1_divappr_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_divide_and_conquer_approx(
+// Recursive divide-and-conquer division, returning approximate quotient.
+//
+// Divides `ns` by `ds` and writes the `ns.len()` - `ds.len()` least-significant quotient limbs to
+// `qs`. Returns the most significant limb of the quotient; `true` means 1 and `false` means 0. The
+// quotient is either correct, or one too large. `ds` must have length greater than 2, `ns` must be
+// at least as long as `ds`, and the most significant bit of `ds` must be set. `d_inv` should be
+// the result of `limbs_two_limb_inverse_helper` applied to the two highest limbs of the
+// denominator.
+//
+// Time: worst case O(n * log(n) ^ 2 * log(log(n)))
+//
+// Additional memory: worst case O(n * log(n))
+//
+// where n = max(`ns.len`, `ds.len()`)
+//
+// # Panics
+// Panics if `ds` has length smaller than 6, `ns` is shorter than or the same length as `ds`, `qs`
+// has length less than `ns.len()` - `ds.len()`, or the last limb of `ds` does not have its highest
+// bit set.
+//
+// This is mpn_dcpi1_divappr_q from mpn/generic/dcpi1_divappr_q.c, GMP 6.2.1.
+pub_crate_test! {limbs_div_divide_and_conquer_approx(
     qs: &mut [Limb],
     ns: &mut [Limb],
     ds: &[Limb],
@@ -1083,29 +1080,28 @@ pub fn limbs_div_divide_and_conquer_approx(
         qs[..q_len].copy_from_slice(&qs_2[1..]);
     }
     highest_q
-}
+}}
 
-/// Compute Q = floor(N / D) + e. N has n_len limbs, D has d_len limbs and must be normalized, and Q
-/// must have n_len - d_len limbs, 0 <= e <= 4. The requirement that Q has n_len - d_len limbs (and
-/// not n_len - d_len + 1 limbs) was put in place in order to allow us to let N be unmodified during
-/// the operation.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// This is mpn_mu_divappr_q from mpn/generic/mu_divappr_q.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_div_barrett_approx(
+// Compute Q = floor(N / D) + e. N has n_len limbs, D has d_len limbs and must be normalized, and Q
+// must have n_len - d_len limbs, 0 <= e <= 4. The requirement that Q has n_len - d_len limbs (and
+// not n_len - d_len + 1 limbs) was put in place in order to allow us to let N be unmodified during
+// the operation.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// This is mpn_mu_divappr_q from mpn/generic/mu_divappr_q.c, GMP 6.2.1.
+pub_crate_test! {limbs_div_barrett_approx(
     qs: &mut [Limb],
     ns: &[Limb],
     ds: &[Limb],
     scratch: &mut [Limb],
 ) -> bool {
     limbs_div_barrett_approx_helper(qs, ns, false, ds, scratch)
-}
+}}
 
 fn limbs_div_barrett_approx_helper(
     qs: &mut [Limb],
@@ -1316,15 +1312,14 @@ fn limbs_div_barrett_approx_is_len(q_len: usize, d_len: usize) -> usize {
     }
 }
 
-/// Time: Worst case O(1)
-///
-/// Additional memory: Worst case O(1)
-///
-/// Result is O(`n_len`)
-///
-/// This is mpn_mu_divappr_q_itch from mpn/generic/mu_divappr_q.c, GMP 6.2.1, where mua_k == 0.
-#[doc(hidden)]
-pub fn limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> usize {
+// Time: Worst case O(1)
+//
+// Additional memory: Worst case O(1)
+//
+// Result is O(`n_len`)
+//
+// This is mpn_mu_divappr_q_itch from mpn/generic/mu_divappr_q.c, GMP 6.2.1, where mua_k == 0.
+pub_crate_test! {limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> usize {
     let qn = n_len - d_len;
     if qn + 1 < d_len {
         d_len = qn + 1;
@@ -1336,7 +1331,7 @@ pub fn limbs_div_barrett_approx_scratch_len(n_len: usize, mut d_len: usize) -> u
     let inv_approx_len = limbs_invert_approx_scratch_len(is_len + 1) + is_len + 2;
     assert!(d_len + local_len + out_len >= inv_approx_len);
     is_len + d_len + local_len + out_len
-}
+}}
 
 //TODO tune
 const DC_DIV_Q_THRESHOLD: usize = DC_DIVAPPR_Q_THRESHOLD;
@@ -1357,15 +1352,14 @@ fn limbs_div_dc_condition(n_len: usize, d_len: usize) -> bool {
             > d_64 * n_64
 }
 
-/// Division when n_len >= 2 * d_len - FUDGE.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-#[doc(hidden)]
-pub fn limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+// Division when n_len >= 2 * d_len - FUDGE.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+pub_crate_test! {limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     // |________________________|
     //                  |_______|
     let n_len = ns.len();
@@ -1411,10 +1405,9 @@ pub fn limbs_div_to_out_unbalanced(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [L
             assert!(!highest_q);
         }
     }
-}
+}}
 
-#[doc(hidden)]
-pub fn limbs_div_q_dc_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
+pub_test! {limbs_div_q_dc_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     let highest_d = ds[d_len - 1];
@@ -1428,7 +1421,7 @@ pub fn limbs_div_q_dc_helper(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) -> b
         let mut scratch = vec![0; limbs_div_barrett_scratch_len(n_len, d_len)];
         limbs_div_barrett(qs, ns, ds, &mut scratch)
     }
-}
+}}
 
 /// Division when n_len >= 2 * d_len - FUDGE.
 ///
@@ -1594,15 +1587,14 @@ fn limbs_div_to_out_unbalanced_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]
     }
 }
 
-/// Division when n_len < 2 * d_len - FUDGE.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-#[doc(hidden)]
-pub fn limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+// Division when n_len < 2 * d_len - FUDGE.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+pub_test! {limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     // |________________________|
     //        |_________________|
     let n_len = ns.len();
@@ -1676,54 +1668,52 @@ pub fn limbs_div_to_out_balanced(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
             assert!(!limbs_sub_limb_in_place(qs, 1));
         }
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, returning the quotient. The quotient has `ns.len() - ds.len() + 1`
-/// limbs.
-///
-/// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
-/// significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
-/// of `ds` is zero.
-///
-/// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
-/// qp is returned.
-#[doc(hidden)]
-pub fn limbs_div(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, returning the quotient. The quotient has `ns.len() - ds.len() + 1`
+// limbs.
+//
+// `ns` must be at least as long as `ds` and `ds` must have length at least 2 and its most
+// significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is shorter than `ds`, `ds` has length less than 2, or the most-significant limb
+// of `ds` is zero.
+//
+// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
+// qp is returned.
+pub_test! {limbs_div(ns: &[Limb], ds: &[Limb]) -> Vec<Limb> {
     let mut qs = vec![0; ns.len() - ds.len() + 1];
     limbs_div_to_out_ref_ref(&mut qs, ns, ds);
     qs
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
-/// most-significant limb of `ds` is zero.
-///
-/// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
-/// np and dp are consumed, saving some memory allocations.
-#[doc(hidden)]
-pub fn limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+// most-significant limb of `ds` is zero.
+//
+// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
+// np and dp are consumed, saving some memory allocations.
+pub_crate_test! {limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);
@@ -1736,28 +1726,27 @@ pub fn limbs_div_to_out(qs: &mut [Limb], ns: &mut [Limb], ds: &mut [Limb]) {
     } else {
         limbs_div_to_out_balanced(qs, ns, ds);
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
-/// most-significant limb of `ds` is zero.
-///
-/// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
-/// np is consumed, saving some memory allocations.
-#[doc(hidden)]
-pub fn limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+// most-significant limb of `ds` is zero.
+//
+// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
+// np is consumed, saving some memory allocations.
+pub_test! {limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);
@@ -1770,28 +1759,27 @@ pub fn limbs_div_to_out_val_ref(qs: &mut [Limb], ns: &mut [Limb], ds: &[Limb]) {
     } else {
         limbs_div_to_out_balanced(qs, ns, ds);
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
-/// most-significant limb of `ds` is zero.
-///
-/// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
-/// dp is consumed, saving some memory allocations.
-#[doc(hidden)]
-pub fn limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+// most-significant limb of `ds` is zero.
+//
+// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally and
+// dp is consumed, saving some memory allocations.
+pub_test! {limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);
@@ -1804,27 +1792,26 @@ pub fn limbs_div_to_out_ref_val(qs: &mut [Limb], ns: &[Limb], ds: &mut [Limb]) {
     } else {
         limbs_div_to_out_balanced(qs, ns, ds);
     }
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
-///
-/// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
-/// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
-/// most-significant limb of `ds` is zero.
-///
-/// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally.
-#[doc(hidden)]
-pub fn limbs_div_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, divides them, writing the `ns.len() - ds.len() + 1` limbs of the quotient to `qs`.
+//
+// `ns` must be at least as long as `ds`, `qs` must have length at least `ns.len() - ds.len() + 1`,
+// and `ds` must have length at least 2 and its most significant limb must be greater than zero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `qs` is too short, `ns` is shorter than `ds`, `ds` has length less than 2, or the
+// most-significant limb of `ds` is zero.
+//
+// This is mpn_div_q from mpn/generic/div_q.c, GMP 6.2.1, where scratch is allocated internally.
+pub_test! {limbs_div_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     let n_len = ns.len();
     let d_len = ds.len();
     assert!(n_len >= d_len);
@@ -1837,13 +1824,14 @@ pub fn limbs_div_to_out_ref_ref(qs: &mut [Limb], ns: &[Limb], ds: &[Limb]) {
     } else {
         limbs_div_to_out_balanced(qs, ns, ds);
     }
-}
+}}
 
-/// Divides using the naive (schoolbook) algorithm.
-///
-/// Time: worst case O(1)
-///
-/// Additional memory: worst case O(1)
+// Divides using the naive (schoolbook) algorithm.
+//
+// Time: worst case O(1)
+//
+// Additional memory: worst case O(1)
+#[cfg(feature = "test_build")]
 fn limbs_div_in_place_naive(ns: &mut [Limb], d: Limb) {
     let limb = DoubleLimb::from(d);
     let mut upper = 0;
@@ -1867,7 +1855,7 @@ impl Natural {
         }
     }
 
-    #[doc(hidden)]
+    #[cfg(feature = "test_build")]
     #[inline]
     pub fn div_limb_naive(mut self, other: Limb) -> Natural {
         self.div_assign_limb_naive(other);
@@ -1886,7 +1874,7 @@ impl Natural {
         }
     }
 
-    #[doc(hidden)]
+    #[cfg(feature = "test_build")]
     pub fn div_assign_limb_naive(&mut self, other: Limb) {
         match (&mut *self, other) {
             (_, 0) => panic!("division by zero"),

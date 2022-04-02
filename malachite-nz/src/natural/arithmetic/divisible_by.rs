@@ -14,21 +14,20 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{Limb, BMOD_1_TO_MOD_1_THRESHOLD, DC_BDIV_QR_THRESHOLD, MU_BDIV_QR_THRESHOLD};
 
-/// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
-/// whether that `Natural` is divisible by a given limb.
-///
-/// This function assumes that `ns` has at least two elements and that `d` is nonzero.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `ns.len()`
-///
-/// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.2.1, where a is non-negative and the
-/// ABOVE_THRESHOLD branch is excluded.
-#[doc(hidden)]
-pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
+// Interpreting a slice of `Limb`s as the limbs of a `Natural` in ascending order, determines
+// whether that `Natural` is divisible by a given limb.
+//
+// This function assumes that `ns` has at least two elements and that `d` is nonzero.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `ns.len()`
+//
+// This is mpz_divisible_ui_p from mpz/divis_ui.c, GMP 6.2.1, where a is non-negative and the
+// ABOVE_THRESHOLD branch is excluded.
+pub_crate_test! {limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     assert!(ns.len() > 1);
     if d.even() {
         let twos = TrailingZeros::trailing_zeros(d);
@@ -36,7 +35,7 @@ pub fn limbs_divisible_by_limb(ns: &[Limb], d: Limb) -> bool {
     } else {
         limbs_mod_exact_odd_limb(ns, d, 0) == 0
     }
-}
+}}
 
 fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
     if ns.len() < BMOD_1_TO_MOD_1_THRESHOLD {
@@ -46,27 +45,25 @@ fn limbs_mod_limb_helper(ns: &[Limb], d_low: Limb) -> Limb {
     }
 }
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, determines whether the first `Natural` is divisible by the second. Both `Natural`s
-/// are taken by value.
-///
-/// `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
-/// must be nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
-///
-/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
-/// zero.
-#[allow(clippy::absurd_extreme_comparisons)]
-#[doc(hidden)]
-pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, determines whether the first `Natural` is divisible by the second. Both `Natural`s
+// are taken by value.
+//
+// `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
+// must be nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
+//
+// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
+// zero.
+pub_crate_test! {limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -139,29 +136,27 @@ pub fn limbs_divisible_by(ns: &mut [Limb], ds: &mut [Limb]) -> bool {
         &mut rs[..d_len]
     };
     slice_test_zero(rs)
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, determines whether the first `Natural` is divisible by the second. The first
-/// `Natural` is taken by value, and the second by reference.
-///
-/// `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
-/// must be nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
-///
-/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
-/// zero.
-#[allow(clippy::absurd_extreme_comparisons)]
-#[doc(hidden)]
-pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, determines whether the first `Natural` is divisible by the second. The first
+// `Natural` is taken by value, and the second by reference.
+//
+// `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
+// must be nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
+//
+// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
+// zero.
+pub_crate_test! {limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -237,29 +232,27 @@ pub fn limbs_divisible_by_val_ref(ns: &mut [Limb], ds: &[Limb]) -> bool {
         &mut rs[..d_len]
     };
     slice_test_zero(rs)
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, determines whether the first `Natural` is divisible by the second. The first
-/// `Natural` is taken by reference, and the second by value.
-///
-/// `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
-/// must be nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
-///
-/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
-/// zero.
-#[allow(clippy::absurd_extreme_comparisons)]
-#[doc(hidden)]
-pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, determines whether the first `Natural` is divisible by the second. The first
+// `Natural` is taken by reference, and the second by value.
+//
+// `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
+// must be nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
+//
+// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
+// zero.
+pub_test! {limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -331,29 +324,27 @@ pub fn limbs_divisible_by_ref_val(ns: &[Limb], ds: &mut [Limb]) -> bool {
         &mut rs[..d_len]
     };
     slice_test_zero(rs)
-}
+}}
 
-/// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
-/// `Natural`s, determines whether the first `Natural` is divisible by the second. Both `Natural`s
-///// are taken by reference.
-///
-/// `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
-/// must be nonzero.
-///
-/// Time: Worst case O(n * log(n) * log(log(n)))
-///
-/// Additional memory: Worst case O(n * log(n))
-///
-/// where n = `ns.len()`
-///
-/// # Panics
-/// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
-///
-/// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
-/// zero.
-#[allow(clippy::absurd_extreme_comparisons)]
-#[doc(hidden)]
-pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
+// Interpreting two slices of `Limb`s, `ns` and `ds`, as the limbs (in ascending order) of two
+// `Natural`s, determines whether the first `Natural` is divisible by the second. Both `Natural`s
+// are taken by reference.
+//
+// `ns` must be at least as long as `ds`, both slices must be nonempty, and the last limb of both
+// must be nonzero.
+//
+// Time: Worst case O(n * log(n) * log(log(n)))
+//
+// Additional memory: Worst case O(n * log(n))
+//
+// where n = `ns.len()`
+//
+// # Panics
+// Panics if `ns` is shorter than `ds`, `ds` is empty, or the last limbs of either slice are zero.
+//
+// This is mpn_divisible_p from mpn/generic/divis.c, GMP 6.2.1, where an >= dn and neither are
+// zero.
+pub_test! {limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
     let n_len = ns.len();
     let d_len = ds.len();
     assert_ne!(d_len, 0);
@@ -427,7 +418,7 @@ pub fn limbs_divisible_by_ref_ref(ns: &[Limb], ds: &[Limb]) -> bool {
         &mut rs[..d_len]
     };
     slice_test_zero(rs)
-}
+}}
 
 impl Natural {
     fn divisible_by_limb(&self, other: Limb) -> bool {

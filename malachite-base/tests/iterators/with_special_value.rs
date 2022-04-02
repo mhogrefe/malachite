@@ -4,8 +4,8 @@ use malachite_base::iterators::with_special_value;
 use malachite_base::num::random::random_primitive_ints;
 use malachite_base::options::random::random_options;
 use malachite_base::random::{Seed, EXAMPLE_SEED};
-use malachite_base_test_util::stats::common_values_map::common_values_map_debug;
-use malachite_base_test_util::stats::median;
+use malachite_base::test_util::stats::common_values_map::common_values_map_debug;
+use malachite_base::test_util::stats::median;
 use std::fmt::Debug;
 
 fn with_special_value_helper<I: Clone + Iterator>(

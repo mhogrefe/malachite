@@ -2,15 +2,15 @@ use malachite_base::num::arithmetic::traits::{
     CeilingLogBase2, IsPowerOf2, NextPowerOf2, NextPowerOf2Assign, PowerOf2,
 };
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_vec_gen_var_1};
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{unsigned_gen, unsigned_vec_gen_var_1};
 use malachite_nz::natural::arithmetic::next_power_of_2::{
     limbs_next_power_of_2, limbs_slice_next_power_of_2_in_place, limbs_vec_next_power_of_2_in_place,
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
-use malachite_nz_test_util::generators::natural_gen;
+use malachite_nz::test_util::common::{natural_to_rug_integer, rug_integer_to_natural};
+use malachite_nz::test_util::generators::natural_gen;
 use rug;
 use std::str::FromStr;
 

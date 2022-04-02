@@ -1,10 +1,10 @@
 use malachite_base::num::basic::integers::PrimitiveInt;
-use malachite_base::vecs::{vec_delete_left, vec_pad_left};
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen,
     unsigned_vec_unsigned_unsigned_triple_gen_var_1,
 };
+use malachite_base::vecs::{vec_delete_left, vec_pad_left};
 
 #[test]
 fn test_vec_pad_left() {

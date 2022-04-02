@@ -1,7 +1,7 @@
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::logic::traits::TrailingZeros;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     signed_gen_var_3, signed_unsigned_pair_gen_var_1, unsigned_gen, unsigned_pair_gen_var_2,
 };
 

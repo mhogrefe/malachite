@@ -17,22 +17,21 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::Limb;
 
-/// Returns the limbs obtained by taking a slice of bits beginning at index `start` of the negative
-/// of `limb` and ending at index `end - 1`. `start` must be less than or equal to `end`, but apart
-/// from that there are no restrictions on the index values. If they index beyond the physical size
-/// of the input limbs, the function interprets them as pointing to `true` bits. `x` must be
-/// positive.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `end * Limb::WIDTH`
-///
-/// # Panics
-/// Panics if `start` > `end`.
-#[doc(hidden)]
-pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
+// Returns the limbs obtained by taking a slice of bits beginning at index `start` of the negative
+// of `limb` and ending at index `end - 1`. `start` must be less than or equal to `end`, but apart
+// from that there are no restrictions on the index values. If they index beyond the physical size
+// of the input limbs, the function interprets them as pointing to `true` bits. `x` must be
+// positive.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `end * Limb::WIDTH`
+//
+// # Panics
+// Panics if `start` > `end`.
+pub_test! {limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = TrailingZeros::trailing_zeros(x);
     if trailing_zeros >= end {
@@ -56,25 +55,24 @@ pub fn limbs_neg_limb_get_bits(x: Limb, start: u64, end: u64) -> Vec<Limb> {
     };
     limbs_vec_mod_power_of_2_in_place(&mut out, bit_len);
     out
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs obtained by taking a slice of bits beginning at index `start` of the negative of the
-/// `Natural` and ending at index `end - 1`. `start` must be less than or equal to `end`, but apart
-/// from that there are no restrictions on the index values. If they index beyond the physical size
-/// of the input limbs, the function interprets them as pointing to `true` bits. The input slice
-/// cannot only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs.len()`, `end * Limb::WIDTH`)
-///
-/// # Panics
-/// Panics if `start` > `end`.
-#[doc(hidden)]
-pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs obtained by taking a slice of bits beginning at index `start` of the negative of the
+// `Natural` and ending at index `end - 1`. `start` must be less than or equal to `end`, but apart
+// from that there are no restrictions on the index values. If they index beyond the physical size
+// of the input limbs, the function interprets them as pointing to `true` bits. The input slice
+// cannot only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs.len()`, `end * Limb::WIDTH`)
+//
+// # Panics
+// Panics if `start` > `end`.
+pub_test! {limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = limbs_trailing_zeros(xs);
     if trailing_zeros >= end {
@@ -111,25 +109,24 @@ pub fn limbs_slice_neg_get_bits(xs: &[Limb], start: u64, end: u64) -> Vec<Limb> 
     }
     limbs_vec_mod_power_of_2_in_place(&mut out, bit_len);
     out
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
-/// limbs obtained by taking a slice of bits beginning at index `start` of the negative of the
-/// `Natural` and ending at index `end - 1`. `start` must be less than or equal to `end`, but apart
-/// from that there are no restrictions on the index values. If they index beyond the physical size
-/// of the input limbs, the function interprets them as pointing to `true` bits. The input slice
-/// cannot only contain zeros.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = max(`xs.len()`, `end * Limb::WIDTH`)
-///
-/// # Panics
-/// Panics if `start` > `end`.
-#[doc(hidden)]
-pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural`, returns the
+// limbs obtained by taking a slice of bits beginning at index `start` of the negative of the
+// `Natural` and ending at index `end - 1`. `start` must be less than or equal to `end`, but apart
+// from that there are no restrictions on the index values. If they index beyond the physical size
+// of the input limbs, the function interprets them as pointing to `true` bits. The input slice
+// cannot only contain zeros.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = max(`xs.len()`, `end * Limb::WIDTH`)
+//
+// # Panics
+// Panics if `start` > `end`.
+pub_test! {limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Limb> {
     assert!(start <= end);
     let trailing_zeros = limbs_trailing_zeros(&xs);
     if trailing_zeros >= end {
@@ -161,31 +158,30 @@ pub fn limbs_vec_neg_get_bits(mut xs: Vec<Limb>, start: u64, end: u64) -> Vec<Li
     }
     limbs_vec_mod_power_of_2_in_place(&mut xs, bit_len);
     xs
-}
+}}
 
-/// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural` n, writes the
-/// limbs of `bits` into the limbs of -n, starting at bit `start` of -n (inclusive) and ending at
-/// bit `end` of -n (exclusive). The bit indices do not need to be aligned with any limb boundaries.
-/// If `bits` has more than `end` - `start` bits, only the first `end` - `start` bits are written.
-/// If `bits` has fewer than `end` - `start` bits, the remaining written bits are one. `xs` may be
-/// extended to accommodate the new bits. `start` must be smaller than `end`, and `xs` cannot only
-/// contain zeros.
-///
-/// Time: worst case O(max(n / 2 ^ `Limb::WIDTH`, m))
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `end` and m = `xs.len()`
-///
-/// # Panics
-/// Panics if `start` >= `end` or `xs` only contains zeros.
-#[doc(hidden)]
-pub fn limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
+// Interpreting a `Vec` of `Limb`s as the limbs (in ascending order) of a `Natural` n, writes the
+// limbs of `bits` into the limbs of -n, starting at bit `start` of -n (inclusive) and ending at
+// bit `end` of -n (exclusive). The bit indices do not need to be aligned with any limb boundaries.
+// If `bits` has more than `end` - `start` bits, only the first `end` - `start` bits are written.
+// If `bits` has fewer than `end` - `start` bits, the remaining written bits are one. `xs` may be
+// extended to accommodate the new bits. `start` must be smaller than `end`, and `xs` cannot only
+// contain zeros.
+//
+// Time: worst case O(max(n / 2 ^ `Limb::WIDTH`, m))
+//
+// Additional memory: worst case O(n)
+//
+// where n = `end` and m = `xs.len()`
+//
+// # Panics
+// Panics if `start` >= `end` or `xs` only contains zeros.
+pub_test! {limbs_neg_assign_bits(xs: &mut Vec<Limb>, start: u64, end: u64, bits: &[Limb]) {
     assert!(start < end);
     assert!(!limbs_sub_limb_in_place(xs, 1));
     limbs_assign_bits_helper(xs, start, end, bits, true);
     limbs_vec_add_limb_in_place(xs, 1);
-}
+}}
 
 impl Natural {
     fn neg_get_bits(&self, start: u64, end: u64) -> Natural {

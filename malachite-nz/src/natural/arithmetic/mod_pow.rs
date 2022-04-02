@@ -145,10 +145,9 @@ fn to_redc(out: &mut [Limb], xs: &[Limb], ms: &[Limb]) {
 //TODO tune
 const REDC_1_TO_REDC_N_THRESHOLD: usize = 100;
 
-#[doc(hidden)]
-pub fn limbs_mod_pow_odd_scratch_len(n: usize) -> usize {
+pub_test! {limbs_mod_pow_odd_scratch_len(n: usize) -> usize {
     max(limbs_modular_invert_scratch_len(n), n << 1)
-}
+}}
 
 fn square_using_basecase_mul(out: &mut [Limb], xs: &[Limb]) {
     limbs_mul_greater_to_out_basecase(out, xs, xs)
@@ -230,21 +229,20 @@ fn select_fns(
     }
 }
 
-/// Given the limbs of $x$, $E$, and odd $m$, writes the limbs of $x^E \mod m$ to an output slice.
-///
-/// `xs`, `es`, and `ms` must be nonempty and their last elements must be nonzero. $m$ must be odd,
-/// $E$ must be greater than 1, and `out` must be at least as long as `ms`. It is not required than
-/// `xs` be less than `ms`.
-///
-/// TODO complexity
-///
-/// # Panics
-/// Panics if `xs`, `es`, or `ms` are empty, if `xs` is longer than `ms`, if the first element of
-/// `ms` is even, or if $E$ less than 2.
-///
-/// This is mpn_powm from mpn/generic/powm.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_mod_pow_odd(
+// Given the limbs of $x$, $E$, and odd $m$, writes the limbs of $x^E \mod m$ to an output slice.
+//
+// `xs`, `es`, and `ms` must be nonempty and their last elements must be nonzero. $m$ must be odd,
+// $E$ must be greater than 1, and `out` must be at least as long as `ms`. It is not required than
+// `xs` be less than `ms`.
+//
+// TODO complexity
+//
+// # Panics
+// Panics if `xs`, `es`, or `ms` are empty, if `xs` is longer than `ms`, if the first element of
+// `ms` is even, or if $E$ less than 2.
+//
+// This is mpn_powm from mpn/generic/powm.c, GMP 6.2.1.
+pub_test! {limbs_mod_pow_odd(
     out: &mut [Limb],
     xs: &[Limb],
     es: &[Limb],
@@ -336,23 +334,22 @@ pub fn limbs_mod_pow_odd(
     if limbs_cmp_same_length(out, ms) != Ordering::Less {
         limbs_sub_same_length_in_place_left(out, ms);
     }
-}
+}}
 
-/// Interpreting a `Vec<Limb>` and two `&[Limb]` as the limbs (in ascending order) of three
-/// `Natural`s, `x`, `exp`, and `m`, writes the limbs of `x`<sup>`exp`</sup> mod 2<sup>`m`</sup> to
-/// an output slice. Assumes the input is already reduced mod `m`. No input may be empty or have
-/// trailing zeros, the exponent must be greater than 1, and the output slice must be at least as
-/// long as `ms`.
-///
-/// TODO complexity
-///
-/// # Panics
-/// Panics if the exponent has trailing zeros or is 1.
-///
-/// This is mpz_powm from mpn/generic/powm.c, GMP 6.2.1, where b, e, and m are non-negative.
-/// Investigate changes from 6.1.2?
-#[doc(hidden)]
-pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
+// Interpreting a `Vec<Limb>` and two `&[Limb]` as the limbs (in ascending order) of three
+// `Natural`s, `x`, `exp`, and `m`, writes the limbs of `x`<sup>`exp`</sup> mod 2<sup>`m`</sup> to
+// an output slice. Assumes the input is already reduced mod `m`. No input may be empty or have
+// trailing zeros, the exponent must be greater than 1, and the output slice must be at least as
+// long as `ms`.
+//
+// TODO complexity
+//
+// # Panics
+// Panics if the exponent has trailing zeros or is 1.
+//
+// This is mpz_powm from mpn/generic/powm.c, GMP 6.2.1, where b, e, and m are non-negative.
+// Investigate changes from 6.1.2?
+pub_test! {limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
     let ms_len = ms.len();
     let es_len = es.len();
     let xs_len = xs.len();
@@ -443,7 +440,7 @@ pub fn limbs_mod_pow(out: &mut [Limb], xs: &[Limb], es: &[Limb], ms: &[Limb]) {
         );
         limbs_add_to_out_aliased(out, ms_nonzero_len, &scratch_0_1[..ms_len]);
     }
-}
+}}
 
 impl ModPow<Natural, Natural> for Natural {
     type Output = Natural;

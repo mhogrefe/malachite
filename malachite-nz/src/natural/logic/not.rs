@@ -4,56 +4,53 @@ use natural::Natural;
 use platform::Limb;
 use std::ops::Not;
 
-/// Returns the bitwise not of a slice of limbs.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(n)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp is returned.
-#[doc(hidden)]
-pub fn limbs_not(xs: &[Limb]) -> Vec<Limb> {
+// Returns the bitwise not of a slice of limbs.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(n)
+//
+// where n = `xs.len()`
+//
+// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp is returned.
+pub_test! {limbs_not(xs: &[Limb]) -> Vec<Limb> {
     xs.iter().map(|x| !x).collect()
-}
+}}
 
-/// Writes the bitwise not of a slice of limbs to the lowest `x.len()` limbs of `out`. For this to
-/// work, `out` must be at least as long as `xs`.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp != up.
-///
-/// # Panics
-/// Panics if `out` is shorter than `xs`.
-#[doc(hidden)]
-pub fn limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
+// Writes the bitwise not of a slice of limbs to the lowest `x.len()` limbs of `out`. For this to
+// work, `out` must be at least as long as `xs`.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp != up.
+//
+// # Panics
+// Panics if `out` is shorter than `xs`.
+pub_crate_test! {limbs_not_to_out(out: &mut [Limb], xs: &[Limb]) {
     assert!(out.len() >= xs.len());
     for (x, y) in out.iter_mut().zip(xs.iter()) {
         *x = !y;
     }
-}
+}}
 
-/// Takes the bitwise not of a slice of limbs in place.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp == up.
-#[doc(hidden)]
-pub fn limbs_not_in_place(xs: &mut [Limb]) {
+// Takes the bitwise not of a slice of limbs in place.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpn_com from mpn/generic/com.c, GMP 6.1.2, where rp == up.
+pub_crate_test! {limbs_not_in_place(xs: &mut [Limb]) {
     for x in xs.iter_mut() {
         x.not_assign();
     }
-}
+}}
 
 impl Not for Natural {
     type Output = Integer;

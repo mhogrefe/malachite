@@ -4,8 +4,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{One, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::{GenConfig, TINY_LIMIT};
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::{GenConfig, TINY_LIMIT};
+use malachite_base::test_util::generators::{
     unsigned_gen_var_11, unsigned_pair_gen_var_27, unsigned_quadruple_gen_var_11,
     unsigned_vec_unsigned_pair_gen_var_23,
 };
@@ -18,17 +18,17 @@ use malachite_nz::natural::arithmetic::gcd::matrix_2_2::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::common::{
+use malachite_nz::test_util::common::{
     biguint_to_natural, natural_to_biguint, natural_to_rug_integer, rug_integer_to_natural,
 };
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     large_type_gen_var_5, large_type_gen_var_6, large_type_gen_var_7, large_type_gen_var_8,
     natural_gen, natural_pair_gen, natural_pair_gen_var_4, natural_triple_gen,
     unsigned_vec_pair_gen_var_10,
 };
 #[cfg(feature = "32_bit_limbs")]
-use malachite_nz_test_util::natural::arithmetic::gcd::half_gcd_matrix_create;
-use malachite_nz_test_util::natural::arithmetic::gcd::{
+use malachite_nz::test_util::natural::arithmetic::gcd::half_gcd_matrix_create;
+use malachite_nz::test_util::natural::arithmetic::gcd::{
     gcd_binary_nz, gcd_euclidean_nz, half_gcd_matrix_1_to_naturals, half_gcd_matrix_to_naturals,
     limbs_gcd_div_alt, limbs_gcd_div_naive, OwnedHalfGcdMatrix,
 };

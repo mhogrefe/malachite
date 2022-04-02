@@ -1,6 +1,6 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::signed_gen_var_11;
+use malachite_base::test_util::generators::signed_gen_var_11;
 use std::panic::catch_unwind;
 
 #[test]

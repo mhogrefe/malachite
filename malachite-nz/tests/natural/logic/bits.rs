@@ -1,10 +1,10 @@
 use malachite_base::num::basic::traits::Zero;
 use malachite_base::num::conversion::traits::ExactFrom;
 use malachite_base::num::logic::traits::{BitConvertible, BitIterable, SignificantBits};
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_gen_var_5};
+use malachite_base::test_util::generators::{unsigned_gen, unsigned_gen_var_5};
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_bool_vec_pair_gen_var_2, natural_gen, natural_unsigned_pair_gen_var_4,
 };
 

@@ -7,6 +7,10 @@ authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
 name = "malachite_base"
 path = "src/lib.rs"
 
+[[bin]]
+name = "malachite_base_main"
+path = "src/bin.rs"
+
 [dependencies]
 itertools = "0.9.0"
 rand = "0.7.3"
@@ -14,10 +18,17 @@ rand_chacha = "0.2.2"
 ryu = "1.0"
 sha3 = "0.9.0"
 
+clap = { version = "2.33.1", optional = true }
+gnuplot = { version = "0.0.26", optional = true }
+time = { version = "0.1.40", optional = true }
+walkdir = { version = "2", optional = true }
+
+[features]
+test_build = ["clap", "gnuplot", "time", "walkdir"]
+
 [profile.release]
 lto = true
-strip = "debuginfo"
+strip = true
 
 [dev-dependencies]
-malachite-base-test-util = { path = "../malachite-base-test-util" }
 maplit = "1.0.2"

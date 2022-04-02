@@ -2,11 +2,11 @@ use malachite_base::num::arithmetic::mod_pow::simple_binary_mod_pow;
 use malachite_base::num::arithmetic::traits::Parity;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_12, unsigned_pair_gen_var_16, unsigned_quadruple_gen_var_6,
     unsigned_quadruple_gen_var_7, unsigned_triple_gen_var_14, unsigned_triple_gen_var_15,
 };
-use malachite_base_test_util::num::arithmetic::mod_pow::naive_mod_pow;
+use malachite_base::test_util::num::arithmetic::mod_pow::naive_mod_pow;
 
 fn mod_pow_helper<T: PrimitiveUnsigned>() {
     let test = |x: T, exp: u64, m, out| {

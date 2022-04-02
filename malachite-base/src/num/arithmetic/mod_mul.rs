@@ -7,11 +7,10 @@ use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, HasHalf, JoinHalves, SplitInHalf, WrappingFrom};
 use num::logic::traits::LeadingZeros;
 
-#[doc(hidden)]
-pub fn naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
+pub_test! {naive_mod_mul<T: PrimitiveUnsigned>(x: T, y: T, m: T) -> T {
     let (product_1, product_0) = T::x_mul_y_is_zz(x, y);
     T::xx_div_mod_y_is_qr(product_1, product_0, m).1
-}
+}}
 
 const INVERT_U32_TABLE_LOG_SIZE: u64 = 9;
 
@@ -61,8 +60,7 @@ const INVERT_U32_TABLE: [u32; INVERT_U32_TABLE_SIZE] = [
     16448, 16432, 16416, 16400, 16384,
 ];
 
-/// Tests that `INVERT_U32_TABLE` is correct.
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub fn test_invert_u32_table() {
     for (i, &x) in INVERT_U32_TABLE.iter().enumerate() {
         let value = (u32::power_of_2(24) - u32::power_of_2(14) + u32::power_of_2(9))
@@ -75,20 +73,19 @@ pub fn test_invert_u32_table() {
     }
 }
 
-/// Computes
-/// $$
-/// f(x) = \left \lfloor \frac{2^{64} - 2^{32}x - 1}{x} \right \rfloor =
-///     \left \lfloor \frac{2^{64}-1}{x}-2^{32} \right \rfloor.
-/// $$
-///
-/// The highest bit of `x` must be set.
-///
-/// # Worst-case complexity
-/// Constant time and additional memory.
-///
-/// This is invert_limb from longlong.h, FLINT 2.7.1, when GMP_LIMB_BITS == 32.
-#[doc(hidden)]
-pub fn limbs_invert_limb_u32(x: u32) -> u32 {
+// Computes
+// $$
+// f(x) = \left \lfloor \frac{2^{64} - 2^{32}x - 1}{x} \right \rfloor =
+//     \left \lfloor \frac{2^{64}-1}{x}-2^{32} \right \rfloor.
+// $$
+//
+// The highest bit of `x` must be set.
+//
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is invert_limb from longlong.h, FLINT 2.7.1, when GMP_LIMB_BITS == 32.
+pub_crate_test! {limbs_invert_limb_u32(x: u32) -> u32 {
     assert!(x.get_highest_bit());
     let a = INVERT_U32_TABLE[usize::exact_from(x << 1 >> 23)];
     let b = (a << 4)
@@ -105,7 +102,7 @@ pub fn limbs_invert_limb_u32(x: u32) -> u32 {
             .upper_half()
             .wrapping_add(x),
     )
-}
+}}
 
 const INVERT_U64_TABLE_LOG_SIZE: u64 = 8;
 
@@ -132,7 +129,7 @@ const INVERT_U64_TABLE: [u64; INVERT_U64_TABLE_SIZE] = [
 ];
 
 /// Tests that `INVERT_U64_TABLE` is correct.
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub fn test_invert_u64_table() {
     for (i, &x) in INVERT_U64_TABLE.iter().enumerate() {
         let value = (u64::power_of_2(19) - 3 * u64::power_of_2(8))
@@ -145,20 +142,19 @@ pub fn test_invert_u64_table() {
     }
 }
 
-/// Computes
-/// $$
-/// f(x) = \left \lfloor \frac{2^{128} - 2^{64}x - 1}{x} \right \rfloor =
-///     \left \lfloor \frac{2^{128}-1}{x}-2^{64} \right \rfloor.
-/// $$
-///
-/// The highest bit of `x` must be set.
-///
-/// # Worst-case complexity
-/// Constant time and additional memory.
-///
-/// This is invert_limb from longlong.h, FLINT 2.7.1, when GMP_LIMB_BITS == 64.
-#[doc(hidden)]
-pub fn limbs_invert_limb_u64(x: u64) -> u64 {
+// Computes
+// $$
+// f(x) = \left \lfloor \frac{2^{128} - 2^{64}x - 1}{x} \right \rfloor =
+//     \left \lfloor \frac{2^{128}-1}{x}-2^{64} \right \rfloor.
+// $$
+//
+// The highest bit of `x` must be set.
+//
+// # Worst-case complexity
+// Constant time and additional memory.
+//
+// This is invert_limb from longlong.h, FLINT 2.7.1, when GMP_LIMB_BITS == 64.
+pub_crate_test! {limbs_invert_limb_u64(x: u64) -> u64 {
     assert!(x.get_highest_bit());
     let a = (x >> 24) + 1;
     let b = INVERT_U64_TABLE[usize::exact_from(x << 1 >> 56)];
@@ -176,11 +172,10 @@ pub fn limbs_invert_limb_u64(x: u64) -> u64 {
             .upper_half()
             .wrapping_add(x),
     )
-}
+}}
 
-/// This is n_ll_mod_preinv from ulong_extras/ll_mod_preinv.c, FLINT 2.7.1.
-#[doc(hidden)]
-pub fn limbs_mod_preinverted<
+// This is n_ll_mod_preinv from ulong_extras/ll_mod_preinv.c, FLINT 2.7.1.
+pub_test! {limbs_mod_preinverted<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -243,11 +238,10 @@ pub fn limbs_mod_preinverted<
             (r - d) >> shift
         }
     }
-}
+}}
 
-/// This is n_mulmod2_preinv from ulong_extras.h, FLINT 2.7.1.
-#[doc(hidden)]
-pub fn fast_mod_mul<
+// This is n_mulmod2_preinv from ulong_extras.h, FLINT 2.7.1.
+pub_test! {fast_mod_mul<
     T: PrimitiveUnsigned,
     DT: From<T> + HasHalf<Half = T> + JoinHalves + PrimitiveUnsigned + SplitInHalf,
 >(
@@ -259,7 +253,7 @@ pub fn fast_mod_mul<
     assert_ne!(m, T::ZERO);
     let (product_1, product_0) = (DT::from(x) * DT::from(y)).split_in_half();
     limbs_mod_preinverted::<T, DT>(product_1, product_0, m, inv)
-}
+}}
 
 macro_rules! impl_mod_mul_precomputed_fast {
     ($t:ident, $dt:ident, $invert_limb:ident) => {

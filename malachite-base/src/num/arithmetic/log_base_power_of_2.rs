@@ -1,12 +1,13 @@
 use num::arithmetic::traits::{
     CeilingLogBasePowerOf2, CheckedLogBasePowerOf2, DivMod, DivRound, FloorLogBasePowerOf2,
 };
+#[cfg(feature = "test_build")]
 use num::basic::traits::Iverson;
 use num::basic::unsigneds::PrimitiveUnsigned;
 use num::conversion::traits::{ExactFrom, SciMantissaAndExponent};
 use rounding_modes::RoundingMode;
 
-#[doc(hidden)]
+#[cfg(feature = "test_build")]
 pub fn ceiling_log_base_power_of_2_naive<T: PrimitiveUnsigned>(x: T, pow: u64) -> u64 {
     assert_ne!(x, T::ZERO);
     assert_ne!(pow, 0);

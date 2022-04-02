@@ -1,7 +1,7 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_nz::natural::Natural;
-use malachite_nz_test_util::common::natural_to_rug_integer;
-use malachite_nz_test_util::generators::natural_primitive_float_pair_gen;
+use malachite_nz::test_util::common::natural_to_rug_integer;
+use malachite_nz::test_util::generators::natural_primitive_float_pair_gen;
 use rug;
 use std::cmp::Ordering;
 use std::str::FromStr;

@@ -1,5 +1,5 @@
 use malachite_base::rational_sequences::RationalSequence;
-use malachite_base_test_util::generators::large_type_gen_var_22;
+use malachite_base::test_util::generators::large_type_gen_var_22;
 
 #[test]
 pub fn test_mutate() {

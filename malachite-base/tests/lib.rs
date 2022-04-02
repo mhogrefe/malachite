@@ -37,8 +37,6 @@ extern crate itertools;
 #[macro_use]
 extern crate malachite_base;
 #[macro_use]
-extern crate malachite_base_test_util;
-#[macro_use]
 extern crate maplit;
 extern crate rand;
 extern crate rand_chacha;

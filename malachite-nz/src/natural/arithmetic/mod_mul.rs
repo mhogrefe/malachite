@@ -11,11 +11,10 @@ use natural::InnerNatural::{Large, Small};
 use natural::Natural;
 use platform::{DoubleLimb, Limb};
 
-/// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0.
-///
-/// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
-#[doc(hidden)]
-pub fn limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
+// m_1 cannot be zero, and we cannot have m_1 == 1 and m_0 == 0.
+//
+// This is part of fmpz_mod_ctx_init from fmpz_mod/ctx_init.c, FLINT 2.7.1.
+pub_test! {limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, Limb) {
     let xs = &mut [0; 5];
     let out = &mut [0; 3];
     let bits = LeadingZeros::leading_zeros(m_1);
@@ -32,26 +31,25 @@ pub fn limbs_precompute_mod_mul_two_limbs(m_1: Limb, m_0: Limb) -> (Limb, Limb, 
     }
     assert_ne!(out[2], 0);
     (out[2], out[1], out[0])
-}
+}}
 
-/// Standard Barrett reduction: (set r = `Limb::WIDTH`)
-///
-/// We have m fits into 2 words and 2 ^ r < m < 2 ^ (2 * r). Therefore 2 ^ (3 * r) >
-/// 2 ^ (4 * r) / m > 2 ^ (2 * r) and the precomputed number inv = floor(2 ^ (4 * r) / m) fits into
-/// 3 words. The inputs x and y are < m and therefore fit into 2 words.
-///
-/// The computation of a = x*y mod m is:
-/// w = x * y               x < m ^ 2 and therefore fits into 4 words
-/// z = (w >> r) * inv      z <= m * 2 ^ (3 * r) and therefore fits into 5 words
-/// q = (z >> (3 * r)) * n  q fits into 4 words
-/// w = w - q               w fits into 3 words after the subtraction
-///
-/// at this point the canonical reduction in the range [0, m) is one of a = w, a = w - n, or
-/// a = w - 2 * m
-///
-/// This is _fmpz_mod_mul2 from fmpz_mod/mul.c, FLINT 2.7.1.
-#[doc(hidden)]
-pub fn limbs_mod_mul_two_limbs(
+// Standard Barrett reduction: (set r = `Limb::WIDTH`)
+//
+// We have m fits into 2 words and 2 ^ r < m < 2 ^ (2 * r). Therefore 2 ^ (3 * r) >
+// 2 ^ (4 * r) / m > 2 ^ (2 * r) and the precomputed number inv = floor(2 ^ (4 * r) / m) fits into
+// 3 words. The inputs x and y are < m and therefore fit into 2 words.
+//
+// The computation of a = x*y mod m is:
+// w = x * y               x < m ^ 2 and therefore fits into 4 words
+// z = (w >> r) * inv      z <= m * 2 ^ (3 * r) and therefore fits into 5 words
+// q = (z >> (3 * r)) * n  q fits into 4 words
+// w = w - q               w fits into 3 words after the subtraction
+//
+// at this point the canonical reduction in the range [0, m) is one of a = w, a = w - n, or
+// a = w - 2 * m
+//
+// This is _fmpz_mod_mul2 from fmpz_mod/mul.c, FLINT 2.7.1.
+pub_test! {limbs_mod_mul_two_limbs(
     x_1: Limb,
     x_0: Limb,
     y_1: Limb,
@@ -120,7 +118,7 @@ pub fn limbs_mod_mul_two_limbs(
     } else {
         (w_1, w_0)
     }
-}
+}}
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 #[doc(hidden)]

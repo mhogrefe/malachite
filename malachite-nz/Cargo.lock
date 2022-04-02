@@ -169,21 +169,13 @@ checksum = "efaa7b300f3b5fe8eb6bf21ce3895e1751d9665086af2d64b42f19701015ff4f"
 name = "malachite-base"
 version = "0.1.0"
 dependencies = [
+ "clap",
+ "gnuplot",
  "itertools",
  "rand",
  "rand_chacha",
  "ryu",
  "sha3",
-]
-
-[[package]]
-name = "malachite-base-test-util"
-version = "0.1.0"
-dependencies = [
- "clap",
- "gnuplot",
- "itertools",
- "malachite-base",
  "time",
  "walkdir",
 ]
@@ -194,22 +186,6 @@ version = "0.1.0"
 dependencies = [
  "itertools",
  "malachite-base",
- "malachite-base-test-util",
- "malachite-nz-test-util",
- "num",
- "rug",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "malachite-nz-test-util"
-version = "0.1.0"
-dependencies = [
- "itertools",
- "malachite-base",
- "malachite-base-test-util",
- "malachite-nz",
  "num",
  "rug",
  "serde",
@@ -444,9 +420,9 @@ checksum = "8ea5119cdb4c55b55d432abb513a0429384878c15dde60cc77b1c99de1a95a6a"
 
 [[package]]
 name = "syn"
-version = "1.0.89"
+version = "1.0.90"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea297be220d52398dcc07ce15a209fce436d361735ac1db700cab3b6cdfb9f54"
+checksum = "704df27628939572cd88d33f171cd6f896f4eaca85252c6e0a72d8d8287ee86f"
 dependencies = [
  "proc-macro2",
  "quote",

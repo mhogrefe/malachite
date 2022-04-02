@@ -2,7 +2,7 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{
     FromOtherTypeSlice, VecFromOtherType, VecFromOtherTypeSlice,
 };
-use malachite_base_test_util::generators::unsigned_gen;
+use malachite_base::test_util::generators::unsigned_gen;
 use std::fmt::Debug;
 
 #[test]

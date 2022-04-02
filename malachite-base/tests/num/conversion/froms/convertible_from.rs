@@ -3,7 +3,7 @@ use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, ConvertibleFrom};
-use malachite_base_test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
+use malachite_base::test_util::generators::{primitive_float_gen, signed_gen, unsigned_gen};
 use std::fmt::Debug;
 
 #[test]

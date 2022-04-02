@@ -1,8 +1,8 @@
 use malachite_base::num::basic::floats::PrimitiveFloat;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::primitive_float_gen_var_8;
+use malachite_base::test_util::generators::primitive_float_gen_var_8;
+use malachite_q::test_util::generators::rational_gen_var_7;
 use malachite_q::Rational;
-use malachite_q_test_util::generators::rational_gen_var_7;
 
 #[test]
 fn test_from_f32_simplest() {

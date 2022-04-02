@@ -1,6 +1,6 @@
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{JoinHalves, SplitInHalf};
-use malachite_base_test_util::generators::unsigned_gen;
+use malachite_base::test_util::generators::unsigned_gen;
 
 fn lower_half_test_helper<T: PrimitiveUnsigned + SplitInHalf>(n: T, out: T::Half)
 where

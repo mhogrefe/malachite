@@ -3,7 +3,7 @@ use malachite_base::num::arithmetic::traits::{
 };
 use malachite_base::num::basic::traits::{One, Two};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
+use malachite_base::test_util::generators::{signed_gen_var_5, unsigned_gen_var_5};
 use malachite_nz::natural::Natural;
 use malachite_q::Rational;
 

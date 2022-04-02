@@ -6,17 +6,17 @@ use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::{CheckedFrom, PowerOf2Digits};
 use malachite_base::num::logic::traits::SignificantBits;
 use malachite_base::slices::{slice_leading_zeros, slice_trailing_zeros};
-use malachite_base::vecs::vec_from_str;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_pair_gen_var_18, unsigned_pair_gen_var_5, unsigned_vec_gen,
     unsigned_vec_unsigned_pair_gen_var_10, unsigned_vec_unsigned_pair_gen_var_11,
     unsigned_vec_unsigned_pair_gen_var_2, unsigned_vec_unsigned_pair_gen_var_3,
 };
+use malachite_base::vecs::vec_from_str;
 use malachite_nz::integer::Integer;
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_vec_unsigned_pair_gen_var_1, natural_vec_unsigned_pair_gen_var_2,
 };
 use std::panic::catch_unwind;

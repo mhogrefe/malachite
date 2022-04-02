@@ -7,7 +7,7 @@ use malachite_base::num::basic::signeds::PrimitiveSigned;
 use malachite_base::num::basic::unsigneds::PrimitiveUnsigned;
 use malachite_base::num::conversion::traits::WrappingFrom;
 use malachite_base::num::float::NiceFloat;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::{
     primitive_float_gen, signed_gen_var_2, unsigned_gen, unsigned_gen_var_17,
 };
 use std::panic::catch_unwind;

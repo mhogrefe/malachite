@@ -9,20 +9,19 @@ use natural::Natural;
 use platform::Limb;
 use std::cmp::Ordering;
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, finds the lowest index greater than or equal to `starting_index` at which the
-/// `Integer` has a `false` bit. If the starting index is too large and there are no more `false`
-/// bits above it, `None` is returned.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpz_scan0 from mpz/scan0.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -> Option<u64> {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, finds the lowest index greater than or equal to `starting_index` at which the
+// `Integer` has a `false` bit. If the starting index is too large and there are no more `false`
+// bits above it, `None` is returned.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpz_scan0 from mpz/scan0.c, GMP 6.2.1.
+pub_test! {limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -> Option<u64> {
     let n = xs.len();
     let i = slice_leading_zeros(xs);
     assert!(i < n);
@@ -54,21 +53,20 @@ pub fn limbs_index_of_next_false_bit_neg(xs: &[Limb], mut starting_index: u64) -
     }
     limbs_index_of_next_true_bit(&xs[i + 1..], starting_index)
         .map(|result| result + after_boundary_offset)
-}
+}}
 
-/// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
-/// `Integer`, finds the lowest index greater than or equal to `starting_index` at which the
-/// `Integer` has a `true` bit.
-///
-/// Time: worst case O(n)
-///
-/// Additional memory: worst case O(1)
-///
-/// where n = `xs.len()`
-///
-/// This is mpz_scan1 from mpz/scan1.c, GMP 6.2.1.
-#[doc(hidden)]
-pub fn limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) -> u64 {
+// Interpreting a slice of `Limb`s as the limbs (in ascending order) of the negative of an
+// `Integer`, finds the lowest index greater than or equal to `starting_index` at which the
+// `Integer` has a `true` bit.
+//
+// Time: worst case O(n)
+//
+// Additional memory: worst case O(1)
+//
+// where n = `xs.len()`
+//
+// This is mpz_scan1 from mpz/scan1.c, GMP 6.2.1.
+pub_test! {limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) -> u64 {
     let n = xs.len();
     let i = slice_leading_zeros(xs);
     assert!(i < n);
@@ -95,7 +93,7 @@ pub fn limbs_index_of_next_true_bit_neg(xs: &[Limb], mut starting_index: u64) ->
         starting_index -= after_boundary_offset;
     }
     limbs_index_of_next_false_bit(&xs[i + 1..], starting_index) + after_boundary_offset
-}
+}}
 
 impl Natural {
     // self != 0

@@ -1,8 +1,8 @@
 use malachite_base::num::arithmetic::traits::{Abs, CheckedSqrt, Square, SquareAssign};
-use malachite_base_test_util::generators::signed_gen_var_10;
+use malachite_base::test_util::generators::signed_gen_var_10;
 use malachite_nz::integer::Integer;
 use malachite_nz::platform::{Limb, SignedLimb};
-use malachite_nz_test_util::generators::{integer_gen, integer_pair_gen, natural_gen};
+use malachite_nz::test_util::generators::{integer_gen, integer_pair_gen, natural_gen};
 use std::str::FromStr;
 
 #[test]

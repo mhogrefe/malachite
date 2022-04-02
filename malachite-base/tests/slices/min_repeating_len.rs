@@ -1,8 +1,8 @@
 use malachite_base::num::arithmetic::traits::DivisibleBy;
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::slices::min_repeating_len;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{unsigned_gen, unsigned_vec_gen_var_4};
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{unsigned_gen, unsigned_vec_gen_var_4};
 
 #[test]
 fn test_min_repeating_len() {

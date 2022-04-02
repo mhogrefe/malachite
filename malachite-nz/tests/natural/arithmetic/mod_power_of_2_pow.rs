@@ -5,8 +5,8 @@ use malachite_base::num::arithmetic::traits::{
 use malachite_base::num::basic::integers::PrimitiveInt;
 use malachite_base::num::basic::traits::{Iverson, One, Two, Zero};
 use malachite_base::num::conversion::traits::ExactFrom;
-use malachite_base_test_util::generators::common::GenConfig;
-use malachite_base_test_util::generators::{
+use malachite_base::test_util::generators::common::GenConfig;
+use malachite_base::test_util::generators::{
     unsigned_triple_gen_var_16, unsigned_vec_pair_gen_var_3,
 };
 use malachite_nz::natural::arithmetic::mod_power_of_2_pow::{
@@ -14,13 +14,13 @@ use malachite_nz::natural::arithmetic::mod_power_of_2_pow::{
 };
 use malachite_nz::natural::Natural;
 use malachite_nz::platform::Limb;
-use malachite_nz_test_util::generators::{
+use malachite_nz::test_util::generators::{
     natural_natural_natural_unsigned_quadruple_gen_var_3,
     natural_natural_natural_unsigned_quadruple_gen_var_4,
     natural_natural_unsigned_triple_gen_var_5, natural_unsigned_pair_gen,
     natural_unsigned_pair_gen_var_11, unsigned_vec_unsigned_vec_unsigned_triple_gen_var_21,
 };
-use malachite_nz_test_util::natural::arithmetic::mod_power_of_2_pow::*;
+use malachite_nz::test_util::natural::arithmetic::mod_power_of_2_pow::*;
 use std::str::FromStr;
 
 fn verify_limbs_pow_low(xs: &[Limb], es: &[Limb], out: &[Limb]) {
