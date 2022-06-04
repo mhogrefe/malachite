@@ -2,6 +2,14 @@
 name = "malachite-nz"
 version = "0.2.0"
 authors = ["Mikhail Hogrefe <mikhailhogrefe@gmail.com>"]
+rust-version = "1.61.0"
+description = "The bignum types Natural and Integer, with efficient algorithms partially derived from GMP"
+readme = "README.md"
+homepage = "https://malachite.rs/"
+repository = "https://github.com/mhogrefe/malachite"
+license = "LGPL-3.0"
+keywords = ["mathematics", "math", "numerics", "bignum"]
+categories = ["mathematics"]
 
 [lib]
 name = "malachite_nz"
